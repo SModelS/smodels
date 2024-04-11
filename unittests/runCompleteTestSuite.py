@@ -64,14 +64,17 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
         alltests._tests = [t for t in alltests._tests[:] if isInReducedSet(t) ]
 
     n_tests, n_failed = 0, 0
+    n_test = 0
     for series in alltests:
         for test in series:
             if type(test)!=unittest.suite.TestSuite:
-                print ( "%sError: could not import ``%s'' {%s}" % \
-                        ( colors.error, test, type(test) ) )
+                print ( f"{colors.error}Error: could not import ``{test}'' {type(test)}" )
                 print ( test._exception, colors.reset )
                 continue
             for t in test:
+                n_test += 1 
+                # if n_test < 190: # we can speed things up here
+                #    continue
                 if filter and (not filter in str(t)):
                     continue
                 n_tests += 1

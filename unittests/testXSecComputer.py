@@ -14,6 +14,7 @@ sys.path.insert(0,"../")
 from smodels.tools import xsecComputer, toolBox
 from smodels.tools.xsecComputer import LO, NLL
 from smodels.base.physicsUnits import TeV, fb
+from smodels.base.smodelsLogging import setLogLevel, logger
 from smodels.base import crossSection
 import tempfile
 import unittest
@@ -24,7 +25,6 @@ import logging.config
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
     logging.config.fileConfig( "./logging.conf" )
-    from smodels.base.smodelsLogging import setLogLevel,logger
     
     setLogLevel ( "warn" )
 
@@ -32,7 +32,7 @@ class XSecTest(unittest.TestCase):
 
     def testLOGlu(self):
         """ test the computation of LO cross section, pythia6 """
-        self.logger.info ( "test LO xsecs @ 8 TeV" )
+        logger.info ( "test LO xsecs @ 8 TeV" )
         slhafile= "./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( LO, 2000, 6 )
         w = computer.compute(8*TeV, slhafile ).getDictionary()
@@ -42,7 +42,7 @@ class XSecTest(unittest.TestCase):
 
     def testNLLGlu(self):
         """ test the computation of NLL cross section """
-        self.logger.info ( "test NLL xsecs @ 8 TeV" )
+        logger.info ( "test NLL xsecs @ 8 TeV" )
         slhafile="./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( NLL, 2000, 6 )
         w = computer.compute( 8*TeV, slhafile ).getDictionary()
@@ -51,7 +51,7 @@ class XSecTest(unittest.TestCase):
 
     def testLOGlu13(self):
         """ test the computation of LO cross section, pythia6 """
-        self.logger.info ( "test LO xsecs @ 13 TeV" )
+        logger.info ( "test LO xsecs @ 13 TeV" )
         slhafile="./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( LO, 3000, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
@@ -60,7 +60,7 @@ class XSecTest(unittest.TestCase):
 
     def testNLLGlu13(self):
         """ test the computation of NLL cross section with pythia6 """
-        self.logger.info ( "test NLL xsecs @ 13 TeV" )
+        logger.info ( "test NLL xsecs @ 13 TeV" )
         slhafile="./testFiles/slha/simplyGluino.slha"
         computer = xsecComputer.XSecComputer ( NLL, 3000, 6 )
         w = computer.compute( 13*TeV, slhafile ).getDictionary()
@@ -81,7 +81,7 @@ class XSecTest(unittest.TestCase):
         fnew = open(tmpfile,'w')
         fnew.write(fdata)
         fnew.close()        
-        self.logger.info ("test NLL xsecs @ 8 and 13 TeV" )
+        logger.info ("test NLL xsecs @ 8 and 13 TeV" )
         #Set overall options:
         #Options for cross section calculation:
         xargs = argparse.Namespace()
@@ -137,7 +137,7 @@ class XSecTest(unittest.TestCase):
         fnew = open(tmpfile,'w')
         fnew.write(fdata)
         fnew.close()        
-        self.logger.info ("test NLL xsecs @ 8 and 13 TeV" )
+        logger.info ("test NLL xsecs @ 8 and 13 TeV" )
         #Set overall options:
         #Options for cross section calculation:
         xargs = argparse.Namespace()
@@ -182,6 +182,7 @@ class XSecTest(unittest.TestCase):
         
     def testSSJokers(self):
         """ test the signal strength multipliers, with jokers """
+        setLogLevel ( "fatal" )
         
         slhafile="./testFiles/slha/simplyGluino.slha"
         f = open(slhafile,'r')
@@ -194,7 +195,7 @@ class XSecTest(unittest.TestCase):
         fnew = open(tmpfile,'w')
         fnew.write(fdata)
         fnew.close()        
-        self.logger.info ("test NLL xsecs @ 8 and 13 TeV" )
+        logger.info ("test NLL xsecs @ 8 and 13 TeV" )
         #Set overall options:
         #Options for cross section calculation:
         xargs = argparse.Namespace()

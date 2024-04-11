@@ -12,7 +12,9 @@ sys.path.insert(0, "../")
 
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer
 LikelihoodComputer.debug_mode = True
-from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import theoryPredictionsFor, \
+     TheoryPredictionsCombiner
+from smodels.base.smodelsLogging import setLogLevel
 from smodels.decomposition import decomposer
 from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
@@ -194,6 +196,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 
 
     def testGetCombiner(self):
+        setLogLevel ( "fatal" )
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
         parfile = "./testParameters_comb.ini"
