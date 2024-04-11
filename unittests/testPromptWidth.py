@@ -21,8 +21,7 @@ from smodels.base.physicsUnits import fb, GeV, pb
 from smodels.base.smodelsLogging import setLogLevel
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
-setLogLevel("error")
-
+setLogLevel("fatal")
 
 class RunPromptWidth(unittest.TestCase):
 
