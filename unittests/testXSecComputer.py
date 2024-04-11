@@ -101,7 +101,7 @@ class XSecTest(unittest.TestCase):
         xargs.filename = tmpfile
         xargs.colors = False
         xargs.ssmultipliers = None
-        xargs.verbosity = "warning"
+        xargs.verbosity = "error"
         #Compute LO cross sections
         xsecComputer.main(xargs)
         #Compute NLL cross sections
@@ -158,7 +158,7 @@ class XSecTest(unittest.TestCase):
         xargs.colors = False
         xargs.ssmultipliers = { (1000021,1000021): 4. }
         # xargs.ssmultipliers = { 1000021: 2. }
-        xargs.verbosity = "warning"
+        xargs.verbosity = "error"
         #Compute LO cross sections
         xsecComputer.main(xargs)
         #Compute NLL cross sections
@@ -182,7 +182,6 @@ class XSecTest(unittest.TestCase):
         
     def testSSJokers(self):
         """ test the signal strength multipliers, with jokers """
-        setLogLevel ( "fatal" )
         
         slhafile="./testFiles/slha/simplyGluino.slha"
         f = open(slhafile,'r')
@@ -216,7 +215,7 @@ class XSecTest(unittest.TestCase):
         xargs.colors = False
         xargs.ssmultipliers = { ('*100002?','*1000021'): 4. }
         # xargs.ssmultipliers = { 1000021: 2. }
-        xargs.verbosity = "warning"
+        xargs.verbosity = "error"
         #Compute LO cross sections
         xsecComputer.main(xargs)
         #Compute NLL cross sections
