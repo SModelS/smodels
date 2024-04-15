@@ -368,11 +368,12 @@ class TheoryPrediction(object):
         # Compute likelihoods and related parameters:
         llhdDict = self.statsComputer.get_five_values(expected = expected,
                      return_nll = True )
-        self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
-        self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
-        self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
-        self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
-        self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
+        if llhdDict not in [ None, {} ]:
+            self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
+            self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
+            self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
+            self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
+            self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
 
 class TheoryPredictionsCombiner(TheoryPrediction):
@@ -691,7 +692,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            if not isinstance(theoPred.dataset,CombinedDataSet) and "CR" in theoPred.dataset.dataInfo.dataId: # Individual CRs shouldn't give results
+            if not isinstance(theoPred.dataset,CombinedDataSet) and not theoPred.dataset.dataInfo.dataId is None and "CR" in theoPred.dataset.dataInfo.dataId: # Individual CRs shouldn't give results
                 theoPred.upperLimit = None
             else:
                 theoPred.upperLimit = theoPred.getUpperLimit()

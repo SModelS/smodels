@@ -96,6 +96,8 @@ class PyhfData:
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}
+        if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
+            jsonFiles = dict( zip( [ "dummy%d" % i for i in range(len(inputJsons)) ], [ "" for i in range(len(inputJsons)) ] ) )
         self.jsonFiles = jsonFiles
         self.includeCRs = includeCRs
         self.signalUncertainty = signalUncertainty
@@ -148,7 +150,7 @@ class PyhfData:
                 if "CR" in ch["name"]:
                     nbCRinWS += 1
             if nbCRwithEM and nbCRwithEM != nbCRinWS:
-                logger.warning(f"Number of CRs in workspace: {nbCRwithEM} but number of CRs with EM: {nbCRwithEM}. Signal in CRs will not be patched.")
+                logger.warning(f"Number of CRs in workspace: {nbCRinWS} but number of CRs with EM: {nbCRwithEM}. Signal in CRs will not be patched.")
             if nbCRwithEM != 0 and not self.includeCRs:
                 logger.warning("EM in CRs but includeCRs == False. Signal in CRs will not be patched.")
             for i_ch, ch in enumerate(ws["channels"]):
