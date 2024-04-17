@@ -687,7 +687,9 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 expResults = sum(dataSetResults)
             else:
                 expResults = TheoryPredictionList()
-                expResults.append(_getBestResult(dataSetResults)) # Best result = combination if available
+                bestRes = _getBestResult(dataSetResults)
+                if not bestRes is None:
+                    expResults.append(bestRes) # Best result = combination if available
 
         for theoPred in expResults:
             theoPred.expResult = expResult
@@ -720,6 +722,9 @@ def _getCombinedResultFor(dataSetResults, expResult):
     :return: TheoryPrediction object
     """
 
+    if all([True if "CR" in predList[0].dataset.dataInfo.dataId else False for predList in dataSetResults]): # Don't give combined result if all regions are CRs
+        return None
+        
     if len(dataSetResults) == 1:
         return dataSetResults[0]
     elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
@@ -792,6 +797,7 @@ def _getBestResult(dataSetResults):
     # select the best one according to the expected upper limit:
     bestExpectedR = 0.0
     bestXsec = 0.0*fb
+    bestPred = None
     for predList in dataSetResults:
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
