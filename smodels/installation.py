@@ -151,7 +151,7 @@ def version( return_tuple : bool = False ) -> Union[str,Tuple]:
     if not return_tuple:
         return l
     import re
-    ret = re.split("\.|-",l)
+    ret = re.split("\\.|-",l)
     for i,r in enumerate(ret):
         try:
             ret[i]=int(r)

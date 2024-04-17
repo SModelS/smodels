@@ -19,7 +19,7 @@ from smodels.decomposition import decomposer
 
 class AsciiTest(unittest.TestCase):
     def orig(self):
-        return """ /------------\\
+        return r""" /------------\
  |    q  q    |
  |    \ /     |
  | ----*----  |
