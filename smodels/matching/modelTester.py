@@ -92,7 +92,7 @@ def testPoint(inputFile, outputDir, parser, database):
 
     printParameters = OrderedDict(printParameters)
     outputStatus = ioObjects.OutputStatus(inputStatus.status, inputFile,
-                                          printParameters, 
+                                          printParameters,
                                           database.databaseVersion)
     masterPrinter.addObj(outputStatus)
     if outputStatus.status < 0:
@@ -121,7 +121,7 @@ def testPoint(inputFile, outputDir, parser, database):
             ignorePromptQNumbers = ignorePromptQNumbers.replace(" ","")
             ignorePromptQNumbers = ignorePromptQNumbers.split(",")
         model.updateParticles(inputFile=inputFile,
-                              promptWidth=promptWidth, 
+                              promptWidth=promptWidth,
                               stableWidth=stableWidth,
                               ignorePromptQNumbers=ignorePromptQNumbers)
     except SModelSError as e:
@@ -186,7 +186,7 @@ def testPoint(inputFile, outputDir, parser, database):
         pass
 
     allPredictions = theoryPredictionsFor(database, smstoplist,
-                                          useBestDataset=useBest, 
+                                          useBestDataset=useBest,
                                           combinedResults=combineResults)
 
     """Compute chi-square and likelihood"""
@@ -201,6 +201,7 @@ def testPoint(inputFile, outputDir, parser, database):
 
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
+        theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if not "CR" in os.path.basename(tp.dataset.path)] # Do not print CRs "results"
         masterPrinter.addObj(theoryPredictions)
     else:
         outputStatus.updateStatus(0)  # no results after enforcing maxcond
@@ -319,7 +320,7 @@ def _determineNCPus(cpus_wanted, n_files):
     return ncpus
 
 
-def testPoints(fileList, inDir, outputDir, parser, database, 
+def testPoints(fileList, inDir, outputDir, parser, database,
                timeout, development, parameterFile):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
@@ -504,7 +505,7 @@ def loadDatabaseResults(parser, database):
     database.selectExpResults(analysisIDs=analyses, txnames=txnames,
                                  datasetIDs=datasetIDs, dataTypes=dataTypes,
                                  useNonValidated=useNonValidated)
-    
+
 
 def getParameters(parameterFile):
     """
@@ -590,4 +591,3 @@ def getCombiner(inputFile,parameterFile):
 
 
     return combiner
-

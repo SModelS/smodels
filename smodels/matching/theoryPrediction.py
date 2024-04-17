@@ -684,7 +684,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 if combinedRes is not None:
                     dataSetResults.append(TheoryPredictionList([combinedRes]))
             if not useBestDataset: #  Report all datasets
-                expResults = sum(dataSetResults) 
+                expResults = sum(dataSetResults)
             else:
                 expResults = TheoryPredictionList()
                 expResults.append(_getBestResult(dataSetResults)) # Best result = combination if available
@@ -692,7 +692,10 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            theoPred.upperLimit = theoPred.getUpperLimit()
+            if not isinstance(theoPred.dataset,CombinedDataSet) and not theoPred.dataset.dataInfo.dataId is None and "CR" in theoPred.dataset.dataInfo.dataId: # Individual CRs shouldn't give results
+                theoPred.upperLimit = None
+            else:
+                theoPred.upperLimit = theoPred.getUpperLimit()
         expResults.sortTheoryPredictions()
 
         for theoPred in expResults:
@@ -778,7 +781,7 @@ def _getBestResult(dataSetResults):
     # return the single result:
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    
+
     # If combination is included, always return it
     for predList in dataSetResults:
         for tp in predList:
@@ -794,6 +797,8 @@ def _getBestResult(dataSetResults):
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
         dataset = predList[0].dataset
+        if "CR" in dataset.dataInfo.dataId: # A CR cannot be the best SR
+            continue
         if dataset.getType() != "efficiencyMap":
             txt = (
                 "Multiple data sets should only exist for efficiency map results, but we have them for %s?"

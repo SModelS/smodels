@@ -26,10 +26,10 @@ from typing import Union, Text
 class StatsComputer:
     __slots__ = [ "nsig", "dataObject", "dataType", "likelihoodComputer", "data",
                   "upperLimitComputer", "deltas_sys", "allowNegativeSignals" ]
-    
+
     def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list], dataType : str,
                    nsig : Union[None,float,List] = None,
-                   deltas_rel : Union[None,float] = None, 
+                   deltas_rel : Union[None,float] = None,
                    allowNegativeSignals : bool = False):
         """
          Initialise.
@@ -63,11 +63,11 @@ class StatsComputer:
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a StatsComputer
-        """        
-        computer = StatsComputer(dataObject=dataset,  
-                                 dataType="1bin", 
+        """
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="1bin",
                                  nsig=nsig, deltas_rel=deltas_rel)
-        
+
         computer.getComputerSingleBin( )
 
         return computer
@@ -82,11 +82,11 @@ class StatsComputer:
 
         :returns: a StatsComputer
         """
-        
-        computer = StatsComputer(dataObject=dataset,  
-                                 dataType="SL", 
+
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="SL",
                                  nsig=nsig, deltas_rel=deltas_rel)
-        
+
         computer.getComputerMultiBinSL( )
 
         return computer
@@ -101,10 +101,10 @@ class StatsComputer:
 
         :returns: a StatsComputer
         """
-        computer = StatsComputer(dataObject=dataset,  
-                                 dataType="pyhf", 
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="pyhf",
                                  nsig=nsig, deltas_rel=deltas_rel)
-        
+
         computer.getComputerPyhf( )
 
         return computer
@@ -135,10 +135,10 @@ class StatsComputer:
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
         computer = StatsComputer(dataObject=theorypred.dataset,
-                                 dataType="truncGaussian", 
+                                 dataType="truncGaussian",
                                  nsig=0.,
                                  allowNegativeSignals=True)
-        
+
         computer.getComputerTruncGaussian( **kwargs)
 
         return computer
@@ -150,16 +150,16 @@ class StatsComputer:
         :param deltas_rel: relative error for the signal
         :returns: a StatsComputer
         """
-        
+
         # Only allow negative signal if all theory predictions allow for it
         allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
                                     for tp in theoryPredictions])
 
-        computer = StatsComputer(dataObject=theoryPredictions,  
-                                 dataType="analysesComb", 
+        computer = StatsComputer(dataObject=theoryPredictions,
+                                 dataType="analysesComb",
                                  nsig=None, deltas_rel=deltas_rel,
                                  allowNegativeSignals=allowNegativeSignals)
-        
+
         computer.getComputerAnalysesComb( )
 
         return computer
@@ -167,7 +167,7 @@ class StatsComputer:
     def getComputerSingleBin(self):
         """
         Create computer from a single bin
-        
+
         """
 
         dataset = self.dataObject
@@ -233,12 +233,20 @@ class StatsComputer:
                 logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
         logger.debug("list of datasets: {}".format(datasets))
         logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+        includeCRs = False
+        if hasattr(globalInfo,'includeCRs'):
+            includeCRs = globalInfo.includeCRs
+        signalUncertainty = None
+        if hasattr(globalInfo,"signalUncertainty"):
+            signalUncertainty = globalInfo.signalUncertainty
         # Constructing the list of signals with subsignals matching each json
         nsignals = list()
         for jsName in jsonFiles:
             subSig = list()
             for srName in globalInfo.jsonFiles[jsName]:
                 try:
+                    if 'CR' in srName and not includeCRs: # Allow signal to leak in CRs only if they are kept
+                        continue
                     index = datasets.index(srName)
                 except ValueError:
                     line = (
@@ -250,15 +258,10 @@ class StatsComputer:
             nsignals.append(subSig)
         # Loading the jsonFiles, unless we already have them (because we pickled)
         nsig = self.nsig
-        data = PyhfData(nsignals, jsons, jsonFiles)
+        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty)
         if data.errorFlag:
             return None
-        if hasattr(globalInfo, "includeCRs"):
-            includeCRs = globalInfo.includeCRs
-        else:
-            includeCRs = False
-        self.upperLimitComputer = PyhfUpperLimitComputer(data, includeCRs=includeCRs,
-                                            lumi=self.dataObject.getLumi() )
+        self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
 
     def getComputerTruncGaussian ( self, **kwargs ):
@@ -276,7 +279,7 @@ class StatsComputer:
         :param nsig: signal yields.
         """
 
-        self.upperLimitComputer = AnaCombLikelihoodComputer(theoryPredictions=self.dataObject, 
+        self.upperLimitComputer = AnaCombLikelihoodComputer(theoryPredictions=self.dataObject,
                                                             deltas_rel=self.deltas_sys)
         self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
 
@@ -284,8 +287,8 @@ class StatsComputer:
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """
-        Return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
-        
+        Return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
+
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
                                  correct, if necessary
         """
@@ -359,7 +362,7 @@ class StatsComputer:
     def maximize_likelihood ( self, expected : Union[bool,Text],
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
-        :param return_nll: if True, return negative log likelihood 
+        :param return_nll: if True, return negative log likelihood
         :returns: Dictionary of llhd (llhd at mu_hat), \
                   muhat, sigma_mu (sigma of mu_hat), \
                   optionally also theta_hat
@@ -378,7 +381,7 @@ class StatsComputer:
             kwargs["expected"]=expected
 
         ret = self.likelihoodComputer.lmax ( return_nll = return_nll,
-                                   allowNegativeSignals = self.allowNegativeSignals, 
+                                   allowNegativeSignals = self.allowNegativeSignals,
                                    **kwargs )
         return ret
 
@@ -386,7 +389,7 @@ class StatsComputer:
            limit_on_xsec : bool = False ) -> float:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
-        
+
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
         """

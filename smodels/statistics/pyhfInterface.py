@@ -17,7 +17,7 @@ from scipy import optimize
 import numpy as np
 from smodels.base.smodelsLogging import logger
 import logging
-import warnings
+logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
 
 jsonver = ""
@@ -77,9 +77,7 @@ except pyhf.exceptions.ImportBackendError as e:
 
     warnings.filterwarnings("ignore", r"invalid value encountered in log")
 
-
 countWarning = {"llhdszero": 0}
-# logger=getLogger()
 
 
 class PyhfData:
@@ -91,14 +89,18 @@ class PyhfData:
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, jsonFiles=None ):
+    def __init__(self, nsignals, inputJsons, jsonFiles=None, includeCRs=False, signalUncertainty=None):
         self.nsignals = nsignals  # fb
         self.getTotalYield()
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}
+        if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
+            jsonFiles = dict( zip( [ "dummy%d" % i for i in range(len(inputJsons)) ], [ "" for i in range(len(inputJsons)) ] ) )
         self.jsonFiles = jsonFiles
+        self.includeCRs = includeCRs
+        self.signalUncertainty = signalUncertainty
         self.combinations = None
         if jsonFiles != None:
             self.combinations = [os.path.splitext(os.path.basename(js))[0] for js in jsonFiles]
@@ -119,7 +121,7 @@ class PyhfData:
 
         :ivar channelsInfo: list of dictionaries (one dictionary for each json file) containing useful information about the json files
             - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
-            - :key otherRegions: list of strings indicating the path to the control and validation region channels
+            - :key otherRegions: list of dictionnaries indicating the path and the name of the control and/or validation region channels
         """
         # Identifying the path to the SR and VR channels in the main workspace files
         self.channelsInfo = []  # workspace specifications
@@ -127,7 +129,7 @@ class PyhfData:
             logger.error("The 'inputJsons' parameter must be of type list")
             self.errorFlag = True
             return
-        for ws in self.inputJsons:
+        for ws, jsName in zip(self.inputJsons, [js for js in self.jsonFiles]):
             wsChannelsInfo = {}
             wsChannelsInfo["signalRegions"] = []
             wsChannelsInfo["otherRegions"] = []
@@ -139,8 +141,20 @@ class PyhfData:
                 )
                 self.channelsInfo = None
                 return
+            nbCRwithEM = 0
+            nbCRinWS = 0
+            for dataset in self.jsonFiles[jsName]:
+                if "CR" in dataset:
+                    nbCRwithEM += 1
+            for ch in ws["channels"]:
+                if "CR" in ch["name"]:
+                    nbCRinWS += 1
+            if nbCRwithEM and nbCRwithEM != nbCRinWS:
+                logger.warning(f"Number of CRs in workspace: {nbCRinWS} but number of CRs with EM: {nbCRwithEM}. Signal in CRs will not be patched.")
+            if nbCRwithEM != 0 and not self.includeCRs:
+                logger.warning("EM in CRs but includeCRs == False. Signal in CRs will not be patched.")
             for i_ch, ch in enumerate(ws["channels"]):
-                if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
+                if "SR" in ch["name"] or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
                     wsChannelsInfo["signalRegions"].append(
                         {
                             "path": "/channels/"
@@ -150,9 +164,9 @@ class PyhfData:
                         }
                     )  # Number of bins
                 else:
-                    wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
+                    wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': ch["name"]})
             wsChannelsInfo["otherRegions"].sort(
-                key=lambda path: path.split("/")[-1], reverse=True
+                key=lambda path: int(path['path'].split("/")[-1]), reverse=True
             )  # Need to sort correctly the paths to the channels to be removed
             self.channelsInfo.append(wsChannelsInfo)
 
@@ -197,7 +211,7 @@ class PyhfUpperLimitComputer:
     Class that computes the upper limit using the jsons files and signal informations in the 'data' instance of 'PyhfData'
     """
 
-    def __init__(self, data, cl=0.95, includeCRs=False, lumi=None ):
+    def __init__(self, data, cl=0.95, lumi=None ):
         """
 
         :param data: instance of 'PyhfData' holding the signals information
@@ -224,7 +238,7 @@ class PyhfUpperLimitComputer:
         self.channelsInfo = self.data.channelsInfo
         self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.nWS = self.data.nWS
-        self.includeCRs = includeCRs
+        self.includeCRs = data.includeCRs
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
         self.workspaces_expected = self.wsMaker(apriori=True)
@@ -284,7 +298,7 @@ class PyhfUpperLimitComputer:
 
     def patchMaker(self):
         """
-        Method that creates the list of patches to be applied to the self.inputJsons workspaces, one for each region given the 'self.nsignals and the informations available in self.channelsInfo and the content of the self.inputJsons
+        Method that creates the list of patches to be applied to the self.inputJsons workspaces, one for each region given the self.nsignals and the informations available in self.channelsInfo and the content of the self.inputJsons
         NB: It seems we need to include the change of the "modifiers" in the patches as well
 
         :return: the list of patches, one for each workspace
@@ -292,7 +306,6 @@ class PyhfUpperLimitComputer:
 
         if self.channelsInfo == None:
             return None
-        nsignals = self.nsignals
         # Constructing the patches to be applied on the main workspace files
         patches = []
         for ws, info, subSig in zip(self.inputJsons, self.channelsInfo, self.nsignals):
@@ -308,14 +321,23 @@ class PyhfUpperLimitComputer:
                 value["modifiers"] = []
                 value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
                 value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
+                if self.data.signalUncertainty is not None and self.data.signalUncertainty != 0:
+                    # Uncomment the line below to add a MC statistical uncertainty.
+                    # value["modifiers"].append({"data": [sigBin*self.data.signalUncertainty for sigBin in value["data"]], "type": "staterror", "name": "MCError"})
+                    value["modifiers"].append({"data": {"hi_data": [sigBin*(1+self.data.signalUncertainty) for sigBin in value["data"]],
+                                                        "lo_data": [sigBin*(1-self.data.signalUncertainty) for sigBin in value["data"]]
+                                                       },
+                                               "type": "histosys",
+                                               "name": "signalUncertainty"
+                                              })
                 value["name"] = "bsm"
                 operator["value"] = value
                 patch.append(operator)
-            if self.includeCRs:
-                logger.debug("keeping the CRs")
-            else:
-                for path in info["otherRegions"]:
-                    patch.append({"op": "remove", "path": path})
+            for region in info["otherRegions"]:
+                if 'CR' in region['name'] and self.includeCRs:
+                    continue
+                else:
+                    patch.append({"op": "remove", "path": region['path']})
             patches.append(patch)
         return patches
 
@@ -484,7 +506,7 @@ class PyhfUpperLimitComputer:
                     for i, ns in enumerate(self.data.nsignals):
                         for j, v in enumerate(ns):
                             self.data.nsignals[i][j] = v * mu
-                self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
+                self.__init__(self.data, self.cl, self.lumi)
                 ### allow this, for computation of l_SM
                 # if self.zeroSignalsFlag[workspace_index] == True:
                 #    logger.warning("Workspace number %d has zero signals" % workspace_index)
@@ -659,7 +681,7 @@ class PyhfUpperLimitComputer:
                 "Values in x were outside bounds during a minimize step, clipping to bounds",
             )
 
-            self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
+            self.__init__(self.data, self.cl, self.lumi)
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index != None:
@@ -697,7 +719,6 @@ class PyhfUpperLimitComputer:
                         _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
-
                     except (pyhf.exceptions.FailedMinimization,ValueError) as e:
                         pass
                     if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
@@ -705,11 +726,16 @@ class PyhfUpperLimitComputer:
                     else:
                         _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
-
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
+                        if abs ( sigma_mu_temp - 1.0 ) < 1e-8: # Fischer information is nonsense
+                            #Calculate inv_hess numerically
+                            inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                            sigma_mu_temp = float ( np.sqrt ( inv_hess))
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
-#                    sigma_mu = float ( o.unc[model.config.poi_index] ) * self.scale
+                        else: # sigma_mu is still nonsense
+                            logger.warning("sigma_mu computation failed, even with inv_hess numercially computed. sigma_mu will be set to 1.")
+                            sigma_mu = 1.
 
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 if pyhfinfo["backend"] == "pytorch":
@@ -801,7 +827,7 @@ class PyhfUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        self.__init__(self.data, self.cl, self.includeCRs, self.lumi)
+        self.__init__(self.data, self.cl, self.lumi)
         if workspace_index in self.data.cachedULs[expected]:
             ret = self.data.cachedULs[expected][workspace_index]
             return ret
