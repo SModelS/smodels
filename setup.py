@@ -143,7 +143,6 @@ setup(
               'smodels.matching',
               'smodels.tools',
               'smodels.base',
-              'smodels.theory',
               'smodels.statistics',
               'smodels.experiment'],
     include_package_data = True,
