@@ -267,7 +267,7 @@ def runSingleFile(inputFile, outputDir, parser, database,
 
 def runSetOfFiles(inputFiles, outputDir, parser, database,
                   timeout, development, parameterFile, 
-                  runnerid, return_dict ):
+                  return_dict ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -364,9 +364,11 @@ def testPoints(fileList, inDir, outputDir, parser, database,
             logger.addHandler(fileLog)
 
             # Run a single process:
-            outputDict = runSetOfFiles(cleanedList, outputDir, parser,
-                                       database, timeout,
-                                       development, parameterFile, 0 )
+            outputDict = {}
+            runSetOfFiles(cleanedList, outputDir, parser,
+                            database, timeout,
+                            development, parameterFile, 
+                            outputDict )
         else:
             logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
                         % (nFiles, ncpus))
@@ -384,9 +386,9 @@ def testPoints(fileList, inDir, outputDir, parser, database,
             from multiprocessing import Process, Manager
             manager = Manager()
             outputDict = manager.dict()
-            for ctr,chunkFile in enumerate(chunkedFiles):
+            for chunkFile in chunkedFiles:
                 args = ( chunkFile, outputDir, parser, database, timeout, 
-                         development, parameterFile, ctr, outputDict )
+                         development, parameterFile, outputDict )
                 p = Process ( target=runSetOfFiles, args = args )
                 p.start()
                               

@@ -317,6 +317,7 @@ class Model(object):
             particle.totalwidth = abs(particleData.totalwidth)*GeV
             broadWidth = 0.01
             if particle.totalwidth > broadWidth*particle.mass:
+                # Check if the particle can decay to SM only:
                 logger.warning("Particle %s has a total width/mass = %1.2f. Some results may not be valid for broad resonances!" %(str(particle),float(particle.totalwidth/particle.mass)))
             if particle.totalwidth < stableWidth:
                 particle._isStable = True  # Treat particle as stable
