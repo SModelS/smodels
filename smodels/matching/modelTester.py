@@ -31,7 +31,6 @@ from smodels.tools import coverage
 
 
 from collections import OrderedDict
-import multiprocessing
 import os
 import sys
 import time
@@ -267,7 +266,8 @@ def runSingleFile(inputFile, outputDir, parser, database,
 
 
 def runSetOfFiles(inputFiles, outputDir, parser, database,
-                  timeout, development, parameterFile):
+                  timeout, development, parameterFile, 
+                  return_dict ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -280,14 +280,10 @@ def runSetOfFiles(inputFiles, outputDir, parser, database,
     :returns: printers output
     """
 
-    output = {}
     for inputFile in inputFiles:
-        output.update(runSingleFile(inputFile, outputDir, parser, database,
-                                    timeout, development, parameterFile))
-        gc.collect()
-
-    return output
-
+        tmp=runSingleFile(inputFile, outputDir, parser, database,
+                          timeout, development, parameterFile)
+        return_dict.update ( tmp )
 
 def _cleanList(fileList, inDir):
     """ clean up list of files """
@@ -368,9 +364,11 @@ def testPoints(fileList, inDir, outputDir, parser, database,
             logger.addHandler(fileLog)
 
             # Run a single process:
-            outputDict = runSetOfFiles(cleanedList, outputDir, parser,
-                                       database, timeout,
-                                       development, parameterFile)
+            outputDict = {}
+            runSetOfFiles(cleanedList, outputDir, parser,
+                            database, timeout,
+                            development, parameterFile, 
+                            outputDict )
         else:
             logger.info("Running SModelS for %i files with %i processes. Messages will be redirected to smodels.log"
                         % (nFiles, ncpus))
@@ -384,14 +382,26 @@ def testPoints(fileList, inDir, outputDir, parser, database,
             # Launch multiple processes.
             # Split list of files
             chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
-            pool = multiprocessing.Pool(processes=ncpus)
             children = []
+            from multiprocessing import Process, Manager
+            manager = Manager()
+            outputDict = manager.dict()
             for chunkFile in chunkedFiles:
-                p = pool.apply_async(runSetOfFiles, args=(chunkFile, outputDir, parser,
-                                                          database, timeout,
-                                                          development, parameterFile,))
+                args = ( chunkFile, outputDir, parser, database, timeout, 
+                         development, parameterFile, outputDict )
+                p = Process ( target=runSetOfFiles, args = args )
+                p.start()
+                              
                 children.append(p)
-            pool.close()
+            ctr = 0
+            nsteps = 10
+            for p in children:
+                p.join()
+                ctr+=1
+                if ctr % nsteps == 10:
+                    t=(time.time()-t0)/60.
+                    logger.info ( f"{ctr} of {len(children)} processes done in {t:.2f} min" )
+            """
             iprint, nprint = 5, 5  # Define when to start printing and the percentage step
             # Check process progress until they are all finished
             while True:
@@ -407,10 +417,7 @@ def testPoints(fileList, inDir, outputDir, parser, database,
                 time.sleep(2)
 
             logger.debug("All children terminated")
-
-            outputDict = {}
-            for p in children:
-                outputDict.update(p.get())
+            """
 
         # Collect output to build global summary:
         scanSummaryFile = os.path.join(outputDir, 'summary.txt')
