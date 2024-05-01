@@ -377,7 +377,7 @@ class Model(object):
 
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
-                        roundMasses = 1, ignorePromptQNumbers=[], 
+                        roundMasses = 1, ignorePromptQNumbers=[],
                         minMass=1.0*GeV):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
