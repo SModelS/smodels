@@ -1,0 +1,7 @@
+dataId: CR_ewk_VV_high
+dataType: efficiencyMap
+observedN: 687
+expectedBG: 1
+bgError: 1
+upperLimit: 10000000.0*fb
+expectedUpperLimit: 10000000.0*fb

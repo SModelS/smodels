@@ -1,0 +1,7 @@
+dataId: SR_ewk_2l_mm_med_a
+dataType: efficiencyMap
+observedN: 16
+expectedBG: 14.6
+bgError: 2.9
+upperLimit: 0.08398*fb
+expectedUpperLimit: 0.07771*fb

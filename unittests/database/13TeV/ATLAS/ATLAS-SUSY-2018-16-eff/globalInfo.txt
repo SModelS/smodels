@@ -1,0 +1,16 @@
+id: ATLAS-SUSY-2018-16
+sqrts: 13*TeV
+lumi: 139/fb
+prettyName: 2 soft l + jets, EWK
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-16/
+arxiv: http://arxiv.org/abs/1911.12606
+publication: Phys. Rev. D 101 (2020) 052005
+publicationDOI: http://doi.org/10.1103/PhysRevD.101.052005
+contact: atlas-phys-susy-conveners@cern.ch
+comment: Be careful when testing models allowing for the production of only electrons or muons against this analysis. The EMs in the slepton CRs are correct only if both leptons can be produced. Moreover, but not related, SR_ewk_1l1T, SR_ewk_2l_low, SR_ewk_2l_med and SR_ewk_2l_high are inclusive SRs with different mass plane than the exclusive ones. Fake individual json files were created in order for SModelS to get a result from them even when the combination of SRs is on.
+private: False
+implementedBy: Timothee Pascal
+lastUpdate: 2024/4/24
+jsonFiles: {'orig/EWKinos_bkgonly_SR2lOnly.json': ['CR_ewk_VV_high', 'CR_ewk_VV_low', 'CR_ewk_tau_high', 'CR_ewk_tau_low', 'CR_ewk_top_high', 'CR_ewk_top_low', 'SR_ewk_2l_ee_high_c', 'SR_ewk_2l_ee_low_c', 'SR_ewk_2l_ee_med_c', 'SR_ewk_2l_ee_high_d', 'SR_ewk_2l_ee_low_d', 'SR_ewk_2l_ee_med_d', 'SR_ewk_2l_ee_high_e', 'SR_ewk_2l_ee_low_e', 'SR_ewk_2l_ee_med_e', 'SR_ewk_2l_ee_high_f', 'SR_ewk_2l_ee_low_f', 'SR_ewk_2l_ee_med_f', 'SR_ewk_2l_ee_high_g', 'SR_ewk_2l_ee_low_g', 'SR_ewk_2l_ee_high_h', 'SR_ewk_2l_ee_low_h', 'SR_ewk_2l_mm_high_a', 'SR_ewk_2l_mm_low_a', 'SR_ewk_2l_mm_med_a', 'SR_ewk_2l_mm_high_b', 'SR_ewk_2l_mm_low_b', 'SR_ewk_2l_mm_med_b', 'SR_ewk_2l_mm_high_c', 'SR_ewk_2l_mm_low_c', 'SR_ewk_2l_mm_med_c', 'SR_ewk_2l_mm_high_d', 'SR_ewk_2l_mm_low_d', 'SR_ewk_2l_mm_med_d', 'SR_ewk_2l_mm_high_e', 'SR_ewk_2l_mm_low_e', 'SR_ewk_2l_mm_med_e', 'SR_ewk_2l_mm_high_f', 'SR_ewk_2l_mm_low_f', 'SR_ewk_2l_mm_med_f', 'SR_ewk_2l_mm_high_g', 'SR_ewk_2l_mm_low_g', 'SR_ewk_2l_mm_high_h', 'SR_ewk_2l_mm_low_h'], 'orig/Sleptons_bkgonly.json': ['CR_slep_VV_high', 'CR_slep_VV_low', 'CR_slep_tau_high', 'CR_slep_tau_low', 'CR_slep_top_high', 'CR_slep_top_low', 'SR_slep_2l_ee_high_a', 'SR_slep_2l_ee_low_a', 'SR_slep_2l_ee_high_b', 'SR_slep_2l_ee_low_b', 'SR_slep_2l_ee_high_c', 'SR_slep_2l_ee_low_c', 'SR_slep_2l_ee_high_d', 'SR_slep_2l_ee_low_d', 'SR_slep_2l_ee_high_e', 'SR_slep_2l_ee_low_e', 'SR_slep_2l_ee_high_f', 'SR_slep_2l_ee_low_f', 'SR_slep_2l_ee_high_g', 'SR_slep_2l_ee_low_g', 'SR_slep_2l_ee_high_h', 'SR_slep_2l_ee_low_h', 'SR_slep_2l_mm_high_a', 'SR_slep_2l_mm_low_a', 'SR_slep_2l_mm_high_b', 'SR_slep_2l_mm_low_b', 'SR_slep_2l_mm_high_c', 'SR_slep_2l_mm_low_c', 'SR_slep_2l_mm_high_d', 'SR_slep_2l_mm_low_d', 'SR_slep_2l_mm_high_e', 'SR_slep_2l_mm_low_e', 'SR_slep_2l_mm_high_f', 'SR_slep_2l_mm_low_f', 'SR_slep_2l_mm_high_g', 'SR_slep_2l_mm_low_g', 'SR_slep_2l_mm_high_h', 'SR_slep_2l_mm_low_h'], 'orig/SR_ewk_1l1T_bkgonly.json': ['SR_ewk_1l1T'], 'orig/SR_ewk_2l_low_bkgonly.json': ['SR_ewk_2l_low'], 'orig/SR_ewk_2l_med_bkgonly.json': ['SR_ewk_2l_med'], 'orig/SR_ewk_2l_high_bkgonly.json': ['SR_ewk_2l_high']}
+includeCRs: True
+signalUncertainty: 0.22

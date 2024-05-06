@@ -1,0 +1,75 @@
+{
+    "channels": [
+        {
+            "name": "SRee_cuts",
+            "samples": [
+                {
+                    "data": [
+                        202.5
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi": 1.040,
+                                "lo": 0.960
+                            },
+                            "name": "ucbSRee",
+                            "type": "normsys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    },
+                    {
+                        "bounds": [
+                            [
+                                0.0,
+                                10.0
+                            ]
+                        ],
+                        "fixed": false,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "mu_SIG"
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                199
+            ],
+            "name": "SRee_cuts"
+        }
+    ],
+    "version": "1.0.0"
+}

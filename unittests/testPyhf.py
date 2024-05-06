@@ -350,6 +350,55 @@ class PyhfTest(unittest.TestCase):
             CLs = float(result)
         self.assertAlmostEqual(CLs, 0.05, 2)
 
+    def testPatchUncertaintyAndCRs(self):
+        """
+        Test if signal uncertainty and signal in the CRs are pathed, with ATLAS-SUSY-2018-16 as a test case
+        """
+        from smodels.base.physicsUnits import GeV
+        from smodels.experiment.databaseObj import Database
+        from smodels.base import runtime
+        from smodels.particlesLoader import load
+        from smodels.base.model import Model
+        from smodels.share.models.SMparticles import SMList
+        import os
+        from smodels.decomposition import decomposer
+        from smodels.matching.theoryPrediction import _getDataSetPredictions, _getCombinedResultFor, TheoryPredictionList
+
+        database = Database('./database/')
+        runtime.modelFile = "smodels.share.models.mssm"
+        BSMList = load()
+
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
+        model.updateParticles(inputFile=slhafile,ignorePromptQNumbers = ['eCharge','colordim','spin'])
+
+        # Set main options for decomposition
+        topDict = decomposer.decompose(model, sigmacut=0.001,
+                               massCompress=True, invisibleCompress=True,
+                               minmassgap=5*GeV)
+
+        expResult = database.getExpResults(analysisIDs=['ATLAS-SUSY-2018-16'],
+                                            datasetIDs=['all'],
+                                            txnames=['TChiWZoff'],
+                                            dataTypes=['efficiencyMap'])[0]
+
+        expSMSDict = database.expSMSDict
+        smsMatch = expSMSDict.getMatchesFrom(topDict)
+        dataSetResults = []
+        for dataset in expResult.datasets:
+            predList = _getDataSetPredictions(dataset, smsMatch, expSMSDict, maxMassDist=0.2)
+            if predList:
+                dataSetResults.append(predList)
+
+        combinedRes = _getCombinedResultFor(dataSetResults,expResult)
+        combinedRes.setStatsComputer()
+
+        patch = combinedRes._statsComputer.likelihoodComputer.patches[0]
+
+        with open('patch_2018-16.json','r') as f:
+            patch_ref = json.load(f)
+
+        self.assertEqual(patch,patch_ref)
 
 if __name__ == "__main__":
     unittest.main()
