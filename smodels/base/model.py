@@ -315,10 +315,6 @@ class Model(object):
                 raise SModelSError()
 
             particle.totalwidth = abs(particleData.totalwidth)*GeV
-            broadWidth = 0.01
-            if particle.totalwidth > broadWidth*particle.mass:
-                # Check if the particle can decay to SM only:
-                logger.warning("Particle %s has a total width/mass = %1.2f. Some results may not be valid for broad resonances!" %(str(particle),float(particle.totalwidth/particle.mass)))
             if particle.totalwidth < stableWidth:
                 particle._isStable = True  # Treat particle as stable
                 logger.debug("Particle %s has width below the threshold and will be assumed as stable" % particle.pdg)
@@ -355,6 +351,16 @@ class Model(object):
                     daughters.append(daughter)
                 newDecay.daughters = daughters
                 particle.decays.append(newDecay)
+
+            # Check for broad width resonances
+            broadWidth = 0.01
+            if particle.totalwidth > broadWidth*particle.mass:
+                for decay in particle.decays:
+                    # Check if the particle can decay to SM only:
+                    if all(daughter.isSM for daughter in decay.daughters):                        
+                        logger.warning("Particle %s has a total width/mass = %1.2f. Some results may not be valid for broad resonances!" %(str(particle),float(particle.totalwidth/particle.mass)))
+                        break
+
 
         #  Check if all unstable particles have decay channels defined:
         for p in self.BSMparticles:
