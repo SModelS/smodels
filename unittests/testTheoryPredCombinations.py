@@ -54,6 +54,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             t.computeStatistics()
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
+        self.assertAlmostEqual(combiner.muhat(), 1.205884272994354, 4)
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
