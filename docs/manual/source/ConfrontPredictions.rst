@@ -221,7 +221,12 @@ SModelS supports the usage of these JSON likelihoods from v1.2.4 onward via an i
 `pyhf <https://scikit-hep.org/pyhf/>`_ package, a pure-python implementation of the HistFactory statistical model. This means that for |EMr| from ATLAS, for which a JSON likelihood is available and when the combination of signal regions is turned on, the evaluation of the likelihood is relegated to `pyhf <https://scikit-hep.org/pyhf/>`_. Internally, the whole calculation
 is based on the asymptotic formulas of *Asymptotic formulae for likelihood-based tests of new physics*, `arXiv:1007.1727 <https://arxiv.org/abs/1007.1727>`_.
 
-The :ref:`figure below <combinedSRfigPyhf>` examplifies how the constraints improve from
+By default, the control regions (CRs) are removed from the statistical model. The possibility to prevent this has been added with SModelS v.2.2.0 through the *includeCRs* flag in the *globalInfo.txt* files.
+From v3.0.0 onward, SModelS can emulate signal leaking into the CRs if efficiency maps are provided for them. The statistical treatment of CRs is identical to the one of SRs, except that the former are not allowed to individually constrain the tested model. If *includeCRs = False* in the *globalInfo.txt* file, the CRs as well as the leaking signals are removed from the statistical model.
+Additionally, v3.0.0 added the possibility to incorporate signal uncertainty within the statistical model. When a value is provided in the *signalUncertainty* field of the *globalInfo.txt* file, each nominal signal of each bin of each channel (CRs as well as SRs) can be modified through an additive nuisance parameter constrained by a Gaussian (more precisely, it is done through `pyhf <https://scikit-hep.org/pyhf/>`_ "correlated shape" modifiers).
+These features are used at the level of analysis implementation and cannot be turned on or off by the user.
+
+The :ref:`figure below <combinedSRfigPyhf>` exemplifies how the constraints improve from
 using the best signal region (left) to using the full likelihood (right).
 
 .. _combinedSRfigPyhf:
