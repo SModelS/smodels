@@ -1,4 +1,4 @@
-#Global results summary (21 files)
+#Global results summary (22 files)
 #The most constraining analysis corresponds to the one with largest observed r.
 #The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
 #Analyses used for combination = ATLAS-CONF-2013-037,CMS-SUS-13-012.
@@ -8,6 +8,7 @@
 T1tttt.slha          CMS-PAS-SUS-15-002        30.5      nan     ATLAS-CONF-2013-037   5.92      5.47          CMS-SUS-13-012      5.82     8.24        8.87         10.4           
 T1ttttoff.slha       CMS-PAS-SUS-15-002        8.16      nan     N/A                   nan       nan           CMS-SUS-13-012      0.662    0.936       0.662        0.936          
 T6bbHH_pyhf.slha     N/A                       nan       nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+TChiWZoff_150_125_150_125.slha  N/A                       nan      nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
 TRV1_1800_300_300.slha   N/A                   nan      nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
 broken.slha          N/A                       nan       nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
 complicated.slha     ATLAS-SUSY-2013-02        0.388     nan     ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.133        0.21           
