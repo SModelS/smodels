@@ -121,7 +121,7 @@ class DataSet(object):
         return False
 
     def isCombMatrixCombinableWith_(self, other):
-        """ check for combinability via the combinations matrix """
+        """ Check for combinability via the combinations matrix. """
         if not hasattr(self.globalInfo, "_combinationsmatrix"):
             return False
         if self.globalInfo._combinationsmatrix is None:
@@ -144,11 +144,12 @@ class DataSet(object):
         return False
 
     def isGlobalFieldCombinableWith_(self, other):
-        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
-        this check is at analysis level (not at dataset level).
+        """
+        Check for 'combinableWith' fields in globalInfo, check if <other> matches.
+        This check is at analysis level (not at dataset level).
 
         :params other: a dataset to check against
-        :returns: true, if pair is marked as combinable, else false
+        :returns: True, if pair is marked as combinable, else False
         """
         if not hasattr(self.globalInfo, "combinableWith"):
             return False
@@ -163,11 +164,11 @@ class DataSet(object):
         return False
 
     def isLocalFieldCombinableWith_(self, other):
-        """ check for 'combinableWith' fields in globalInfo, check if <other> matches.
-        this check is at dataset level (not at dataset level).
+        """ Check for 'combinableWith' fields in dataInfo, check if <other> matches.
+        This check is at dataset level (not at analysis level).
 
         :params other: a dataset to check against
-        :returns: true, if pair is marked as combinable, else false
+        :returns: True, if pair is marked as combinable, else False
         """
         if not hasattr(self.dataInfo, "combinableWith"):
             return False
@@ -188,7 +189,7 @@ class DataSet(object):
         In case of efficiency maps, check if any txnames have overlapping
         constraints. This would result in double counting, so we dont
         allow it.
-         """
+        """
         if self.getType() == "upperLimit":
             return False
         logger.debug("checking for redundancy")
@@ -454,7 +455,7 @@ class CombinedDataSet(object):
         self.findType()
 
     def isCombinableWith ( self, other ):
-        """ 
+        """
         Function that reports if two datasets are mutually uncorrelated = combinable.
         A combined dataset is combinable with "other", if all consistituents are.
 
@@ -482,14 +483,14 @@ class CombinedDataSet(object):
         return ret
 
     def getIndex(self, dId, datasetOrder):
-        """ 
+        """
         Get the index of dataset within the datasetOrder, but allow for abbreviated names.
 
         :param dId: id of dataset to search for, may be abbreviated
         :param datasetOrder: the ordered list of datasetIds, long form
         :returns: index, or -1 if not found
         """
-        
+
         if dId in datasetOrder:
             # easy peasy, we found the dId
             return datasetOrder.index(dId)
