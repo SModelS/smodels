@@ -57,11 +57,26 @@ class Info(object):
                     continue
 
             self.cacheJsons()
+            self.cacheOnnx()
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False
         return True
+
+    def cacheOnnx(self):
+        """ if we have the "modelFile" attribute defined,
+            we cache the corresponding onnx. Needed when pickling """
+        if not hasattr(self, "modelFile"):
+            return
+        if hasattr(self, "onnx"):  # seems like we already have them
+            return
+        import onnxruntime
+        dirp = os.path.dirname(self.path)
+        modelFile = os.path.join(dirp, self.modelFile)
+        with open ( modelFile, "rt" ) as f:
+            self.onnx = f.read()
+            f.close()
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,

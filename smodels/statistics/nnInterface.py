@@ -28,7 +28,7 @@ class NNData:
         self.nsignals = nsignals  # fb
         self.getTotalYield()
         self.modelFile = modelFile
-        print ( f"modelFile {modelFile}" )
+        print ( f"@@0 modelFile {modelFile}" )
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}

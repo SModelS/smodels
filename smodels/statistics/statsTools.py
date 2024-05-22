@@ -235,7 +235,9 @@ class StatsComputer:
         globalInfo = self.dataObject.globalInfo
         datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         nsig = self.nsig
-        data = NNData( nsig, globalInfo.modelFile )
+        filename = globalInfo.modelFile
+        # filename = os.path.join ( os.path.dirname ( globalInfo.path ), filename )
+        data = NNData( nsig, filename )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer
 
