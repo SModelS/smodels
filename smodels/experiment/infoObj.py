@@ -74,7 +74,7 @@ class Info(object):
         import onnxruntime
         dirp = os.path.dirname(self.path)
         modelFile = os.path.join(dirp, self.modelFile)
-        with open ( modelFile, "rt" ) as f:
+        with open ( modelFile, "rb" ) as f:
             self.onnx = f.read()
             f.close()
 
