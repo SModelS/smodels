@@ -24,10 +24,14 @@ class NNData:
     :ivar modelFile: path to onnx model file
     """
 
-    def __init__(self, nsignals, modelFile ):
+    def __init__(self, nsignals, globalInfo ):
         self.nsignals = nsignals  # fb
         self.getTotalYield()
-        self.modelFile = modelFile
+        self.globalInfo = globalInfo
+        #filename = globalInfo.modelFile
+        #filename = os.path.join ( os.path.dirname ( globalInfo.path ), filename )
+        #self.modelFile = modelFile
+        # print ( f"@@0 modelFile {hasattr(globalInfo,'onnx')}" )
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}
@@ -56,6 +60,8 @@ class NNUpperLimitComputer:
         """
 
         self.data = data
+        import onnxruntime
+        self.regressor = onnxruntime.InferenceSession ( self.data.globalInfo.onnx )
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))

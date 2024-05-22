@@ -233,11 +233,9 @@ class StatsComputer:
         Create computer for a machine learned model
         """
         globalInfo = self.dataObject.globalInfo
-        datasets = [ds.getID() for ds in self.dataObject.origdatasets]
+        # datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         nsig = self.nsig
-        filename = globalInfo.modelFile
-        # filename = os.path.join ( os.path.dirname ( globalInfo.path ), filename )
-        data = NNData( nsig, filename )
+        data = NNData( nsig, globalInfo )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer
 
