@@ -12,6 +12,7 @@
 
 __all__ = [ "StatsComputer" ]
 
+import sys
 from typing import Union, Text, Dict, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
@@ -40,9 +41,6 @@ class StatsComputer:
         :param deltas_rel: relative error on signal. currently unused
         :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
         """
-        print ( f"statsComputer {dataType}" )
-        sys.exit()
-
         if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             logger.error ( f"I do not recognize the data type {dataType}" )
             raise SModelSError()
@@ -237,17 +235,9 @@ class StatsComputer:
         globalInfo = self.dataObject.globalInfo
         datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         nsig = self.nsig
-        print ( f"getComputerNN" )
         data = NNData( nsig, globalInfo.modelFile )
-        import sys
-        sys.exit()
-        """
-        if data.errorFlag:
-            return None
-        self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
-        self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
-        """
-
+        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        self.likelihoodComputer = self.upperLimitComputer
 
     def getComputerPyhf(self ):
         """
@@ -444,6 +434,16 @@ class StatsComputer:
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                        expected = expected, workspace_index = index )
+        elif self.dataType == "nn":
+            if all([s == 0 for s in self.nsig]):
+                logger.warning("All signals are empty")
+                return None
+            if limit_on_xsec:
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                       expected = expected )
+            else:
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                       expected = expected )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(self.data,
