@@ -18,6 +18,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
@@ -39,8 +40,10 @@ class StatsComputer:
         :param deltas_rel: relative error on signal. currently unused
         :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
         """
+        print ( f"statsComputer {dataType}" )
+        sys.exit()
 
-        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb"]:
+        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             logger.error ( f"I do not recognize the data type {dataType}" )
             raise SModelSError()
 
@@ -106,6 +109,24 @@ class StatsComputer:
                                  nsig=nsig, deltas_rel=deltas_rel)
 
         computer.getComputerPyhf( )
+
+        return computer
+
+    @classmethod
+    def forNNs(cls, dataset, nsig, deltas_rel):
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="nn",
+                                 nsig=nsig, deltas_rel=deltas_rel)
+
+        computer.getComputerNN( )
 
         return computer
 
@@ -208,6 +229,25 @@ class StatsComputer:
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
+
+    def getComputerNN(self ):
+        """
+        Create computer for a machine learned model
+        """
+        globalInfo = self.dataObject.globalInfo
+        datasets = [ds.getID() for ds in self.dataObject.origdatasets]
+        nsig = self.nsig
+        print ( f"getComputerNN" )
+        data = NNData( nsig, globalInfo.modelFile )
+        import sys
+        sys.exit()
+        """
+        if data.errorFlag:
+            return None
+        self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
+        """
+
 
     def getComputerPyhf(self ):
         """
