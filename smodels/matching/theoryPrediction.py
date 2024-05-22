@@ -343,6 +343,10 @@ class TheoryPrediction(object):
                                              expected = expected,
                                              return_nll = True )
         self.cachedNlls[expected][mu] = nll
+
+        if abs(mu) < 1e-5:
+            self.cachedObjs[expected]["nll_sm"] = nll
+
         return self.nllToLikelihood ( nll, return_nll )
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
@@ -724,7 +728,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     if all([True if "CR" in predList[0].dataset.dataInfo.dataId else False for predList in dataSetResults]): # Don't give combined result if all regions are CRs
         return None
-        
+
     if len(dataSetResults) == 1:
         return dataSetResults[0]
     elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
