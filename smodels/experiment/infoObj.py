@@ -71,12 +71,22 @@ class Info(object):
             return
         if hasattr(self, "onnx"):  # seems like we already have them
             return
-        import onnxruntime
         dirp = os.path.dirname(self.path)
         modelFile = os.path.join(dirp, self.modelFile)
         with open ( modelFile, "rb" ) as f:
             self.onnx = f.read()
             f.close()
+        import onnx
+        m = onnx.load ( modelFile )
+        # smYields = {}
+        smYields = []
+        for em in m.metadata_props:
+            if em.key == "bkg_yields":
+                st = eval(em.value)
+                for l in st:
+                #    smYields[ l[0] ] = l[1]
+                    smYields.append ( l[1] )
+        self.smYields = smYields
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,

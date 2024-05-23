@@ -44,7 +44,8 @@ class NNData:
 
 class NNUpperLimitComputer:
     """
-    Class that computes the upper limit using the jsons files and signal informations in the 'data' instance of 'NNData'
+    Class that computes the upper limit using the jsons files and signal 
+    informations in the 'data' instance of 'NNData'
     """
 
     def __init__(self, data, cl=0.95, lumi=None ):
@@ -86,10 +87,12 @@ class NNUpperLimitComputer:
         # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForModel}" )
         # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
         # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
+        # print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
         syields = []
         for ds in self.data.globalInfo.datasetOrderForModel.split(","):
             idx = self.data.origDataSetOrder.index ( ds )    
             tmp = float ( self.nsignals[idx]*poi_test )
+            tmp += self.data.globalInfo.smYields[idx]
             syields.append ( tmp )
         # syields = (np.array(self.nsignals)*poi_test).tolist()
         nzeroes = self.regressor_dim - len(syields)
