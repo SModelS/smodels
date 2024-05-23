@@ -8,8 +8,10 @@
 
 """
 
-from typing import Union, Text
+from typing import Union, Text, Tuple, Callable
 import copy
+import numpy as np
+import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
 
@@ -62,6 +64,11 @@ class NNUpperLimitComputer:
         self.data = data
         import onnxruntime
         self.regressor = onnxruntime.InferenceSession ( self.data.globalInfo.onnx )
+        # store the dimensionality of the input vector that the model
+        # asks us to. this may be different from the number of our 
+        # signal regions, as control regions may have been added.
+        # we will pad with zeroes
+        self.regressor_dim = self.regressor.get_inputs()[0].shape[1]
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))
@@ -73,6 +80,26 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
+    def negative_log_likelihood(self, poi_test: float):
+        """ the method that really wraps around the llhd computation.
+
+        :returns: dictionary with nlls, obs and exp, mu=0 and 1
+        """
+        nzeroes = self.regressor_dim - len(self.nsignals)
+        syields = (np.array(self.nsignals)*poi_test).tolist()
+        if nzeroes > 0:
+            syields += [0]*nzeroes
+        # print ( f"@@5 syields {syields}" )
+        scaled_signal_yields = np.array( [syields], dtype=np.float32 )
+        # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
+        # print ( f"@@8 input {self.regressor.get_inputs()[0].shape}" )
+        arr = self.regressor.run(None, {"input_1":scaled_signal_yields})
+        arr = arr[0][0]
+        # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
+        ret = { "nll_exp_0": arr[0], "nll_exp_1": arr[1],
+                "nll_obs_0": arr[2], "nll_obs_1": arr[3] }
+        return ret
+
     def welcome(self):
         """
         greet the world
@@ -83,8 +110,7 @@ class NNUpperLimitComputer:
         logger.info( f"NN interface, we are using xxx" )
         nninfo["hasgreeted"] = True
 
-    def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
-                    expected=False):
+    def likelihood( self, mu=1.0, return_nll=False, expected=False):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -96,39 +122,67 @@ class NNUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
+        ret = self.negative_log_likelihood ( mu )
+        lbl = "nll_obs_1"
+        if expected:
+            lbl = "nll_exp_1"
+        nll = ret[lbl]
+        logger.debug( f"Calling likelihood")
+        return self.exponentiateNLL ( nll, not return_nll )
 
-        logger.debug("Calling likelihood")
-        return 1.
-
-    def exponentiateNLL(self, twice_nll, doIt):
+    def exponentiateNLL(self, nll, doIt):
         """if doIt, then compute likelihood from nll,
         else return nll"""
-        if twice_nll == None:
+        if nll == None:
             return None
             #if doIt:
             #    return 0.0
             #return 9000.0
         if doIt:
-            return np.exp(-twice_nll / 2.0)
-        return twice_nll / 2.0
+            return np.exp(-nll )
+        return nll
 
-    def lmax( self, workspace_index=None, return_nll=False, expected=False,
+    def lmax( self, return_nll=False, expected=False,
               allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
 
         :param return_nll: if true, return nll, not llhd
-        :param workspace_index: supply index of workspace to use. If None, \
-            choose index of best combo
-        :param expected: if False, compute expected values, if True, \
-            compute a priori expected, if "posteriori" compute posteriori \
-            expected
-        :param allowNegativeSignals: if False, then negative nsigs are replaced \
-            with 0.
+        :param workspace_index: supply index of workspace to use. If None, 
+        choose index of best combo
+        :param expected: if False, compute expected values, if True,
+        compute a priori expected, if "posteriori" compute posteriori
+        expected
+        :param allowNegativeSignals: if False, then negative nsigs are 
+        replaced with 0.
         """
         # logger.error("expected flag needs to be heeded!!!")
-        logger.debug("Calling lmax")
-        lmax, muhat, sigma_mu = 1.0, 1.0, 1.0
+        lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
+        logger.error("Calling lmax")
+        from scipy import optimize
+        # print ( f"@@5 before minimize!" )
+        def getNLL ( mu ):
+            ret = self.negative_log_likelihood ( mu )
+            lbl = "nll_obs_1"
+            if expected:
+                lbl = "nll_exp_1"
+            return ret[lbl]
+        for mu0 in [ 1.0, 0.0, 3.0, -1.0, 10.0, 0.1 ]:
+            o = optimize.minimize ( getNLL, mu0, tol=1e-9 )
+            if o.success == True:
+                #print ( f"@@6 o={o}" )
+                muhat = o.x
+                lmax = self.exponentiateNLL ( o.fun, not return_nll )
+                if not allowNegativeSignals and muhat < 0.:
+                    muhat = 0.
+                    lmax = self.likelihood ( 0., return_nll = return_nll,
+                        expected = expected )
+                sigma_mu = np.sqrt ( o.hess_inv[0][0] )
+                ret = { "lmax": lmax, "muhat": muhat, 
+                        "sigma_mu": sigma_mu }
+                #print ( f"@@7 ret={ret}" )
+                #sys.exit()
+                return ret
         ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
         return ret
 
@@ -176,7 +230,47 @@ class NNUpperLimitComputer:
                                 - else: choose best combo
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        return 1.0
+        print ( f"@@5 getUpperLimitOnMu" )
+        from smodels.statistics.basicStats import determineBrentBracket
+        mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
+                                allowNegativeSignals=allowNegativeSignals)
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
+                allowNegative = allowNegativeSignals )
+        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        print ( f"@@5 getUpperLimitOnMu, mu_lim {mu_lim}" )
+        return mu_lim
+
+    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
+        """
+        Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
+        plus mu_hat and sigma_mu
+
+        :param expected: if True, compute expected likelihood, else observed
+        """
+        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
+        mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        mu_hat = mu_hat if mu_hat is not None else 0.0
+        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
+        # a posteriori expected is needed here
+        # mu_hat is mu_hat for signal_rel
+        fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
+                             return_nll=True)
+        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+
+        # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
+        # return 1.
+
+        def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
+            # at - infinity this should be .95,
+            # at + infinity it should -.05
+            # Make sure to always compute the correct llhd value (from theoryPrediction)
+            # and not used the cached value (which is constant for mu~=1 an mu~=0)
+            nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
+            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
+            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
+
+        return mu_hat, sigma_mu, clsRoot
+
 
     def transform ( self, expected : Union [ Text, bool ] ):
         """ replace the actual observations with backgrounds,
