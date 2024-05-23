@@ -78,14 +78,14 @@ class Info(object):
             f.close()
         import onnx
         m = onnx.load ( modelFile )
-        # smYields = {}
-        smYields = []
+        smYields = {}
+        # smYields = []
         for em in m.metadata_props:
             if em.key == "bkg_yields":
                 st = eval(em.value)
                 for l in st:
-                #    smYields[ l[0] ] = l[1]
-                    smYields.append ( l[1] )
+                    smYields[ l[0] ] = l[1]
+                #    smYields.append ( l[1] )
         self.smYields = smYields
 
     def cacheJsons(self):

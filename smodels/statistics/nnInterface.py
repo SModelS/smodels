@@ -85,19 +85,24 @@ class NNUpperLimitComputer:
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
         # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForModel}" )
+        # print ( f"@@0 datasetOrder {type(self.data.globalInfo.datasetOrderForModel)}" )
         # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
         # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
         # print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
         syields = []
-        for ds in self.data.globalInfo.datasetOrderForModel.split(","):
-            idx = self.data.origDataSetOrder.index ( ds )    
-            tmp = float ( self.nsignals[idx]*poi_test )
-            tmp += self.data.globalInfo.smYields[idx]
-            syields.append ( tmp )
+        for ds in self.data.globalInfo.datasetOrderForModel:
+            if type(ds) in [ tuple ]:
+                idx = self.data.origDataSetOrder.index ( ds[0] )
+                tmp = float ( self.nsignals[idx]*poi_test )
+                tmp += self.data.globalInfo.smYields[ ds[1] ]
+                syields.append ( tmp )
+            if type(ds) in [ str ]:
+                tmp = self.data.globalInfo.smYields[ ds ]
+                syields.append ( tmp )
         # syields = (np.array(self.nsignals)*poi_test).tolist()
-        nzeroes = self.regressor_dim - len(syields)
-        if nzeroes > 0:
-            syields += [0]*nzeroes
+        # nzeroes = self.regressor_dim - len(syields)
+        #if nzeroes > 0:
+        #    syields += [0]*nzeroes
         # print ( f"@@5 syields {syields}" )
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
         # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
