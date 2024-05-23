@@ -14,6 +14,8 @@ import numpy as np
 import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL
+from scipy import optimize
 
 nninfo = {
     "hasgreeted": False,
@@ -115,8 +117,6 @@ class NNUpperLimitComputer:
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
 
-        :param workspace_index: supply index of workspace to use. If None, \
-                                choose index of best combo
         :param return_nll: if true, return nll, not llhd
         :param expected: if False, compute expected values, if True, \
             compute a priori expected, if "posteriori" compute posteriori \
@@ -148,8 +148,6 @@ class NNUpperLimitComputer:
         Returns the negative log max likelihood
 
         :param return_nll: if true, return nll, not llhd
-        :param workspace_index: supply index of workspace to use. If None, 
-        choose index of best combo
         :param expected: if False, compute expected values, if True,
         compute a priori expected, if "posteriori" compute posteriori
         expected
@@ -159,7 +157,6 @@ class NNUpperLimitComputer:
         # logger.error("expected flag needs to be heeded!!!")
         lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
         logger.error("Calling lmax")
-        from scipy import optimize
         # print ( f"@@5 before minimize!" )
         def getNLL ( mu ):
             ret = self.negative_log_likelihood ( mu )
@@ -186,24 +183,18 @@ class NNUpperLimitComputer:
         ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
         return ret
 
-    def getUpperLimitOnSigmaTimesEff(self, expected=False, workspace_index=None):
+    def getUpperLimitOnSigmaTimesEff(self, expected=False ):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
-            - by default, the combination of the workspaces contained into self.workspaces
-            - if workspace_index is specified, self.workspace[workspace_index]
-              (useful for computation of the best upper limit)
 
         :param expected:  - if set to 'True': uses expected SM backgrounds as signals
                           - else: uses 'self.nsignals'
-        :param workspace_index: - if different from 'None': index of the workspace to use
-                                  for upper limit
-                                - else: choose best combo
         :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
         if self.data.totalYield == 0.:
             return None
         else:
-            ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
+            ul = self.getUpperLimitOnMu( expected=expected )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -212,32 +203,23 @@ class NNUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
-    # Trying a new method for upper limit computation :
-    # re-scaling the signal predictions so that mu falls in [0, 10] instead of
-    # looking for mu bounds
-    # Usage of the index allows for rescaling
-    def getUpperLimitOnMu(self, expected=False, workspace_index=None):
+    def getUpperLimitOnMu(self, expected=False, 
+            allowNegativeSignals = False ):
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
-            - if workspace_index is specified, self.workspace[workspace_index]
-              (useful for computation of the best upper limit)
 
         :param expected:  - if set to 'True': uses expected SM backgrounds as signals
                           - else: uses 'self.nsignals'
-        :param workspace_index: - if different from 'None': index of the workspace to use
-                                  for upper limit
-                                - else: choose best combo
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        print ( f"@@5 getUpperLimitOnMu" )
-        from smodels.statistics.basicStats import determineBrentBracket
+        # print ( f"@@5 getUpperLimitOnMu" )
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
-                                allowNegativeSignals=allowNegativeSignals)
+                              allowNegativeSignals=allowNegativeSignals)
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        print ( f"@@5 getUpperLimitOnMu, mu_lim {mu_lim}" )
+        # print ( f"@@5 getUpperLimitOnMu, mu_lim {mu_lim}" )
         return mu_lim
 
     def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
@@ -265,8 +247,8 @@ class NNUpperLimitComputer:
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
+            nll = self.likelihood(mu, return_nll=True, expected=expected)
+            nllA = self.likelihood(mu, expected="posteriori", return_nll=True)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
         return mu_hat, sigma_mu, clsRoot
