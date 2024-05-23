@@ -28,17 +28,11 @@ class NNData:
     :ivar modelFile: path to onnx model file
     """
 
-    def __init__(self, nsignals, globalInfo ):
+    def __init__(self, nsignals, globalInfo, origDataSetOrder ):
         self.nsignals = nsignals  # fb
         self.getTotalYield()
         self.globalInfo = globalInfo
-        #filename = globalInfo.modelFile
-        #filename = os.path.join ( os.path.dirname ( globalInfo.path ), filename )
-        #self.modelFile = modelFile
-        # print ( f"@@0 modelFile {hasattr(globalInfo,'onnx')}" )
-        self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
-        self.cachedULs = {False: {}, True: {}, "posteriori": {}}
+        self.origDataSetOrder = origDataSetOrder
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
@@ -87,8 +81,16 @@ class NNUpperLimitComputer:
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
-        nzeroes = self.regressor_dim - len(self.nsignals)
-        syields = (np.array(self.nsignals)*poi_test).tolist()
+        #print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForModel}" )
+        #print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
+        #print ( f"@@2 nsignals {self.nsignals}" )
+        syields = []
+        for ds in self.data.globalInfo.datasetOrderForModel.split(","):
+            idx = self.data.origDataSetOrder.index ( ds )    
+            tmp = float ( self.nsignals[idx]*poi_test )
+            syields.append ( tmp )
+        # syields = (np.array(self.nsignals)*poi_test).tolist()
+        nzeroes = self.regressor_dim - len(syields)
         if nzeroes > 0:
             syields += [0]*nzeroes
         # print ( f"@@5 syields {syields}" )
@@ -159,15 +161,17 @@ class NNUpperLimitComputer:
         logger.error("Calling lmax")
         # print ( f"@@5 before minimize!" )
         def getNLL ( mu ):
-            ret = self.negative_log_likelihood ( mu )
+            d = self.negative_log_likelihood ( mu )
             lbl = "nll_obs_1"
             if expected:
                 lbl = "nll_exp_1"
-            return ret[lbl]
+            ret = d[lbl]
+            # print ( f"@@X getNLL {mu}={ret}" )
+            return ret
         for mu0 in [ 1.0, 0.0, 3.0, -1.0, 10.0, 0.1 ]:
             o = optimize.minimize ( getNLL, mu0, tol=1e-9 )
+            # print ( f"@@6 o={o}" )
             if o.success == True:
-                #print ( f"@@6 o={o}" )
                 muhat = o.x
                 lmax = self.exponentiateNLL ( o.fun, not return_nll )
                 if not allowNegativeSignals and muhat < 0.:
@@ -177,10 +181,11 @@ class NNUpperLimitComputer:
                 sigma_mu = np.sqrt ( o.hess_inv[0][0] )
                 ret = { "lmax": lmax, "muhat": muhat, 
                         "sigma_mu": sigma_mu }
-                #print ( f"@@7 ret={ret}" )
+                # print ( f"@@7 ret={ret}" )
                 #sys.exit()
                 return ret
         ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
+        #print ( f"@@9 ret {ret}" )
         return ret
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False ):
@@ -219,7 +224,6 @@ class NNUpperLimitComputer:
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        # print ( f"@@5 getUpperLimitOnMu, mu_lim {mu_lim}" )
         return mu_lim
 
     def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
