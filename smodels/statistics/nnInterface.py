@@ -182,7 +182,7 @@ class NNUpperLimitComputer:
             o = optimize.minimize ( getNLL, mu0, tol=1e-9 )
             # print ( f"@@6 o={o}" )
             if o.success == True:
-                muhat = o.x
+                muhat = o.x[0]
                 lmax = self.exponentiateNLL ( o.fun, not return_nll )
                 if not allowNegativeSignals and muhat < 0.:
                     muhat = 0.
@@ -228,12 +228,12 @@ class NNUpperLimitComputer:
                           - else: uses 'self.nsignals'
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        # print ( f"@@5 getUpperLimitOnMu" )
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                               allowNegativeSignals=allowNegativeSignals)
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
         return mu_lim
 
     def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
