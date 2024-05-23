@@ -28,11 +28,13 @@ class NNData:
     :ivar modelFile: path to onnx model file
     """
 
-    def __init__(self, nsignals, globalInfo, origDataSetOrder ):
+    def __init__(self, nsignals, dataObject ):
         self.nsignals = nsignals  # fb
         self.getTotalYield()
-        self.globalInfo = globalInfo
-        self.origDataSetOrder = origDataSetOrder
+        self.dataObject = dataObject
+        self.globalInfo = dataObject.globalInfo
+        datasets = [ds.getID() for ds in self.dataObject.origdatasets]
+        self.origDataSetOrder = datasets
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
@@ -81,9 +83,9 @@ class NNUpperLimitComputer:
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
-        #print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForModel}" )
-        #print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
-        #print ( f"@@2 nsignals {self.nsignals}" )
+        # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForModel}" )
+        # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
+        # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
         syields = []
         for ds in self.data.globalInfo.datasetOrderForModel.split(","):
             idx = self.data.origDataSetOrder.index ( ds )    
