@@ -88,16 +88,23 @@ class NNUpperLimitComputer:
         # print ( f"@@0 datasetOrder {type(self.data.globalInfo.datasetOrderForModel)}" )
         # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
         # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
-        # print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
+        #print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
+        #print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
+        # print ( f"@@3 means {self.data.globalInfo.inputErrors}" )
+        # sys.exit()
         syields = []
-        for ds in self.data.globalInfo.datasetOrderForModel:
+        for i,ds in enumerate(self.data.globalInfo.datasetOrderForModel):
             if type(ds) in [ tuple ]:
                 idx = self.data.origDataSetOrder.index ( ds[0] )
                 tmp = float ( self.nsignals[idx]*poi_test )
                 tmp += self.data.globalInfo.smYields[ ds[1] ]
+                tmp -= self.data.globalInfo.inputMeans[i]
+                tmp /= self.data.globalInfo.inputErrors[i]
                 syields.append ( tmp )
             if type(ds) in [ str ]:
                 tmp = self.data.globalInfo.smYields[ ds ]
+                tmp -= self.data.globalInfo.inputMeans[i]
+                tmp /= self.data.globalInfo.inputErrors[i]
                 syields.append ( tmp )
         # print ( f"@@5 syields {syields} poi {poi_test}" )
         # syields = (np.array(self.nsignals)*poi_test).tolist()
@@ -106,13 +113,27 @@ class NNUpperLimitComputer:
         #    syields += [0]*nzeroes
         # print ( f"@@5 syields {syields}" )
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
-        # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
         # print ( f"@@8 input {self.regressor.get_inputs()[0].shape}" )
+        #print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
+        ## humbertos
+        # scaled_signal_yields = np.array ( [[13.52858044,10.0246462,5.26799756,20.40353088,9.88274537,7.06560028,6.54992687,8.07212193,6.60742379,158.77486684,565.80858696,518.80569167,446.57924612,142.72791787]], dtype=np.float32 )
+        ## rafals
+        # scaled_signal_yields = np.array ( [[7.67329182,10.287399,11.11071819,24.22864547,4.50237295,7.38171835,7.73185249,6.44837165,2.1427933,119.24440527,500.0748255,792.39242141,374.82884992,120.65946601]], dtype=np.float32 )
+        
         arr = self.regressor.run(None, {"input_1":scaled_signal_yields})
         arr = arr[0][0]
+        ## humbertos
+        ## my arr is 103.28695893000021, 903.0098876953125, 108.14218170999995, 1525.634521484375
+        ## ML_LHClikelihoods/test_spey_ml/ForWolfgang/test.csv claims:
+        ## 103.28695893,117.86493379,108.14218171,111.99108552 
+
+        ## rafals
+        ## my arr is 103.28695893,4983.60498046875,108.14218171,4760.98193359375 
+        ## rafals: 103.28695893,123.19202698,108.14218171,122.01426745
         # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
         ret = { "nll_exp_0": arr[0], "nll_exp_1": arr[1],
                 "nll_obs_0": arr[2], "nll_obs_1": arr[3] }
+        # print ( f"@@8 ret {ret}" )
         return ret
 
     def welcome(self):
