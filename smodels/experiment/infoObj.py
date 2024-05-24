@@ -87,7 +87,6 @@ class Info(object):
                     smYields[ l[0] ] = l[1]
                 #    smYields.append ( l[1] )
             if em.key == "standardization_mean":
-                st = eval(em.value)
                 inputMeans = eval(em.value)
             if em.key == "standardization_std":
                 inputErrors = eval(em.value)
