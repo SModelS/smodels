@@ -91,7 +91,6 @@ class NNUpperLimitComputer:
         #print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
         #print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
         #print ( f"@@3 means {self.data.globalInfo.inputErrors}" )
-        # sys.exit()
         syields = []
         for i,ds in enumerate(self.data.globalInfo.datasetOrderForModel):
             if type(ds) in [ tuple ]:
