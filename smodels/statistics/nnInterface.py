@@ -99,6 +99,7 @@ class NNUpperLimitComputer:
             if type(ds) in [ str ]:
                 tmp = self.data.globalInfo.smYields[ ds ]
                 syields.append ( tmp )
+        # print ( f"@@5 syields {syields} poi {poi_test}" )
         # syields = (np.array(self.nsignals)*poi_test).tolist()
         # nzeroes = self.regressor_dim - len(syields)
         #if nzeroes > 0:
