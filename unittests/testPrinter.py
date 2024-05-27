@@ -76,7 +76,7 @@ def compareSLHA(slhadefault, slhanew, allowedRelDiff):
     defaultBlocks = sorted([defaultData.blocks[b].name for b in defaultData.blocks])
     newBlocks = sorted([newData.blocks[b].name for b in newData.blocks])
     if defaultBlocks != newBlocks:
-        logger.error('Block structure differs!')
+        logger.error(f'Block structure differs! {defaultBlocks} != {newBlocks}')
         return False
 
     for b in defaultData.blocks:
@@ -272,9 +272,13 @@ class RunPrinterTest(unittest.TestCase):
         # Check SLHA output:
         outputfile = out.replace('.py', '.smodelsslha')
         slhaDefaultFile = "./lightEWinos_default.smodelsslha"
-        self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
-                                    allowedRelDiff=0.05))
-        self.removeOutputs(outputfile)
+        comp = compareSLHA(slhaDefaultFile, outputfile,
+                           allowedRelDiff=0.05)
+        if not comp:
+            logger.error ( f"{outputfile} and {slhaDefaultFile} differ!" )
+        self.assertTrue(comp)
+        if comp:
+            self.removeOutputs(outputfile)
 
     
     def testPythonPrinterNodesMap(self):
