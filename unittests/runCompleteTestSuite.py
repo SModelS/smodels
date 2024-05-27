@@ -91,9 +91,9 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
 
                 #a=t.run() ## python3
                 # print ( "a=",a )
-    print( "[runCompleteTestSuite] %d/%d tests failed." % ( n_failed, n_tests ))
+    print( f"[runCompleteTestSuite] {n_failed}/{n_tests} tests failed." )
     if n_failed > 0:
-        raise AssertionError("%i tests failed" %n_failed)
+        raise AssertionError( f"{n_failed} tests failed" )
 
 
 def parallel_run ( verbose, testNotebooks=False, reduced=False ):

@@ -127,9 +127,9 @@ smodelsOutputDefault = {
             7 : 'q',
             8 : 'q'
         },
-        'likelihood' : 1.267167e-11,
-        'l_max' : 0.07085462,
-        'l_SM' : 0.04875737
+        'nll' : 25.091652322862235,
+        'nll_max' : 2.6471251067851,
+        'nll_SM' : 3.0208989134775686
     }
 ],
 'CombinedRes' : [
@@ -137,9 +137,9 @@ smodelsOutputDefault = {
         'AnalysisID' : 'CMS-SUS-13-012',
         'r' : 4.450234,
         'r_expected' : 6.507382,
-        'likelihood' : 1.267167e-11,
-        'l_max' : 0.07085462,
-        'l_SM' : 0.04875737
+        'nll' : 25.091652322862235,
+        'nll_max' : 2.6471251067851,
+        'nll_SM' : 3.0208989134775686
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.0,

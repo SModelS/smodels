@@ -34,9 +34,9 @@ smodelsOutputDefault = {
         'r' : 0.8349838,
         'r_expected' : 0.8349838,
         'Width (GeV)' : None,
-        'likelihood' : 0.1680834,
-        'l_max' : 2.071631,
-        'l_SM' : 2.071631
+        'nll' : 1.783294994187348,
+        'nll_max' : -0.728336219734454,
+        'nll_SM' : -0.728336
     },
     {
         'maxcond' : 0.0,
@@ -53,9 +53,9 @@ smodelsOutputDefault = {
         'r' : 0.008014361,
         'r_expected' : 0.00915927,
         'Width (GeV)' : [[2.37186555, 'stable'], [2.37186555, 'stable']],
-        'likelihood' : 0.02475033,
-        'l_max' : 0.02972175,
-        'l_SM' : 0.02442398
+        'nll' : 3.6989164567229924,
+        'nll_max' : 3.5158761779589756,
+        'nll_SM' : 3.712189842416584
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.6027619,
@@ -119,9 +119,9 @@ smodelsOutputDefault = {
         'AnalysisID' : 'ATLAS-CONF-2013-037',
         'r' : 0.008014361,
         'r_expected' : 0.00915927,
-        'likelihood' : 0.02475033,
-        'l_max' : 0.02972175,
-        'l_SM' : 0.02442398
+        'nll' : 3.6989164567229924,
+        'nll_max' : 3.5158761779589756,
+        'nll_SM' : 3.712189842416584
     }
 ]
 }

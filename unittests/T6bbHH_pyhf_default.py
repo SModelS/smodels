@@ -34,9 +34,9 @@ smodelsOutputDefault = {
         'r' : 1.223551,
         'r_expected' : 0.8403036,
         'Width (GeV)' : [[1.0, 1.0, 'stable'], [1.0, 1.0, 'stable']],
-        'likelihood' : 4.972371e-23,
-        'l_max' : 9.723844e-22,
-        'l_SM' : 9.723844e-22
+        'nll' : 51.35556035013835,
+        'nll_max' : 48.38229103232457,
+        'nll_SM' : 48.38229103232457
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.0,

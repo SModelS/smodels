@@ -66,9 +66,9 @@ smodelsOutputDefault = {
         'r' : 4.450234,
         'r_expected' : 6.507382,
         'Width (GeV)' : [[1.0, 'stable'], [1.0, 'stable']],
-        'likelihood' : 1.267167e-11,
-        'l_max' : 0.07085462,
-        'l_SM' : 0.04875737
+        'nll' : 25.091652322862235,
+        'nll_max' : 2.6471251067851,
+        'nll_SM' : 3.0208989134775686
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.0,
@@ -84,9 +84,9 @@ smodelsOutputDefault = {
         'AnalysisID' : 'CMS-SUS-13-012',
         'r' : 4.450234,
         'r_expected' : 6.507382,
-        'likelihood' : 1.267167e-11,
-        'l_max' : 0.07085462,
-        'l_SM' : 0.04875737
+        'nll' : 25.091652322862235,
+        'nll_max' : 2.6471251067851,
+        'nll_SM' : 3.0208989134775686
     }
 ]
 }

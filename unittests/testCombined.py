@@ -14,6 +14,7 @@ import os
 sys.path.insert(0, "../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
+from smodels.base.smodelsLogging import setLogLevel
 
 class CombinedTest(unittest.TestCase):
 
@@ -32,7 +33,7 @@ class CombinedTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         if equals != True:
-            logger.error("%s differs from %s!" % ("gluino_squarks_default_agg.py", outputfile))
+            logger.error( f"gluino_squarks_default_agg.py differs from {outputfile}!" )
         self.assertTrue(equals)
         for i in [outputfile, outputfile.replace(".py", ".pyc")]:
             if os.path.exists(i):

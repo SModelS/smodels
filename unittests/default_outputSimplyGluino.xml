@@ -136,9 +136,9 @@
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.2637784</expected_upper_limit_fb>
-            <l_SM>0.04875737</l_SM>
-            <l_max>0.07085462</l_max>
-            <likelihood>1.267167e-11</likelihood>
+            <nll_SM>3.0208989134775686</nll_SM>
+            <nll_max>2.6471251067851</nll_max>
+            <nll>25.091652322862235</nll>
             <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
             <r>4.450234</r>

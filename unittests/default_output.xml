@@ -3,9 +3,9 @@
     <CombinedRes_List>
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037,CMS-SUS-13-012</AnalysisID>
-            <l_SM>6.179978e-05</l_SM>
-            <l_max>0.0001330265</l_max>
-            <likelihood>9.477238e-05</likelihood>
+            <nll_SM>9.691610753377516</nll_SM>
+            <nll_max>8.92496220146949</nll_max>
+            <nll>9.264032541364987</nll>
             <r>0.1332295</r>
             <r_expected>0.2068</r_expected>
         </CombinedRes>
@@ -140,9 +140,9 @@
             <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.7514</expected_upper_limit_fb>
-            <l_SM>0.002530291</l_SM>
-            <l_max>0.005396484</l_max>
-            <likelihood>0.003868391</likelihood>
+            <nll_SM>5.979420963094128</nll_SM>
+            <nll_max>5.222007648587915</nll_max>
+            <nll>5.554916620667446</nll>
             <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
             <r>0.1296154</r>
@@ -270,9 +270,9 @@
             <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.35</expected_upper_limit_fb>
-            <l_SM>0.02442398</l_SM>
-            <l_max>0.02972175</l_max>
-            <likelihood>0.02449917</likelihood>
+            <nll_SM>3.709116039556333</nll_SM>
+            <nll_max>3.5158761779589756</nll_max>
+            <nll>3.712189842416584</nll>
             <lumi_fb-1>20.7</lumi_fb-1>
             <maxcond>0.0</maxcond>
             <r>0.001829564</r>

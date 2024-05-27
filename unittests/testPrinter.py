@@ -40,7 +40,7 @@ def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
             if el.tag in ignore:
                 continue
             if el.tag != newel.tag:
-                logger.warning("tags %s and %s differ" % (el.tag, newel.tag))
+                logger.warning( f"tags {el.tag} and {newel.tag} differ" )
                 return False
 
             if el.text == newel.text:
@@ -125,6 +125,8 @@ class RunPrinterTest(unittest.TestCase):
         # Test summary output
         output = Summary(outputfile, allowedRelDiff=0.05)
         default = Summary(defaultfile, allowedRelDiff=0.05)
+        if default != output:
+            logger.error ( f"{outputfile} and {defaultfile} differ!" )
 
         self.assertEqual(default, output)
         self.removeOutputs(outputfile)
@@ -140,12 +142,13 @@ class RunPrinterTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top",
                            fname="./unitTestOutput/printer_output.py")
+        if default != output:
+            logger.error ( f"{outputfile} and gluino_squarks_default.py differ!" )
 
         self.assertTrue(equals)
         self.removeOutputs(out)
         self.removeOutputs('./debug.log')  
 
-        
         outputfile = out.replace('.py', '.xml')
         defFile = "default_output.xml"
         # Test xml output
@@ -153,19 +156,24 @@ class RunPrinterTest(unittest.TestCase):
         xmlNew = ElementTree.parse(outputfile).getroot()
         sortXML(xmlDefault)
         sortXML(xmlNew)
-        self.assertTrue(compareXML(xmlDefault, xmlNew,
-                                   allowedRelDiff=0.05,
-                                   ignore=['input_file', 'smodels_version', 'ncpus']))
+        comp = compareXML(xmlDefault, xmlNew,
+                      allowedRelDiff=0.05,
+                      ignore=['input_file', 'smodels_version', 'ncpus'])
+        if not comp:
+            logger.error ( f"{outputfile} and {defFile} differ!" )
+        self.assertTrue(comp)
         self.removeOutputs(outputfile)
         self.removeOutputs('./debug.log')
 
         outputfile = out.replace('.py', '.smodelsslha')
 
         slhaDefaultFile = "./gluino_squarks_default.slha.smodelsslha"
-        self.assertTrue(compareSLHA(slhaDefaultFile, outputfile,
-                                    allowedRelDiff=0.05))
+        comp = compareSLHA(slhaDefaultFile, outputfile,
+                           allowedRelDiff=0.05)
+        if not comp:
+            logger.error ( f"{outputfile} and {slhaDefaultFile} differ!" )
+        self.assertTrue(comp )
         self.removeOutputs(outputfile)
-
 
     def testPythonPrinterSimpleV2(self):
 
@@ -191,6 +199,9 @@ class RunPrinterTest(unittest.TestCase):
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields)
 
+        if equals == False:
+            from smodels.base.smodelsLogging import logger
+            logger.error ( f"{outputfile} and simplyGluino_default_extended.py differ!" )
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 
@@ -221,9 +232,10 @@ class RunPrinterTest(unittest.TestCase):
         defaultfile = "lightEWinos_default.smodels"
         output = Summary(outputfile, allowedRelDiff=0.05)
         default = Summary(defaultfile, allowedRelDiff=0.05)
+        if output != default:
+            logger.error ( f"{outputfile} differs from {defaultfile}" )
         self.assertEqual(default, output)
         self.removeOutputs(outputfile)
-
 
         # Check Python output
         smodelsOutput = importModule(out)
@@ -235,6 +247,9 @@ class RunPrinterTest(unittest.TestCase):
                                           key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top")
+        if not equals:
+            logger.error ( f"{outputfile} differs from lightEWinos_default.py" )
+            
         self.assertTrue(equals)
         self.removeOutputs(out)
         self.removeOutputs('./debug.log')       

@@ -289,12 +289,12 @@ class PyPrinter(BasicPrinter):
             if hasattr(self, "addnodesmap") and self.addnodesmap:
                 resDict['Nodes Map'] = nodesDict
 
-            llhd = theoryPrediction.likelihood()
-            if llhd is not None:
+            nll = theoryPrediction.likelihood( return_nll = True )
+            if nll is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
-                resDict['likelihood'] = self._round(llhd)
-                resDict['l_max'] = self._round(theoryPrediction.lmax())
-                resDict['l_SM'] = self._round(theoryPrediction.lsm())
+                resDict['nll'] = self._round(nll)
+                resDict['nll_max'] = self._round(theoryPrediction.lmax(return_nll = True ))
+                resDict['nll_SM'] = self._round(theoryPrediction.lsm( return_nll = True ))
             ExptRes.append(resDict)
 
         return {'ExptRes': ExptRes}
@@ -405,15 +405,15 @@ class PyPrinter(BasicPrinter):
         r = self._round(obj.getRValue(expected=False))
         r_expected = self._round(obj.getRValue(expected=True))
 
-        llhd = self._round(obj.likelihood())
-        lmax = self._round(obj.lmax())
-        lsm = self._round(obj.lsm())
+        nll = self._round(obj.likelihood( return_nll = True ))
+        nllmax = self._round(obj.lmax( return_nll = True ))
+        nllsm = self._round(obj.lsm( return_nll = True ))
 
         resDict = {'AnalysisID': expIDs,
                    'r': r, 'r_expected': r_expected,
-                   'likelihood': llhd,
-                   'l_max': lmax,
-                   'l_SM': lsm}
+                   'nll': nll,
+                   'nll_max': nllmax,
+                   'nll_SM': nllsm}
 
         combRes.append(resDict)
 
