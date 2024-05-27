@@ -335,21 +335,25 @@ class TxTPrinter(BasicPrinter):
                 serv = self._formatNumber(theoryPrediction.getRValue(
                     expected=self.getTypeOfExpected()), 4)
                 output += "Expected r-value: %s\n" % serv
-            llhd = theoryPrediction.likelihood()
-            if llhd is not None:
+            nll = theoryPrediction.likelihood( return_nll = True )
+            if nll is not None:
                 chi2, chi2sm = None, None
+                nllsm = theoryPrediction.lsm( return_nll = True )
+                nllmin = theoryPrediction.lmax( return_nll = True )
                 try:
-                    chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
+                    # chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
+                    chi2sm = 2*(nll - nllsm )
                 except TypeError:
                     pass
                 try:
-                    chi2 = -2*np.log(llhd/theoryPrediction.lmax())
+                    # chi2 = -2*np.log(llhd/theoryPrediction.lmax())
+                    chi2 = 2*(nll - nllmin )
                 except TypeError:
                     pass
-                output += "Likelihood: " + self._formatNumber(llhd, 4) + "\n"
-                output += "L_max: " + self._formatNumber(theoryPrediction.lmax(
-                ), 4) + "   -2log(L/L_max): " + self._formatNumber(chi2, 4) + "\n"
-                output += "L_SM: " + self._formatNumber(theoryPrediction.lsm(), 4) + \
+                output += "nll: " + self._formatNumber(nll, 4) + "\n"
+                output += "nll_min: " + self._formatNumber(nllmin, 4) + \
+                          "   -2log(L/L_max): " + self._formatNumber(chi2, 4) + "\n"
+                output += "nll_SM: " + self._formatNumber(nllsm, 4) + \
                           "   -2log(L/L_SM): " + \
                     self._formatNumber(chi2sm, 4) + "\n"
 
