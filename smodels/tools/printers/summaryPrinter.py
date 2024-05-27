@@ -121,24 +121,22 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
-            # print L, L_max and L_SM instead of chi2 and llhd; SK 2021-05-14
-            llhd = theoPred.likelihood()
-            if llhd is not None:
-                lmax = theoPred.lmax()
-                lsm = theoPred.lsm()
-                lvals = [llhd, lmax, lsm]
+            nll = theoPred.likelihood( return_nll = True )
+            if nll is not None:
+                nllmin = theoPred.lmax( return_nll = True )
+                nllsm = theoPred.lsm( return_nll = True )
+                lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
-                        lv = "%10.3E" % lv
+                        lv = f"{lv:10.3E}"
                     else:
                         lv = str(lv)
                     lvals[i] = lv
-                llhd, lmax, lsm = lvals[:]
-                if llhd == lmax == lsm == "None":
-                    output += " Likelihoods: L, L_max, L_SM = N/A\n"
+                nll, nllmin, nllsm = lvals[:]
+                if nll == nllmin == nllsm == "None":
+                    output += " Likelihoods: nll, nll_min, nll_SM = N/A\n"
                 else:
-                    output += " Likelihoods: L, L_max, L_SM = %s, %s, %s\n" % (
-                        llhd, lmax, lsm)
+                    output += f" Likelihoods: nll, nll_min, nll_SM = {nll}, {nllmin}, {nllsm}\n"
 
             if not (theoPred is obj[-1]):
                 output += 80 * "-" + "\n"
@@ -178,14 +176,13 @@ class SummaryPrinter(TxTPrinter):
         r = obj.getRValue()
         r_expected = obj.getRValue(expected=True)
         # Get likelihoods:
-        lsm = obj.lsm()
-        llhd = obj.likelihood()
-        lmax = obj.lmax()
-        output += "Combined Analyses: %s\n" % (expIDs)
-        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
-            llhd, lmax, lsm)
-        output += "combined r-value: %10.3E\n" % r
-        output += "combined r-value (expected): %10.3E" % r_expected
+        nllsm = obj.lsm( return_nll = True )
+        nll = obj.likelihood( return_nll = True )
+        nllmin = obj.lmax( return_nll = True )
+        output += f"Combined Analyses: {expIDs}\n"
+        output += f"Likelihoods: nll, nll_min, nll_SM = {nll:10.3E}, {nllmin:10.3E}, {nllsm:10.3E}\n"
+        output += f"combined r-value: {r:10.3E}\n"
+        output += f"combined r-value (expected): {r_expected:10.3E}" 
         output += "\n===================================================== \n"
         output += "\n"
 

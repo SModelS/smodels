@@ -456,14 +456,13 @@ class TxTPrinter(BasicPrinter):
         r = obj.getRValue()
         r_expected = obj.getRValue(expected=self.getTypeOfExpected())
         # Get likelihoods:
-        lsm = obj.lsm()
-        llhd = obj.likelihood()
-        lmax = obj.lmax()
-        output += "Combined Analyses: %s\n" % (expIDs)
-        output += "Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (
-            llhd, lmax, lsm)
-        output += "combined r-value: %10.3E\n" % r
-        output += "combined r-value (expected): %10.3E" % r_expected
+        nllsm = obj.lsm( return_nll = True )
+        nll = obj.likelihood( return_nll = True )
+        nllmin = obj.lmax( return_nll = True )
+        output += f"Combined Analyses: {expIDs}\n"
+        output += f"Likelihoods: nll, nll_min, nll_SM = {nll:10.3E}, {nllmin:10.3E}, {nllsm:10.3E}\n" 
+        output += f"combined r-value: {r:10.3E}\n"
+        output += f"combined r-value (expected): {r_expected:10.3E}"
         output += "\n===================================================== \n"
         output += "\n"
 
