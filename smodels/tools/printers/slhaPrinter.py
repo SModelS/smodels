@@ -123,12 +123,12 @@ class SLHAPrinter(TxTPrinter):
                 "'", "").replace("[", "").replace("]", "")
 
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
-            output += " %d 1 %-30.2E #r value\n" % (cter, r)
+            output += " %d 1 %-30.3E #r value\n" % (cter, r)
             if not r_expected:
                 output += " %d 2 N/A                            #expected r value\n" % (
                     cter)
             else:
-                output += " %d 2 %-30.2E #expected r value\n" % (
+                output += " %d 2 %-30.3E #expected r value\n" % (
                     cter, r_expected)
             output += " %d 3 %-30.2f #condition violation\n" % (
                 cter, theoPred.getmaxCondition())
@@ -171,7 +171,7 @@ class SLHAPrinter(TxTPrinter):
         for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
             output += "\n %d 0 %-30s      # %s" % (
                 i, group.label, group.description)
-            output += "\n %d 1 %-30.2E      # %s" % (
+            output += "\n %d 1 %-30.3E      # %s" % (
                 i, group.getTotalXSec(), "Total cross-section (fb)")
         output += "\n"
         return output
@@ -215,8 +215,8 @@ class SLHAPrinter(TxTPrinter):
                 lvals[i] = lv
             nll, nllmin, nllsm = lvals[:]
 
-            output += " %d 1 %-30.2E #r value\n" % (cter, r)
-            output += " %d 2 %-30.2E #expected r value\n" % (cter, r_expected)
+            output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
             output += " %d 3 %s #nll\n" % (cter, nll)
             output += " %d 4 %s #nll_min\n" % (cter, nllmin)
             output += " %d 5 %s #nll_SM\n" % (cter, nllsm)
