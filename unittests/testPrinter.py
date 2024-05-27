@@ -173,7 +173,8 @@ class RunPrinterTest(unittest.TestCase):
         if not comp:
             logger.error ( f"{outputfile} and {slhaDefaultFile} differ!" )
         self.assertTrue(comp )
-        self.removeOutputs(outputfile)
+        if comp:
+            self.removeOutputs(outputfile)
 
     def testPythonPrinterSimpleV2(self):
 
