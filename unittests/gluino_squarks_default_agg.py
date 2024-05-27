@@ -40,7 +40,7 @@ smodelsOutputDefault={
             'r_expected': 0.005238129,
             'Width (GeV)': None,
             'nll': 194.71485898551276,
-            'nll_max': 194.6963727333933,
+            'nll_min': 194.6963727333933,
             'nll_SM': 194.6963727333933
         }
     ],

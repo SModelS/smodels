@@ -137,7 +137,7 @@
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.2637784</expected_upper_limit_fb>
             <nll_SM>3.0208989134775686</nll_SM>
-            <nll_max>2.6471251067851</nll_max>
+            <nll_min>2.6471251067851</nll_min>
             <nll>25.091652322862235</nll>
             <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>

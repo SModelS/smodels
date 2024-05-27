@@ -67,7 +67,7 @@ smodelsOutputDefault = {
         'r_expected' : 6.507382,
         'Width (GeV)' : [[1.0, 'stable'], [1.0, 'stable']],
         'nll' : 25.091652322862235,
-        'nll_max' : 2.6471251067851,
+        'nll_min' : 2.6471251067851,
         'nll_SM' : 3.0208989134775686
     }
 ],
@@ -85,7 +85,7 @@ smodelsOutputDefault = {
         'r' : 4.450234,
         'r_expected' : 6.507382,
         'nll' : 25.091652322862235,
-        'nll_max' : 2.6471251067851,
+        'nll_min' : 2.6471251067851,
         'nll_SM' : 3.0208989134775686
     }
 ]

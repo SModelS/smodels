@@ -130,7 +130,7 @@ smodelsOutputDefault={
             'r_expected': 0.2078608,
             'Width (GeV)': None,
             'nll': 5.554916620667446,
-            'nll_max': 5.222007648587915,
+            'nll_min': 5.222007648587915,
             'nll_SM': 5.979420963094128
         },
         {
@@ -233,7 +233,7 @@ smodelsOutputDefault={
             'r_expected': 0.00209093,
             'Width (GeV)': None,
             'nll': 3.709116039556333,
-            'nll_max': 3.5158761779589756,
+            'nll_min': 3.5158761779589756,
             'nll_SM': 3.712189842416584
         },
         {
@@ -303,7 +303,7 @@ smodelsOutputDefault={
             "r": 0.1332296,
             "r_expected": 0.207,
             "nll": 9.26403233033306,
-            "nll_max": 8.92496220146949,
+            "nll_min": 8.92496220146949,
             "nll_SM": 9.691610753377516,
         }
     ],

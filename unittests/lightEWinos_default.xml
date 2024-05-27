@@ -4,7 +4,7 @@
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
             <nll_SM>3.878980472603534</nll_SM>
-            <nll_max>3.878980472603534</nll_max>
+            <nll_min>3.878980472603534</nll_min>
             <nll>3.963032129669542</nll>
             <r>0.1092852</r>
             <r_expected>0.1009563</r_expected>
@@ -32,7 +32,7 @@
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.433</expected_upper_limit_fb>
             <nll_SM>3.878980472603534</nll_SM>
-            <nll_max>3.878980472603534</nll_max>
+            <nll_min>3.878980472603534</nll_min>
             <nll>3.963032129669542</nll>
             <lumi_fb-1>20.7</lumi_fb-1>
             <maxcond>0.0</maxcond>

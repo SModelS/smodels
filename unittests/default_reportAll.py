@@ -89,7 +89,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.2078608,
         'Width (GeV)' : None,
         'nll' : 5.554917,
-        'nll_max' : 5.222008,
+        'nll_min' : 5.222008,
         'nll_SM' : 5.979421
     },
     {
@@ -108,7 +108,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.174369,
         'Width (GeV)' : None,
         'nll' : 4.954053,
-        'nll_max' : 4.820234,
+        'nll_min' : 4.820234,
         'nll_SM' : 5.205862
     },
     {
@@ -143,7 +143,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.09952635,
         'Width (GeV)' : None,
         'nll' : 6.180565,
-        'nll_max' : 6.113938,
+        'nll_min' : 6.113938,
         'nll_SM' : 6.113938
     },
     {
@@ -162,7 +162,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.1226178,
         'Width (GeV)' : None,
         'nll' : 5.808196,
-        'nll_max' : 5.429653,
+        'nll_min' : 5.429653,
         'nll_SM' : 6.052394
     },
     {
@@ -181,7 +181,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.04239949,
         'Width (GeV)' : None,
         'nll' : 4.528561,
-        'nll_max' : 4.414542,
+        'nll_min' : 4.414542,
         'nll_SM' : 4.414542
     },
     {
@@ -216,7 +216,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.1190561,
         'Width (GeV)' : None,
         'nll' : 1.75879,
-        'nll_max' : 1.309501,
+        'nll_min' : 1.309501,
         'nll_SM' : 2.215916
     },
     {
@@ -235,7 +235,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.03637451,
         'Width (GeV)' : None,
         'nll' : 3.794834,
-        'nll_max' : 3.743679,
+        'nll_min' : 3.743679,
         'nll_SM' : 3.743679
     },
     {
@@ -270,7 +270,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.03808976,
         'Width (GeV)' : None,
         'nll' : 7.129948,
-        'nll_max' : 7.129869,
+        'nll_min' : 7.129869,
         'nll_SM' : 7.131083
     },
     {
@@ -289,7 +289,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.05269725,
         'Width (GeV)' : None,
         'nll' : 2.909252,
-        'nll_max' : 2.647125,
+        'nll_min' : 2.647125,
         'nll_SM' : 3.020899
     },
     {
@@ -308,7 +308,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.02920722,
         'Width (GeV)' : None,
         'nll' : 6.02585,
-        'nll_max' : 5.999308,
+        'nll_min' : 5.999308,
         'nll_SM' : 5.999308
     },
     {
@@ -327,7 +327,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.02925617,
         'Width (GeV)' : None,
         'nll' : 7.346674,
-        'nll_max' : 7.324503,
+        'nll_min' : 7.324503,
         'nll_SM' : 7.324503
     },
     {
@@ -346,7 +346,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.04060068,
         'Width (GeV)' : None,
         'nll' : 7.261318,
-        'nll_max' : 6.95674,
+        'nll_min' : 6.95674,
         'nll_SM' : 7.327445
     },
     {
@@ -365,7 +365,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.02836536,
         'Width (GeV)' : None,
         'nll' : 6.358017,
-        'nll_max' : 6.318702,
+        'nll_min' : 6.318702,
         'nll_SM' : 6.37545
     },
     {
@@ -384,7 +384,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.01526924,
         'Width (GeV)' : None,
         'nll' : 4.488023,
-        'nll_max' : 4.452688,
+        'nll_min' : 4.452688,
         'nll_SM' : 4.452688
     },
     {
@@ -403,7 +403,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.01683147,
         'Width (GeV)' : None,
         'nll' : 8.570525,
-        'nll_max' : 8.550996,
+        'nll_min' : 8.550996,
         'nll_SM' : 8.550996
     },
     {
@@ -422,7 +422,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.01266643,
         'Width (GeV)' : None,
         'nll' : 2.93441,
-        'nll_max' : 2.916364,
+        'nll_min' : 2.916364,
         'nll_SM' : 2.916364
     },
     {
@@ -441,7 +441,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.01375161,
         'Width (GeV)' : None,
         'nll' : 5.128092,
-        'nll_max' : 5.121452,
+        'nll_min' : 5.121452,
         'nll_SM' : 5.121452
     },
     {
@@ -460,7 +460,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.01023063,
         'Width (GeV)' : None,
         'nll' : 7.175763,
-        'nll_max' : 7.164363,
+        'nll_min' : 7.164363,
         'nll_SM' : 7.164363
     },
     {
@@ -479,7 +479,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.01044035,
         'Width (GeV)' : None,
         'nll' : 9.211099,
-        'nll_max' : 9.086764,
+        'nll_min' : 9.086764,
         'nll_SM' : 9.221546
     },
     {
@@ -498,7 +498,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.009266123,
         'Width (GeV)' : None,
         'nll' : 8.670339,
-        'nll_max' : 8.458763,
+        'nll_min' : 8.458763,
         'nll_SM' : 8.682343
     },
     {
@@ -517,7 +517,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.008325061,
         'Width (GeV)' : None,
         'nll' : 7.020758,
-        'nll_max' : 6.943624,
+        'nll_min' : 6.943624,
         'nll_SM' : 7.027459
     },
     {
@@ -536,7 +536,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.005515159,
         'Width (GeV)' : None,
         'nll' : 5.440559,
-        'nll_max' : 5.436715,
+        'nll_min' : 5.436715,
         'nll_SM' : 5.436715
     },
     {
@@ -555,7 +555,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.005311046,
         'Width (GeV)' : None,
         'nll' : 5.626215,
-        'nll_max' : 5.621506,
+        'nll_min' : 5.621506,
         'nll_SM' : 5.621506
     },
     {
@@ -574,7 +574,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.006753073,
         'Width (GeV)' : None,
         'nll' : 5.793305,
-        'nll_max' : 5.549453,
+        'nll_min' : 5.549453,
         'nll_SM' : 5.802738
     },
     {
@@ -593,7 +593,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.006766623,
         'Width (GeV)' : None,
         'nll' : 3.380629,
-        'nll_max' : 3.189869,
+        'nll_min' : 3.189869,
         'nll_SM' : 3.390316
     },
     {
@@ -612,7 +612,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.003709919,
         'Width (GeV)' : None,
         'nll' : 9.895274,
-        'nll_max' : 9.85809,
+        'nll_min' : 9.85809,
         'nll_SM' : 9.897297
     },
     {
@@ -631,7 +631,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.004286312,
         'Width (GeV)' : None,
         'nll' : 3.875406,
-        'nll_max' : 3.629946,
+        'nll_min' : 3.629946,
         'nll_SM' : 3.88204
     },
     {
@@ -650,7 +650,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.00302334,
         'Width (GeV)' : None,
         'nll' : 11.29724,
-        'nll_max' : 11.29283,
+        'nll_min' : 11.29283,
         'nll_SM' : 11.29782
     },
     {
@@ -669,7 +669,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.00200908,
         'Width (GeV)' : None,
         'nll' : 8.14724,
-        'nll_max' : 8.147147,
+        'nll_min' : 8.147147,
         'nll_SM' : 8.147147
     },
     {
@@ -688,7 +688,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.002090931,
         'Width (GeV)' : None,
         'nll' : 3.709116,
-        'nll_max' : 3.515876,
+        'nll_min' : 3.515876,
         'nll_SM' : 3.71219
     },
     {
@@ -707,7 +707,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.001646023,
         'Width (GeV)' : None,
         'nll' : 4.283309,
-        'nll_max' : 4.261969,
+        'nll_min' : 4.261969,
         'nll_SM' : 4.284095
     },
     {
@@ -726,7 +726,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.001492153,
         'Width (GeV)' : None,
         'nll' : 3.879854,
-        'nll_max' : 3.87898,
+        'nll_min' : 3.87898,
         'nll_SM' : 3.87898
     },
     {
@@ -745,7 +745,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.001279571,
         'Width (GeV)' : None,
         'nll' : 7.650429,
-        'nll_max' : 7.649354,
+        'nll_min' : 7.649354,
         'nll_SM' : 7.649354
     },
     {
@@ -764,7 +764,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.0009608355,
         'Width (GeV)' : None,
         'nll' : 6.341021,
-        'nll_max' : 6.34102,
+        'nll_min' : 6.34102,
         'nll_SM' : 6.34102
     },
     {
@@ -783,7 +783,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.001459782,
         'Width (GeV)' : None,
         'nll' : 6.630711,
-        'nll_max' : 6.387695,
+        'nll_min' : 6.387695,
         'nll_SM' : 6.632743
     },
     {
@@ -802,7 +802,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.005288522,
         'Width (GeV)' : None,
         'nll' : 10.91461,
-        'nll_max' : 2.434919,
+        'nll_min' : 2.434919,
         'nll_SM' : 10.96884
     },
     {
@@ -821,7 +821,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.0005514325,
         'Width (GeV)' : None,
         'nll' : 9.284623,
-        'nll_max' : 9.284265,
+        'nll_min' : 9.284265,
         'nll_SM' : 9.284265
     },
     {
@@ -859,7 +859,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.0008326722,
         'Width (GeV)' : None,
         'nll' : 4.151833,
-        'nll_max' : 4.139667,
+        'nll_min' : 4.139667,
         'nll_SM' : 4.152115
     },
     {
@@ -878,7 +878,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.0006321416,
         'Width (GeV)' : None,
         'nll' : 12.706,
-        'nll_max' : 12.70051,
+        'nll_min' : 12.70051,
         'nll_SM' : 12.70613
     },
     {
@@ -897,7 +897,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.0002518082,
         'Width (GeV)' : None,
         'nll' : 8.868617,
-        'nll_max' : 8.86844,
+        'nll_min' : 8.86844,
         'nll_SM' : 8.86844
     },
     {
@@ -916,7 +916,7 @@ smodelsOutputDefault = {
         'r_expected' : 0.0001337748,
         'Width (GeV)' : None,
         'nll' : 4.090197,
-        'nll_max' : 3.629946,
+        'nll_min' : 3.629946,
         'nll_SM' : 4.090463
     },
     {

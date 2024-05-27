@@ -293,7 +293,7 @@ class PyPrinter(BasicPrinter):
             if nll is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
                 resDict['nll'] = self._round(nll)
-                resDict['nll_max'] = self._round(theoryPrediction.lmax(return_nll = True ))
+                resDict['nll_min'] = self._round(theoryPrediction.lmax(return_nll = True ))
                 resDict['nll_SM'] = self._round(theoryPrediction.lsm( return_nll = True ))
             ExptRes.append(resDict)
 
@@ -412,7 +412,7 @@ class PyPrinter(BasicPrinter):
         resDict = {'AnalysisID': expIDs,
                    'r': r, 'r_expected': r_expected,
                    'nll': nll,
-                   'nll_max': nllmax,
+                   'nll_min': nllmax,
                    'nll_SM': nllsm}
 
         combRes.append(resDict)
