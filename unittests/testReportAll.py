@@ -42,7 +42,8 @@ class TestReportAll(unittest.TestCase):
                            ignore=ignoreFields, fname=outputfile,
                            fname2="default_reportAll.py")
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        if equals:
+            self.removeOutputs(outputfile)
 
 
 if __name__ == "__main__":
