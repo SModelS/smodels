@@ -136,27 +136,27 @@ class SLHAPrinter(TxTPrinter):
                                                    expResult.globalInfo.id)
             output += " %d 5 %-30s #signal region \n" % (
                 cter, signalRegion.replace(" ", "_"))
-            llhd = theoPred.likelihood()
-            if llhd is not None:
-                lmax = theoPred.lmax()
-                lsm = theoPred.lsm()
-                lvals = [llhd, lmax, lsm]
+            nll = theoPred.likelihood( return_nll  = True )
+            if nll is not None:
+                nllmin = theoPred.lmax(return_nll=True)
+                nllsm = theoPred.lsm( return_nll=True )
+                lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
                         lv = "%-30.2E" % lv
                     else:
                         lv = str(lv)
                     lvals[i] = lv
-                llhd, lmax, lsm = lvals[:]
-                output += " %d 6 %s #Likelihood\n" % (cter, llhd)
-                output += " %d 7 %s #L_max\n" % (cter, lmax)
-                output += " %d 8 %s #L_SM\n" % (cter, lsm)
+                nll, nllmin, nllsm = lvals[:]
+                output += " %d 6 %s #nll\n" % (cter, nll)
+                output += " %d 7 %s #nll_min\n" % (cter, nllmin)
+                output += " %d 8 %s #nll_SM\n" % (cter, nllsm)
             else:
-                output += " %d 6 N/A                            #Likelihood\n" % (
+                output += " %d 6 N/A                            #nll\n" % (
                     cter)
-                output += " %d 7 N/A                            #L_max\n" % (
+                output += " %d 7 N/A                            #nll_min\n" % (
                     cter)
-                output += " %d 8 N/A                            #L_SM\n" % (
+                output += " %d 8 N/A                            #nll_SM\n" % (
                     cter)
             output += "\n"
 
@@ -203,23 +203,23 @@ class SLHAPrinter(TxTPrinter):
             r = self._round(cRes.getRValue(expected=False))
             r_expected = self._round(cRes.getRValue(expected=True))
 
-            llhd = cRes.likelihood()
-            lmax = cRes.lmax()
-            lsm = cRes.lsm()
-            lvals = [llhd, lmax, lsm]
+            nll = cRes.likelihood(return_nll=True)
+            nllmin = cRes.lmax(return_nll=True)
+            nllsm = cRes.lsm(return_nll=True)
+            lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.float64)):
                     lv = "%-30.2E" % lv
                 else:
                     lv = str(lv)
                 lvals[i] = lv
-            llhd, lmax, lsm = lvals[:]
+            nll, nllmin, nllsm = lvals[:]
 
             output += " %d 1 %-30.2E #r value\n" % (cter, r)
             output += " %d 2 %-30.2E #expected r value\n" % (cter, r_expected)
-            output += " %d 3 %s #Likelihood\n" % (cter, llhd)
-            output += " %d 4 %s #L_max\n" % (cter, lmax)
-            output += " %d 5 %s #L_SM\n" % (cter, lsm)
+            output += " %d 3 %s #nll\n" % (cter, nll)
+            output += " %d 4 %s #nll_min\n" % (cter, nllmin)
+            output += " %d 5 %s #nll_SM\n" % (cter, nllsm)
             output += " %d 6 %s #IDs of combined analyses\n" % (cter, expIDs)
             output += "\n"
 

@@ -18,9 +18,9 @@ BLOCK SModelS_Exclusion
  1 3 0.00                           #condition violation
  1 4 ATLAS-CONF-2013-037            #analysis
  1 5 SRbC3                          #signal region 
- 1 6 1.90E-02                       #Likelihood
- 1 7 2.07E-02                       #L_max
- 1 8 2.07E-02                       #L_SM
+ 1 6 3.96E+00                       #nll
+ 1 7 3.88E+00                       #nll_min
+ 1 8 3.88E+00                       #nll_SM
 
  2 0 T1                             #txname 
  2 1 6.56E-05                       #r value
@@ -28,16 +28,16 @@ BLOCK SModelS_Exclusion
  2 3 0.00                           #condition violation
  2 4 ATLAS-SUSY-2013-02             #analysis
  2 5 (UL)                           #signal region 
- 2 6 N/A                            #Likelihood
- 2 7 N/A                            #L_max
- 2 8 N/A                            #L_SM
+ 2 6 N/A                            #nll
+ 2 7 N/A                            #nll_min
+ 2 8 N/A                            #nll_SM
 
 BLOCK SModelS_CombinedAnas
  1 1 1.09E-01                       #r value
  1 2 1.01E-01                       #expected r value
- 1 3 1.90E-02                       #Likelihood
- 1 4 2.07E-02                       #L_max
- 1 5 2.07E-02                       #L_SM
+ 1 3 3.96E+00                       #nll
+ 1 4 3.88E+00                       #nll_min
+ 1 5 3.88E+00                       #nll_SM
  1 6 ATLAS-CONF-2013-037 #IDs of combined analyses
 
 
