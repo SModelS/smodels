@@ -35,7 +35,7 @@ Theory Prediction =  3.47E-04 [pb]
 Condition Violation =  None
 UL for theory prediction =  1.20E-01 [fb]
 r = 2.888E+00
-L_BSM, L_SM, L_max = 2.298E-09, 8.011E-03, 8.158E-03
+nll_BSM, nll_SM, nll_min = 19.891, 4.827, 4.809
 
  CMS-SUS-19-006-agg 
 ------------------------
@@ -736,7 +736,7 @@ The largest r-value (theory/upper limit ratio) is 4.783E+00
 Combined analyses: ATLAS-SUSY-2013-11,CMS-SUS-13-013
 Combined r value: 2.053E-02
 Combined r value (expected): 2.004E-02
-Likelihoods: L, L_max, L_SM =  2.069E-03,  2.079E-03,  2.079E-03
+Likelihoods: nll, nll_min, nll_SM = 6.181, 6.176, 6.176
 
 
  Combination of analyses done in 0.00m

@@ -113,8 +113,8 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         # Compute likelihoods for EM-type results:
         if dataset.getType() == 'efficiencyMap':
             theoryPrediction.computeStatistics()
-            print('L_BSM, L_SM, L_max = %1.3E, %1.3E, %1.3E' % (theoryPrediction.likelihood(),
-                    theoryPrediction.lsm(), theoryPrediction.lmax()))
+            print('nll_BSM, nll_SM, nll_min = %1.3f, %1.3f, %1.3f' % (theoryPrediction.likelihood( return_nll = True ),
+                    theoryPrediction.lsm( return_nll = True ), theoryPrediction.lmax( return_nll = True )))
         if r > rmax:
             rmax = r
             bestResult = theoryPrediction.analysisId()
@@ -146,13 +146,13 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
     elif len(selectedTheoryPreds) > 1:
         combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
         combiner.computeStatistics()
-        llhd = combiner.likelihood()
-        lmax = combiner.lmax()
-        lsm = combiner.lsm()
+        nll = combiner.likelihood( return_nll = True )
+        nllmin = combiner.lmax( return_nll = True )
+        nllsm = combiner.lsm( return_nll = True )
         print("\n\nCombined analyses:", combiner.analysisId())
         print("Combined r value: %1.3E" % combiner.getRValue())
         print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
-        print("Likelihoods: L, L_max, L_SM = %10.3E, %10.3E, %10.3E\n" % (llhd, lmax, lsm))
+        print("Likelihoods: nll, nll_min, nll_SM = %.3f, %.3f, %.3f\n" % (nll, nllmin, nllsm))
 
     print("\n Combination of analyses done in %1.2fm" %((time.time()-t0)/60.))
     t0 = time.time()
