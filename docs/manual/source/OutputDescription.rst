@@ -88,8 +88,8 @@ If all the options in **stdout-printer** are set to True (see |parameters|), the
   After this basic information, the signal cross section (|theory prediction|),
   the list of :ref:`condition values <ULconditions>`  (if applicable) and the corresponding observed
   upper limit are shown. Also, if available, the expected upper limit is included.
-  If  **computeStatistics** = True, the likelihood for the BSM signal, that for the SM hypothesis,
-  and the maximum likelihood are printed
+  If  **computeStatistics** = True, the negative log likelihood (nll) for the BSM signal, that for the SM hypothesis,
+  and the minimum nll are printed
   (see :ref:`likelihood calculation <likelihoodCalc>`).
   Finally, if **printExtendedResults** = True, the IDs of the contributing |SMS|  (|SMS topologies| being constrained) is given. The ID numbers correspond to the ones printed in the decomposition/topologies table (see above) and can be used to obtain detailed information about the constrained |SMS topologies|.
 
@@ -182,7 +182,7 @@ Below we describe in detail the blocks contained in the summary output:
   the (theory cross section)/(expected upper limit) ratio (*r_expect*) are also printed.
   For |ULrs| the condition violation (see :ref:`upper limit conditions <ULconditions>`) is also included.
   .
-  Finally, if  **computeStatistics** = True, the likelihood values (for |EMrs|) are printed:
+  Finally, if  **computeStatistics** = True, the negative log likelihood values (for |EMrs|) are printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodels
    :lines: 23-39
@@ -268,7 +268,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.  A list of |txnames| and their meaning is available `here <https://smodels.github.io/docs/SmsDictionary>`_.
   Furthermore, the masses and widths\ [#f3]_ of the |SMS| contributing to the signal cross section, the
-  individual contribution of each |txname| (if **addTxWeights** = True) and the likelihood values
+  individual contribution of each |txname| (if **addTxWeights** = True) and the negative log likelihood values
   (if **computeStatistics** = True) are also included.
 
 .. literalinclude:: /images/gluino_squarks.slha.py
@@ -328,7 +328,7 @@ Below we give a description of each block together with a sample output.
   only the result with the highest :math:`r`-value is displayed.
   For each experimental result, the |txname| (for a list of all |txnames| and their meaning, see  `SMS Dictionary <https://smodels.github.io/docs/SmsDictionary>`_), the :math:`r`-value, the expected :math:`r`-value (when available),
   the :ref:`condition violation <ULconditions>`, the experimental result *label* and the signal region (|dataset|) are shown.
-  If **computeStatistics** = True, the likelihood values
+  If **computeStatistics** = True, the negative log likelihood values
   for |EMrs| are also printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha

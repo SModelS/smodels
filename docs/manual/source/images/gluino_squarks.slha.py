@@ -689,9 +689,9 @@ smodelsOutput = {
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 0.17976008654165604},
-        'likelihood' : 1.870578e-07,
-        'l_max' : 0.04143224,
-        'l_SM' : 0.04143224
+        'nll' : 15.491848,
+        'nll_min' : 3.183696,
+        'nll_SM' : 3.183696
     },
     {
         'maxcond' : 0.0,
@@ -2060,9 +2060,9 @@ smodelsOutput = {
         'AnalysisID' : 'ATLAS-SUSY-2018-10,CMS-SUS-13-012',
         'r' : 3.129969,
         'r_expected' : 3.169335,
-        'likelihood' : 7.267042e-10,
-        'l_max' : 9.746177e-05,
-        'l_SM' : 9.745792e-05
+        'nll' : 21.042502,
+        'nll_min' : 9.236050,
+        'nll_SM' : 9.236090
     }
 ],
 'Total xsec for missing topologies (fb)' : 388.8044,

@@ -2542,9 +2542,9 @@ Observed experimental limit: 5.82E-02 [fb]
 Expected experimental limit: 5.82E-02 [fb]
 Observed r-value: 3.089
 Expected r-value: 3.089
-Likelihood: 1.871e-07
-L_max: 0.04143   -2log(L/L_max): 24.62
-L_SM: 0.04143   -2log(L/L_SM): 24.62
+nll: 15.492
+nll_min: 3.184   -2log(L/L_max): 24.62
+nll_SM: 3.184   -2log(L/L_SM): 24.62
 Contributing SMS: [16, 17]
 
 ---------------Analysis Label = ATLAS-SUSY-2016-07
@@ -2557,9 +2557,9 @@ Observed experimental limit: 1.27E+00 [fb]
 Expected experimental limit: 1.07E+00 [fb]
 Observed r-value: 1.72
 Expected r-value: 2.042
-Likelihood: 6.412e-07
-L_max: 0.0009778   -2log(L/L_max): 14.66
-L_SM: 0.0009077   -2log(L/L_SM): 14.51
+nll: 14.26
+nll_min: 6.93    -2log(L/L_max): 14.66
+nll_SM: 7.005   -2log(L/L_SM): 14.51
 Contributing SMS: [16, 17]
 
 ---------------Analysis Label = ATLAS-SUSY-2016-07
@@ -3122,7 +3122,7 @@ Observed r-value: 0.0001359
 Contributing SMS: [16, 17]
 ===================================================== 
 Combined Analyses: ATLAS-SUSY-2018-10,CMS-SUS-13-012
-Likelihoods: L, L_max, L_SM =  7.267E-10,  9.746E-05,  9.746E-05
+Likelihoods: nll, nll_min, nll_SM = 21.043, 9.236, 9.236
 combined r-value:  3.130E+00
 combined r-value (expected):  3.169E+00
 ===================================================== 

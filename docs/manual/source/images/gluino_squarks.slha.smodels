@@ -26,12 +26,12 @@ Decomposition output status: 1 #decomposition was successful
  ATLAS-SUSY-2018-10  1.30E+01    0.0  1.798E-01  5.820E-02  3.089E+00  3.089E+00
  Signal Region:  4j0blowx_3
  Txnames:  T6WW
- Likelihoods: L, L_max, L_SM =  1.871E-07,  4.143E-02,  4.143E-02
+ Likelihoods: nll, nll_min, nll_SM =  2.240E+01,  3.184E+00,  3.184E+00
 --------------------------------------------------------------------------------
  ATLAS-SUSY-2016-07  1.30E+01    0.0  2.185E+00  1.270E+00  1.720E+00  2.042E+00
  Signal Region:  5j_Meff_1600
  Txnames:  T6WW
- Likelihoods: L, L_max, L_SM =  6.412E-07,  9.778E-04,  9.077E-04
+ Likelihoods: nll, nll_min, nll_SM =  1.378E+02,  6.930E+00,  7.005E+00
 --------------------------------------------------------------------------------
  ATLAS-SUSY-2016-07  1.30E+01    0.0  3.579E+01  5.375E+01  6.658E-01  N/A
  Signal Region:  (UL)
@@ -238,17 +238,17 @@ ATLAS-CONF-2013-089  8.00E+00    0.0  5.500E+00  4.047E+04  1.359E-04  N/A
  Signal Region:  (UL)
  Txnames:  T6WW
 
- 
+
 ================================================================================
 The highest r value is = 3.08866 from ATLAS-SUSY-2018-10 (r_expected=3.08866)
 CMS analysis with highest available r_expected: CMS-SUS-13-012, r_expected=0.28274, r_obs=0.18467
 ATLAS analysis with highest available r_expected: ATLAS-SUSY-2018-10, r_expected=3.08866, r_obs=3.08866
-===================================================== 
+=====================================================
 Combined Analyses: ATLAS-SUSY-2018-10,CMS-SUS-13-012
-Likelihoods: L, L_max, L_SM =  7.267E-10,  9.746E-05,  9.746E-05
+Likelihoods: nll, nll_min, nll_SM = 21.043, 9.236, 9.236
 combined r-value:  3.130E+00
 combined r-value (expected):  3.169E+00
-===================================================== 
+=====================================================
 
 
 Total cross-section for missing topologies (fb):  3.888E+02
@@ -260,31 +260,31 @@ Total cross-section for topologies outside the grid (fb):  0.000E+00
 ================================================================================
 missing topologies with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)                  SMS description
- 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET) 
- 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET) 
- 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET) 
- 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET) 
- 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET) 
- 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET) 
- 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET) 
- 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET) 
- 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET) 
- 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET) 
+ 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET)
+ 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET)
+ 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET)
+ 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET)
+ 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET)
+ 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET)
+ 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET)
+ 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET)
+ 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET)
+ 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET)
 ================================================================================
 No missing topologies with displaced decays found
 ================================================================================
 missing topologies with prompt decays with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)                  SMS description
- 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET) 
- 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET) 
- 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET) 
- 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET) 
- 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET) 
- 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET) 
- 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET) 
- 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET) 
- 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET) 
- 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET) 
+ 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET)
+ 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET)
+ 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET)
+ 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET)
+ 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET)
+ 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET)
+ 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET)
+ 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET)
+ 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET)
+ 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET)
 ================================================================================
 No topologies outside the grid found
 ================================================================================
