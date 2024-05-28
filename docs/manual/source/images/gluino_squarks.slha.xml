@@ -41,7 +41,7 @@
             <expected_upper_limit_fb>0.0582</expected_upper_limit_fb>
             <nll>15.491848</nll>
             <nll_SM>3.183696</nll_SM>
-            <nll_min>0.04143224</nll_min>
+            <nll_min>3.183696</nll_min>
             <lumi_fb-1>139.0</lumi_fb-1>
             <maxcond>0.0</maxcond>
             <r>3.088661</r>
