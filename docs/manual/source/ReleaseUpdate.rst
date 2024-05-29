@@ -42,7 +42,7 @@ New in Version 3.0.0:
   * Added option for selecting which quantum numbers to be erased (see  the :ref:`ignorePromptQNumbers<erasePrompt>` option in parameters.ini)
   * Added :ref:`outputFormat <parameterFileOutputFormat>` option to parameters.ini to allow for writing the output using the old format 
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure (see :ref:`missing topologies <finalStateSMS>`)
-	* We now report negative log likelihoods, instead of likelihoods 
+  * We now report negative log likelihoods, instead of likelihoods 
   * Z2parity attribute of particles is not longer needed
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (see :ref:`SMS Dictionary <smsDictionary>`)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see :ref:`Clustering <cluster>`)

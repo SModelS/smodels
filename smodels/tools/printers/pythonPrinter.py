@@ -406,13 +406,13 @@ class PyPrinter(BasicPrinter):
         r_expected = self._round(obj.getRValue(expected=True))
 
         nll = self._round(obj.likelihood( return_nll = True ))
-        nllmax = self._round(obj.lmax( return_nll = True ))
+        nllmin = self._round(obj.lmax( return_nll = True ))
         nllsm = self._round(obj.lsm( return_nll = True ))
 
         resDict = {'AnalysisID': expIDs,
                    'r': r, 'r_expected': r_expected,
                    'nll': nll,
-                   'nll_min': nllmax,
+                   'nll_min': nllmin,
                    'nll_SM': nllsm}
 
         combRes.append(resDict)
