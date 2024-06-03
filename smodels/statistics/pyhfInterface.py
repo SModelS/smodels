@@ -196,10 +196,7 @@ class PyhfData:
                 nBinsJson += sr["size"]
             if nBinsJson != len(subSig):
                 logger.error(
-                    "The number of signals provided is different from the number of bins for json number {} and channel number {}".format(
-                        self.channelsInfo.index(wsInfo), self.nsignals.index(subSig)
-                    )
-                )
+                    f"The number of signals ({len(subSig)}) provided is different from the number of bins for json ({nBinsJson}), number {self.channelsInfo.index(wsInfo)} and channel number {self.nsignals.index(subSig)}" )
                 self.errorFlag = True
             allZero = all([s == 0 for s in subSig])
             # Checking if all signals matching this json are zero
