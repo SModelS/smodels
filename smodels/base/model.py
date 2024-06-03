@@ -357,7 +357,8 @@ class Model(object):
             if particle.totalwidth > broadWidth*particle.mass:
                 for decay in particle.decays:
                     # Check if the particle can decay to SM only:
-                    if all(daughter.isSM for daughter in decay.daughters):                        
+                    if decay is not None and all(daughter.isSM for daughter in decay.daughters):
+                    # if all(daughter.isSM for daughter in decay.daughters):
                         logger.warning("Particle %s has a total width/mass = %1.2f. Some results may not be valid for broad resonances!" %(str(particle),float(particle.totalwidth/particle.mass)))
                         break
 
