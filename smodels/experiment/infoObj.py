@@ -79,7 +79,9 @@ class Info(object):
         import onnx
         m = onnx.load ( modelFile )
         smYields, inputMeans, inputErrors = {}, [], []
+        nll_exp_mu0, nll_obs_mu0 = None, None
         # smYields = []
+        import json
         for em in m.metadata_props:
             if em.key == "bkg_yields":
                 st = eval(em.value)
@@ -88,11 +90,17 @@ class Info(object):
                 #    smYields.append ( l[1] )
             if em.key == "standardization_mean":
                 inputMeans = eval(em.value)
-            if em.key == "standardization_std":
+            elif em.key == "standardization_std":
                 inputErrors = eval(em.value)
+            elif em.key == 'nLL_exp_mu0':
+                nll_exp_mu0 = json.loads(em.value)
+            elif em.key == 'nLL_obs_mu0':
+                nll_obs_mu0 = json.loads(em.value)
         self.smYields = smYields
         self.inputMeans = inputMeans
         self.inputErrors = inputErrors
+        self.nll_exp_mu0 = nll_exp_mu0
+        self.nll_obs_mu0 = nll_obs_mu0
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,

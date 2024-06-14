@@ -134,9 +134,12 @@ class NNUpperLimitComputer:
         ## my arr is 103.28695893,4983.60498046875,108.14218171,4760.98193359375 
         ## rafals: 103.28695893,123.19202698,108.14218171,122.01426745
         # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
-        ret = { "nll_exp_0": arr[0], "nll_exp_1": arr[1],
-                "nll_obs_0": arr[2], "nll_obs_1": arr[3] }
-        # print ( f"@@8 ret {ret}" )
+        nll0obs =  self.data.globalInfo.nll_obs_mu0
+        nll0exp =  self.data.globalInfo.nll_exp_mu0
+        #print ( f"@@7 nll0obs {nll0obs}" )
+        # print ( f"@@8 arr {arr}" )
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": arr[1]+nll0exp,
+                "nll_obs_0": nll0obs, "nll_obs_1": arr[0]+nll0obs }
         # sys.exit()
         return ret
 
