@@ -117,11 +117,14 @@ class NNUpperLimitComputer:
         # scaled_signal_yields = np.array ( [[13.52858044,10.0246462,5.26799756,20.40353088,9.88274537,7.06560028,6.54992687,8.07212193,6.60742379,158.77486684,565.80858696,518.80569167,446.57924612,142.72791787]], dtype=np.float32 )
         ## rafals
         # scaled_signal_yields = np.array ( [[7.67329182,10.287399,11.11071819,24.22864547,4.50237295,7.38171835,7.73185249,6.44837165,2.1427933,119.24440527,500.0748255,792.39242141,374.82884992,120.65946601]], dtype=np.float32 )
+        # print ( f"@@6 unscaled_signal_yields {scaled_signal_yields}" )
         for i,x in enumerate(scaled_signal_yields[0]):
-            t = 0.
+            t = 0. # x
             err = self.data.globalInfo.inputErrors[i]
             if err > 1e-20:
                 t = (x - self.data.globalInfo.inputMeans[i])/err
+            #else:
+            #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_signal_yields[0][i]=t
 
         # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
@@ -139,10 +142,21 @@ class NNUpperLimitComputer:
         # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
         nll0obs =  self.data.globalInfo.nll_obs_mu0
         nll0exp =  self.data.globalInfo.nll_exp_mu0
+        """
+        obsDelta = self.data.globalInfo.inputMeans[-2]
+        expDelta = self.data.globalInfo.inputMeans[-1]
+        obsErr = self.data.globalInfo.inputErrors[-2]
+        expErr = self.data.globalInfo.inputErrors[-1]
+        nll1obs = nll0obs + arr[0]*obsErr + obsDelta
+        nll1exp = nll0exp + arr[1]*expErr + expDelta
+        """
+        nll1obs = arr[0] + nll0obs
+        nll1exp = arr[1] + nll0exp
         #print ( f"@@7 nll0obs {nll0obs}" )
         # print ( f"@@8 arr {arr}" )
-        ret = { "nll_exp_0": nll0exp, "nll_exp_1": arr[1]+nll0exp,
-                "nll_obs_0": nll0obs, "nll_obs_1": arr[0]+nll0obs }
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
+                "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
+        print ( f"@@8 ret {ret}" )
         # sys.exit()
         return ret
 
