@@ -89,8 +89,8 @@ class NNUpperLimitComputer:
         # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
         # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
         #print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
-        #print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
-        #print ( f"@@3 means {self.data.globalInfo.inputErrors}" )
+        # print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
+        # print ( f"@@3 errors {self.data.globalInfo.inputErrors}" )
         syields = []
         for i,ds in enumerate(self.data.globalInfo.datasetOrderForModel):
             if type(ds) in [ tuple ]:
@@ -118,7 +118,10 @@ class NNUpperLimitComputer:
         ## rafals
         # scaled_signal_yields = np.array ( [[7.67329182,10.287399,11.11071819,24.22864547,4.50237295,7.38171835,7.73185249,6.44837165,2.1427933,119.24440527,500.0748255,792.39242141,374.82884992,120.65946601]], dtype=np.float32 )
         for i,x in enumerate(scaled_signal_yields[0]):
-            t = (x - self.data.globalInfo.inputMeans[i])/self.data.globalInfo.inputErrors[i]
+            t = 0.
+            err = self.data.globalInfo.inputErrors[i]
+            if err > 1e-20:
+                t = (x - self.data.globalInfo.inputMeans[i])/err
             scaled_signal_yields[0][i]=t
 
         # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
