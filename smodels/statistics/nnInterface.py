@@ -142,21 +142,19 @@ class NNUpperLimitComputer:
         # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
         nll0obs =  self.data.globalInfo.nll_obs_mu0
         nll0exp =  self.data.globalInfo.nll_exp_mu0
-        """
-        obsDelta = self.data.globalInfo.inputMeans[-2]
-        expDelta = self.data.globalInfo.inputMeans[-1]
-        obsErr = self.data.globalInfo.inputErrors[-2]
-        expErr = self.data.globalInfo.inputErrors[-1]
-        nll1obs = nll0obs + arr[0]*obsErr + obsDelta
-        nll1exp = nll0exp + arr[1]*expErr + expDelta
-        """
-        nll1obs = arr[0] + nll0obs
-        nll1exp = arr[1] + nll0exp
+        expDelta = self.data.globalInfo.inputMeans[-2]
+        obsDelta = self.data.globalInfo.inputMeans[-1]
+        expErr = self.data.globalInfo.inputErrors[-2]
+        obsErr = self.data.globalInfo.inputErrors[-1]
+        nll1exp = nll0exp + arr[0]*expErr + expDelta
+        nll1obs = nll0obs + arr[1]*obsErr + obsDelta
+        # nll1obs = arr[0] + nll0obs
+        # nll1exp = arr[1] + nll0exp
         #print ( f"@@7 nll0obs {nll0obs}" )
         # print ( f"@@8 arr {arr}" )
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
                 "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
-        print ( f"@@8 ret {ret}" )
+        # print ( f"@@8 ret {ret}" )
         # sys.exit()
         return ret
 
@@ -216,16 +214,16 @@ class NNUpperLimitComputer:
         lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
         logger.error("Calling lmax")
         # print ( f"@@5 before minimize!" )
+        lbl = "nll_obs_1"
+        if expected:
+            lbl = "nll_exp_1"
         def getNLL ( mu ):
             d = self.negative_log_likelihood ( mu )
-            lbl = "nll_obs_1"
-            if expected:
-                lbl = "nll_exp_1"
             ret = d[lbl]
-            # print ( f"@@X getNLL {mu}={ret}" )
+            #print ( f"@@X getNLL {mu}={ret} lbl={lbl}" )
             return ret
         for mu0 in [ 1.0, 0.0, 3.0, -1.0, 10.0, 0.1 ]:
-            o = optimize.minimize ( getNLL, mu0, tol=1e-9 )
+            o = optimize.minimize ( getNLL, mu0 ) # , tol=1e-9 )
             # print ( f"@@6 o={o}" )
             if o.success == True:
                 muhat = o.x[0]
@@ -237,11 +235,10 @@ class NNUpperLimitComputer:
                 sigma_mu = np.sqrt ( o.hess_inv[0][0] )
                 ret = { "lmax": lmax, "muhat": muhat, 
                         "sigma_mu": sigma_mu }
-                # print ( f"@@7 ret={ret}" )
-                #sys.exit()
-                return ret
+                #print ( f"@@7 ret={ret}" )
+                #print ( f"@@7 nll(0)={self.likelihood(0.,return_nll=True)} lbl={lbl}" )
         ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-        #print ( f"@@9 ret {ret}" )
+        # print ( f"@@9 ret {ret}" )
         return ret
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False ):
