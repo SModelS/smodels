@@ -44,7 +44,7 @@ class NNData:
 
 class NNUpperLimitComputer:
     """
-    Class that computes the upper limit using the jsons files and signal 
+    Class that computes the upper limit using the jsons files and signal
     informations in the 'data' instance of 'NNData'
     """
 
@@ -64,7 +64,7 @@ class NNUpperLimitComputer:
         import onnxruntime
         self.regressor = onnxruntime.InferenceSession ( self.data.globalInfo.onnx )
         # store the dimensionality of the input vector that the model
-        # asks us to. this may be different from the number of our 
+        # asks us to. this may be different from the number of our
         # signal regions, as control regions may have been added.
         # we will pad with zeroes
         self.regressor_dim = self.regressor.get_inputs()[0].shape[1]
@@ -128,16 +128,16 @@ class NNUpperLimitComputer:
             scaled_signal_yields[0][i]=t
 
         # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
-        
+
         arr = self.regressor.run(None, {"input_1":scaled_signal_yields})
         arr = arr[0][0]
         ## humbertos
         ## my arr is 103.28695893000021, 903.0098876953125, 108.14218170999995, 1525.634521484375
         ## ML_LHClikelihoods/test_spey_ml/ForWolfgang/test.csv claims:
-        ## 103.28695893,117.86493379,108.14218171,111.99108552 
+        ## 103.28695893,117.86493379,108.14218171,111.99108552
 
         ## rafals
-        ## my arr is 103.28695893,4983.60498046875,108.14218171,4760.98193359375 
+        ## my arr is 103.28695893,4983.60498046875,108.14218171,4760.98193359375
         ## rafals: 103.28695893,123.19202698,108.14218171,122.01426745
         # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
         nll0obs =  self.data.globalInfo.nll_obs_mu0
@@ -186,7 +186,7 @@ class NNUpperLimitComputer:
         logger.debug( f"Calling likelihood")
         return self.exponentiateNLL ( nll, not return_nll )
 
-    def exponentiateNLL(self, nll, doIt):
+    def exponentiateNLL(self, nll, doIt = True ):
         """if doIt, then compute likelihood from nll,
         else return nll"""
         if nll == None:
@@ -199,7 +199,7 @@ class NNUpperLimitComputer:
         return nll
 
     def lmax( self, return_nll=False, expected=False,
-              allowNegativeSignals=False):
+              allowNegativeSignals=True ):
         """
         Returns the negative log max likelihood
 
@@ -207,38 +207,50 @@ class NNUpperLimitComputer:
         :param expected: if False, compute expected values, if True,
         compute a priori expected, if "posteriori" compute posteriori
         expected
-        :param allowNegativeSignals: if False, then negative nsigs are 
+        :param allowNegativeSignals: if False, then negative nsigs are
         replaced with 0.
         """
+        # allowNegativeSignals = True
         # logger.error("expected flag needs to be heeded!!!")
-        lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
-        logger.error("Calling lmax")
+        # lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
+        print( f"Calling lmax negativeSignals = {allowNegativeSignals}")
         # print ( f"@@5 before minimize!" )
         lbl = "nll_obs_1"
+        nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
         if expected:
             lbl = "nll_exp_1"
-        def getNLL ( mu ):
+        def getNLL ( mu ): # , nll0 ):
             d = self.negative_log_likelihood ( mu )
-            ret = d[lbl]
-            #print ( f"@@X getNLL {mu}={ret} lbl={lbl}" )
+            ret = d[lbl] # - nll0
+            # print ( f"@@X dNLL({mu})={ret} lbl={lbl} nll0={nll0}" )
             return ret
-        for mu0 in [ 1.0, 0.0, 3.0, -1.0, 10.0, 0.1 ]:
-            o = optimize.minimize ( getNLL, mu0 ) # , tol=1e-9 )
-            # print ( f"@@6 o={o}" )
+        ret = { "nll_min": nll0, "muhat": 0., "sigma_mu": 0. }
+        muini = [ 0.0, 1.0, 3.0, -1.0, 10.0, 0.1, -0.1 ]
+        if not allowNegativeSignals:
+            muini = [ 0.0, 1.0, 3.0, 10.0, 0.1 ]
+        for mu0 in muini:
+            o = optimize.minimize ( getNLL, mu0, method="Nelder-Mead" )
+            # print ( f"@@6 o={o} nll0 {nll0}" )
+            # sys.exit()
             if o.success == True:
                 muhat = o.x[0]
-                lmax = self.exponentiateNLL ( o.fun, not return_nll )
                 if not allowNegativeSignals and muhat < 0.:
-                    muhat = 0.
-                    lmax = self.likelihood ( 0., return_nll = return_nll,
-                        expected = expected )
-                sigma_mu = np.sqrt ( o.hess_inv[0][0] )
-                ret = { "lmax": lmax, "muhat": muhat, 
-                        "sigma_mu": sigma_mu }
-                #print ( f"@@7 ret={ret}" )
-                #print ( f"@@7 nll(0)={self.likelihood(0.,return_nll=True)} lbl={lbl}" )
-        ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-        # print ( f"@@9 ret {ret}" )
+                    continue
+                nll_min = o.fun
+                #    muhat = 0.
+                #    nll_min = nll0
+                if nll_min < ret["nll_min"]:
+                    ret = { "nll_min": nll_min, "muhat": muhat }
+        # ret["nll_min"]+=nll0
+        ret["nll0"]=nll0
+        lmax = self.exponentiateNLL ( ret["nll_min"] )
+        ret["lmax"]=lmax
+        ret["expected"]=expected
+        o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
+        sigma_mu = np.sqrt ( o.hess_inv[0][0] )
+        ret["sigma_mu"]=sigma_mu
+        # print ( f"@@9 ret {ret} lbl" )
+        # sys.exit()
         return ret
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False ):
@@ -261,7 +273,7 @@ class NNUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
-    def getUpperLimitOnMu(self, expected=False, 
+    def getUpperLimitOnMu(self, expected=False,
             allowNegativeSignals = False ):
         """
         Compute the upper limit on the signal strength modifier with:
