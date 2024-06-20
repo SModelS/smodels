@@ -12,12 +12,14 @@
 
 __all__ = [ "StatsComputer" ]
 
+import sys
 from typing import Union, Text, Dict, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
@@ -39,8 +41,7 @@ class StatsComputer:
         :param deltas_rel: relative error on signal. currently unused
         :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
         """
-
-        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb"]:
+        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             logger.error ( f"I do not recognize the data type {dataType}" )
             raise SModelSError()
 
@@ -106,6 +107,24 @@ class StatsComputer:
                                  nsig=nsig, deltas_rel=deltas_rel)
 
         computer.getComputerPyhf( )
+
+        return computer
+
+    @classmethod
+    def forNNs(cls, dataset, nsig, deltas_rel):
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="nn",
+                                 nsig=nsig, deltas_rel=deltas_rel)
+
+        computer.getComputerNN( )
 
         return computer
 
@@ -208,6 +227,16 @@ class StatsComputer:
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
+
+    def getComputerNN(self ):
+        """
+        Create computer for a machine learned model
+        """
+        globalInfo = self.dataObject.globalInfo
+        nsig = self.nsig
+        data = NNData( nsig, self.dataObject )
+        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        self.likelihoodComputer = self.upperLimitComputer
 
     def getComputerPyhf(self ):
         """
@@ -404,6 +433,16 @@ class StatsComputer:
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                        expected = expected, workspace_index = index )
+        elif self.dataType == "nn":
+            if all([s == 0 for s in self.nsig]):
+                logger.warning("All signals are empty")
+                return None
+            if limit_on_xsec:
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                       expected = expected )
+            else:
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                       expected = expected )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(self.data,
