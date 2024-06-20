@@ -213,7 +213,7 @@ class NNUpperLimitComputer:
         # allowNegativeSignals = True
         # logger.error("expected flag needs to be heeded!!!")
         # lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
-        print( f"Calling lmax negativeSignals = {allowNegativeSignals}")
+        # print( f"Calling lmax negativeSignals = {allowNegativeSignals}")
         # print ( f"@@5 before minimize!" )
         lbl = "nll_obs_1"
         nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
@@ -239,7 +239,7 @@ class NNUpperLimitComputer:
                 nll_min = o.fun
                 #    muhat = 0.
                 #    nll_min = nll0
-                if nll_min < ret["nll_min"]:
+                if 0. < nll_min < ret["nll_min"]:
                     ret = { "nll_min": nll_min, "muhat": muhat }
         # ret["nll_min"]+=nll0
         ret["nll0"]=nll0
@@ -249,7 +249,7 @@ class NNUpperLimitComputer:
         o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
         sigma_mu = np.sqrt ( o.hess_inv[0][0] )
         ret["sigma_mu"]=sigma_mu
-        # print ( f"@@9 ret {ret} lbl" )
+        # logger.error ( f"@@9 ret {ret}" )
         # sys.exit()
         return ret
 
@@ -291,7 +291,7 @@ class NNUpperLimitComputer:
         # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
         return mu_lim
 
-    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
+    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = True ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
