@@ -243,8 +243,9 @@ class NNUpperLimitComputer:
                     ret = { "nll_min": nll_min, "muhat": muhat }
         # ret["nll_min"]+=nll0
         ret["nll0"]=nll0
-        lmax = self.exponentiateNLL ( ret["nll_min"] )
-        ret["lmax"]=lmax
+        # lmax = self.exponentiateNLL ( ret["nll_min"] )
+        # ret["lmax"]=lmax
+        ret["lmax"]=ret["nll_min"] # FIXME!!!
         ret["expected"]=expected
         o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
         sigma_mu = np.sqrt ( o.hess_inv[0][0] )
