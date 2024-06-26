@@ -65,19 +65,19 @@ class Info(object):
         return True
 
     def cacheOnnx(self):
-        """ if we have the "modelFile" attribute defined,
+        """ if we have the "mlModel" attribute defined,
             we cache the corresponding onnx. Needed when pickling """
-        if not hasattr(self, "modelFile"):
+        if not hasattr(self, "mlModel"):
             return
         if hasattr(self, "onnx"):  # seems like we already have them
             return
         dirp = os.path.dirname(self.path)
-        modelFile = os.path.join(dirp, self.modelFile)
-        with open ( modelFile, "rb" ) as f:
+        mlModel = os.path.join(dirp, self.mlModel)
+        with open ( mlModel, "rb" ) as f:
             self.onnx = f.read()
             f.close()
         import onnx
-        m = onnx.load ( modelFile )
+        m = onnx.load ( mlModel )
         smYields, inputMeans, inputErrors = {}, [], []
         nll_exp_mu0, nll_obs_mu0 = None, None
         # smYields = []

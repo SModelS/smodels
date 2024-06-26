@@ -25,7 +25,7 @@ class NNData:
     """
     Holds data for use in the machine learned models
     :ivar nsignals: signal predictions list divided into sublists, one for each json file
-    :ivar modelFile: path to onnx model file
+    :ivar mlModel: path to onnx model file
     """
 
     def __init__(self, nsignals, dataObject ):
@@ -84,15 +84,15 @@ class NNUpperLimitComputer:
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
-        # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForModel}" )
-        # print ( f"@@0 datasetOrder {type(self.data.globalInfo.datasetOrderForModel)}" )
+        # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForMLModel}" )
+        # print ( f"@@0 datasetOrder {type(self.data.globalInfo.datasetOrderForMLModel)}" )
         # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
         # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
         #print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
         # print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
         # print ( f"@@3 errors {self.data.globalInfo.inputErrors}" )
         syields = []
-        for i,ds in enumerate(self.data.globalInfo.datasetOrderForModel):
+        for i,ds in enumerate(self.data.globalInfo.datasetOrderForMLModel):
             if type(ds) in [ tuple ]:
                 idx = self.data.origDataSetOrder.index ( ds[0] )
                 tmp = float ( self.nsignals[idx]*poi_test )
