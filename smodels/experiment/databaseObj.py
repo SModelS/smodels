@@ -1190,15 +1190,15 @@ class SubDatabase(object):
                 newDataSet.dataInfo = dataset.dataInfo
                 newDataSet.txnameList = []
                 for txname in dataset.txnameList:
-                    if type(txname.validated) == str:
-                        txname.validated = txname.validated.lower()
-                    # print ( "txname",txname.validated,type(txname.validated) )
-                    if (txname.validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
-                        logger.error("value of validated field '%s' in %s unknown." % (txname.validated, expResult))
-                    if txname.validated in [None, "none"]:  # FIXME after 1.1.1 this becomes a warning msg?
+                    validated = txname.validated
+                    if type(validated) == str:
+                        validated = validated.lower()
+                    if (validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
+                        logger.error("value of validated field '%s' in %s unknown." % (validated, expResult))
+                    if validated in [None, "none"]:  # FIXME after 1.1.1 this becomes a warning msg?
                         logger.debug("validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." %
                             (expResult.globalInfo.id, dataset.dataInfo.dataId, txname))
-                    if txname.validated not in [None, True, "true", "n/a", "tbd"] and (not useNonValidated):
+                    if validated not in [None, True, "true", "n/a", "tbd"] and (not useNonValidated):
                         continue
                     if txnames != ['all']:
                         #Replaced by wildcard-evaluation below (2018-04-06 mat)
