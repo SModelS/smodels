@@ -43,6 +43,7 @@ New in Version 3.0.0:
   * Added :ref:`outputFormat <parameterFileOutputFormat>` option to parameters.ini to allow for writing the output using the old format 
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure (see :ref:`missing topologies <finalStateSMS>`)
   * We now report negative log likelihoods, instead of likelihoods 
+  * `model.updateParticles <base.html#base.model.Model.updateParticles>`_ and `crossSection.getXsecFromSLHAFile <base.html#base.crossSection.getXsecFromSLHAFile>`_ can now also supply SLHA strings instead of SLHA filenames as argument
   * Z2parity attribute of particles is not longer needed
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (see :ref:`SMS Dictionary <smsDictionary>`)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see :ref:`Clustering <cluster>`)

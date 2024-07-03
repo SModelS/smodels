@@ -732,7 +732,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     Obtain cross sections for pair production of R-odd particles from input SLHA file.
     The default unit for cross section is pb.
 
-    :parameter slhafile: SLHA input file with cross sections
+    :parameter slhafile: SLHA input file with cross sections, can also be a string containing the SLHA file content
     :parameter useXSecs: if defined enables the user to select cross sections to
                      use. Must be a XSecInfoList object
     :parameter xsecUnit: cross section unit in the input file (must be a Unum unit)
@@ -741,7 +741,11 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     """
     # Store information about all cross sections in the SLHA file
     xSecsInFile = XSectionList()
-    f = pyslha.readSLHAFile(slhafile)
+    from smodels.base.runtime import slhaFileOrString
+    if slhaFileOrString ( slhafile ):
+        f = pyslha.readSLHA(slhafile)
+    else:
+        f = pyslha.readSLHAFile(slhafile)
     for production in f.xsections:
         process = f.xsections.get(production)
         for pxsec in process.xsecs:
