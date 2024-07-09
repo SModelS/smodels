@@ -129,6 +129,7 @@ class PyhfData:
             logger.error("The 'inputJsons' parameter must be of type list")
             self.errorFlag = True
             return
+
         for ws, jsName in zip(self.inputJsons, [js for js in self.jsonFiles]):
             wsChannelsInfo = {}
             wsChannelsInfo["signalRegions"] = []
@@ -140,7 +141,8 @@ class PyhfData:
                     )
                 )
                 self.channelsInfo = None
-                return
+                returnw
+
             nbCRwithEM = 0
             nbCRinWS = 0
             for dataset in self.jsonFiles[jsName]:
@@ -153,18 +155,27 @@ class PyhfData:
                 logger.warning(f"Number of CRs in workspace: {nbCRinWS} but number of CRs with EM: {nbCRwithEM}. Signal in CRs will not be patched.")
             if nbCRwithEM != 0 and not self.includeCRs:
                 logger.warning("EM in CRs but includeCRs == False. Signal in CRs will not be patched.")
+
+            smodelsRegions = self.jsonFiles[jsName] # CR and SR names implemented in the database
             for i_ch, ch in enumerate(ws["channels"]):
                 if "SR" in ch["name"] or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
+                    nBins = len(ch["samples"][0]["data"])
+                    smodelsName = ";".join( smodelsRegions[:nBins] ) # Name of the corresponding CR or SR. Join all CR or SR names if multiple bins.
+                    smodelsRegions = smodelsRegions[nBins:]
+
                     wsChannelsInfo["signalRegions"].append(
                         {
                             "path": "/channels/"
                             + str(i_ch)
                             + "/samples/0",  # Path of the new sample to add (signal prediction)
-                            "size": len(ch["samples"][0]["data"]),
+                            "size": nBins,
+                            "smodelsName": smodelsName
                         }
                     )  # Number of bins
+
                 else:
                     wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': ch["name"]})
+
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
             )  # Need to sort correctly the paths to the channels to be removed
@@ -309,7 +320,7 @@ class PyhfUpperLimitComputer:
             patch = []
             for srInfo in info["signalRegions"]:
                 nBins = srInfo["size"]
-                operator = {}
+                operator = {} # Operator for patching the signal
                 operator["op"] = "add"
                 operator["path"] = srInfo["path"]
                 value = {}
@@ -327,15 +338,17 @@ class PyhfUpperLimitComputer:
                                                "type": "histosys",
                                                "name": "signalUncertainty"
                                               })
-                value["name"] = "bsm"
+                value["name"] = "bsm:" + srInfo["smodelsName"]
                 operator["value"] = value
                 patch.append(operator)
+
             for region in info["otherRegions"]:
                 if 'CR' in region['name'] and self.includeCRs:
                     continue
                 else:
-                    patch.append({"op": "remove", "path": region['path']})
+                    patch.append({"op": "remove", "path": region['path']}) # operator for removing useless regions
             patches.append(patch)
+
         return patches
 
     def wsMaker(self, apriori=False):
@@ -360,7 +373,7 @@ class PyhfUpperLimitComputer:
                             if obs["name"] == ch["name"]:
                                 bkg = [0.0] * len(obs["data"])
                                 for sp in ch["samples"]:
-                                    if sp["name"] == "bsm":
+                                    if "bsm:" in sp["name"]:
                                         continue
                                     for iSR in range(len(obs["data"])):
                                         # Summing over all bkg samples for each bin/SR
@@ -383,7 +396,7 @@ class PyhfUpperLimitComputer:
                             if obs["name"] == ch["name"]:
                                 bkg = [0.0] * len(obs["data"])
                                 for sp in ch["samples"]:
-                                    if sp["name"] == "bsm":
+                                    if "bsm:" in sp["name"]:
                                         continue
                                     for iSR in range(len(obs["data"])):
                                         # Summing over all bkg samples for each bin/SR
@@ -400,6 +413,7 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 workspaces.append(ws)
+
             return workspaces
 
     def backup(self):
