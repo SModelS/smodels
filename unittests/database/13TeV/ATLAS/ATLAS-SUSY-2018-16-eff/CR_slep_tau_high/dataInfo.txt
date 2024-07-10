@@ -1,7 +1,7 @@
 dataId: CR_slep_tau_high
 dataType: efficiencyMap
 observedN: 218
-expectedBG: 1
-bgError: 1
-upperLimit: 10000000.0*fb
-expectedUpperLimit: 10000000.0*fb
+expectedBG: 218.4
+bgError: 15.4
+upperLimit: 0.303*fb
+expectedUpperLimit: 0.3042*fb

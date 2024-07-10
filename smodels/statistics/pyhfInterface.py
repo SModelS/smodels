@@ -342,17 +342,19 @@ class PyhfUpperLimitComputer:
                 operator["value"] = value
                 patch.append(operator)
 
-                operator = {} # Operator for renaming the channels according to their region name from the database
-                operator["op"] = "replace"
-                operator["path"] = srInfo["path"].replace('samples/0','name')
-                operator["value"] = srInfo["smodelsName"]
-                patch.append(operator)
+                if srInfo["smodelsName"]: # If the CRs/SRs have a name in the database (it is always True when running SModelS the usual way)
+                    operator = {} # Operator for renaming the channels according to their region name from the database
+                    operator["op"] = "replace"
+                    operator["path"] = srInfo["path"].replace('samples/0','name')
+                    operator["value"] = srInfo["smodelsName"]
+                    patch.append(operator)
 
-                operator = {} # Operator for renaming the observations according to their region name from the database
-                operator["op"] = "replace"
-                operator["path"] = srInfo["path"].replace('channels','observations').replace('samples/0','name')
-                operator["value"] = srInfo["smodelsName"]
-                patch.append(operator)
+                    operator = {} # Operator for renaming the observations according to their region name from the database
+                    operator["op"] = "replace"
+                    operator["path"] = srInfo["path"].replace('channels','observations').replace('samples/0','name')
+                    operator["value"] = srInfo["smodelsName"]
+                    patch.append(operator)
+
             for region in info["otherRegions"]:
                 if 'CR' in region['name'] and self.includeCRs:
                     continue
