@@ -141,7 +141,7 @@ class PyhfData:
                     )
                 )
                 self.channelsInfo = None
-                returnw
+                return
 
             nbCRwithEM = 0
             nbCRinWS = 0
