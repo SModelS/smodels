@@ -338,10 +338,21 @@ class PyhfUpperLimitComputer:
                                                "type": "histosys",
                                                "name": "signalUncertainty"
                                               })
-                value["name"] = "bsm:" + srInfo["smodelsName"]
+                value["name"] = "bsm"
                 operator["value"] = value
                 patch.append(operator)
 
+                operator = {} # Operator for renaming the channels according to their region name from the database
+                operator["op"] = "replace"
+                operator["path"] = srInfo["path"].replace('samples/0','name')
+                operator["value"] = srInfo["smodelsName"]
+                patch.append(operator)
+
+                operator = {} # Operator for renaming the observations according to their region name from the database
+                operator["op"] = "replace"
+                operator["path"] = srInfo["path"].replace('channels','observations').replace('samples/0','name')
+                operator["value"] = srInfo["smodelsName"]
+                patch.append(operator)
             for region in info["otherRegions"]:
                 if 'CR' in region['name'] and self.includeCRs:
                     continue
@@ -373,7 +384,7 @@ class PyhfUpperLimitComputer:
                             if obs["name"] == ch["name"]:
                                 bkg = [0.0] * len(obs["data"])
                                 for sp in ch["samples"]:
-                                    if "bsm:" in sp["name"]:
+                                    if sp["name"] == "bsm":
                                         continue
                                     for iSR in range(len(obs["data"])):
                                         # Summing over all bkg samples for each bin/SR
@@ -396,7 +407,7 @@ class PyhfUpperLimitComputer:
                             if obs["name"] == ch["name"]:
                                 bkg = [0.0] * len(obs["data"])
                                 for sp in ch["samples"]:
-                                    if "bsm:" in sp["name"]:
+                                    if sp["name"] == "bsm":
                                         continue
                                     for iSR in range(len(obs["data"])):
                                         # Summing over all bkg samples for each bin/SR
