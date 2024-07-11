@@ -59,7 +59,6 @@ class PyhfTest(unittest.TestCase):
         expRes = database.getExpResults(analysisIDs=['ATLAS-SUSY-2019-09'],
                                             datasetIDs=['all'],
                                             dataTypes=['efficiencyMap'])[0]
-        print ( len(expRes.datasets) )
         from smodels.experiment.datasetObj import CombinedDataSet
         deltas_rel = 0.
         srNsigs = [0.]*len(expRes.origdatasets)
