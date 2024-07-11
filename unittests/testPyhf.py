@@ -54,6 +54,10 @@ class PyhfTest(unittest.TestCase):
         return ws
 
     def testJsonNames(self):
+        """ FIXME this is a test for the correctness of our 
+        pyhf name hack. the hack as well as this test will disappear,
+        once a proper smodels-name to pyhf-name map is in place in the database
+        """
         from smodels.experiment.databaseObj import Database
         database = Database('./database_extra/')
         expRes = database.getExpResults(analysisIDs=['ATLAS-SUSY-2019-09'],
