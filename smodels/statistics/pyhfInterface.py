@@ -129,6 +129,7 @@ class PyhfData:
             logger.error("The 'inputJsons' parameter must be of type list")
             self.errorFlag = True
             return
+
         for ws, jsName in zip(self.inputJsons, [js for js in self.jsonFiles]):
             wsChannelsInfo = {}
             wsChannelsInfo["signalRegions"] = []
@@ -141,6 +142,7 @@ class PyhfData:
                 )
                 self.channelsInfo = None
                 return
+
             nbCRwithEM = 0
             nbCRinWS = 0
             for dataset in self.jsonFiles[jsName]:
@@ -153,18 +155,27 @@ class PyhfData:
                 logger.warning(f"Number of CRs in workspace: {nbCRinWS} but number of CRs with EM: {nbCRwithEM}. Signal in CRs will not be patched.")
             if nbCRwithEM != 0 and not self.includeCRs:
                 logger.warning("EM in CRs but includeCRs == False. Signal in CRs will not be patched.")
+
+            smodelsRegions = self.jsonFiles[jsName] # CR and SR names implemented in the database
             for i_ch, ch in enumerate(ws["channels"]):
                 if "SR" in ch["name"] or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
+                    nBins = len(ch["samples"][0]["data"])
+                    smodelsName = ";".join( smodelsRegions[:nBins] ) # Name of the corresponding CR or SR. Join all CR or SR names if multiple bins.
+                    smodelsRegions = smodelsRegions[nBins:]
+
                     wsChannelsInfo["signalRegions"].append(
                         {
                             "path": "/channels/"
                             + str(i_ch)
                             + "/samples/0",  # Path of the new sample to add (signal prediction)
-                            "size": len(ch["samples"][0]["data"]),
+                            "size": nBins,
+                            "smodelsName": smodelsName
                         }
                     )  # Number of bins
+
                 else:
                     wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': ch["name"]})
+
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
             )  # Need to sort correctly the paths to the channels to be removed
@@ -293,6 +304,28 @@ class PyhfUpperLimitComputer:
             pass
         self.nsignals_1 = self.nsignals.copy()  # nsignals at previous loop
 
+    def changeChannelName ( self, srInfo ):
+        """ changes the channel names in the json to match the SModelS name.
+        FIXME this is only a hack for now, should be replaced by a
+        self-respecting dataIdMap in the database itself,
+        that maps the smodels names to the pyhf names explicitly.
+        This method will then go away!
+        """
+        operators= []
+        operator = {} # Operator for renaming the channels according to their region name from the database
+        operator["op"] = "replace"
+        operator["path"] = srInfo["path"].replace('samples/0','name')
+        operator["value"] = srInfo["smodelsName"]
+        operators.append(operator)
+
+        operator = {} # Operator for renaming the observations according to their region name from the database
+        operator["op"] = "replace"
+        operator["path"] = srInfo["path"].replace('channels','observations').replace('samples/0','name')
+        operator["value"] = srInfo["smodelsName"]
+        operators.append(operator)
+        return operators
+
+
     def patchMaker(self):
         """
         Method that creates the list of patches to be applied to the self.inputJsons workspaces, one for each region given the self.nsignals and the informations available in self.channelsInfo and the content of the self.inputJsons
@@ -309,7 +342,7 @@ class PyhfUpperLimitComputer:
             patch = []
             for srInfo in info["signalRegions"]:
                 nBins = srInfo["size"]
-                operator = {}
+                operator = {} # Operator for patching the signal
                 operator["op"] = "add"
                 operator["path"] = srInfo["path"]
                 value = {}
@@ -330,12 +363,24 @@ class PyhfUpperLimitComputer:
                 value["name"] = "bsm"
                 operator["value"] = value
                 patch.append(operator)
+
+                ## FIXME this if block is a hack, only to be used until
+                ## smodels-database has proper dataIdMaps, mapping the smodels
+                ## SR names to the pyhf ones. once these dataIdMaps are in place,
+                ## they should be used instead of this hack that rewrites
+                ## the pyhf channel names
+                if srInfo["smodelsName"]: # If the CRs/SRs have a name in the database (it is always True when running SModelS the usual way)
+                    operators = self.changeChannelName ( srInfo )
+                    for operator in operators:
+                        patch.append(operator)
+
             for region in info["otherRegions"]:
                 if 'CR' in region['name'] and self.includeCRs:
                     continue
                 else:
-                    patch.append({"op": "remove", "path": region['path']})
+                    patch.append({"op": "remove", "path": region['path']}) # operator for removing useless regions
             patches.append(patch)
+
         return patches
 
     def wsMaker(self, apriori=False):
@@ -400,6 +445,7 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 workspaces.append(ws)
+
             return workspaces
 
     def backup(self):

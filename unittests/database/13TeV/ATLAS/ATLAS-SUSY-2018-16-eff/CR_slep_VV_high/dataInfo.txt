@@ -1,7 +1,7 @@
 dataId: CR_slep_VV_high
 dataType: efficiencyMap
 observedN: 367
-expectedBG: 1
-bgError: 1
-upperLimit: 10000000.0*fb
-expectedUpperLimit: 10000000.0*fb
+expectedBG: 361.8
+bgError: 17.5
+upperLimit: 0.4015*fb
+expectedUpperLimit: 0.3841*fb
