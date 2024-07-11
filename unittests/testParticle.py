@@ -40,6 +40,25 @@ p1c.pdg = 10
 
 class ParticleTest(unittest.TestCase):
 
+    def testSLHAFileAsString(self):
+        """ test if we get the same result if SLHA file is given as string
+        """
+        slhafile = 'testFiles/slha/lightEWinos.slha'
+        firstModel = Model(BSMparticles=BSMList, SMparticles=SMList)
+        firstModel.updateParticles(slhafile)
+
+        secondModel = Model(BSMparticles=BSMList, SMparticles=SMList)
+        with open(slhafile) as f:
+            secondModel.updateParticles(f.read())
+
+        self.assertTrue ( firstModel == secondModel )
+
+        slhafile = 'testFiles/slha/gluino_squarks.slha'
+        with open(slhafile) as f:
+            secondModel.updateParticles(f.read())
+
+        self.assertTrue ( firstModel != secondModel )
+
     def testParticleComparison(self):
 
         slhafile = 'testFiles/slha/lightEWinos.slha'
