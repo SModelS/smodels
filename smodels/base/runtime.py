@@ -50,6 +50,7 @@ def filetype ( filename ):
         return None
     return None
 
+
 def experimentalFeatures():
     """ a simple boolean flag to turn experimental features on/off,
     can be turned on and off via options:experimental in parameters.ini.

@@ -6,12 +6,12 @@
 """
 
 import pyslha
+import os
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import GeV
 from smodels.base import lheReader, crossSection
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.exceptions import SModelSBaseError as SModelSError
-
 
 class Model(object):
     """
@@ -179,25 +179,24 @@ class Model(object):
         (masses, widths, BRs and cross-sections). If a http address is given, it will
         attempt to download the file.
 
-        :param inputFile: input file (SLHA or LHE)
+        :param inputFile: input file (SLHA or LHE), can also be a string containing the SLHA file
 
         :return: dictionary with masses, dictionary with decays and XSectionList object
-        """
+        """ 
 
         # Download input file, if requested
         if inputFile.startswith("http") or inputFile.startswith("ftp"):
             logger.info("Asked for remote slhafile %s. Fetching it." % inputFile)
             import requests
-            import os.path
             r = requests.get(inputFile)
             if r.status_code != 200:
                 logger.error("Could not retrieve remote file %d: %s" % (r.status_code, r.reason))
                 raise SModelSError()
-            basename = os.path.basename(inputFile)
-            f = open(basename, "w")
+            baseName = os.path.basename(inputFile)
+            f = open(baseName, "w")
             f.write(r.text)
             f.close()
-            inputFile = basename
+            inputFile = baseName
 
         #  Trick to suppress pyslha error messages:
         import sys
@@ -205,7 +204,10 @@ class Model(object):
         #  Try to read file assuming it is an SLHA file:
         try:
             sys.stderr = None
-            res = pyslha.readSLHAFile(inputFile)
+            if os.path.isfile(inputFile):
+                res = pyslha.readSLHAFile(inputFile)
+            else:
+                res = pyslha.readSLHA(inputFile)
             massDict = res.blocks['MASS']
             #  Make sure both PDG signs appear in massDict
             for pdg, mass in massDict.items():
@@ -382,14 +384,13 @@ class Model(object):
                         if hasattr ( particle, attr ):
                             delattr(particle, attr)
 
-
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, ignorePromptQNumbers=[],
                         minMass=1.0*GeV):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
 
-        :param inputFile: input file (SLHA or LHE)
+        :param inputFile: input file (SLHA or LHE), can also be the file content given as a long string
 
         :param promptWidth: Maximum width for considering particles as decaying prompt. If None, it
                             will be set 1e-11 GeV.
@@ -407,12 +408,14 @@ class Model(object):
         """
 
         self.inputFile = inputFile
+        if not os.path.isfile(inputFile):
+            self.inputFile = "string"
         if promptWidth is None:
             promptWidth = 1e-11*GeV
         if stableWidth is None:
             stableWidth = 1e-25*GeV
 
-        massDict, decaysDict, xsections = self.getModelDataFrom(self.inputFile)
+        massDict, decaysDict, xsections = self.getModelDataFrom(inputFile)
         self.xsections = xsections
 
         #  Restric BSM particles to the overlap between allBSMparticles and massDict:
