@@ -6,13 +6,12 @@
 """
 
 import pyslha
+import os
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import GeV
 from smodels.base import lheReader, crossSection
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.exceptions import SModelSBaseError as SModelSError
-from smodels.base.runtime import slhaFileOrString
-
 
 class Model(object):
     """
@@ -183,22 +182,21 @@ class Model(object):
         :param inputFile: input file (SLHA or LHE), can also be a string containing the SLHA file
 
         :return: dictionary with masses, dictionary with decays and XSectionList object
-        """
+        """ 
 
         # Download input file, if requested
         if inputFile.startswith("http") or inputFile.startswith("ftp"):
             logger.info("Asked for remote slhafile %s. Fetching it." % inputFile)
             import requests
-            import os.path
             r = requests.get(inputFile)
             if r.status_code != 200:
                 logger.error("Could not retrieve remote file %d: %s" % (r.status_code, r.reason))
                 raise SModelSError()
-            basename = os.path.basename(inputFile)
-            f = open(basename, "w")
+            baseName = os.path.basename(inputFile)
+            f = open(baseName, "w")
             f.write(r.text)
             f.close()
-            inputFile = basename
+            inputFile = baseName
 
         #  Trick to suppress pyslha error messages:
         import sys
@@ -206,10 +204,10 @@ class Model(object):
         #  Try to read file assuming it is an SLHA file:
         try:
             sys.stderr = None
-            if slhaFileOrString ( inputFile ):
-                res = pyslha.readSLHA ( inputFile )
-            else:
+            if os.path.isfile(inputFile):
                 res = pyslha.readSLHAFile(inputFile)
+            else:
+                res = pyslha.readSLHA(inputFile)
             massDict = res.blocks['MASS']
             #  Make sure both PDG signs appear in massDict
             for pdg, mass in massDict.items():
@@ -410,7 +408,7 @@ class Model(object):
         """
 
         self.inputFile = inputFile
-        if slhaFileOrString ( inputFile ):
+        if not os.path.isfile(inputFile):
             self.inputFile = "string"
         if promptWidth is None:
             promptWidth = 1e-11*GeV

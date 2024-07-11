@@ -50,33 +50,6 @@ def filetype ( filename ):
         return None
     return None
 
-def slhaFileOrString ( string : str ) -> bool:
-    """ is the given string a path to an slha file,
-    or is it an SLHA file content?
-
-    :returns: true, if string is data string, false is path to slha file
-    """
-    import os
-    if string.endswith(".slha") and os.path.exists ( string ):
-        ## clearly a file
-        return False
-    if len(string)>100 and not string.endswith(".slha"):
-        ## clearly a string
-        return True
-    if os.path.exists ( string ):
-        ## most probably a file
-        return False
-    if len(string)>100 and "BLOCK " in string:
-        ## clearly a string
-        return True
-    if len(string)>100 and "block " in string:
-        ## clearly a string
-        return True
-    if len(string)>100:
-        logger.warning ( f"am not sure if input is a string or a filename, will assume it is a string" )
-        return True
-    logger.warning ( f"am not sure if input is a string or a filename, will assume it is a filename" )
-    return False
 
 def experimentalFeatures():
     """ a simple boolean flag to turn experimental features on/off,

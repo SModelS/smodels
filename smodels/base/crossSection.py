@@ -11,6 +11,7 @@
 
 import unum
 import pyslha
+import os
 from smodels.base.physicsUnits import TeV, pb, GeV
 from smodels.base import lheReader
 from smodels.base.exceptions import SModelSBaseError as SModelSError
@@ -741,11 +742,20 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     """
     # Store information about all cross sections in the SLHA file
     xSecsInFile = XSectionList()
-    from smodels.base.runtime import slhaFileOrString
-    if slhaFileOrString ( slhafile ):
-        f = pyslha.readSLHA(slhafile)
-    else:
-        f = pyslha.readSLHAFile(slhafile)
+    # Check if slhafile is a valid file:
+    if os.path.isfile(slhafile):
+        try:
+            f = pyslha.readSLHAFile(slhafile)
+        except Exception as e:
+            logger.error(f"Error reading file {f}: {e}")
+            raise SModelSError()
+    else: # Assume slhafile is a string containing the SLHA file content:
+        try:
+            f = pyslha.readSLHA(slhafile)
+        except Exception as e:
+            logger.error(f"Error reading SLHA string {f}: {e}")
+            raise SModelSError()
+        
     for production in f.xsections:
         process = f.xsections.get(production)
         for pxsec in process.xsecs:
