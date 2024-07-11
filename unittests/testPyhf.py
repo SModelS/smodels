@@ -53,6 +53,25 @@ class PyhfTest(unittest.TestCase):
                   version='1.0.0')
         return ws
 
+    def testJsonNames(self):
+        from smodels.experiment.databaseObj import Database
+        database = Database('./database_extra/')
+        expRes = database.getExpResults(analysisIDs=['ATLAS-SUSY-2019-09'],
+                                            datasetIDs=['all'],
+                                            dataTypes=['efficiencyMap'])[0]
+        print ( len(expRes.datasets) )
+        from smodels.experiment.datasetObj import CombinedDataSet
+        deltas_rel = 0.
+        srNsigs = [0.]*len(expRes.origdatasets)
+        from smodels.statistics.statsTools import StatsComputer
+        cdataset = CombinedDataSet ( expRes )
+        computer = StatsComputer.forPyhf( cdataset, srNsigs,  deltas_rel )
+        channelnames = [['SRWZ_1', 'SRWZ_10', 'SRWZ_11', 'SRWZ_12', 'SRWZ_13', 'SRWZ_14', 'SRWZ_15', 'SRWZ_16', 'SRWZ_17', 'SRWZ_18', 'SRWZ_19', 'SRWZ_2', 'SRWZ_20', 'SRWZ_3', 'SRWZ_4', 'SRWZ_5', 'SRWZ_6', 'SRWZ_7', 'SRWZ_8', 'SRWZ_9', 'WZ_CR_0jets_cuts', 'WZ_CR_HighHT_cuts', 'WZ_CR_LowHT_cuts'],['CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts', 'SRhigh_0Jb', 'SRhigh_0Jc', 'SRhigh_0Jd', 'SRhigh_0Je', 'SRhigh_0Jf1', 'SRhigh_0Jf2', 'SRhigh_0Jg1', 'SRhigh_0Jg2', 'SRhigh_nJa', 'SRhigh_nJb', 'SRhigh_nJc', 'SRhigh_nJd', 'SRhigh_nJe', 'SRhigh_nJf', 'SRhigh_nJg', 'SRlow_0Jb', 'SRlow_0Jc', 'SRlow_0Jd', 'SRlow_0Je', 'SRlow_0Jf1', 'SRlow_0Jf2', 'SRlow_0Jg1', 'SRlow_0Jg2', 'SRlow_nJb', 'SRlow_nJc', 'SRlow_nJd', 'SRlow_nJe', 'SRlow_nJf1', 'SRlow_nJf2', 'SRlow_nJg1', 'SRlow_nJg2']]
+        for i,ws in enumerate ( computer.likelihoodComputer.workspaces ):
+            model = ws.model()
+            self.assertTrue ( model.config.channels == channelnames[i] )
+
+
     def testCorruptJson1Signal(self):
         """
         Tests how the module handles corrupted json files
