@@ -181,7 +181,7 @@ class TheoryPrediction(object):
                 datasetList = [ds.getID() for ds in self.dataset.origdatasets]
                 for ds in datasetList:
                     if ds not in srNsigDict.keys():
-                        srNsigDict.update( {ds: 0} )
+                        srNsigDict.update( {ds: 0.0} )
                 # Get list of signal yields corresponding to the dataset order:
                 # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                 #        for dataID in datasetList]
