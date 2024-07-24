@@ -107,15 +107,15 @@ class PyhfData:
 
         self.nWS = len(inputJsons)
         self.errorFlag = False
-        self.getWSInfo()
         self.checkConsistency()
+        self.getWSInfo()
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
         S = 0
         for dict in self.nsignals.values():
             for signal in dict.values():
-                if type(signal) == list:
+                if isinstance(signal, list):
                     for sig in signal:
                         S += sig
                 else:
@@ -130,6 +130,9 @@ class PyhfData:
             - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
             - :key otherRegions: list of dictionnaries indicating the path and the name of the control and/or validation region channels
         """
+        if self.errorFlag:
+            return
+
         # Identifying the path to the channels in the main workspace files
         self.channelsInfo = []  # workspace specifications
         if not isinstance(self.inputJsons, list):
@@ -157,27 +160,48 @@ class PyhfData:
                     if signalName == region['smodels'] and region['type'] == 'CR':
                         sigInCRs = True
             if sigInCRs and not self.includeCRs:
-                logger.warning("Signal in CRs but includeCRs = False. CRs will be removed.")
+                logger.warning("Signal in CRs but includeCRs = False. CRs will still be removed.")
 
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
-            for i_ch, ch in enumerate(ws["channels"]):
-                if "SR" in ch["name"] or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
-                    nBins = len(ch["samples"][0]["data"])
-                    smodelsName = ";".join( smodelsRegions[:nBins] ) # Name of the corresponding CR or SR. Join all CR or SR names if multiple bins.
-                    smodelsRegions = smodelsRegions[nBins:]
+            for i_ch, ch in enumerate(ws["observations"]):
+                for region in self.jsonFiles[jsName]:
+                    if region['pyhf'] == ch['name']:
+                        if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
+                            if region['smodels'] not in self.nsignals[jsName]:
+                                logger.error(f"Region {region['smodels']} of {jsName} not in the signal dictionary!")
+                                self.errorFlag = True
+                                return
+                            else:
+                                nBins = len(ch["data"])
+                                # Find all smodels names if many share the same pyhf name (for multi-bin regions)
+                                smodelsName = []
+                                for region in self.jsonFiles[jsName]:
+                                    if region['pyhf'] == ch['name']:
+                                        smodelsName.append(region['smodels'])
+                                if len(smodelsName) != nBins:
+                                    logger.error(f"Json region {region['pyhf']} has {nBins} bins, but only {len(smodelsName)} are implemented!")
+                                    self.errorFlag = True
+                                    return
 
-                    wsChannelsInfo["signalRegions"].append(
-                        {
-                            "path": "/channels/"
-                            + str(i_ch)
-                            + "/samples/0",  # Path of the new sample to add (signal prediction)
-                            "size": nBins,
-                            "smodelsName": smodelsName
-                        }
-                    )  # Number of bins
+                                signal = []
+                                for name in smodelsName: # In case of multiple signals for one region, the dict ordering within globalInfo.jsonFiles matters
+                                    signal.append(self.nsignals[jsName][name])
 
-                else:
-                    wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': ch["name"]})
+                                smodelsName = ";".join( smodelsName ) # Name of the corresponding region(s). Join all names if multiple bins.
+
+                                wsChannelsInfo["signalRegions"].append(
+                                    {
+                                        "path": "/channels/"
+                                        + str(i_ch)
+                                        + "/samples/0",  # Path of the new sample to add (signal prediction)
+                                        "size": nBins,
+                                        "smodelsName": smodelsName,
+                                        "signal": signal
+                                    }
+                                )
+                        else:
+                            wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': ch["name"], 'type': region['type']})
+                        break
 
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
@@ -190,29 +214,31 @@ class PyhfData:
 
         :param zeroSignalsFlag: boolean identifying if all SRs of a single json are empty
         """
-        if not isinstance(self.nsignals, list):
+        if not isinstance(self.nsignals, dict):
             logger.error("The 'nsignals' parameter must be of type list")
             self.errorFlag = True
+
         if self.nWS != len(self.nsignals):
             logger.error(
                 "The number of subsignals provided is different from the number of json files"
             )
             self.errorFlag = True
         self.zeroSignalsFlag = list()
-        if self.channelsInfo == None:
-            return
-        for wsInfo, subSig in zip(self.channelsInfo, self.nsignals):
-            if not isinstance(subSig, list):
-                logger.error("The 'nsignals' parameter must be a two dimensional list")
+
+        for jsName, subSig in zip(self.jsonFiles, self.nsignals.values()):
+            if not isinstance(subSig, dict):
+                logger.error("The 'nsignals' parameter must be a dictionary of dictionary")
                 self.errorFlag = True
+                return
             nBinsJson = 0
-            for sr in wsInfo["signalRegions"]:
-                nBinsJson += sr["size"]
+            for region in self.jsonFiles[jsName]:
+                if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
+                    nBinsJson += 1
             if nBinsJson != len(subSig):
                 logger.error(
-                    f"The number of signals ({len(subSig)}) provided is different from the number of bins for json ({nBinsJson}), number {self.channelsInfo.index(wsInfo)} and channel number {self.nsignals.index(subSig)}" )
+                    f"The number of signals ({len(subSig)}) provided is different from the number of signal bins for json ({nBinsJson}) for {jsName}" )
                 self.errorFlag = True
-            allZero = all([s == 0 for s in subSig])
+            allZero = all([s == 0 for s in subSig.values()])
             # Checking if all signals matching this json are zero
             self.zeroSignalsFlag.append(allZero)
 
@@ -291,7 +317,9 @@ class PyhfUpperLimitComputer:
         :return: updated list of patches and workspaces (self.patches, self.workspaces and self.workspaces_expected)
         """
 
-        self.nsignals = [[sig * factor for sig in ws] for ws in self.nsignals]
+        for jsName in self.nsignals.keys():
+            for regionName in self.nsignals[jsName].keys():
+                self.nsignals[jsName][regionName] = self.nsignals[jsName][regionName]*factor
         try:
             self.alreadyBeenThere = self.nsignals == self.nsignals_2
         except AttributeError:
@@ -341,16 +369,14 @@ class PyhfUpperLimitComputer:
             return None
         # Constructing the patches to be applied on the main workspace files
         patches = []
-        for ws, info, subSig in zip(self.inputJsons, self.channelsInfo, self.nsignals):
+        for ws, info in zip(self.inputJsons, self.channelsInfo):
             patch = []
             for srInfo in info["signalRegions"]:
-                nBins = srInfo["size"]
                 operator = {} # Operator for patching the signal
                 operator["op"] = "add"
                 operator["path"] = srInfo["path"]
                 value = {}
-                value["data"] = subSig[:nBins]
-                subSig = subSig[nBins:]
+                value["data"] = srInfo['signal']
                 value["modifiers"] = []
                 value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
                 value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
@@ -378,7 +404,7 @@ class PyhfUpperLimitComputer:
                         patch.append(operator)
 
             for region in info["otherRegions"]:
-                if 'CR' in region['name'] and self.includeCRs:
+                if region['type'] == 'CR' and self.includeCRs:
                     continue
                 else:
                     patch.append({"op": "remove", "path": region['path']}) # operator for removing useless regions
@@ -549,9 +575,9 @@ class PyhfUpperLimitComputer:
             self.backup()
             try:
                 if abs(mu - 1.0) > 1e-6:
-                    for i, ns in enumerate(self.data.nsignals):
-                        for j, v in enumerate(ns):
-                            self.data.nsignals[i][j] = v * mu
+                    for jsName in self.data.nsignals.keys():
+                        for regionName in self.data.nsignals[jsName].keys():
+                            self.data.nsignals[jsName][regionName] = self.data.nsignals[jsName][regionName]*mu
                 self.__init__(self.data, self.cl, self.lumi)
                 ### allow this, for computation of l_SM
                 # if self.zeroSignalsFlag[workspace_index] == True:
@@ -1036,88 +1062,90 @@ class PyhfUpperLimitComputer:
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
-    C = [
-        18774.2,
-        -2866.97,
-        -5807.3,
-        -4460.52,
-        -2777.25,
-        -1572.97,
-        -846.653,
-        -442.531,
-        -2866.97,
-        496.273,
-        900.195,
-        667.591,
-        403.92,
-        222.614,
-        116.779,
-        59.5958,
-        -5807.3,
-        900.195,
-        1799.56,
-        1376.77,
-        854.448,
-        482.435,
-        258.92,
-        134.975,
-        -4460.52,
-        667.591,
-        1376.77,
-        1063.03,
-        664.527,
-        377.714,
-        203.967,
-        106.926,
-        -2777.25,
-        403.92,
-        854.448,
-        664.527,
-        417.837,
-        238.76,
-        129.55,
-        68.2075,
-        -1572.97,
-        222.614,
-        482.435,
-        377.714,
-        238.76,
-        137.151,
-        74.7665,
-        39.5247,
-        -846.653,
-        116.779,
-        258.92,
-        203.967,
-        129.55,
-        74.7665,
-        40.9423,
-        21.7285,
-        -442.531,
-        59.5958,
-        134.975,
-        106.926,
-        68.2075,
-        39.5247,
-        21.7285,
-        11.5732,
-    ]
-    nsignal = [x / 100.0 for x in [47, 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3]]
-    m = PyhfData(
-        observed=[1964, 877, 354, 182, 82, 36, 15, 11],
-        backgrounds=[2006.4, 836.4, 350.0, 147.1, 62.0, 26.2, 11.1, 4.7],
-        covariance=C,
-        #              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
-        third_moment=[0.0] * 8,
-        nsignal=nsignal,
-        name="ATLAS-SUSY-2018-31 model",
-    )
-    ulComp = PyhfUpperLimitComputer(cl=0.95)
-    # uls = ulComp.getUpperLimitOnMu ( Data ( 15,17.5,3.2,0.00454755 ) )
-    # print ( "uls=", uls )
-    ul_old = 131.828 * sum(
-        nsignal
-    )  # With respect to the older refernece value one must normalize the xsec
-    print("old ul=", ul_old)
-    ul = ulComp.getUpperLimitOnMu(m)
-    print("ul", ul)
+    ### Needs to be updated
+    print("Needs to be updated")
+    # C = [
+    #     18774.2,
+    #     -2866.97,
+    #     -5807.3,
+    #     -4460.52,
+    #     -2777.25,
+    #     -1572.97,
+    #     -846.653,
+    #     -442.531,
+    #     -2866.97,
+    #     496.273,
+    #     900.195,
+    #     667.591,
+    #     403.92,
+    #     222.614,
+    #     116.779,
+    #     59.5958,
+    #     -5807.3,
+    #     900.195,
+    #     1799.56,
+    #     1376.77,
+    #     854.448,
+    #     482.435,
+    #     258.92,
+    #     134.975,
+    #     -4460.52,
+    #     667.591,
+    #     1376.77,
+    #     1063.03,
+    #     664.527,
+    #     377.714,
+    #     203.967,
+    #     106.926,
+    #     -2777.25,
+    #     403.92,
+    #     854.448,
+    #     664.527,
+    #     417.837,
+    #     238.76,
+    #     129.55,
+    #     68.2075,
+    #     -1572.97,
+    #     222.614,
+    #     482.435,
+    #     377.714,
+    #     238.76,
+    #     137.151,
+    #     74.7665,
+    #     39.5247,
+    #     -846.653,
+    #     116.779,
+    #     258.92,
+    #     203.967,
+    #     129.55,
+    #     74.7665,
+    #     40.9423,
+    #     21.7285,
+    #     -442.531,
+    #     59.5958,
+    #     134.975,
+    #     106.926,
+    #     68.2075,
+    #     39.5247,
+    #     21.7285,
+    #     11.5732,
+    # ]
+    # nsignal = [x / 100.0 for x in [47, 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3]]
+    # m = PyhfData(
+    #     observed=[1964, 877, 354, 182, 82, 36, 15, 11],
+    #     backgrounds=[2006.4, 836.4, 350.0, 147.1, 62.0, 26.2, 11.1, 4.7],
+    #     covariance=C,
+    #     #              third_moment = [ 0.1, 0.02, 0.1, 0.1, 0.003, 0.0001, 0.0002, 0.0005 ],
+    #     third_moment=[0.0] * 8,
+    #     nsignal=nsignal,
+    #     name="ATLAS-SUSY-2018-31 model",
+    # )
+    # ulComp = PyhfUpperLimitComputer(cl=0.95)
+    # # uls = ulComp.getUpperLimitOnMu ( Data ( 15,17.5,3.2,0.00454755 ) )
+    # # print ( "uls=", uls )
+    # ul_old = 131.828 * sum(
+    #     nsignal
+    # )  # With respect to the older refernece value one must normalize the xsec
+    # print("old ul=", ul_old)
+    # ul = ulComp.getUpperLimitOnMu(m)
+    # print("ul", ul)

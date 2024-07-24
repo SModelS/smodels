@@ -182,7 +182,6 @@ class TheoryPrediction(object):
                 for ds in datasetList:
                     if ds not in srNsigDict.keys():
                         srNsigDict.update( {ds: 0} )
-                print("srNsigDict:",srNsigDict)
                 # Get list of signal yields corresponding to the dataset order:
                 # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                 #        for dataID in datasetList]
@@ -695,7 +694,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 expResults = sum(dataSetResults)
             else:
                 expResults = TheoryPredictionList()
-                bestRes = _getBestResult(dataSetResults)
+                bestRes = _getBestResult(dataSetResults,expResult.globalInfo)
                 if not bestRes is None:
                     expResults.append(bestRes) # Best result = combination if available
 
@@ -747,11 +746,19 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     :return: TheoryPrediction object
     """
+    # Don't give combined result if all regions are CRs
+    isNotSR = []
+    for predList in dataSetResults:
+        for regionSet in expResult.globalInfo.jsonFiles.values():
+            for region in regionSet:
+                if region['smodels'] == predList[0].dataset.dataInfo.dataId:
+                    if region['type'] == 'SR':
+                        isNotSR.append(False)
+                    else:
+                        isNotSR.append(True)
 
-    if all([True if "CR" in predList[0].dataset.dataInfo.dataId else False for predList in dataSetResults]): # Don't give combined result if all regions are CRs
+    if all(isNotSR):
         return None
-
-    print('FIXME')
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
@@ -801,12 +808,13 @@ def _getCombinedResultFor(dataSetResults, expResult):
     return theoryPrediction
 
 
-def _getBestResult(dataSetResults):
+def _getBestResult(dataSetResults, globalInfo):
     """
     Returns the best result according to the expected upper limit.
     If a combined result is included in the list, always return it.
 
     :param datasetPredictions: list of TheoryPredictionList objects
+    :param globalInfo: globalInfo of the exp result (used to get the region types)
     :return: best result (TheoryPrediction object)
     """
 
@@ -831,8 +839,20 @@ def _getBestResult(dataSetResults):
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
         dataset = predList[0].dataset
-        if "CR" in dataset.dataInfo.dataId: # A CR cannot be the best SR
+
+        # Only a SR can be the best SR
+        stop = False
+        if hasattr(globalInfo,"jsonFiles"):
+            for regionSet in globalInfo.jsonFiles.values():
+                for region in regionSet:
+                    if region['smodels'] == dataset.dataInfo.dataId:
+                        if region['type'] != 'SR':
+                            stop = True
+                    if stop: break
+                if stop: break
+        if stop:
             continue
+
         if dataset.getType() != "efficiencyMap":
             txt = (
                 "Multiple data sets should only exist for efficiency map results, but we have them for %s?"
