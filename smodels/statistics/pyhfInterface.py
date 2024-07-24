@@ -90,7 +90,7 @@ class PyhfData:
     """
 
     def __init__(self, nsignals, inputJsons, jsonFiles=None, includeCRs=False, signalUncertainty=None):
-        self.nsignals = nsignals  # fb
+        self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
         self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)

@@ -236,12 +236,12 @@ class StatsComputer:
                 logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
         jsonDictNames = {}
         for jsName in jsonFiles:
-            jsonDictNames.update( { jsName: [ region['smodels'] for region in jsonFiles[jsName] ] } )
+            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None ] } )
         # jsonRegions = [ [region['smodels'] for region in globalInfo.jsonFiles[jsName]] for jsName in jsonFiles]
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
         for ds in datasets:
             if not ds in jsonRegions:
-                logger.warning(f'Region {ds} does not appear in any json file for {ds.globalInfo.Id}')
+                logger.warning(f'Region {ds} does not appear in any json file for {globalInfo.id}')
         logger.debug("list of datasets: {}".format(datasets))
         logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
 
