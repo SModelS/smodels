@@ -112,7 +112,14 @@ class PyhfData:
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
-        S = sum ( [ sum(x) for x in self.nsignals ] )
+        S = 0
+        for dict in self.nsignals.values():
+            for signal in dict.values():
+                if type(signal) == list:
+                    for sig in signal:
+                        S += sig
+                else:
+                    S += signal
         self.totalYield = S
 
     def getWSInfo(self):
@@ -123,14 +130,14 @@ class PyhfData:
             - :key signalRegions: list of dictonaries with 'json path' and 'size' (number of bins) of the 'signal regions' channels in the json files
             - :key otherRegions: list of dictionnaries indicating the path and the name of the control and/or validation region channels
         """
-        # Identifying the path to the SR and VR channels in the main workspace files
+        # Identifying the path to the channels in the main workspace files
         self.channelsInfo = []  # workspace specifications
         if not isinstance(self.inputJsons, list):
             logger.error("The 'inputJsons' parameter must be of type list")
             self.errorFlag = True
             return
 
-        for ws, jsName in zip(self.inputJsons, [js for js in self.jsonFiles]):
+        for ws, jsName in zip(self.inputJsons, self.jsonFiles):
             wsChannelsInfo = {}
             wsChannelsInfo["signalRegions"] = []
             wsChannelsInfo["otherRegions"] = []
@@ -143,20 +150,16 @@ class PyhfData:
                 self.channelsInfo = None
                 return
 
-            nbCRwithEM = 0
-            nbCRinWS = 0
-            for dataset in self.jsonFiles[jsName]:
-                if "CR" in dataset:
-                    nbCRwithEM += 1
-            for ch in ws["channels"]:
-                if "CR" in ch["name"]:
-                    nbCRinWS += 1
-            if nbCRwithEM and nbCRwithEM != nbCRinWS:
-                logger.warning(f"Number of CRs in workspace: {nbCRinWS} but number of CRs with EM: {nbCRwithEM}. Signal in CRs will not be patched.")
-            if nbCRwithEM != 0 and not self.includeCRs:
-                logger.warning("EM in CRs but includeCRs == False. Signal in CRs will not be patched.")
+            sigInCRs = False
+            signalNames = self.nsignals[jsName].keys()
+            for signalName in signalNames:
+                for region in self.jsonFiles[jsName]:
+                    if signalName == region['smodels'] and region['type'] == 'CR':
+                        sigInCRs = True
+            if sigInCRs and not self.includeCRs:
+                logger.warning("Signal in CRs but includeCRs = False. CRs will be removed.")
 
-            smodelsRegions = self.jsonFiles[jsName] # CR and SR names implemented in the database
+            smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             for i_ch, ch in enumerate(ws["channels"]):
                 if "SR" in ch["name"] or ("CR" in ch["name"] and self.includeCRs and nbCRwithEM == nbCRinWS):  # if channel name starts with 'SR' or 'CR' if includeCRs
                     nBins = len(ch["samples"][0]["data"])

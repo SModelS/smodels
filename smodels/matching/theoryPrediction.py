@@ -179,12 +179,16 @@ class TheoryPrediction(object):
 
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
                 datasetList = [ds.getID() for ds in self.dataset.origdatasets]
+                for ds in datasetList:
+                    if ds not in srNsigDict.keys():
+                        srNsigDict.update( {ds: 0} )
+                print(srNsigDict)
                 # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                       for dataID in datasetList]
+                # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
+                #        for dataID in datasetList]
                 # Get computer
                 computer = StatsComputer.forPyhf(dataset=self.dataset,
-                                                       nsig=srNsigs,
+                                                       nsig=srNsigDict,
                                                        deltas_rel = self.deltas_rel)
 
         self._statsComputer = computer
@@ -698,10 +702,28 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            if not isinstance(theoPred.dataset,CombinedDataSet) and not theoPred.dataset.dataInfo.dataId is None and "CR" in theoPred.dataset.dataInfo.dataId: # Individual CRs shouldn't give results
-                theoPred.upperLimit = None
-            else:
+            type = None
+            if isinstance(theoPred.dataset,CombinedDataSet): # Individual CRs shouldn't give results
                 theoPred.upperLimit = theoPred.getUpperLimit()
+                continue
+            else:
+                if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
+                    for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
+                        for region in regionSet:
+                            if region["smodels"] == theoPred.dataset.dataInfo.dataId:
+                                type = region["type"]
+                else:
+                    type = "SR"
+
+                if type is None:
+                    logger.error(f"Could not find type of region {theoPred.dataInfo.dataId} from {theoPred.globalInfo.Id}")
+                    raise SModelSError()
+
+                if type == "SR":
+                    theoPred.upperLimit = theoPred.getUpperLimit()
+                else:
+                    theoPred.upperLimit = None
+
         expResults.sortTheoryPredictions()
 
         for theoPred in expResults:
@@ -716,7 +738,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 def _getCombinedResultFor(dataSetResults, expResult):
     """
     Compute the combined result for all datasets, if covariance
-    matrices are available. Return a TheoryPrediction object
+    matrices or jsonFiles are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
 
@@ -728,6 +750,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     if all([True if "CR" in predList[0].dataset.dataInfo.dataId else False for predList in dataSetResults]): # Don't give combined result if all regions are CRs
         return None
+
+    print('FIXME')
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
