@@ -223,6 +223,8 @@ class StatsComputer:
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
             for region in globalInfo.jsonFiles[jsName]:
+                if not "type" in region:
+                    region['type']='SR'
                 if region['type'] == 'SR':
                     jsonSRs.append(region['smodels'])
             if all([ds not in jsonSRs for ds in datasets]):

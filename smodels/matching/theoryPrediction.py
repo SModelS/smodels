@@ -752,6 +752,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
         for regionSet in expResult.globalInfo.jsonFiles.values():
             for region in regionSet:
                 if region['smodels'] == predList[0].dataset.dataInfo.dataId:
+                    if not "type" in region:
+                        region["type"]="SR"
                     if region['type'] == 'SR':
                         isNotSR.append(False)
                     else:

@@ -166,6 +166,8 @@ class PyhfData:
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             for i_ch, ch in enumerate(ws["observations"]):
                 for region in self.jsonFiles[jsName]:
+                    if not "pyhf" in region:
+                        region["pyhf"]=region["smodels"]
                     if region['pyhf'] == ch['name']:
                         if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
                             if region['smodels'] not in self.nsignals[jsName]:
