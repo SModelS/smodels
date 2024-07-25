@@ -1015,8 +1015,6 @@ class PyhfUpperLimitComputer:
                 rt1 = root_func(lo_mu)
                 # rt5 = root_func(med_mu)
                 rt10 = root_func(hi_mu)
-                if nattempts == 2:
-                    import sys; sys.exit()
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
