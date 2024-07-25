@@ -19,6 +19,7 @@ from smodels.base.smodelsLogging import logger
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
+# from icecream import ic
 
 jsonver = ""
 try:
@@ -326,7 +327,9 @@ class PyhfUpperLimitComputer:
             pass
         self.scale *= factor
         logger.debug("new signal scale : {}".format(self.scale))
+        #ic ( "rescale", factor, self.nsignals )
         self.patches = self.patchMaker()
+        #ic ( "patches", self.patches )
         self.workspaces = self.wsMaker()
         self.workspaces_expected = self.wsMaker(apriori=True)
         try:
@@ -369,14 +372,19 @@ class PyhfUpperLimitComputer:
             return None
         # Constructing the patches to be applied on the main workspace files
         patches = []
-        for ws, info in zip(self.inputJsons, self.channelsInfo):
+        for ws, info, (jsFileName,jsFile) in zip(self.inputJsons, self.channelsInfo, self.data.jsonFiles.items() ):
             patch = []
             for srInfo in info["signalRegions"]:
                 operator = {} # Operator for patching the signal
                 operator["op"] = "add"
                 operator["path"] = srInfo["path"]
                 value = {}
-                value["data"] = srInfo['signal']
+                #value["data"] = srInfo['signal']
+                sr_order = srInfo["smodelsName"].split(";")
+                nsignals = self.nsignals[jsFileName]
+                value["data"] = [ nsignals[x] for x in sr_order ]
+                #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+                # sys.exit()
                 value["modifiers"] = []
                 value["modifiers"].append({"data": None, "type": "normfactor", "name": "mu_SIG"})
                 value["modifiers"].append({"data": None, "type": "lumi", "name": "lumi"})
@@ -398,7 +406,7 @@ class PyhfUpperLimitComputer:
                 ## SR names to the pyhf ones. once these dataIdMaps are in place,
                 ## they should be used instead of this hack that rewrites
                 ## the pyhf channel names
-                if srInfo["smodelsName"]: # If the CRs/SRs have a name in the database (it is always True when running SModelS the usual way)
+                if False: # srInfo["smodelsName"]: # If the CRs/SRs have a name in the database (it is always True when running SModelS the usual way)
                     operators = self.changeChannelName ( srInfo )
                     for operator in operators:
                         patch.append(operator)
@@ -958,10 +966,12 @@ class PyhfUpperLimitComputer:
                         if pyhfinfo["backend"] == "numpy":
                             sup.filter(RuntimeWarning, r"invalid value encountered in log")
                         # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                        # ic ( workspace["channels"][0]["samples"][0]["data"] )
+                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
                             result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
                         except Exception as e:
-                            logger.info(f"when testing hypothesis {mu}, caught exception: {e}")
+                            logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
                             result = float("nan")
                             if expected == "posteriori":
                                 result = [float("nan")] * 2
@@ -988,6 +998,7 @@ class PyhfUpperLimitComputer:
             nattempts = 0
             nNan = 0
             lo_mu, med_mu, hi_mu = 0.2, 1.0, 5.0
+            # ic ( "A", lo_mu, hi_mu, root_func(lo_mu), root_func(hi_mu) )
             # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
@@ -1004,6 +1015,8 @@ class PyhfUpperLimitComputer:
                 rt1 = root_func(lo_mu)
                 # rt5 = root_func(med_mu)
                 rt10 = root_func(hi_mu)
+                if nattempts == 2:
+                    import sys; sys.exit()
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
