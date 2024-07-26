@@ -123,6 +123,50 @@ class PyhfData:
                     S += signal
         self.totalYield = S
 
+    def createPatchForRegion ( self, region, i_r, i_ch, ch, jsName ):
+        # ic ( region )
+        if not "pyhf" in region:
+            region["pyhf"]=region["smodels"]
+        chname = ch['name']
+        chname2 = f'{ch["name"]}[0]' ## binned SRs
+        if not region["pyhf"] in [ chname, chname2 ]:
+            return None, None
+        if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
+            if region['smodels'] not in self.nsignals[jsName]:
+                logger.error(f"Region {region['smodels']} of {jsName} not in the signal dictionary!")
+                self.errorFlag = True
+                return None, None
+            nBins = len(ch["data"])
+            # Find all smodels names if many share the same pyhf name (for multi-bin regions)
+            smodelsName = []
+            for i_r3, region in enumerate ( self.jsonFiles[jsName] ):
+                chname3 = f'{ch["name"]}[{i_r3}]' ## binned SRs
+                if region['pyhf'] in [ chname, chname3 ]:
+                    smodelsName.append(region['smodels'])
+            if len(smodelsName) != nBins:
+                logger.error(f"Json region {region['pyhf']} has {nBins} bins, but only {len(smodelsName)} are implemented!")
+                self.errorFlag = True
+                return None, None
+
+            signal = []
+            for name in smodelsName: # In case of multiple signals for one region, the dict ordering within globalInfo.jsonFiles matters
+                signal.append(self.nsignals[jsName][name])
+
+            smodelsName = ";".join( smodelsName ) # Name of the corresponding region(s). Join all names if multiple bins.
+
+            ret = {
+                    "path": f"/channels/{i_ch}/samples/0",
+                    "size": nBins,
+                    "smodelsName": smodelsName,
+                    "signal": signal
+                }, "signalRegions"
+            # ic ( ret )
+            return ret
+        ret = { 'path': f"/channels/{i_ch}", 'name': chname, 
+                'type': region['type']}, "otherRegions"
+        # ic ( ret )
+        return ( ret )
+
     def getWSInfo(self):
         """
         Getting informations from the json files
@@ -166,48 +210,9 @@ class PyhfData:
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             for i_ch, ch in enumerate(ws["observations"]):
                 for i_r, region in enumerate ( self.jsonFiles[jsName] ):
-                    if not "pyhf" in region:
-                        region["pyhf"]=region["smodels"]
-                    chname = ch['name']
-                    chname2 = f'{ch["name"]}[{i_r}]' ## binned SRs
-                    if region['pyhf'] in [ chname, chname2 ]:
-                        if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
-                            if region['smodels'] not in self.nsignals[jsName]:
-                                logger.error(f"Region {region['smodels']} of {jsName} not in the signal dictionary!")
-                                self.errorFlag = True
-                                return
-                            else:
-                                nBins = len(ch["data"])
-                                # Find all smodels names if many share the same pyhf name (for multi-bin regions)
-                                smodelsName = []
-                                for i_r3, region in enumerate ( self.jsonFiles[jsName] ):
-                                    chname3 = f'{ch["name"]}[{i_r3}]' ## binned SRs
-                                    if region['pyhf'] in [ chname, chname3 ]:
-                                        smodelsName.append(region['smodels'])
-                                if len(smodelsName) != nBins:
-                                    logger.error(f"Json region {region['pyhf']} has {nBins} bins, but only {len(smodelsName)} are implemented!")
-                                    self.errorFlag = True
-                                    return
-
-                                signal = []
-                                for name in smodelsName: # In case of multiple signals for one region, the dict ordering within globalInfo.jsonFiles matters
-                                    signal.append(self.nsignals[jsName][name])
-
-                                smodelsName = ";".join( smodelsName ) # Name of the corresponding region(s). Join all names if multiple bins.
-
-                                wsChannelsInfo["signalRegions"].append(
-                                    {
-                                        "path": "/channels/"
-                                        + str(i_ch)
-                                        + "/samples/0",  # Path of the new sample to add (signal prediction)
-                                        "size": nBins,
-                                        "smodelsName": smodelsName,
-                                        "signal": signal
-                                    }
-                                )
-                        else:
-                            wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': chname, 'type': region['type']})
-                        break
+                    patch, patchType = self.createPatchForRegion ( region, i_r, i_ch, ch, jsName )
+                    if patch != None:
+                        wsChannelsInfo[patchType].append(patch)
 
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
@@ -332,9 +337,7 @@ class PyhfUpperLimitComputer:
             pass
         self.scale *= factor
         logger.debug("new signal scale : {}".format(self.scale))
-        #ic ( "rescale", factor, self.nsignals )
         self.patches = self.patchMaker()
-        #ic ( "patches", self.patches )
         self.workspaces = self.wsMaker()
         self.workspaces_expected = self.wsMaker(apriori=True)
         try:
