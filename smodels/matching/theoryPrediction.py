@@ -749,18 +749,21 @@ def _getCombinedResultFor(dataSetResults, expResult):
     # Don't give combined result if all regions are CRs
     isNotSR = []
     for predList in dataSetResults:
-        for regionSet in expResult.globalInfo.jsonFiles.values():
-            for region in regionSet:
-                if type(region)==str:
-                    logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
-                    import sys; sys.exit()
-                if region['smodels'] == predList[0].dataset.dataInfo.dataId:
-                    if not "type" in region:
-                        region["type"]="SR"
-                    if region['type'] == 'SR':
-                        isNotSR.append(False)
-                    else:
-                        isNotSR.append(True)
+        if hasattr ( expResult.globalInfo, "jsonFiles" ):
+            for regionSet in expResult.globalInfo.jsonFiles.values():
+                for region in regionSet:
+                    if type(region)==str:
+                        logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
+                        import sys; sys.exit()
+                    if region['smodels'] == predList[0].dataset.dataInfo.dataId:
+                        if not "type" in region:
+                            region["type"]="SR"
+                        if region['type'] == 'SR':
+                            isNotSR.append(False)
+                        else:
+                            isNotSR.append(True)
+        else:
+            isNotSR = [ False ]
 
     if all(isNotSR):
         return None
