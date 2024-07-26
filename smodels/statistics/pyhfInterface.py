@@ -165,10 +165,12 @@ class PyhfData:
 
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             for i_ch, ch in enumerate(ws["observations"]):
-                for region in self.jsonFiles[jsName]:
+                for i_r, region in enumerate ( self.jsonFiles[jsName] ):
                     if not "pyhf" in region:
                         region["pyhf"]=region["smodels"]
-                    if region['pyhf'] == ch['name']:
+                    chname = ch['name']
+                    chname2 = f'{ch["name"]}[{i_r}]' ## binned SRs
+                    if region['pyhf'] in [ chname, chname2 ]:
                         if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
                             if region['smodels'] not in self.nsignals[jsName]:
                                 logger.error(f"Region {region['smodels']} of {jsName} not in the signal dictionary!")
@@ -178,8 +180,9 @@ class PyhfData:
                                 nBins = len(ch["data"])
                                 # Find all smodels names if many share the same pyhf name (for multi-bin regions)
                                 smodelsName = []
-                                for region in self.jsonFiles[jsName]:
-                                    if region['pyhf'] == ch['name']:
+                                for i_r3, region in enumerate ( self.jsonFiles[jsName] ):
+                                    chname3 = f'{ch["name"]}[{i_r3}]' ## binned SRs
+                                    if region['pyhf'] in [ chname, chname3 ]:
                                         smodelsName.append(region['smodels'])
                                 if len(smodelsName) != nBins:
                                     logger.error(f"Json region {region['pyhf']} has {nBins} bins, but only {len(smodelsName)} are implemented!")
@@ -203,7 +206,7 @@ class PyhfData:
                                     }
                                 )
                         else:
-                            wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': ch["name"], 'type': region['type']})
+                            wsChannelsInfo["otherRegions"].append({'path': "/channels/" + str(i_ch), 'name': chname, 'type': region['type']})
                         break
 
             wsChannelsInfo["otherRegions"].sort(
@@ -384,6 +387,7 @@ class PyhfUpperLimitComputer:
                 #value["data"] = srInfo['signal']
                 sr_order = srInfo["smodelsName"].split(";")
                 nsignals = self.nsignals[jsFileName]
+                # ic ( nsignals, sr_order, srInfo, jsFileName )
                 value["data"] = [ nsignals[x] for x in sr_order ]
                 #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                 # sys.exit()
