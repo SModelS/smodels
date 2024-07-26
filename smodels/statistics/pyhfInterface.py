@@ -114,8 +114,8 @@ class PyhfData:
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
         S = 0
-        for dict in self.nsignals.values():
-            for signal in dict.values():
+        for dct in self.nsignals.values():
+            for signal in dct.values():
                 if isinstance(signal, list):
                     for sig in signal:
                         S += sig
