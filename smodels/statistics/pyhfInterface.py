@@ -123,8 +123,7 @@ class PyhfData:
                     S += signal
         self.totalYield = S
 
-    def createPatchForRegion ( self, region, i_r, i_ch, ch, jsName ):
-        # ic ( region )
+    def createPatchForRegion ( self, region, i_ch, ch, jsName ):
         if not "pyhf" in region:
             region["pyhf"]=region["smodels"]
         chname = ch['name']
@@ -139,10 +138,18 @@ class PyhfData:
             nBins = len(ch["data"])
             # Find all smodels names if many share the same pyhf name (for multi-bin regions)
             smodelsName = []
-            for i_r3, region in enumerate ( self.jsonFiles[jsName] ):
-                chname3 = f'{ch["name"]}[{i_r3}]' ## binned SRs
-                if region['pyhf'] in [ chname, chname3 ]:
-                    smodelsName.append(region['smodels'])
+            ctr = 0
+            if region["pyhf"] == chname: # no bins, so easy
+                smodelsName.append(region['smodels'])
+            else: ## bins
+                hasAdded = True
+                while hasAdded:
+                    hasAdded = False
+                    for rregion in self.jsonFiles[jsName]:
+                        if rregion["pyhf"] == f'{ch["name"]}[{ctr}]':
+                            smodelsName.append(rregion['smodels'])
+                            ctr+=1
+                            hasAdded = True
             if len(smodelsName) != nBins:
                 logger.error(f"Json region {region['pyhf']} has {nBins} bins, but only {len(smodelsName)} are implemented!")
                 self.errorFlag = True
@@ -160,11 +167,9 @@ class PyhfData:
                     "smodelsName": smodelsName,
                     "signal": signal
                 }, "signalRegions"
-            # ic ( ret )
             return ret
         ret = { 'path': f"/channels/{i_ch}", 'name': chname, 
                 'type': region['type']}, "otherRegions"
-        # ic ( ret )
         return ( ret )
 
     def getWSInfo(self):
@@ -208,11 +213,13 @@ class PyhfData:
                 logger.warning("Signal in CRs but includeCRs = False. CRs will still be removed.")
 
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
-            for i_ch, ch in enumerate(ws["observations"]):
-                for i_r, region in enumerate ( self.jsonFiles[jsName] ):
-                    patch, patchType = self.createPatchForRegion ( region, i_r, i_ch, ch, jsName )
+            for i_r, region in enumerate ( self.jsonFiles[jsName] ):
+                for i_ch, ch in enumerate(ws["observations"]):
+                    ## create a patch for the region, but only if channel matches
+                    patch, patchType = self.createPatchForRegion ( region, i_ch, ch, jsName )
                     if patch != None:
                         wsChannelsInfo[patchType].append(patch)
+                        break
 
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
