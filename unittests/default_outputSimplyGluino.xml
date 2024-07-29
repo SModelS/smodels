@@ -66,10 +66,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>2.2</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>25.70389</r>
+            <r>25.70394</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>4309.035</theory_prediction_fb>
-            <upper_limit_fb>167.6413</upper_limit_fb>
+            <upper_limit_fb>167.641</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -102,10 +102,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>15.00266</r>
+            <r>15.00267</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>572.1689</theory_prediction_fb>
-            <upper_limit_fb>38.13784</upper_limit_fb>
+            <upper_limit_fb>38.1378</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>CMS-SUS-13-012</AnalysisID>
@@ -136,11 +136,11 @@
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.2637784</expected_upper_limit_fb>
-            <nll_SM>3.0208989134775686</nll_SM>
-            <nll_min>2.6471251067851</nll_min>
-            <nll>25.091652322862235</nll>
             <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
+            <nll>25.09165</nll>
+            <nll_SM>3.020899</nll_SM>
+            <nll_min>2.647125</nll_min>
             <r>4.450234</r>
             <r_expected>6.507382</r_expected>
             <theory_prediction_fb>1.716507</theory_prediction_fb>
@@ -150,7 +150,7 @@
     <OutputStatus>
         <checkinput>True</checkinput>
         <computestatistics>False</computestatistics>
-        <database_version>unittest300-beta</database_version>
+        <database_version>unittest300</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -161,7 +161,7 @@
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>3.0.0-beta</smodels_version>
+        <smodels_version>3.0.0</smodels_version>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>

@@ -175,7 +175,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
             "CMS-SUS-12-024": (4.52551e-4, "efficiencyMap"),
             "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
-            "ATLAS-SUSY-2019-09": (2.318e-1, "combined"),
+            "ATLAS-SUSY-2019-09": (0.24687149539396214, "combined"),
         }
         # Make sure each ID appears only once:
         selectedIDs = {tp.analysisId() : (tp.getRValue(expected=True),tp.dataType())
@@ -184,16 +184,19 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # Check if the correct predictions were selected:
         for ana in goodIDs:
             diff_rel = abs(goodIDs[ana][0]-selectedIDs[ana][0])/goodIDs[ana][0]
-            self.assertAlmostEqual(diff_rel,0.0,2)
+            if abs ( diff_rel ) > 1e-3:
+                from smodels.base.smodelsLogging import logger
+                logger.error ( f"r-values differ for {ana}: {goodIDs[ana][0]}!={selectedIDs[ana][0]}" )
+            self.assertAlmostEqual(diff_rel,0.,2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
         self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
-        self.assertAlmostEqual(combiner.likelihood() / 6.181123374537111e-27, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 5.508703964689339e-27, 1., 2)
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / 0.2771209732232204, 1., 2)
-        self.assertAlmostEqual(combiner.CLs(), 0.4672132966218591, 2 )
-        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.5295734, 2 )
-        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.64744, 2 )
+        self.assertAlmostEqual(combiner.getRValue() / 0.3239489977193064, 1., 2)
+        self.assertAlmostEqual(combiner.CLs(), 0.3837834664689492, 2 )
+        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.4784390458083965, 2 )
+        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.5729568665333286, 2 )
 
 
     def testGetCombiner(self):

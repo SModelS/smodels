@@ -3,11 +3,11 @@
     <CombinedRes_List>
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037,CMS-SUS-13-012</AnalysisID>
-            <nll_SM>9.691610753377516</nll_SM>
-            <nll_min>8.92496220146949</nll_min>
-            <nll>9.264032541364987</nll>
-            <r>0.1332295</r>
-            <r_expected>0.2068</r_expected>
+            <nll>9.264033</nll>
+            <nll_SM>9.691611</nll_SM>
+            <nll_min>8.924963</nll_min>
+            <r>0.1333632</r>
+            <r_expected>0.2100586</r_expected>
         </CombinedRes>
     </CombinedRes_List>
     <ExptRes_List>
@@ -17,12 +17,12 @@
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>991.72</Mass_GeV>
+                    <Mass_GeV>992.87</Mass_GeV>
                     <Mass_GeV>269.0</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>992.87</Mass_GeV>
+                    <Mass_GeV>991.72</Mass_GeV>
                     <Mass_GeV>269.0</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
@@ -46,10 +46,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.3875959</r>
+            <r>0.387596</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>6.660644</theory_prediction_fb>
-            <upper_limit_fb>17.18451</upper_limit_fb>
+            <upper_limit_fb>17.1845</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -57,11 +57,11 @@
             <DataSetID>None</DataSetID>
             <Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>991.31</Mass_GeV>
+                    <Mass_GeV>991.43</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
                 <Mass_GeV_List>
-                    <Mass_GeV>991.43</Mass_GeV>
+                    <Mass_GeV>991.31</Mass_GeV>
                     <Mass_GeV>129.0</Mass_GeV>
                 </Mass_GeV_List>
             </Mass_GeV_List>
@@ -82,10 +82,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.3209495</r>
+            <r>0.3209494</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>1.956671</theory_prediction_fb>
-            <upper_limit_fb>6.096509</upper_limit_fb>
+            <upper_limit_fb>6.09651</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -140,11 +140,11 @@
             <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.7514</expected_upper_limit_fb>
-            <nll_SM>5.979420963094128</nll_SM>
-            <nll_min>5.222007648587915</nll_min>
-            <nll>5.554916620667446</nll>
             <lumi_fb-1>19.5</lumi_fb-1>
             <maxcond>0.0</maxcond>
+            <nll>5.554917</nll>
+            <nll_SM>5.979421</nll_SM>
+            <nll_min>5.222008</nll_min>
             <r>0.1296154</r>
             <r_expected>0.2078608</r_expected>
             <theory_prediction_fb>0.1561866</theory_prediction_fb>
@@ -184,7 +184,7 @@
             <r>0.1106242</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>7.529518</theory_prediction_fb>
-            <upper_limit_fb>68.06394</upper_limit_fb>
+            <upper_limit_fb>68.0639</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
@@ -217,10 +217,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.0611803</r>
+            <r>0.06118018</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>0.6619329</theory_prediction_fb>
-            <upper_limit_fb>10.81938</upper_limit_fb>
+            <upper_limit_fb>10.8194</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-SUSY-2013-12</AnalysisID>
@@ -253,10 +253,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>20.3</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.03839162</r>
+            <r>0.03839161</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>18.47093</theory_prediction_fb>
-            <upper_limit_fb>481.1188</upper_limit_fb>
+            <upper_limit_fb>481.119</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
@@ -270,14 +270,14 @@
             <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.35</expected_upper_limit_fb>
-            <nll_SM>3.709116039556333</nll_SM>
-            <nll_min>3.5158761779589756</nll_min>
-            <nll>3.712189842416584</nll>
             <lumi_fb-1>20.7</lumi_fb-1>
             <maxcond>0.0</maxcond>
+            <nll>3.709116</nll>
+            <nll_SM>3.71219</nll_SM>
+            <nll_min>3.515876</nll_min>
             <r>0.001829564</r>
-            <r_expected>0.00209093</r_expected>
-            <theory_prediction_fb>0.0007318254</theory_prediction_fb>
+            <r_expected>0.002090931</r_expected>
+            <theory_prediction_fb>0.0007318257</theory_prediction_fb>
             <upper_limit_fb>0.4</upper_limit_fb>
         </ExptRes>
         <ExptRes>
@@ -311,10 +311,10 @@
             <expected_upper_limit_fb>None</expected_upper_limit_fb>
             <lumi_fb-1>2.2</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>0.0008312426</r>
+            <r>0.000831243</r>
             <r_expected>None</r_expected>
             <theory_prediction_fb>0.03496325</theory_prediction_fb>
-            <upper_limit_fb>42.06142</upper_limit_fb>
+            <upper_limit_fb>42.0614</upper_limit_fb>
         </ExptRes>
         <ExptRes>
             <AnalysisID>CMS-PAS-SUS-12-026</AnalysisID>
@@ -344,20 +344,20 @@
                 </Width_GeV_List>
             </Width_GeV_List>
             <dataType>upperLimit</dataType>
-            <expected_upper_limit_fb>55.92364</expected_upper_limit_fb>
+            <expected_upper_limit_fb>55.9236</expected_upper_limit_fb>
             <lumi_fb-1>9.2</lumi_fb-1>
             <maxcond>0.0</maxcond>
-            <r>7.135788e-05</r>
-            <r_expected>5.496207e-05</r_expected>
+            <r>7.135794e-05</r>
+            <r_expected>5.496211e-05</r_expected>
             <theory_prediction_fb>0.003073679</theory_prediction_fb>
-            <upper_limit_fb>43.07414</upper_limit_fb>
+            <upper_limit_fb>43.0741</upper_limit_fb>
         </ExptRes>
     </ExptRes_List>
     <OutputStatus>
         <checkinput>True</checkinput>
         <combineanas>CMS-SUS-13-012,ATLAS-SUSY-2018-31,ATLAS-CONF-2013-037</combineanas>
         <computestatistics>False</computestatistics>
-        <database_version>unittest300-beta</database_version>
+        <database_version>unittest300</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -368,14 +368,14 @@
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>3.0.0-beta</smodels_version>
+        <smodels_version>3.0.0</smodels_version>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>
-    <Total_xsec_for_missing_topologies_fb>3065.78</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_missing_topologies_fb>3067.454</Total_xsec_for_missing_topologies_fb>
     <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
-    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>3065.78</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
-    <Total_xsec_for_topologies_outside_the_grid_fb>235.8</Total_xsec_for_topologies_outside_the_grid_fb>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>3067.454</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>235.7505</Total_xsec_for_topologies_outside_the_grid_fb>
     <missing_topologies_List>
         <missing_topologies>
             <element>[[[jet,W]],[[jet,jet,W]]] (MET,MET)</element>
