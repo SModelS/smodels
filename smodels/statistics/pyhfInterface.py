@@ -19,7 +19,7 @@ from smodels.base.smodelsLogging import logger
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
-# from icecream import ic
+from typing import Dict
 
 jsonver = ""
 try:
@@ -84,13 +84,15 @@ countWarning = {"llhdszero": 0}
 class PyhfData:
     """
     Holds data for use in pyhf
-    :ivar nsignals: signal predictions list divided into sublists, one for each json file
+    :ivar nsignals: signal predictions dictionary of dictionaries, 
+    one for each json file, one entry per signal region
     :ivar inputJsons: list of json instances
     :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__(self, nsignals, inputJsons, jsonFiles=None, includeCRs=False, signalUncertainty=None):
+    def __init__( self, nsignals : Dict[str, Dict], inputJsons, jsonFiles=None, 
+                  includeCRs=False, signalUncertainty=None):
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
@@ -98,7 +100,18 @@ class PyhfData:
         self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
-            jsonFiles = dict( zip( [ "dummy%d" % i for i in range(len(inputJsons)) ], [ "" for i in range(len(inputJsons)) ] ) )
+            jsonFiles = {}
+            for jFile,sregions in nsignals.items():
+                regions = []
+                srname = "SR1"
+                if len(sregions)==1:
+                    regions.append ( { "smodels": srname, "type": "SR", "pyhf": srname } )
+                else:
+                    for j in range( len ( sregions ) ):
+                        srname = f"SR1[{j}]"
+                        regions.append ( { "smodels": srname, "type": "SR", 
+                                           "pyhf": srname } )
+                jsonFiles[ jFile ] = regions
         self.jsonFiles = jsonFiles
         self.includeCRs = includeCRs
         self.signalUncertainty = signalUncertainty
@@ -214,6 +227,8 @@ class PyhfData:
 
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             for i_r, region in enumerate ( self.jsonFiles[jsName] ):
+                if not "observations" in ws:
+                    continue
                 for i_ch, ch in enumerate(ws["observations"]):
                     ## create a patch for the region, but only if channel matches
                     patch, patchType = self.createPatchForRegion ( region, i_ch, ch, jsName )
@@ -290,7 +305,9 @@ class PyhfUpperLimitComputer:
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))
         self.inputJsons = self.data.inputJsons
-        self.channelsInfo = self.data.channelsInfo
+        self.channelsInfo = None
+        if hasattr ( self.data, "channelsInfo" ):
+            self.channelsInfo = self.data.channelsInfo
         self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.nWS = self.data.nWS
         self.includeCRs = data.includeCRs
