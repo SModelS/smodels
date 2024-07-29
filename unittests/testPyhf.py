@@ -14,6 +14,7 @@ import unittest
 import json
 import jsonpatch
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer, pyhf
+import warnings
 
 class PyhfTest(unittest.TestCase):
 
@@ -373,6 +374,7 @@ class PyhfTest(unittest.TestCase):
         import os
         from smodels.decomposition import decomposer
         from smodels.matching.theoryPrediction import _getDataSetPredictions, _getCombinedResultFor, TheoryPredictionList
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         database = Database('./database/')
         runtime.modelFile = "smodels.share.models.mssm"
