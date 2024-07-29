@@ -28,7 +28,7 @@ class StatsComputer:
                   "upperLimitComputer", "deltas_sys", "allowNegativeSignals" ]
 
     def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list], dataType : str,
-                   nsig : Union[None,float,List] = None,
+                   nsig : Union[None,float,List,Dict] = None,
                    deltas_rel : Union[None,float] = None,
                    allowNegativeSignals : bool = False):
         """
@@ -214,7 +214,6 @@ class StatsComputer:
         Create computer for a pyhf result
         """
 
-
         globalInfo = self.dataObject.globalInfo
         jsonFiles = [js for js in globalInfo.jsonFiles]
         jsons = globalInfo.jsons.copy()
@@ -222,42 +221,56 @@ class StatsComputer:
         datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         # Filtering the json files by looking at the available datasets
         for jsName in globalInfo.jsonFiles:
-            if all([ds not in globalInfo.jsonFiles[jsName] for ds in datasets]):
+            jsonSRs = []
+            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ):
+                if type(region)==str:
+                    region = { "smodels": region, "type": "SR" }
+                    globalInfo.jsonFiles[jsName][ir] = region
+                if not "type" in region:
+                    region["type"]="SR"
+                    globalInfo.jsonFiles[jsName][ir]['type']="SR"
+                if region['type'] == 'SR':
+                    jsonSRs.append(region['smodels'])
+            if all([ds not in jsonSRs for ds in datasets]):
                 # No datasets found for this json combination
                 jsIndex = jsonFiles.index(jsName)
                 jsonFiles.pop(jsIndex)
                 jsons.pop(jsIndex)
                 continue
-            if not all([ds in datasets for ds in globalInfo.jsonFiles[jsName]]):
+            if not all([SR in datasets for SR in jsonSRs]):
                 # Some SRs are missing for this json combination
-                logger.error( "Wrong json definition in globalInfo.jsonFiles for json : %s" % jsName)
+                logger.error( f"Wrong json definition in globalInfo.jsonFiles for json : {jsName}" )
+        #from icecream import ic
+        #ic ( globalInfo.jsonFiles )
+        #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+        jsonDictNames = {}
+        for jsName in jsonFiles:
+            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None ] } )
+        # jsonRegions = [ [region['smodels'] for region in globalInfo.jsonFiles[jsName]] for jsName in jsonFiles]
+        jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
+        for ds in datasets:
+            if not ds in jsonRegions:
+                logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
         logger.debug("list of datasets: {}".format(datasets))
         logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+
+        # Constructing the list of signals with subsignals matching each json
+        nsignals = {}
+        for jsName in jsonFiles:
+            nsignals.update( { jsName: {} } )
+        for name, nsig in self.nsig.items():
+            for jsName in nsignals.keys():
+                if name in jsonDictNames[jsName]:
+                    nsignals[jsName].update( { name: nsig } )
+
         includeCRs = False
         if hasattr(globalInfo,'includeCRs'):
             includeCRs = globalInfo.includeCRs
         signalUncertainty = None
         if hasattr(globalInfo,"signalUncertainty"):
             signalUncertainty = globalInfo.signalUncertainty
-        # Constructing the list of signals with subsignals matching each json
-        nsignals = list()
-        for jsName in jsonFiles:
-            subSig = list()
-            for srName in globalInfo.jsonFiles[jsName]:
-                try:
-                    if 'CR' in srName and not includeCRs: # Allow signal to leak in CRs only if they are kept
-                        continue
-                    index = datasets.index(srName)
-                except ValueError:
-                    line = (
-                        f"{srName} signal region provided in globalInfo is not in the list of datasets, {jsName}:{','.join(datasets)}"
-                    )
-                    raise ValueError(line)
-                sig = self.nsig[index]
-                subSig.append(sig)
-            nsignals.append(subSig)
+
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        nsig = self.nsig
         data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty)
         if data.errorFlag:
             return None
