@@ -43,7 +43,7 @@ class CppTest(unittest.TestCase):
         templines = templf.readlines()
         templf.close()
         if "database" in dbpath and not "https" in dbpath:
-                dbpath = "../test/"+dbpath
+                dbpath = "../unittests/"+dbpath
         parmf = open ( "../cpp/parameters.ini", "wt" )
         for line in templines:
             parmf.write ( line.replace ( "@@DBPATH@@", dbpath ) )

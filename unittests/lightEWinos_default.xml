@@ -3,9 +3,9 @@
     <CombinedRes_List>
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
-            <nll_SM>3.878980472603534</nll_SM>
-            <nll_min>3.878980472603534</nll_min>
-            <nll>3.963032129669542</nll>
+            <nll>3.963032</nll>
+            <nll_SM>3.87898</nll_SM>
+            <nll_min>3.87898</nll_min>
             <r>0.1092852</r>
             <r_expected>0.1009563</r_expected>
         </CombinedRes>
@@ -31,11 +31,11 @@
             </Width_GeV_List>
             <dataType>efficiencyMap</dataType>
             <expected_upper_limit_fb>0.433</expected_upper_limit_fb>
-            <nll_SM>3.878980472603534</nll_SM>
-            <nll_min>3.878980472603534</nll_min>
-            <nll>3.963032129669542</nll>
             <lumi_fb-1>20.7</lumi_fb-1>
             <maxcond>0.0</maxcond>
+            <nll>3.963032</nll>
+            <nll_SM>3.87898</nll_SM>
+            <nll_min>3.87898</nll_min>
             <r>0.1092852</r>
             <r_expected>0.1009563</r_expected>
             <theory_prediction_fb>0.04371409</theory_prediction_fb>
@@ -76,22 +76,22 @@
         <combineanas>ATLAS-CONF-2013-037,CMS-SUS-13-012</combineanas>
         <combinesrs>False</combinesrs>
         <computestatistics>True</computestatistics>
-        <database_version>unittest300-beta</database_version>
+        <database_version>unittest300</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
         <experimentalfeatures>False</experimentalfeatures>
         <file_status>1</file_status>
-        <input_file>../testFiles/slha/lightEWinos.slha</input_file>
+        <ignorepromptqnumbers>spin,eCharge,colordim</ignorepromptqnumbers>
+        <input_file>./testFiles/slha/lightEWinos.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
         <model>share.models.mssm</model>
         <ncpus>1</ncpus>
         <promptwidth>1e-11</promptwidth>
-        <ignorepromptqnumbers>spin,eCharge,colordim</ignorepromptqnumbers>
         <reportallsrs>False</reportallsrs>
         <sigmacut>10.0</sigmacut>
-        <smodels_version>3.0.0-beta</smodels_version>
+        <smodels_version>3.0.0</smodels_version>
         <stablewidth>1e-25</stablewidth>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
@@ -2346,10 +2346,10 @@
             </Weights_fb>
         </SMS_Decomposition>
     </SMS_Decomposition_List>
-    <Total_xsec_for_missing_topologies_fb>5223.424</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_missing_topologies_fb>5056.816</Total_xsec_for_missing_topologies_fb>
     <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
-    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>5223.424</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
-    <Total_xsec_for_topologies_outside_the_grid_fb>47.18918</Total_xsec_for_topologies_outside_the_grid_fb>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>5056.816</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>213.7975</Total_xsec_for_topologies_outside_the_grid_fb>
     <missing_topologies_List>
         <missing_topologies>
             <SMS>PV &gt; (jet,jet,MET), (nu,l,MET)</SMS>
@@ -2616,6 +2616,26 @@
         </missing_topologies_with_prompt_decays>
     </missing_topologies_with_prompt_decays_List>
     <topologies_outside_the_grid_List>
+        <topologies_outside_the_grid>
+            <SMS>PV &gt; (jet,jet,MET), (l,l,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>46</SMS_IDs>
+                <SMS_IDs>47</SMS_IDs>
+                <SMS_IDs>54</SMS_IDs>
+                <SMS_IDs>55</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>118.3128</weight_fb>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
+            <SMS>PV &gt; (nu,l,MET), (nu,l,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>5</SMS_IDs>
+                <SMS_IDs>14</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>48.29554</weight_fb>
+        </topologies_outside_the_grid>
         <topologies_outside_the_grid>
             <SMS>PV &gt; (b,b,MET), (b,b,MET)</SMS>
             <SMS_IDs_List>
