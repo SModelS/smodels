@@ -718,7 +718,8 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                     if theoPred.dataType() == "combined":
                         type = "SR"
                     else:
-                        logger.error(f"Could not find type of region {theoPred.dataInfo.dataId} from {theoPred.globalInfo.Id}")
+                        logger.error(f"Could not find type of region {theoPred.dataType()} from {theoPred.globalInfo.Id}")
+                        import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                     raise SModelSError()
 
                 if type == "SR":
@@ -756,8 +757,9 @@ def _getCombinedResultFor(dataSetResults, expResult):
             for regionSet in expResult.globalInfo.jsonFiles.values():
                 for region in regionSet:
                     if type(region)==str:
-                        logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
-                        import sys; sys.exit()
+                        region = { "smodels": region, "type": "SR" }
+                        #logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
+                        # import sys; sys.exit()
                     if region['smodels'] == predList[0].dataset.dataInfo.dataId:
                         if not "type" in region:
                             region["type"]="SR"
