@@ -14,6 +14,7 @@ import unittest
 import json
 import jsonpatch
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer, pyhf
+from smodels.base.smodelsLogging import logger
 
 class PyhfTest(unittest.TestCase):
 
@@ -408,6 +409,12 @@ class PyhfTest(unittest.TestCase):
         with open('patch_2018-16.json','r') as f:
             patch_ref = json.load(f)
 
+        equals = patch == patch_ref
+        if not equals:
+            logger.error ( f"patch_2018-16.json != debug.json" )
+            with open('debug.json','w') as f:
+                json.dump(patch,f,indent=4)
+            
         self.assertEqual(patch,patch_ref)
 
 if __name__ == "__main__":
