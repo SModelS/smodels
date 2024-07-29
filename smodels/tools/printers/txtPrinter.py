@@ -96,8 +96,7 @@ class TxTPrinter(BasicPrinter):
 
         if not hasattr(self, 'printdecomp') or not self.printdecomp:
             return None
-
-        old_vertices = ""
+        
         slabel = "Topologies Table"
         output = ""
         output += "  " + "="*56 + "  \n"
@@ -112,17 +111,30 @@ class TxTPrinter(BasicPrinter):
         else:
             baseLabel = 'SMS'
 
+        # Get topology names:
+        topoNames = {canonName : canonName for canonName in obj}
+        topoNames_v2 = {}
+        if self.outputFormat == "version2":            
+            for canonName in obj:
+                smsList = obj[canonName]       
+                try:
+                    sms = smsList[0]
+                    evenParticles = sms.treeToBrackets()[0]
+                    vertnumb = str([len(v) for v in evenParticles[0]])
+                    vertnumb += str([len(v) for v in evenParticles[1]])
+                    vertnumb = vertnumb.replace(' ','')
+                    topoName = vertnumb
+                    topoNames_v2[canonName] = topoName
+                except:
+                    logger.info("Could not format SMS using version2, switching to current format.")
+                    self.outputFormat = 'current'
+        
+        if self.outputFormat == 'version2':
+            topoNames = topoNames_v2
+
         for canonName in obj:
             smsList = obj[canonName]
-            if self.outputFormat == "version2":
-                sms = smsList[0]
-                evenParticles = sms.treeToBrackets()[0]
-                vertnumb = str([len(v) for v in evenParticles[0]])
-                vertnumb += str([len(v) for v in evenParticles[1]])
-                vertnumb = vertnumb.replace(' ','')
-                topoName = vertnumb
-            else:
-                topoName = canonName
+            topoName = topoNames[canonName]
 
             output += "===================================================== \n"
             output += "Topology: %s \n" %topoName

@@ -112,32 +112,37 @@ class PyPrinter(BasicPrinter):
 
         smsDict = {}
         if self.outputFormat == 'version2':
-            branchList, finalState, intermediateState = obj.treeToBrackets()
-            masses = []
-            pidlist = []
-            for bIndex in obj.daughterIndices(obj.rootIndex):
-                branch = obj.indexToNode(bIndex)
-                if branch.isSM:
-                    continue
-                mass = float('%1.3e' %branch.mass.asNumber(GeV))
-                bMasses = [mass]
-                pids = [branch.pdg]
-                for n in obj.dfsIndexIterator(bIndex):
-                    node = obj.indexToNode(n)
-                    if node.isSM:
+            try:
+                branchList, finalState, _ = obj.treeToBrackets()
+                masses = []
+                pidlist = []
+                for bIndex in obj.daughterIndices(obj.rootIndex):
+                    branch = obj.indexToNode(bIndex)
+                    if branch.isSM:
                         continue
-                    mass = float('%1.3e' %node.mass.asNumber(GeV))
-                    bMasses.append(mass)
-                    pids.append(node.pdg)
-                masses.append(bMasses)
-                pidlist.append(pids)
+                    mass = float('%1.3e' %branch.mass.asNumber(GeV))
+                    bMasses = [mass]
+                    pids = [branch.pdg]
+                    for n in obj.dfsIndexIterator(bIndex):
+                        node = obj.indexToNode(n)
+                        if node.isSM:
+                            continue
+                        mass = float('%1.3e' %node.mass.asNumber(GeV))
+                        bMasses.append(mass)
+                        pids.append(node.pdg)
+                    masses.append(bMasses)
+                    pidlist.append(pids)
 
-            smsDict["ID"] = obj.smsID
-            smsDict["Particles"] =  str(branchList).replace("'","").replace(" ","")
-            smsDict["final states"] =  finalState
-            smsDict["Masses (GeV)"] = masses
-            smsDict["PIDs"] = pidlist
-        else:
+                smsDict["ID"] = obj.smsID
+                smsDict["Particles"] =  str(branchList).replace("'","").replace(" ","")
+                smsDict["final states"] =  finalState
+                smsDict["Masses (GeV)"] = masses
+                smsDict["PIDs"] = pidlist
+            except:
+                logger.info("Could not format SMS using version2, switching to current format.")
+                self.outputFormat = 'current'
+
+        if self.outputFormat == 'current':
             smsDict["ID"] = obj.smsID
             smsDict["SMS"] = str(obj)
             smsDict["Masses (GeV)"] = [(str(node),float('%1.3e' %node.mass.asNumber(GeV)))
