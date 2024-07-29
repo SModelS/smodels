@@ -8,4 +8,26 @@ contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2019/12/6
-jsonFiles: {"BkgOnlyA.json": [ { "smodels": "SRA_L" },  { "smodels": "SRA_M" },  { "smodels": "SRA_H"} ], "BkgOnlyB.json": [ { "smodels": "SRB"} ], "BkgOnlyC.json": [ { "smodels": "SRC_22" },  { "smodels": "SRC_24" },  { "smodels": "SRC_26" },  { "smodels": "SRC_28"} ]}
+# jsonFiles: {"BkgOnlyA.json": [ { "smodels": "SRA_L" },  { "smodels": "SRA_M" },  { "smodels": "SRA_H"} ], "BkgOnlyB.json": [ { "smodels": "SRB"} ], "BkgOnlyC.json": [ { "smodels": "SRC_22" },  { "smodels": "SRC_24" },  { "smodels": "SRC_26" },  { "smodels": "SRC_28"} ]}
+jsonFiles: {
+  'BkgOnlyA.json': [
+    {'pyhf': 'SR_meff[0]', 'smodels': 'SRA_L', 'type': 'SR'},
+    {'pyhf': 'SR_meff[1]', 'smodels': 'SRA_M', 'type': 'SR'},
+    {'pyhf': 'SR_meff[2]', 'smodels': 'SRA_H', 'type': 'SR'},
+    {'pyhf': 'VRtt_meff', 'smodels': None, 'type': 'VR'},
+    {'pyhf': 'CRtt_meff', 'smodels': None, 'type': 'CR'}],
+  'BkgOnlyB.json': [
+    {'pyhf': 'SR_cuts', 'smodels': 'SRB', 'type': 'SR'},
+    {'pyhf': 'CRtt_cuts', 'smodels': None, 'type': 'CR'},
+    {'pyhf': 'VRtt_cuts', 'smodels': None, 'type': 'VR'}],
+  'BkgOnlyC.json': [
+    {'pyhf': 'SR_metsigST[0]', 'smodels': 'SRC_22', 'type': 'SR'},
+    {'pyhf': 'SR_metsigST[1]', 'smodels': 'SRC_24', 'type': 'SR'},
+    {'pyhf': 'SR_metsigST[2]', 'smodels': 'SRC_26', 'type': 'SR'},
+    {'pyhf': 'SR_metsigST[3]', 'smodels': 'SRC_28', 'type': 'SR'},
+    {'pyhf': 'CRtt_cuts', 'smodels': None, 'type': 'CR'},
+    {'pyhf': 'VRzAlt_cuts', 'smodels': None, 'type': 'VR'},
+    {'pyhf': 'CRz_cuts', 'smodels': None, 'type': 'CR'},
+    {'pyhf': 'VRtt_cuts', 'smodels': None, 'type': 'VR'},
+    {'pyhf': 'VRz_cuts', 'smodels': None, 'type': 'VR'}]
+  }

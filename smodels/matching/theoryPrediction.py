@@ -715,7 +715,10 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                     type = "SR"
 
                 if type is None:
-                    logger.error(f"Could not find type of region {theoPred.dataInfo.dataId} from {theoPred.globalInfo.Id}")
+                    if theoPred.dataType() == "combined":
+                        type = "SR"
+                    else:
+                        logger.error(f"Could not find type of region {theoPred.dataInfo.dataId} from {theoPred.globalInfo.Id}")
                     raise SModelSError()
 
                 if type == "SR":

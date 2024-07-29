@@ -119,7 +119,7 @@ class RunSModelSTest(unittest.TestCase):
     def testPyhfCombination(self):
         filename = "./testFiles/slha/T6bbHH_pyhf.slha"
         inifile = "./testParameters_pyhf.ini"
-        outputfile = runMain(filename, inifile=inifile, suppressStdout=True)
+        outputfile = runMain(filename, inifile=inifile, suppressStdout=False)
         smodelsOutput = importModule(outputfile)
         from T6bbHH_pyhf_default import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']

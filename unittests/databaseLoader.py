@@ -13,9 +13,9 @@ import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 
-# dbpath = "./database"
 # dbpath = "../../smodels-database"
 dbpath = "unittest"
+# dbpath = "./database"
 
 database = Database( dbpath)
 
