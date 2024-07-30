@@ -190,27 +190,35 @@ class PyhfData:
         in the order of the ws """
         if "pyhf" in self.jsonFiles[jsName][0]:
             return
+
+        def guessPyhfName ( name : str ) -> str:
+            if name.startswith ( "CR" ):
+                return "CR"
+            if name.startswith ( "VR" ):
+                return "VR"
+            if name.startswith ( "SR" ):
+                return "SR"
+            if "_CR_" in name:
+                return "CR"
+            return "SR"
         ## we dont have the mapping smodels<->pyhf
         ctr = 0
         for observation in observations:
-            if observation["name"].startswith ( "CR" ):
-                region = { "pyhf": observation["name"], "smodels": None, "type": "CR" }
+            name = observation["name"]
+            regionType = guessPyhfName ( name )
+            if regionType in [ "CR" ]: # , "VR" ]
+                region = { "pyhf": observation["name"], "smodels": None, 
+                           "type": regionType }
                 self.jsonFiles[jsName].append ( region )
-                #logger.warning ( f"jsonFiles did not give mapping of SModelS to pyhf  names, but we have control regions. Do update the jsonFiles entry!" )
-                continue
-            if observation["name"].startswith ( "VR" ):
-                region = { "pyhf": observation["name"], "smodels": None, "type": "VR" }
-                self.jsonFiles[jsName].append ( region )
-                # logger.warning ( f"jsonFiles did not give mapping of SModelS to pyhf  names, but we have validation regions. Do update the jsonFiles entry!" )
                 continue
             if len(observation["data"])==1:
                 if ctr < len(self.jsonFiles[jsName]):
-                   self.jsonFiles[jsName][ctr]["pyhf"]=f"{observation['name']}"
+                   self.jsonFiles[jsName][ctr]["pyhf"]=f"{name}"
                 ctr += 1
             else:
                 for i in range(len(observation["data"])):
                     if ctr < len(self.jsonFiles[jsName]):
-                        self.jsonFiles[jsName][ctr]["pyhf"]=f"{observation['name']}[{i}]"
+                        self.jsonFiles[jsName][ctr]["pyhf"]=f"{name}[{i}]"
                     ctr += 1
 
 
