@@ -204,20 +204,18 @@ class PyhfData:
             return "SR"
         ## we dont have the mapping smodels<->pyhf
         ctr = 0
-        # ic ( "---" )
+        #ic ( "---" )
         nJsonFiles = len(self.jsonFiles[jsName])
-        nObs = len(observations)
+        #nObs = len(observations)
         #ic ( self.includeCRs, nObs, nJsonFiles )
         #ic ( observations )
         #ic ( self.jsonFiles[jsName] )
-        nSRs, nCRs = 0, 0
+        nSRs = 0
         for observation in observations:
             name = observation["name"]
             regionType = guessPyhfName ( name )
             if regionType == "SR":
                 nSRs += 1
-            if regionType == "CR":
-                nCRs += 1
         # ic ( nSRs, nCRs )
         for observation in observations:
             name = observation["name"]
@@ -233,7 +231,8 @@ class PyhfData:
                 self.jsonFiles[jsName].append ( region )
                 continue
             if self.includeCRs and regionType in [ "CR" ]:
-                if nSRs < nObs and nSRs+nCRs == nObs:
+                if nSRs == nJsonFiles: # and nSRs+nCRs == nObs:
+                    ## the signal regions alone do it
                     region = { "pyhf": observation["name"], "smodels": None, 
                                "type": regionType }
                     self.jsonFiles[jsName].append ( region )
