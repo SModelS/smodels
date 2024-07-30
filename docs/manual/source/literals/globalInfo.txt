@@ -1,12 +1,14 @@
-sqrts: 8.0*TeV
-lumi: 19.4/fb
-id: CMS-SUS-12-024
-prettyName: \slash{E}_{T}+b
-url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12024
-arxiv: http://arxiv.org/abs/1305.2390
-publication: http://www.sciencedirect.com/science/article/pii/S0370269313005339
-contact: Keith Ulmer <keith.ulmer@cern.ch>, Josh Thompson <joshua.thompson@cern.ch>, Alessandro Gaz <alessandro.gaz@cern.ch>
+id: ATLAS-SUSY-2018-04
+sqrts: 13*TeV
+lumi: 139.0/fb
+prettyName: 2 hadronic taus
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-04/
+arxiv: https://arxiv.org/abs/1911.06660
+publication: Phys. Rev. D 101 (2020) 032009
+publicationDOI: https://doi.org/10.1103/PhysRevD.101.032009
+contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
-lastUpdate: 2015/5/11
-
+lastUpdate: 2020/1/26
+jsonFiles: {"SRcombined.json": ["SRlow", "SRhigh"]}
+# includeCRs: True
