@@ -20,7 +20,6 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
 from typing import Dict, List
-from icecream import ic
 
 jsonver = ""
 try:

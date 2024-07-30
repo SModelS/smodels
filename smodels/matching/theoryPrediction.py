@@ -162,30 +162,23 @@ class TheoryPrediction(object):
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {pred.dataset.getID() :
+            srNsigDict = {ds.getID() : 0.0 for ds in self.dataset.origdatasets}
+            # Update with theory predictions
+            srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
-                          for pred in self.datasetPredictions}
+                          for pred in self.datasetPredictions})
 
             # Get ordered list of datasets:
             if hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                       for dataID in datasetList]
+                srNsigs = [srNsigDict[dataID] for dataID in datasetList]
                 # Get computer
                 computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
                                                        nsig=srNsigs,
                                                        deltas_rel = self.deltas_rel)
 
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                datasetList = [ds.getID() for ds in self.dataset.origdatasets]
-                for ds in datasetList:
-                    if ds not in srNsigDict.keys():
-                        srNsigDict.update( {ds: 0.0} )
-                # Get list of signal yields corresponding to the dataset order:
-                # srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                #        for dataID in datasetList]
-                # Get computer
                 computer = StatsComputer.forPyhf(dataset=self.dataset,
                                                        nsig=srNsigDict,
                                                        deltas_rel = self.deltas_rel)

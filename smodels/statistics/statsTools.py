@@ -222,13 +222,17 @@ class StatsComputer:
         # Filtering the json files by looking at the available datasets
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
-            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ):
-                if type(region)==str:
-                    region = { "smodels": region, "type": "SR" }
-                    globalInfo.jsonFiles[jsName][ir] = region
-                if not "type" in region:
+            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ): 
+                if isinstance(region,str):
+                    region = { "smodels": region, "type": "SR" }                    
+                elif isinstance(region,dict) and not ("type" in region):
                     region["type"]="SR"
-                    globalInfo.jsonFiles[jsName][ir]['type']="SR"
+                else:
+                    raise SModelSError("The jsonFiles field should contain lists \
+                                       of strings or dictionaries \
+                                       (%s is not allowed)" %type(region))
+                
+                globalInfo.jsonFiles[jsName][ir] = region
                 if region['type'] == 'SR':
                     jsonSRs.append(region['smodels'])
             if all([ds not in jsonSRs for ds in datasets]):
@@ -240,9 +244,7 @@ class StatsComputer:
             if not all([SR in datasets for SR in jsonSRs]):
                 # Some SRs are missing for this json combination
                 logger.error( f"Wrong json definition in globalInfo.jsonFiles for json : {jsName}" )
-        #from icecream import ic
-        #ic ( globalInfo.jsonFiles )
-        #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+
         jsonDictNames = {}
         for jsName in jsonFiles:
             jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None ] } )
