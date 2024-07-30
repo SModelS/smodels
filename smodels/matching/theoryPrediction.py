@@ -763,6 +763,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
                         region = { "smodels": region, "type": "SR" }
                         #logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
                         # import sys; sys.exit()
+                    if not "smodels" in region:
+                        region["smodels"]=None
                     if region['smodels'] == predList[0].dataset.dataInfo.dataId:
                         if not "type" in region:
                             region["type"]="SR"
