@@ -77,7 +77,7 @@ Each |ExpRes| folder contains:
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
-data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>'` or a :ref:`full pyhf likelihood<pyhfllhd>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
+data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>` or a :ref:`full pyhf likelihood <pyhfllhd>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
 
 .. literalinclude:: /literals/globalInfo.txt
    :lines: 1-13
