@@ -20,6 +20,7 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 warnings.filterwarnings("ignore")
 from typing import Dict, List
+from icecream import ic
 
 jsonver = ""
 try:
@@ -206,7 +207,7 @@ class PyhfData:
         for observation in observations:
             name = observation["name"]
             regionType = guessPyhfName ( name )
-            if regionType in [ "CR" ]: # , "VR" ]
+            if regionType in [ "CR", "VR" ]:
                 region = { "pyhf": observation["name"], "smodels": None, 
                            "type": regionType }
                 self.jsonFiles[jsName].append ( region )
@@ -277,6 +278,7 @@ class PyhfData:
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
             )  # Need to sort correctly the paths to the channels to be removed
             self.channelsInfo.append(wsChannelsInfo)
+            # ic ( wsChannelsInfo )
 
     def checkConsistency(self):
         """
