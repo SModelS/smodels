@@ -10,8 +10,11 @@ contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2020/1/26
+# the line below configures the statistical model
 jsonFiles: { 'SRcombined.json': [
+    {'pyhf': 'QCR1cut_cuts', 'type': 'CR'},
+    {'pyhf': 'QCR2cut_cuts', 'type': 'CR'},
     {'smodels': 'SRlow', 'pyhf': 'SR1cut_cuts'},
-    {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'}]
-  }
-# includeCRs: True
+    {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'},
+    {'pyhf': 'WCRcut_cuts', 'type': 'CR'}] }
+includeCRs: False
