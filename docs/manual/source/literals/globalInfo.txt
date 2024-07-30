@@ -10,5 +10,8 @@ contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2020/1/26
-jsonFiles: {"SRcombined.json": ["SRlow", "SRhigh"]}
+jsonFiles: { 'SRcombined.json': [
+    {'smodels': 'SRlow', 'pyhf': 'SR1cut_cuts'},
+    {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'}]
+  }
 # includeCRs: True

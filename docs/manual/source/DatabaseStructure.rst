@@ -80,7 +80,7 @@ used to identify the result and additional information about the source of the
 data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>` or a :ref:`full pyhf likelihood <pyhfllhd>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
 
 .. literalinclude:: /literals/globalInfo.txt
-   :lines: 1-13
+   :lines: 1-17
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
