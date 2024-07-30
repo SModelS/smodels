@@ -204,22 +204,51 @@ class PyhfData:
             return "SR"
         ## we dont have the mapping smodels<->pyhf
         ctr = 0
+        # ic ( "---" )
+        nJsonFiles = len(self.jsonFiles[jsName])
+        nObs = len(observations)
+        #ic ( self.includeCRs, nObs, nJsonFiles )
+        #ic ( observations )
+        #ic ( self.jsonFiles[jsName] )
+        nSRs, nCRs = 0, 0
         for observation in observations:
             name = observation["name"]
             regionType = guessPyhfName ( name )
-            if regionType in [ "CR", "VR" ]:
+            if regionType == "SR":
+                nSRs += 1
+            if regionType == "CR":
+                nCRs += 1
+        # ic ( nSRs, nCRs )
+        for observation in observations:
+            name = observation["name"]
+            regionType = guessPyhfName ( name )
+            if regionType in [ "VR" ]:
                 region = { "pyhf": observation["name"], "smodels": None, 
                            "type": regionType }
                 self.jsonFiles[jsName].append ( region )
                 continue
+            if not self.includeCRs and regionType in [ "CR" ]:
+                region = { "pyhf": observation["name"], "smodels": None, 
+                           "type": regionType }
+                self.jsonFiles[jsName].append ( region )
+                continue
+            if self.includeCRs and regionType in [ "CR" ]:
+                if nSRs < nObs and nSRs+nCRs == nObs:
+                    region = { "pyhf": observation["name"], "smodels": None, 
+                               "type": regionType }
+                    self.jsonFiles[jsName].append ( region )
+                    continue
+                
             if len(observation["data"])==1:
                 if ctr < len(self.jsonFiles[jsName]):
                    self.jsonFiles[jsName][ctr]["pyhf"]=f"{name}"
+                   self.jsonFiles[jsName][ctr]["type"]=regionType
                 ctr += 1
             else:
                 for i in range(len(observation["data"])):
                     if ctr < len(self.jsonFiles[jsName]):
                         self.jsonFiles[jsName][ctr]["pyhf"]=f"{name}[{i}]"
+                        self.jsonFiles[jsName][ctr]["type"]=regionType
                     ctr += 1
 
 
