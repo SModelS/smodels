@@ -1,4 +1,4 @@
-Release v3.0.0, Thu 1 Aug 2024
+Release v3.0.0, Mon 5 Aug 2024
 =======================================================
 
   * Extension to general SMS topologies using graphs
@@ -15,6 +15,16 @@ Release v3.0.0, Thu 1 Aug 2024
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes #37
   * Added CITATION.cff file, closes #38
 
+  * Database extension: added results from 10 ATLAS and 6 CMS analyses:
+    - results from ATLAS:
+	      ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33, 
+		    ATLAS-SUSY-2018-22, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13,
+			  ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-SUSY-2018-09,
+			  ATLAS-EXOT-2013-11
+	  - results from CMS:
+	      CMS-SUS-21-007, CMS-EXO-20-004, CMS-EXO-20-008, CMS-EXO-19-012,
+		    CMS-EXO-16-057, CMS-EXO-12-059
+	       
 
 Release v2.3.3, Tue 19 Dec 2023
 =======================================================
