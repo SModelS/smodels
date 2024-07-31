@@ -62,7 +62,7 @@ New in Version 3.0.0:
      * results from CMS:
         CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-20-004 (EM), CMS-EXO-19-012 (UL),
         CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
-     * results from recasts: ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (LLP repo), ATLAS-SUSY-2018-22 (CM)
+     * results from recasts: ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (LLP repo), ATLAS-SUSY-2018-22 (CM2)
 
 
     Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses above are resonance searches, while ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated with the new graph-based topology description of SModelS v3.
