@@ -41,25 +41,25 @@ New in Version 3.0.0:
   * Large code refactoring
   * Added option for selecting which quantum numbers to be ignored in prompt results (see  the :ref:`ignorePromptQNumbers<erasePrompt>` option in parameters.ini)
   * Added :ref:`outputFormat <parameterFileOutputFormat>` option to parameters.ini to allow for writing the output using the old format (old bracket notation instead of new string representation of SMS)
-  * Output for |EMrs| now reports negative log likelihoods, instead of likelihoods 
+  * Output for |EMrs| now reports negative log likelihoods, instead of likelihoods
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure (see :ref:`missing topologies <finalStateSMS>`)
   * `model.updateParticles <base.html#base.model.Model.updateParticles>`_ and `crossSection.getXsecFromSLHAFile <base.html#base.crossSection.getXsecFromSLHAFile>`_ can now also supply SLHA strings instead of SLHA filenames as argument
   * Z2parity attribute of particles is no longer needed (in QNUMBERS blocks)
-  * `jsonFiles <DatabaseStructure.html#experimental-result-folder>`_ entries in database now allow to specify also pyhf region names and region types (signal or control region) 
+  * `jsonFiles <DatabaseStructure.html#experimental-result-folder>`_ entries in database now allow to specify also pyhf region names and region types (signal or control region)
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (see :ref:`SMS Dictionary <smsDictionary>`)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see :ref:`Clustering <cluster>`)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes `#37 <https://github.com/SModelS/smodels/issues/37>`_
   * Added CITATION.cff file, closes `#38 <https://github.com/SModelS/smodels/issues/38>`_
-  * Added smodels-analyses.json in database 
+  * Added smodels-analyses.json in database
 
   * |database| extension, added results from 10 (11?) ATLAS and 6 CMS analyses:
 
-     * results from ATLAS: ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33, ATLAS-SUSY-2018-22, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13, ATLAS-SUSY-2018-09, ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-EXOT-2018-06 (tbc!), ATLAS-EXOT-2013-11       
+     * results from ATLAS: ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33, ATLAS-SUSY-2018-22, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13, ATLAS-SUSY-2018-09, ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-EXOT-2018-06 (tbc!), ATLAS-EXOT-2013-11
 
      * results from CMS: CMS-SUS-21-007, CMS-EXO-20-004, CMS-EXO-20-008, CMS-EXO-19-012, CMS-EXO-16-057, CMS-EXO-12-059
 
-     * Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses above are resonance searches, while ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated with the new graph-based topology description of SModelS v3.   
-     
+     * Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses above are resonance searches, while ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated with the new graph-based topology description of SModelS v3.
+
 
 New in Version 2.3.3:
 ^^^^^^^^^^^^^^^^^^^^^
