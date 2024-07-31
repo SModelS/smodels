@@ -44,7 +44,7 @@ New in Version 3.0.0:
   * Output for |EMrs| now reports negative log likelihoods, instead of likelihoods
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure (see :ref:`missing topologies <finalStateSMS>`)
   * `model.updateParticles <base.html#base.model.Model.updateParticles>`_ and `crossSection.getXsecFromSLHAFile <base.html#base.crossSection.getXsecFromSLHAFile>`_ can now also supply SLHA strings instead of SLHA filenames as argument
-  * Z2parity attribute of particles is no longer needed (in QNUMBERS blocks)
+  * Z2parity attribute of particles is no longer needed (in :ref:`QNUMBERS blocks <qnumberSLHA>`)
   * `jsonFiles <DatabaseStructure.html#experimental-result-folder>`_ entries in database now allow to specify also pyhf region names and region types (signal or control region)
   * Enabled EMs for control regions to emulate signal leakage to control regions (see :ref:`pyhf Approach <pyhfllhd>`)
   * Introduced signalUncertainty field in the globalInfo.txt files to quantify signal uncertainties for pyhf statistical models (see :ref:`pyhf Approach <pyhfllhd>`)
@@ -54,7 +54,7 @@ New in Version 3.0.0:
   * Added CITATION.cff file, closes `#38 <https://github.com/SModelS/smodels/issues/38>`_
   * Added smodels-analyses.json in database
 
-  * |database| extension, added results from 10 (11?) ATLAS and 6 CMS analyses:
+  * |database| extension: added results from 10 (11?) ATLAS and 6 CMS analyses:
 
      * results from ATLAS: ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33, ATLAS-SUSY-2018-22, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13, ATLAS-SUSY-2018-09, ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-EXOT-2018-06 (tbc!), ATLAS-EXOT-2013-11
 
