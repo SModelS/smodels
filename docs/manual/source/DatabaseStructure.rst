@@ -85,7 +85,7 @@ data. In case a statistical model is given (either a :ref:`simplified likelihood
 In this case, the connection of SModelS with the pyhf model is specified as
 a dictionary, with the json file name as the keys and a list of analysis region
 entries as the values. The region entries match the SModelS names (``smodels``), 
-i.e. the names of the efficiency maps implemented in SModelS, with the pyhf region names (``pyhf``) 
+i.e. the dataId's of the relevant efficiency maps, with the pyhf region names (``pyhf``) 
 used in the json file; the region type (signal, control, or validation region) is 
 specified as ``type`` (default: **SR**). If the pyhf name is omitted, it is assumed to be equal to the 
 SModelS name. If the SModelS name is omitted, we assume **None** as value, indicating
