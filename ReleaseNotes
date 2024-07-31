@@ -1,4 +1,4 @@
-Release v3.0.0, Wed 24 Jul 2024
+Release v3.0.0, Thu 1 Aug 2024
 =======================================================
 
   * Extension to general SMS topologies using graphs
@@ -8,6 +8,7 @@ Release v3.0.0, Wed 24 Jul 2024
   * We now report negative log likelihoods, instead of likelihoods
   * Added outputFormat option to parameters.ini to allow for writing the output using the old format
   * model.updateParticles and crossSection.getXsecFromSLHAFile can now also supply SLHA strings instead of SLHA filenames as argument
+  * jsonFiles entries in database now allow to specify also pyhf name, and analysis region type
   * Z2parity attribute of particles is not longer needed
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (SMS Dictionary)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see Clustering)
