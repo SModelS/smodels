@@ -79,8 +79,25 @@ It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
 data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>` or a :ref:`full pyhf likelihood <pyhfllhd>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
 
-.. literalinclude:: /literals/globalInfo.txt
+.. literalinclude:: /literals/globalInfo201804.txt
    :lines: 1-20
+
+In this case, the connection of SModelS with the pyhf model is specified as
+a dictionary with the json file name as the keys, and a list of analysis region
+entries as the values. The region entries contain the information to connect
+the SModelS names (``smodels``) with the pyhf names (``pyhf``), with the region type
+specified as ``type``. If the pyhf name is omitted, it is assumed to be equal to the 
+SModelS name. If the SModelS name is omitted, we assume **None** as value, indicating
+that the pyhf region will not be connected with any SModelS region. This is typically the case for control or validation regions. If the ``type`` is omitted, **SR** is assumed. For the special case of an SR region where the pyhf name conicides with the SModelS one, a simple name string can be used instead of a dictionary, as is illustrated by the ATLAS-SUSY-2018-14 example:
+
+.. literalinclude:: /literals/globalInfo201814.txt
+   :lines: 14
+
+In case of simplified likelihoods, the covariance matrix is supplied in the ``covariance`` field, with the order of the regions specified in a ``datasetOrder`` field, 
+shown in the example given by ATLAS-SUSY-2018-41:
+
+.. literalinclude:: /literals/globalInfo201841.txt
+   :lines: 12-14
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
