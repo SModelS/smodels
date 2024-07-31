@@ -74,7 +74,7 @@ authors:
       RWTH Aachen, 52074 Aachen, Germany
 identifiers:
   - type: url
-    value: 'https://link.springer.com/article/10.1140/epjc/s10052-014-2868-5'
+    value: 'https://doi.org/10.1140/epjc/s10052-014-2868-5'
     description: Initial publication
 repository-code: 'https://github.com/SModelS'
 url: 'https://smodels.github.io'
