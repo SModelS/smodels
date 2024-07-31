@@ -10,6 +10,8 @@ Release v3.0.0, Mon 5 Aug 2024
   * model.updateParticles and crossSection.getXsecFromSLHAFile can now also supply SLHA strings instead of SLHA filenames as argument
   * Z2parity attribute of particles is no longer needed (in QNUMBERS blocks)
   * jsonFiles entries in the database now allow to specify also pyhf region names and region types (signal or control region)
+  * Enabled EMs for control regions to emulate signal leakage to control regions 
+  * Introduced signalUncertainty field in the globalInfo.txt files to quantify signal uncertainties for pyhf statistical models 
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (SMS Dictionary)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see Clustering)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes #37

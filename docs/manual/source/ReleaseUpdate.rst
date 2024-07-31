@@ -46,6 +46,8 @@ New in Version 3.0.0:
   * `model.updateParticles <base.html#base.model.Model.updateParticles>`_ and `crossSection.getXsecFromSLHAFile <base.html#base.crossSection.getXsecFromSLHAFile>`_ can now also supply SLHA strings instead of SLHA filenames as argument
   * Z2parity attribute of particles is no longer needed (in QNUMBERS blocks)
   * `jsonFiles <DatabaseStructure.html#experimental-result-folder>`_ entries in database now allow to specify also pyhf region names and region types (signal or control region)
+  * Enabled EMs for control regions to emulate signal leakage to control regions (see :ref:`pyhf Approach <pyhfllhd>`)
+  * Introduced signalUncertainty field in the globalInfo.txt files to quantify signal uncertainties for pyhf statistical models (see :ref:`pyhf Approach <pyhfllhd>`)
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (see :ref:`SMS Dictionary <smsDictionary>`)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see :ref:`Clustering <cluster>`)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes `#37 <https://github.com/SModelS/smodels/issues/37>`_
