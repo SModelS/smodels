@@ -1,7 +1,6 @@
-
 """
 .. module:: pythonPrinter
-   :synopsis: Class for decribing a printer in python format
+   :synopsis: Class for describing a printer in python format
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 

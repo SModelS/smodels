@@ -1,7 +1,6 @@
-
 """
 .. module:: slhaPrinter
-   :synopsis: Class for decribing a printer in SLHA format
+   :synopsis: Class for describing a printer in SLHA format
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 

@@ -1,4 +1,3 @@
-
 """
 .. module:: txtPrinter
    :synopsis: Class for defining a log (stdout) printer

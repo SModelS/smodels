@@ -1,7 +1,6 @@
-
 """
 .. module:: summaryPrinter
-   :synopsis: Class for decribing a summary printer in text format.
+   :synopsis: Class for describing a summary printer in text format.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 

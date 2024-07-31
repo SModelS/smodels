@@ -1,4 +1,3 @@
-
 """
 .. module:: basicPrinter
    :synopsis: Base class for defining printer classes
