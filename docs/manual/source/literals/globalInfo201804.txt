@@ -1,0 +1,20 @@
+id: ATLAS-SUSY-2018-04
+sqrts: 13*TeV
+lumi: 139.0/fb
+prettyName: 2 hadronic taus
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-04/
+arxiv: https://arxiv.org/abs/1911.06660
+publication: Phys. Rev. D 101 (2020) 032009
+publicationDOI: https://doi.org/10.1103/PhysRevD.101.032009
+contact: atlas-phys-susy-conveners@cern.ch
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2020/1/26
+# the line below configures the statistical model
+jsonFiles: { 'SRcombined.json': [
+    {'pyhf': 'QCR1cut_cuts', 'type': 'CR'},
+    {'pyhf': 'QCR2cut_cuts', 'type': 'CR'},
+    {'smodels': 'SRlow', 'pyhf': 'SR1cut_cuts'},
+    {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'},
+    {'pyhf': 'WCRcut_cuts', 'type': 'CR'}] }
+includeCRs: False

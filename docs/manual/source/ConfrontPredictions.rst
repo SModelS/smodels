@@ -207,7 +207,7 @@ The :ref:`figure below <combinedSRfigV2>` shows a comparison for `TChiHH <http:/
    Figure: Comparison of `CMS-SUS-20-004 <http://cms-results.web.cern.ch/cms-results/public-results/publications/SUS-20-004/>`_ using SLv1 (left), and SLv2 (right).
 
 
-.. pyhfllhd:
+.. _pyhfllhd:
 
 Full Likelihoods (pyhf) Approach
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

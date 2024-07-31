@@ -162,29 +162,25 @@ class TheoryPrediction(object):
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {pred.dataset.getID() :
+            srNsigDict = {ds.getID() : 0.0 for ds in self.dataset.origdatasets}
+            # Update with theory predictions
+            srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
-                          for pred in self.datasetPredictions}
+                          for pred in self.datasetPredictions})
 
             # Get ordered list of datasets:
             if hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                       for dataID in datasetList]
+                srNsigs = [srNsigDict[dataID] for dataID in datasetList]
                 # Get computer
                 computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
                                                        nsig=srNsigs,
                                                        deltas_rel = self.deltas_rel)
 
             elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                datasetList = [ds.getID() for ds in self.dataset.origdatasets]
-                # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                       for dataID in datasetList]
-                # Get computer
                 computer = StatsComputer.forPyhf(dataset=self.dataset,
-                                                       nsig=srNsigs,
+                                                       nsig=srNsigDict,
                                                        deltas_rel = self.deltas_rel)
 
         self._statsComputer = computer
@@ -691,17 +687,42 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 expResults = sum(dataSetResults)
             else:
                 expResults = TheoryPredictionList()
-                bestRes = _getBestResult(dataSetResults)
+                bestRes = _getBestResult(dataSetResults,expResult.globalInfo)
                 if not bestRes is None:
                     expResults.append(bestRes) # Best result = combination if available
 
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            if not isinstance(theoPred.dataset,CombinedDataSet) and not theoPred.dataset.dataInfo.dataId is None and "CR" in theoPred.dataset.dataInfo.dataId: # Individual CRs shouldn't give results
-                theoPred.upperLimit = None
-            else:
+            tpe = None
+            if isinstance(theoPred.dataset,CombinedDataSet): # Individual CRs shouldn't give results
                 theoPred.upperLimit = theoPred.getUpperLimit()
+                continue
+            else:
+                if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
+                    for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
+                        for region in regionSet:
+                            if type(region)==str:
+                                if region == theoPred.dataset.dataInfo.dataId:
+                                    # if given in old format, it is an SR
+                                    tpe = "SR"
+                                    break
+                            elif region["smodels"] == theoPred.dataset.dataInfo.dataId:
+                                tpe = region["type"]
+                                break
+                else:
+                    tpe = "SR"
+
+                if tpe is None:
+                    logger.error(f"Could not find type of region {theoPred.dataType()} from {theoPred.analysisId()}")
+                    sys.exit()
+                    raise SModelSError()
+
+                if tpe == "SR":
+                    theoPred.upperLimit = theoPred.getUpperLimit()
+                else:
+                    theoPred.upperLimit = None
+
         expResults.sortTheoryPredictions()
 
         for theoPred in expResults:
@@ -716,7 +737,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 def _getCombinedResultFor(dataSetResults, expResult):
     """
     Compute the combined result for all datasets, if covariance
-    matrices are available. Return a TheoryPrediction object
+    matrices or jsonFiles are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
 
@@ -725,8 +746,29 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     :return: TheoryPrediction object
     """
+    # Don't give combined result if all regions are CRs
+    isNotSR = []
+    for predList in dataSetResults:
+        if hasattr ( expResult.globalInfo, "jsonFiles" ):
+            for regionSet in expResult.globalInfo.jsonFiles.values():
+                for region in regionSet:
+                    if type(region)==str:
+                        region = { "smodels": region, "type": "SR" }
+                        #logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
+                        # import sys; sys.exit()
+                    if not "smodels" in region:
+                        region["smodels"]=None
+                    if region['smodels'] == predList[0].dataset.dataInfo.dataId:
+                        if not "type" in region:
+                            region["type"]="SR"
+                        if region['type'] == 'SR':
+                            isNotSR.append(False)
+                        else:
+                            isNotSR.append(True)
+        else:
+            isNotSR = [ False ]
 
-    if all([True if "CR" in predList[0].dataset.dataInfo.dataId else False for predList in dataSetResults]): # Don't give combined result if all regions are CRs
+    if all(isNotSR):
         return None
 
     if len(dataSetResults) == 1:
@@ -777,12 +819,13 @@ def _getCombinedResultFor(dataSetResults, expResult):
     return theoryPrediction
 
 
-def _getBestResult(dataSetResults):
+def _getBestResult(dataSetResults, globalInfo):
     """
     Returns the best result according to the expected upper limit.
     If a combined result is included in the list, always return it.
 
     :param datasetPredictions: list of TheoryPredictionList objects
+    :param globalInfo: globalInfo of the exp result (used to get the region types)
     :return: best result (TheoryPrediction object)
     """
 
@@ -807,8 +850,21 @@ def _getBestResult(dataSetResults):
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
         dataset = predList[0].dataset
-        if "CR" in dataset.dataInfo.dataId: # A CR cannot be the best SR
+
+        # Only a SR can be the best SR
+        stop = False
+        if hasattr(globalInfo,"jsonFiles"):
+            for regionSet in globalInfo.jsonFiles.values():
+                for region in regionSet:
+                    if type(region) == dict and \
+                            region['smodels'] == dataset.dataInfo.dataId:
+                        if region['type'] != 'SR':
+                            stop = True
+                    if stop: break
+                if stop: break
+        if stop:
             continue
+
         if dataset.getType() != "efficiencyMap":
             txt = (
                 "Multiple data sets should only exist for efficiency map results, but we have them for %s?"

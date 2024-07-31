@@ -581,8 +581,14 @@ def concatenateLines ( oldcontent ):
         that end with '\'  or ',' """
     content=[] ## concatenate lines that end with "," or "\"
     tmp=""
-    for line in oldcontent:
+    import re
+    for i,line in enumerate ( oldcontent ):
         tmp+=line.strip()
+        ## if next line starts with tab or whitespace or "}",
+        ## merge the lines
+        if i < len(oldcontent)-1 and re.match("[ \t}]",oldcontent[i+1] ):
+            # if next line starts with white space, we add also
+            continue
         if tmp != "" and tmp[-1] not in [ ",", '\\' ]:
             content.append ( tmp )
             tmp=""
