@@ -83,12 +83,14 @@ data. In case a statistical model is given (either a :ref:`simplified likelihood
    :lines: 1-20
 
 In this case, the connection of SModelS with the pyhf model is specified as
-a dictionary with the json file name as the keys, and a list of analysis region
-entries as the values. The region entries contain the information to connect
-the SModelS names (``smodels``) with the pyhf names (``pyhf``), with the region type
-specified as ``type``. If the pyhf name is omitted, it is assumed to be equal to the 
+a dictionary, with the json file name as the keys and a list of analysis region
+entries as the values. The region entries match the SModelS names (``smodels``), 
+i.e. the names of the efficiency maps implemented in SModelS, with the pyhf region names (``pyhf``) 
+used in the json file; the region type (signal, control, or validation region) is 
+specified as ``type`` (default: **SR**). If the pyhf name is omitted, it is assumed to be equal to the 
 SModelS name. If the SModelS name is omitted, we assume **None** as value, indicating
-that the pyhf region will not be connected with any SModelS region. This is typically the case for control or validation regions. If the ``type`` is omitted, **SR** is assumed. For the special case of an SR region where the pyhf name conicides with the SModelS one, a simple name string can be used instead of a dictionary, as is illustrated by the ATLAS-SUSY-2018-14 example:
+that there is no corresponding efficiency map implemented; in this case no signal counts will be patched in this region. This is typically the case for control or validation regions. 
+Finally, in case the same region naming is used in the pyhf model and in SModelS, a simple name string can be used instead of a dictionary, as is illustrated by the ATLAS-SUSY-2018-14 example:
 
 .. literalinclude:: /literals/globalInfo201814.txt
    :lines: 14
