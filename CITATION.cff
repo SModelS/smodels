@@ -20,7 +20,7 @@ authors:
       Avenue des Martyrs, F-38026 Grenoble, France
   - given-names: Sabine
     family-names: Kraml
-    email: sabine.kraml@gmail.com
+    email: sabine.kraml@lpsc.in2p3.fr
     orcid: 'https://orcid.org/0000-0002-2613-7000'
     affiliation: >-
       Laboratoire de Physique Subatomique et de Cosmologie
@@ -33,6 +33,20 @@ authors:
       Centro de Ciências Naturais e Humanas, Universidade
       Federal do ABC, Santo André, 09210-580 SP, Brazil
     orcid: 'https://orcid.org/0000-0002-5251-7891'
+  - given-names: Yoxara
+    family-names: Villamizar
+    email: FIXME
+    affiliation: >-
+      Centro de Ciências Naturais e Humanas, Universidade
+      Federal do ABC, Santo André, 09210-580 SP, Brazil
+    orcid: 'https://orcid.org/0000-0001-6792-1734'
+  - given-names: Camila
+    family-names: Ramos
+    email: FIXME
+    affiliation: >-
+      Centro de Ciências Naturais e Humanas, Universidade
+      Federal do ABC, Santo André, 09210-580 SP, Brazil
+    orcid: FIXME
   - given-names: Sahana
     family-names: Narasimha
     email: sahana.narasimha@oeaw.ac.at
@@ -75,7 +89,32 @@ authors:
 identifiers:
   - type: url
     value: 'https://doi.org/10.1140/epjc/s10052-014-2868-5'
-    description: Initial publication
+    description: 'SModelS: a tool for interpreting simplified-model results from the LHC and its application to supersymmetry'
+identifiers:
+  - type: url
+    value: 'https://doi.org/10.1016/j.cpc.2018.02.007'
+    description: 'SModelS v1.1 user manual: Improving simplified model constraints with efficiency maps'
+  - type: url
+    value: 'https://doi.org/10.1016/j.cpc.2018.02.007'
+    description: 'SModelS v1.1 user manual: Improving simplified model constraints with efficiency maps'
+  - type: url
+    value: 'https://doi.org/10.31526/LHEP.1.2018.02'
+    description: 'SModelS extension with the CMS supersymmetry search results from Run 2'
+  - type: url
+    value: 'https://doi.org/10.1016/j.cpc.2019.07.013'
+    description: 'SModelS v1.2: long-lived particles, combination of signal regions, and other novelties'
+  - type: url
+    value: 'https://doi.org/10.31526/lhep.2020.158'
+    description: 'SModelS Database Update v1.2.3'
+  - type: url
+    value: 'https://doi.org/10.1016/j.cpc.2021.107909'
+    description: 'A SModelS interface for pyhf likelihoods'
+  - type: url
+    value: 'https://doi.org/10.1007/JHEP08(2022)068'
+    description: 'Constraining new physics with SModelS version 2'
+  - type: url
+    value: 'https://doi.org/10.21468/SciPostPhys.15.5.185'
+    description: 'SModelS v2.3: Enabling global likelihood analyses'
 repository-code: 'https://github.com/SModelS'
 url: 'https://smodels.github.io'
 repository-artifact: 'https://zenodo.org/communities/smodels'
