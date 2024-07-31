@@ -2,7 +2,14 @@
 % When you are using SModelS for a publication, please cite:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% SModelS proper: \cite{Ambrogi:2017neo,Kraml:2013mwa,smodels:wiki}
+% SModelS proper: \cite{Kraml:2013mwa,Ambrogi:2017neo,Ambrogi:2018ujg,Alguero:2021dig,MahdiAltakach:2023bdn,smodels:v3}
+%
+% SModelS-pyhf interface: \cite{Alguero:2020grj}
+% SModelS-Resummino interface: \cite{Altakach:2023tsd}
+%
+%%%%%%%%%%% as well as: %%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%
+% pyhf: \cite{Heinrich:2021gyp}
 %
 % PySLHA: \cite{Buckley:2013jua}
 %
@@ -11,6 +18,8 @@
 % Pythia8.2: \cite{Sjostrand:2006za,Sjostrand:2014zea}
 %
 % NLL-fast: \cite{Beenakker:1996ch,Beenakker:1997ut,Kulesza:2008jb,Kulesza:2009kq,Beenakker:2009ha,Beenakker:2010nq,Beenakker:2011fu}
+%
+% Resummino: \cite{Fuks:2013vua,Fiaschi:2023tkq}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % database.bib provided in ./smodels-database folder lists all the analyses implemented in the database.
@@ -21,7 +30,109 @@
 %%% add \usepackage[utf8]{inputenc} to your latex preamble
 
 
- %%% SModelS v1.1 release %%%
+%%% SModelS v3.0 %%% --> replace with actual paper ref!
+@article{smodels:v3,
+    author = "Altakach, Mohammad Mahdi and Kraml, Sabine and Lessa, Andre and Narasimha, Sahana and Pascal, Timoth\'ee and Ramos, Camila and Villamizar, Yoxara and Waltenberger, Wolfgang",
+    title = "{SModelS v3: Going Beyond $\mathcal{Z}_2$ Topologies}",
+    eprint = "240x.nnnnn",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    year = "2024"
+}
+
+
+%%% SModelS global EW-ino study %%%
+@article{Altakach:2023tsd,
+    author = "Altakach, Mohammad Mahdi and Kraml, Sabine and Lessa, Andre and Narasimha, Sahana and Pascal, Timoth\'ee and Reymermier, Th\'eo and Waltenberger, Wolfgang",
+    title = "{Global LHC constraints on electroweak-inos with SModelS v2.3}",
+    eprint = "2312.16635",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.21468/SciPostPhys.16.4.101",
+    journal = "SciPost Phys.",
+    volume = "16",
+    number = "4",
+    pages = "101",
+    year = "2024"
+}
+
+%%% SModelS v2.3 %%%
+@article{MahdiAltakach:2023bdn,
+    author = "Mahdi Altakach, Mohammad and Kraml, Sabine and Lessa, Andre and Narasimha, Sahana and Pascal, Timoth\'ee and Waltenberger, Wolfgang",
+    title = "{SModelS v2.3: Enabling global likelihood analyses}",
+    eprint = "2306.17676",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.21468/SciPostPhys.15.5.185",
+    journal = "SciPost Phys.",
+    volume = "15",
+    number = "5",
+    pages = "185",
+    year = "2023"
+}
+
+
+%%% SModelS v2.0 %%%
+@article{Alguero:2021dig,
+    author = {Alguero, Ga\"el and Heisig, Jan and Khosa, Charanjit K. and Kraml, Sabine and Kulkarni, Suchita and Lessa, Andre and Reyes-Gonz\'alez, Humberto and Waltenberger, Wolfgang and Wongel, Alicia},
+    title = "{Constraining new physics with SModelS version 2}",
+    eprint = "2112.00769",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "TTK-21-50",
+    doi = "10.1007/JHEP08(2022)068",
+    journal = "JHEP",
+    volume = "08",
+    pages = "068",
+    year = "2022"
+}
+
+%%% Tools conf 2020 %%%
+@article{Alguero:2020yhu,
+    author = {Alguero, Ga\"el and Heisig, Jan and Khosa, Charanjit K. and Kraml, Sabine and Kulkarni, Suchita and Lessa, Andre and Neuhuber, Philipp and Reyes-Gonz\'alez, Humberto and Waltenberger, Wolfgang and Wongel, Alicia},
+    title = "{New developments in SModelS}",
+    eprint = "2012.08192",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.22323/1.392.0022",
+    journal = "PoS",
+    volume = "TOOLS2020",
+    pages = "022",
+    year = "2021"
+}
+
+%%% SModelS v1.2.4 (pyhf interface) %%%
+@article{Alguero:2020grj,
+    author = {Alguero, Ga\"el and Kraml, Sabine and Waltenberger, Wolfgang},
+    title = "{A SModelS interface for pyhf likelihoods}",
+    eprint = "2009.01809",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.1016/j.cpc.2021.107909",
+    journal = "Comput. Phys. Commun.",
+    volume = "264",
+    pages = "107909",
+    year = "2021"
+}
+
+%%% SModelS v1.2 release %%%
+@article{Ambrogi:2018ujg,
+      author         = "Ambrogi, Federico and others",
+      title          = "{SModelS v1.2: long-lived particles, combination of
+                        signal regions, and other novelties}",
+      journal        = "Comput. Phys. Commun.",
+      volume         = "251",
+      year           = "2020",
+      pages          = "106848",
+      doi            = "10.1016/j.cpc.2019.07.013",
+      eprint         = "1811.10624",
+      archivePrefix  = "arXiv",
+      primaryClass   = "hep-ph",
+      reportNumber   = "CP3-18-65",
+      SLACcitation   = "%%CITATION = ARXIV:1811.10624;%%"
+}
+
+%%% SModelS v1.1 release %%%
 @article{Ambrogi:2017neo,
       author         = "Ambrogi, Federico and Kraml, Sabine and Kulkarni, Suchita
                         and Laa, Ursula and Lessa, Andre and Magerl, Veronika and
@@ -35,6 +146,7 @@
       reportNumber   = "LPSC17001, HEPHY-PUB-981-17",
       SLACcitation   = "%%CITATION = ARXIV:1701.06586;%%"
 }
+
 
 %%% original SModelS paper %%%
 @article{Kraml:2013mwa,
@@ -55,10 +167,7 @@
       SLACcitation   = "%%CITATION = ARXIV:1312.4175;%%",
 }
 
-%%% original SModelS webpage %%%
-@misc{smodels:wiki, 
-      note = "{http://smodels.hephy.at}",
-}
+
 
 %%% Pythia 8.2 %%%
 @article{Sjostrand:2014zea,
@@ -273,5 +382,44 @@ note = "{http://phystev.cnrs.fr/wiki/2013:groups:tools:slha}",
       SLACcitation   = "%%CITATION = ARXIV:1305.4194;%%",
 }
 
+%%% Resummino %%%
+@article{Fuks:2013vua,
+    author = "Fuks, Benjamin and Klasen, Michael and Lamprea, David R. and Rothering, Marcel",
+    title = "{Precision predictions for electroweak superpartner production at hadron colliders with Resummino}",
+    eprint = "1304.0790",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "CERN-PH-TH-2013-064, IPHC-PHENO-13-02, MS-TP-13-06",
+    doi = "10.1140/epjc/s10052-013-2480-0",
+    journal = "Eur. Phys. J. C",
+    volume = "73",
+    pages = "2480",
+    year = "2013"
+}
+@article{Fiaschi:2023tkq,
+    author = "Fiaschi, Juri and Fuks, Benjamin and Klasen, Michael and Neuwirth, Alexander",
+    title = "{Electroweak superpartner production at 13.6 Tev with Resummino}",
+    eprint = "2304.11915",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "MS-TP-23-14, LTH 1339",
+    doi = "10.1140/epjc/s10052-023-11888-y",
+    journal = "Eur. Phys. J. C",
+    volume = "83",
+    number = "8",
+    pages = "707",
+    year = "2023"
+}
 
+%%% pyhf %%%
+@article{Heinrich:2021gyp,
+    author = "Heinrich, Lukas and Feickert, Matthew and Stark, Giordon and Cranmer, Kyle",
+    title = "{pyhf: pure-Python implementation of HistFactory statistical models}",
+    doi = "10.21105/joss.02823",
+    journal = "J. Open Source Softw.",
+    volume = "6",
+    number = "58",
+    pages = "2823",
+    year = "2021"
+}
 
