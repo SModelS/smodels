@@ -80,18 +80,31 @@ except pyhf.exceptions.ImportBackendError as e:
 
 countWarning = {"llhdszero": 0}
 
+def guessPyhfType ( name : str ) -> str:
+    """ given the pyhf analysis region name,
+    guess the type. awkward, phase this out! """
+    if name.startswith ( "CR" ):
+        return "CR"
+    if name.startswith ( "VR" ):
+        return "VR"
+    if name.startswith ( "SR" ):
+        return "SR"
+    if "CR" in name: ## arggh!!
+        logger.warning ( f"old jsonFiles format used, and 'CR' in the middle of the region name: {name}. I will assume it is a control region but do switch to the new format ASAP" )
+        return "CR"
+    return "SR"
 
 class PyhfData:
     """
     Holds data for use in pyhf
-    :ivar nsignals: signal predictions dictionary of dictionaries, 
+    :ivar nsignals: signal predictions dictionary of dictionaries,
     one for each json file, one entry per signal region
     :ivar inputJsons: list of json instances
     :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
     """
 
-    def __init__( self, nsignals : Dict[str, Dict], inputJsons, jsonFiles=None, 
+    def __init__( self, nsignals : Dict[str, Dict], inputJsons, jsonFiles=None,
                   includeCRs=False, signalUncertainty=None):
         self.nsignals = nsignals
         self.getTotalYield()
@@ -109,7 +122,7 @@ class PyhfData:
                 else:
                     for j in range( len ( sregions ) ):
                         srname = f"SR1[{j}]"
-                        regions.append ( { "smodels": srname, "type": "SR", 
+                        regions.append ( { "smodels": srname, "type": "SR",
                                            "pyhf": srname } )
                 jsonFiles[ jFile ] = regions
         self.jsonFiles = jsonFiles
@@ -181,7 +194,7 @@ class PyhfData:
                     "signal": signal
                 }, "signalRegions"
             return ret
-        ret = { 'path': f"/channels/{i_ch}", 'name': chname, 
+        ret = { 'path': f"/channels/{i_ch}", 'name': chname,
                 'type': region['type']}, "otherRegions"
         return ( ret )
 
@@ -191,16 +204,6 @@ class PyhfData:
         if "pyhf" in self.jsonFiles[jsName][0]:
             return
 
-        def guessPyhfName ( name : str ) -> str:
-            if name.startswith ( "CR" ):
-                return "CR"
-            if name.startswith ( "VR" ):
-                return "VR"
-            if name.startswith ( "SR" ):
-                return "SR"
-            if "_CR_" in name:
-                return "CR"
-            return "SR"
         ## we dont have the mapping smodels<->pyhf
         ctr = 0
         #ic ( "---" )
@@ -212,31 +215,31 @@ class PyhfData:
         nSRs = 0
         for observation in observations:
             name = observation["name"]
-            regionType = guessPyhfName ( name )
+            regionType = guessPyhfType ( name )
             if regionType == "SR":
                 nSRs += 1
         # ic ( nSRs, nCRs )
         for observation in observations:
             name = observation["name"]
-            regionType = guessPyhfName ( name )
+            regionType = guessPyhfType ( name )
             if regionType in [ "VR" ]:
-                region = { "pyhf": observation["name"], "smodels": None, 
+                region = { "pyhf": observation["name"], "smodels": None,
                            "type": regionType }
                 self.jsonFiles[jsName].append ( region )
                 continue
             if not self.includeCRs and regionType in [ "CR" ]:
-                region = { "pyhf": observation["name"], "smodels": None, 
+                region = { "pyhf": observation["name"], "smodels": None,
                            "type": regionType }
                 self.jsonFiles[jsName].append ( region )
                 continue
             if self.includeCRs and regionType in [ "CR" ]:
                 if nSRs == nJsonFiles: # and nSRs+nCRs == nObs:
                     ## the signal regions alone do it
-                    region = { "pyhf": observation["name"], "smodels": None, 
+                    region = { "pyhf": observation["name"], "smodels": None,
                                "type": regionType }
                     self.jsonFiles[jsName].append ( region )
                     continue
-                
+
             if len(observation["data"])==1:
                 if ctr < len(self.jsonFiles[jsName]):
                    self.jsonFiles[jsName][ctr]["pyhf"]=f"{name}"
