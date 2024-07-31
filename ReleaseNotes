@@ -3,27 +3,31 @@ Release v3.0.0, Mon 5 Aug 2024
 
   * Extension to general SMS topologies using graphs
   * Large code refactoring
-  * Added option for selecting which quantum numbers to be erased (see  the ignorePromptQNumbers option in parameters.ini)
+  * Added option for selecting which quantum numbers to be ignored in prompt results (see the ignorePromptQNumbers option in parameters.ini)
+  * Added outputFormat option to parameters.ini for switching back to v2 output format (old bracket notation); default is v3 output format (string representation of SMS)
+  * Output for EM-type results now reports negative log likelihoods, instead of likelihoods
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure
-  * We now report negative log likelihoods, instead of likelihoods
-  * Added outputFormat option to parameters.ini to allow for writing the output using the old format
   * model.updateParticles and crossSection.getXsecFromSLHAFile can now also supply SLHA strings instead of SLHA filenames as argument
-  * jsonFiles entries in database now allow to specify also pyhf name, and analysis region type
-  * Z2parity attribute of particles is not longer needed
+  * Z2parity attribute of particles is not longer needed (in QNUMBERS blocks)
+  * jsonFiles entries in the database now allow to specify also pyhf region names and region types (signal or control region)
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (SMS Dictionary)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see Clustering)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes #37
   * Added CITATION.cff file, closes #38
+  * Added smodels-analyses.json in database 
 
-  * Database extension: added results from 10 ATLAS and 6 CMS analyses:
+  * Database extension: added results from 10 (or 11, tbc) ATLAS and 6 CMS analyses: 
     - results from ATLAS:
-        ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33,
-        ATLAS-SUSY-2018-22, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13,
-        ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-SUSY-2018-09,
-        ATLAS-EXOT-2013-11
+        ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33, ATLAS-SUSY-2018-22, 
+        ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13, ATLAS-SUSY-2018-09, 
+        ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-EXOT-2018-06 (tbc!), ATLAS-EXOT-2013-11       
     - results from CMS:
         CMS-SUS-21-007, CMS-EXO-20-004, CMS-EXO-20-008, CMS-EXO-19-012,
         CMS-EXO-16-057, CMS-EXO-12-059
+    
+    Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses are resonance searches, while 
+    ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated 
+    with the new graph-based topology description of SModelS v3.   
 
 
 Release v2.3.3, Tue 19 Dec 2023
