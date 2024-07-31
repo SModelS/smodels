@@ -18,14 +18,14 @@ Release v3.0.0, Mon 5 Aug 2024
   * Added CITATION.cff file, closes #38
   * Added smodels-analyses.json in database
 
-  * Database extension: added results from 10 (or 11, tbc) ATLAS and 6 CMS analyses:
+  * Database extension: added results from 10 (or 11?) ATLAS and 6 CMS analyses:
     - results from ATLAS:
-        ATLAS-SUSY-2019-08, ATLAS-SUSY-2018-42, ATLAS-SUSY-2018-33, ATLAS-SUSY-2018-22,
-        ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13, ATLAS-SUSY-2018-09,
-        ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-EXOT-2018-06 (tbc!), ATLAS-EXOT-2013-11
+        ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL),
+        ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL, tbc!), ATLAS-EXOT-2013-11 (UL)
     - results from CMS:
-        CMS-SUS-21-007, CMS-EXO-20-004, CMS-EXO-20-008, CMS-EXO-19-012,
-        CMS-EXO-16-057, CMS-EXO-12-059
+        CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-20-004 (EM), CMS-EXO-19-012 (UL),
+        CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
+    - EMs from recasts: ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (LLP repo), ATLAS-SUSY-2018-22 (CM)
 
     Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses are resonance searches, while
     ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated
