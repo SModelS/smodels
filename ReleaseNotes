@@ -8,7 +8,7 @@ Release v3.0.0, Mon 5 Aug 2024
   * Output for EM-type results now reports negative log likelihoods, instead of likelihoods
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure
   * model.updateParticles and crossSection.getXsecFromSLHAFile can now also supply SLHA strings instead of SLHA filenames as argument
-  * Z2parity attribute of particles is not longer needed (in QNUMBERS blocks)
+  * Z2parity attribute of particles is no longer needed (in QNUMBERS blocks)
   * jsonFiles entries in the database now allow to specify also pyhf region names and region types (signal or control region)
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (SMS Dictionary)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see Clustering)
