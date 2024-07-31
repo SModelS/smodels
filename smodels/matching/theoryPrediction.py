@@ -687,7 +687,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 expResults = sum(dataSetResults)
             else:
                 expResults = TheoryPredictionList()
-                bestRes = _getBestResult(dataSetResults,expResult.globalInfo)
+                bestRes = _getBestResult(dataSetResults)
                 if not bestRes is None:
                     expResults.append(bestRes) # Best result = combination if available
 
@@ -819,13 +819,12 @@ def _getCombinedResultFor(dataSetResults, expResult):
     return theoryPrediction
 
 
-def _getBestResult(dataSetResults, globalInfo):
+def _getBestResult(dataSetResults):
     """
     Returns the best result according to the expected upper limit.
     If a combined result is included in the list, always return it.
 
     :param datasetPredictions: list of TheoryPredictionList objects
-    :param globalInfo: globalInfo of the exp result (used to get the region types)
     :return: best result (TheoryPrediction object)
     """
 
@@ -840,6 +839,7 @@ def _getBestResult(dataSetResults, globalInfo):
             if isinstance(tp.dataset,CombinedDataSet):
                 return tp
 
+    
     # For efficiency-map analyses with multipler signal regions,
     # select the best one according to the expected upper limit:
     bestExpectedR = 0.0
@@ -850,6 +850,7 @@ def _getBestResult(dataSetResults, globalInfo):
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
         dataset = predList[0].dataset
+        globalInfo = dataset.globalInfo
 
         # Only a SR can be the best SR
         stop = False
