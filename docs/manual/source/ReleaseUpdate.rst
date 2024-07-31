@@ -54,7 +54,7 @@ New in Version 3.0.0:
   * |database| extension, added results from 10 ATLAS and 6 CMS analyses:
 
      * results from ATLAS: ATLAS-SUSY-2018-22, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-13, ATLAS-EXOT-2019-03, ATLAS-EXOT-2018-48, ATLAS-SUSY-2018-09, ATLAS-EXOT-2013-11
-	   * results from CMS: CMS-SUS-21-007, CMS-EXO-20-004, CMS-EXO-20-008, CMS-EXO-19-012, CMS-EXO-16-057, CMS-EXO-12-059
+     * results from CMS: CMS-SUS-21-007, CMS-EXO-20-004, CMS-EXO-20-008, CMS-EXO-19-012, CMS-EXO-16-057, CMS-EXO-12-059
 
 New in Version 2.3.3:
 ^^^^^^^^^^^^^^^^^^^^^
