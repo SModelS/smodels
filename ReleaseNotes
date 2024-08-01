@@ -1,18 +1,35 @@
-Release v3.0.0, Wed 24 Jul 2024
+Release v3.0.0, Mon 5 Aug 2024
 =======================================================
 
   * Extension to general SMS topologies using graphs
   * Large code refactoring
-  * Added option for selecting which quantum numbers to be erased (see  the ignorePromptQNumbers option in parameters.ini)
+  * Added option for selecting which quantum numbers to be ignored in prompt results (see the ignorePromptQNumbers option in parameters.ini)
+  * Added outputFormat option to parameters.ini for switching back to v2 output format (old bracket notation); default is v3 output format (string representation of SMS)
+  * Output for EM-type results now reports negative log likelihoods, instead of likelihoods
   * Changes in missing topologies (coverage): the grouping of topologies is now done only by final states and ignores the topology structure
-  * We now report negative log likelihoods, instead of likelihoods
-  * Added outputFormat option to parameters.ini to allow for writing the output using the old format
   * model.updateParticles and crossSection.getXsecFromSLHAFile can now also supply SLHA strings instead of SLHA filenames as argument
-  * Z2parity attribute of particles is not longer needed
+  * Z2parity attribute of particles is no longer needed (in QNUMBERS blocks)
+  * jsonFiles entries in the database now allow to specify also pyhf region names and region types (signal or control region)
+  * Enabled EMs for control regions to emulate signal leakage to control regions 
+  * Introduced signalUncertainty field in the globalInfo.txt files to quantify signal uncertainties for pyhf statistical models 
   * Introduced centralized database dictionary to decrease redundancies in SMS matching (SMS Dictionary)
   * Clustering of SMS for UL results replaced by a (simple) K-means clustering algorithm (see Clustering)
   * Changed the lock file mechanism for downloading the database to work with all file systems, fixes #37
   * Added CITATION.cff file, closes #38
+  * Added smodels-analyses.json in database
+
+  * Database extension: added results from 10 (or 11?) ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
+    - results from ATLAS:
+        ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL),
+        ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL, tbc!), ATLAS-EXOT-2013-11 (UL)
+    - results from CMS:
+        CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-20-004 (EM+cov), CMS-EXO-19-012 (UL),
+        CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
+    - EMs from recasts: ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (LLP repo), ATLAS-SUSY-2018-22 (CM2)
+
+    Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses are resonance searches, while
+    ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated
+    with the new graph-based topology description of SModelS v3.
 
 
 Release v2.3.3, Tue 19 Dec 2023
@@ -64,12 +81,12 @@ Release v2.3.0, Tue 23 May 2023
   * Database extension: added/updated results from 6 ATLAS and 4 CMS analyses
     (hfm=HistFactory model, cov=covariance matrix for SR combination):
     - results from ATLAS:
-      ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM),
+      ATLAS-SUSY-2018-05 (UL,EM+hfm), ATLAS-SUSY-2018-32 (EM+hfm), ATLAS-SUSY-2018-41 (EM+cov, updated), ATLAS-SUSY-2018-42 (UL,EM)
       ATLAS-SUSY-2019-02 (UL,EM+cov), ATLAS-SUSY-2013-12 (8TeV, EM)
     - results from CMS:
       CMS-SUS-19-010 (UL), CMS-SUS-20-004 (UL,EM), CMS-SUS-21-002 (UL,EM+cov)
     - added expected ULs to CMS-SUS-19-009
-	  - added non-aggregated results for CMS-SUS-16-039, CMS-SUS-16-050, CMS-PAS-SUS-16-052, and CMS-SUS-19-006
+    - added non-aggregated results for CMS-SUS-16-039, CMS-SUS-16-050, CMS-PAS-SUS-16-052, and CMS-SUS-19-006
 
 
 Release v2.2.1, Tue 18 October 2022

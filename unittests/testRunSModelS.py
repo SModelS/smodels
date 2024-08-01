@@ -117,6 +117,8 @@ class RunSModelSTest(unittest.TestCase):
         self.removeOutputs(outputfile)
 
     def testPyhfCombination(self):
+        import warnings
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         filename = "./testFiles/slha/T6bbHH_pyhf.slha"
         inifile = "./testParameters_pyhf.ini"
         outputfile = runMain(filename, inifile=inifile, suppressStdout=True)

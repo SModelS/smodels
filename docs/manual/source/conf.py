@@ -286,7 +286,7 @@ autoclass_content = 'both'
 numfig = True
 numfig_format = {'figure' : "Figure %s:"}
 
-nitpicky = True
+nitpicky = False
 
 nitpick_ignore = [('py:class', 'type')]
 nitpick_ignore_regex = [('py:class', 'logging.StreamHandler'),('py:class', 'collections.OrderedDict')]

@@ -1,0 +1,15 @@
+id: ATLAS-SUSY-2018-14
+sqrts: 13*TeV
+lumi: 139.0/fb
+prettyName: displaced vertices
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-14/
+arxiv: https://arxiv.org/abs/2011.07812
+publication: Phys. Rev. Lett. 127 (2021) 051802
+publicationDOI: https://link.aps.org/doi/10.1103/PhysRevLett.127.051802
+contact: atlas-phys-susy-conveners@cern.ch
+comment: Search for displaced leptons plus MET. The data was digitized from the figures in the publication.
+private: False
+implementedBy: GA
+lastUpdate: 2021/5/26
+jsonFiles: {'SRee_bkgonly.json': ['SRee'], 'SRmm_bkgonly.json': ['SRmm'], 'Comb_bkgonly.json': ['SRee', 'SRmm', 'SRem']}
+type: displaced

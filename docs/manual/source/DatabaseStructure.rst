@@ -77,10 +77,29 @@ Each |ExpRes| folder contains:
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
-data.  Here is the content of CMS-SUS-12-024/globalInfo.txt as an example:
+data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>` or a :ref:`full pyhf likelihood <pyhfllhd>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
 
-.. literalinclude:: /literals/globalInfo.txt
-   :lines: 1-11
+.. literalinclude:: /literals/globalInfo201804.txt
+   :lines: 1-20
+
+In this case, the connection of SModelS with the pyhf model is specified as
+a dictionary, with the json file name as the keys and a list of analysis region
+entries as the values. The region entries match the SModelS names (``smodels``), 
+i.e. the dataId's of the relevant efficiency maps, with the pyhf region names (``pyhf``) 
+used in the json file; the region type (signal, control, or validation region) is 
+specified as ``type`` (default: **SR**). If the pyhf name is omitted, it is assumed to be equal to the 
+SModelS name. If the SModelS name is omitted, we assume **None** as value, indicating
+that there is no corresponding efficiency map implemented; in this case no signal counts will be patched in this region. This is typically the case for control or validation regions. 
+Finally, in case the region names in the pyhf model and in SModelS coincide, a simple name string can be used instead of a dictionary, as is illustrated by the ATLAS-SUSY-2018-14 example:
+
+.. literalinclude:: /literals/globalInfo201814.txt
+   :lines: 14
+
+In case of simplified likelihoods, the covariance matrix is supplied in the ``covariance`` field, with the order of the regions specified in a ``datasetOrder`` field, 
+shown in the example given by ATLAS-SUSY-2018-41:
+
+.. literalinclude:: /literals/globalInfo201841.txt
+   :lines: 12-14
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_

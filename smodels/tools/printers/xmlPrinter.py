@@ -1,7 +1,6 @@
-
 """
 .. module:: xmlPrinter
-   :synopsis: Class for decribing a printer in XML format
+   :synopsis: Class for describing a printer in XML format
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
