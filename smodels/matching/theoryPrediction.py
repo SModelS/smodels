@@ -859,7 +859,7 @@ def _getBestResult(dataSetResults):
                 for region in regionSet:
                     if type(region) == dict and \
                             region['smodels'] == dataset.dataInfo.dataId:
-                        if region['type'] != 'SR':
+                        if "type" in region and region['type'] != 'SR':
                             stop = True
                     if stop: break
                 if stop: break
