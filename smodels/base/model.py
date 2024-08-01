@@ -355,7 +355,7 @@ class Model(object):
                 particle.decays.append(newDecay)
 
             # Check for broad width resonances
-            broadWidth = 0.01
+            broadWidth = 0.02
             if particle.totalwidth > broadWidth*particle.mass:
                 for decay in particle.decays:
                     # Check if the particle can decay to SM only:
