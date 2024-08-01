@@ -21,7 +21,7 @@ Release v3.0.0, Mon 5 Aug 2024
   * Database extension: added results from 10 (or 11?) ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
     - results from ATLAS:
         ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL),
-        ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL, tbc!), ATLAS-EXOT-2013-11 (UL)
+        ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL), ATLAS-EXOT-2013-11 (UL)
     - results from CMS:
         CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-20-004 (EM+cov), CMS-EXO-19-012 (UL),
         CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
@@ -45,8 +45,7 @@ Release v2.3.2, Wed 30 Aug 2023
 =======================================================
 
   * fixed bug in initialisation of analysis combination
-  * added smodels version to output of "txt" printer
-
+  * smodels version now printed in all output formats
 
 Release v2.3.1, Mon 17 Jul 2023
 =======================================================
