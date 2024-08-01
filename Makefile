@@ -14,8 +14,8 @@ ifndef HAS_CXX
 endif
 
 resolve_deps: ## resolve the deps via pip
-	@echo "try to resolve the python dependencies via pip"
-	smodels/installation.py -R
+	@echo "trying to resolve the python dependencies via pip:"
+	@smodels/installation.py -R
 
 smodels_externaltools: resolve_deps externaltools
 	@echo

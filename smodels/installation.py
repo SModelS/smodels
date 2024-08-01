@@ -47,6 +47,7 @@ def resolve_dependencies( as_user = True ):
     """
     ck = test_requirements()
     if ck == True: ## nothing to be done
+        print ( "all dependencies are met." )
         return None
     import subprocess
     req = f"{installDirectory()}/smodels/share/requirements.txt"
