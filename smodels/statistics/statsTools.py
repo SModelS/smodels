@@ -247,7 +247,11 @@ class StatsComputer:
 
         jsonDictNames = {}
         for jsName in jsonFiles:
-            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None ] } )
+            for i,region in enumerate(globalInfo.jsonFiles[jsName]):
+                if not "smodels" in region:
+                    region["smodels"]=None
+                    # globalInfo.jsonFiles[jsName][i]["smodels"]=None
+            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None and "smodels" in region ] } )
         # jsonRegions = [ [region['smodels'] for region in globalInfo.jsonFiles[jsName]] for jsName in jsonFiles]
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
         for ds in datasets:
