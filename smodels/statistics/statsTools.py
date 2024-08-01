@@ -223,8 +223,6 @@ class StatsComputer:
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
             for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ): 
-                if isinstance(region,dict) and not ("type" in region):
-                    region["type"]="SR"
                 if isinstance(region,str):
                     region = { "smodels": region, "type": "SR" }                    
                 elif not isinstance(region,dict):

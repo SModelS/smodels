@@ -49,6 +49,19 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
+                if tag in [ "jsonFiles", "jsonFiles_FullLikelihood" ]:
+                    jsonFiles = eval(value)
+                    for jsonFileName,regions in jsonFiles.items():
+                        for region in regions:
+                            if type(region)==str:
+                                region={"smodels": region}
+                            if not "type" in region:
+                                region["type"]="SR"
+                            if not "smodels" in region:
+                                region["smodels"]=None
+                            if not "pyhf" in region:
+                                region["pyhf"]=region["smodels"]
+                    value = str(jsonFiles)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
                 else:

@@ -150,8 +150,6 @@ class PyhfData:
         self.totalYield = S
 
     def createPatchForRegion ( self, region, i_ch, ch, jsName ):
-        if not "pyhf" in region:
-            region["pyhf"]=region["smodels"]
         chname = ch['name']
         chname2 = f'{ch["name"]}[0]' ## binned SRs
         if not region["pyhf"] in [ chname, chname2 ]:
