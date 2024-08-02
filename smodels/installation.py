@@ -47,22 +47,23 @@ def resolve_dependencies( as_user = True ):
     """
     ck = test_requirements()
     if ck == True: ## nothing to be done
+        print ( "all dependencies are met." )
         return None
     import subprocess
-    req = "%s/smodels/share/requirements.txt" % installDirectory()
-    find_pip = subprocess.call ( [ 'which', 'pip' ], stdout=subprocess.PIPE )
-    find_pip3 = subprocess.call ( [ 'which', 'pip3' ], stdout=subprocess.PIPE )
-    if find_pip != 0 and find_pip3 != 0:
+    req = f"{installDirectory()}/smodels/share/requirements.txt"
+    try:
+        import pip
+    except (ModuleNotFoundError,ImportError) as e:
         print ( "error: pip not found. cannot install requirements. Maybe try easy_install pip" )
         sys.exit()
-    p = "pip3"
-    if find_pip3 != 0:
-        p = "pip"
-    userwide = ""
+    cmd = [ sys.executable, '-m', 'pip', 'install', '--upgrade', '-r', req ]
     if as_user:
-        userwide = "--user"
+        o = subprocess.getoutput ( " ".join ( [ sys.executable, '-m', 'pip', 'install', '--user', '--dry-run', 'pyslha' ] ) )
+        #o = subprocess.getoutput ( f"{p} install --user --dry-run pyslha" )
+        if not "Can not perform a '--user' install" in o:
+            cmd.insert( 4, '--user' )
 
-    out = subprocess.call ( [ p, 'install', userwide, '--upgrade', '-r', req ] )
+    out = subprocess.call ( cmd )
     if out == 0:
         print ( "dependencies have been installed successfully." )
         return None
@@ -110,7 +111,7 @@ def pythonDirectory():
 
 def authors():
     """ return the author list, taken from BANNER """
-    copying_file = open('%s/smodels/share/BANNER' % installDirectory(), 'r')
+    copying_file = open(f'{installDirectory()}/smodels/share/BANNER', 'r')
     lines = copying_file.readlines()
     copying_file.close()
     authors = ""
@@ -130,7 +131,7 @@ def authors():
 
 def requirements():
     ret=[]
-    f = open("%s/smodels/share/requirements.txt" % installDirectory())
+    f = open( f"{installDirectory()}/smodels/share/requirements.txt")
     lines=f.readlines()
     for l in lines: ret.append ( l.strip() )
     f.close()
@@ -213,7 +214,7 @@ def databasePath ( label ):
     if label == None:
         label = "official"
     v=version().replace(".","")
-    r="%s/%s%s" % (__dbServer__,label,v)
+    r=f"{__dbServer__}/{label}{v}"
     return r
 
 def main():
@@ -247,7 +248,7 @@ def main():
                 if t: print ( t )
             else:
                 r = funcs[f]()
-                if r != None: 
+                if r != None:
                     print ( r )
 
 if __name__ == "__main__":

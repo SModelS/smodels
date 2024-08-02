@@ -8,3 +8,4 @@ pytest
 parameterized
 matplotlib
 redirector
+line_profiler

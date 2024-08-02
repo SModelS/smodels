@@ -702,12 +702,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
                     for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
                         for region in regionSet:
-                            if type(region)==str:
-                                if region == theoPred.dataset.dataInfo.dataId:
-                                    # if given in old format, it is an SR
-                                    tpe = "SR"
-                                    break
-                            elif region["smodels"] == theoPred.dataset.dataInfo.dataId:
+                            if region["smodels"] == theoPred.dataset.dataInfo.dataId:
                                 tpe = region["type"]
                                 break
                 else:
@@ -752,15 +747,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
         if hasattr ( expResult.globalInfo, "jsonFiles" ):
             for regionSet in expResult.globalInfo.jsonFiles.values():
                 for region in regionSet:
-                    if type(region)==str:
-                        region = { "smodels": region, "type": "SR" }
-                        #logger.error ( f"jsonFile has wrong format at {expResult.globalInfo.id}" )
-                        # import sys; sys.exit()
-                    if not "smodels" in region:
-                        region["smodels"]=None
                     if region['smodels'] == predList[0].dataset.dataInfo.dataId:
-                        if not "type" in region:
-                            region["type"]="SR"
                         if region['type'] == 'SR':
                             isNotSR.append(False)
                         else:
@@ -859,7 +846,7 @@ def _getBestResult(dataSetResults):
                 for region in regionSet:
                     if type(region) == dict and \
                             region['smodels'] == dataset.dataInfo.dataId:
-                        if region['type'] != 'SR':
+                        if "type" in region and region['type'] != 'SR':
                             stop = True
                     if stop: break
                 if stop: break
