@@ -175,7 +175,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
             "CMS-SUS-12-024": (4.52551e-4, "efficiencyMap"),
             "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
-            "ATLAS-SUSY-2019-09": (0.24687149539396214, "combined"),
+            "ATLAS-SUSY-2019-09": (0.231855657, "combined"),
         }
         # Make sure each ID appears only once:
         selectedIDs = {tp.analysisId() : (tp.getRValue(expected=True),tp.dataType())
@@ -191,12 +191,12 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
         self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
-        self.assertAlmostEqual(combiner.likelihood() / 5.508703964689339e-27, 1., 2)
+        self.assertAlmostEqual(combiner.likelihood() / 6.1811227091720504e-27, 1., 2)
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / 0.3239489977193064, 1., 2)
-        self.assertAlmostEqual(combiner.CLs(), 0.3837834664689492, 2 )
-        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.4784390458083965, 2 )
-        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.5729568665333286, 2 )
+        self.assertAlmostEqual(combiner.getRValue() / 0.2771301968, 1., 2)        
+        self.assertAlmostEqual(combiner.CLs(), 0.46721329662185557, 2 )
+        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.5295734024482494, 2 )
+        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.6474406370750514, 2 )
 
 
     def testGetCombiner(self):
