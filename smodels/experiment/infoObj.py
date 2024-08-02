@@ -52,6 +52,7 @@ class Info(object):
                 if tag in [ "jsonFiles", "jsonFiles_FullLikelihood" ]:
                     jsonFiles = eval(value)
                     for jsonFileName,regions in jsonFiles.items():
+                        newregions = []
                         for region in regions:
                             if type(region)==str:
                                 region={"smodels": region}
@@ -61,6 +62,8 @@ class Info(object):
                                 region["smodels"]=None
                             if not "pyhf" in region:
                                 region["pyhf"]=region["smodels"]
+                            newregions.append ( region )
+                        jsonFiles[jsonFileName] = newregions
                     value = str(jsonFiles)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
