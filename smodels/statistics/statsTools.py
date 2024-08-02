@@ -223,9 +223,7 @@ class StatsComputer:
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
             for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ): 
-                if isinstance(region,str):
-                    region = { "smodels": region, "type": "SR" }                    
-                elif not isinstance(region,dict):
+                if not isinstance(region,dict):
                     raise SModelSError("The jsonFiles field should contain lists \
                                        of strings or dictionaries \
                                        (%s is not allowed)" %type(region))

@@ -60,8 +60,6 @@ class Info(object):
                                 region["type"]="SR"
                             if not "smodels" in region:
                                 region["smodels"]=None
-                            if not "pyhf" in region:
-                                region["pyhf"]=region["smodels"]
                             newregions.append ( region )
                         jsonFiles[jsonFileName] = newregions
                     value = str(jsonFiles)
