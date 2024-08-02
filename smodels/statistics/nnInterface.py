@@ -89,6 +89,7 @@ class NNUpperLimitComputer:
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
+        """
         from icecream import ic
         ic  ( self.nsignals )
         ic  ( poi_test )
@@ -96,19 +97,17 @@ class NNUpperLimitComputer:
         ic ( self.data.globalInfo.smYields )
         # ic ( self.data.globalInfo.inputMeans )
         # ic ( self.data.globalInfo.inputErrors )
+        """
         syields = []
         for srname,smyield in self.data.globalInfo.smYields.items():
             pyhfname = srname[:-2]
             smodelsname = self.data.globalInfo
-            signal = float ( self.nsignals )
-        #for channel in channelorder:
-        #    tmp = 0.
-        #    if channel["type"] == "SR":
-        #        tmp = float ( self.nsignals[ channel["smodels"] ] )
-            # tmp += self.data.globalInfo
+            signal = float ( self.nsignals[pyhfname]*poi_test )
+            tot = smyield + signal
+            syields.append ( tot )
 
-        sys.exit()
-            
+        """
+        ic ( syields )
         nyields =[]
         for i,ds in enumerate(self.data.globalInfo.datasetOrderForMLModel):
             if type(ds) in [ tuple ]:
@@ -122,7 +121,8 @@ class NNUpperLimitComputer:
                 nyields.append ( tmp )
                 #print ( f"@@R for CR {i} I use {ds}" )
         ic (syields, nyields )
-        # sys.exit()
+        sys.exit()
+        """
         # print ( f"@@5 syields {syields} poi {poi_test}" )
         # syields = (np.array(self.nsignals)*poi_test).tolist()
         # nzeroes = self.regressor_dim - len(syields)

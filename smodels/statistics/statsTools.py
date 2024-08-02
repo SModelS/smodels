@@ -234,25 +234,24 @@ class StatsComputer:
         """
         globalInfo = self.dataObject.globalInfo
         nsignals = {}
-        jsonFiles = [js for js in globalInfo.jsonFiles]
-        # jsonDictNames = {}
-        smodelsPyhfTranslator = {}
-        for jsName in jsonFiles:
+        translator = {}
+        for jsName in globalInfo.jsonFiles.keys():
             for region in globalInfo.jsonFiles[jsName]:
-                # jsonDictNames[jsName].append ( region["smodels"] )
-                smodelsPyhfTranslator[ region["smodels"] ] = region["pyhf"]
+                nsignals[ region["pyhf"] ] = 0.
+                if region["smodels"] != None:
+                    # jsonDictNames[jsName].append ( region["smodels"] )
+                    translator[ region["smodels"] ] = region["pyhf"]
+        """
         from icecream import ic
         ic ( "--A" )
-        ic ( smodelsPyhfTranslator )
+        ic ( translator )
         ic ( self.nsig )
         ic ( globalInfo.jsonFiles[jsName] )
-        for name, nsig in self.nsig.items():
-            for jsName in jsonFiles:
-                if name in globalInfo.jsonFiles[jsName]:
-                    pyhfname = smodelsPyhfTranslator[name]
-                    nsignals[pyhfname]=nsig
-        ic ( nsignals )
-        import sys; sys.exit()
+        """
+        ## translate the signal from smodels names to pyhf names
+        for smname,pyhname in translator.items():
+            nsignals[pyhname] = self.nsig[smname]
+        # ic ( nsignals )
         data = NNData( nsignals, self.dataObject )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer
