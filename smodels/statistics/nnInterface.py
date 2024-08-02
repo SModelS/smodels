@@ -38,9 +38,14 @@ class NNData:
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
-        S = sum ( self.nsignals )
+        S = 0
+        for signal in self.nsignals.values():
+            if isinstance(signal, list):
+                for sig in signal:
+                    S += sig
+            else:
+                S += signal
         self.totalYield = S
-        self.zeroSignalsFlag = self.totalYield == 0.
 
 class NNUpperLimitComputer:
     """
@@ -71,7 +76,7 @@ class NNUpperLimitComputer:
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))
-        self.zeroSignalsFlag = self.data.zeroSignalsFlag
+        # self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.cl = cl
         self.sigma_mu = None
         self.alreadyBeenThere = (
@@ -79,19 +84,40 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
+    def getPyhfChannelOrder ( self ):
+        """ get the order of the pyhf channels of the pyhf model """
+        ## FIXME this is wrong!
+        from icecream import ic
+        ic  ( self.data.globalInfo.jsonFiles )
+        order = []
+        for jsonFileName, regions in self.data.globalInfo.jsonFiles.items():
+            for region in regions:
+                order.append ( region )
+        return order
+
     def negative_log_likelihood(self, poi_test: float):
         """ the method that really wraps around the llhd computation.
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
-        # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForMLModel}" )
-        # print ( f"@@0 datasetOrder {type(self.data.globalInfo.datasetOrderForMLModel)}" )
-        # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
-        # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
-        #print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
-        # print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
-        # print ( f"@@3 errors {self.data.globalInfo.inputErrors}" )
+        from icecream import ic
+        ic  ( self.nsignals )
+        ic  ( poi_test )
+        channelorder = self.getPyhfChannelOrder()
+        ic  ( channelorder )
+        ic ( self.data.origDataSetOrder )
+        ic ( self.data.globalInfo.smYields )
+        # ic ( self.data.globalInfo.inputMeans )
+        # ic ( self.data.globalInfo.inputErrors )
         syields = []
+        for channel in channelorder:
+            tmp = 0.
+            if channel["type"] == "SR":
+                tmp = float ( self.nsignals[ channel["smodels"] ] )
+            # tmp += self.data.globalInfo
+
+        sys.exit()
+            
         for i,ds in enumerate(self.data.globalInfo.datasetOrderForMLModel):
             if type(ds) in [ tuple ]:
                 idx = self.data.origDataSetOrder.index ( ds[0] )
@@ -112,12 +138,6 @@ class NNUpperLimitComputer:
         # print ( f"@@5 syields {syields}" )
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
 
-        # print ( f"@@8 input {self.regressor.get_inputs()[0].shape}" )
-        ## humbertos
-        # scaled_signal_yields = np.array ( [[13.52858044,10.0246462,5.26799756,20.40353088,9.88274537,7.06560028,6.54992687,8.07212193,6.60742379,158.77486684,565.80858696,518.80569167,446.57924612,142.72791787]], dtype=np.float32 )
-        ## rafals
-        # scaled_signal_yields = np.array ( [[7.67329182,10.287399,11.11071819,24.22864547,4.50237295,7.38171835,7.73185249,6.44837165,2.1427933,119.24440527,500.0748255,792.39242141,374.82884992,120.65946601]], dtype=np.float32 )
-        # print ( f"@@6 unscaled_signal_yields {scaled_signal_yields}" )
         for i,x in enumerate(scaled_signal_yields[0]):
             t = 0. # x
             err = self.data.globalInfo.inputErrors[i]
@@ -127,19 +147,8 @@ class NNUpperLimitComputer:
             #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_signal_yields[0][i]=t
 
-        # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
-
         arr = self.regressor.run(None, {"input_1":scaled_signal_yields})
         arr = arr[0][0]
-        ## humbertos
-        ## my arr is 103.28695893000021, 903.0098876953125, 108.14218170999995, 1525.634521484375
-        ## ML_LHClikelihoods/test_spey_ml/ForWolfgang/test.csv claims:
-        ## 103.28695893,117.86493379,108.14218171,111.99108552
-
-        ## rafals
-        ## my arr is 103.28695893,4983.60498046875,108.14218171,4760.98193359375
-        ## rafals: 103.28695893,123.19202698,108.14218171,122.01426745
-        # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
         nll0obs =  self.data.globalInfo.nll_obs_mu0
         nll0exp =  self.data.globalInfo.nll_exp_mu0
         expDelta = self.data.globalInfo.inputMeans[-2]
@@ -148,14 +157,8 @@ class NNUpperLimitComputer:
         obsErr = self.data.globalInfo.inputErrors[-1]
         nll1exp = nll0exp + arr[0]*expErr + expDelta
         nll1obs = nll0obs + arr[1]*obsErr + obsDelta
-        # nll1obs = arr[0] + nll0obs
-        # nll1exp = arr[1] + nll0exp
-        #print ( f"@@7 nll0obs {nll0obs}" )
-        # print ( f"@@8 arr {arr}" )
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
                 "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
-        # print ( f"@@8 ret {ret}" )
-        # sys.exit()
         return ret
 
     def welcome(self):

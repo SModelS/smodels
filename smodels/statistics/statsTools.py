@@ -233,8 +233,20 @@ class StatsComputer:
         Create computer for a machine learned model
         """
         globalInfo = self.dataObject.globalInfo
-        nsig = self.nsig
-        data = NNData( nsig, self.dataObject )
+        nsignals = {}
+        jsonFiles = [js for js in globalInfo.jsonFiles]
+        jsonDictNames = {}
+        for jsName in jsonFiles:
+            for i,region in enumerate(globalInfo.jsonFiles[jsName]):
+                if not "smodels" in region:
+                    region["smodels"]=None
+                    # globalInfo.jsonFiles[jsName][i]["smodels"]=None
+            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None and "smodels" in region ] } )
+        for name, nsig in self.nsig.items():
+            for jsName in jsonFiles:
+                if name in jsonDictNames[jsName]:
+                    nsignals[name]=nsig
+        data = NNData( nsignals, self.dataObject )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer
 
