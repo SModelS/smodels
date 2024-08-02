@@ -1,0 +1,334 @@
+#!/usr/bin/env python3
+
+"""
+.. module:: nnInterface
+   :synopsis: Code that delegates the computation of limits and likelihoods to machine learned models
+
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
+"""
+
+from typing import Union, Text, Tuple, Callable
+import copy
+import numpy as np
+import sys
+import onnxruntime
+from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL
+from scipy import optimize
+
+nninfo = {
+    "hasgreeted": False,
+}
+
+class NNData:
+    """
+    Holds data for use in the machine learned models
+    :ivar nsignals: signal predictions list divided into sublists, one for each json file
+    :ivar mlModel: path to onnx model file
+    """
+
+    def __init__(self, nsignals, dataObject ):
+        self.nsignals = nsignals  # fb
+        self.getTotalYield()
+        self.dataObject = dataObject
+        self.globalInfo = dataObject.globalInfo
+        datasets = [ds.getID() for ds in self.dataObject.origdatasets]
+        self.origDataSetOrder = datasets
+
+    def getTotalYield ( self ):
+        """ the total yield in all signal regions """
+        S = sum ( self.nsignals )
+        self.totalYield = S
+        self.zeroSignalsFlag = self.totalYield == 0.
+
+class NNUpperLimitComputer:
+    """
+    Class that computes the upper limit using the jsons files and signal
+    informations in the 'data' instance of 'NNData'
+    """
+
+    def __init__(self, data, cl=0.95, lumi=None ):
+        """
+
+        :param data: instance of 'NNData' holding the signals information
+        :param cl: confdence level at which the upper limit is desired to be computed
+        :ivar data: created from data
+        :ivar nsignals: signal predictions list divided into sublists, one for each json file
+        :ivar zeroSignalsFlag: list boolean flags in case all signals are zero for a specific json
+        :ivar cl: created from cl
+        :ivar alreadyBeenThere: boolean flag that identifies when nsignals accidentally passes twice at two identical values
+        """
+
+        self.data = data
+        import onnxruntime
+        self.regressor = onnxruntime.InferenceSession ( self.data.globalInfo.onnx )
+        # store the dimensionality of the input vector that the model
+        # asks us to. this may be different from the number of our
+        # signal regions, as control regions may have been added.
+        # we will pad with zeroes
+        self.regressor_dim = self.regressor.get_inputs()[0].shape[1]
+        self.lumi = lumi
+        self.nsignals = copy.deepcopy ( self.data.nsignals )
+        logger.debug("Signals : {}".format(self.nsignals))
+        self.zeroSignalsFlag = self.data.zeroSignalsFlag
+        self.cl = cl
+        self.sigma_mu = None
+        self.alreadyBeenThere = (
+            False  # boolean to detect wether self.signals has returned to an older value
+        )
+        self.welcome()
+
+    def negative_log_likelihood(self, poi_test: float):
+        """ the method that really wraps around the llhd computation.
+
+        :returns: dictionary with nlls, obs and exp, mu=0 and 1
+        """
+        # print ( f"@@0 datasetOrder {self.data.globalInfo.datasetOrderForMLModel}" )
+        # print ( f"@@0 datasetOrder {type(self.data.globalInfo.datasetOrderForMLModel)}" )
+        # print ( f"@@1 origDataSetOrder {self.data.origDataSetOrder}" )
+        # print ( f"@@2 nsignals {self.nsignals} poi={poi_test} " )
+        #print ( f"@@3 smYields {self.data.globalInfo.smYields}" )
+        # print ( f"@@3 means {self.data.globalInfo.inputMeans}" )
+        # print ( f"@@3 errors {self.data.globalInfo.inputErrors}" )
+        syields = []
+        for i,ds in enumerate(self.data.globalInfo.datasetOrderForMLModel):
+            if type(ds) in [ tuple ]:
+                idx = self.data.origDataSetOrder.index ( ds[0] )
+                tmp = float ( self.nsignals[idx]*poi_test )
+                tmp += self.data.globalInfo.smYields[ ds[1] ]
+                syields.append ( tmp )
+                #print ( f"@@R for SR {i} I use {ds}, idx {idx}" )
+            if type(ds) in [ str ]:
+                tmp = self.data.globalInfo.smYields[ ds ]
+                syields.append ( tmp )
+                #print ( f"@@R for CR {i} I use {ds}" )
+        # sys.exit()
+        # print ( f"@@5 syields {syields} poi {poi_test}" )
+        # syields = (np.array(self.nsignals)*poi_test).tolist()
+        # nzeroes = self.regressor_dim - len(syields)
+        #if nzeroes > 0:
+        #    syields += [0]*nzeroes
+        # print ( f"@@5 syields {syields}" )
+        scaled_signal_yields = np.array( [syields], dtype=np.float32 )
+
+        # print ( f"@@8 input {self.regressor.get_inputs()[0].shape}" )
+        ## humbertos
+        # scaled_signal_yields = np.array ( [[13.52858044,10.0246462,5.26799756,20.40353088,9.88274537,7.06560028,6.54992687,8.07212193,6.60742379,158.77486684,565.80858696,518.80569167,446.57924612,142.72791787]], dtype=np.float32 )
+        ## rafals
+        # scaled_signal_yields = np.array ( [[7.67329182,10.287399,11.11071819,24.22864547,4.50237295,7.38171835,7.73185249,6.44837165,2.1427933,119.24440527,500.0748255,792.39242141,374.82884992,120.65946601]], dtype=np.float32 )
+        # print ( f"@@6 unscaled_signal_yields {scaled_signal_yields}" )
+        for i,x in enumerate(scaled_signal_yields[0]):
+            t = 0. # x
+            err = self.data.globalInfo.inputErrors[i]
+            if err > 1e-20:
+                t = (x - self.data.globalInfo.inputMeans[i])/err
+            #else:
+            #    t = # - self.data.globalInfo.inputMeans[i]
+            scaled_signal_yields[0][i]=t
+
+        # print ( f"@@6 scaled_signal_yields {scaled_signal_yields}" )
+
+        arr = self.regressor.run(None, {"input_1":scaled_signal_yields})
+        arr = arr[0][0]
+        ## humbertos
+        ## my arr is 103.28695893000021, 903.0098876953125, 108.14218170999995, 1525.634521484375
+        ## ML_LHClikelihoods/test_spey_ml/ForWolfgang/test.csv claims:
+        ## 103.28695893,117.86493379,108.14218171,111.99108552
+
+        ## rafals
+        ## my arr is 103.28695893,4983.60498046875,108.14218171,4760.98193359375
+        ## rafals: 103.28695893,123.19202698,108.14218171,122.01426745
+        # nLL_exp_mu0,nLL_exp_mu1,nLL_obs_mu0,nLL_obs_mu1
+        nll0obs =  self.data.globalInfo.nll_obs_mu0
+        nll0exp =  self.data.globalInfo.nll_exp_mu0
+        expDelta = self.data.globalInfo.inputMeans[-2]
+        obsDelta = self.data.globalInfo.inputMeans[-1]
+        expErr = self.data.globalInfo.inputErrors[-2]
+        obsErr = self.data.globalInfo.inputErrors[-1]
+        nll1exp = nll0exp + arr[0]*expErr + expDelta
+        nll1obs = nll0obs + arr[1]*obsErr + obsDelta
+        # nll1obs = arr[0] + nll0obs
+        # nll1exp = arr[1] + nll0exp
+        #print ( f"@@7 nll0obs {nll0obs}" )
+        # print ( f"@@8 arr {arr}" )
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
+                "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
+        # print ( f"@@8 ret {ret}" )
+        # sys.exit()
+        return ret
+
+    def welcome(self):
+        """
+        greet the world
+        """
+
+        if nninfo["hasgreeted"]:
+            return
+        logger.info( f"NN interface, we are using xxx" )
+        nninfo["hasgreeted"] = True
+
+    def likelihood( self, mu=1.0, return_nll=False, expected=False):
+        """
+        Returns the value of the likelihood. \
+        Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
+
+        :param return_nll: if true, return nll, not llhd
+        :param expected: if False, compute expected values, if True, \
+            compute a priori expected, if "posteriori" compute posteriori \
+            expected
+        """
+        ret = self.negative_log_likelihood ( mu )
+        lbl = "nll_obs_1"
+        if expected:
+            lbl = "nll_exp_1"
+        nll = ret[lbl]
+        logger.debug( f"Calling likelihood")
+        return self.exponentiateNLL ( nll, not return_nll )
+
+    def exponentiateNLL(self, nll, doIt = True ):
+        """if doIt, then compute likelihood from nll,
+        else return nll"""
+        if nll == None:
+            return None
+            #if doIt:
+            #    return 0.0
+            #return 9000.0
+        if doIt:
+            return np.exp(-nll )
+        return nll
+
+    def lmax( self, return_nll=False, expected=False,
+              allowNegativeSignals=True ):
+        """
+        Returns the negative log max likelihood
+
+        :param return_nll: if true, return nll, not llhd
+        :param expected: if False, compute expected values, if True,
+        compute a priori expected, if "posteriori" compute posteriori
+        expected
+        :param allowNegativeSignals: if False, then negative nsigs are
+        replaced with 0.
+        """
+        # allowNegativeSignals = True
+        # logger.error("expected flag needs to be heeded!!!")
+        # lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
+        # print( f"Calling lmax negativeSignals = {allowNegativeSignals}")
+        # print ( f"@@5 before minimize!" )
+        lbl = "nll_obs_1"
+        nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
+        if expected:
+            lbl = "nll_exp_1"
+        def getNLL ( mu ): # , nll0 ):
+            d = self.negative_log_likelihood ( mu )
+            ret = d[lbl] # - nll0
+            # print ( f"@@X dNLL({mu})={ret} lbl={lbl} nll0={nll0}" )
+            return ret
+        ret = { "nll_min": nll0, "muhat": 0., "sigma_mu": 0. }
+        muini = [ 0.0, 1.0, 3.0, -1.0, 10.0, 0.1, -0.1 ]
+        if not allowNegativeSignals:
+            muini = [ 0.0, 1.0, 3.0, 10.0, 0.1 ]
+        for mu0 in muini:
+            o = optimize.minimize ( getNLL, mu0, method="Nelder-Mead" )
+            # print ( f"@@6 o={o} nll0 {nll0}" )
+            # sys.exit()
+            if o.success == True:
+                muhat = o.x[0]
+                if not allowNegativeSignals and muhat < 0.:
+                    continue
+                nll_min = o.fun
+                #    muhat = 0.
+                #    nll_min = nll0
+                if 0. < nll_min < ret["nll_min"]:
+                    ret = { "nll_min": nll_min, "muhat": muhat }
+        # ret["nll_min"]+=nll0
+        ret["nll0"]=nll0
+        # lmax = self.exponentiateNLL ( ret["nll_min"] )
+        # ret["lmax"]=lmax
+        ret["lmax"]=ret["nll_min"] # FIXME!!!
+        ret["expected"]=expected
+        o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
+        sigma_mu = np.sqrt ( o.hess_inv[0][0] )
+        ret["sigma_mu"]=sigma_mu
+        # logger.error ( f"@@9 ret {ret}" )
+        # sys.exit()
+        return ret
+
+    def getUpperLimitOnSigmaTimesEff(self, expected=False ):
+        """
+        Compute the upper limit on the fiducial cross section sigma times efficiency:
+
+        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
+                          - else: uses 'self.nsignals'
+        :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
+        """
+        if self.data.totalYield == 0.:
+            return None
+        else:
+            ul = self.getUpperLimitOnMu( expected=expected )
+            if ul == None:
+                return ul
+            if self.lumi is None:
+                logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
+                return ul
+            xsec = self.data.totalYield / self.lumi
+            return ul * xsec
+
+    def getUpperLimitOnMu(self, expected=False,
+            allowNegativeSignals = False ):
+        """
+        Compute the upper limit on the signal strength modifier with:
+            - by default, the combination of the workspaces contained into self.workspaces
+
+        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
+                          - else: uses 'self.nsignals'
+        :return: the upper limit at 'self.cl' level (0.95 by default)
+        """
+        mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
+                              allowNegativeSignals=allowNegativeSignals)
+        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
+                allowNegative = allowNegativeSignals )
+        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
+        return mu_lim
+
+    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = True ) -> Tuple[float, float, Callable]:
+        """
+        Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
+        plus mu_hat and sigma_mu
+
+        :param expected: if True, compute expected likelihood, else observed
+        """
+        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
+        mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        mu_hat = mu_hat if mu_hat is not None else 0.0
+        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
+        # a posteriori expected is needed here
+        # mu_hat is mu_hat for signal_rel
+        fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
+                             return_nll=True)
+        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+
+        # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
+        # return 1.
+
+        def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
+            # at - infinity this should be .95,
+            # at + infinity it should -.05
+            # Make sure to always compute the correct llhd value (from theoryPrediction)
+            # and not used the cached value (which is constant for mu~=1 an mu~=0)
+            nll = self.likelihood(mu, return_nll=True, expected=expected)
+            nllA = self.likelihood(mu, expected="posteriori", return_nll=True)
+            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
+
+        return mu_hat, sigma_mu, clsRoot
+
+
+    def transform ( self, expected : Union [ Text, bool ] ):
+        """ replace the actual observations with backgrounds,
+            if expected is True or "posteriori" """
+        # always start from scratch
+        # self.model = copy.deepcopy ( self.origModel )
+        if expected == False:
+            return
+        self.data.observed = self.model.backgrounds

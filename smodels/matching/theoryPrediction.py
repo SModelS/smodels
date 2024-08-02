@@ -167,9 +167,18 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
+            if hasattr(self.dataset.globalInfo, "mlModel"):
+                datasetList = [ds.getID() for ds in self.dataset.origdatasets]
+                # Get list of signal yields corresponding to the dataset order:
+                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
+                       for dataID in datasetList]
+                # Get computer
+                computer = StatsComputer.forNNs(dataset=self.dataset,
+                                              nsig=srNsigs,
+                                              deltas_rel = self.deltas_rel)
 
             # Get ordered list of datasets:
-            if hasattr(self.dataset.globalInfo, "covariance"):
+            elif hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] for dataID in datasetList]

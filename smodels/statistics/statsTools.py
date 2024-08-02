@@ -18,6 +18,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
@@ -88,6 +89,24 @@ class StatsComputer:
                                  nsig=nsig, deltas_rel=deltas_rel)
 
         computer.getComputerMultiBinSL( )
+
+        return computer
+
+    @classmethod
+    def forNNs(cls, dataset, nsig, deltas_rel):
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="nn",
+                                 nsig=nsig, deltas_rel=deltas_rel)
+
+        computer.getComputerNN( )
 
         return computer
 
@@ -208,6 +227,16 @@ class StatsComputer:
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
+
+    def getComputerNN(self ):
+        """
+        Create computer for a machine learned model
+        """
+        globalInfo = self.dataObject.globalInfo
+        nsig = self.nsig
+        data = NNData( nsig, self.dataObject )
+        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        self.likelihoodComputer = self.upperLimitComputer
 
     def getComputerPyhf(self ):
         """

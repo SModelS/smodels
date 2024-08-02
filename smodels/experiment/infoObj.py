@@ -71,11 +71,50 @@ class Info(object):
                     continue
 
             self.cacheJsons()
+            self.cacheOnnx()
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False
         return True
+
+    def cacheOnnx(self):
+        """ if we have the "mlModel" attribute defined,
+            we cache the corresponding onnx. Needed when pickling """
+        if not hasattr(self, "mlModel"):
+            return
+        if hasattr(self, "onnx"):  # seems like we already have them
+            return
+        dirp = os.path.dirname(self.path)
+        mlModel = os.path.join(dirp, self.mlModel)
+        with open ( mlModel, "rb" ) as f:
+            self.onnx = f.read()
+            f.close()
+        import onnx
+        m = onnx.load ( mlModel )
+        smYields, inputMeans, inputErrors = {}, [], []
+        nll_exp_mu0, nll_obs_mu0 = None, None
+        # smYields = []
+        import json
+        for em in m.metadata_props:
+            if em.key == "bkg_yields":
+                st = eval(em.value)
+                for l in st:
+                    smYields[ l[0] ] = l[1]
+                #    smYields.append ( l[1] )
+            if em.key == "standardization_mean":
+                inputMeans = eval(em.value)
+            elif em.key == "standardization_std":
+                inputErrors = eval(em.value)
+            elif em.key == 'nLL_exp_mu0':
+                nll_exp_mu0 = json.loads(em.value)
+            elif em.key == 'nLL_obs_mu0':
+                nll_obs_mu0 = json.loads(em.value)
+        self.smYields = smYields
+        self.inputMeans = inputMeans
+        self.inputErrors = inputErrors
+        self.nll_exp_mu0 = nll_exp_mu0
+        self.nll_obs_mu0 = nll_obs_mu0
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
