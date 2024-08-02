@@ -235,17 +235,24 @@ class StatsComputer:
         globalInfo = self.dataObject.globalInfo
         nsignals = {}
         jsonFiles = [js for js in globalInfo.jsonFiles]
-        jsonDictNames = {}
+        # jsonDictNames = {}
+        smodelsPyhfTranslator = {}
         for jsName in jsonFiles:
-            for i,region in enumerate(globalInfo.jsonFiles[jsName]):
-                if not "smodels" in region:
-                    region["smodels"]=None
-                    # globalInfo.jsonFiles[jsName][i]["smodels"]=None
-            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None and "smodels" in region ] } )
+            for region in globalInfo.jsonFiles[jsName]:
+                # jsonDictNames[jsName].append ( region["smodels"] )
+                smodelsPyhfTranslator[ region["smodels"] ] = region["pyhf"]
+        from icecream import ic
+        ic ( "--A" )
+        ic ( smodelsPyhfTranslator )
+        ic ( self.nsig )
+        ic ( globalInfo.jsonFiles[jsName] )
         for name, nsig in self.nsig.items():
             for jsName in jsonFiles:
-                if name in jsonDictNames[jsName]:
-                    nsignals[name]=nsig
+                if name in globalInfo.jsonFiles[jsName]:
+                    pyhfname = smodelsPyhfTranslator[name]
+                    nsignals[pyhfname]=nsig
+        ic ( nsignals )
+        import sys; sys.exit()
         data = NNData( nsignals, self.dataObject )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer

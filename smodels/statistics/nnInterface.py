@@ -84,17 +84,6 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
-    def getPyhfChannelOrder ( self ):
-        """ get the order of the pyhf channels of the pyhf model """
-        ## FIXME this is wrong!
-        from icecream import ic
-        ic  ( self.data.globalInfo.jsonFiles )
-        order = []
-        for jsonFileName, regions in self.data.globalInfo.jsonFiles.items():
-            for region in regions:
-                order.append ( region )
-        return order
-
     def negative_log_likelihood(self, poi_test: float):
         """ the method that really wraps around the llhd computation.
 
@@ -103,32 +92,36 @@ class NNUpperLimitComputer:
         from icecream import ic
         ic  ( self.nsignals )
         ic  ( poi_test )
-        channelorder = self.getPyhfChannelOrder()
-        ic  ( channelorder )
         ic ( self.data.origDataSetOrder )
         ic ( self.data.globalInfo.smYields )
         # ic ( self.data.globalInfo.inputMeans )
         # ic ( self.data.globalInfo.inputErrors )
         syields = []
-        for channel in channelorder:
-            tmp = 0.
-            if channel["type"] == "SR":
-                tmp = float ( self.nsignals[ channel["smodels"] ] )
+        for srname,smyield in self.data.globalInfo.smYields.items():
+            pyhfname = srname[:-2]
+            smodelsname = self.data.globalInfo
+            signal = float ( self.nsignals )
+        #for channel in channelorder:
+        #    tmp = 0.
+        #    if channel["type"] == "SR":
+        #        tmp = float ( self.nsignals[ channel["smodels"] ] )
             # tmp += self.data.globalInfo
 
         sys.exit()
             
+        nyields =[]
         for i,ds in enumerate(self.data.globalInfo.datasetOrderForMLModel):
             if type(ds) in [ tuple ]:
                 idx = self.data.origDataSetOrder.index ( ds[0] )
                 tmp = float ( self.nsignals[idx]*poi_test )
                 tmp += self.data.globalInfo.smYields[ ds[1] ]
-                syields.append ( tmp )
+                nyields.append ( tmp )
                 #print ( f"@@R for SR {i} I use {ds}, idx {idx}" )
             if type(ds) in [ str ]:
                 tmp = self.data.globalInfo.smYields[ ds ]
-                syields.append ( tmp )
+                nyields.append ( tmp )
                 #print ( f"@@R for CR {i} I use {ds}" )
+        ic (syields, nyields )
         # sys.exit()
         # print ( f"@@5 syields {syields} poi {poi_test}" )
         # syields = (np.array(self.nsignals)*poi_test).tolist()
