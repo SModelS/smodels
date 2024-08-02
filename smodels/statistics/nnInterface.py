@@ -89,6 +89,7 @@ class NNUpperLimitComputer:
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
+
         """
         from icecream import ic
         ic  ( self.nsignals )
@@ -100,35 +101,21 @@ class NNUpperLimitComputer:
         """
         syields = []
         for srname,smyield in self.data.globalInfo.smYields.items():
-            pyhfname = srname[:-2]
+            p1 = srname.rfind("-")
+            realname = srname[:p1]
+            # ic ( realname )
+            if not realname in self.nsignals:
+                realname = f"{realname}[{srname[p1+1:]}]"
+                assert realname in self.nsignals, \
+                  f"cannot find sr name {realname} in {self.nsignals}"
             smodelsname = self.data.globalInfo
-            signal = float ( self.nsignals[pyhfname]*poi_test )
+            signal = float ( self.nsignals[realname]*poi_test )
             tot = smyield + signal
             syields.append ( tot )
 
-        """
-        ic ( syields )
-        nyields =[]
-        for i,ds in enumerate(self.data.globalInfo.datasetOrderForMLModel):
-            if type(ds) in [ tuple ]:
-                idx = self.data.origDataSetOrder.index ( ds[0] )
-                tmp = float ( self.nsignals[idx]*poi_test )
-                tmp += self.data.globalInfo.smYields[ ds[1] ]
-                nyields.append ( tmp )
-                #print ( f"@@R for SR {i} I use {ds}, idx {idx}" )
-            if type(ds) in [ str ]:
-                tmp = self.data.globalInfo.smYields[ ds ]
-                nyields.append ( tmp )
-                #print ( f"@@R for CR {i} I use {ds}" )
-        ic (syields, nyields )
-        sys.exit()
-        """
+        #ic ( syields )
+        #sys.exit()
         # print ( f"@@5 syields {syields} poi {poi_test}" )
-        # syields = (np.array(self.nsignals)*poi_test).tolist()
-        # nzeroes = self.regressor_dim - len(syields)
-        #if nzeroes > 0:
-        #    syields += [0]*nzeroes
-        # print ( f"@@5 syields {syields}" )
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
 
         for i,x in enumerate(scaled_signal_yields[0]):
