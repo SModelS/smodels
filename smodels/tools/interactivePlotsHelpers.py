@@ -536,19 +536,34 @@ class PlotlyBackend:
             data_frame_br[column] = self.data_frame_all[column]
             for i in range(len(self.data_frame_all.index)):
                 if self.data_frame_all[column][i]:
-                    data_frame_br[column][i] = self.data_frame_all[column][i].split("','")
+                  
+                    #data_frame_br[column][i] = self.data_frame_all[column][i].split("','")
+                    
+                    data_frame_br.loc[i, column]= str(self.data_frame_all[column][i].split("','"))
+                    
+  
                 else:
-                    data_frame_br[column][i] = []
+                    #data_frame_br[column][i] = []
+              
+                    data_frame_br.loc[i, column]= ''
                 j=0
                 brs=''
-                for br in data_frame_br[column][i]:
+                #for br in data_frame_br[column][i]:
+                for br in data_frame_br.loc[i, column]:
+            
+                    if str(type(br).__name__) == 'list':
+                        
+                     
+                        br=br[0]
                     if j<=4:
                         brs=brs+' '+br
                     if j>4:
                         brs=brs+'<br>'
                         j=0
                     j=j+1
-                data_frame_br[column][i]=brs
+                #data_frame_br[column][i]=brs
+     
+                data_frame_br.loc[i, column] = brs
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+column+': '+data_frame_br[column].astype('str')+'<br>'
 
         #Provisinal data frame to handle changes False-->not available
