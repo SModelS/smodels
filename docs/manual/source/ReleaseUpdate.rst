@@ -54,7 +54,7 @@ New in Version 3.0.0:
   * Added CITATION.cff file, closes `#38 <https://github.com/SModelS/smodels/issues/38>`_
   * Added smodels-analyses.json in database
 
-  * |database| extension: added results from 10 (11?) ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
+  * |database| extension: added results from 11 ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
 
      * results from ATLAS: 
         ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL), ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL, tbc!), ATLAS-EXOT-2013-11 (UL)
