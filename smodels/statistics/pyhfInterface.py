@@ -90,7 +90,7 @@ def guessPyhfType ( name : str ) -> str:
     if name.startswith ( "SR" ):
         return "SR"
     if "CR" in name: ## arggh!!
-        logger.warning ( f"old jsonFiles format used, and 'CR' in the middle of the region name: {name}. I will assume it is a control region but do switch to the new format ASAP" )
+        logger.debug ( f"old jsonFiles format used, and 'CR' in the middle of the region name: {name}. I will assume it is a control region but do switch to the new format ASAP" )
         return "CR"
     return "SR"
 
