@@ -612,6 +612,16 @@ class TheoryPredictionList(object):
         else:
             return self.__add__(theoPredList)
 
+    def removeRNone(self):
+        """
+        Remove predictions for which r-value = None
+        (such as when the UL computer fails due to convergence issues).
+        """
+        
+        tpList = [tp for tp in self._theoryPredictions 
+                  if tp.getRValue() is not None]
+        self._theoryPredictions = tpList[:]
+
     def sortTheoryPredictions(self):
         """
         Reverse sort theoryPredictions by R value.
@@ -710,7 +720,6 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
                 if tpe is None:
                     logger.error(f"Could not find type of region {theoPred.dataType()} from {theoPred.analysisId()}")
-                    sys.exit()
                     raise SModelSError()
 
                 if tpe == "SR":
@@ -724,6 +733,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             ret.append(theoPred)
 
     tpList = TheoryPredictionList(ret)
+    tpList.removeRNone()
     tpList.sortTheoryPredictions()
 
     return tpList

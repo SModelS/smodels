@@ -8,15 +8,13 @@
 
 from __future__ import print_function
 import os
-from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.physicsUnits import fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
-from collections import OrderedDict
 import unum
 
 
@@ -144,13 +142,13 @@ class SummaryPrinter(TxTPrinter):
         output += 80 * "=" + "\n"
         output += "The highest r value is = %.5f from %s" % \
             (maxr["obs"], maxr["anaid"])
-        if maxr["exp"] is not None and maxr["exp"] > -.5:
+        if maxr["exp"] is not None and maxr["exp"] >= 0.0:
             output += " (r_expected=%.5f)" % maxr["exp"]
         else:
             output += " (r_expected not available)"
         output += "\n"
         for coll, values in maxcoll.items():
-            if values["obs"] == None or values["obs"] < -.5:
+            if values["obs"] == None or values["obs"] < 0.0:
                 continue
             output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
                       (coll, values["anaid"], values["exp"], values["obs"])
