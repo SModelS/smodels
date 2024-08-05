@@ -92,12 +92,14 @@ class SummaryPrinter(TxTPrinter):
             value = theoPred.xsection
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
-            rs = str(r)
-            rs_expected = str(r_expected)
-            if type(r) in [int, float, np.float64]:
+            if r is not None:
                 rs = "%10.3E" % r
-            if type(r_expected) in [int, float, np.float64]:
+            else:
+                rs = "NaN" # r = None means the calculation failed
+            if r_expected is not None:
                 rs_expected = "%10.3E" % r_expected
+            else:
+                rs_expected = "N/A" # r_exp could not be available
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
@@ -106,12 +108,8 @@ class SummaryPrinter(TxTPrinter):
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
             # theory cross section , expt upper limit
             output += "%10.3E %s " % (value.asNumber(fb), uls)
-            if r_expected:
-                output += "%s %s" % (rs, rs_expected)
-            elif r is None:
-                output += "N/A  N/A"
-            else:
-                output += "%10.3E  N/A" % r
+            output += "%s %s" % (rs, rs_expected)
+            
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
@@ -178,14 +176,14 @@ class SummaryPrinter(TxTPrinter):
         nllmin = obj.lmax( return_nll = True )
         output += f"Combined Analyses: {expIDs}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n"
-        r_string = "None"
-        r_exp_string = "None"
-        if r != None:
-            r_string = f"{r:10.3E}"
-        if r_expected != None:
-            r_exp_string = f"{r_expected:10.3E}"
-        output += f"combined r-value: {r_string}\n"
-        output += f"combined r-value (expected): {r_exp_string}" 
+        if r is not None:
+            output += f"combined r-value: {r:10.3E}\n"
+        else:
+            output += f"combined r-value: NaN (failed to compute r-value)\n"
+        if r_expected is not None:
+            output += f"combined r-value (expected): {r_expected:10.3E}\n"
+        else:
+            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

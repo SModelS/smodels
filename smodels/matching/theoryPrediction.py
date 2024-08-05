@@ -453,10 +453,12 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
         # Now sort by highest priority and then by highest expected r-value:
         selectedTPs = sorted(
-            selectedTPs, key=lambda tp: (priority[tp.dataType()], tp.getRValue(expected=True))
+            selectedTPs, key=lambda tp: (priority[tp.dataType()], 
+                                         tp.getRValue(expected=True) is not None,
+                                         tp.getRValue(expected=True))
         )
         # Now get a single TP for each result
-        # (the highest ranking analyses come last and are kept in the dict)
+        # (the highest ranking analyses with r != None come last and are kept in the dict)
         uniqueTPs = {tp.analysisId(): tp for tp in selectedTPs}
         uniqueTPs = list(uniqueTPs.values())
 
@@ -733,7 +735,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             ret.append(theoPred)
 
     tpList = TheoryPredictionList(ret)
-    tpList.removeRNone()
+    # tpList.removeRNone() # Remove results with r = None
     tpList.sortTheoryPredictions()
 
     return tpList
