@@ -1119,7 +1119,7 @@ class PyhfUpperLimitComputer:
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
                 if self.alreadyBeenThere:
-                    factor = 1 + (factor - 1) / 2
+                    factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
                     rt5 = root_func(med_mu)
