@@ -144,7 +144,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineAnas:
 
-    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated*, so use with caution! Available from v2.2.0 onwards. NB, due to issues with pyhf, for the time being it is *advisable to use this feature only with combineSRs=False*.
+    * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated*, so use with caution! Available from v2.2.0 onwards.
 
 .. _parameterExperimentalFeatures:
 
