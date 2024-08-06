@@ -150,7 +150,7 @@ class SummaryPrinter(TxTPrinter):
             output += " (r_expected not available)"
         output += "\n"
         for coll, values in maxcoll.items():
-            if values["obs"] < -.5:
+            if values["obs"] == None or values["obs"] < -.5:
                 continue
             output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
                       (coll, values["anaid"], values["exp"], values["obs"])
@@ -180,8 +180,14 @@ class SummaryPrinter(TxTPrinter):
         nllmin = obj.lmax( return_nll = True )
         output += f"Combined Analyses: {expIDs}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n"
-        output += f"combined r-value: {r:10.3E}\n"
-        output += f"combined r-value (expected): {r_expected:10.3E}" 
+        r_string = "None"
+        r_exp_string = "None"
+        if r != None:
+            r_string = f"{r:10.3E}"
+        if r_expected != None:
+            r_exp_string = f"{r_expected:10.3E}"
+        output += f"combined r-value: {r_string}\n"
+        output += f"combined r-value (expected): {r_exp_string}" 
         output += "\n===================================================== \n"
         output += "\n"
 
