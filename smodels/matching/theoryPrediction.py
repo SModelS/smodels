@@ -453,7 +453,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
         # Now sort by highest priority and then by highest expected r-value:
         selectedTPs = sorted(
-            selectedTPs, key=lambda tp: (priority[tp.dataType()], 
+            selectedTPs, key=lambda tp: (priority[tp.dataType()],
                                          tp.getRValue(expected=True) is not None,
                                          tp.getRValue(expected=True))
         )
@@ -619,8 +619,8 @@ class TheoryPredictionList(object):
         Remove predictions for which r-value = None
         (such as when the UL computer fails due to convergence issues).
         """
-        
-        tpList = [tp for tp in self._theoryPredictions 
+
+        tpList = [tp for tp in self._theoryPredictions
                   if tp.getRValue() is not None]
         self._theoryPredictions = tpList[:]
 
@@ -838,7 +838,7 @@ def _getBestResult(dataSetResults):
             if isinstance(tp.dataset,CombinedDataSet):
                 return tp
 
-    
+
     # For efficiency-map analyses with multipler signal regions,
     # select the best one according to the expected upper limit:
     bestExpectedR = 0.0
