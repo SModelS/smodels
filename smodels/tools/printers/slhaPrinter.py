@@ -104,7 +104,8 @@ class SLHAPrinter(TxTPrinter):
             rList = []
         elif not printAll:
             rList = [firstResult] + [res for res in obj._theoryPredictions[1:]
-                                   if res.getRValue() >= 1.0]
+                                   if (res.getRValue() is not None 
+                                       and res.getRValue() >= 1.0)]
         else:
             rList = obj._theoryPredictions[:]
 
@@ -122,10 +123,12 @@ class SLHAPrinter(TxTPrinter):
                 "'", "").replace("[", "").replace("]", "")
 
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
-            output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            if r is not None:
+                output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            else:
+                output += " %d 1 NaN                            #r value (failed to compute r-value)\n" % (cter)
             if not r_expected:
-                output += " %d 2 N/A                            #expected r value\n" % (
-                    cter)
+                output += " %d 2 N/A                            #expected r value\n" % (cter) # r_expected could fail or simply not be available
             else:
                 output += " %d 2 %-30.3E #expected r value\n" % (
                     cter, r_expected)
@@ -214,8 +217,14 @@ class SLHAPrinter(TxTPrinter):
                 lvals[i] = lv
             nll, nllmin, nllsm = lvals[:]
 
-            output += " %d 1 %-30.3E #r value\n" % (cter, r)
-            output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            if r is not None:
+                output += " %d 1 %-30.3E #r value\n" % (cter, r)
+            else:
+                output += " %d 1 NaN                            #r value (failed to compute r-value)\n" % (cter)
+            if r_expected is not None:
+                output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+            else:
+                output += " %d 2 NaN                            #expected r value (failed to compute expected r-value)\n" % (cter)
             output += " %d 3 %s #nll\n" % (cter, nll)
             output += " %d 4 %s #nll_min\n" % (cter, nllmin)
             output += " %d 5 %s #nll_SM\n" % (cter, nllsm)
