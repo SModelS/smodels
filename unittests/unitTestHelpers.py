@@ -12,6 +12,8 @@ import sys
 sys.path.append('../')
 import unum
 import re
+import pyslha
+from xml.etree import ElementTree
 import numpy as np
 import redirector
 from smodels.tools.runSModelS import run
@@ -180,6 +182,92 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
             logger.error("Objects %s and %s differ in %s: %s != %s" % (obj1, obj2, where, fname, fname2))
             return False
     return True
+
+
+def sortXML(xmltree):
+    for el in xmltree:
+        sortXML(el)
+    xmltree[:] = sorted(xmltree, key=lambda el: [el.tag, ElementTree.tostring(el)])
+
+
+def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
+
+    if len(xmldefault) != len(xmlnew):
+        logger.warning("lengths of document %d != %d" % (len(xmldefault), len(xmlnew)))
+        return False
+    for i, el in enumerate(xmldefault):
+        newel = xmlnew[i]
+        if len(el) != len(newel):
+            logger.warning("lengths of elements %s and %s differ (%d != %d)" % (el.tag,newel.tag,len(el), len(newel)))
+            return False
+        if len(el) == 0:
+            if el.tag in ignore:
+                continue
+            if el.tag != newel.tag:
+                logger.warning( f"tags {el.tag} and {newel.tag} differ" )
+                return False
+
+            if el.text == newel.text:
+                continue
+
+            if type(el.text) == str and "[" not in el.text:
+                try:
+                    el.text = eval(el.text)
+                    newel.text = eval(newel.text)
+                except (TypeError, NameError, SyntaxError):
+                    el.text = el.text.replace(" ","")
+                    newel.text = newel.text.replace(" ","")
+
+            if isinstance(el.text, float) and isinstance(newel.text, float):
+                diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
+                if diff > allowedRelDiff:
+                    logger.warning("values %s and %s differ" % (el.text, newel.text))
+                    return False
+            elif newel.text != el.text:
+                logger.warning("texts %s and %s differ" % (el.text, newel.text))
+                return False
+        else:
+            if not compareXML(el, newel, allowedRelDiff, ignore):
+                return False
+
+    return True
+
+
+def compareSLHA(slhadefault, slhanew, allowedRelDiff):
+
+    newData = pyslha.read(slhanew, ignorenomass=True, ignorenobr=True, ignoreblocks=["SMODELS_SETTINGS"])
+    defaultData = pyslha.read(slhadefault, ignorenomass=True, ignorenobr=True, ignoreblocks=["SMODELS_SETTINGS"])
+    defaultBlocks = sorted([defaultData.blocks[b].name for b in defaultData.blocks])
+    newBlocks = sorted([newData.blocks[b].name for b in newData.blocks])
+    if defaultBlocks != newBlocks:
+        logger.error(f'Block structure differs! {defaultBlocks} != {newBlocks}')
+        return False
+
+    for b in defaultData.blocks:
+        if len(defaultData.blocks[b].entries) != len(newData.blocks[b].entries):
+            logger.error('Numbers of entries in block %s differ' % (defaultData.blocks[b].name))
+            return False
+        keys = defaultData.blocks[b].keys()
+        bkeys = newData.blocks[b].keys()
+        if keys != bkeys:
+            logger.error(f"Keys of blocks {b} differ!")
+            return False
+        for k in keys:
+            ei = defaultData.blocks[b].entries[k]
+            ej = newData.blocks[b].entries[k]
+            if type(ei) == float and type(ej) == float:
+                denom = ei + ej
+                if denom == 0.:
+                    denom = 1e-6
+                de = 2. * abs(ei - ej) / denom
+                if de > allowedRelDiff:
+                    logger.error(f'Entries in block differ: {ei}!={ej} {type(ei)}')
+                    return False
+            elif ei != ej:
+                logger.error(f'Entries in block differ: {ei}!={ej} {type(ei)}')
+                return False
+    return True
+
 
 def importModule(filename):
     """ import a module, but giving the filename """
