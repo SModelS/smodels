@@ -8,15 +8,13 @@
 
 from __future__ import print_function
 import os
-from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.physicsUnits import fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
-from collections import OrderedDict
 import unum
 
 
@@ -94,12 +92,14 @@ class SummaryPrinter(TxTPrinter):
             value = theoPred.xsection
             r = theoPred.getRValue(expected=False)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
-            rs = str(r)
-            rs_expected = str(r_expected)
-            if type(r) in [int, float, np.float64]:
+            if r is not None:
                 rs = "%10.3E" % r
-            if type(r_expected) in [int, float, np.float64]:
+            else:
+                rs = "NaN" # r = None means the calculation failed
+            if r_expected is not None:
                 rs_expected = "%10.3E" % r_expected
+            else:
+                rs_expected = "N/A" # r_exp could not be available
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
@@ -108,12 +108,8 @@ class SummaryPrinter(TxTPrinter):
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
             # theory cross section , expt upper limit
             output += "%10.3E %s " % (value.asNumber(fb), uls)
-            if r_expected:
-                output += "%s %s" % (rs, rs_expected)
-            elif r is None:
-                output += "N/A  N/A"
-            else:
-                output += "%10.3E  N/A" % r
+            output += "%s %s" % (rs, rs_expected)
+            
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
@@ -144,13 +140,13 @@ class SummaryPrinter(TxTPrinter):
         output += 80 * "=" + "\n"
         output += "The highest r value is = %.5f from %s" % \
             (maxr["obs"], maxr["anaid"])
-        if maxr["exp"] is not None and maxr["exp"] > -.5:
+        if maxr["exp"] is not None and maxr["exp"] >= 0.0:
             output += " (r_expected=%.5f)" % maxr["exp"]
         else:
             output += " (r_expected not available)"
         output += "\n"
         for coll, values in maxcoll.items():
-            if values["obs"] == None or values["obs"] < -.5:
+            if values["obs"] == None or values["obs"] < 0.0:
                 continue
             output += "%s analysis with highest available r_expected: %s, r_expected=%.5f, r_obs=%.5f\n" % \
                       (coll, values["anaid"], values["exp"], values["obs"])
@@ -180,14 +176,14 @@ class SummaryPrinter(TxTPrinter):
         nllmin = obj.lmax( return_nll = True )
         output += f"Combined Analyses: {expIDs}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n"
-        r_string = "None"
-        r_exp_string = "None"
-        if r != None:
-            r_string = f"{r:10.3E}"
-        if r_expected != None:
-            r_exp_string = f"{r_expected:10.3E}"
-        output += f"combined r-value: {r_string}\n"
-        output += f"combined r-value (expected): {r_exp_string}" 
+        if r is not None:
+            output += f"combined r-value: {r:10.3E}\n"
+        else:
+            output += f"combined r-value: NaN (failed to compute r-value)\n"
+        if r_expected is not None:
+            output += f"combined r-value (expected): {r_expected:10.3E}\n"
+        else:
+            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

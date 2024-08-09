@@ -79,6 +79,8 @@ except pyhf.exceptions.ImportBackendError as e:
     warnings.filterwarnings("ignore", r"invalid value encountered in log")
 
 countWarning = {"llhdszero": 0}
+# Sets the maximum number of attempts for determining the brent bracketing interval for mu:
+nattempts_max = 10
 
 def guessPyhfType ( name : str ) -> str:
     """ given the pyhf analysis region name,
@@ -1106,9 +1108,9 @@ class PyhfUpperLimitComputer:
                     # logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                     return None
                     # nattempts = 0
-                if nattempts > 10:
+                if nattempts > nattempts_max:
                     logger.warning(
-                        "tried 10 times to determine the bounds for brent bracketing. we abort now."
+                        f"tried {nattempts_max} times to determine the bounds for brent bracketing. we abort now."
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all

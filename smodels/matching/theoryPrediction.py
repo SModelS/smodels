@@ -453,10 +453,12 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
         # Now sort by highest priority and then by highest expected r-value:
         selectedTPs = sorted(
-            selectedTPs, key=lambda tp: (priority[tp.dataType()], tp.getRValue(expected=True))
+            selectedTPs, key=lambda tp: (priority[tp.dataType()],
+                                         tp.getRValue(expected=True) is not None,
+                                         tp.getRValue(expected=True))
         )
         # Now get a single TP for each result
-        # (the highest ranking analyses come last and are kept in the dict)
+        # (the highest ranking analyses with r != None come last and are kept in the dict)
         uniqueTPs = {tp.analysisId(): tp for tp in selectedTPs}
         uniqueTPs = list(uniqueTPs.values())
 
@@ -612,6 +614,16 @@ class TheoryPredictionList(object):
         else:
             return self.__add__(theoPredList)
 
+    def removeRNone(self):
+        """
+        Remove predictions for which r-value = None
+        (such as when the UL computer fails due to convergence issues).
+        """
+
+        tpList = [tp for tp in self._theoryPredictions
+                  if tp.getRValue() is not None]
+        self._theoryPredictions = tpList[:]
+
     def sortTheoryPredictions(self):
         """
         Reverse sort theoryPredictions by R value.
@@ -710,7 +722,6 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
                 if tpe is None:
                     logger.error(f"Could not find type of region {theoPred.dataType()} from {theoPred.analysisId()}")
-                    sys.exit()
                     raise SModelSError()
 
                 if tpe == "SR":
@@ -724,6 +735,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             ret.append(theoPred)
 
     tpList = TheoryPredictionList(ret)
+    # tpList.removeRNone() # Remove results with r = None
     tpList.sortTheoryPredictions()
 
     return tpList
@@ -826,7 +838,7 @@ def _getBestResult(dataSetResults):
             if isinstance(tp.dataset,CombinedDataSet):
                 return tp
 
-    
+
     # For efficiency-map analyses with multipler signal regions,
     # select the best one according to the expected upper limit:
     bestExpectedR = 0.0
