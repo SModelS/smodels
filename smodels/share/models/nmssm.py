@@ -78,10 +78,10 @@ inos = [gluino] + [n1,n2,n3,n4,n5] + [c1,c2] + [gravitino]
 rOdd = squarks + sleptons + inos
 rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
 
-higgs = [H,H2,H3,A1,A2]
-higgsC = [p.chargeConjugate() for p in higgs]
+bsm_higgs = [H,H2,H3,A1,A2]
+bsm_higgsC = [p.chargeConjugate() for p in bsm_higgs]
 
 #Generic BSM particles:
 
-BSMList = rOdd + rOddC + higgs + higgsC
+BSMList = rOdd + rOddC + bsm_higgs + bsm_higgsC
 BSMparticleList = MultiParticle('BSM', BSMList)
