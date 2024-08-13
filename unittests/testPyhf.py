@@ -369,7 +369,7 @@ class PyhfTest(unittest.TestCase):
         from smodels.base.physicsUnits import GeV
         from smodels.experiment.databaseObj import Database
         from smodels.base import runtime
-        from smodels.particlesLoader import load
+        from smodels.tools.particlesLoader import load
         from smodels.base.model import Model
         from smodels.share.models.SMparticles import SMList
         import os

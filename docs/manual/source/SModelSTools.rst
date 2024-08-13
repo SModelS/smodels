@@ -6,7 +6,6 @@
 .. |constraint| replace:: :ref:`constraint <ULconstraint>`
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |database| replace:: :ref:`database <Database>`
-.. |bracket notation| replace:: :ref:`bracket notation <bracketNotation>`
 .. |ExpRes| replace:: :ref:`Experimental Result<ExpResult>`
 .. |ExpRess| replace:: :ref:`Experimental Results<ExpResult>`
 .. |Database| replace:: :ref:`Database <Database>`
@@ -309,7 +308,7 @@ Below we give more detailed information about each entry in this file.
 
   * **Analysis**: shows the experimental analysis from which the strongest constraint (r_max) comes from
 
-  * **MT_max**: shows the missing topology with the largest cross section (in SModelS bracket notation)
+  * **MT_max**: shows the missing topology with the largest cross section
 
   * **MT_max_xsec**: shows the cross section of MT_max
 

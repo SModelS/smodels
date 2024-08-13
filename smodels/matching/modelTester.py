@@ -21,7 +21,7 @@ from smodels.matching import theoryPrediction
 from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredictionsCombiner
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.share.models.SMparticles import SMList
-from smodels.particlesLoader import load
+from smodels.tools.particlesLoader import load
 from smodels.tools import crashReport, timeOut
 from smodels.tools.printers.masterPrinter import MPrinter
 from smodels.tools.printerTools import printScanSummary

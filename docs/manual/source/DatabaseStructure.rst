@@ -99,7 +99,7 @@ In case of simplified likelihoods, the covariance matrix is supplied in the ``co
 shown in the example given by ATLAS-SUSY-2018-41:
 
 .. literalinclude:: /literals/globalInfo201841.txt
-   :lines: 12-14
+   :lines: 12-13
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_

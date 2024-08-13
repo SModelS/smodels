@@ -44,13 +44,12 @@ Note here that the PDG code 25 is reserved for the SM-like Higgs boson with a ma
 
      higgs = Particle(isSM=True, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth=0.*GeV, _isInvisible=False)
 
-in the database. 
 If the BSM model has an enlarged Higgs sector, a PDG code 25 must be assigned *only* to a 125 GeV Higgs with SM-like decay branching ratios; this is important for correctly matching experimental results involving a SM-like Higgs for which the analysis assumed SM branching ratios for the Higgs with the mass fixed to 125 GeV.
 
 
-* **Reading of BSM particles from an SLHA input file, along with their quantum numbers is implemented by the** `getParticlesFromSLHA function <particlesLoader.html#particlesLoader.getParticlesFromSLHA>`_
+* **Reading of BSM particles from an SLHA input file, along with their quantum numbers is implemented by the** `getParticlesFromSLHA function <tools.html#tools.particlesLoader.getParticlesFromSLHA>`_
 
-* **Reading of BSM particles from a module input file, along with their quantum numbers is implemented by the** `getParticlesFromModule function <particlesLoader.html#particlesLoader.getParticlesFromModule>`_
+* **Reading of BSM particles from a module input file, along with their quantum numbers is implemented by the** `getParticlesFromModule function <tools.html#tools.particlesLoader.getParticlesFromModule>`_
 
 
 .. _modelParameters:
