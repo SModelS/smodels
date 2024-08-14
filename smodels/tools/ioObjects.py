@@ -188,7 +188,7 @@ class SlhaStatus(object):
         self.filename = filename
         self.slha = self.read()
         
-        from smodels.particlesLoader import load
+        from smodels.tools.particlesLoader import load
 
         BSMList = load()
         

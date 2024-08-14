@@ -15,7 +15,7 @@ from smodels.matching.theoryPrediction import theoryPredictionsFor,TheoryPredict
 from smodels.experiment.databaseObj import Database
 from smodels.tools import coverage
 from smodels.base.smodelsLogging import setLogLevel
-from smodels.particlesLoader import load
+from smodels.tools.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 import time
