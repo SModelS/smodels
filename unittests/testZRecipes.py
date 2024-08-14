@@ -60,7 +60,7 @@ class RecipeTest(unittest.TestCase):
         p = subprocess.Popen([cmd], shell=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         t0 = time.time()
-        output, error = p.communicate()
+        _, error = p.communicate()
         logger.debug("%s run in %1.2fs" %(notebookFile,time.time()-t0))
         if p.returncode != 0:
             logger.debug("Notebook %s failed with error:\n %s" %(notebookFile,error))

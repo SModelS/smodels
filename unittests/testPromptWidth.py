@@ -13,7 +13,7 @@ import os
 sys.path.insert(0, "../")
 import unittest
 from smodels.base import runtime
-from smodels.particlesLoader import load
+from smodels.tools.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 from smodels.decomposition import decomposer

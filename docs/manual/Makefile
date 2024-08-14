@@ -54,7 +54,7 @@ clean:
 
 copy_files:
 	cp ../../parameters.ini source/images/
-	cp ../../iplots_parameters.py source/images/
+	cp ../../smodels/etc/iplots_parameters.py source/images/
 	cp ../../smodels/etc/parameters_default.ini source/images/
 	cp ../../cpp/run.cpp source/examples/
 	cp ../../Example.py source/examples/

@@ -63,7 +63,7 @@ def main():
     xseccomputer.add_argument( '--noautocompile', action='store_true',
         help="turn off automatic compilation" )
 
-    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections via resummino for a given SLHA file.")
+    xsecresummino = subparsers.add_parser('xsecresummino', description="Compute gaugino and slepton cross sections via resummino for a SLHA file.")
     xsecresummino.add_argument('-f', '--filename', required=True,
             help="SLHA file to compute cross sections for. "
             "If a directory is given, cross sections for all files in the directory are computed." )

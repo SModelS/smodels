@@ -15,7 +15,7 @@ import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
 from smodels.base.smodelsLogging import setLogLevel
 from smodels.base import runtime
-from smodels.particlesLoader import load
+from smodels.tools.particlesLoader import load
 import subprocess
 from smodels.base.smodelsLogging import logger
 from smodels.base.model import Model
@@ -101,7 +101,7 @@ class ModelsTest(unittest.TestCase):
 
     def testParticlesFromSLHA(self):
 
-        from smodels.particlesLoader import getParticlesFromSLHA
+        from smodels.tools.particlesLoader import getParticlesFromSLHA
         from smodels.base.particle import Particle
 
         BSMList = getParticlesFromSLHA("./testFiles/slha/idm_example.slha")

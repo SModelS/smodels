@@ -1,4 +1,4 @@
-Release v3.0.0, Mon 5 Aug 2024
+Release v3.0.0, Wed 7 Aug 2024
 =======================================================
 
   * Extension to general SMS topologies using graphs
@@ -18,7 +18,7 @@ Release v3.0.0, Mon 5 Aug 2024
   * Added CITATION.cff file, closes #38
   * Added smodels-analyses.json in database
 
-  * Database extension: added results from 10 (or 11?) ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
+  * Database extension: added results from 11 ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
     - results from ATLAS:
         ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL),
         ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL), ATLAS-EXOT-2013-11 (UL)

@@ -240,6 +240,12 @@ def getScanSummaryFrom(output, ptype):
     else:
         rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb = info
 
+    # Convert Nones to NaN:
+    rvals = np.array(rvals,dtype=float) # Convert None to nan
+    rexp = np.array(rexp,dtype=float) # Convert None to nan
+    r_comb,rexp_comb = np.array([r_comb,rexp_comb],dtype=float)
+
+
     # Sort results by r_obs
     # (replace nan by -1 for sorting only)
     rvals_c = np.nan_to_num(rvals,nan=-1.0)

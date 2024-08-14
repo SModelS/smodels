@@ -79,6 +79,8 @@ except pyhf.exceptions.ImportBackendError as e:
     warnings.filterwarnings("ignore", r"invalid value encountered in log")
 
 countWarning = {"llhdszero": 0}
+# Sets the maximum number of attempts for determining the brent bracketing interval for mu:
+nattempts_max = 10
 
 def guessPyhfType ( name : str ) -> str:
     """ given the pyhf analysis region name,
@@ -90,7 +92,7 @@ def guessPyhfType ( name : str ) -> str:
     if name.startswith ( "SR" ):
         return "SR"
     if "CR" in name: ## arggh!!
-        logger.warning ( f"old jsonFiles format used, and 'CR' in the middle of the region name: {name}. I will assume it is a control region but do switch to the new format ASAP" )
+        logger.debug ( f"old jsonFiles format used, and 'CR' in the middle of the region name: {name}. I will assume it is a control region but do switch to the new format ASAP" )
         return "CR"
     return "SR"
 
@@ -1106,9 +1108,9 @@ class PyhfUpperLimitComputer:
                     # logger.warning("encountered NaN 5 times while trying to determine the bounds for brent bracketing. now trying with q instead of qtilde test statistic")
                     return None
                     # nattempts = 0
-                if nattempts > 10:
+                if nattempts > nattempts_max:
                     logger.warning(
-                        "tried 10 times to determine the bounds for brent bracketing. we abort now."
+                        f"tried {nattempts_max} times to determine the bounds for brent bracketing. we abort now."
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
@@ -1119,7 +1121,7 @@ class PyhfUpperLimitComputer:
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
                 if self.alreadyBeenThere:
-                    factor = 1 + (factor - 1) / 2
+                    factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
                     rt5 = root_func(med_mu)

@@ -468,16 +468,16 @@ class TxTPrinter(BasicPrinter):
         # Get list of analyses used in combination:
         expIDs = obj.analysisId()
         # Get r-value:
-        r = obj.getRValue()
-        r_expected = obj.getRValue(expected=self.getTypeOfExpected())
+        r = self._formatNumber(obj.getRValue(),4)
+        r_expected = self._formatNumber(obj.getRValue(expected=self.getTypeOfExpected()),4)
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )
         nllmin = obj.lmax( return_nll = True )
         output += f"Combined Analyses: {expIDs}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n" 
-        output += f"combined r-value: {r:10.3E}\n"
-        output += f"combined r-value (expected): {r_expected:10.3E}"
+        output += f"combined r-value: {r:s}\n"
+        output += f"combined r-value (expected): {r_expected:s}"
         output += "\n===================================================== \n"
         output += "\n"
 
