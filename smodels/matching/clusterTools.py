@@ -431,7 +431,7 @@ def clusterTo(centroids,smsList,dataset,maxDist):
             # If cluster is not valid, keep only the first SMS of the
             # list and move all the other SMS to the notClustered list
             # (note that a cluster with a single SMS is always valid)
-            logger.debug('AverageSMS in SMSCluster has not valid UL, splitting cluster.')
+            logger.debug('AverageSMS in SMSCluster has no valid UL, splitting cluster.')
             smsCluster_single = SMSCluster(smsArray[indexList[:1]].tolist())
             clusterObjs.append(smsCluster_single)
             notClustered += indexList[1:]
