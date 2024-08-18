@@ -111,11 +111,12 @@ class RFailsTest(unittest.TestCase):
 
         self.assertTrue(comp)
 
-        for f in os.listdir(dirname):
-            self.removeOutputs(os.path.join(out,os.path.basename(f)))
+        if comp:
+            for f in os.listdir(dirname):
+                self.removeOutputs(os.path.join(out,os.path.basename(f)))
 
-        if os.path.isfile(outSummary):
-            os.remove(outSummary)
+            if os.path.isfile(outSummary):
+                os.remove(outSummary)
 
 if __name__ == "__main__":
     unittest.main()
