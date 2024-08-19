@@ -377,15 +377,11 @@ class ClustererTest(unittest.TestCase):
 
     def testClusterFails(self):
         """ test a case where the average cluster SMS does not have a well defined UL"""
-
-        info = Info("./dbPAS12022/data/dataInfo.txt")
-        globalInfo = Info("./dbPAS12022/globalInfo.txt")
-        txname=TxName("./dbPAS12022/data/TChiWZ.txt",
-                        globalInfo,info,finalStates)
-        dataset = DataSet(info = globalInfo, createInfo = False)
-        dataset.dataInfo = info
-        dataset.txnameList = [txname]
-
+        from smodels.experiment.databaseObj import Database
+        db = Database ( "https://smodels.github.io/database/unittest_PAS12022" )
+        er = db.getExpResults ( analysisIDs='CMS-PAS-SUS-12-022', txnames='TChiWZ' )[0]
+        dataset = er.datasets[0]
+        txname = dataset.txnameList[0]
 
         slhafile = 'testFiles/clusterfails/failed_cluster.slha'
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
