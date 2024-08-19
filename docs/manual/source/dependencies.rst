@@ -1,6 +1,7 @@
  * docutils>=0.3
  * numpy>=1.22.0
  * scipy>=1.0.0
+ * sympy>=1.0.0
  * unum>=4.0.0
  * requests>=2.0.0
  * pyslha>=3.1.0

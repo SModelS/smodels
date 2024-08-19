@@ -238,6 +238,13 @@ Installation on Ubuntu machines should be straightforward with superuser privile
 (if you do not have superuser privileges see instructions below):
 
  * sudo apt install gfortran python-setuptools python-scipy python-numpy python-docutils python-argparse
+
+On more recent Ubuntu's (e.g. 24.04) try:
+
+ * sudo apt install gfortran python3-setuptools python3-scipy python3-numpy python3-docutils
+
+Finally:
+
  * setup.py install
 
 Note that the last command can be run as superuser, or with the "--user" flag.
