@@ -57,8 +57,7 @@ New in Version 3.0.0:
   * |database| extension: added results from 11 ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
 
      * results from ATLAS: ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL), ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL), ATLAS-EXOT-2013-11 (UL)
-     * results from CMS: CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-19-012 (UL),
-        CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
+     * results from CMS: CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-19-012 (UL), CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
      * EM results from recasts: ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (`LLP repo <https://github.com/llprecasting/recastingCodes/tree/main/HSCPs/ATLAS-SUSY-2018-42>`), ATLAS-SUSY-2018-22 (CM2), CMS-EXO-20-004 (`MonoXSMS <https://doi.org/10.5281/zenodo.13324003>`)
 
 
