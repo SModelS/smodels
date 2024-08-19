@@ -54,7 +54,6 @@ def run(filter=None, testNotebooks=False, reduced=False ):
 
 
 def verbose_run( filter=None, testNotebooks=False, reduced=False ):
-
     alltests = unittest.TestLoader().discover("./")
 
     if not testNotebooks:
@@ -164,8 +163,7 @@ if __name__ == "__main__":
         if args.reduced:
             print('Reduced set of unit tests')
 
-
-        elif args.parallel:
+        if args.parallel:
             parallel_run(args.verbose, args.notebooks, args.reduced)
             sys.exit()
         elif args.verbose:
