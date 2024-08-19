@@ -611,47 +611,51 @@ class PyhfUpperLimitComputer:
 
     def rescaleBgYields(self, init_pars, workspace, model):
         """
+        Increase initial value of nuisance parameters until the starting value of the total yield (mu*signal + background) is positive
+
         :param init_pars: list of initial parameters values one wants to increase in order to turn positive the negative total yields
         :param workspace: the pyhf workspace
         :param model: the pyhf model
         :return: the list of initial parameters values that gives positive total yields
         """
         for pos,yld in enumerate(model.expected_actualdata(init_pars)):
-            # If a total yield (mu*signal + background) evaluated with the initial parameters is negative, increase a parameter to turn it positive
             if yld < 0:
                 sum_bins = 0
+                positive = False
                 # Find the SR and the bin (the position inside the SR) corresponding to the negative total yield
                 for channel,nbins in model.config.channel_nbins.items():
                     sum_bins += nbins
                     if pos < sum_bins:
                         SR = channel
-                        # Bin number = the position of the bin in the SR
-                        # (i.e. the position of the negative total yield in the list, starting at the corresponding SR)
-                        bin_num = pos-sum_bins+nbins
+                        bin_num = pos-sum_bins+nbins # The position of the bin in the SR
                         break
-                # Find the name of the parameter that modifies the background yield of the negative total yield
+                # Find the name of the parameter that modifies the background yield
                 for channel in workspace['channels']:
                     if channel['name'] == SR:
                         for sample in range(len(channel['samples'])):
                             for modifier in channel['samples'][sample]['modifiers']:
-                                # The multiplicative modifier (i.e. parameter) that will be increased is a 'staterror' one (others may work as well)
+                                # The multiplicative modifier that will be increased is of type 'staterror' (others may work as well)
                                 # In case of a simplified json, let's take the only parameter called 'totalError'
-                                if ('type' in modifier.keys() and modifier['type'] == 'staterror') or modifier['name'] == 'totalError':
+                                if ('type' in modifier.keys() and modifier['type'] == 'staterror') or ('type' in modifier.keys() and modifier['type'] == 'normsys') or modifier['name'] == 'totalError':
                                     name = modifier['name']
+                                    # Find the position of the parameter within the pyhf list of parameters
+                                    position = self.get_position(name,model)+bin_num
+                                    # Find the upper bound of the parameter that will be increased
+                                    max_bound = model.config.suggested_bounds()[position][1]
+                                    # If the parameter one wants to increase is not fixed, add 0.1 to its value (it is an arbitrary step) until
+                                    # the total yield becomes positive or the parameter upper bound is reached
+                                    if not model.config.suggested_fixed()[position]:
+                                        while model.expected_actualdata(init_pars)[pos] < 0:
+                                            if init_pars[position] + 0.1 < max_bound:
+                                                init_pars[position] += 0.1
+                                            else:
+                                                init_pars[position] = max_bound
+                                                break
+                                        positive = model.expected_actualdata(init_pars)[pos] >= 0
+                                if positive:
                                     break
-                # Find the position of the parameter within the pyhf list of parameters
-                position = self.get_position(name,model)+bin_num
-                # Find the upper bound of the parameter that will be increased
-                max_bound = model.config.suggested_bounds()[position][1]
-                # If the parameter one wants to increase is not fixed, add 0.1 to its value (it is an arbitrary step) until
-                # the total yield becomes positive or the parameter upper bound is reached
-                if not model.config.suggested_fixed()[position]:
-                    while model.expected_actualdata(init_pars)[pos] < 0:
-                        if init_pars[position] + 0.1 < max_bound:
-                            init_pars[position] += 0.1
-                        else:
-                            init_pars[position] = max_bound
-                            break
+                            if positive:
+                                break
         return init_pars
 
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
