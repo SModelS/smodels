@@ -253,6 +253,24 @@ class SMSCluster(object):
 
         return avgSMS
 
+    def isValid(self,dataset):
+        """
+        Checks if the SMSCluster is a valid cluster,
+        i.e. if its AverageSMS has a well defined UL
+
+        :param dataset: Dataset object used to check the UL
+
+        :return: True/False 
+        """
+
+        ul = dataset.getUpperLimitFor(self.averageSMS, 
+                                      txnames=self.averageSMS.txname)
+        self.averageSMS._upperLimit = ul
+
+        isvalid = (ul is not None)
+        
+        return isvalid
+
 def relativeDistance(sms1, sms2, dataset):
     """
     Defines the relative distance between two SMS according to their
@@ -401,8 +419,23 @@ def clusterTo(centroids,smsList,dataset,maxDist):
         else:
             notClustered.append(isms)
     
-    clusterObjs = [SMSCluster((np.array(smsList)[indexList]).tolist())
-                    for indexList in clusters]
+    smsArray = np.array(smsList)
+    clusterObjs = []
+    for indexList in clusters:
+        smsCluster = SMSCluster(smsArray[indexList].tolist())
+        # Check if the cluster is valid:
+        is_valid = smsCluster.isValid(dataset)        
+        if is_valid:
+            clusterObjs.append(smsCluster)
+        else:
+            # If cluster is not valid, keep only the first SMS of the
+            # list and move all the other SMS to the notClustered list
+            # (note that a cluster with a single SMS is always valid)
+            logger.debug('AverageSMS in SMSCluster has no valid UL, splitting cluster.')
+            smsCluster_single = SMSCluster(smsArray[indexList[:1]].tolist())
+            clusterObjs.append(smsCluster_single)
+            notClustered += indexList[1:]
+
     clusterObjs = sorted(clusterObjs, key = lambda c: sorted([sms.smsID for sms in c.smsList]))
 
     # Sort not clustered by largest distance first
@@ -414,7 +447,7 @@ def clusterTo(centroids,smsList,dataset,maxDist):
 def kmeansCluster(initialCentroids,sortedSMSList,dataset,maxDist):
 
     # First cluster around the initial centroids
-    clusters,notClustered = clusterTo(initialCentroids,sortedSMSList,dataset,maxDist)
+    clusters,_ = clusterTo(initialCentroids,sortedSMSList,dataset,maxDist)
     
     stop = False
     # Now iterate until the clusters converge
@@ -423,7 +456,7 @@ def kmeansCluster(initialCentroids,sortedSMSList,dataset,maxDist):
         # Compute new centroids:
         centroids = [cluster.averageSMS for cluster in clusters]
         # Compute new clusters
-        newClusters,notClustered = clusterTo(centroids,sortedSMSList,dataset,maxDist=float('inf'))
+        newClusters,_ = clusterTo(centroids,sortedSMSList,dataset,maxDist=float('inf'))
         # Stop when clusters no longer change
         if all(clusters[ic] == c for ic,c in enumerate(newClusters)):
             stop = True
