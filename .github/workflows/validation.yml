@@ -38,7 +38,7 @@ jobs:
           # cat smodels/share/requirements.txt | grep -v numpy >> modded.txt;
           # python -m pip install -r modded.txt; 
         fi
-        if [ -f unittests/test_requirements.txt ]; then python -m pip install -r test/test_requirements.txt; fi
+        if [ -f unittests/test_requirements.txt ]; then python -m pip install -r unittests/test_requirements.txt; fi
         python -m pip install -e .
     - name: Test with unittest
       run: |
