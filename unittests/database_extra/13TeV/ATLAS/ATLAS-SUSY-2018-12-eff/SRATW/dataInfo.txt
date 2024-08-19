@@ -1,0 +1,7 @@
+dataId: SRATW
+dataType: efficiencyMap
+observedN: 8
+expectedBG: 5.6
+bgError: 0.7
+upperLimit: 0.0672*fb
+expectedUpperLimit: 0.0515*fb

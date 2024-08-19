@@ -1,0 +1,101 @@
+id: ATLAS-SUSY-2018-16
+sqrts: 13*TeV
+lumi: 139/fb
+prettyName: 2 soft l + jets, EWK
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-16/
+arxiv: https://arxiv.org/abs/1911.12606
+publication: Phys. Rev. D 101 (2020) 052005
+publicationDOI: https://doi.org/10.1103/PhysRevD.101.052005
+contact: atlas-phys-susy-conveners@cern.ch
+comment: Be careful when testing models allowing for the production of only electrons or muons against this analysis. The EMs in the slepton CRs are correct only if both leptons can be produced. Moreover, but not related, the higgsino mass plane has been implemented in another database entry to reduce its computation time and to increase its result validity. No full stat model exists for this mass plane since only EMs from inclusive SRs are published. Merging it with ATLAS-SUSY-2018-16 then requires to create fake, individual, bkg-only stat models for them to be picked up when combining SRs. In that case, all the stat models have to be computed, even if they are almost unsensitive to the tested model. The wino-bino mass plane uses a full stat model, thus increasing the computation time of pure higgsino models by a lot. On top of that, the higgsino exclusion limits obtained though the validation are farther from the official ones.
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2024/7/30
+jsonFiles: {
+  'EWKinos_bkgonly_SR2lOnly.json': [
+    {'pyhf': 'CRVV_MLL_hghmet_cuts', 'smodels': 'CR_ewk_VV_high', 'type': 'CR'},
+    {'pyhf': 'CRVV_MLL_lowmet_cuts', 'smodels': 'CR_ewk_VV_low', 'type': 'CR'},
+    {'pyhf': 'CRtau_MLL_hghmet_cuts', 'smodels': 'CR_ewk_tau_high', 'type': 'CR'},
+    {'pyhf': 'CRtau_MLL_lowmet_cuts', 'smodels': 'CR_ewk_tau_low', 'type': 'CR'},
+    {'pyhf': 'CRtop_MLL_hghmet_cuts', 'smodels': 'CR_ewk_top_high', 'type': 'CR'},
+    {'pyhf': 'CRtop_MLL_lowmet_cuts', 'smodels': 'CR_ewk_top_low', 'type': 'CR'},
+    {'pyhf': 'SRee_eMLLc_hghmet_cuts', 'smodels': 'SR_ewk_2l_ee_high_c', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLc_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_ee_low_c'},
+    {'pyhf': 'SRee_eMLLc_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_ee_med_c', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLd_hghmet_cuts', 'smodels': 'SR_ewk_2l_ee_high_d', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLd_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_ee_low_d', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLd_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_ee_med_d', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLe_hghmet_cuts', 'smodels': 'SR_ewk_2l_ee_high_e', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLe_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_ee_low_e', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLe_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_ee_med_e', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLf_hghmet_cuts', 'smodels': 'SR_ewk_2l_ee_high_f', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLf_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_ee_low_f', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLf_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_ee_med_f', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLg_hghmet_cuts', 'smodels': 'SR_ewk_2l_ee_high_g', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLg_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_ee_low_g', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLh_hghmet_cuts', 'smodels': 'SR_ewk_2l_ee_high_h', 'type': 'SR'},
+    {'pyhf': 'SRee_eMLLh_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_ee_low_h', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLa_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_a', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLa_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_a', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLa_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_mm_med_a', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLb_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_b', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLb_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_b', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLb_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_mm_med_b', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLc_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_c', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLc_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_c', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLc_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_mm_med_c', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLd_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_d', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLd_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_d', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLd_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_mm_med_d', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLe_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_e', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLe_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_e', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLe_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_mm_med_e', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLf_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_f', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLf_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_f', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLf_lowmet_deltaM_low_cuts', 'smodels': 'SR_ewk_2l_mm_med_f', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLg_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_g', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLg_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_g', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLh_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_h', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMLLh_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_h', 'type': 'SR'}],
+  'Sleptons_bkgonly.json': [
+    {'pyhf': 'CRVV_MT2_hghmet_cuts', 'smodels': 'CR_slep_VV_high', 'type': 'CR'},
+    {'pyhf': 'CRVV_MT2_lowmet_cuts', 'smodels': 'CR_slep_VV_low', 'type': 'CR'},
+    {'pyhf': 'CRtau_MT2_hghmet_cuts', 'smodels': 'CR_slep_tau_high', 'type': 'CR'},
+    {'pyhf': 'CRtau_MT2_lowmet_cuts', 'smodels': 'CR_slep_tau_low', 'type': 'CR'},
+    {'pyhf': 'CRtop_MT2_hghmet_cuts', 'smodels': 'CR_slep_top_high', 'type': 'CR'},
+    {'pyhf': 'CRtop_MT2_lowmet_cuts', 'smodels': 'CR_slep_top_low', 'type': 'CR'},
+    {'pyhf': 'SRee_eMT2a_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_a', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2a_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_a', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2b_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_b', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2b_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_b', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2c_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_c', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2c_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_c', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2d_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_d', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2d_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_d', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2e_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_e', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2e_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_e', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2f_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_f', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2f_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_f', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2g_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_g', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2g_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_g', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2h_hghmet_cuts', 'smodels': 'SR_slep_2l_ee_high_h', 'type': 'SR'},
+    {'pyhf': 'SRee_eMT2h_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_ee_low_h', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2a_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_a', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2a_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_a', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2b_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_b', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2b_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_b', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2c_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_c', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2c_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_c', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2d_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_d', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2d_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_d', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2e_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_e', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2e_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_e', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2f_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_f', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2f_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_f', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2g_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_g', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2g_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_g', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2h_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_h', 'type': 'SR'},
+    {'pyhf': 'SRmm_eMT2h_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_h', 'type': 'SR'}]
+  }
+includeCRs: True
+signalUncertainty: 0.22

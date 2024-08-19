@@ -1,0 +1,7 @@
+dataId: SR_ewk_2l_mm_high_b
+dataType: efficiencyMap
+observedN: 5
+expectedBG: 2.1
+bgError: 1.3
+upperLimit: 0.06018*fb
+expectedUpperLimit: 0.0437*fb
