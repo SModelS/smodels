@@ -30,8 +30,8 @@ setLogLevel ( "fatal" )
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()
-    keywords = [ "cpp", "nllfast", "pythia", "xsec", 
-                "server", "loadlatest", "notebook", "recipes" ]
+    keywords = [ "cpp", "nllfast", "pythia", "xsec", "interactiveplot",
+                 "server", "loadlatest", "notebook", "recipes" ]
     for keyword in keywords:
         if keyword in t:
             return False
