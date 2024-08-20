@@ -79,6 +79,7 @@ For citing the experimental analyses in the database, you can use
 *smodels-database/database.bib*.
 
 .. _v2.3: https://inspirehep.net/record/2673443
+.. _v2.0: https://inspirehep.net/record/1982681
 .. _v1.2: https://inspirehep.net/record/1705426
 .. _v1.1: https://inspirehep.net/record/1510436
 .. _original: https://inspirehep.net/record/1269436
