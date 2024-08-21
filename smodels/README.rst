@@ -73,3 +73,5 @@ convenience, the relevant citations are provided in bibtex format in
 
 For citing the experimental analyses in the database, you can use
 `database.bib <https://github.com/SModelS/smodels-database-release/blob/main/database.bib>`_.
+
+.. _SModelS online manual: http://smodels.readthedocs.io/
