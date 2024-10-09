@@ -107,6 +107,9 @@ class AverageSMS(TheorySMS):
 
         if not isinstance(other, TheorySMS):
             return -1
+        
+        if self.canonName != other.canonName:
+            return -1
 
         for nodeIndex in self.nodeIndices:
             nodeA = self.indexToNode(nodeIndex)
