@@ -425,6 +425,8 @@ def clusterTo(centroids,smsList,dataset,maxDist):
     smsArray = np.array(smsList)
     clusterObjs = []
     for indexList in clusters:
+        if not indexList:
+            continue
         smsCluster = SMSCluster(smsArray[indexList].tolist())
         # Check if the cluster is valid:
         is_valid = smsCluster.isValid(dataset)        
