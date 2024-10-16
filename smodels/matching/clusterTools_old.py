@@ -255,14 +255,6 @@ class SMSCluster(object):
         avgSMS._index = None
 
         return avgSMS
-    
-    @property
-    def upperLimit(self):
-        """
-        Cluster upper limit given by the AverageSMS upper limit.
-        """
-
-        if hasattr(self.avera)
 
     def isValid(self,dataset):
         """
@@ -482,7 +474,7 @@ def kmeansCluster(initialCentroids,sortedSMSList,dataset,maxDist):
 
 def doCluster(smsList, dataset, maxDist,nmax=100):
     """
-    Cluster algorithm to cluster SMS using a modified minimal spanning tree method.
+    Cluster algorithm to cluster SMS using a modified K-Means method.
 
     :parameter smsList: list of all SMS to be clustered
     :parameter dataset: Dataset object to be used when computing distances in upper limit space
@@ -493,63 +485,14 @@ def doCluster(smsList, dataset, maxDist,nmax=100):
               belonging to the cluster
     """
 
-    # First combine all identical SMS into AverageSMS objects:
+    # Get average SMS:
     averageSMSList = groupSMS(smsList, dataset)
-
-    # Start with a cluster for each SMS:
-    clusterList = [SMSCluster([sms]) for sms in averageSMSList]
-
-    # Sort clusters by proximity in upperLimit 
-    clusterList = sorted(clusterList, key=lambda cluster: cluster[0]._upperLimit)
-
-    # Compute the distance matrix for the clusters:
-    dMatrix = np.full((len(clusterList),len(clusterList)),fill_value=0.0)
-    for iA,clusterA in enumerate(clusterList):
-        for iB,clusterB in enumerate(clusterList):
-            if iA >= iB: continue
-            dMatrix[iA,iB] = relativeDistance(clusterA.averageSMS,clusterB.averageSMS,
-            dataset=dataset)
-            dMatrix[iB,iA] = dMatrix[iA,iB] # the matrix is symmetric
-    
-    minDist = min([d for d in dMatrix.flatten() if d > 0.])
-    # Merge closest cluster up to the point no more merges are possible:
-    while minDist < maxDist:
-        # Get indices of first pair of clusters with minimum distance
-        mergeIndices = np.argwhere(dMatrix == minDist)[0]
-        # Merge clusters with indices in mergeIndices
-        newCluster = mergeClusters(clusterList[mergeIndices])
-        # If new cluster is valid (average is close to original clusters)
-        # keep it. Otherwise go back to original clusters, but set
-        # their distance above maxDist, so they will no longer be merged
-        if newCluster.isValid():
-            # Update cluster list:
-            # Remove cluster with largest index
-            # and replace cluster with smallest index by new cluster
-            delete_index = max(mergeIndices)
-            replace_index = min(mergeIndices)
-            clusterList.pop(delete_index)
-            clusterList[replace_index] = newCluster 
-            # Remove row and column for cluster with largest index
-            dMatrix = np.delete(dMatrix,delete_index,0)
-            dMatrix = np.delete(dMatrix,delete_index,1)
-            # Compute the distances between the new cluster and all the
-            # other ones.
-        else:
-            dMatrix[mergeIndices] = 2*maxDist
-            dMatrix[np.flip(mergeIndices)] = 2*maxDist
-
-        minDist = min([d for d in dMatrix.flatten() if d > 0.])
-        
-
 
     # Index average SMS:
     sortedSMSList = sorted(averageSMSList, key=lambda sms: sms._upperLimit)
     for isms, sms in enumerate(sortedSMSList):
         sms._index = isms
 
-
-    # Start iteration:
-    # 
 
     # Choose initial centroids as the first SMS in a chain of
     # SMS all with dist < maxDist:
