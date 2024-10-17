@@ -361,9 +361,8 @@ def doCluster(smsList, dataset, maxDist):
         mergeIndices = np.argwhere(dMatrix == minDist)[0]
         # Merge clusters with indices in mergeIndices
         newCluster = mergeClusters(np.take(clusterList,mergeIndices))
-        # If new cluster is valid (averageSMS is close to the cluster's SMS)
-        # keep it. Otherwise go back to original clusters, but set
-        # their distance above maxDist, so they will no longer be merged
+        # If new cluster is valid (averageSMS is close to the cluster's SMS),
+        # replace the two orignal clusters by it. 
         if newCluster.isValid(maxDist):
             # Update cluster list:
             # Remove cluster with largest index
@@ -382,6 +381,9 @@ def doCluster(smsList, dataset, maxDist):
                 if iA >= replace_index: continue
                 dMatrix[iA,replace_index] = clusterA.distanceTo(newCluster)
                 dMatrix[replace_index,iA] = dMatrix[iA,replace_index] # the matrix is symmetric
+        
+        # Otherwise keep the original clusters, but set 
+        # their distance above maxDist, so they will no longer be allowed to merge
         else:
             dMatrix[mergeIndices] = 2*maxDist
             dMatrix[np.flip(mergeIndices)] = 2*maxDist
