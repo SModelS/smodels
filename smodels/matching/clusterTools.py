@@ -410,75 +410,16 @@ def groupSMS(smsList, dataset):
                                % (str(sms), nclusters))
     return avgSMSList
 
-def clusterTo(centroids,smsList,dataset,maxDist):
+def mergeClusters(clusterList):
     """
-    Assign a SMS from smsList to one of the centroids
+    Merge a list of SMSCluster objects
     """
     
-    dMatrix = np.full((len(smsList),len(centroids)),fill_value=maxDist)
-    for isms,sms in enumerate(smsList):
-        for ic,c in enumerate(centroids):
-            dMatrix[isms,ic] = relativeDistance(c,sms,dataset)
+    smsList = [cluster.averageSMS for cluster in clusterList]
+    newCluster = SMSCluster(smsList)
 
-    clusters = [[] for ic in range(len(centroids))]
-    notClustered = []
-    for isms,sms in enumerate(smsList):
-        ic = np.argmin(dMatrix[isms])
-        d = dMatrix[isms,ic]
-        if d < maxDist:
-            clusters[ic].append(isms)
-        else:
-            notClustered.append(isms)
-    
-    smsArray = np.array(smsList)
-    clusterObjs = []
-    for indexList in clusters:
-        if not indexList:
-            continue
-        smsCluster = SMSCluster(smsArray[indexList].tolist())
-        # Check if the cluster is valid:
-        is_valid = smsCluster.isValid(dataset)        
-        if is_valid:
-            clusterObjs.append(smsCluster)
-        else:
-            # If cluster is not valid, keep only the first SMS of the
-            # list and move all the other SMS to the notClustered list
-            # (note that a cluster with a single SMS is always valid)
-            logger.debug('AverageSMS in SMSCluster has no valid UL, splitting cluster.')
-            smsCluster_single = SMSCluster(smsArray[indexList[:1]].tolist())
-            clusterObjs.append(smsCluster_single)
-            notClustered += indexList[1:]
+    return newCluster
 
-    clusterObjs = sorted(clusterObjs, key = lambda c: sorted([sms.smsID for sms in c.smsList]))
-
-    # Sort not clustered by largest distance first
-    notClustered = sorted(notClustered, key = lambda isms: min(dMatrix[isms,:]),reverse=True)
-    notClustered = np.array(smsList)[notClustered].tolist()
-
-    return clusterObjs,notClustered   
-
-def kmeansCluster(initialCentroids,sortedSMSList,dataset,maxDist):
-
-    # First cluster around the initial centroids
-    clusters,_ = clusterTo(initialCentroids,sortedSMSList,dataset,maxDist)
-    
-    stop = False
-    # Now iterate until the clusters converge
-    # (at this stage do not impose a distance limit for clustering)
-    while (not stop):
-        # Compute new centroids:
-        centroids = [cluster.averageSMS for cluster in clusters]
-        # Compute new clusters
-        newClusters,_ = clusterTo(centroids,sortedSMSList,dataset,maxDist=float('inf'))
-        # Stop when clusters no longer change
-        if all(clusters[ic] == c for ic,c in enumerate(newClusters)):
-            stop = True
-        else:
-            clusters = newClusters[:]
-
-    # Using the converged centroids remove the SMS with d(centroid,sms) > maxDist
-    newClusters,notClustered = clusterTo(centroids,sortedSMSList,dataset,maxDist=maxDist)
-    return  newClusters,notClustered
 
 def doCluster(smsList, dataset, maxDist,nmax=100):
     """
@@ -517,7 +458,7 @@ def doCluster(smsList, dataset, maxDist,nmax=100):
         # Get indices of first pair of clusters with minimum distance
         mergeIndices = np.argwhere(dMatrix == minDist)[0]
         # Merge clusters with indices in mergeIndices
-        newCluster = mergeClusters(clusterList[mergeIndices])
+        newCluster = mergeClusters(np.take(clusterList,mergeIndices))
         # If new cluster is valid (average is close to original clusters)
         # keep it. Otherwise go back to original clusters, but set
         # their distance above maxDist, so they will no longer be merged
@@ -534,6 +475,12 @@ def doCluster(smsList, dataset, maxDist,nmax=100):
             dMatrix = np.delete(dMatrix,delete_index,1)
             # Compute the distances between the new cluster and all the
             # other ones.
+            # Recompute distances using the new cluster:
+            for iA,clusterA in enumerate(clusterList):
+                if iA >= replace_index: continue
+                dMatrix[iA,replace_index] =relativeDistance(clusterA.averageSMS,newCluster.averageSMS,
+                                                            dataset=dataset)
+                dMatrix[replace_index,iA] = dMatrix[iA,replace_index] # the matrix is symmetric
         else:
             dMatrix[mergeIndices] = 2*maxDist
             dMatrix[np.flip(mergeIndices)] = 2*maxDist
@@ -541,37 +488,8 @@ def doCluster(smsList, dataset, maxDist,nmax=100):
         minDist = min([d for d in dMatrix.flatten() if d > 0.])
         
 
-
-    # Index average SMS:
-    sortedSMSList = sorted(averageSMSList, key=lambda sms: sms._upperLimit)
-    for isms, sms in enumerate(sortedSMSList):
-        sms._index = isms
-
-
-    # Start iteration:
-    # 
-
-    # Choose initial centroids as the first SMS in a chain of
-    # SMS all with dist < maxDist:
-    centroids = [sortedSMSList[0]]
-    for sms in sortedSMSList:
-        if relativeDistance(sms,centroids[-1],dataset) > maxDist:
-            centroids.append(sms)
-
-    clusters,notClustered = kmeansCluster(centroids,sortedSMSList,dataset,maxDist)
-
-    niter = 1
-    while (len(notClustered) !=0) and (niter < nmax):
-        centroids = [c.averageSMS for c in clusters] + [notClustered[0]]
-        clusters,notClustered = kmeansCluster(centroids,sortedSMSList,dataset,maxDist)
-        niter += 1
-
-    if (niter == nmax) and len(notClustered) != 0:
-        logger.warning("SMSCluster failed, using unclustered topologies")
-        clusters = [SMSCluster([sms]) for sms in sortedSMSList]
-
     # Replace average SMS by the original SMS:
-    for cluster in clusters:
+    for cluster in clusterList:
         originalSMS = []
         for avgSMS in cluster.smsList[:]:
             originalSMS += avgSMS.smsList[:]
