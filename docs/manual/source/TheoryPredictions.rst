@@ -230,11 +230,18 @@ If the average masses are very distinct from the masses of the original |SMS|, i
 
    Example of two |SMS| with similar upper limit, but very distinct masses. The "average" |SMS| is also shown.
 
-Hence the distance between the |SMS| in a given cluster and the cluster average |SMS| (or centroid) can be used as a measure to determine 
+Hence the distance between the |SMS| in a given cluster and the cluster average |SMS| can be used as a measure to determine 
 whether the cluster is valid or not.
-This type of clustering corresponds to the K-means clustering algorithm, which relies on the distance between the cluster elements and the cluster centroid. 
-A modified version of this algorithm is then used to cluster a set of |SMS| using the distance definition given above.
-The number of clusters is chosen as the smallest possible so all the |SMS| belong to one cluster and all the |SMS| within a given cluster have a distance to the cluster centroid smaller than a maximum value (defined by `maxDist <matching.html#matching.clusterTools.clusterSMS>`_).
+The clustering algorithm is based on the following steps:
+
+ 0. First all identical |SMS| (identical upper limit, masses, ...) are merged, resulting in a list of average SMS.
+ 1. Each SMS obtained from the previous step is assigned to its own cluster.
+ 2. The pairwise distances (given by the distance between the respective average SMS) for all clusters are computed.
+ 3. If the smallest pairwise distance is larger than the maximum allowed distance :math:`\rightarrow` **stop clusterting**.
+ 4. The pair of clusters with the smallest distance are considered for merging.
+    * If the merge of the cluster pair is valid, i.e. the average SMS for the merged cluster is close in distance to all the SMS from the cluster pair :math:`\rightarrow` clusters are merged
+    * If the merge is not valid :math:`\rightarrow` set the distance between the two clusters to a value larger than the maximum allowed distance, so they will no longer be merged
+ 5. Return to step 2. 
 
 
 * **The clustering of SMS is implemented by the** `clusterSMS <matching.html#matching.clusterTools.clusterSMS>`_  **method**.

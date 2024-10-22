@@ -1,3 +1,9 @@
+Release v3.0.0, xxx 2024
+=======================================================
+
+  * Bug fix for printing signal region combination results
+  * New cluster algorithm (simpler and more stable)
+
 Release v3.0.0, Tue 20 Aug 2024
 =======================================================
 
