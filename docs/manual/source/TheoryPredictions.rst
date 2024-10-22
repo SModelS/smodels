@@ -232,15 +232,18 @@ If the average masses are very distinct from the masses of the original |SMS|, i
 
 Hence the distance between the |SMS| in a given cluster and the cluster average |SMS| can be used as a measure to determine 
 whether the cluster is valid or not.
+Furthermore, the distance between two clusters is given by the distance between the respective average SMS.
+The maximum allowed distance between two clusters or the cluster average SMS and the SMS within the cluster is defined by `maxDist <matching.html#matching.clusterTools.clusterSMS>`_ and
+has a default value of 0.2 (20%).
 The clustering algorithm is based on the following steps:
 
  0. First all identical |SMS| (identical upper limit, masses, ...) are merged, resulting in a list of average SMS.
  1. Each SMS obtained from the previous step is assigned to its own cluster.
- 2. The pairwise distances (given by the distance between the respective average SMS) for all clusters are computed.
- 3. If the smallest pairwise distance is larger than the maximum allowed distance :math:`\rightarrow` **stop clusterting**.
+ 2. The pairwise distances between all clusters (:math:`d(c_A,c_B)`) are computed.
+ 3. If :math:`min(d(c_A,c_B)) > maxDist \rightarrow` **stop clusterting**, otherwise go to step 4.
  4. The pair of clusters with the smallest distance are considered for merging.
-    * If the merge of the cluster pair is valid, i.e. the average SMS for the merged cluster is close in distance to all the SMS from the cluster pair :math:`\rightarrow` clusters are merged
-    * If the merge is not valid :math:`\rightarrow` set the distance between the two clusters to a value larger than the maximum allowed distance, so they will no longer be merged
+   * If the merge of the cluster pair is valid, i.e. the average SMS for the merged cluster is close in distance to all the SMS from the cluster pair :math:`\rightarrow` clusters are merged
+   * If the merge is not valid :math:`\rightarrow` set the distance between the two clusters to a value larger than the maximum allowed distance, so they will no longer be merged
  5. Return to step 2. 
 
 
