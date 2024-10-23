@@ -37,7 +37,7 @@ New in Version 3.0.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Bug fix for printing signal region combination results
-  * New :ref:`cluster algorithm<cluster>`
+  * Replaced algorithm for :ref:`clustering SMS <cluster>` for UL results by a modified minimum spanning tree algorithm
 
 New in Version 3.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
