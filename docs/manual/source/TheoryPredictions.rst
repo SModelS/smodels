@@ -201,7 +201,7 @@ Clustering Topologies
 
 As discussed in :ref:`Theory Predictions for UL <thePredUL>`, in order to cluster the |topologies| it is necessary
 to determine whether two |SMS| are similar for a given |ExpRes|, which usually means similar efficiencies.
-Although the efficiencies are related to the cross section upper limit (:math:`\sigma_{\rm UL}`), the assumption they are inversely proportional is only valid for searches with a single signal region, which is rarely the case.
+Although the efficiencies are related to the cross section upper limits (:math:`\sigma_{\rm UL}`), the assumption that they are inversely proportional to the efficiencies is only valid for searches with a single signal region, which is rarely the case.
 However, if two |SMS| have similar properties (i.e. BSM masses and widths) and their upper limits are nearly equal, 
 it is reasonable to assume that they have similar efficiencies.
 Hence, a measure of *distance* between two |SMS| can be defined using the relative difference between their upper limits:
@@ -209,15 +209,15 @@ Hence, a measure of *distance* between two |SMS| can be defined using the relati
 
 .. math::
 
-   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{UL,a}-\sigma_{UL,b}|}{\sigma_{UL,a}+\sigma_{UL,b}}
+   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{{\rm UL},a}-\sigma_{{\rm UL},b}|}{\sigma_{UL,a}+\sigma_{UL,b}}
    
-where :math:`\sigma_{UL,a}` (:math:`\sigma_{UL,b}`) is the cross section upper limit for the |SMS| "a" ("b"). These upper limits are extracted from the :ref:`upper limit maps <ULtype>` and typically depend on the masses and widths of the BSM particles appearing in the |SMS|.
+where :math:`\sigma_{{\rm UL},a}` (:math:`\sigma_{{\rm UL},b}`) is the cross section upper limit for |SMS| "a" ("b"). These upper limits are extracted from the :ref:`upper limit maps <ULtype>` and typically depend on the masses and widths of the BSM particles appearing in the |SMS|.
 Notice that the above definition of distance quantifies the experimental analysis' 
 sensitivity to changes in the |SMS| properties (masses and widths). 
 
 
 However, since most |ExpRess| combine distinct signal regions, it is possible that two |SMS| have (by chance) the same upper limit value, but still have very distinct efficiencies and should not be clustered together.
-One example is shown in :numref:`Fig. %s <avgSMSFig>`, where the |SMS| "a" and "b" have similar upper limits (:math:`\sigma_{\rm UL,a} \simeq \sigma_{\rm UL,b}`), but they clearly have very distinct masses and most likely different efficiencies.
+One example is shown in :numref:`Fig. %s <avgSMSFig>`, where the |SMS| "a" and "b" have similar upper limits (:math:`\sigma_{{\rm UL},a} \simeq \sigma_{{\rm UL},b}`), but they clearly have very distinct masses and most likely different efficiencies.
 In order to deal with such cases we define for each cluster of |SMS| an "average" topology, which is constructed using the average of the |SMS| properties (average masses and widths).
 If the average masses are very distinct from the masses of the original |SMS|, it is likely that the upper limit for the average |SMS| will fall into another region of the upper limit map and will differ considerably from the original upper limits, as shown in :numref:`Fig. %s <avgSMSFig>`.
 
