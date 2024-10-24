@@ -201,7 +201,7 @@ Clustering Topologies
 
 As discussed in :ref:`Theory Predictions for UL <thePredUL>`, in order to cluster the |topologies| it is necessary
 to determine whether two |SMS| are similar for a given |ExpRes|, which usually means similar efficiencies.
-Although the efficiencies are related to the cross section upper limit (:math:`\sigma_{\rm UL}`), the assumption they are inversely proportional is only valid for searches with a single signal region, which is rarely the case.
+Although the efficiencies are related to the cross section upper limits (:math:`\sigma_{\rm UL}`), the assumption that they are inversely proportional to the efficiencies is only valid for searches with a single signal region, which is rarely the case.
 However, if two |SMS| have similar properties (i.e. BSM masses and widths) and their upper limits are nearly equal, 
 it is reasonable to assume that they have similar efficiencies.
 Hence, a measure of *distance* between two |SMS| can be defined using the relative difference between their upper limits:
@@ -209,15 +209,15 @@ Hence, a measure of *distance* between two |SMS| can be defined using the relati
 
 .. math::
 
-   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{UL,a}-\sigma_{UL,b}|}{\sigma_{UL,a}+\sigma_{UL,b}}
+   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{{\rm UL},a}-\sigma_{{\rm UL},b}|}{\sigma_{UL,a}+\sigma_{UL,b}}
    
-where :math:`\sigma_{UL,a}` (:math:`\sigma_{UL,b}`) is the cross section upper limit for the |SMS| "a" ("b"). These upper limits are extracted from the :ref:`upper limit maps <ULtype>` and typically depend on the masses and widths of the BSM particles appearing in the |SMS|.
+where :math:`\sigma_{{\rm UL},a}` (:math:`\sigma_{{\rm UL},b}`) is the cross section upper limit for |SMS| "a" ("b"). These upper limits are extracted from the :ref:`upper limit maps <ULtype>` and typically depend on the masses and widths of the BSM particles appearing in the |SMS|.
 Notice that the above definition of distance quantifies the experimental analysis' 
 sensitivity to changes in the |SMS| properties (masses and widths). 
 
 
 However, since most |ExpRess| combine distinct signal regions, it is possible that two |SMS| have (by chance) the same upper limit value, but still have very distinct efficiencies and should not be clustered together.
-One example is shown in :numref:`Fig. %s <avgSMSFig>`, where the |SMS| "a" and "b" have similar upper limits (:math:`\sigma_{\rm UL,a} \simeq \sigma_{\rm UL,b}`), but they clearly have very distinct masses and most likely different efficiencies.
+One example is shown in :numref:`Fig. %s <avgSMSFig>`, where the |SMS| "a" and "b" have similar upper limits (:math:`\sigma_{{\rm UL},a} \simeq \sigma_{{\rm UL},b}`), but they clearly have very distinct masses and most likely different efficiencies.
 In order to deal with such cases we define for each cluster of |SMS| an "average" topology, which is constructed using the average of the |SMS| properties (average masses and widths).
 If the average masses are very distinct from the masses of the original |SMS|, it is likely that the upper limit for the average |SMS| will fall into another region of the upper limit map and will differ considerably from the original upper limits, as shown in :numref:`Fig. %s <avgSMSFig>`.
 
@@ -230,12 +230,21 @@ If the average masses are very distinct from the masses of the original |SMS|, i
 
    Example of two |SMS| with similar upper limit, but very distinct masses. The "average" |SMS| is also shown.
 
-Hence the distance between the |SMS| in a given cluster and the cluster average |SMS| (or centroid) can be used as a measure to determine 
+Hence the distance between the |SMS| in a given cluster and the cluster average |SMS| can be used as a measure to determine 
 whether the cluster is valid or not.
-This type of clustering corresponds to the K-means clustering algorithm, which relies on the distance between the cluster elements and the cluster centroid. 
-A modified version of this algorithm is then used to cluster a set of |SMS| using the distance definition given above.
-The number of clusters is chosen as the smallest possible so all the |SMS| belong to one cluster and all the |SMS| within a given cluster have a distance to the cluster centroid smaller than a maximum value (defined by `maxDist <matching.html#matching.clusterTools.clusterSMS>`_).
+Furthermore, the distance between two clusters is given by the distance between the respective average |SMS|.
+The maximum allowed distance between two clusters or the cluster average |SMS| and the |SMS| within the cluster is defined by `maxDist <matching.html#matching.clusterTools.clusterSMS>`_ and
+has a default value of 0.2 (20%).
+The clustering algorithm is based on the following steps:
 
+ 0. First all identical SMS (identical upper limit, masses, ...) are merged, resulting in a list of average SMS.
+ 1. Each SMS obtained from the previous step is assigned to its own cluster.
+ 2. The pairwise distances between all clusters, :math:`d(c_A,c_B)`, are computed.
+ 3. If :math:`min(d(c_A,c_B)) > maxDist \rightarrow` **stop clustering**, else continue.
+ 4. The pair of clusters with the smallest distance is considered for merging.
+   * If the average SMS for the merged cluster is close in distance to all the SMS from the cluster pair :math:`\rightarrow` clusters are merged
+   * If the distance between the two clusters is greater than the maximum allowed distance, they will not be merged
+ 5. Return to step 2. 
 
 * **The clustering of SMS is implemented by the** `clusterSMS <matching.html#matching.clusterTools.clusterSMS>`_  **method**.
 

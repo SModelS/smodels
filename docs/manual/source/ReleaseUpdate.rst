@@ -33,6 +33,11 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 3.0.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Bug fix for printing signal region combination results
+  * Replaced algorithm for :ref:`clustering SMS <cluster>` for UL results by a modified minimum spanning tree algorithm
 
 New in Version 3.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
