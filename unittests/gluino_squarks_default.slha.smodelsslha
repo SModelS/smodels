@@ -1,0 +1,130 @@
+BLOCK SModelS_Settings
+ 0 v3.0.0-beta               #SModelS version
+ 1 unittest300-beta          #database version
+ 2 0.2                       #maximum condition violation
+ 3 1                         #compression (0 off, 1 on)
+ 4 5.0                       #minimum mass gap for mass compression [GeV]
+ 5 0.03                      #sigmacut [fb]
+ 6 0                         #signal region combination (0 off, 1 on)
+ 7 1                         #analyses combination (0 off, 1 on)
+
+BLOCK SModelS_Exclusion
+ 0 0 0                              #output status (-1 not tested, 0 not excluded, 1 excluded)
+ 1 0 T6WW                           #txname 
+ 1 1 3.876E-01                      #r value
+ 1 2 N/A                            #expected r value
+ 1 3 0.00                           #condition violation
+ 1 4 ATLAS-SUSY-2013-02             #analysis
+ 1 5 (UL)                           #signal region 
+ 1 6 N/A                            #nll
+ 1 7 N/A                            #nll_min
+ 1 8 N/A                            #nll_SM
+
+ 2 0 T2                             #txname 
+ 2 1 3.209E-01                      #r value
+ 2 2 N/A                            #expected r value
+ 2 3 0.00                           #condition violation
+ 2 4 ATLAS-SUSY-2013-02             #analysis
+ 2 5 (UL)                           #signal region 
+ 2 6 N/A                            #nll
+ 2 7 N/A                            #nll_min
+ 2 8 N/A                            #nll_SM
+
+ 3 0 T5WW                           #txname 
+ 3 1 2.800E-01                      #r value
+ 3 2 N/A                            #expected r value
+ 3 3 0.00                           #condition violation
+ 3 4 ATLAS-SUSY-2013-02             #analysis
+ 3 5 (UL)                           #signal region 
+ 3 6 N/A                            #nll
+ 3 7 N/A                            #nll_min
+ 3 8 N/A                            #nll_SM
+
+ 4 0 T1, T1tttt, T2                 #txname 
+ 4 1 1.296E-01                      #r value
+ 4 2 2.079E-01                      #expected r value
+ 4 3 0.00                           #condition violation
+ 4 4 CMS-SUS-13-012                 #analysis
+ 4 5 3NJet6_1000HT1250_600MHTinf    #signal region 
+ 4 6 5.55E+00                       #nll
+ 4 7 5.22E+00                       #nll_min
+ 4 8 5.98E+00                       #nll_SM
+
+ 5 0 T1                             #txname 
+ 5 1 1.106E-01                      #r value
+ 5 2 N/A                            #expected r value
+ 5 3 0.00                           #condition violation
+ 5 4 CMS-PAS-SUS-15-002             #analysis
+ 5 5 (UL)                           #signal region 
+ 5 6 N/A                            #nll
+ 5 7 N/A                            #nll_min
+ 5 8 N/A                            #nll_SM
+
+ 6 0 T1                             #txname 
+ 6 1 6.118E-02                      #r value
+ 6 2 N/A                            #expected r value
+ 6 3 0.00                           #condition violation
+ 6 4 ATLAS-SUSY-2013-02             #analysis
+ 6 5 (UL)                           #signal region 
+ 6 6 N/A                            #nll
+ 6 7 N/A                            #nll_min
+ 6 8 N/A                            #nll_SM
+
+ 7 0 TChiWZ                         #txname 
+ 7 1 3.839E-02                      #r value
+ 7 2 N/A                            #expected r value
+ 7 3 0.00                           #condition violation
+ 7 4 ATLAS-SUSY-2013-12             #analysis
+ 7 5 (UL)                           #signal region 
+ 7 6 N/A                            #nll
+ 7 7 N/A                            #nll_min
+ 7 8 N/A                            #nll_SM
+
+ 8 0 T1qqtt, T1tttt                 #txname 
+ 8 1 1.830E-03                      #r value
+ 8 2 2.091E-03                      #expected r value
+ 8 3 0.00                           #condition violation
+ 8 4 ATLAS-CONF-2013-037            #analysis
+ 8 5 SRtN3                          #signal region 
+ 8 6 3.71E+00                       #nll
+ 8 7 3.52E+00                       #nll_min
+ 8 8 3.71E+00                       #nll_SM
+
+ 9 0 T1tttt                         #txname 
+ 9 1 8.312E-04                      #r value
+ 9 2 N/A                            #expected r value
+ 9 3 0.00                           #condition violation
+ 9 4 CMS-PAS-SUS-15-002             #analysis
+ 9 5 (UL)                           #signal region 
+ 9 6 N/A                            #nll
+ 9 7 N/A                            #nll_min
+ 9 8 N/A                            #nll_SM
+
+ 10 0 T1tttt                         #txname 
+ 10 1 7.136E-05                      #r value
+ 10 2 5.496E-05                      #expected r value
+ 10 3 0.00                           #condition violation
+ 10 4 CMS-PAS-SUS-12-026             #analysis
+ 10 5 (UL)                           #signal region 
+ 10 6 N/A                            #nll
+ 10 7 N/A                            #nll_min
+ 10 8 N/A                            #nll_SM
+
+BLOCK SModelS_CombinedAnas
+ 1 1 1.334E-01                      #r value
+ 1 2 2.101E-01                      #expected r value
+ 1 3 9.26E+00                       #nll
+ 1 4 8.92E+00                       #nll_min
+ 1 5 9.69E+00                       #nll_SM
+ 1 6 ATLAS-CONF-2013-037,CMS-SUS-13-012 #IDs of combined analyses
+
+
+BLOCK SModelS_Coverage
+ 0 0 missing (all)                       # missing topologies
+ 0 1 3.067E+03                           # Total cross-section (fb)
+ 1 0 missing (displaced)                 # missing topologies with displaced decays
+ 1 1 0.000E+00                           # Total cross-section (fb)
+ 2 0 missing (prompt)                    # missing topologies with prompt decays
+ 2 1 3.067E+03                           # Total cross-section (fb)
+ 3 0 outsideGrid (all)                   # topologies outside the grid
+ 3 1 2.358E+02                           # Total cross-section (fb)

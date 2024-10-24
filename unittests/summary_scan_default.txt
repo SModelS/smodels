@@ -1,0 +1,28 @@
+#Global results summary (22 files)
+#The most constraining analysis corresponds to the one with largest observed r.
+#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.
+#Analyses used for combination = ATLAS-CONF-2013-037,CMS-SUS-13-012.
+#r(combined) = nan means no analysis from the above combination set produced results.
+#filename            MostConstrainingAnalysis  r_max     r_exp   MostSensitive(ATLAS)  r(ATLAS)  r_exp(ATLAS)  MostSensitive(CMS)  r(CMS)   r_exp(CMS)  r(combined)  r_exp(combined)
+416126634.slha       ATLAS-SUSY-2013-12        1.29      nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+T1tttt.slha          CMS-PAS-SUS-15-002        30.5      nan     ATLAS-CONF-2013-037   5.92      5.47          CMS-SUS-13-012      5.82     8.24        8.87         10.4           
+T1ttttoff.slha       CMS-PAS-SUS-15-002        8.16      nan     N/A                   nan       nan           CMS-SUS-13-012      0.662    0.936       0.662        0.936          
+T6bbHH_pyhf.slha     N/A                       nan       nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+TChiWZoff_150_125_150_125.slha  N/A                       nan      nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+TRV1_1800_300_300.slha   N/A                   nan      nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+broken.slha          N/A                       nan       nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+complicated.slha     ATLAS-SUSY-2013-02        0.388     nan     ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.133        0.21           
+gluinoToTops.slha    CMS-PAS-SUS-15-002        5.52      nan     ATLAS-CONF-2013-037   0.479     0.443         CMS-SUS-13-012      0.844    0.703       1.12         0.884          
+gluino_squarks.slha  ATLAS-SUSY-2013-02        0.388     nan     ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.133        0.21           
+higgsinoStop.slha    ATLAS-SUSY-2013-05        196       nan     ATLAS-CONF-2013-037   37.8      43.2          N/A                 nan      nan         37.8         43.2           
+hscpTest_long.slha   CMS-EXO-13-006            0.5       0.5     N/A                   nan       nan           CMS-EXO-13-006      0.5      0.5         nan          nan            
+hscpTest_mid.slha    CMS-EXO-13-006            0.0884    0.0884  N/A                   nan       nan           CMS-EXO-13-006      0.0884   0.0884      nan          nan            
+hscpTest_short.slha  CMS-EXO-13-006            0.0406    0.0406  N/A                   nan       nan           CMS-EXO-13-006      0.0406   0.0406      nan          nan            
+idm_example.slha     ATLAS-SUSY-2013-12        0.0136    nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+lifetime.slha        CMS-PAS-SUS-15-002        0.000451  nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+lightEWinos.slha     ATLAS-SUSY-2013-12        0.646     nan     ATLAS-CONF-2013-037   0.119     0.11          CMS-SUS-13-012      0.00556  0.00786     0.125        0.115          
+lightEWinos_simple.slha  ATLAS-CONF-2013-037       0.119    0.11    ATLAS-CONF-2013-037   0.119     0.11          CMS-SUS-13-012      0.00556  0.00786     0.125        0.115          
+longLived.slha       CMS-EXO-13-006            0.835     0.835   ATLAS-CONF-2013-037   0.00801   0.00916       CMS-EXO-13-006      0.835    0.835       0.00801      0.00916        
+nobdecay.slha        ATLAS-SUSY-2013-02        0.803     nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan            
+simplyGluino.slha    CMS-PAS-SUS-15-002        25.7      nan     N/A                   nan       nan           CMS-SUS-13-012      4.45     6.51        4.45         6.51           
+squarks_degenerate.slha  ATLAS-SUSY-2013-02    0.58      nan     N/A                   nan       nan           CMS-SUS-13-012      0.256    0.304       0.256        0.304          

@@ -1,0 +1,8 @@
+dataId: H_SR4
+dataType: efficiencyMap
+observedN: 115
+expectedBG: 93
+bgError: 10
+comment: H_SR4
+upperLimit: 0.392*fb
+expectedUpperLimit: 0.22*fb

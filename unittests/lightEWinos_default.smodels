@@ -1,0 +1,87 @@
+Input status: 1
+Decomposition output status: 1 #decomposition was successful
+# Input File: ./testFiles/slha/lightEWinos.slha
+# checkinput = True
+# combineanas = ATLAS-CONF-2013-037,CMS-SUS-13-012
+# combinesrs = False
+# computestatistics = True
+# docompress = True
+# doinvisible = True
+# experimentalfeatures = False
+# ignorepromptqnumbers = spin,eCharge,colordim
+# maxcond = 0.2
+# minmassgap = 5.
+# model = share.models.mssm
+# ncpus = 1
+# promptwidth = 1e-11
+# reportallsrs = False
+# sigmacut = 10.0
+# stablewidth = 1e-25
+# testcoverage = True
+# SModelS version: 3.0.0
+# Database version: unittest300
+================================================================================
+#Analysis  Sqrts  Cond_Violation  Theory_Value(fb)  Exp_limit(fb)  r  r_expected
+
+ATLAS-CONF-2013-037  8.00E+00    0.0  4.371E-02  4.000E-01  1.093E-01  1.010E-01
+ Signal Region:  SRbC3
+ Txnames:  T1bbtt
+ Likelihoods: nll, nll_min, nll_SM =  3.963E+00,  3.879E+00,  3.879E+00
+--------------------------------------------------------------------------------
+ ATLAS-SUSY-2013-02  8.00E+00    0.0  1.530E+03  2.333E+07  6.560E-05  N/A
+ Signal Region:  (UL)
+ Txnames:  T1
+
+ 
+================================================================================
+The highest r value is = 0.10929 from ATLAS-CONF-2013-037 (r_expected=0.10096)
+ATLAS analysis with highest available r_expected: ATLAS-CONF-2013-037, r_expected=0.10096, r_obs=0.10929
+===================================================== 
+Combined Analyses: ATLAS-CONF-2013-037
+Likelihoods: nll, nll_min, nll_SM = 3.963, 3.879, 3.879
+combined r-value:  1.093E-01
+combined r-value (expected):  1.010E-01
+===================================================== 
+
+
+Total cross-section for missing topologies (fb):  5.057E+03
+Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
+Total cross-section for missing topologies with prompt decays (fb):  5.057E+03
+Total cross-section for topologies outside the grid (fb):  2.138E+02
+
+#Full information on unconstrained cross sections
+================================================================================
+missing topologies with the highest cross sections (up to 10):
+Sqrts (TeV)   Weight (fb)                  SMS description
+ 13.0          1.204E+03    #                        PV > (jet,jet,MET), (nu,l,MET) 
+ 13.0          6.003E+02    #                       PV > (jet,jet,MET), (nu,ta,MET) 
+ 13.0          5.075E+02    #                         PV > (jet,jet,MET), (b,b,MET) 
+ 13.0          5.021E+02    #             PV > (b,t,jet,jet,MET), (b,b,jet,jet,MET) 
+ 13.0          3.500E+02    #                             PV > (MET), (jet,jet,MET) 
+ 13.0          3.059E+02    #             PV > (b,t,jet,jet,MET), (b,t,jet,jet,MET) 
+ 13.0          2.403E+02    #                     PV > (b,b,MET), (b,t,jet,jet,MET) 
+ 13.0          1.972E+02    #                     PV > (b,b,MET), (b,b,jet,jet,MET) 
+ 13.0          1.670E+02    #             PV > (b,b,jet,jet,MET), (b,b,jet,jet,MET) 
+ 13.0          1.587E+02    #                            PV > (nu,l,MET), (b,b,MET) 
+================================================================================
+No missing topologies with displaced decays found
+================================================================================
+missing topologies with prompt decays with the highest cross sections (up to 10):
+Sqrts (TeV)   Weight (fb)                  SMS description
+ 13.0          1.204E+03    #                        PV > (jet,jet,MET), (nu,l,MET) 
+ 13.0          6.003E+02    #                       PV > (jet,jet,MET), (nu,ta,MET) 
+ 13.0          5.075E+02    #                         PV > (jet,jet,MET), (b,b,MET) 
+ 13.0          5.021E+02    #             PV > (b,t,jet,jet,MET), (b,b,jet,jet,MET) 
+ 13.0          3.500E+02    #                             PV > (MET), (jet,jet,MET) 
+ 13.0          3.059E+02    #             PV > (b,t,jet,jet,MET), (b,t,jet,jet,MET) 
+ 13.0          2.403E+02    #                     PV > (b,b,MET), (b,t,jet,jet,MET) 
+ 13.0          1.972E+02    #                     PV > (b,b,MET), (b,b,jet,jet,MET) 
+ 13.0          1.670E+02    #             PV > (b,b,jet,jet,MET), (b,b,jet,jet,MET) 
+ 13.0          1.587E+02    #                            PV > (nu,l,MET), (b,b,MET) 
+================================================================================
+topologies outside the grid with the highest cross sections (up to 10):
+Sqrts (TeV)   Weight (fb)                  SMS description
+ 13.0          1.183E+02    #                         PV > (jet,jet,MET), (l,l,MET) 
+ 13.0          4.830E+01    #                           PV > (nu,l,MET), (nu,l,MET) 
+ 13.0          4.719E+01    #                             PV > (b,b,MET), (b,b,MET) 
+================================================================================

@@ -1,0 +1,11 @@
+id: CMS-EXO-19-012
+sqrts: 13*TeV
+lumi: 137.0/fb
+url: https://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-19-012/index.html
+arxiv: https://arxiv.org/abs/1911.03947
+publication: https://link.springer.com/article/10.1007/JHEP05(2020)033
+contact: CMS collaboration
+private: False
+implementedBy: Yoxara Villamizar
+lastUpdate: 2023/12/9
+type: upperLimit
