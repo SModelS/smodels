@@ -9,6 +9,7 @@
 
 """
 
+import warnings
 import sys
 import os
 sys.path.insert(0, "../")
@@ -34,7 +35,7 @@ class RFailsTest(unittest.TestCase):
                 os.remove(fname)
 
     def testRFailPrinters(self):
-
+        warnings.filterwarnings( action='ignore', category=DeprecationWarning )
         filename = "./testFiles/rfails/mdm_r_fails.slha"
         from smodels.statistics import pyhfInterface
 
@@ -93,7 +94,7 @@ class RFailsTest(unittest.TestCase):
             self.removeOutputs(outputfile)
 
     def testRFailSummary(self):
-        
+        warnings.filterwarnings( action='ignore', category=DeprecationWarning )
         out = "./unitTestOutput"
         dirname = "./testFiles/rfails/"
         from smodels.statistics import pyhfInterface
