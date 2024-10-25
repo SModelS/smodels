@@ -84,21 +84,13 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
-    def negative_log_likelihood(self, poi_test: float):
+    def negative_log_likelihood(self, poi_test):
         """ the method that really wraps around the llhd computation.
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
 
-        """
-        from icecream import ic
-        ic  ( self.nsignals )
-        ic  ( poi_test )
-        ic ( self.data.origDataSetOrder )
-        ic ( self.data.globalInfo.smYields )
-        # ic ( self.data.globalInfo.inputMeans )
-        # ic ( self.data.globalInfo.inputErrors )
-        """
+        
         syields = []
         for srname,smyield in self.data.globalInfo.smYields.items():
             p1 = srname.rfind("-")
@@ -113,9 +105,6 @@ class NNUpperLimitComputer:
             tot = smyield + signal
             syields.append ( tot )
 
-        #ic ( syields )
-        #sys.exit()
-        # print ( f"@@5 syields {syields} poi {poi_test}" )
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
 
         for i,x in enumerate(scaled_signal_yields[0]):
@@ -161,11 +150,18 @@ class NNUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        ret = self.negative_log_likelihood ( mu )
-        lbl = "nll_obs_1"
-        if expected:
-            lbl = "nll_exp_1"
-        nll = ret[lbl]
+        ret = self.negative_log_likelihood(mu)
+        if mu==0.0 and expected:
+            nll = ret['nll_exp_0']
+        elif mu==0.0 and not expected:
+            nll = ret['nll_obs_0']
+        elif mu!=0.0 and expected:
+            nll = ret['nll_exp_1']
+        elif mu!=0.0 and not expected:
+            nll = ret['nll_obs_1']
+        else:
+            raise NotImplementedError(f'Request for {mu} received but only m=0 and mu=1 are implemented.')
+        
         logger.debug( f"Calling likelihood")
         return self.exponentiateNLL ( nll, not return_nll )
 
@@ -198,16 +194,23 @@ class NNUpperLimitComputer:
         # lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
         # print( f"Calling lmax negativeSignals = {allowNegativeSignals}")
         # print ( f"@@5 before minimize!" )
-        lbl = "nll_obs_1"
+
         nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
-        if expected:
-            lbl = "nll_exp_1"
-        def getNLL ( mu ): # , nll0 ):
-            d = self.negative_log_likelihood ( mu )
-            ret = d[lbl] # - nll0
-            # print ( f"@@X dNLL({mu})={ret} lbl={lbl} nll0={nll0}" )
-            return ret
+        def getNLL ( mu ): 
+            d = self.negative_log_likelihood (mu)
+            if mu==0.0 and expected:
+                nll = d['nll_exp_0']
+            elif mu==0.0 and not expected:
+                nll = d['nll_obs_0']
+            elif mu!=0.0 and expected:
+                nll = d['nll_exp_1']
+            elif mu!=0.0 and not expected:
+                nll = d['nll_obs_1']
+        
+            return nll
+
         ret = { "nll_min": nll0, "muhat": 0., "sigma_mu": 0. }
+
         muini = [ 0.0, 1.0, 3.0, -1.0, 10.0, 0.1, -0.1 ]
         if not allowNegativeSignals:
             muini = [ 0.0, 1.0, 3.0, 10.0, 0.1 ]
@@ -224,17 +227,13 @@ class NNUpperLimitComputer:
                 #    nll_min = nll0
                 if 0. < nll_min < ret["nll_min"]:
                     ret = { "nll_min": nll_min, "muhat": muhat }
-        # ret["nll_min"]+=nll0
         ret["nll0"]=nll0
-        # lmax = self.exponentiateNLL ( ret["nll_min"] )
-        # ret["lmax"]=lmax
-        ret["lmax"]=ret["nll_min"] # FIXME!!!
+        ret["lmax"]=ret["nll_min"] # FIXME the lmax name!!!
         ret["expected"]=expected
         o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
         sigma_mu = np.sqrt ( o.hess_inv[0][0] )
         ret["sigma_mu"]=sigma_mu
-        # logger.error ( f"@@9 ret {ret}" )
-        # sys.exit()
+
         return ret
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False ):
