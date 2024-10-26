@@ -60,6 +60,7 @@ pyhfinfo = {
     "required": "0.6.1".split("."),
 }
 
+"""
 try:
     pyhf.set_backend(b"pytorch")
     import torch
@@ -77,6 +78,7 @@ except pyhf.exceptions.ImportBackendError as e:
     pyhfinfo["backendver"] = numpy.version.full_version
 
     warnings.filterwarnings("ignore", r"invalid value encountered in log")
+"""
 
 countWarning = {"llhdszero": 0}
 # Sets the maximum number of attempts for determining the brent bracketing interval for mu:
