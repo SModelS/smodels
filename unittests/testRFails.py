@@ -95,6 +95,7 @@ class RFailsTest(unittest.TestCase):
 
     def testRFailSummary(self):
         warnings.filterwarnings( action='ignore', category=DeprecationWarning )
+        warnings.filterwarnings( action='ignore', category=RuntimeWarning )
         out = "./unitTestOutput"
         dirname = "./testFiles/rfails/"
         from smodels.statistics import pyhfInterface
