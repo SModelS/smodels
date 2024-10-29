@@ -61,8 +61,10 @@ if ver < pyhfinfo["required"]:
     print(f"[SModelS:pyhfInterface] We recommend pyhf >= {str(required)}. Please try to update pyhf ASAP!")
 
 def setBackend ( backend : str ) -> bool:
-    """ try to setup backend to <backend>
-    :param backend: one of: numpy, pytorch, jax, tensorflow
+    """ 
+    try to setup backend to <backend>
+
+    :param backend: one of: numpy (default), pytorch, jax, tensorflow
     :returns: True, if worked, False if failed
     """
     try:
