@@ -9,10 +9,10 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
 import jsonpatch
 import warnings
 import jsonschema
-import semver
 import copy
 from scipy import optimize
 import numpy as np
@@ -27,13 +27,13 @@ jsonver = ""
 try:
     import importlib.metadata
 
-    jsonver = semver.parse_version_info(importlib.metadata.version("jsonschema"))
+    jsonver = int(importlib.metadata.version("jsonschema")[0])
 except Exception as e:
     try:
         from jsonschema import __version__ as jsonver
     except Exception as e:
         pass
-if jsonver.major < 3:
+if jsonver < 3:
     # if jsonschema.__version__[0] == "2": ## deprecated
     print( f"[SModelS:pyhfInterface] jsonschema is version {jsonschema.__version__}, we need > 3.x.x" )
     sys.exit()
@@ -46,19 +46,21 @@ except ModuleNotFoundError:
     print("[SModelS:pyhfInterface] pyhf import failed. Is the module installed?")
     sys.exit(-1)
 
-ver = semver.parse_version_info(pyhf.__version__)
+ver = pyhf.__version__
 
 pyhfinfo = {
     "backend": "numpy",
     "hasgreeted": False,
     "backendver": np.version.full_version,
     "ver": ver,
-    "required": semver.parse_version_info("0.6.1"), # the required pyhf version
+#    "required": "0.6.1", # the required pyhf version
 }
 
+"""
 if ver < pyhfinfo["required"]:
     print(f"[SModelS:pyhfInterface] WARNING you are using pyhf v{str(ver)}" )
     print(f"[SModelS:pyhfInterface] We recommend pyhf >= {str(required)}. Please try to update pyhf ASAP!")
+"""
 
 def setBackend ( backend : str ) -> bool:
     """ 
@@ -396,7 +398,7 @@ class PyhfUpperLimitComputer:
         self.alreadyBeenThere = (
             False  # boolean to detect wether self.signals has returned to an older value
         )
-        self.checkPyhfVersion()
+        # self.checkPyhfVersion()
         self.welcome()
 
     def welcome(self):
