@@ -18,7 +18,8 @@ import numpy as np
 from smodels.base.smodelsLogging import logger
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", r"invalid value encountered in log")
 from typing import Dict, List
 
 jsonver = ""
@@ -48,35 +49,41 @@ except ModuleNotFoundError:
     sys.exit(-1)
 
 ver = pyhf.__version__.split(".")
-if ver[1] == "4" or (ver[1] == "5" and ver[2] in ["0", "1"]):
-    print("[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__)
-    print("[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!")
 
 pyhfinfo = {
     "backend": "numpy",
     "hasgreeted": False,
-    "backendver": "?",
+    "backendver": np.version.full_version,
     "ver": ver,
-    "required": "0.6.1".split("."),
+    "required": "0.6.1".split("."), # the required pyhf version
 }
 
-try:
-    pyhf.set_backend(b"pytorch")
-    import torch
+if ver[1] == "4" or (ver[1] == "5" and ver[2] in ["0", "1"]):
+    print(f"[SModelS:pyhfInterface] WARNING you are using pyhf v{pyhf.__version__}" )
+    print(f"[SModelS:pyhfInterface] We recommend pyhf >= {'.'.join(required)}. Please try to update pyhf ASAP!")
 
-    pyhfinfo["backend"] = "pytorch"
-    pyhfinfo["backendver"] = torch.__version__
+def setBackend ( backend : str ) -> bool:
+    """ try to setup backend to <backend>
+    :param backend: one of: numpy, pytorch, jax, tensorflow
+    :returns: True, if worked, False if failed
+    """
+    try:
+        pyhf.set_backend( backend )
+        pyhfinfo["backend"] = backend
+        pyhfinfo["backendver"] = "?"
+        module_name = backend
+        if backend == "pytorch":
+            module_name = "torch"
+        from importlib.metadata import version
+        pyhfinfo["backendver"] = version(module_name)
+        return True
+    except (pyhf.exceptions.ImportBackendError,pyhf.exceptions.InvalidBackend) as e:
+        print( f"[SModelS:pyhfInterface] WARNING could not set {backend} as the pyhf backend: {e}" )
+        print( f"[SModelS:pyhfInterface] falling back to {pyhfinfo['backend']}." )
+        # print("[SModelS:pyhfInterface] We however recommend that pytorch be installed.")
+    return False
 
-except pyhf.exceptions.ImportBackendError as e:
-    print(
-        "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default."
-    )
-    print("[SModelS:pyhfInterface] We however recommend that pytorch be installed.")
-    import numpy
-
-    pyhfinfo["backendver"] = numpy.version.full_version
-
-    warnings.filterwarnings("ignore", r"invalid value encountered in log")
+# setBackend ( "pytorch" )
 
 countWarning = {"llhdszero": 0}
 # Sets the maximum number of attempts for determining the brent bracketing interval for mu:
