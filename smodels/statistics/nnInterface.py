@@ -90,6 +90,11 @@ class NNUpperLimitComputer:
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
 
+        #if only_one_model:
+        #    skip_the_following
+        #for modelname,model in self.data.globalInfo.smYields.items():
+        #    compute_upper_limit(model)
+        #choose_most_sensitive_model
         
         syields = []
         for srname,smyield in self.data.globalInfo.smYields.items():
