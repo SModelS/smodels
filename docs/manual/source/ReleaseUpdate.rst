@@ -36,9 +36,9 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.0.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Made the :ref:`pyhf backend <parameterFilePyhfbackend>` configurable, defaulting to numpy, see also `pyhfInterface.setBackend <statistics.html#statistics.pyhfInterface.setBackend>`_
   * Bug fix for printing signal region combination results
   * Replaced algorithm for :ref:`clustering SMS <cluster>` for UL results by a modified minimum spanning tree algorithm
+  * Made the :ref:`pyhf backend <parameterFilePyhfbackend>` configurable, see also `pyhfInterface.setBackend <statistics.html#statistics.pyhfInterface.setBackend>`_
 
 New in Version 3.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
