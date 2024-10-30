@@ -56,12 +56,6 @@ pyhfinfo = {
 #    "required": "0.6.1", # the required pyhf version
 }
 
-"""
-if ver < pyhfinfo["required"]:
-    print(f"[SModelS:pyhfInterface] WARNING you are using pyhf v{str(ver)}" )
-    print(f"[SModelS:pyhfInterface] We recommend pyhf >= {str(required)}. Please try to update pyhf ASAP!")
-"""
-
 def setBackend ( backend : str ) -> bool:
     """ 
     try to setup backend to <backend>
