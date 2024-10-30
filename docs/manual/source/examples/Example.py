@@ -24,6 +24,8 @@ setLogLevel("info")
 # Set the path to the database
 import os
 
+from smodels.statistics.pyhfInterface import setBackend
+setBackend("pytorch") # set to one of: numpy (default), pytorch, tensorflow, jax. WARNING: if backend specified is not found, we fall back to numpy!
 
 def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
          database = 'official'):
@@ -40,9 +42,9 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
 
     model = Model(BSMparticles=BSMList, SMparticles=SMList)
     # Path to input file (either a SLHA or LHE file)
-#     lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
+    # lhefile = 'inputFiles/lhe/gluino_squarks.lhe'
     slhafile = os.path.abspath(inputFile)
-#     model.updateParticles(inputFile=lhefile)
+    # model.updateParticles(inputFile=lhefile)
     model.updateParticles(inputFile=slhafile,
                           ignorePromptQNumbers = ['eCharge','colordim','spin'])
 
