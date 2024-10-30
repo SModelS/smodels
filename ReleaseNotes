@@ -3,7 +3,7 @@ Release v3.0.1, Thu 31 Oct 2024
 
   * Bug fix for printing signal region combination results
   * New cluster algorithm (simpler and more stable)
-  * Made the pyhf backend configurable
+  * Made the pyhf backend configurable. WARNING: if backend specified is not found, we now fall back to numpy!
 
 Release v3.0.0, Tue 20 Aug 2024
 =======================================================

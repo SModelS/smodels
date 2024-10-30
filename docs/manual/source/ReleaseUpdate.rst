@@ -38,7 +38,7 @@ New in Version 3.0.1:
 
   * Bug fix for printing signal region combination results
   * Replaced algorithm for :ref:`clustering SMS <cluster>` for UL results by a modified minimum spanning tree algorithm
-  * Made the :ref:`pyhf backend <parameterFilePyhfbackend>` configurable, see also `pyhfInterface.setBackend <statistics.html#statistics.pyhfInterface.setBackend>`_
+  * Made the :ref:`pyhf backend <parameterFilePyhfbackend>` configurable, see also `pyhfInterface.setBackend <statistics.html#statistics.pyhfInterface.setBackend>`_. WARNING: if backend specified is not found, we now fall back to numpy!
 
 New in Version 3.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
