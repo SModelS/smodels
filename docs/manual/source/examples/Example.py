@@ -25,7 +25,9 @@ setLogLevel("info")
 import os
 
 from smodels.statistics.pyhfInterface import setBackend
-setBackend("pytorch") # set to one of: numpy (default), pytorch, tensorflow, jax. WARNING: if backend specified is not found, we fall back to numpy!
+# set pyhf backend to one of: numpy (default), pytorch, tensorflow, jax. 
+# WARNING: if backend specified is not found, we fall back to numpy!
+setBackend("pytorch")
 
 def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
          database = 'official'):
