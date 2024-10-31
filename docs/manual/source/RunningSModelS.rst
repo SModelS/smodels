@@ -138,6 +138,10 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **combineSRs** (True/False): set to True to combine signal regions in |EMrs| when covariance matrix or pyhf JSON likelihood is available. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards for covariance matrices and v1.2.4 onwards for full likelihoods (using pyhf).
 
+.. _parameterFilePyhfbackend:
+
+  * **pyhfbackend**: set to name of pyhf backend. Possible values are: numpy (default), pytorch, tensorflow, jax
+
 .. _parameterFileReportAllSRs:
 
   * **reportAllSRs** (True/False): set to True to report all signal regions, instead of the best signal region only. From v3.0.0 onwards it will also include the combined SRs if combineSRs=True. Beware, the output can be long.
@@ -395,11 +399,16 @@ Below we go step-by-step through this example code:
 .. literalinclude:: /examples/Example.py
    :lines: 16-25
 
+* *Define the pyhfbackend to use*. Specify which `pyhfbackend <statistics.html#statistics.pyhfInterface.setBackend>`_ to use. One of: numpy, pytorch, tensorflow, jax.
+
+.. literalinclude:: /examples/Example.py
+   :lines: 27-30
+
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
   to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 39-39
+   :lines: 38-39
 
 
 * *Load the BSM particles*. By default SModelS assumes the MSSM particle content. For using SModelS
@@ -407,7 +416,7 @@ Below we go step-by-step through this example code:
   to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 42-43
+   :lines: 41-43
 
 * *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file (must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
 

@@ -535,6 +535,12 @@ def getParameters(parameterFile):
         runtime.modelFile = parser.get("particles", "model")
     except:
         pass
+    try:
+        pyhfbackend = parser.get("options","pyhfbackend")
+        from smodels.statistics import pyhfInterface
+        r = pyhfInterface.setBackend ( pyhfbackend )
+    except:
+        pass
     return parser
 
 

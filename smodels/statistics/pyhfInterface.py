@@ -9,6 +9,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
 import jsonpatch
 import warnings
 import jsonschema
@@ -18,25 +19,23 @@ import numpy as np
 from smodels.base.smodelsLogging import logger
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", r"invalid value encountered in log")
 from typing import Dict, List
 
 jsonver = ""
 try:
     import importlib.metadata
 
-    jsonver = importlib.metadata.version("jsonschema")
+    jsonver = int(importlib.metadata.version("jsonschema")[0])
 except Exception as e:
     try:
         from jsonschema import __version__ as jsonver
     except Exception as e:
         pass
-if jsonver[0] == "2":
+if jsonver < 3:
     # if jsonschema.__version__[0] == "2": ## deprecated
-    print(
-        "[SModelS:pyhfInterface] jsonschema is version %s, we need > 3.x.x"
-        % (jsonschema.__version__)
-    )
+    print( f"[SModelS:pyhfInterface] jsonschema is version {jsonschema.__version__}, we need > 3.x.x" )
     sys.exit()
 
 import time, sys, os
@@ -47,36 +46,40 @@ except ModuleNotFoundError:
     print("[SModelS:pyhfInterface] pyhf import failed. Is the module installed?")
     sys.exit(-1)
 
-ver = pyhf.__version__.split(".")
-if ver[1] == "4" or (ver[1] == "5" and ver[2] in ["0", "1"]):
-    print("[SModelS:pyhfInterface] WARNING you are using pyhf v%s." % pyhf.__version__)
-    print("[SModelS:pyhfInterface] We recommend pyhf >= 0.5.2. Please try to update pyhf ASAP!")
+ver = pyhf.__version__
 
 pyhfinfo = {
     "backend": "numpy",
     "hasgreeted": False,
-    "backendver": "?",
+    "backendver": np.version.full_version,
     "ver": ver,
-    "required": "0.6.1".split("."),
+#    "required": "0.6.1", # the required pyhf version
 }
 
-try:
-    pyhf.set_backend(b"pytorch")
-    import torch
+def setBackend ( backend : str ) -> bool:
+    """ 
+    try to setup backend to <backend>
 
-    pyhfinfo["backend"] = "pytorch"
-    pyhfinfo["backendver"] = torch.__version__
+    :param backend: one of: numpy (default), pytorch, jax, tensorflow
+    :returns: True, if worked, False if failed
+    """
+    try:
+        pyhf.set_backend( backend )
+        pyhfinfo["backend"] = backend
+        pyhfinfo["backendver"] = "?"
+        module_name = backend
+        if backend == "pytorch":
+            module_name = "torch"
+        from importlib.metadata import version
+        pyhfinfo["backendver"] = version(module_name)
+        return True
+    except (pyhf.exceptions.ImportBackendError,pyhf.exceptions.InvalidBackend) as e:
+        print( f"[SModelS:pyhfInterface] WARNING could not set {backend} as the pyhf backend: {e}" )
+        print( f"[SModelS:pyhfInterface] falling back to {pyhfinfo['backend']}." )
+        # print("[SModelS:pyhfInterface] We however recommend that pytorch be installed.")
+    return False
 
-except pyhf.exceptions.ImportBackendError as e:
-    print(
-        "[SModelS:pyhfInterface] WARNING could not set pytorch as the pyhf backend, falling back to the default."
-    )
-    print("[SModelS:pyhfInterface] We however recommend that pytorch be installed.")
-    import numpy
-
-    pyhfinfo["backendver"] = numpy.version.full_version
-
-    warnings.filterwarnings("ignore", r"invalid value encountered in log")
+# setBackend ( "pytorch" )
 
 countWarning = {"llhdszero": 0}
 # Sets the maximum number of attempts for determining the brent bracketing interval for mu:
@@ -389,7 +392,7 @@ class PyhfUpperLimitComputer:
         self.alreadyBeenThere = (
             False  # boolean to detect wether self.signals has returned to an older value
         )
-        self.checkPyhfVersion()
+        # self.checkPyhfVersion()
         self.welcome()
 
     def welcome(self):
@@ -400,7 +403,7 @@ class PyhfUpperLimitComputer:
         if pyhfinfo["hasgreeted"]:
             return
         logger.info(
-            f"Pyhf interface, we are using v{'.'.join(pyhfinfo['ver'])}, with {pyhfinfo['backend']} v{pyhfinfo['backendver']} as backend."
+            f"Pyhf interface, we are using v{str(pyhfinfo['ver'])}, with {pyhfinfo['backend']} v{str(pyhfinfo['backendver'])} as backend."
         )
         pyhfinfo["hasgreeted"] = True
 
@@ -411,7 +414,7 @@ class PyhfUpperLimitComputer:
 
         if pyhfinfo["ver"] < pyhfinfo["required"]:
             logger.warning(
-                f"pyhf version is {'.'.join(pyhfinfo['ver'])}. SModelS currently requires pyhf>={'.'.join(pyhfinfo['required'])}. You have been warned."
+                f"pyhf version is {str(pyhfinfo['ver'])}. SModelS currently requires pyhf>={str(pyhfinfo['required'])}. You have been warned."
             )
 
     def rescale(self, factor):

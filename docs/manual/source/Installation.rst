@@ -19,6 +19,7 @@ SModelS is a Python library that requires Python version 3.6 or later. It depend
 
 .. include:: dependencies.rst
 
+For the pyhf backend, either one of pytorch, tensorflow, and jax can be used alternatively to the default numpy. In this case, the corresponding python module needs to be installed, and the :ref:`pyhfbackend <parameterFilePyhfbackend>` option needs to be configured accordingly (or a direct call of `pyhfInterface.setBackend <statistics.html#statistics.pyhfInterface.setBackend>`_ in case of python code)
 For performance reasons, we moreover recommend pytorch>=1.8.0 as backend for pyhf. This is, however, optional: if pytorch is not available, SModelS will use the default backend.
 
 In addition, the :ref:`cross section computers <xsecCalc>` provided by :ref:`smodelsTools.py <smodelsTools>`
