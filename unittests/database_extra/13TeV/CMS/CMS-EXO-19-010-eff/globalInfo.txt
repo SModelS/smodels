@@ -1,0 +1,13 @@
+id: CMS-EXO-19-010
+sqrts: 13*TeV
+lumi: 101.0/fb
+prettyName: disappearing track
+url: http://cms-results.web.cern.ch/cms-results/public-results/publications/EXO-19-010/
+arxiv: https://arxiv.org/abs/2004.05153
+publication: Phys. Lett. B 806 (2020) 135502
+contact: CMS collaboration
+comment: Combined datasets from the 2017, 20018A and 2018B runs. The chargino+chargino efficiencies were multiplied by 2, as instructed by private communications with the analysis authors.
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2021/5/18
+type: displaced

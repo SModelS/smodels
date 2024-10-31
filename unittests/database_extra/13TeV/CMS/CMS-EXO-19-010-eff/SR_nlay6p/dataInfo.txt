@@ -1,0 +1,7 @@
+dataId: SR_nlay6p
+dataType: efficiencyMap
+observedN: 9
+expectedBG: 14.2
+bgError: 1.9748417658131499
+upperLimit: 0.0602*fb
+expectedUpperLimit: 0.0983*fb
