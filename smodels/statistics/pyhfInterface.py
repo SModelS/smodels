@@ -905,6 +905,7 @@ class PyhfUpperLimitComputer:
                 else:
                     sigma_mu_temp = 1.
                     try:
+                        warnings.filterwarnings( "ignore", category=RuntimeWarning )
                         _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
@@ -913,6 +914,7 @@ class PyhfUpperLimitComputer:
                     if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
                         sigma_mu = sigma_mu_temp * self.scale
                     else:
+                        warnings.filterwarnings( "ignore", category=RuntimeWarning )
                         _, _, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, return_result_obj = True, method="L-BFGS-B" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
