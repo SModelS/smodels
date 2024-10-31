@@ -209,7 +209,7 @@ Hence, a measure of *distance* between two |SMS| can be defined using the relati
 
 .. math::
 
-   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{{\rm UL},a}-\sigma_{{\rm UL},b}|}{\sigma_{UL,a}+\sigma_{UL,b}}
+   \mbox{distance}(a,b) = d(a,b) = 2 \frac{|\sigma_{{\rm UL},a}-\sigma_{{\rm UL},b}|}{\sigma_{{\rm UL},a}+\sigma_{{\rm UL},b}}
    
 where :math:`\sigma_{{\rm UL},a}` (:math:`\sigma_{{\rm UL},b}`) is the cross section upper limit for |SMS| "a" ("b"). These upper limits are extracted from the :ref:`upper limit maps <ULtype>` and typically depend on the masses and widths of the BSM particles appearing in the |SMS|.
 Notice that the above definition of distance quantifies the experimental analysis' 
