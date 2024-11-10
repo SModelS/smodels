@@ -71,27 +71,37 @@ class Info(object):
                     continue
 
             self.cacheJsons()
-            self.cacheOnnx()
+            self.cacheOnnxes()
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False
         return True
 
-    def cacheOnnx(self):
-        """ if we have the "mlModel" attribute defined,
-            we cache the corresponding onnx. Needed when pickling """
-        if not hasattr(self, "mlModel"):
+    def cacheOnnxes(self):
+        """ if we have the "mlModels" attribute defined,
+            we cache the corresponding onnx files. Needed when pickling """
+        if not hasattr(self, "mlModels"):
             return
-        if hasattr(self, "onnx"):  # seems like we already have them
+        if hasattr(self, "onnxes"):  # seems like we already have them
             return
         dirp = os.path.dirname(self.path)
-        mlModel = os.path.join(dirp, self.mlModel)
-        with open ( mlModel, "rb" ) as f:
-            self.onnx = f.read()
+        print ( "mlModels", self.mlModels, type(self.mlModels) )
+        print ( "jsonFiles", self.jsonFiles.keys() )
+        mlModels = os.path.join(dirp, self.mlModels )
+        if type(mlModels ) in [ str ]:
+            jsonFileNames = list ( self.jsonFiles.keys() )
+            if len ( jsonFileNames ) == 1:
+                # allow shorthand notation for entries with only one json file
+                mlModels = { jsonFileNames[0]: mlModels }
+            else:
+                logger.error ( f"mlModels field in {dirp} is a string, but  {len(jsonFileNames)} json files are mentioned!" )
+                sys.exit(-1)
+        with open ( mlModels, "rb" ) as f:
+            self.onnxes = f.read()
             f.close()
         import onnx
-        m = onnx.load ( mlModel )
+        m = onnx.load ( mlModels )
         smYields, inputMeans, inputErrors = {}, [], []
         nll_exp_mu0, nll_obs_mu0 = None, None
         # smYields = []
