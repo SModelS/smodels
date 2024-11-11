@@ -86,8 +86,6 @@ class Info(object):
         if hasattr(self, "onnxes"):  # seems like we already have them
             return
         dirp = os.path.dirname(self.path)
-        print ( "mlModels", self.mlModels, type(self.mlModels) )
-        print ( "jsonFiles", self.jsonFiles.keys() )
         if type( self.mlModels ) in [ str ]:
             jsonFileNames = list ( self.jsonFiles.keys() )
             if len ( jsonFileNames ) == 1:
