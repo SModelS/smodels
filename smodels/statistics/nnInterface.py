@@ -88,13 +88,16 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
-    def determineMostSensitiveModel ( self, poi_test ):
+    def determineMostSensitiveModel ( self ):
         modelToUse = list(self.data.globalInfo.smYields.keys())[0]
         # print ( f"@@0 for now use first model {modelToUse}" )
         return modelToUse
 
-    def negative_log_likelihood(self, poi_test):
+    def negative_log_likelihood(self, poi_test,
+        modelToUse : Union[None,str] = None):
         """ the method that really wraps around the llhd computation.
+        :param modelToUse: if given, compute the nll for that model.
+        If None compute for most sensitive analysis.
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
@@ -102,8 +105,9 @@ class NNUpperLimitComputer:
         #for modelname,model in self.data.globalInfo.smYields.items():
         #    compute_upper_limit(model)
         #choose_most_sensitive_model
-        modelToUse = self.determineMostSensitiveModel ( poi_test )
-        
+        if modelToUse == None:
+            modelToUse = self.determineMostSensitiveModel ( )
+
         syields = []
         for srname,smyield in self.data.globalInfo.smYields[modelToUse].items():
             p1 = srname.rfind("-")
@@ -153,7 +157,8 @@ class NNUpperLimitComputer:
         logger.info( f"NN interface, we are using xxx" )
         nninfo["hasgreeted"] = True
 
-    def likelihood( self, mu=1.0, return_nll=False, expected=False):
+    def likelihood( self, mu=1.0, return_nll=False, expected=False,
+              modelToUse : Union[None,str] = None ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -162,8 +167,10 @@ class NNUpperLimitComputer:
         :param expected: if False, compute expected values, if True, \
             compute a priori expected, if "posteriori" compute posteriori \
             expected
+        :param modelToUse: if given, compute likelihood for that model.
+        If None compute for most sensitive analysis.
         """
-        ret = self.negative_log_likelihood(mu)
+        ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
         if mu==0.0 and expected:
             nll = ret['nll_exp_0']
         elif mu==0.0 and not expected:
@@ -174,7 +181,7 @@ class NNUpperLimitComputer:
             nll = ret['nll_obs_1']
         else:
             raise NotImplementedError(f'Request for {mu} received but only m=0 and mu=1 are implemented.')
-        
+
         logger.debug( f"Calling likelihood")
         return self.exponentiateNLL ( nll, not return_nll )
 
@@ -191,9 +198,10 @@ class NNUpperLimitComputer:
         return nll
 
     def lmax( self, return_nll=False, expected=False,
-              allowNegativeSignals=True ):
+              allowNegativeSignals=True,
+              modelToUse : Union[None,str] = None ):
         """
-        Returns the negative log max likelihood
+        Returns the (negative log) max likelihood
 
         :param return_nll: if true, return nll, not llhd
         :param expected: if False, compute expected values, if True,
@@ -201,15 +209,13 @@ class NNUpperLimitComputer:
         expected
         :param allowNegativeSignals: if False, then negative nsigs are
         replaced with 0.
+        :param modelToUse: if given, compute lmax for that model.
+        If None compute for most sensitive analysis.
         """
-        # allowNegativeSignals = True
-        # logger.error("expected flag needs to be heeded!!!")
-        # lmax, muhat, sigma_mu = float("nan"),float("nan"),float("nan")
-        # print( f"Calling lmax negativeSignals = {allowNegativeSignals}")
-        # print ( f"@@5 before minimize!" )
-
+        if modelToUse == None:
+            modelToUse = self.determineMostSensitiveModel ( )
         nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
-        def getNLL ( mu ): 
+        def getNLL ( mu ):
             d = self.negative_log_likelihood (mu)
             if mu==0.0 and expected:
                 nll = d['nll_exp_0']
@@ -219,7 +225,7 @@ class NNUpperLimitComputer:
                 nll = d['nll_exp_1']
             elif mu!=0.0 and not expected:
                 nll = d['nll_obs_1']
-        
+
             return nll
 
         ret = { "nll_min": nll0, "muhat": 0., "sigma_mu": 0. }
@@ -269,8 +275,8 @@ class NNUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
-    def getUpperLimitOnMu(self, expected=False,
-            allowNegativeSignals = False ):
+    def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False, 
+            modelToUse : Union[None,str] = None ):
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
@@ -287,33 +293,39 @@ class NNUpperLimitComputer:
         # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
         return mu_lim
 
-    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = True ) -> Tuple[float, float, Callable]:
+    def getCLsRootFunc(self, expected: bool = False, 
+            allowNegativeSignals : bool = True,
+            modelToUse : Union[None,str] = None ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
         :param expected: if True, compute expected likelihood, else observed
+        :param modelToUse: if given, compute the nll for that model.
+        If None compute for most sensitive analysis.
         """
-        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
+        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
         mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
-        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
+        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True,
+                modelToUse = modelToUse )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True)
+                             return_nll=True, modelToUse = modelToUse )
         _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
 
-        def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
+        def clsRoot( mu: float, return_type: Text = "CLs-alpha", 
+                     modelToUse : Union[None,str] = None ) -> float:
             # at - infinity this should be .95,
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, expected=expected)
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True)
+            nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
+            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, modelToUse = modelToUse )
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
         return mu_hat, sigma_mu, clsRoot
