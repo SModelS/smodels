@@ -88,6 +88,11 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
+    def determineMostSensitiveModel ( self, poi_test ):
+        modelToUse = list(self.data.globalInfo.smYields.keys())[0]
+        # print ( f"@@0 for now use first model {modelToUse}" )
+        return modelToUse
+
     def negative_log_likelihood(self, poi_test):
         """ the method that really wraps around the llhd computation.
 
@@ -97,8 +102,7 @@ class NNUpperLimitComputer:
         #for modelname,model in self.data.globalInfo.smYields.items():
         #    compute_upper_limit(model)
         #choose_most_sensitive_model
-        modelToUse = list(self.data.globalInfo.smYields.keys())[0]
-        print ( f"@@0 for now use first model {modelToUse}" )
+        modelToUse = self.determineMostSensitiveModel ( poi_test )
         
         syields = []
         for srname,smyield in self.data.globalInfo.smYields[modelToUse].items():
