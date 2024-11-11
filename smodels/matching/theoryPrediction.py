@@ -167,7 +167,7 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
-            if hasattr(self.dataset.globalInfo, "mlModel"):
+            if hasattr(self.dataset.globalInfo, "mlModels"):
                 # Get computer
                 computer = StatsComputer.forNNs(dataset=self.dataset,
                                               nsig=srNsigDict,
