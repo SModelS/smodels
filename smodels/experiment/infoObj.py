@@ -88,43 +88,51 @@ class Info(object):
         dirp = os.path.dirname(self.path)
         print ( "mlModels", self.mlModels, type(self.mlModels) )
         print ( "jsonFiles", self.jsonFiles.keys() )
-        mlModels = os.path.join(dirp, self.mlModels )
-        if type(mlModels ) in [ str ]:
+        if type( self.mlModels ) in [ str ]:
             jsonFileNames = list ( self.jsonFiles.keys() )
             if len ( jsonFileNames ) == 1:
+                jsonFileName = jsonFileNames[0]
+                onnxFile = jsonFileName.replace(".json",".onnx")
+                fullPath = os.path.join(dirp, onnxFile )
+                if not os.path.exists ( fullPath ):
+                    onnxFile = "model.onnx" ## fall back to standard name
                 # allow shorthand notation for entries with only one json file
-                mlModels = { jsonFileNames[0]: mlModels }
+                self.mlModels = { jsonFileName: onnxFile }
             else:
                 logger.error ( f"mlModels field in {dirp} is a string, but  {len(jsonFileNames)} json files are mentioned!" )
                 sys.exit(-1)
-        with open ( mlModels, "rb" ) as f:
-            self.onnxes = f.read()
-            f.close()
-        import onnx
-        m = onnx.load ( mlModels )
-        smYields, inputMeans, inputErrors = {}, [], []
-        nll_exp_mu0, nll_obs_mu0 = None, None
-        # smYields = []
-        import json
-        for em in m.metadata_props:
-            if em.key == "bkg_yields":
-                st = eval(em.value)
-                for l in st:
-                    smYields[ l[0] ] = l[1]
-                #    smYields.append ( l[1] )
-            if em.key == "standardization_mean":
-                inputMeans = eval(em.value)
-            elif em.key == "standardization_std":
-                inputErrors = eval(em.value)
-            elif em.key == 'nLL_exp_mu0':
-                nll_exp_mu0 = json.loads(em.value)
-            elif em.key == 'nLL_obs_mu0':
-                nll_obs_mu0 = json.loads(em.value)
-        self.smYields = smYields
-        self.inputMeans = inputMeans
-        self.inputErrors = inputErrors
-        self.nll_exp_mu0 = nll_exp_mu0
-        self.nll_obs_mu0 = nll_obs_mu0
+        self.onnxes, self.smYields, self.inputMeans = {}, {}, {}
+        self.inputErrors, self.nll_exp_mu0, self.nll_obs_mu0 = {}, {}, {}
+        for jsonfilename, onnxFile in self.mlModels.items():
+            fullPath = os.path.join(dirp, onnxFile )
+            with open ( fullPath, "rb" ) as f:
+                self.onnxes[jsonfilename] = f.read()
+                f.close()
+            import onnx
+            m = onnx.load ( fullPath )
+            smYields, inputMeans, inputErrors = {}, [], []
+            nll_exp_mu0, nll_obs_mu0 = None, None
+            # smYields = []
+            import json
+            for em in m.metadata_props:
+                if em.key == "bkg_yields":
+                    st = eval(em.value)
+                    for l in st:
+                        smYields[ l[0] ] = l[1]
+                    #    smYields.append ( l[1] )
+                if em.key == "standardization_mean":
+                    inputMeans = eval(em.value)
+                elif em.key == "standardization_std":
+                    inputErrors = eval(em.value)
+                elif em.key == 'nLL_exp_mu0':
+                    nll_exp_mu0 = json.loads(em.value)
+                elif em.key == 'nLL_obs_mu0':
+                    nll_obs_mu0 = json.loads(em.value)
+            self.smYields[jsonfilename] = smYields
+            self.inputMeans[jsonfilename] = inputMeans
+            self.inputErrors[jsonfilename] = inputErrors
+            self.nll_exp_mu0[jsonfilename] = nll_exp_mu0
+            self.nll_obs_mu0[jsonfilename] = nll_obs_mu0
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
