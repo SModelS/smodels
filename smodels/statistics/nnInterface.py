@@ -255,18 +255,21 @@ class NNUpperLimitComputer:
 
         return ret
 
-    def getUpperLimitOnSigmaTimesEff(self, expected=False ):
+    def getUpperLimitOnSigmaTimesEff(self, expected=False,
+            modelToUse : Union[None,str] = None ):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
 
         :param expected:  - if set to 'True': uses expected SM backgrounds as signals
                           - else: uses 'self.nsignals'
+        :param modelToUse: if given, compute the nll for that model.
+        If None compute for most sensitive analysis.
         :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
         if self.data.totalYield == 0.:
             return None
         else:
-            ul = self.getUpperLimitOnMu( expected=expected )
+            ul = self.getUpperLimitOnMu( expected=expected, modelToUse=modelToUse )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -283,10 +286,13 @@ class NNUpperLimitComputer:
 
         :param expected:  - if set to 'True': uses expected SM backgrounds as signals
                           - else: uses 'self.nsignals'
+        :param modelToUse: if given, compute the nll for that model.
+        If None compute for most sensitive analysis.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
-                              allowNegativeSignals=allowNegativeSignals)
+                              allowNegativeSignals=allowNegativeSignals,
+                              modelToUse = modelToUse)
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
