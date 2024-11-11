@@ -88,10 +88,23 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
-    def determineMostSensitiveModel ( self ):
-        modelToUse = list(self.data.globalInfo.smYields.keys())[0]
+    def getMostSensitiveModel ( self ):
+        if hasattr ( self, "mostSensitiveModel" ):
+            return self.mostSensitiveModel
+        jsonfiles = list(self.data.globalInfo.smYields.keys())
+        if len(jsonfiles)==1:
+            self.mostSensitiveModel = jsonfiles[0]
+            return self.mostSensitiveModel
+        mumin,modelToUse=float("inf"),None
+        for model in jsonfiles:
+            mu = model.getUpperLimitOnMu ( expected=True, modelToUse = model )
+            if mu < mumin:
+                modelToUse = model
+                mumin = mu
+        self.mostSensitiveModel = modelToUse
+        self.mumin = mumin
         # print ( f"@@0 for now use first model {modelToUse}" )
-        return modelToUse
+        return self.mostSensitiveModel
 
     def negative_log_likelihood(self, poi_test,
         modelToUse : Union[None,str] = None):
@@ -106,7 +119,7 @@ class NNUpperLimitComputer:
         #    compute_upper_limit(model)
         #choose_most_sensitive_model
         if modelToUse == None:
-            modelToUse = self.determineMostSensitiveModel ( )
+            modelToUse = self.getMostSensitiveModel ( )
 
         syields = []
         for srname,smyield in self.data.globalInfo.smYields[modelToUse].items():
@@ -213,7 +226,7 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         """
         if modelToUse == None:
-            modelToUse = self.determineMostSensitiveModel ( )
+            modelToUse = self.getMostSensitiveModel ( )
         nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
         def getNLL ( mu ):
             d = self.negative_log_likelihood (mu)
@@ -279,7 +292,7 @@ class NNUpperLimitComputer:
             return ul * xsec
 
     def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False, 
-            modelToUse : Union[None,str] = None ):
+            modelToUse : Union[None,str] = None ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
@@ -290,6 +303,10 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
+        if modelToUse == None:
+            if hasattr ( self, "mumin" ):
+                return self.mumin
+            modelToUse = self.getMostSensitiveModel()
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                               allowNegativeSignals=allowNegativeSignals,
                               modelToUse = modelToUse)
