@@ -25,7 +25,6 @@ class NNData:
     """
     Holds data for use in the machine learned models
     :ivar nsignals: signal predictions list divided into sublists, one for each json file
-    :ivar mlModel: path to onnx model file
     """
 
     def __init__(self, nsignals, dataObject ):
@@ -67,12 +66,17 @@ class NNUpperLimitComputer:
 
         self.data = data
         import onnxruntime
-        self.regressor = onnxruntime.InferenceSession ( self.data.globalInfo.onnx )
+        self.regressors = {}
+        for jsonfilename,onnx in self.data.globalInfo.onnxes.items():
+            sess = onnxruntime.InferenceSession (  onnx )
+            self.regressors[jsonfilename]={"session": sess,
+                "dim": sess.get_inputs()[0].shape[1] }
+        #self.regressor = onnxruntime.InferenceSession ( self.data.globalInfo.onnx )
         # store the dimensionality of the input vector that the model
         # asks us to. this may be different from the number of our
         # signal regions, as control regions may have been added.
         # we will pad with zeroes
-        self.regressor_dim = self.regressor.get_inputs()[0].shape[1]
+        # self.regressor_dim = self.regressor.get_inputs()[0].shape[1]
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug("Signals : {}".format(self.nsignals))
@@ -90,14 +94,14 @@ class NNUpperLimitComputer:
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
 
-        #if only_one_model:
-        #    skip_the_following
         #for modelname,model in self.data.globalInfo.smYields.items():
         #    compute_upper_limit(model)
         #choose_most_sensitive_model
+        modelToUse = list(self.data.globalInfo.smYields.keys())[0]
+        print ( f"@@0 for now use first model {modelToUse}" )
         
         syields = []
-        for srname,smyield in self.data.globalInfo.smYields.items():
+        for srname,smyield in self.data.globalInfo.smYields[modelToUse].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
             # ic ( realname )
@@ -114,21 +118,21 @@ class NNUpperLimitComputer:
 
         for i,x in enumerate(scaled_signal_yields[0]):
             t = 0. # x
-            err = self.data.globalInfo.inputErrors[i]
+            err = self.data.globalInfo.inputErrors[modelToUse][i]
             if err > 1e-20:
-                t = (x - self.data.globalInfo.inputMeans[i])/err
+                t = (x - self.data.globalInfo.inputMeans[modelToUse][i])/err
             #else:
             #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_signal_yields[0][i]=t
 
-        arr = self.regressor.run(None, {"input_1":scaled_signal_yields})
+        arr = self.regressors[modelToUse]["session"].run(None, {"input_1":scaled_signal_yields})
         arr = arr[0][0]
-        nll0obs =  self.data.globalInfo.nll_obs_mu0
-        nll0exp =  self.data.globalInfo.nll_exp_mu0
-        expDelta = self.data.globalInfo.inputMeans[-2]
-        obsDelta = self.data.globalInfo.inputMeans[-1]
-        expErr = self.data.globalInfo.inputErrors[-2]
-        obsErr = self.data.globalInfo.inputErrors[-1]
+        nll0obs =  self.data.globalInfo.nll_obs_mu0[modelToUse]
+        nll0exp =  self.data.globalInfo.nll_exp_mu0[modelToUse]
+        expDelta = self.data.globalInfo.inputMeans[modelToUse][-2]
+        obsDelta = self.data.globalInfo.inputMeans[modelToUse][-1]
+        expErr = self.data.globalInfo.inputErrors[modelToUse][-2]
+        obsErr = self.data.globalInfo.inputErrors[modelToUse][-1]
         nll1exp = nll0exp + arr[0]*expErr + expDelta
         nll1obs = nll0obs + arr[1]*obsErr + obsDelta
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
