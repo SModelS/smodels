@@ -95,13 +95,13 @@ class Info(object):
                 if not os.path.exists ( fullPath ):
                     onnxFile = "model.onnx" ## fall back to standard name
                 # allow shorthand notation for entries with only one json file
-                self.mlModels = { jsonFileName: onnxFile }
+                self.mlModels = { onnxFile: jsonFileName }
             else:
                 logger.error ( f"mlModels field in {dirp} is a string, but  {len(jsonFileNames)} json files are mentioned!" )
                 sys.exit(-1)
         self.onnxes, self.smYields, self.inputMeans = {}, {}, {}
         self.inputErrors, self.nll_exp_mu0, self.nll_obs_mu0 = {}, {}, {}
-        for jsonfilename, onnxFile in self.mlModels.items():
+        for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
             with open ( fullPath, "rb" ) as f:
                 self.onnxes[jsonfilename] = f.read()
