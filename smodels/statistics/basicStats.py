@@ -16,6 +16,27 @@ from typing import Text
 
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 
+def CLsfromLsb( nll_sb: float, nll_b: float, 
+    sigma2_sb : float, sigma2_b : float ) -> float:
+    """ given nll_sb and nll_b, plus the sigma**2 values around muhat,
+    compute the CLs value, according to section 3.8 in the CCGV paper,
+    tevatron style, https://arxiv.org/pdf/1007.1727.
+
+    :param nll_sb: negative log likelihood of s+b
+    :param nll_b: negative log likelihood of b
+    :param sigma2_sb: sigma**2 of s+b at muhat
+    :param sigma2_b: sigma**2 of b at muhat
+
+    :returns: CLs value i.e. P(s+b)/(1-P(b))
+    """
+    q = 2 * nll_sb - 2 * nll_b # equation 71
+    psb = 1 - stats.norm.cdf( ( q + 1. / sigma2_sb ) * np.sqrt(sigma2_sb) / 2. )
+    # equation 75
+    pb = 1 - stats.norm.cdf( ( q - 1. / sigma2_b ) * np.sqrt(sigma2_b) / 2. )
+    # equation 76
+    CLs = psb / ( 1 - pb )
+    return CLs
+
 def CLsfromNLL(
     nllA: float, nll0A: float, nll: float, nll0: float,
     return_type: Text = "CLs-alpha" ) -> float:
@@ -23,10 +44,10 @@ def CLsfromNLL(
     compute the CLs - alpha from the NLLs
     TODO: following needs explanation
 
-    :param nllA:
-    :param nll0A:
-    :param nll:
-    :param nll0:
+    :param nllA: negative log likelihood of the Asimov data
+    :param nll0A: minimum negative log likelihood of the Asimov data
+    :param nll: negative log likelihood, observed
+    :param nll0: minimum negative log likelihood, observed
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
