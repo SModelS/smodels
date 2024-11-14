@@ -317,7 +317,7 @@ class NNUpperLimitComputer:
         return mu_lim
 
 
-    def getVarForMu ( self, mu ):
+    def getVarForMu ( self, mu : float ) -> float:
         """ get the variance around mu """
         # np.diff(np.diff([x*x for x in range(0,10)]))
         # print ( f"@@1 getVarForMu {mu}" )
