@@ -291,7 +291,7 @@ class NNUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
-    def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False, 
+    def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False,
             modelToUse : Union[None,str] = None ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
@@ -328,7 +328,7 @@ class NNUpperLimitComputer:
         # print ( "hessian", hessian )
         return 1./hessian
 
-    def getCLsRootFunc(self, expected: bool = False, 
+    def getCLsRootFunc(self, expected: bool = False,
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None ) -> Tuple[float, float, Callable]:
         """
@@ -353,7 +353,7 @@ class NNUpperLimitComputer:
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
 
-        def clsRoot( mu: float, return_type: Text = "CLs-alpha", 
+        def clsRootTevatron( mu: float, return_type: Text = "CLs-alpha",
                      modelToUse : Union[None,str] = None ) -> float:
             # at - infinity this should be .95,
             # at + infinity it should -.05
@@ -370,7 +370,7 @@ class NNUpperLimitComputer:
             CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type=return_type)
             return CLs
 
-        def clsRootAsimov( mu: float, return_type: Text = "CLs-alpha", 
+        def clsRootAsimov( mu: float, return_type: Text = "CLs-alpha",
                      modelToUse : Union[None,str] = None ) -> float:
             # at - infinity this should be .95,
             # at + infinity it should -.05
@@ -381,6 +381,7 @@ class NNUpperLimitComputer:
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
 
+        # return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootAsimov
 
 
