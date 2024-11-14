@@ -1049,7 +1049,7 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def clsRootTevatron(mu, expected : bool ):
+            def clsRootTevatron(mu : float ) -> float:
                 """ compute CLs, the tevatron way. """
                 nll_sb = self.likelihood ( mu, expected = expected, return_nll=True )
                 nll_b = self.likelihood ( 0, expected = expected, return_nll=True )
@@ -1059,7 +1059,7 @@ class PyhfUpperLimitComputer:
                 CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type="CLs" )
                 return 1.0 - self.cl - CLs
 
-            def clsRootPyhf(mu):
+            def clsRootPyhf(mu : float ) -> float :
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -1122,6 +1122,12 @@ class PyhfUpperLimitComputer:
                     """
                     return ret
 
+
+            def clsRoot ( mu : float ):
+                """ central 'switch' for how to compute cls """
+                return clsRootPyhf(mu)
+
+
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
             wereBothLarge = False
@@ -1143,9 +1149,9 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = clsRootPyhf(lo_mu)
+                rt1 = clsRoot(lo_mu)
                 # rt5 = root_func(med_mu)
-                rt10 = clsRootPyhf(hi_mu)
+                rt10 = clsRoot(hi_mu)
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1153,7 +1159,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = clsRootPyhf(med_mu)
+                    rt5 = clsRoot(med_mu)
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1165,7 +1171,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = clsRootPyhf(med_mu)
+                    rt5 = clsRoot(med_mu)
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1196,7 +1202,7 @@ class PyhfUpperLimitComputer:
             # Finding the root (Brent bracketing part)
             logger.debug("Final scale : %f" % self.scale)
             logger.debug("Starting brent bracketing")
-            ul = optimize.brentq(clsRootPyhf, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
             ul = ul * self.scale
