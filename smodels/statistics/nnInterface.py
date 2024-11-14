@@ -319,7 +319,14 @@ class NNUpperLimitComputer:
 
     def getVarForMu ( self, mu ):
         """ get the variance around mu """
-        return 1.
+        # np.diff(np.diff([x*x for x in range(0,10)]))
+        # print ( f"@@1 getVarForMu {mu}" )
+        # print ( f"@@1 nll={self.negative_log_likelihood ( mu )}" )
+        dx = 1e-3
+        hessian = np.diff ( np.diff ( [ self.negative_log_likelihood(x)["nll_obs_1"] for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
+        hessian = np.mean ( hessian ) / dx /dx
+        # print ( "hessian", hessian )
+        return 1./hessian
 
     def getCLsRootFunc(self, expected: bool = False, 
             allowNegativeSignals : bool = True,
@@ -360,9 +367,8 @@ class NNUpperLimitComputer:
             if nll_sb is None:
                 return None
             sigma2_sb = self.getVarForMu ( 1. )
-            print ( "sigma2_sb", sigma2_sb )
-            sys.exit()
-            return CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type=return_type)
+            CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type=return_type)
+            return CLs
 
         def clsRootAsimov( mu: float, return_type: Text = "CLs-alpha", 
                      modelToUse : Union[None,str] = None ) -> float:
