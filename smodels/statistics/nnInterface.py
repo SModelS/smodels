@@ -14,7 +14,7 @@ import numpy as np
 import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL
+from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, CLsfromLsb
 from scipy import optimize
 
 nninfo = {
@@ -316,6 +316,11 @@ class NNUpperLimitComputer:
         # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
         return mu_lim
 
+
+    def getVarForMu ( self, mu ):
+        """ get the variance around mu """
+        return 1.
+
     def getCLsRootFunc(self, expected: bool = False, 
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None ) -> Tuple[float, float, Callable]:
@@ -347,11 +352,30 @@ class NNUpperLimitComputer:
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
+            nll_b = self.likelihood(0., return_nll=True, expected=expected, modelToUse = modelToUse )
+            if nll_b is None:
+                return None
+            sigma2_b = self.getVarForMu ( 0. )
+            nll_sb = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
+            if nll_sb is None:
+                return None
+            sigma2_sb = self.getVarForMu ( 1. )
+            print ( "sigma2_sb", sigma2_sb )
+            sys.exit()
+            return CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type=return_type)
+
+        def clsRootAsimov( mu: float, return_type: Text = "CLs-alpha", 
+                     modelToUse : Union[None,str] = None ) -> float:
+            # at - infinity this should be .95,
+            # at + infinity it should -.05
+            # Make sure to always compute the correct llhd value (from theoryPrediction)
+            # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             nllA = self.likelihood(mu, expected="posteriori", return_nll=True, modelToUse = modelToUse )
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
-        return mu_hat, sigma_mu, clsRoot
+
+        return mu_hat, sigma_mu, clsRootAsimov
 
 
     def transform ( self, expected : Union [ Text, bool ] ):

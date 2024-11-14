@@ -17,17 +17,22 @@ from typing import Text
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 
 def CLsfromLsb( nll_sb: float, nll_b: float, 
-    sigma2_sb : float, sigma2_b : float ) -> float:
+    sigma2_sb : float, sigma2_b : float, return_type: Text = "CLs-alpha" ) -> float:
     """ given nll_sb and nll_b, plus the sigma**2 values around muhat,
-    compute the CLs value, according to section 3.8 in the CCGV paper,
-    tevatron style, https://arxiv.org/pdf/1007.1727.
+    compute the CLs value, i.e. P(s+b)/(1-P(b)) according to section 3.8 
+    in the CCGV paper, tevatron style, https://arxiv.org/pdf/1007.1727.
 
     :param nll_sb: negative log likelihood of s+b
     :param nll_b: negative log likelihood of b
     :param sigma2_sb: sigma**2 of s+b at muhat
     :param sigma2_b: sigma**2 of b at muhat
 
-    :returns: CLs value i.e. P(s+b)/(1-P(b))
+    :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
+                        CLs-alpha: returns CLs - 0.05 \
+                        1-CLs: returns 1-CLs value \
+                        CLs: returns CLs value
+
+    :returns: see return_type
     """
     q = 2 * nll_sb - 2 * nll_b # equation 71
     psb = 1 - stats.norm.cdf( ( q + 1. / sigma2_sb ) * np.sqrt(sigma2_sb) / 2. )
@@ -35,7 +40,11 @@ def CLsfromLsb( nll_sb: float, nll_b: float,
     pb = 1 - stats.norm.cdf( ( q - 1. / sigma2_b ) * np.sqrt(sigma2_b) / 2. )
     # equation 76
     CLs = psb / ( 1 - pb )
-    return CLs
+    if return_type == "1-CLs":
+        return 1.0 - CLs
+    elif return_type == "CLs":
+        return CLs
+    return CLs - 0.05
 
 def CLsfromNLL(
     nllA: float, nll0A: float, nll: float, nll0: float,
