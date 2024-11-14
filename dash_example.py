@@ -9,7 +9,6 @@
 from smodels.matching.modelTester import getParameters,loadDatabase,loadDatabaseResults,testPoint
 from dash import Dash, dcc, html, Input, Output, callback, dash_table
 import numpy as np
-import json
 
 
 def setLayout(app,theoryPredictions,fname):
@@ -80,14 +79,7 @@ def setLayout(app,theoryPredictions,fname):
                     ],
         style={'width': '49%', 'display': 'inline-block'}
         ),
-        html.Div([
-            dcc.Markdown("""
-                **Click Data**
-
-                Click on points in the graph.
-            """),
-            html.Pre(id='click-data'),
-        ], className='three columns'),
+        
     ],
     style={'padding': '10px 25px'})
 
@@ -116,17 +108,19 @@ theoryPredictions = sorted(theoryPredictions, key = lambda tp: tp.getRValue(), r
 
 app = Dash(__name__)
 app = setLayout(app,theoryPredictions,fname)
-app.run_server(debug=True)
 
 @callback(
     Output('analysis-data', 'data'),
-    Input('rvaluesGraph', 'hoverData'))
-def update_table(hoverData):
-    anaID = hoverData['points'][0]['x']
-    print(anaID)
-    for tp in theoryPredictions:
-        if tp.analysisId() == anaID:
-            break
+    Input('rvaluesGraph', 'clickData'))
+def update_table(clickData):
+    if clickData is None:
+        tp = theoryPredictions[0]
+    else:
+        anaID = clickData['points'][0]['x']
+        for tp in theoryPredictions:
+            if tp.analysisId() == anaID:
+                break
+
     tp_table = [{"ID" : tp.analysisId(), 
                 "DataSet" : tp.dataset.getID(),
                 "r(obs)" : tp.getRValue(),
@@ -136,9 +130,7 @@ def update_table(hoverData):
 
     return tp_table
 
-@callback(
-    Output('click-data', 'children'),
-   Input('rvaluesGraph', 'clickData'))
-def display_click_data(clickData):
-    return json.dumps(clickData, indent=2)
 
+
+if __name__ == '__main__':
+    app.run(debug=True)
