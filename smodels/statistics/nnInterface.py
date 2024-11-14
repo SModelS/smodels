@@ -324,9 +324,13 @@ class NNUpperLimitComputer:
         # print ( f"@@1 nll={self.negative_log_likelihood ( mu )}" )
         dx = 1e-3
         hessian = np.diff ( np.diff ( [ self.negative_log_likelihood(x)["nll_obs_1"] for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
-        hessian = np.mean ( hessian ) / dx /dx
-        # print ( "hessian", hessian )
-        return 1./hessian
+        h = hessian[hessian>0.] # if only some are negative, remove them
+        if len(h)==0: # if all are negative, invert them
+            h = np.abs ( hessian )
+        h = np.mean ( h ) / dx /dx
+        #if h < 0.:
+        #    print ( f"@@X hessians {h} {hessian}" )
+        return 1./h
 
     def getCLsRootFunc(self, expected: bool = False,
             allowNegativeSignals : bool = True,
