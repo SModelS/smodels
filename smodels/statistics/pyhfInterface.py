@@ -998,9 +998,13 @@ class PyhfUpperLimitComputer:
         # print ( f"@@1 nll={self.negative_log_likelihood ( mu )}" )
         dx = 1e-3
         hessian = np.diff ( np.diff ( [ self.likelihood(x, return_nll = True ) for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
-        hessian = np.mean ( hessian ) / dx /dx
-        # print ( "hessian", hessian )
-        return 1./hessian
+        h = hessian[hessian>0.] # if only some are negative, remove them
+        if len(h)==0: # if all are negative, invert them
+            h = np.abs ( hessian )
+        h = np.mean ( h ) / dx /dx
+        #if h < 0.:
+        #    print ( f"@@X hessians {h} {hessian}" )
+        return 1./h
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
@@ -1125,7 +1129,14 @@ class PyhfUpperLimitComputer:
 
             def clsRoot ( mu : float ):
                 """ central 'switch' for how to compute cls """
-                return clsRootPyhf(mu)
+                pyhf = clsRootPyhf(mu)
+                return pyhf
+                tevatron0 = clsRootTevatron(mu)
+                return tevatron0
+                tevatron = clsRootTevatron(mu)
+                tevatron1 = clsRootTevatron(1.)
+                print ( f"@@0 tevatron0 {tevatron0}" )
+                print ( f"@@0 pyhf {pyhf} {tevatron} {tevatron1}" )
 
 
             # Rescaling signals so that mu is in [0, 10]
