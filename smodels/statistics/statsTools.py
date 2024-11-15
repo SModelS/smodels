@@ -228,29 +228,44 @@ class StatsComputer:
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( )
 
+    def addRegionsForNN ( self, regions : dict, translator : dict,
+                          nsignals : dict ):
+        """ for neural networks, add the regions information contained 
+        in dict to translator, and to nsignals
+        """
+        for region in regions:
+            nsignals[ region["onnx"] ] = 0.
+            if region["smodels"] != None:
+                # jsonDictNames[jsName].append ( region["smodels"] )
+                translator[ region["smodels"] ] = region["onnx"]
+
     def getComputerNN(self ):
         """
         Create computer for a machine learned model
         """
         globalInfo = self.dataObject.globalInfo
+        mlModels = globalInfo.mlModels
+        jsonFiles = globalInfo.jsonFiles
         nsignals = {}
         translator = {}
-        for jsName in globalInfo.jsonFiles.keys():
-            for region in globalInfo.jsonFiles[jsName]:
-                nsignals[ region["pyhf"] ] = 0.
-                if region["smodels"] != None:
-                    # jsonDictNames[jsName].append ( region["smodels"] )
-                    translator[ region["smodels"] ] = region["pyhf"]
-        """
-        from icecream import ic
-        ic ( "--A" )
-        ic ( translator )
-        ic ( self.nsig )
-        ic ( globalInfo.jsonFiles[jsName] )
-        """
+        import sys
+        for mlModel, pointer in mlModels.items():
+            # mlModel is e.g. model.onnx, pointer is either SRcombined.json
+            # or directly the list of SRs, like in jsonFiles
+            if type(pointer) in [ str ]:
+                if pointer not in globalInfo.jsonFiles.keys():
+                    logger.error ( f"no '{pointer}' defined in 'jsonFiles'!" )
+                    sys.exit(-1)
+                ## pointer is e.g. SRcombined.json
+                self.addRegionsForNN ( jsonFiles[pointer], translator, nsignals )
+            elif type(pointer) in [ list ]:
+                self.addRegionsForNN ( pointer, translator, nsignals )
+            else:
+                logger.error ( f"type of {pointer} is {type(pointer)}: dont know what to do." )
+                sys.exit(-1)
         ## translate the signal from smodels names to pyhf names
-        for smname,pyhname in translator.items():
-            nsignals[pyhname] = self.nsig[smname]
+        for smname,pyhfname in translator.items():
+            nsignals[pyhfname] = self.nsig[smname]
         # ic ( nsignals )
         data = NNData( nsignals, self.dataObject )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )

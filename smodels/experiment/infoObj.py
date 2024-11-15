@@ -18,9 +18,37 @@ from smodels.base.smodelsLogging import logger
 class Info(object):
     """
     Holds the meta data information contained in a .txt file
-    (luminosity, sqrts, experimentID,...). Its attributes are generated according to the lines in the
-    .txt file which contain "info_tag: value".
+    (luminosity, sqrts, experimentID,...). Its attributes are generated according 
+    to the lines in the .txt file which contain "info_tag: value".
     """
+
+    def canonizeRegions ( self, regions : list, forNN : bool = False ) -> list:
+        """ given a list of regions in globalInfo.txt in any of the 
+        jsonFiles, jsonFiles_FullLikelihood, or mlModels fields,
+        return a canonical version of that list: strings in
+        that list get transformed into dictionaries, if region type is
+        missing, "SR" is assumed. if the "smodels" counterpart is not
+        given for a region, we assume that there is None.
+
+        :param regions: list of regions in globalInfo.txt
+        :param forNN: if true, then also possibly translate "pyhf" fields into
+        "onnx" field
+        :returns: canonical list of regions
+        """
+        newregions = []
+        for region in regions:
+            if type(region)==str:
+                region={"smodels": region}
+            if not "type" in region:
+                region["type"]="SR"
+            if not "smodels" in region:
+                region["smodels"]=None
+            if forNN:
+                if not "onnx" in region and "pyhf" in region:
+                    region["onnx"]=region["pyhf"]
+                    region.pop("pyhf")
+            newregions.append ( region )
+        return newregions
 
     def __init__(self, path=None):
         """
@@ -42,33 +70,45 @@ class Info(object):
 
             # Get tags in info file:
             tags = [line.split(':', 1)[0].strip() for line in content]
+            modelsLine = None # the mlModels line needs to be parsed
+            ## after the jsonFiles line
             for i, tag in enumerate(tags):
                 if not tag:
                     continue
-                if tag.startswith("# "):  # a comment!
+                if tag.startswith("#"):  # a comment!
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
+                if tag == "mlModels":
+                    modelsLine = value
+                    continue
                 if tag in [ "jsonFiles", "jsonFiles_FullLikelihood" ]:
                     jsonFiles = eval(value)
                     for jsonFileName,regions in jsonFiles.items():
-                        newregions = []
-                        for region in regions:
-                            if type(region)==str:
-                                region={"smodels": region}
-                            if not "type" in region:
-                                region["type"]="SR"
-                            if not "smodels" in region:
-                                region["smodels"]=None
-                            newregions.append ( region )
+                        newregions = self.canonizeRegions ( regions, forNN=False )
                         jsonFiles[jsonFileName] = newregions
                     value = str(jsonFiles)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
                 else:
-                    logger.info("Ignoring unknown field %s found in file %s"
-                                % (tag, self.path))
+                    logger.info(f"Ignoring unknown field {tag} found in file {self.path}" )
                     continue
+            ## only now add the mlModels field
+            if modelsLine != None:
+                mlModels = eval(modelsLine)
+                if type(mlModels)==str:
+                    if len(jsonFiles.values())>1:
+                        logger.error ( f"mlModels {mlModels} is a single model, but we have several json files." )
+                        sys.exit()
+                    mlModels = { mlModels: list(jsonFiles.values())[0] }
+                if type(mlModels)==dict:
+                    for onnxFile,pointer in mlModels.items():
+                        if type(pointer) == str:
+                            pointer = jsonFiles[pointer]
+                        newregions = self.canonizeRegions ( pointer, forNN=True )
+                        mlModels[onnxFile]=newregions
+                value = str(mlModels)
+                self.addInfo("mlModels", value )
 
             self.cacheJsons()
             self.cacheOnnxes()
@@ -104,7 +144,7 @@ class Info(object):
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
             with open ( fullPath, "rb" ) as f:
-                self.onnxes[jsonfilename] = f.read()
+                self.onnxes[onnxFile] = f.read()
                 f.close()
             import onnx
             m = onnx.load ( fullPath )
@@ -126,11 +166,11 @@ class Info(object):
                     nll_exp_mu0 = json.loads(em.value)
                 elif em.key == 'nLL_obs_mu0':
                     nll_obs_mu0 = json.loads(em.value)
-            self.smYields[jsonfilename] = smYields
-            self.inputMeans[jsonfilename] = inputMeans
-            self.inputErrors[jsonfilename] = inputErrors
-            self.nll_exp_mu0[jsonfilename] = nll_exp_mu0
-            self.nll_obs_mu0[jsonfilename] = nll_obs_mu0
+            self.smYields[onnxFile] = smYields
+            self.inputMeans[onnxFile] = inputMeans
+            self.inputErrors[onnxFile] = inputErrors
+            self.nll_exp_mu0[onnxFile] = nll_exp_mu0
+            self.nll_obs_mu0[onnxFile] = nll_obs_mu0
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
