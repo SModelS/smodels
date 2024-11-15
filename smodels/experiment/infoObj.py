@@ -95,6 +95,9 @@ class Info(object):
                     continue
             ## only now add the mlModels field
             if modelsLine != None:
+                if not "'" in modelsLine and not '"' in modelsLine:
+                    # did you write without qoutes?
+                    modelsLine = f'"{modelsLine}"'
                 mlModels = eval(modelsLine)
                 if type(mlModels)==str:
                     if len(jsonFiles.values())>1:
