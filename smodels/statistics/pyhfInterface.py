@@ -1126,17 +1126,16 @@ class PyhfUpperLimitComputer:
                     """
                     return ret
 
-
             def clsRoot ( mu : float ):
                 """ central 'switch' for how to compute cls """
-                pyhf = clsRootPyhf(mu)
-                return pyhf
-                tevatron0 = clsRootTevatron(mu)
-                return tevatron0
-                tevatron = clsRootTevatron(mu)
-                tevatron1 = clsRootTevatron(1.)
-                print ( f"@@0 tevatron0 {tevatron0}" )
-                print ( f"@@0 pyhf {pyhf} {tevatron} {tevatron1}" )
+                #pyhf = clsRootPyhf(mu)
+                #return pyhf
+                cls_root = clsRootTevatron(mu)
+                return cls_root
+                #tevatron = clsRootTevatron(mu)
+                #tevatron1 = clsRootTevatron(1.)
+                #print ( f"@@0 tevatron0 {tevatron0}" )
+                #print ( f"@@0 pyhf {pyhf} {tevatron} {tevatron1}" )
 
 
             # Rescaling signals so that mu is in [0, 10]
