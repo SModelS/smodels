@@ -114,6 +114,10 @@ class NNUpperLimitComputer:
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
+        try:
+            poi_test = poi_test[0]
+        except (TypeError,IndexError) as e:
+            pass
 
         #for modelname,model in self.data.globalInfo.smYields.items():
         #    compute_upper_limit(model)
@@ -158,6 +162,13 @@ class NNUpperLimitComputer:
         nll1obs = nll0obs + arr[1]*obsErr + obsDelta
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
                 "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
+        if abs(poi_test)<1e-7:
+            if abs(nll0obs-nll1obs)>1e-4:
+                logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}." )
+                # ret["nll_obs_1"]=nll0obs
+            if abs(nll0exp-nll1exp)>1e-4:
+                logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1obs {nll1exp:.4f}." )
+                # ret["nll_exp_1"]=nll0exp
         return ret
 
     def welcome(self):
@@ -184,16 +195,10 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         """
         ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
-        if mu==0.0 and expected:
-            nll = ret['nll_exp_0']
-        elif mu==0.0 and not expected:
-            nll = ret['nll_obs_0']
-        elif mu!=0.0 and expected:
+        if expected:
             nll = ret['nll_exp_1']
-        elif mu!=0.0 and not expected:
-            nll = ret['nll_obs_1']
         else:
-            raise NotImplementedError(f'Request for {mu} received but only m=0 and mu=1 are implemented.')
+            nll = ret['nll_obs_1']
 
         logger.debug( f"Calling likelihood")
         return self.exponentiateNLL ( nll, not return_nll )
@@ -319,11 +324,8 @@ class NNUpperLimitComputer:
 
     def getVarForMu ( self, mu : float ) -> float:
         """ get the variance around mu """
-        # np.diff(np.diff([x*x for x in range(0,10)]))
-        # print ( f"@@1 getVarForMu {mu}" )
-        # print ( f"@@1 nll={self.negative_log_likelihood ( mu )}" )
         dx = 1e-3
-        hessian = np.diff ( np.diff ( [ self.negative_log_likelihood(x)["nll_obs_1"] for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
+        hessian = np.diff ( np.diff ( [ self.likelihood(x, return_nll=True ) for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
         h = hessian[hessian>0.] # if only some are negative, remove them
         if len(h)==0: # if all are negative, invert them
             h = np.abs ( hessian )
@@ -391,7 +393,7 @@ class NNUpperLimitComputer:
 
     def transform ( self, expected : Union [ Text, bool ] ):
         """ replace the actual observations with backgrounds,
-            if expected is True or "posteriori" """
+            if expected is True or 'posteriori' """
         # always start from scratch
         # self.model = copy.deepcopy ( self.origModel )
         if expected == False:
