@@ -373,7 +373,8 @@ class NNUpperLimitComputer:
             nllA = self.likelihood(mu, expected="posteriori", return_nll=True, modelToUse = modelToUse )
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
-        useTevatron = True
+        from smodels.base import runtime
+        useTevatron = runtime._useTevatronCLsConstruction
         if useTevatron:
             return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootAsimov

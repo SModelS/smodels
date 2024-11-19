@@ -183,6 +183,12 @@ def testPoint(inputFile, outputDir, parser, database):
         runtime._experimental = expFeatures
     except (NoSectionError, NoOptionError):
         pass
+    try:
+        useTevatronCLs = parser.getboolean("options", "useTevatronCLsConstruction")
+        runtime._useTevatronCLsConstruction = useTevatronCLs
+    except (NoSectionError, NoOptionError):
+        pass
+
 
     allPredictions = theoryPredictionsFor(database, smstoplist,
                                           useBestDataset=useBest,

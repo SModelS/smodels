@@ -15,6 +15,10 @@ modelFile="smodels.share.models.mssm"
 
 _experimental = False ## turn on experimental features
 
+## for the computation of CLs values, shall we use the tevatron way
+## of computing the p-values, or the LHC "Asimov" way?
+_useTevatronCLsConstruction = False
+
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
 def filetype ( filename ):
