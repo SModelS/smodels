@@ -373,9 +373,10 @@ class NNUpperLimitComputer:
             nllA = self.likelihood(mu, expected="posteriori", return_nll=True, modelToUse = modelToUse )
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
-
-        return mu_hat, sigma_mu, clsRootTevatron
-        #return mu_hat, sigma_mu, clsRootAsimov
+        useTevatron = True
+        if useTevatron:
+            return mu_hat, sigma_mu, clsRootTevatron
+        return mu_hat, sigma_mu, clsRootAsimov
 
 
     def transform ( self, expected : Union [ Text, bool ] ):
