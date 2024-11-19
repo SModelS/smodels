@@ -14,7 +14,7 @@ import numpy as np
 import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, CLsfromLsb
+from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, CLsfromLsb, getNumericalVariance
 from scipy import optimize
 
 nninfo = {
@@ -321,19 +321,6 @@ class NNUpperLimitComputer:
         # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
         return mu_lim
 
-
-    def getVarForMu ( self, mu : float ) -> float:
-        """ get the variance around mu """
-        dx = 1e-3
-        hessian = np.diff ( np.diff ( [ self.likelihood(x, return_nll=True ) for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
-        h = hessian[hessian>0.] # if only some are negative, remove them
-        if len(h)==0: # if all are negative, invert them
-            h = np.abs ( hessian )
-        h = np.mean ( h ) / dx /dx
-        #if h < 0.:
-        #    print ( f"@@X hessians {h} {hessian}" )
-        return 1./h
-
     def getCLsRootFunc(self, expected: bool = False,
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None ) -> Tuple[float, float, Callable]:
@@ -368,11 +355,11 @@ class NNUpperLimitComputer:
             nll_b = self.likelihood(0., return_nll=True, expected=expected, modelToUse = modelToUse )
             if nll_b is None:
                 return None
-            sigma2_b = self.getVarForMu ( 0. )
+            sigma2_b = getNumericalVariance ( self, 0. )
             nll_sb = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             if nll_sb is None:
                 return None
-            sigma2_sb = self.getVarForMu ( 1. )
+            sigma2_sb = getNumericalVariance ( self, 1. )
             CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type=return_type)
             return CLs
 

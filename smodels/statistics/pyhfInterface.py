@@ -1057,9 +1057,9 @@ class PyhfUpperLimitComputer:
                 """ compute CLs, the tevatron way. """
                 nll_sb = self.likelihood ( mu, expected = expected, return_nll=True )
                 nll_b = self.likelihood ( 0, expected = expected, return_nll=True )
-                sigma2_b = self.getVarForMu ( 0. )
-                sigma2_sb = self.getVarForMu ( mu )
-                from smodels.statistics.basicStats import CLsfromLsb
+                from smodels.statistics.basicStats import CLsfromLsb, getNumericalVariance
+                sigma2_b = getNumericalVariance ( self, 0. )
+                sigma2_sb = getNumericalVariance ( self, mu )
                 CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type="CLs" )
                 return 1.0 - self.cl - CLs
 

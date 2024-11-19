@@ -16,6 +16,23 @@ from typing import Text
 
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 
+def getNumericalVariance ( obj, mu : float )-> float:
+    """ for nnInterface or pyhfInterface given as "obj",
+    return the numerical variance around "mu"
+
+    :param mu: signal strength multiplier
+    :returns: variance of likelihood around mu
+    """
+    dx = 1e-3
+    hessian = np.diff ( np.diff ( [ obj.likelihood(x, return_nll=True ) for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
+    h = hessian[hessian>0.] # if only some are negative, remove them
+    if len(h)==0: # if all are negative, invert them
+        h = np.abs ( hessian )
+    h = np.mean ( h ) / dx /dx
+    #if h < 0.:
+    #    print ( f"@@X hessians {h} {hessian}" )
+    return 1./h
+
 def CLsfromLsb( nll_sb: float, nll_b: float, 
     sigma2_sb : float, sigma2_b : float, return_type: Text = "CLs-alpha" ) -> float:
     """ given nll_sb and nll_b, plus the sigma**2 values around muhat,
