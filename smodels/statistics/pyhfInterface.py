@@ -667,6 +667,9 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
+        if workspace_index in self.data.cached_likelihoods[expected]:
+            if mu in self.data.cached_likelihoods[expected][workspace_index]:
+                return self.data.cached_likelihoods[expected][workspace_index][mu]
 
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
@@ -677,6 +680,7 @@ class PyhfUpperLimitComputer:
                 "ignore",
                 "Values in x were outside bounds during a minimize step, clipping to bounds",
             )
+            old_index = workspace_index
             # warnings.filterwarnings ( "ignore", "", module="pyhf.exceptions" )
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
@@ -743,9 +747,13 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             # Cache the likelihood (but do we use it?)
-            self.data.cached_likelihoods[expected][
-                workspace_index
-            ] = ret
+            if not workspace_index in self.data.cached_likelihoods[expected]:
+                self.data.cached_likelihoods[expected][workspace_index]={}
+            self.data.cached_likelihoods[expected][workspace_index][mu] = ret
+            if old_index == None:
+                if not old_index in self.data.cached_likelihoods[expected]:
+                    self.data.cached_likelihoods[expected][old_index]={}
+                self.data.cached_likelihoods[expected][old_index][mu] = ret
             ret = self.exponentiateNLL(ret, not return_nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
@@ -855,6 +863,8 @@ class PyhfUpperLimitComputer:
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
+        if workspace_index in self.data.cached_lmaxes[expected]:
+            return self.data.cached_lmaxes[expected][workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
@@ -953,14 +963,14 @@ class PyhfUpperLimitComputer:
                         if True, retuns the modified (and patched) workspace, where obs = sum(bkg). Used for computing apriori expected limit.
         """
         if self.nWS == 1:
-            if expected == True:
+            if expected in [ True, "posteriori" ]:
                 return self.workspaces_expected[0]
             else:
                 return self.workspaces[0]
         else:
             if workspace_index == None:
                 logger.error("No workspace index was provided.")
-            if expected == True:
+            if expected in [ True, "posteriori" ]:
                 return self.workspaces_expected[workspace_index]
             else:
                 return self.workspaces[workspace_index]
@@ -1041,6 +1051,7 @@ class PyhfUpperLimitComputer:
             def clsRootTevatron(mu : float ) -> float:
                 """ compute CLs, the tevatron way. """
                 nll_sb = self.likelihood ( mu, expected = expected, return_nll=True )
+                # print ( f"@@5 clsRootTevatron mu {mu} expected {expected} nll_sb {nll_sb}" )
                 nll_b = self.likelihood ( 0, expected = expected, return_nll=True )
                 from smodels.statistics.basicStats import CLsfromLsb, getNumericalVariance
                 sigma2_b = getNumericalVariance ( self, 0. )
