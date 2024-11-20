@@ -111,8 +111,8 @@ class PyhfData:
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
+        self.cached_likelihoods = { False:{}, True: {}, "posteriori": {} }  ## cache of likelihoods (actually twice_nlls)
+        self.cached_lmaxes = { False:{}, True: {}, "posteriori": {} }  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = {False: {}, True: {}, "posteriori": {}}
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
             jsonFiles = {}
@@ -743,7 +743,7 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             # Cache the likelihood (but do we use it?)
-            self.data.cached_likelihoods[
+            self.data.cached_likelihoods[expected][
                 workspace_index
             ] = ret
             ret = self.exponentiateNLL(ret, not return_nll)
@@ -941,7 +941,7 @@ class PyhfUpperLimitComputer:
             lmax = self.exponentiateNLL(lmax, not return_nll)
 
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-            self.data.cached_lmaxes[workspace_index] = ret
+            self.data.cached_lmaxes[expected][workspace_index] = ret
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):
@@ -990,21 +990,6 @@ class PyhfUpperLimitComputer:
                 return ul
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
-
-    def getVarForMu ( self, mu : float ) -> float:
-        """ get the variance around mu """
-        # np.diff(np.diff([x*x for x in range(0,10)]))
-        # print ( f"@@1 getVarForMu {mu}" )
-        # print ( f"@@1 nll={self.negative_log_likelihood ( mu )}" )
-        dx = 1e-3
-        hessian = np.diff ( np.diff ( [ self.likelihood(x, return_nll = True ) for x in np.arange ( mu - 3e-3, mu + 3e-3, dx ) ] ) )
-        h = hessian[hessian>0.] # if only some are negative, remove them
-        if len(h)==0: # if all are negative, invert them
-            h = np.abs ( hessian )
-        h = np.mean ( h ) / dx /dx
-        #if h < 0.:
-        #    print ( f"@@X hessians {h} {hessian}" )
-        return 1./h
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
