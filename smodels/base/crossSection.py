@@ -755,7 +755,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
         except Exception as e:
             logger.error(f"Error reading SLHA string {f}: {e}")
             raise SModelSError()
-        
+
     for production in f.xsections:
         process = f.xsections.get(production)
         for pxsec in process.xsecs:
@@ -843,6 +843,14 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
             for ixsec, xsec in enumerate(xSecsInFile.xSections):
                 if xsec.pid == pid:
                     xSecsInFile.xSections[ixsec].value += eventCs
+                    if not hasattr ( xSecsInFile.xSections[ixsec], "nevents" ):
+                        xSecsInFile.xSections[ixsec].nevents = 0
+                    xSecsInFile.xSections[ixsec].nevents += 1
+
+    for xsec in xSecsInFile.xSections:
+        nevents = xsec.nevents
+        if nevents < 10:
+            logger.warning ( f"cross section for {xsec.pid} comes from only {nevents} event(s). Consider raising the statistics!" )
 
     reader.close()
 
