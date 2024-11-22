@@ -98,6 +98,9 @@ class XSecBase:
             outfile.write("\n" )
         nxsecs = 0
         for xsec in xsecs:
+            ccomment = comment
+            if hasattr ( xsec, 'nevents' ):
+                ccomment = f"{xsec.nevents}/{comment}"
             writeXsec = True
             for oldxsec in xSectionList:
                 if oldxsec.info == xsec.info and set(oldxsec.pid) == set(xsec.pid):
@@ -105,10 +108,10 @@ class XSecBase:
                     break
             if writeXsec:
                 nxsecs += 1
-                outfile.write( self.xsecToBlock(xsec, (2212, 2212), comment) + "\n")
+                outfile.write( self.xsecToBlock(xsec, (2212, 2212), ccomment) + "\n")
         outfile.close()
 
-        return nxsecs 
+        return nxsecs
 
     def xsecToBlock( self, xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
         """
@@ -238,7 +241,7 @@ class ArgsStandardizer:
         particles.sort()
         particles = set(particles)
         return particles
-    
+
     def checkNCPUs ( self, ncpus, inputFiles ):
         if ncpus < -1 or ncpus == 0:
             logger.error ( "Weird number of CPUs given: %d" % ncpus )
