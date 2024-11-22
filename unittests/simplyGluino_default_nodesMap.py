@@ -16,7 +16,6 @@ smodelsOutputDefault = {
     'combinesrs' : False,
     'combineanas' : 'ATLAS-CONF-2013-037,CMS-SUS-13-012',
     'reportallsrs' : False,
-    'experimentalfeatures' : False,
     'file status' : 1,
     'decomposition status' : 1,
     'warnings' : 'Input file ok',

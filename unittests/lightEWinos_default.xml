@@ -80,7 +80,6 @@
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
-        <experimentalfeatures>False</experimentalfeatures>
         <file_status>1</file_status>
         <ignorepromptqnumbers>spin,eCharge,colordim</ignorepromptqnumbers>
         <input_file>./testFiles/slha/lightEWinos.slha</input_file>

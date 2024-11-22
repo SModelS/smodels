@@ -178,11 +178,7 @@ def testPoint(inputFile, outputDir, parser, database):
             useBest = False
     except (NoSectionError, NoOptionError):
         pass
-    try:
-        expFeatures = parser.getboolean("options", "experimentalFeatures")
-        runtime._experimental = expFeatures
-    except (NoSectionError, NoOptionError):
-        pass
+    setExperimentalFeatures( parser )
 
     allPredictions = theoryPredictionsFor(database, smstoplist,
                                           useBestDataset=useBest,
@@ -530,7 +526,7 @@ def getParameters(parameterFile):
     if ret == []:
         logger.error("No such file or directory: '%s'" % parameterFile)
         sys.exit()
-    setExperimentalFlag(parser)
+    setExperimentalFeatures(parser)
     try:
         runtime.modelFile = parser.get("particles", "model")
     except:
@@ -544,12 +540,15 @@ def getParameters(parameterFile):
     return parser
 
 
-def setExperimentalFlag(parser):
-    """ set the experimental flag, if options:experimental = True """
-    if parser.has_option("options", "experimental"):
-        if parser.getboolean("options", "experimental"):
-            runtime._experimental = True
-
+def setExperimentalFeatures(parser):
+    """ set the experimental features flats, if experimentalFeatures:* = True """
+    if not parser.has_section ( "experimentalFeatures" ):
+        return
+    for feature,flag in dict(parser.items("experimentalFeatures")).items():
+        if not feature in runtime._experimental:
+            logger.warning ( f"'{feature}' is not a known experimental feature. will ignore." )
+            continue
+        runtime._experimental[feature]=bool(flag)
 
 def getAllInputFiles(inFile):
     """

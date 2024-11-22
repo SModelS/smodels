@@ -165,7 +165,7 @@ class StatisticsTest(unittest.TestCase):
     def testExperimentalFeatureOff(self):
         ## check that this all gives none if experimental is turned off
 
-        runtime._experimental = False
+        runtime._experimental["truncatedgaussians"] = False
         database.selectExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
         self.assertTrue(len(database.expResultList), 1)
         filename = "./testFiles/slha/T1tttt.slha"
@@ -186,7 +186,7 @@ class StatisticsTest(unittest.TestCase):
 
     def obsoleteApproxGaussian(self):
         ## turn experimental features on
-        runtime._experimental = True
+        runtime._experimental["truncatedgaussians"] = True
         database.selectExpResults(analysisIDs=["CMS-PAS-SUS-12-026"])
         self.assertTrue(len(database.expResultList), 1)
         filename = "./testFiles/slha/T1tttt.slha"

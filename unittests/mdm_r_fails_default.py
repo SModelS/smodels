@@ -15,7 +15,6 @@ smodelsOutputDefault = {
     'combinesrs' : True,
     'combineanas' : 'ATLAS-SUSY-2018-22-multibin, CMS-EXO-20-004',
     'reportallsrs' : False,
-    'experimentalfeatures' : False,
     'file status' : 1,
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
