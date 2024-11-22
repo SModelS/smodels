@@ -850,7 +850,8 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     for xsec in xSecsInFile.xSections:
         nevents = xsec.nevents
         if nevents < 10:
-            logger.warning ( f"cross section for {xsec.pid} comes from only {nevents} event(s). Consider raising the statistics!" )
+            sqrtS = str ( float ( xsec.info.sqrts / TeV ) )
+            logger.warning ( f"cross section for {xsec.pid}, {sqrtS} TeV, comes from only {nevents} event(s). Consider raising the statistics!" )
 
     reader.close()
 
