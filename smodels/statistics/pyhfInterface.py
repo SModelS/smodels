@@ -114,9 +114,9 @@ class PyhfData:
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
-        self.cachedULs = {False: {}, True: {}, "posteriori": {}}
+        self.cached_likelihoods = { False: {}, True: {}, "posteriori": {} }  ## cache of likelihoods (actually twice_nlls)
+        self.cached_lmaxes = { False: {}, True: {}, "posteriori": {} }  # cache of lmaxes (actually twice_nlls)
+        self.cachedULs = { False: {}, True: {}, "posteriori": {}}
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
             jsonFiles = {}
             for jFile,sregions in nsignals.items():
@@ -674,6 +674,9 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
+        if workspace_index in self.data.cached_likelihoods[expected] and \
+                mu in self.data.cached_likelihoods[expected][workspace_index]:
+            return self.data.cached_likelihoods[expected][workspace_index][mu]
 
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
@@ -685,6 +688,7 @@ class PyhfUpperLimitComputer:
                 "Values in x were outside bounds during a minimize step, clipping to bounds",
             )
             # warnings.filterwarnings ( "ignore", "", module="pyhf.exceptions" )
+            old_index = workspace_index
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index == None:
@@ -750,9 +754,15 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             # Cache the likelihood (but do we use it?)
-            self.data.cached_likelihoods[
+            if not workspace_index in self.data.cached_likelihoods[expected]:
+                self.data.cached_likelihoods[expected][workspace_index]={}
+            self.data.cached_likelihoods[expected][
                 workspace_index
-            ] = ret
+            ][mu] = ret
+            if old_index == None:
+                if not None in self.data.cached_likelihoods[expected]:
+                    self.data.cached_likelihoods[expected][None]={}
+                self.data.cached_likelihoods[expected][None][mu] = ret
             ret = self.exponentiateNLL(ret, not return_nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
@@ -862,6 +872,8 @@ class PyhfUpperLimitComputer:
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
+        if workspace_index in self.data.cached_lmaxes[expected]:
+            return self.data.cached_lmaxes[workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
@@ -871,6 +883,7 @@ class PyhfUpperLimitComputer:
             )
 
             self.__init__(self.data, self.cl, self.lumi)
+            old_index = workspace_index
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index != None:
@@ -950,7 +963,9 @@ class PyhfUpperLimitComputer:
             lmax = self.exponentiateNLL(lmax, not return_nll)
 
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-            self.data.cached_lmaxes[workspace_index] = ret
+            self.data.cached_lmaxes[expected][workspace_index] = ret
+            if old_index == None:
+                self.data.cached_lmaxes[expected][None] = ret
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):
