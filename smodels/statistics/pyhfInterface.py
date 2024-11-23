@@ -117,6 +117,7 @@ class PyhfData:
         self.cached_likelihoods = { False: {}, True: {}, "posteriori": {} }  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = { False: {}, True: {}, "posteriori": {} }  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = { False: {}, True: {}, "posteriori": {}}
+        self.cacheBestCombo = None # memorize also whats the best combo
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
             jsonFiles = {}
             for jFile,sregions in nsignals.items():
@@ -772,6 +773,8 @@ class PyhfUpperLimitComputer:
         """find the index of the best expected combination"""
         if self.nWS == 1:
             return 0
+        if self.data.cacheBestCombo != None:
+            return self.data.cacheBestCombo
         logger.debug( f"Finding best expected combination among {self.nWS} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
@@ -788,6 +791,7 @@ class PyhfUpperLimitComputer:
             if ul < ulMin:
                 ulMin = ul
                 i_best = i_ws
+        self.data.cacheBestCombo = i_best
         return i_best
 
     def exponentiateNLL(self, twice_nll, doIt):
