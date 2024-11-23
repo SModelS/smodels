@@ -104,7 +104,7 @@ class RFailsTest(unittest.TestCase):
         pyhfInterface.nattempts_max = 5
         database = Database('official')
         runMain(dirname,inifile='testParameters_rfails.ini',
-                             overridedatabase = database)
+                             overridedatabase = database,suppressStdout=True )
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'r_fails_summary_default.txt'
         comp = compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05)

@@ -674,7 +674,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if workspace_index in self.data.cached_likelihoods[expected] and \
+        if False and workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
 
@@ -702,7 +702,7 @@ class PyhfUpperLimitComputer:
                 self.__init__(self.data, self.cl, self.lumi)
                 ### allow this, for computation of l_SM
                 # if self.zeroSignalsFlag[workspace_index] == True:
-                #    logger.warning("Workspace number %d has zero signals" % workspace_index)
+                #    logger.warning( f"Workspace number {workspace_index} has zero signals" )
                 #    return None
                 workspace = self.updateWorkspace(workspace_index, expected=expected)
                 # Same modifiers_settings as those used when running the 'pyhf cls' command line
@@ -772,14 +772,14 @@ class PyhfUpperLimitComputer:
         """find the index of the best expected combination"""
         if self.nWS == 1:
             return 0
-        logger.debug("Finding best expected combination among %d workspace(s)" % self.nWS)
+        logger.debug( f"Finding best expected combination among {self.nWS} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
         for i_ws in range(self.nWS):
             if self.data.totalYield == 0.:
                 continue
             if self.zeroSignalsFlag[i_ws] == True:
-                logger.debug("Workspace number %d has zero signals" % i_ws)
+                logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
                 ul = self.getUpperLimitOnMu(expected=True, workspace_index=i_ws)
@@ -873,7 +873,7 @@ class PyhfUpperLimitComputer:
             with 0.
         """
         if workspace_index in self.data.cached_lmaxes[expected]:
-            return self.data.cached_lmaxes[workspace_index]
+            return self.data.cached_lmaxes[expected][workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
@@ -888,7 +888,7 @@ class PyhfUpperLimitComputer:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index != None:
                 if self.zeroSignalsFlag[workspace_index] == True:
-                    logger.warning("Workspace number %d has zero signals" % workspace_index)
+                    logger.warning( f"Workspace number {workspace_index} has zero signals" )
                     return None
                 else:
                     workspace = self.updateWorkspace(workspace_index, expected=expected)
@@ -966,6 +966,7 @@ class PyhfUpperLimitComputer:
             self.data.cached_lmaxes[expected][workspace_index] = ret
             if old_index == None:
                 self.data.cached_lmaxes[expected][None] = ret
+            # print ( f"@@11 ret {ret}" )
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):
@@ -1053,8 +1054,7 @@ class PyhfUpperLimitComputer:
                 == True
             ):
                 logger.debug(
-                    "There is (are) %d workspace(s) and no signal(s) was (were) found" % self.nWS
-                )
+                    f"There is (are) {self.nWS} workspace(s) and no signal(s) was (were) found" )
                 return None
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
