@@ -60,6 +60,7 @@ class PyhfTest(unittest.TestCase):
         Tests how the module handles corrupted json files
         Maybe it is needed to test different types of corruptions
         """
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         from smodels.base.smodelsLogging import setLogLevel
         setLogLevel("fatal")
         #Defining the channels
@@ -135,6 +136,7 @@ class PyhfTest(unittest.TestCase):
         Tests how the module handles corrupted json files
         Maybe it is needed to test different types of corruptions
         """
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         #Defining the channels
         modifiers = []
         modifiers.append(dict(data=None,
@@ -261,6 +263,7 @@ class PyhfTest(unittest.TestCase):
         """
         Computes the UL using the pyhfInterface module and checks if, outside of the module, this UL still gives a 95% CLs
         """
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         bkg = self.simpleJson([0.8], [10])
         signals = [ 0.4 ]
         # Make the patch by hand
@@ -314,6 +317,7 @@ class PyhfTest(unittest.TestCase):
         """
         Same as previous but with two SRs
         """
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         bkg = self.simpleJson([0.8, 0.9], [10, 11])
         signals = [0.4, 0.2]
         # Make the patch by hand

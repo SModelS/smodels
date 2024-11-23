@@ -46,7 +46,6 @@ Note here that the PDG code 25 is reserved for the SM-like Higgs boson with a ma
 
 If the BSM model has an enlarged Higgs sector, a PDG code 25 must be assigned *only* to a 125 GeV Higgs with SM-like decay branching ratios; this is important for correctly matching experimental results involving a SM-like Higgs for which the analysis assumed SM branching ratios for the Higgs with the mass fixed to 125 GeV.
 
-
 * **Reading of BSM particles from an SLHA input file, along with their quantum numbers is implemented by the** `getParticlesFromSLHA function <tools.html#tools.particlesLoader.getParticlesFromSLHA>`_
 
 * **Reading of BSM particles from a module input file, along with their quantum numbers is implemented by the** `getParticlesFromModule function <tools.html#tools.particlesLoader.getParticlesFromModule>`_

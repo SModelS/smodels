@@ -70,10 +70,10 @@ def CLsfromNLL(
     compute the CLs - alpha from the NLLs
     TODO: following needs explanation
 
-    :param nllA: negative log likelihood of the Asimov data
-    :param nll0A: minimum negative log likelihood of the Asimov data
-    :param nll: negative log likelihood, observed
-    :param nll0: minimum negative log likelihood, observed
+    :param nllA: negative log likelihood for Asimov data
+    :param nll0A: negative log likelihood at muhat for Asimov data
+    :param nll: negative log likelihood
+    :param nll0: negative log likelihood at muhat
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \

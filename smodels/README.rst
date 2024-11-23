@@ -28,7 +28,7 @@ SModelS v3
 
 SModelS is an automatic, public tool for interpreting simplified-model results
 from the LHC. It is based on a general procedure to decompose Beyond the
-Standard Model (BSM) collider signatures presenting a Z\ :sub:`2` symmetry into
+Standard Model (BSM) collider signatures into
 Simplified Model Spectrum (SMS) topologies. Our method provides a way to cast
 BSM predictions for the LHC in a model independent framework, which can be
 directly confronted with the relevant experimental constraints.
@@ -66,26 +66,12 @@ used to test *runSModelS.py*.
 Citation
 ========
 
-If you use this software please cite both the SModelS v1.1_ and v1.2_ manuals,
-the original_ SModelS publication, as well as the programs
-it makes use of (pythia8_/pythia6_, NLL-fast_ and pyslha_).
-If you use specifically the long-lived particles implementation, please cite also this_ paper.
-For the Run2 database, cite the v1.2_ manual and the databaseUpdate_ paper.
-
-For your convenience, the relevant
-citations are provided in bibtex format in *references.bib*.
+If you use this software please cite the SModelS v1-v3 manuals, the original
+SModelS publication, as well as the programs it makes use of.  For your
+convenience, the relevant citations are provided in bibtex format in
+`references.bib <https://github.com/SModelS/smodels/blob/main/references.bib>`_.
 
 For citing the experimental analyses in the database, you can use
-*smodels-database/database.bib*.
+`database.bib <https://github.com/SModelS/smodels-database-release/blob/main/database.bib>`_.
 
-.. _v2.3: https://inspirehep.net/record/2673443
-.. _v1.2: https://inspirehep.net/record/1705426
-.. _v1.1: https://inspirehep.net/record/1510436
-.. _original: https://inspirehep.net/record/1269436
-.. _this: https://inspirehep.net/record/1687820
-.. _databaseUpdate: https://inspirehep.net/record/1658765
-.. _pythia6: https://pythia6.hepforge.org/
-.. _pythia8: http://home.thep.lu.se/~torbjorn/Pythia.html
-.. _pyslha: http://www.insectnation.org/projects/pyslha.html
-.. _NLL-fast: http://pauli.uni-muenster.de/~akule_01/nllwiki/index.php/NLL-fast
 .. _SModelS online manual: http://smodels.readthedocs.io/

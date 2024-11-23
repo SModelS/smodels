@@ -33,6 +33,12 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 3.0.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Bug fix for printing signal region combination results
+  * Replaced algorithm for :ref:`clustering SMS <cluster>` for UL results by a modified minimum spanning tree algorithm
+  * Made the :ref:`pyhf backend <parameterFilePyhfbackend>` configurable, see also `pyhfInterface.setBackend <statistics.html#statistics.pyhfInterface.setBackend>`_. WARNING: if backend specified is not found, we now fall back to numpy!
 
 New in Version 3.0.0:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -56,13 +62,9 @@ New in Version 3.0.0:
 
   * |database| extension: added results from 11 ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
 
-     * results from ATLAS: 
-        ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL), ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL, tbc!), ATLAS-EXOT-2013-11 (UL)
-     * results from CMS:
-        CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-20-004 (EM+cov), CMS-EXO-19-012 (UL),
-        CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
-     * results from recasts: 
-        ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (LLP repo), ATLAS-SUSY-2018-22 (CM2)
+     * results from ATLAS: ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL), ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL), ATLAS-EXOT-2013-11 (UL)
+     * results from CMS: CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-19-012 (UL), CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
+     * EM results from recasts: ATLAS-SUSY-2019-08 (MA5), ATLAS-SUSY-2018-42 (`LLP repo <https://github.com/llprecasting/recastingCodes/tree/main/HSCPs/ATLAS-SUSY-2018-42>`_), ATLAS-SUSY-2018-22 (CM2), CMS-EXO-20-004 (`MonoXSMS <https://doi.org/10.5281/zenodo.13324003>`_)
 
 
     Note that the 4 ATLAS-EXOT and 5 CMS-EXO analyses above are resonance searches, while ATLAS-SUSY-2018-13 is an RPV SUSY search. These 10 analyses can only be treated with the new graph-based topology description of SModelS v3.

@@ -28,13 +28,15 @@ from databaseLoader import database
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.matching.matcherAuxiliaryFuncs import roundValue
+from smodels.base.smodelsLogging import setLogLevel
+setLogLevel("error")
+
 
 from unitTestHelpers import theorySMSFromString as fromString
 slhafile = './testFiles/slha/lightEWinos.slha'
 
 model = Model( BSMparticles=BSMList, SMparticles=SMList)
 model.updateParticles(inputFile=slhafile,ignorePromptQNumbers=['spin'])
-
 
 
 class ClustererTest(unittest.TestCase):
@@ -372,6 +374,40 @@ class ClustererTest(unittest.TestCase):
         predictions = theoryPredictionsFor(database, topDict, combinedResults=False)
         clusterSizes = sorted([len(p.smsList) for p in predictions])
         self.assertEqual(clusterSizes, [1,16,16])
+
+    def testClusterFails(self):
+        """ test a case where the average cluster SMS does not have a well defined UL"""
+        from smodels.experiment.databaseObj import Database
+        db = Database ( "https://smodels.github.io/database/unittest_PAS12022" )
+        er = db.getExpResults ( analysisIDs='CMS-PAS-SUS-12-022', txnames='TChiWZ' )[0]
+        dataset = er.datasets[0]
+        txname = dataset.txnameList[0]
+
+        slhafile = 'testFiles/clusterfails/failed_cluster.slha'
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(slhafile,ignorePromptQNumbers=['spin','eCharge','colordim'])
+        sigmacut = 0.001*fb
+        mingap = 5.*GeV
+        smsDict = decomposer.decompose(model, sigmacut, massCompress=True, invisibleCompress=True, minmassgap=mingap)
+
+        # Select SMS:
+        smsFilter = ['(PV > C1-(1),N2(2)), (C1-(1) > N1~,W-), (N2(2) > N1,Z)', 
+                     '(PV > C1-(1),N3(2)), (C1-(1) > N1~,W-), (N3(2) > N1,Z)', 
+                     '(PV > N2(1),C1+(2)), (N2(1) > N1,Z), (C1+(2) > N1,W+)',                     
+                     '(PV > C1+(1),N2(2)), (C1+(1) > N1,W+), (N2(2) > N1,Z)', 
+                     '(PV > N3(1),C1+(2)), (N3(1) > N1,Z), (C1+(2) > N1,W+)',
+                     '(PV > C1+(1),N3(2)), (C1+(1) > N1,W+), (N3(2) > N1,Z)'
+                     ]
+        # The SMS have to be in the correct order for clustering of all SMS to fail!
+        smsList = [sms for sms in smsDict.getSMSList() if str(sms) in smsFilter]
+        for sms in smsList:
+            sms.weight = 1*fb
+            sms.txname = txname
+        smsList = sorted(smsList, key = lambda sms: smsFilter.index(str(sms)))
+
+        clusters = clusterTools.clusterSMS(smsList, 0.2, dataset)
+        self.assertEqual(len(clusters),2)
+
 
 if __name__ == "__main__":
     unittest.main()

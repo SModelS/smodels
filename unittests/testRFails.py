@@ -9,6 +9,7 @@
 
 """
 
+import warnings
 import sys
 import os
 sys.path.insert(0, "../")
@@ -34,7 +35,7 @@ class RFailsTest(unittest.TestCase):
                 os.remove(fname)
 
     def testRFailPrinters(self):
-
+        warnings.filterwarnings( action='ignore', category=DeprecationWarning )
         filename = "./testFiles/rfails/mdm_r_fails.slha"
         from smodels.statistics import pyhfInterface
 
@@ -93,7 +94,8 @@ class RFailsTest(unittest.TestCase):
             self.removeOutputs(outputfile)
 
     def testRFailSummary(self):
-        
+        warnings.filterwarnings( action='ignore', category=DeprecationWarning )
+        warnings.filterwarnings( action='ignore', category=RuntimeWarning )
         out = "./unitTestOutput"
         dirname = "./testFiles/rfails/"
         from smodels.statistics import pyhfInterface
@@ -102,7 +104,7 @@ class RFailsTest(unittest.TestCase):
         pyhfInterface.nattempts_max = 5
         database = Database('official')
         runMain(dirname,inifile='testParameters_rfails.ini',
-                             overridedatabase = database)
+                             overridedatabase = database,suppressStdout=True )
         outSummary = os.path.join(out, 'summary.txt')
         outDefault = 'r_fails_summary_default.txt'
         comp = compareScanSummary(outSummary, outDefault, allowedRelDiff=0.05)
@@ -111,11 +113,12 @@ class RFailsTest(unittest.TestCase):
 
         self.assertTrue(comp)
 
-        for f in os.listdir(dirname):
-            self.removeOutputs(os.path.join(out,os.path.basename(f)))
+        if comp:
+            for f in os.listdir(dirname):
+                self.removeOutputs(os.path.join(out,os.path.basename(f)))
 
-        if os.path.isfile(outSummary):
-            os.remove(outSummary)
+            if os.path.isfile(outSummary):
+                os.remove(outSummary)
 
 if __name__ == "__main__":
     unittest.main()

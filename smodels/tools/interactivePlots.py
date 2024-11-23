@@ -346,7 +346,10 @@ class Plotter(object):
                         if not is_within_directory(path, member_path):
                             raise Exception("Attempted Path Traversal in Tar File")
                 
-                    tar.extractall(path,filter="data") # , members, numeric_owner
+                    try:
+                        tar.extractall(path,filter="data") # , members, numeric_owner
+                    except TypeError as e: ## perhaps an older version of tarfile
+                        tar.extractall(path) # , members, numeric_owner
                     
                 
                 safe_extract(tar)
@@ -378,7 +381,11 @@ class Plotter(object):
                         if not is_within_directory(path, member_path):
                             raise Exception("Attempted Path Traversal in Tar File")
                 
-                    tar.extractall(path,filter="data") # , members, numeric_owner
+                    try:
+                        tar.extractall(path,filter="data") # , members, numeric_owner
+                    except TypeError as e:
+                        ## for older versions of tarfile
+                        tar.extractall(path) # , members, numeric_owner
                     
                 
                 safe_extract(tar)

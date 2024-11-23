@@ -39,7 +39,7 @@ class AverageSMS(TheorySMS):
         attrList = ['mass', 'totalwidth', 'isSM']
         for sms in smsList:
             dataMap = sms.txname.dataMap
-            attrList += [attr for node, attr, unit in dataMap.values()]
+            attrList += [attr for _, attr,_ in dataMap.values()]
         attrList = list(set(attrList))
 
         # Define base SMS to copy (common) global properties from
@@ -47,14 +47,17 @@ class AverageSMS(TheorySMS):
 
         #  Define relevant properties to be stored and averaged over:
         self.properties = attrList
-        self.smsList = smsList[:]
         self.txname = smsBase.txname
+        #If the average corresponds to a single SMS, we
+        # can directly use its upperLimit value (if defined).
+        if (len(smsList) == 1) and hasattr(smsBase,'_upperLimit'):
+            self._upperLimit = smsBase._upperLimit
 
         #  Consistency checks:
-        if any(sms.canonName != smsBase.canonName for sms in self.smsList):
+        if any(sms.canonName != smsBase.canonName for sms in smsList):
             logger.error("Can not build average SMS from SMS with distinct topologies.")
             raise SModelSError()
-        if any(sms.txname != self.txname for sms in self.smsList):
+        if any(sms.txname != self.txname for sms in smsList):
             logger.error("Can not build average SMS from SMS for distinct txnames.")
             raise SModelSError()
 
@@ -65,6 +68,7 @@ class AverageSMS(TheorySMS):
         if len(smsList) == 1:
             avgNodesDict = {n : node for n,node in zip(smsBase.nodeIndices,smsBase.nodes)}
         else:
+            weights = [sms.weight.asNumber(fb) for sms in smsList]
             for nodeIndex in smsBase.nodeIndices:
                 if nodeIndex == smsBase.rootIndex:
                     # For the root node make a dummy copy:
@@ -75,7 +79,7 @@ class AverageSMS(TheorySMS):
                     attrDict = {}
                     for attr in self.properties:
                         values = [getattr(ptc, attr) for ptc in allParticles]
-                        avgAttr = self.getAverage(values)
+                        avgAttr = average(values, weights, nround=5)
                         attrDict[attr] = avgAttr
                     mp = allParticles[0]
                     for ptc in allParticles[1:]:
@@ -94,19 +98,22 @@ class AverageSMS(TheorySMS):
         self.copyTreeFrom(smsBase,nodesObjDict=avgNodesDict)
         # Compute the weight
         self.weight = smsBase.weight
-        for sms in self.smsList[1:]:
+        for sms in smsList[1:]:
             self.weight = self.weight + sms.weight
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         """
         Compares the SMS with other. Only the properties
         defined in self.properties are used for comparison.
         :param other:  SMS to be compared (SMS object)
-        :return: -1 if self < other, 0 if self == other, +1, if self > other.
+        :return: True/False.
         """
 
         if not isinstance(other, TheorySMS):
-            return -1
+            return False
+        
+        if self.canonName != other.canonName:
+            return False
 
         for nodeIndex in self.nodeIndices:
             nodeA = self.indexToNode(nodeIndex)
@@ -117,103 +124,32 @@ class AverageSMS(TheorySMS):
                 attrA = getattr(nodeA,attr)
                 attrB = getattr(nodeB,attr)
                 if attrA != attrB:
-                    if attrA > attrB:
-                        return 1
-                    else:
-                        return -1
-        return 0
-
-    def __lt__(self, other):
-        return self.__cmp__(other) == -1
-
-    def __gt__(self, other):
-        return self.__cmp__(other) == 1
-
-    def __eq__(self, other):
-        return self.__cmp__(other) == 0
+                    return False
+        return True
 
     def __ne__(self, other):
-        return self.__cmp__(other) != 0
-
-    def getAverage(self, values, weighted=True, nround=5):
-        """
-        Compute the average value for the attribute using
-        the SMS list in self.smsList.
-        If weighted = True, compute the weighted average
-        using the SMS weights.
-
-        :param values: List of values to be averaged over
-        :param weighted: If True, uses the SMS weights to compute a weighted average
-        :param nround: If greater than zero and the returning attibute is numeric, will round it
-                      to this number of significant digits.
-
-        :return: Average value of attribute.
-        """
-
-        if weighted:
-            weights = [sms.weight.asNumber(fb) for sms in self.smsList]
-        else:
-            weights = [1.]*len(self.smsList)
-
-        return average(values, weights, nround)
-
-    def contains(self, sms):
-        """
-        Check if the average SMS contains the SMS
-
-        :param sms: TheorySMS object
-
-        :return: True/False
-        """
-
-        if any(sms is selfSMS for selfSMS in self.smsList):
-            return True
-        return False
-
+        return not self.__eq__(other)
 
 class SMSCluster(object):
     """
-    An instance of this class represents a cluster of SMS.
+    An instance of this class represents a cluster of SMS,
+    which holds the averageSMS.
     This class is used to store the relevant information about a cluster of
     SMS and to manipulate this information.
     """
 
-    def __init__(self, smsList=[]):
+    def __init__(self, smsList=[], dataset=None):
 
-        self.smsList = smsList
-
-    def __eq__(self, other):
-
-        if type(self) != type(other):
-            return False
-        elif set(self.indices()) != set(other.indices()):
-            return False
-        else:
-            return True
-
-    def __iter__(self):
-        return iter(self.smsList)
-
-    def __getitem__(self, isms):
-        return self.smsList[isms]
-
-    def __len__(self):
-        return len(self.smsList)
-
+        self.smsList = smsList[:]
+        self.dataset = dataset
+        # Compute average SMS
+        self.averageSMS = self.computeAverageSMS()
+        
     def __str__(self):
-        return str(self.smsList)
+        return str(self.averageSMS)
 
     def __repr__(self):
-        return str(self.smsList)
-
-    def indices(self):
-        """
-        Return a list of SMS indices appearing in cluster
-        """
-
-        indices = [sms._index for sms in self]
-
-        return indices
+        return str(self.averageSMS)
 
     def getTotalXSec(self):
         """
@@ -227,8 +163,7 @@ class SMSCluster(object):
             totxsec += sms.weight
         return totxsec
 
-    @property
-    def averageSMS(self):
+    def computeAverageSMS(self):
         """
         Computes the average SMS for the cluster.
         The average SMS has generic ParticleNodes
@@ -243,45 +178,90 @@ class SMSCluster(object):
         cName = self.smsList[0].canonName
         tx = self.smsList[0].txname
         if any(sms.canonName != cName for sms in self.smsList):
-            return None
-        if any(sms.txname != tx for sms in self.smsList):
-            return None
-        # Define the average SMS with the required properties averaged over:
-        avgSMS = AverageSMS(self.smsList[:])
+            avgSMS = None
+        elif any(sms.txname != tx for sms in self.smsList):
+            avgSMS = None
+        else:
+            # Define the average SMS with the required properties averaged over:
+            avgSMS = AverageSMS(self.smsList[:])
 
-        avgSMS._index = None
+        # If the averageSMS can be defined, 
+        # compute the averageSMS upper limit 
+        if avgSMS is not None and self.dataset is not None:
+            ul = self.dataset.getUpperLimitFor(avgSMS,txnames=tx)
+            avgSMS._upperLimit = ul
 
         return avgSMS
+    
+    def distanceTo(self,sms):
+        """
+        Defines the relative distance between the cluster
+        and SMS object or another cluster.
+        The distance is computed using the upper limits for
+        the averageSMS (for cluster objects) or the SMS upper limit.
+        The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
 
-def relativeDistance(sms1, sms2, dataset):
-    """
-    Defines the relative distance between two SMS according to their
-    upper limit values.
-    The distance is defined as d = 2*|ul1-ul2|/(ul1+ul2).
+        :parameter sms: SMS object or SMSCluster object
 
-    :parameter sms1: SMS object
-    :parameter sms2: SMS object
+        :returns: relative distance
+        """
 
-    :returns: relative distance
-    """
+        sms1 = self.averageSMS
 
-    if not hasattr(sms1, '_upperLimit'):
-        sms1._upperLimit = dataset.getUpperLimitFor(sms1,
-                                                   txnames=sms1.txname)
-    if not hasattr(sms2, '_upperLimit'):
-        sms2._upperLimit = dataset.getUpperLimitFor(sms2,
-                                                   txnames=sms2.txname)
+        if isinstance(sms,SMSCluster):
+            sms2 = sms.averageSMS
+        else:
+            sms2 = sms
 
-    ul1 = sms1._upperLimit
-    ul2 = sms2._upperLimit
+        if not hasattr(sms2, '_upperLimit'):
+            sms2._upperLimit = self.dataset.getUpperLimitFor(sms2,
+                                                    txnames=sms2.txname)
 
-    if ul1 is None or ul2 is None:
-        return None
-    if (ul1+ul2).asNumber(fb) == 0.:
-        return 0.
-    ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
+        ul1 = sms1._upperLimit
+        ul2 = sms2._upperLimit
 
-    return ulDistance
+        if ul1 is None or ul2 is None:
+            return None
+        if (ul1+ul2).asNumber(fb) == 0.:
+            return 0.
+        ulDistance = 2.*abs(ul1 - ul2)/(ul1 + ul2)
+
+        return ulDistance
+
+    def isValid(self,maxDist):
+        """
+        Checks if the SMSCluster is a valid cluster,
+        i.e. if its AverageSMS has a well defined UL
+        and the distance between any SMS in the cluster
+        and the cluster AverageSMS  is smaller than maxDist.
+
+        :param dataset: Dataset object used to check the UL
+        :parameter maxDist: maximum distance between the averageSMS and
+                            all the SMS in the cluster
+
+        :return: True/False 
+        """
+
+        if self.averageSMS is None:
+            return False
+        if self.averageSMS._upperLimit is None:
+            return False
+      
+        # Compute distances between averageSMS and SMS in cluster
+        dists = [self.distanceTo(sms) for sms in self.smsList]
+        
+        # Check if any distance could not be computed:
+        if any(d is None for d in dists):
+            return False
+        
+        # Compute maximal distance between averageSMS and SMS
+        dist = max(dists,default=0.0)
+        if dist > maxDist:
+            return False
+        
+        return True
+
+
 
 def clusterSMS(smsList, maxDist, dataset):
     """
@@ -322,28 +302,24 @@ def clusterSMS(smsList, maxDist, dataset):
     if dataset.getType() == 'upperLimit':  # Group according to upper limit values
         clusters = doCluster(smsUnique, dataset, maxDist)
     elif dataset.getType() == 'efficiencyMap':  # Group all SMS together
-        cluster = SMSCluster()
-        for isms, sms in enumerate(smsUnique):
-            sms._index = isms
-        cluster.smsList = smsUnique
+        cluster = SMSCluster(smsUnique)
         clusters = [cluster]
 
     for cluster in clusters:
         cluster.txnames = txnames
     return clusters
 
-def groupSMS(smsList, dataset):
+
+def doCluster(smsList, dataset, maxDist):
     """
-    Group SMS into groups where the average SMS
-    identical to all the SMS in group.
-    The groups contain all SMS which share the same mass,width and upper limit
-    and can be replaced by their average SMS when building clusters.
+    Cluster algorithm to cluster SMS using a modified minimal spanning tree method.
 
-    :parameter smsList: list of all SMS to be grouped
+    :parameter smsList: list of all SMS to be clustered
     :parameter dataset: Dataset object to be used when computing distances in upper limit space
+    :parameter maxDist: maximum distance for clustering two SMS
 
-    :returns: a list of AverageSMS objects
-              which represents a group of SMS with same mass, width and upper limit.
+    :returns: a list of SMSCluster objects containing the SMS
+              belonging to the cluster
     """
 
 
@@ -355,134 +331,146 @@ def groupSMS(smsList, dataset):
             raise SModelSError("Trying to cluster SMS (id = %i, txname = %s) outside the grid for dataset %s." 
                                 %(sms.smsID,sms.txname,dataset.longStr()))
 
-    # Group SMS if they have the same UL
-    # and give the same average SMS (same BSM attributes)
-    avgSMSList = []
-    for iA, smsA in enumerate(smsList):
-        avgSMS = AverageSMS([smsA])
-        avgSMS._upperLimit = smsA._upperLimit
-        for iB, smsB in enumerate(smsList):
-            if iB <= iA:
-                continue
-            if smsA._upperLimit != smsB._upperLimit:
-                continue
-            if avgSMS != smsB:
-                continue
-            avgSMS.smsList.append(smsB)
-            avgSMS.weight += smsB.weight
-        if avgSMS not in avgSMSList:
-            avgSMSList.append(avgSMS)
+    # Sort SMS by upperLimit 
+    sortedSMSList = sorted(smsList, key = lambda sms: sms._upperLimit)
 
-    # Make sure each SMS belongs to a average SMS:
-    for sms in smsList:
-        nclusters = sum([avgSMS.contains(sms) for avgSMS in avgSMSList])
-        if nclusters != 1:
-            raise SModelSError("Error computing average SMS. SMS %s belongs to %i average SMS."
-                               % (str(sms), nclusters))
-    return avgSMSList
+    # Cluster all identical SMS into clusters
+    clusterList = groupSMS(sortedSMSList,dataset)
 
-def clusterTo(centroids,smsList,dataset,maxDist):
-    """
-    Assign a SMS from smsList to one of the centroids
-    """
+    # Sort clusters by proximity in upperLimit 
+    clusterList = sorted(clusterList, 
+                         key=lambda cluster: cluster.averageSMS._upperLimit)
+
+    # Compute the distance matrix for the clusters:
+    # (diagonal entries are set to None)
+    dMatrix = np.full((len(clusterList),len(clusterList)),fill_value=None)
+    for iA,clusterA in enumerate(clusterList):
+        for iB,clusterB in enumerate(clusterList):
+            if iA >= iB: continue
+            dMatrix[iA,iB] = clusterA.distanceTo(clusterB)
+            dMatrix[iB,iA] = dMatrix[iA,iB] # the matrix is symmetric
     
-    dMatrix = np.full((len(smsList),len(centroids)),fill_value=maxDist)
-    for isms,sms in enumerate(smsList):
-        for ic,c in enumerate(centroids):
-            dMatrix[isms,ic] = relativeDistance(c,sms,dataset)
-
-    clusters = [[] for ic in range(len(centroids))]
-    notClustered = []
-    for isms,sms in enumerate(smsList):
-        ic = np.argmin(dMatrix[isms])
-        d = dMatrix[isms,ic]
-        if d < maxDist:
-            clusters[ic].append(isms)
+    # Check minimal distance between two distinct clusters
+    # (set default to 2*maxDist in case len(clusterList) == 1, i.e. dMatrix is empty)
+    minDist = min([d for d in dMatrix.flatten() if d is not None], 
+                  default=2*maxDist)
+    # Merge closest cluster up to the point when
+    # no more merges are possible (all clusters have distances larger than maxDist)
+    while (len(clusterList) > 1) and (minDist < maxDist):
+        # Get indices of first pair of clusters with minimum distance
+        mergeIndices = np.argwhere(dMatrix == minDist)[0]
+        # Merge clusters with indices in mergeIndices
+        newCluster = mergeClusters(np.take(clusterList,mergeIndices))
+        # If new cluster is valid (averageSMS is close to the cluster's SMS),
+        # replace the two orignal clusters by it. 
+        if newCluster.isValid(maxDist):
+            # Update cluster list:
+            # Remove cluster with largest index
+            # and replace cluster with smallest index by new cluster
+            delete_index = max(mergeIndices)
+            replace_index = min(mergeIndices)
+            clusterList.pop(delete_index)
+            clusterList[replace_index] = newCluster 
+            # Remove row and column for cluster with largest index
+            dMatrix = np.delete(dMatrix,delete_index,0)
+            dMatrix = np.delete(dMatrix,delete_index,1)
+            # Compute the distances between the new cluster and all the
+            # other ones.
+            # Recompute distances using the new cluster:
+            for iA,clusterA in enumerate(clusterList):
+                if iA >= replace_index: continue
+                dMatrix[iA,replace_index] = clusterA.distanceTo(newCluster)
+                dMatrix[replace_index,iA] = dMatrix[iA,replace_index] # the matrix is symmetric
+        
+        # Otherwise keep the original clusters, but set 
+        # their distance above maxDist, so they will no longer be allowed to merge
         else:
-            notClustered.append(isms)
-    
-    clusterObjs = [SMSCluster((np.array(smsList)[indexList]).tolist())
-                    for indexList in clusters]
-    clusterObjs = sorted(clusterObjs, key = lambda c: sorted([sms.smsID for sms in c.smsList]))
-
-    # Sort not clustered by largest distance first
-    notClustered = sorted(notClustered, key = lambda isms: min(dMatrix[isms,:]),reverse=True)
-    notClustered = np.array(smsList)[notClustered].tolist()
-
-    return clusterObjs,notClustered   
-
-def kmeansCluster(initialCentroids,sortedSMSList,dataset,maxDist):
-
-    # First cluster around the initial centroids
-    clusters,notClustered = clusterTo(initialCentroids,sortedSMSList,dataset,maxDist)
-    
-    stop = False
-    # Now iterate until the clusters converge
-    # (at this stage do not impose a distance limit for clustering)
-    while (not stop):
-        # Compute new centroids:
-        centroids = [cluster.averageSMS for cluster in clusters]
-        # Compute new clusters
-        newClusters,notClustered = clusterTo(centroids,sortedSMSList,dataset,maxDist=float('inf'))
-        # Stop when clusters no longer change
-        if all(clusters[ic] == c for ic,c in enumerate(newClusters)):
-            stop = True
-        else:
-            clusters = newClusters[:]
-
-    # Using the converged centroids remove the SMS with d(centroid,sms) > maxDist
-    newClusters,notClustered = clusterTo(centroids,sortedSMSList,dataset,maxDist=maxDist)
-    return  newClusters,notClustered
-
-def doCluster(smsList, dataset, maxDist,nmax=100):
-    """
-    Cluster algorithm to cluster SMS using a modified K-Means method.
-
-    :parameter smsList: list of all SMS to be clustered
-    :parameter dataset: Dataset object to be used when computing distances in upper limit space
-    :parameter maxDist: maximum distance for clustering two SMS
-    :parameter nmax: maximum number of iterations
-
-    :returns: a list of SMSCluster objects containing the SMS
-              belonging to the cluster
-    """
-
-    # Get average SMS:
-    averageSMSList = groupSMS(smsList, dataset)
-
-    # Index average SMS:
-    sortedSMSList = sorted(averageSMSList, key=lambda sms: sms._upperLimit)
-    for isms, sms in enumerate(sortedSMSList):
-        sms._index = isms
+            dMatrix[mergeIndices] = 2*maxDist
+            dMatrix[np.flip(mergeIndices)] = 2*maxDist
 
 
-    # Choose initial centroids as the first SMS in a chain of
-    # SMS all with dist < maxDist:
-    centroids = [sortedSMSList[0]]
-    for sms in sortedSMSList:
-        if relativeDistance(sms,centroids[-1],dataset) > maxDist:
-            centroids.append(sms)
+        minDist = min([d for d in dMatrix.flatten() if d is not None], 
+                  default=2*maxDist)
+        
 
-    clusters,notClustered = kmeansCluster(centroids,sortedSMSList,dataset,maxDist)
-
-    niter = 1
-    while (len(notClustered) !=0) and (niter < nmax):
-        centroids = [c.averageSMS for c in clusters] + [notClustered[0]]
-        clusters,notClustered = kmeansCluster(centroids,sortedSMSList,dataset,maxDist)
-        niter += 1
-
-    if (niter == nmax) and len(notClustered) != 0:
-        logger.warning("SMSCluster failed, using unclustered topologies")
-        clusters = [SMSCluster([sms]) for sms in sortedSMSList]
-
-    # Replace average SMS by the original SMS:
-    for cluster in clusters:
-        originalSMS = []
-        for avgSMS in cluster.smsList[:]:
-            originalSMS += avgSMS.smsList[:]
-        cluster.smsList = originalSMS[:]        
-    
     # Finally sort clusters by total xsection and length
-    clusters = sorted(clusters, key = lambda c: (c.getTotalXSec(),len(c)),reverse=True)
+    clusters = sorted(clusterList, 
+                      key = lambda c: (c.getTotalXSec(),len(c.smsList)),
+                      reverse=True)
 
     return clusters
+
+
+def groupSMS(smsList,dataset):
+    """
+    Group SMS into clusters where the average SMS is
+    identical to all the SMS in cluster.
+    Each cluster contains all SMS which share the same mass,width and upper limit
+    and can be replaced by their average SMS.
+
+    :parameter smsList: list of all SMS to be grouped
+
+    :returns: a list of SMSCluster objects
+              which represents a group of SMS with same mass, width and upper limit.
+    """
+
+    # Group SMS if they have the same UL
+    # and give the same average SMS (same BSM attributes)
+    smsClusterList = []
+    nonClusteredSMS = smsList[:]
+    while nonClusteredSMS:
+        smsA = nonClusteredSMS.pop(0)
+        smsCluster = SMSCluster([smsA],dataset=dataset)
+        # Keep track of the SMS which could not
+        # be clustered with smsA to use in the next iteration
+        notClustered = []
+        while nonClusteredSMS:
+            smsB = nonClusteredSMS.pop(0)
+            # If it can not be clustered with smsA, add to notClustered list
+            if (smsA._upperLimit != smsB._upperLimit) or (smsCluster.averageSMS != smsB):
+                notClustered.append(smsB)
+                continue
+            smsCluster.smsList.append(smsB)
+            smsCluster.averageSMS.weight += smsB.weight
+        
+        smsClusterList.append(smsCluster)
+        nonClusteredSMS = notClustered[:]
+
+    # Make sure each SMS belongs to a cluster:
+    nclustered = sum([len(c.smsList) for c in smsClusterList])
+    nsms = len(smsList)
+    if nclustered != nsms:
+        raise SModelSError(f"Error grouping SMS. {nclustered}/{nsms} SMS were clustered")
+    
+    return smsClusterList
+
+def mergeClusters(clusterList,useAverage=False):
+    """
+    Merge a list of SMSCluster objects using
+    the averageSMS of each cluster if useAverage is True.
+    Otherwise cluster the list of all SMS from all clusters.
+
+    :param clusterList: List of SMSCluster objects
+    :param useAverage: True/False. If True, 
+                       will cluster the averageSMS in each cluster.
+    """
+        
+    if len(clusterList) == 0:
+        return None
+    
+    smsList = []
+    for cluster in clusterList:
+        smsList += cluster.smsList[:]
+        
+    if not useAverage:
+        newCluster = SMSCluster(smsList,
+                                clusterList[0].dataset)
+    else:
+        avgSMSList = [cluster.averageSMS 
+                   for cluster in clusterList]
+        newCluster = SMSCluster(avgSMSList,
+                                clusterList[0].dataset)
+        # Make sure the cluster SMS list contains the original SMS
+        newCluster.smsList = smsList[:]
+
+    return newCluster
