@@ -674,7 +674,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if False and workspace_index in self.data.cached_likelihoods[expected] and \
+        if True and workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
 
@@ -756,6 +756,7 @@ class PyhfUpperLimitComputer:
             # Cache the likelihood (but do we use it?)
             if not workspace_index in self.data.cached_likelihoods[expected]:
                 self.data.cached_likelihoods[expected][workspace_index]={}
+            ret = self.exponentiateNLL(ret, not return_nll)
             self.data.cached_likelihoods[expected][
                 workspace_index
             ][mu] = ret
@@ -763,7 +764,6 @@ class PyhfUpperLimitComputer:
                 if not None in self.data.cached_likelihoods[expected]:
                     self.data.cached_likelihoods[expected][None]={}
                 self.data.cached_likelihoods[expected][None][mu] = ret
-            ret = self.exponentiateNLL(ret, not return_nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
