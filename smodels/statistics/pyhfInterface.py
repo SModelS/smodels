@@ -57,7 +57,7 @@ pyhfinfo = {
 }
 
 def setBackend ( backend : str ) -> bool:
-    """ 
+    """
     try to setup backend to <backend>
 
     :param backend: one of: numpy (default), pytorch, jax, tensorflow
@@ -1066,7 +1066,17 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def clsRoot(mu : float ) -> float:
+            def clsRootTevatron(mu : float ) -> float:
+                """ compute CLs, the tevatron way. """
+                nll_sb = self.likelihood ( mu, expected = expected, return_nll=True )
+                nll_b = self.likelihood ( 0, expected = expected, return_nll=True )
+                from smodels.statistics.basicStats import CLsfromLsb, getNumericalVariance
+                sigma2_b = getNumericalVariance ( self, 0. )
+                sigma2_sb = getNumericalVariance ( self, mu )
+                CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type="CLs" )
+                return 1.0 - self.cl - CLs
+
+            def clsRootAsimov(mu : float ) -> float:
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -1120,6 +1130,15 @@ class PyhfUpperLimitComputer:
                         CLs = float(result)
                     # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
                     return 1.0 - self.cl - CLs
+
+
+            def clsRoot ( mu : float ):
+                """ central 'switch' for how to compute cls """
+                from smodels.base import runtime
+                useTevatron = runtime._useTevatronCLsConstruction
+                if useTevatron:
+                    return clsRootTevatron(mu)
+                return clsRootAsimov(mu)
 
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
