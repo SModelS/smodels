@@ -146,8 +146,8 @@ class TheoryPrediction(object):
         """
 
         if self.dataType() == "upperLimit":
-            from smodels.base.runtime import experimentalFeatures
-            if not experimentalFeatures():
+            from smodels.base.runtime import experimentalFeature
+            if not experimentalFeature( "truncatedGaussians" ):
                 computer = 'N/A'
             else:
                 computer = StatsComputer.forTruncatedGaussian(self)

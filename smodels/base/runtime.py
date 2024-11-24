@@ -10,10 +10,12 @@
 
 """
 
+from typing import Union
+
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
 
-_experimental = False ## turn on experimental features
+_experimental = { "truncatedgaussians": False } ## experimental features
 
 ## for the computation of CLs values, shall we use the tevatron way
 ## of computing the p-values, or the LHC "Asimov" way?
@@ -55,11 +57,16 @@ def filetype ( filename ):
     return None
 
 
-def experimentalFeatures():
-    """ a simple boolean flag to turn experimental features on/off,
+def experimentalFeature( feature : str ) -> Union[None,bool]:
+    """ method to check if a certain experimental feature is enabled.
     can be turned on and off via options:experimental in parameters.ini.
+    :param feature: ask for feature
+    
+    :returns: None if feature does not exist, else boolean
     """
-    return _experimental
+    if not feature in _experimental:
+        return None
+    return _experimental[feature]
 
 def nCPUs():
     """ obtain the number of *available* CPU cores on the machine, for several

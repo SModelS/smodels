@@ -146,7 +146,7 @@ class RunPrinterTest(unittest.TestCase):
 
         slhafile = "./testFiles/slha/lightEWinos.slha"
         out = runMain(slhafile,inifile="testPrinters_parameters.ini",
-                suppressStdout = True )
+                suppressStdout = False )
 
         # Check Summary output
         outputfile = out.replace('.py', '.smodels')

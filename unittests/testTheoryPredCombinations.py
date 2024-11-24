@@ -150,7 +150,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         warnings.filterwarnings("ignore", category=UserWarning)        
         from smodels.base import runtime
-        runtime._experimental = True
+        runtime._experimental["truncatedgaussians"] = True
 
         anaids = [
           # 'CMS-SUS-16-036',
