@@ -374,7 +374,7 @@ class NNUpperLimitComputer:
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
 
         from smodels.base import runtime
-        useTevatron = runtime._useTevatronCLsConstruction
+        useTevatron = runtime.experimentalFeature ( "tevatroncls" )
         if useTevatron:
             return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootAsimov

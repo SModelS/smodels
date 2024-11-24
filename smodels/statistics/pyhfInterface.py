@@ -1135,7 +1135,7 @@ class PyhfUpperLimitComputer:
             def clsRoot ( mu : float ):
                 """ central 'switch' for how to compute cls """
                 from smodels.base import runtime
-                useTevatron = runtime._useTevatronCLsConstruction
+                useTevatron = runtime.experimentalFeature ( "tevatroncls" )
                 if useTevatron:
                     return clsRootTevatron(mu)
                 return clsRootAsimov(mu)
