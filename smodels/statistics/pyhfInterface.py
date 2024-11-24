@@ -1066,7 +1066,7 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def root_func(mu):
+            def clsRoot(mu : float ) -> float:
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -1106,7 +1106,7 @@ class PyhfUpperLimitComputer:
                             if expected == "posteriori":
                                 result = [float("nan")] * 2
                     end = time.time()
-                    logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                    logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
                     logger.debug(f"result for {mu} {result}")
                     if expected == "posteriori":
                         logger.debug("computing a-posteriori expected limit")
@@ -1118,7 +1118,7 @@ class PyhfUpperLimitComputer:
                     else:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         CLs = float(result)
-                    # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
+                    # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
                     return 1.0 - self.cl - CLs
 
             # Rescaling signals so that mu is in [0, 10]
@@ -1128,7 +1128,7 @@ class PyhfUpperLimitComputer:
             nattempts = 0
             nNan = 0
             lo_mu, med_mu, hi_mu = 0.2, 1.0, 5.0
-            # ic ( "A", lo_mu, hi_mu, root_func(lo_mu), root_func(hi_mu) )
+            # ic ( "A", lo_mu, hi_mu, clsRoot(lo_mu), clsRoot(hi_mu) )
             # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
@@ -1142,9 +1142,9 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = root_func(lo_mu)
-                # rt5 = root_func(med_mu)
-                rt10 = root_func(hi_mu)
+                rt1 = clsRoot(lo_mu)
+                # rt5 = clsRoot(med_mu)
+                rt10 = clsRoot(hi_mu)
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1152,7 +1152,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = root_func(med_mu)
+                    rt5 = clsRoot(med_mu)
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1164,7 +1164,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = root_func(med_mu)
+                    rt5 = clsRoot(med_mu)
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1193,11 +1193,11 @@ class PyhfUpperLimitComputer:
                     self.rescale(1 / factor)
                     continue
             # Finding the root (Brent bracketing part)
-            logger.debug("Final scale : %f" % self.scale)
+            logger.debug( f"Final scale : {self.scale}" )
             logger.debug("Starting brent bracketing")
-            ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
-            logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
+            logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
