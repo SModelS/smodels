@@ -544,11 +544,12 @@ def setExperimentalFeatures(parser):
     """ set the experimental features flats, if experimentalFeatures:* = True """
     if not parser.has_section ( "experimentalFeatures" ):
         return
-    for feature,flag in dict(parser.items("experimentalFeatures")).items():
+    for feature in dict(parser.items("experimentalFeatures")).keys():
         if not feature in runtime._experimental:
             logger.warning ( f"'{feature}' is not a known experimental feature. will ignore." )
             continue
-        runtime._experimental[feature]=bool(flag)
+        flag = parser.getboolean ( "experimentalFeatures", feature )
+        runtime._experimental[feature]=flag
 
 def getAllInputFiles(inFile):
     """
