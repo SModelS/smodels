@@ -578,7 +578,7 @@ class LikelihoodComputer:
                 # gaussian = self.coeff * np.exp ( expon )
                 # gaussian2 = stats.multivariate_normal.pdf(theta,mean=M,cov=C)
                 ret = gaussian * (reduce(lambda x, y: x * y, poisson))
-            return ret
+            return float(ret)
         except ValueError as e:
             raise Exception("ValueError %s, %s" % (e, self.model.V))
             # raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))

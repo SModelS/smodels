@@ -114,9 +114,10 @@ class PyhfData:
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
-        self.cached_likelihoods = {}  ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = {}  # cache of lmaxes (actually twice_nlls)
-        self.cachedULs = {False: {}, True: {}, "posteriori": {}}
+        self.cached_likelihoods = { False: {}, True: {}, "posteriori": {} }  ## cache of likelihoods (actually twice_nlls)
+        self.cached_lmaxes = { False: {}, True: {}, "posteriori": {} }  # cache of lmaxes (actually twice_nlls)
+        self.cachedULs = { False: {}, True: {}, "posteriori": {}}
+        self.cacheBestCombo = None # memorize also whats the best combo
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
             jsonFiles = {}
             for jFile,sregions in nsignals.items():
@@ -674,6 +675,9 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
+        if True and workspace_index in self.data.cached_likelihoods[expected] and \
+                mu in self.data.cached_likelihoods[expected][workspace_index]:
+            return self.data.cached_likelihoods[expected][workspace_index][mu]
 
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
@@ -685,6 +689,7 @@ class PyhfUpperLimitComputer:
                 "Values in x were outside bounds during a minimize step, clipping to bounds",
             )
             # warnings.filterwarnings ( "ignore", "", module="pyhf.exceptions" )
+            old_index = workspace_index
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index == None:
@@ -698,7 +703,7 @@ class PyhfUpperLimitComputer:
                 self.__init__(self.data, self.cl, self.lumi)
                 ### allow this, for computation of l_SM
                 # if self.zeroSignalsFlag[workspace_index] == True:
-                #    logger.warning("Workspace number %d has zero signals" % workspace_index)
+                #    logger.warning( f"Workspace number {workspace_index} has zero signals" )
                 #    return None
                 workspace = self.updateWorkspace(workspace_index, expected=expected)
                 # Same modifiers_settings as those used when running the 'pyhf cls' command line
@@ -750,10 +755,16 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             # Cache the likelihood (but do we use it?)
-            self.data.cached_likelihoods[
-                workspace_index
-            ] = ret
+            if not workspace_index in self.data.cached_likelihoods[expected]:
+                self.data.cached_likelihoods[expected][workspace_index]={}
             ret = self.exponentiateNLL(ret, not return_nll)
+            self.data.cached_likelihoods[expected][
+                workspace_index
+            ][mu] = ret
+            if old_index == None:
+                if not None in self.data.cached_likelihoods[expected]:
+                    self.data.cached_likelihoods[expected][None]={}
+                self.data.cached_likelihoods[expected][None][mu] = ret
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
@@ -762,14 +773,16 @@ class PyhfUpperLimitComputer:
         """find the index of the best expected combination"""
         if self.nWS == 1:
             return 0
-        logger.debug("Finding best expected combination among %d workspace(s)" % self.nWS)
+        if self.data.cacheBestCombo != None:
+            return self.data.cacheBestCombo
+        logger.debug( f"Finding best expected combination among {self.nWS} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
         for i_ws in range(self.nWS):
             if self.data.totalYield == 0.:
                 continue
             if self.zeroSignalsFlag[i_ws] == True:
-                logger.debug("Workspace number %d has zero signals" % i_ws)
+                logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
                 ul = self.getUpperLimitOnMu(expected=True, workspace_index=i_ws)
@@ -778,6 +791,7 @@ class PyhfUpperLimitComputer:
             if ul < ulMin:
                 ulMin = ul
                 i_best = i_ws
+        self.data.cacheBestCombo = i_best
         return i_best
 
     def exponentiateNLL(self, twice_nll, doIt):
@@ -862,6 +876,8 @@ class PyhfUpperLimitComputer:
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
+        if workspace_index in self.data.cached_lmaxes[expected]:
+            return self.data.cached_lmaxes[expected][workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
@@ -871,11 +887,12 @@ class PyhfUpperLimitComputer:
             )
 
             self.__init__(self.data, self.cl, self.lumi)
+            old_index = workspace_index
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
             if workspace_index != None:
                 if self.zeroSignalsFlag[workspace_index] == True:
-                    logger.warning("Workspace number %d has zero signals" % workspace_index)
+                    logger.warning( f"Workspace number {workspace_index} has zero signals" )
                     return None
                 else:
                     workspace = self.updateWorkspace(workspace_index, expected=expected)
@@ -950,7 +967,10 @@ class PyhfUpperLimitComputer:
             lmax = self.exponentiateNLL(lmax, not return_nll)
 
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-            self.data.cached_lmaxes[workspace_index] = ret
+            self.data.cached_lmaxes[expected][workspace_index] = ret
+            if old_index == None:
+                self.data.cached_lmaxes[expected][None] = ret
+            # print ( f"@@11 ret {ret}" )
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):
@@ -1038,8 +1058,7 @@ class PyhfUpperLimitComputer:
                 == True
             ):
                 logger.debug(
-                    "There is (are) %d workspace(s) and no signal(s) was (were) found" % self.nWS
-                )
+                    f"There is (are) {self.nWS} workspace(s) and no signal(s) was (were) found" )
                 return None
             if workspace_index == None:
                 workspace_index = self.getBestCombinationIndex()
@@ -1047,7 +1066,7 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def root_func(mu):
+            def clsRoot(mu : float ) -> float:
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -1087,7 +1106,7 @@ class PyhfUpperLimitComputer:
                             if expected == "posteriori":
                                 result = [float("nan")] * 2
                     end = time.time()
-                    logger.debug("Hypotest elapsed time : %1.4f secs" % (end - start))
+                    logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
                     logger.debug(f"result for {mu} {result}")
                     if expected == "posteriori":
                         logger.debug("computing a-posteriori expected limit")
@@ -1099,7 +1118,7 @@ class PyhfUpperLimitComputer:
                     else:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         CLs = float(result)
-                    # logger.debug("Call of root_func(%f) -> %f" % (mu, 1.0 - CLs))
+                    # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
                     return 1.0 - self.cl - CLs
 
             # Rescaling signals so that mu is in [0, 10]
@@ -1109,7 +1128,7 @@ class PyhfUpperLimitComputer:
             nattempts = 0
             nNan = 0
             lo_mu, med_mu, hi_mu = 0.2, 1.0, 5.0
-            # ic ( "A", lo_mu, hi_mu, root_func(lo_mu), root_func(hi_mu) )
+            # ic ( "A", lo_mu, hi_mu, clsRoot(lo_mu), clsRoot(hi_mu) )
             # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
@@ -1123,9 +1142,9 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = root_func(lo_mu)
-                # rt5 = root_func(med_mu)
-                rt10 = root_func(hi_mu)
+                rt1 = clsRoot(lo_mu)
+                # rt5 = clsRoot(med_mu)
+                rt10 = clsRoot(hi_mu)
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1133,7 +1152,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = root_func(med_mu)
+                    rt5 = clsRoot(med_mu)
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1145,7 +1164,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = root_func(med_mu)
+                    rt5 = clsRoot(med_mu)
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1174,11 +1193,11 @@ class PyhfUpperLimitComputer:
                     self.rescale(1 / factor)
                     continue
             # Finding the root (Brent bracketing part)
-            logger.debug("Final scale : %f" % self.scale)
+            logger.debug( f"Final scale : {self.scale}" )
             logger.debug("Starting brent bracketing")
-            ul = optimize.brentq(root_func, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
-            logger.debug("getUpperLimitOnMu elpased time : %1.4f secs" % (endUL - startUL))
+            logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
