@@ -33,6 +33,11 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 3.0.2:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Small fix in pyhf caching code (results should not change)
+
 New in Version 3.0.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
