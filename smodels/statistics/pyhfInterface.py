@@ -675,7 +675,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if True and workspace_index in self.data.cached_likelihoods[expected] and \
+        if workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
 
