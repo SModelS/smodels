@@ -1109,7 +1109,32 @@ class PyhfUpperLimitComputer:
                         # ic ( workspace["channels"][0]["samples"][0]["data"] )
                         # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
+                            args["return_tail_probs"]=True
                             result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                            result = result[0]
+                            if False:
+                                print ( f"@@1 hypotest CLs {result}" )
+                                asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), \
+                                        model, None, None, None )
+                                print ( f"@@2 asimov data {asimov_data}[:3]" )
+                                pars = model.config.suggested_init()
+                                # nll = .5 * pyhf.infer.mle.twice_nll ( pars, workspace.data(model), model )
+                                nll = float ( - model.logpdf(pars, workspace.data(model) ) )
+                                print ( f"@@3 nll is {nll}" )
+                                nllA = float ( - model.logpdf(pars, asimov_data ) )
+                                print ( f"@@3 nllA is {nllA}" )
+                                muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                                    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                                nll0 = maxNllh/2.
+                                print ( f"@@4 nll0 is {nll0}" )
+                                muhat, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
+                                    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                                nll0A = maxNllhA/2.
+                                print ( f"@@4 nll0A is {nll0A}" )
+                                from smodels.statistics.basicStats import CLsfromNLL
+                                cls = CLsfromNLL (nllA, nll0A, nll, nll0 )
+                                print ( f"@@5 cls is {cls}" )
+                                
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
                             result = float("nan")
