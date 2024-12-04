@@ -263,7 +263,7 @@ class AnaCombLikelihoodComputer(object):
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
             nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
+            return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu), return_type=return_type) if nll is not None else None
 
         return mu_hat, sigma_mu, clsRoot
 
