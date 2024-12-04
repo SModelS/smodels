@@ -1076,7 +1076,8 @@ class PyhfUpperLimitComputer:
                 CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type="CLs" )
                 return 1.0 - self.cl - CLs
 
-            def clsRootAsimov(mu : float ) -> float:
+            def clsRootPyhf(mu : float ) -> float:
+                """ thats the original code to get cls from pyhf """
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -1109,32 +1110,7 @@ class PyhfUpperLimitComputer:
                         # ic ( workspace["channels"][0]["samples"][0]["data"] )
                         # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
-                            args["return_tail_probs"]=True
                             result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                            result = result[0]
-                            if False:
-                                print ( f"@@1 hypotest CLs {result}" )
-                                asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), \
-                                        model, None, None, None )
-                                print ( f"@@2 asimov data {asimov_data}[:3]" )
-                                pars = model.config.suggested_init()
-                                # nll = .5 * pyhf.infer.mle.twice_nll ( pars, workspace.data(model), model )
-                                nll = float ( - model.logpdf(pars, workspace.data(model) ) )
-                                print ( f"@@3 nll is {nll}" )
-                                nllA = float ( - model.logpdf(pars, asimov_data ) )
-                                print ( f"@@3 nllA is {nllA}" )
-                                muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
-                                    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                                nll0 = maxNllh/2.
-                                print ( f"@@4 nll0 is {nll0}" )
-                                muhat, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
-                                    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                                nll0A = maxNllhA/2.
-                                print ( f"@@4 nll0A is {nll0A}" )
-                                from smodels.statistics.basicStats import CLsfromNLL
-                                cls = CLsfromNLL (nllA, nll0A, nll, nll0 )
-                                print ( f"@@5 cls is {cls}" )
-                                
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
                             result = float("nan")
@@ -1156,6 +1132,96 @@ class PyhfUpperLimitComputer:
                     # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
                     return 1.0 - self.cl - CLs
 
+            def clsRootAsimov(mu : float ) -> float:
+                """ here is our code that allows to plug in different data """
+                # If expected == False, use unmodified (but patched) workspace
+                # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
+                # If expected == posteriori, use unmodified (but patched) workspace
+                workspace = self.updateWorkspace(workspace_index, expected=expected)
+                # Same modifiers_settings as those use when running the 'pyhf cls' command line
+                msettings = {
+                    "normsys": {"interpcode": "code4"},
+                    "histosys": {"interpcode": "code4p"},
+                }
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+                    model = workspace.model(modifier_settings=msettings)
+                    bounds = model.config.suggested_bounds()
+                    bounds[model.config.poi_index] = (0, 10)
+                    start = time.time()
+                    args = {}
+                    args["return_expected"] = expected == "posteriori"
+                    args["par_bounds"] = bounds
+                    # args["maxiter"]=100000
+                    pver = float(pyhf.__version__[:3])
+                    stat = "qtilde"
+                    if pver < 0.6:
+                        args["qtilde"] = True
+                    else:
+                        args["test_stat"] = stat
+                    with np.testing.suppress_warnings() as sup:
+                        if pyhfinfo["backend"] == "numpy":
+                            sup.filter(RuntimeWarning, r"invalid value encountered in log")
+                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                        # ic ( workspace["channels"][0]["samples"][0]["data"] )
+                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+                        try:
+                            # print ( f"@@0 -----" )
+                            # args["return_tail_probs"]=True
+                            # result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                            #print ( f"@@1 my mu {mu}" )
+                            asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), \
+                                    model, None, None, None )
+                            #print ( f"@@2 my asimov data {asimov_data[:3]}" )
+                            pars = model.config.suggested_init()
+                            # pars[model.config.poi_index]=mu
+                            # look at test_statistics:_tmu_like!!
+                            # nll = .5 * pyhf.infer.mle.twice_nll ( pars, workspace.data(model), model )
+                            tnll = pyhf.infer.mle.fixed_poi_fit(mu, workspace.data(model), model, return_fitted_val=True )
+                            nll = float ( tnll[1] )
+                            #print ( f"@@3 my nll is {nll}" )
+                            tnllA = pyhf.infer.mle.fixed_poi_fit(mu, asimov_data, model, return_fitted_val = True ) 
+                            nllA = float ( tnllA[1] )
+
+                            #print ( f"@@3 my nllA is {nllA}" )
+                            muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                                return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                            nll0 = maxNllh
+                            #print ( f"@@4 my nll0 is {nll0}" )
+                            muhat, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
+                                return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                            nll0A = maxNllhA
+                            #print ( f"@@4 my nll0A is {nll0A}" )
+                            from smodels.statistics.basicStats import CLsfromNLL
+                            cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
+                            return 1.0 - self.cl - cls
+                            #print ( f"@@5 my cls is {cls}" )
+                            #print ( f"@@1 their hypotest CLs {result}" )
+                            
+                        except Exception as e:
+                            logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
+                            result = float("nan")
+                            if expected == "posteriori":
+                                result = [float("nan")] * 2
+                    end = time.time()
+                    return None
+                    """
+                    logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
+                    # logger.debug(f"result for {mu} {result}")
+                    if expected == "posteriori":
+                        logger.debug("computing a-posteriori expected limit")
+                        # logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        try:
+                            CLs = float(result[1].tolist())
+                        except TypeError:
+                            CLs = float(result[1][0])
+                    else:
+                        #logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                        # CLs = float(result)
+                    # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
+                    return 1.0 - self.cl - CLs
+                    """
+
 
             def clsRoot ( mu : float ):
                 """ central 'switch' for how to compute cls """
@@ -1163,7 +1229,10 @@ class PyhfUpperLimitComputer:
                 useTevatron = runtime.experimentalFeature ( "tevatroncls" )
                 if useTevatron:
                     return clsRootTevatron(mu)
-                return clsRootAsimov(mu)
+                old = clsRootPyhf(mu)
+                ret = clsRootAsimov(mu)
+                print ( f"@@X compare {old},{ret}" )
+                return ret
 
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
