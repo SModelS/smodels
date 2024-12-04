@@ -66,7 +66,7 @@ class RunSModelSTest(unittest.TestCase):
 
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
-        outputfile = runMain(filename)
+        outputfile = runMain(filename,suppressStdout=True)
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "gluino_squarks_default.py"

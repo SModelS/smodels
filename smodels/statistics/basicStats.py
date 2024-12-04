@@ -17,7 +17,7 @@ from typing import Text
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 
 def CLsfromNLL(
-    nllA: float, nll0A: float, nll: float, nll0: float,
+        nllA: float, nll0A: float, nll: float, nll0: float, big_muhat: bool,
     return_type: Text = "CLs-alpha" ) -> float:
     """
     compute the CLs - alpha from the NLLs
@@ -27,6 +27,7 @@ def CLsfromNLL(
     :param nll0A: negative log likelihood at muhat for Asimov data
     :param nll: negative log likelihood
     :param nll0: negative log likelihood at muhat
+    :param big_muhat: true if muhat>mu
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
@@ -34,7 +35,7 @@ def CLsfromNLL(
     :return: Cls-type value, see above
     """
     assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
-    qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
+    qmu = 0.0 if ( 2 * (nll - nll0) < 0.0 or big_muhat ) else 2 * (nll - nll0)
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
     if qA < 0.0:

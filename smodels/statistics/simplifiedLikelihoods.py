@@ -926,7 +926,7 @@ class UpperLimitComputer:
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        ul = self.getUpperLimitOnMu( model, expected=expected, 
+        ul = self.getUpperLimitOnMu( model, expected=expected,
                                      trylasttime=trylasttime)
 
         if ul == None:
@@ -1002,7 +1002,8 @@ class UpperLimitComputer:
             """
             nll = computer.likelihood(mu, return_nll=True)
             nllA = compA.likelihood(mu, return_nll=True)
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
+            return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
+                              return_type=return_type)
 
         return mu_hat, sigma_mu, clsRoot
 
