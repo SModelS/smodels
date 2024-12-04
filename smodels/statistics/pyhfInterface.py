@@ -1106,11 +1106,11 @@ class PyhfUpperLimitComputer:
                     with np.testing.suppress_warnings() as sup:
                         if pyhfinfo["backend"] == "numpy":
                             sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                        # ic ( workspace["channels"][0]["samples"][0]["data"] )
-                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
-                            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                            args["return_tail_probs"]=True
+                            ret = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                            # print ( f"@@pyhfInterface: their CL values {ret}" )
+                            result = ret[0]
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
                             result = float("nan")
@@ -1130,6 +1130,7 @@ class PyhfUpperLimitComputer:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         CLs = float(result)
                     # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
+                    # print ( f"@@ their CLs is {CLs}" )
                     return 1.0 - self.cl - CLs
 
             def clsRootAsimov(mu : float ) -> float:
@@ -1188,12 +1189,17 @@ class PyhfUpperLimitComputer:
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             nll0 = maxNllh
                             #print ( f"@@4 my nll0 is {nll0}" )
-                            muhat, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
+                            muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             nll0A = maxNllhA
-                            #print ( f"@@4 my nll0A is {nll0A}" )
+                            #print ( f"@@4 my nll: {nll} nll0: {nll0} nllA: {nllA} nll0A is {nll0A}" )
                             from smodels.statistics.basicStats import CLsfromNLL
-                            cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
+                            # cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
+                            big_muhat = (muhat[model.config.poi_index]>mu)
+                            ret = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., \
+                                    big_muhat, return_type="CLs", return_tail_probs = True )
+                            cls = ret["ret"]
+
                             end = time.time()
                             #print ( f"@@5 my cls is {cls}" )
                             return 1.0 - self.cl - cls
@@ -1209,9 +1215,15 @@ class PyhfUpperLimitComputer:
                 useTevatron = runtime.experimentalFeature ( "tevatroncls" )
                 if useTevatron:
                     return clsRootTevatron(mu)
+                #print ( f"@@x ----- starting mu={mu} expected={expected}" )
                 old = clsRootPyhf(mu)
                 ret = clsRootAsimov(mu)
-                print ( f"@@X compare {old},{ret} {expected}" )
+                # print ( f"@@X compare {old},{ret} (expected={expected})" )
+                if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
+                    # pass
+                    print ( f"@@ values differ. stopping." )
+                    sys.exit()
+                # print ( f"@@x -----------" )
                 return ret
 
             # Rescaling signals so that mu is in [0, 10]

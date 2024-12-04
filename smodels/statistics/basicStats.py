@@ -33,10 +33,10 @@ def getNumericalVariance ( obj, mu : float )-> float:
     #    print ( f"@@X hessians {h} {hessian}" )
     return 1./h
 
-def CLsfromLsb( nll_sb: float, nll_b: float, 
+def CLsfromLsb( nll_sb: float, nll_b: float,
     sigma2_sb : float, sigma2_b : float, return_type: Text = "CLs-alpha" ) -> float:
     """ given nll_sb and nll_b, plus the sigma**2 values around muhat,
-    compute the CLs value, i.e. P(s+b)/(1-P(b)) according to section 3.8 
+    compute the CLs value, i.e. P(s+b)/(1-P(b)) according to section 3.8
     in the CCGV paper, tevatron style, https://arxiv.org/pdf/1007.1727.
 
     :param nll_sb: negative log likelihood of s+b
@@ -64,8 +64,9 @@ def CLsfromLsb( nll_sb: float, nll_b: float,
     return CLs - 0.05
 
 def CLsfromNLL(
-    nllA: float, nll0A: float, nll: float, nll0: float,
-    return_type: Text = "CLs-alpha" ) -> float:
+        nllA: float, nll0A: float, nll: float, nll0: float,
+        big_muhat : bool, return_type: Text = "CLs-alpha",
+        return_tail_probs : bool = False ) -> float:
     """
     compute the CLs - alpha from the NLLs
     TODO: following needs explanation
@@ -74,34 +75,52 @@ def CLsfromNLL(
     :param nll0A: negative log likelihood at muhat for Asimov data
     :param nll: negative log likelihood
     :param nll0: negative log likelihood at muhat
+    :param big_muhat: true if muhat > mu
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
+    :param return_tail_probs: if true, return also tail probabilities: CLsb, CLb
     :return: Cls-type value, see above
     """
     assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
     qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
+    qmu = 0.0 if big_muhat else qmu
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
     if qA < 0.0:
         qA = 0.0
     sqA = np.sqrt(qA)
-    if qA >= qmu:
-        CLsb = 1.0 - stats.multivariate_normal.cdf(sqmu)
-        CLb = stats.multivariate_normal.cdf(sqA - sqmu)
+    #print ( f"@@X my big_muhat {big_muhat}" )
+    #print ( f"@@X my qmu {qmu} qmu_A {qA}" )
+    #print ( f"@@X my sqmu {sqmu} sqmu_A {sqA} condition {sqmu<=sqA}" )
+    if sqmu <= sqA:
+        CLsb = 1.0 - stats.norm.cdf(sqmu)
+        CLb = stats.norm.cdf(sqA - sqmu)
     else:
         CLsb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA))
         CLb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA))
+        #print ( f"@@X my old for CLsb i evaluate at {qmu/(2*sqA)}+{qA/(2*sqA)}: {CLsb}" )
+        #print ( f"@@X my old for CLb i evaluate at {qmu/(2*sqA)}-{qA/(2*sqA)}: {CLb}" )
+        #CLsb = 1.0 if qA == 0.0 else 0.5
+        #CLb = 1.0 if qA == 0.0 else stats.norm.cdf( sqA )
+        #print ( f"@@X my new for CLsb i evaluate at {sqA}: {CLb}" )
+
+    # print ( f"@@X my CLsb={CLsb} CLb={CLb} qmu {qmu} qmu_A {qA}" )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
 
-    if return_type == "1-CLs":
-        return 1.0 - CLs
-    elif return_type == "CLs":
-        return CLs
+    ret = CLs - 0.05
 
-    return CLs - 0.05
+    if return_type == "1-CLs":
+        ret = 1.0 - CLs
+    elif return_type == "CLs":
+        ret = CLs
+
+    if return_tail_probs:
+        return { "ret": CLs, "CLsb": CLsb, "CLb": CLb }
+
+    return ret
 
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
          allowNegative = True ):
