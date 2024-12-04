@@ -1194,34 +1194,14 @@ class PyhfUpperLimitComputer:
                             #print ( f"@@4 my nll0A is {nll0A}" )
                             from smodels.statistics.basicStats import CLsfromNLL
                             cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
-                            return 1.0 - self.cl - cls
+                            end = time.time()
                             #print ( f"@@5 my cls is {cls}" )
-                            #print ( f"@@1 their hypotest CLs {result}" )
+                            return 1.0 - self.cl - cls
                             
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
-                            result = float("nan")
-                            if expected == "posteriori":
-                                result = [float("nan")] * 2
-                    end = time.time()
+                            return None
                     return None
-                    """
-                    logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
-                    # logger.debug(f"result for {mu} {result}")
-                    if expected == "posteriori":
-                        logger.debug("computing a-posteriori expected limit")
-                        # logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                        try:
-                            CLs = float(result[1].tolist())
-                        except TypeError:
-                            CLs = float(result[1][0])
-                    else:
-                        #logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                        # CLs = float(result)
-                    # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
-                    return 1.0 - self.cl - CLs
-                    """
-
 
             def clsRoot ( mu : float ):
                 """ central 'switch' for how to compute cls """
@@ -1231,7 +1211,7 @@ class PyhfUpperLimitComputer:
                     return clsRootTevatron(mu)
                 old = clsRootPyhf(mu)
                 ret = clsRootAsimov(mu)
-                print ( f"@@X compare {old},{ret}" )
+                print ( f"@@X compare {old},{ret} {expected}" )
                 return ret
 
             # Rescaling signals so that mu is in [0, 10]
