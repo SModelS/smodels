@@ -1139,6 +1139,7 @@ class PyhfUpperLimitComputer:
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
                 workspace = self.updateWorkspace(workspace_index, expected=expected)
+                workspace_expected = self.updateWorkspace(workspace_index, expected=True)
                 # Same modifiers_settings as those use when running the 'pyhf cls' command line
                 msettings = {
                     "normsys": {"interpcode": "code4"},
@@ -1171,8 +1172,8 @@ class PyhfUpperLimitComputer:
                             # args["return_tail_probs"]=True
                             # result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
                             #print ( f"@@1 my mu {mu}" )
-                            asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), \
-                                    model, None, None, None )
+                            #asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), \
+                            #        model, None, None, None )
                             #print ( f"@@2 my asimov data {asimov_data[:3]}" )
                             pars = model.config.suggested_init()
                             # pars[model.config.poi_index]=mu
@@ -1181,17 +1182,23 @@ class PyhfUpperLimitComputer:
                             tnll = pyhf.infer.mle.fixed_poi_fit(mu, workspace.data(model), model, return_fitted_val=True )
                             nll = float ( tnll[1] )
                             #print ( f"@@3 my nll is {nll}" )
-                            tnllA = pyhf.infer.mle.fixed_poi_fit(mu, asimov_data, model, return_fitted_val = True ) 
-                            nllA = float ( tnllA[1] )
+                            #tnllA = pyhf.infer.mle.fixed_poi_fit(mu, asimov_data, model, return_fitted_val = True ) 
+                            #nllA = float ( tnllA[1] )
+                            tnllA = pyhf.infer.mle.fixed_poi_fit(mu, workspace_expected.data(model), model, return_fitted_val=True )
+                            nllA = float ( tnll[1] )
 
                             #print ( f"@@3 my nllA is {nllA}" )
                             muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             nll0 = maxNllh
                             #print ( f"@@4 my nll0 is {nll0}" )
-                            muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
+                            #muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
+                            #    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
+                            # nll0A = maxNllhA
+                            muhatA, maxNllhA, o = pyhf.infer.mle.fit(workspace_expected.data(model), model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             nll0A = maxNllhA
+
                             #print ( f"@@4 my nll: {nll} nll0: {nll0} nllA: {nllA} nll0A is {nll0A}" )
                             from smodels.statistics.basicStats import CLsfromNLL
                             # cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
@@ -1216,13 +1223,13 @@ class PyhfUpperLimitComputer:
                 if useTevatron:
                     return clsRootTevatron(mu)
                 #print ( f"@@x ----- starting mu={mu} expected={expected}" )
-                old = clsRootPyhf(mu)
-                ret = clsRootAsimov(mu)
+                # old = clsRootPyhf(mu) ## thats the actual pyhf version
+                ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
-                if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
-                    # pass
-                    print ( f"@@ values differ. stopping." )
-                    sys.exit()
+                #if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
+                #    # pass
+                #    print ( f"@@ clsRoot values differ: {old}!={ret}. stopping." )
+                #    sys.exit()
                 # print ( f"@@x -----------" )
                 return ret
 
