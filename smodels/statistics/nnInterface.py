@@ -371,7 +371,7 @@ class NNUpperLimitComputer:
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             nllA = self.likelihood(mu, expected="posteriori", return_nll=True, modelToUse = modelToUse )
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
+            return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
 
         from smodels.base import runtime
         useTevatron = runtime.experimentalFeature ( "tevatroncls" )
