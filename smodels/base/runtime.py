@@ -17,6 +17,7 @@ modelFile="smodels.share.models.mssm"
 
 # experimental features
 _experimental = { "truncatedgaussians": False,
+                  "asimovisexpected": False,
                   "tevatroncls": False } ## experimental features
 ## for the computation of CLs values, shall we use the tevatron way
 ## of computing the p-values, or the LHC "Asimov" way?

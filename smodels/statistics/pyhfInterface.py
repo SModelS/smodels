@@ -1222,9 +1222,12 @@ class PyhfUpperLimitComputer:
                 useTevatron = runtime.experimentalFeature ( "tevatroncls" )
                 if useTevatron:
                     return clsRootTevatron(mu)
+                asimovIsExpected = runtime.experimentalFeature ( "asimovisexpected" )
                 #print ( f"@@x ----- starting mu={mu} expected={expected}" )
-                # old = clsRootPyhf(mu) ## thats the actual pyhf version
-                ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
+                if asimovIsExpected:
+                    ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
+                else:
+                    ret = clsRootPyhf(mu) ## thats the actual pyhf version
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
                 #if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
                 #    # pass
