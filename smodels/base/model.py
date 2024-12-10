@@ -256,10 +256,10 @@ class Model(object):
         smPDGs, bsmPDGs = self.getSMandBSMList()
         allPDGs = smPDGs+bsmPDGs
         for xsec in self.xsections.xSections[:]:
-            if any(pid not in allPDGs for pid in xsec.pid):
+            if any(pid not in allPDGs for pid in xsec.pid[2:]):
                 logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" % str(xsec.pid))
                 self.xsections.delete(xsec)
-            if all(pid in smPDGs for pid in xsec.pid):
+            if all(pid in smPDGs for pid in xsec.pid[2:]):
                 logger.debug("Cross-section for %s includes only SM particles and will be ignored" % str(xsec.pid))
                 self.xsections.delete(xsec)
 

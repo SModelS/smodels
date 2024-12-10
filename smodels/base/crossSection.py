@@ -158,7 +158,8 @@ class XSection(object):
         if None in pn:
             self._pid = pn
             return
-        self._pid = tuple(sorted(pn))
+        pn = list(pn)
+        self._pid = tuple(sorted(pn[:2]) + sorted(pn[2:]))
 
     def __mul__(self, other):
         """
@@ -268,7 +269,7 @@ class XSection(object):
         """
         Generate cross section information in string format.
         """
-        st = self.info.label + ':' + str(self.value) + " " + str(self.pid)
+        st = self.info.label + ':' + str(self.value) + " " + str(self.pid[2:])
         return st
 
     def __repr__(self):
@@ -292,7 +293,7 @@ class XSection(object):
         newXsec = XSection()
         newXsec.info = self.info.copy()
         newXsec.value = self.value
-        newXsec.pid = tuple(list(self.pid)[:])
+        newXsec.pid = tuple(self.pid[:])
         return newXsec
 
     def _zeroXSec(self):
@@ -324,7 +325,7 @@ class XSectionList(object):
             for info in infoList:
                 newentry = XSection()
                 newentry.value = 0. * pb
-                newentry.pid = (None, None)
+                newentry.pid = (None,None,None, None)
                 newentry.info = info.copy()
                 self.add(newentry)
 
@@ -370,7 +371,7 @@ class XSectionList(object):
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = oldXsec.value + newXsec.value
                         if newXsec.pid != oldXsec.pid:
-                            oldXsec.pid = (None, None)
+                            oldXsec.pid = (None,None,None, None)
 
         return self
 
@@ -483,7 +484,7 @@ class XSectionList(object):
         else:
             exists = False
             for iXSec, xSec in enumerate(self.xSections):
-                if xSec.info == newxsec.info and sorted(xSec.pid) == sorted(newxsec.pid):
+                if xSec.info == newxsec.info and xSec.pid == newxsec.pid:
                     self.xSections[iXSec].value = xSec.value + newxsec.value
                     break
             if not exists:
@@ -500,7 +501,7 @@ class XSectionList(object):
                 xsecList.add(xsec)
             elif type(item) == type(xsec.info.sqrts) and item == xsec.info.sqrts:
                 xsecList.add(xsec)
-            elif type(item) == type(xsec.pid) and item == xsec.pid:
+            elif type(item) == type(xsec.pid) and (item == xsec.pid or item == xsec.pid[2:]):
                 xsecList.add(xsec)
             elif type(item) == type(1) and (item in xsec.pid):
                 xsecList.add(xsec)
@@ -556,7 +557,7 @@ class XSectionList(object):
         """
         allPidPairs = []
         for xsec in self:
-            allPidPairs.append(xsec.pid)
+            allPidPairs.append(xsec.pid[2:])
         return list(set(allPidPairs))
 
     def getPIDs(self):
@@ -566,7 +567,7 @@ class XSectionList(object):
         """
         allPids = []
         for xsec in self:
-            allPids.extend(xsec.pid)
+            allPids.extend(xsec.pid[2:])
         return sorted(list(set(allPids)))
 
     def getMaxXsec(self):
@@ -617,7 +618,7 @@ class XSectionList(object):
                 xSecDictionary[label] = {}
                 xSecs = self.getXsecsFor(label)
                 for xsec in xSecs:
-                    xSecDictionary[label][xsec.pid] = xsec.value
+                    xSecDictionary[label][xsec.pid[2:]] = xsec.value
 
         return xSecDictionary
 
@@ -642,7 +643,7 @@ class XSectionList(object):
                     if newXsec.info == oldXsec.info:
                         oldXsec.value = oldXsec.value + newXsec.value
                         if newXsec.pid != oldXsec.pid:
-                            oldXsec.pid = (None, None)
+                            oldXsec.pid = (None,None,None, None)
 
     def removeLowerOrder(self):
         """
@@ -770,7 +771,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
             xsec.info.order = csOrder
             xsec.info.label = wlabel
             xsec.value = pxsec.value * pb
-            xsec.pid = production[2:]
+            xsec.pid = production[:]
             # Do not add xsecs which do not match the user required ones:
             if (useXSecs and not xsec.info in useXSecs):
                 continue
@@ -832,7 +833,8 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
         wlabel += f' ({orderToString(xsec.info.order,True,False)})'
         xsec.info.label = wlabel
         xsec.value = 0. * pb
-        xsec.pid = pid
+        # Assume p p collisions by default
+        xsec.pid = [2212,2212] + list(pid)
         # If addEvents = False, set cross section value to event weight
         if not addEvents:
             xsec.value = eventCs
@@ -841,7 +843,7 @@ def getXsecFromLHEFile(lhefile, addEvents=True):
     if addEvents:
         for pid in allpids:
             for ixsec, xsec in enumerate(xSecsInFile.xSections):
-                if xsec.pid == pid:
+                if xsec.pid[2:] == pid:
                     xSecsInFile.xSections[ixsec].value += eventCs
 
     reader.close()
