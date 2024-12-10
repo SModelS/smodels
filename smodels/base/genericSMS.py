@@ -12,10 +12,12 @@ from smodels.base.inclusiveObjects import InclusiveValue
 from collections import OrderedDict
 from itertools import product
 
-class GenericSMS(object):
+
+class GenericGraph(object):
+
     """
     A generic class for describing and manipulating 
-    Simplified Model Topologies based on graphs concepts.
+    simple graphs.
     """
 
     def __init__(self):
@@ -23,32 +25,29 @@ class GenericSMS(object):
         Initialize basic attributes.
         """
 
-        self._canonName = None
-        self._rootIndex = None
         self._successors = OrderedDict()  # Stores the nodes and their successors (daughters)
         self._predecessors = {}  # Stores the nodes and their predecessors (parents)
         self._nodesMapping = {}  # Stores the nodeIndex->node object mapping
-        self._nodeCanonNames = {}  # Stores the canonical names for the nodes
-        self._finalStates = {}  # Stores the final states of each node
-        self._sorted = False # Tag SMS as sorted or not
 
     def __hash__(self):
         return object.__hash__(self)
 
     def __repr__(self):
         """
-        Returns the string representation of the tree.
+        Returns the string representation of the graph.
         """
 
         return str(self)
-
+    
     def __str__(self):
         """
-        Returns a string representing the process
-        described by the tree.
+        Returns a string listing the graph nodes.
         """
 
-        return self.treeToString()
+        gStr = ",".join([f'{nodeIndex}:{str(node)}' for nodeIndex,node in self._nodesMapping.items()])
+
+        return gStr
+
 
     def __getattr__(self, attr):
         """
@@ -63,21 +62,19 @@ class GenericSMS(object):
         if (attr.startswith('__') and attr.endswith('__')) or attr in dir(self):
             return self.__getattribute__(attr)
 
-
         try:
-            val = [getattr(node, attr) if node is not self.root else None
-                   for node in self.nodes]
+            val = [getattr(node, attr) for node in self.nodes]
             return val
         except AttributeError:
-            raise AttributeError("Neither SMS nor nodes have attribute ``%s''" % attr)
-
+            raise AttributeError("Neither Graph nor its nodes have attribute ``%s''" % attr)
+        
     def add_node(self, node, nodeIndex=None):
         """
-        Adds a node object to the tree. If nodeIndex is None,
+        Adds a node object to the graph. If nodeIndex is None,
         the node index will be automatically assigned.
 
-        :param node: ParticleNode object
-        :param nodeIndex: The index for the ParticleNode. It must not
+        :param node: node object
+        :param nodeIndex: The index for the node. It must not
                           match any other indices already in the tree.
 
         :return: The node index for the newly added node
@@ -94,12 +91,12 @@ class GenericSMS(object):
         self._nodesMapping[nodeIndex] = node
 
         return nodeIndex
-
+    
     def add_nodes_from(self, nodes):
         """
-        Adds a list of nodes to the Tree.
+        Adds a list of nodes to the Graph.
 
-        :param nodes: List of ParticleNode objects
+        :param nodes: List of node objects
 
         :return: A list of node indices for the newly added nodes
         """
@@ -109,10 +106,10 @@ class GenericSMS(object):
             nodeIndices.append(self.add_node(node))
 
         return nodeIndices
-
+    
     def remove_node(self, nodeIndex):
         """
-        Removes a node from the tree if the nodeIndex is in the tree.
+        Removes a node from the Graph if the nodeIndex is in the Graph.
         The node is removed as well as its appearence in any edges.
 
         :param nodeIndex: Node index
@@ -121,9 +118,6 @@ class GenericSMS(object):
         if nodeIndex in self._successors:
             self._successors.pop(nodeIndex)
             self._nodesMapping.pop(nodeIndex)
-
-        if nodeIndex in self._nodeCanonNames:
-            self._nodeCanonNames.pop(nodeIndex)
 
         for nodeA, daughtersA in self._successors.items():
             if nodeIndex not in daughtersA:
@@ -138,12 +132,9 @@ class GenericSMS(object):
             if momA == nodeIndex:
                 self._predecessors.pop(nodeA)
 
-        if nodeIndex in self._finalStates:
-            self._finalStates.pop(nodeIndex)
-
     def remove_nodes_from(self, nodeIndices):
         """
-        Removes a list of nodes from the Tree.
+        Removes a list of nodes from the Graph.
 
         :param nodeIndices: List of node indices
         """
@@ -153,7 +144,7 @@ class GenericSMS(object):
 
     def add_edge(self, nodeIndexA, nodeIndexB):
         """
-        Adds a directed edge to existing nodes in the Tree (nodeA -> nodeB).
+        Adds a directed edge to existing nodes in the Graph (nodeA -> nodeB).
 
         :param nodeIndexA: Index for node A
         :param nodeIndexB: Index for node B
@@ -164,7 +155,7 @@ class GenericSMS(object):
 
     def add_edges_from(self, edges):
         """
-        Adds a list of directed edges to the Tree.
+        Adds a list of directed edges to the Graph.
 
         :param edges: List of tuples containing node indices
                       (e.g. [(nodeIndexA,nodeIndexB),(nodeIndexA,nodeIndexC),...])
@@ -176,7 +167,7 @@ class GenericSMS(object):
     def remove_edge(self, nodeIndexA, nodeIndexB):
         """
         Removes an edge from the tree if the edge
-        (nodeIndexA -> nodeIndexB) is in the tree.
+        (nodeIndexA -> nodeIndexB) is in the Graph.
 
         :param nodeIndexA: Index for node A
         :param nodeIndexB: Index for node B
@@ -193,7 +184,7 @@ class GenericSMS(object):
 
     def remove_edges(self, edges):
         """
-        Removes edges from the tree if they appear in the tree.
+        Removes edges from the tree if they appear in the Graph.
 
         :param edges: List of tuples containing node indices
                       (e.g. [(nodeIndexA,nodeIndexB),(nodeIndexA,nodeIndexC),...])
@@ -203,16 +194,12 @@ class GenericSMS(object):
 
     def clear(self):
         """
-        Remove all nodes and edges from the graph, but
-        keep its canonName.
+        Remove all nodes and edges from the graph.
         """
 
         self._successors = OrderedDict()
         self._predecessors = {}
         self._nodesMapping = {}
-        self._nodeCanonNames = {}
-        self._finalStates = {}
-        self._rootIndex = None
 
     def indexToNode(self, nodeIndex):
         """
@@ -235,36 +222,31 @@ class GenericSMS(object):
         else:
             raise SModelSError("Can not convert object of type %s to nodes" %str(type(nodeIndex)))
 
-    def daughterIndices(self, nodeIndex, ignoreInclusiveNodes=False):
+    def daughterIndices(self, nodeIndex):
         """
         Returns the list of node indices corresponding to the
-        daughters of nodeIndex.
+        successors of nodeIndex.
 
         :param nodeIndex: Parent node index
-        :param ignoreInclusiveNodes: If True, skips inclusive nodes
         """
 
-        daughters = self._successors[nodeIndex]
-        if ignoreInclusiveNodes:
-            daughters = [d for d in daughters[:]
-                         if not self.indexToNode(d).isInclusive]
+        successors = self._successors[nodeIndex]
 
-        return daughters
+        return successors
 
-    def daughters(self, nodeIndex,  ignoreInclusiveNodes=False):
+    def daughters(self, nodeIndex):
         """
         Returns the list of node objects corresponding to the
         daughters of nodeIndex.
 
         :param nodeIndex: Parent node index
-        :param ignoreInclusiveNodes: If True, it skips inclusive nodes
         """
 
-        daughterIndices = self.daughterIndices(nodeIndex, ignoreInclusiveNodes)
+        daughterIndices = self.daughterIndices(nodeIndex)
         daughters = self.indexToNode(daughterIndices)
 
         return daughters
-
+    
     def parentIndex(self, nodeIndex):
         """
         Returns the node index corresponding to the
@@ -287,39 +269,7 @@ class GenericSMS(object):
         parent = self.indexToNode(parentIndex)
 
         return parent
-
-    @property
-    def rootIndex(self):
-        """
-        Returns the index of the root node (primary vertex) of the tree.
-        If it has not been defined, compute it.
-
-        :return: root node index
-        """
-
-        if self._rootIndex is None:
-            root = [nodeIndex for nodeIndex in self.nodeIndices
-                    if self.in_degree(nodeIndex) == 0]
-            if len(root) != 1:
-                raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
-            self._rootIndex = root[0]
-
-        return self._rootIndex
-
-    @property
-    def root(self):
-        """
-        Returns the root node (primary vertex) of the tree.
-        If it has not been defined, compute it.
-
-        :return: root node
-        """
-
-        rootIndex = self.rootIndex
-        root = self.indexToNode(rootIndex)
-
-        return root
-
+    
     @property
     def nodeIndices(self):
         """
@@ -332,7 +282,7 @@ class GenericSMS(object):
         nodeIndexList = list(self._successors.keys())
 
         return nodeIndexList
-
+    
     @property
     def edgeIndices(self):
         """
@@ -371,6 +321,360 @@ class GenericSMS(object):
         edgesList = [tuple(self.indexToNode(edgeTuple)) for edgeTuple in self.edgeIndices]
 
         return edgesList
+    
+    def out_degree(self, nodeIndex):
+        """
+        Computes the number of outgoing edges from the node
+        (number of daughters).
+
+        :param nodeIndex: Node index (int)
+
+        :return: Number of outgoing edges (int)
+        """
+
+        if nodeIndex not in self.nodeIndices:
+            return 0
+        else:
+            return len(self.daughterIndices(nodeIndex))
+
+    def in_degree(self, nodeIndex):
+        """
+        Computes the number of incoming edges to the node
+        (number of parents).
+
+        :param nodeIndex: Node index (int)
+
+        :return: Number of incoming edges (1 or 0)
+        """
+
+        if nodeIndex in self._predecessors:
+            if self._predecessors[nodeIndex] is not None:
+                return 1
+
+        return 0
+
+    def number_of_nodes(self):
+        """
+        Returns the total number of nodes in the Tree.
+
+
+        :return: Number of nodes (int)
+        """
+
+        return len(self.nodeIndices)
+    
+    def compareNodes(self,other,nodeIndex1,nodeIndex2):
+        """
+        Convenience function for defining how nodes are compared
+        within the SMS.
+
+        :param other: TheorySMS object (if other=self compare subtrees of the same SMS).
+        :param nodeIndex1: Index of first node
+        :param nodeIndex2: Index of second node
+
+        :return: 1 if node1 > node2, -1 if node1 < node2, 0 if node1 == node2.
+        """
+
+        # Comparison parameters:
+        node1 = self.indexToNode(nodeIndex1)
+        node2 = other.indexToNode(nodeIndex2)
+
+        # Directly use node comparison:
+        cmp = node1.compareTo(node2)
+        return cmp
+    
+    def relabelNodeIndices(self,nodeIndexDict):
+        """
+        Relabel node indices according to nodeIndexDict.
+        For node indices not appearing in nodeIndexDict nothing is done.
+
+        :param nodeIndexDict: Dictionary with current node indices as keys
+                              and new indices as values
+        """
+
+        if any(nodeIndex not in nodeIndexDict for nodeIndex in self.nodeIndices):
+            raise SModelSError("Dictionary for relabelling nodes must contain all node indices")
+
+        newMapping = {}
+        newSuccessors = OrderedDict()
+        newPredecessors = {}
+        for oldIndex, newIndex in nodeIndexDict.items():
+            # Update daughter indices
+            newDaughters = []
+            for d in self.daughterIndices(oldIndex):
+                if d in nodeIndexDict:
+                    newDaughters.append(nodeIndexDict[d])
+                else:
+                    newDaughters.append(d)
+
+            newPredecessors.update({d : newIndex
+                                    for d in newDaughters})
+            # Add entry to newSuccessors dict:
+            newSuccessors[newIndex] = newDaughters
+            # Add entry to newMapping dict
+            newMapping[newIndex] = self.indexToNode(oldIndex)
+            
+        # Update dicts:
+        self._successors = newSuccessors
+        self._predecessors = newPredecessors
+        self._nodesMapping = newMapping
+
+    def updateNodeObjects(self, nodeObjectDict):
+        """
+        Update the node index -> node object mapping.
+        Only affects the indices appearing in nodeObjectDict.
+
+        :param nodeObjectDict: Dictionary with current node indices as keys
+                              and new node objects as values
+        """
+
+        for nodeIndex, newObj in nodeObjectDict.items():
+            self._nodesMapping[nodeIndex] = newObj
+
+    def draw(self, particleColor='steelblue2',
+                smColor='lightpink2',
+                pvColor='darkgray',
+                labelAttr='label',
+                attrUnit=None, filename=None, view=True,
+                maxLabelSize=10,
+                graph_kwargs={'layout' : 'dot', 'ranksep' : '0.3', 'rankdir' : "LR"},
+                nodes_kwargs={'style' : 'filled', 'fontsize' : '10', 'color' : 'black','shape' : 'circle','margin' : '0'},
+                edges_kwargs={'arrowhead' : 'vee', 'arrowsize' : '0.7',  'color' : 'grey53'}):
+        """
+        Draws Tree using matplotlib.
+
+        :param particleColor: color for particle nodes
+        :param smColor: color used for particles which have the isSM attribute set to True
+        :param fontsize: Font size for labels
+        :param labelAttr: attribute to be used as label. If None, will use the string representation of the node object. It can also be a dictionary with node indices as keys and the label strings as values.
+        :param attrUnit: Unum object with the unit to be removed from label attribute(if applicable)
+        :param filename: Filename to save drawing to.
+        :param view: open a viewer after plotting
+        :param maxLabelSize: Maximum size for the label string for the node. If the label is larger, it will be truncated.
+                             If None/False/0, it will keep the full label.
+        :param graph_kwargs: Dictionary with graph attributes to be used.
+        :param nodes_kwargs: Dictionary with nodes attributes to be used.
+        :param edges_kwargs: Dictionary with nodes attributes to be used.
+
+        :return: Display a GraphViz Digraph object, if view is true (and save it to file if filename is defined)
+        """
+
+        try:
+            import graphviz
+        except ImportError:
+            raise SModelSError("For drawing SMS objects, please install graphviz")
+
+        nodesAndIndices = zip(self.nodes,self.nodeIndices)
+
+        if labelAttr is None:
+            labels = {nodeIndex: "" for _,nodeIndex in nodesAndIndices}
+        elif isinstance(labelAttr,dict):
+            labels = {k : v for k,v in labelAttr.items()}
+        elif labelAttr == 'label':
+            labels = {nodeIndex: str(n) for n,nodeIndex in nodesAndIndices}
+        elif attrUnit is not None:
+            labels = {nodeIndex: str(getattr(n, labelAttr).asNumber(attrUnit))
+                      if (hasattr(n, labelAttr) and getattr(n, labelAttr) is not None)
+                      else str(n) for n,nodeIndex in nodesAndIndices}
+        elif labelAttr == 'node':
+            labels = {nodeIndex: str(nodeIndex) for _,nodeIndex in nodesAndIndices}
+        else:
+            labels = {nodeIndex: str(getattr(n, labelAttr)) if hasattr(n, labelAttr)
+                      else str(n) for n,nodeIndex in nodesAndIndices}
+
+        for key in labels:
+            if labels[key] == 'anyOdd':
+                labels[key] = 'BSM'
+
+        node_color = {}
+        for n in self.nodeIndices:
+            node = self.indexToNode(n)
+            if hasattr(node, 'isSM') and node.isSM:
+                node_color[n] = smColor
+            else:
+                node_color[n] = particleColor
+
+        # Truncate labels if needed:
+        if maxLabelSize:
+            for key,val in labels.items():
+                if len(val) > maxLabelSize:
+                    labels[key] = val[:maxLabelSize]+'...'
+
+        dot = graphviz.Digraph()
+        for key,val in graph_kwargs.items():
+            dot.attr(**{key : str(val)})
+        for nodeIndex in self.nodeIndices:            
+            nodeAttrs = {k : v for k,v in nodes_kwargs.items()}
+            if 'label' not in nodeAttrs:
+                nodeAttrs['label'] = labels[nodeIndex]
+            if 'fillcolor' not in nodeAttrs:
+                nodeAttrs['fillcolor'] = node_color[nodeIndex]
+            dot.node(str(nodeIndex), **nodeAttrs)
+        for edgeIndex in self.edgeIndices:
+            dot.edge(str(edgeIndex[0]),str(edgeIndex[1]),
+                     **edges_kwargs)
+
+        # If filename is defined, save image
+        if filename is not None:
+            import os
+            filename = os.path.abspath(filename)
+            # dot.format = extension[1:]
+            dot.render(outfile=filename, view=view, cleanup=True)
+
+        # Try to display (for various circumstances)
+        if view:
+            try:
+                display(dot) # for notebooks
+            except NameError:
+                try:
+                    import os
+                    fname = filename
+                    if fname != None:
+                        fname, _ = os.path.splitext(filename)
+                    dot.view(filename=fname) # for terminals
+                except (RuntimeError, graphviz.ExecutableNotFound,\
+                        graphviz.CalledProcessError) as e:
+                    pass
+
+class GenericSMS(GenericGraph):
+    """
+    A generic class for describing and manipulating 
+    Simplified Model Topologies based on graphs concepts.
+    """
+
+    def __init__(self):
+        """
+        Initialize basic attributes.
+        """
+
+        GenericGraph.__init__(self)
+
+        self._canonName = None
+        self._rootIndex = None
+        self._nodeCanonNames = {}  # Stores the canonical names for the nodes
+        self._finalStates = {}  # Stores the final states of each node
+        self._sorted = False # Tag SMS as sorted or not
+
+
+    def __str__(self):
+        """
+        Returns a string representing the process
+        described by the tree.
+        """
+
+        return self.treeToString()
+    
+    def __getattr__(self, attr):
+        """
+        If the attribute has not been defined for self
+        try to fetch it from its nodes
+
+        :param attr: Attribute name
+        :return: Attribute value
+        """
+
+        # If calling another special method, return default (required for pickling)
+        if (attr.startswith('__') and attr.endswith('__')) or attr in dir(self):
+            return self.__getattribute__(attr)
+
+
+        try:
+            val = [getattr(node, attr) if node is not self.root else None
+                   for node in self.nodes]
+            return val
+        except AttributeError:
+            raise AttributeError("Neither SMS nor its nodes have attribute ``%s''" % attr)
+
+    def remove_node(self, nodeIndex):
+        """
+        Removes a node from the tree if the nodeIndex is in the tree.
+        The node is removed as well as its appearence in any edges.
+
+        :param nodeIndex: Node index
+        """
+
+        super().remove_node(nodeIndex)
+
+        if nodeIndex in self._nodeCanonNames:
+            self._nodeCanonNames.pop(nodeIndex)
+
+        if nodeIndex in self._finalStates:
+            self._finalStates.pop(nodeIndex)
+
+    def clear(self):
+        """
+        Remove all nodes and edges from the graph, but
+        keep its canonName.
+        """
+
+        super().clear()
+        self._nodeCanonNames = {}
+        self._finalStates = {}
+        self._rootIndex = None
+
+    def daughterIndices(self, nodeIndex, ignoreInclusiveNodes=False):
+        """
+        Returns the list of node indices corresponding to the
+        daughters of nodeIndex.
+
+        :param nodeIndex: Parent node index
+        :param ignoreInclusiveNodes: If True, skips inclusive nodes
+        """
+
+        daughters = self._successors[nodeIndex]
+        if ignoreInclusiveNodes:
+            daughters = [d for d in daughters[:]
+                         if not self.indexToNode(d).isInclusive]
+
+        return daughters   
+
+    def daughters(self, nodeIndex,  ignoreInclusiveNodes=False):
+        """
+        Returns the list of node objects corresponding to the
+        daughters of nodeIndex.
+
+        :param nodeIndex: Parent node index
+        :param ignoreInclusiveNodes: If True, it skips inclusive nodes
+        """
+
+        daughterIndices = self.daughterIndices(nodeIndex, ignoreInclusiveNodes)
+        daughters = self.indexToNode(daughterIndices)
+
+        return daughters 
+    
+
+    @property
+    def rootIndex(self):
+        """
+        Returns the index of the root node (primary vertex) of the tree.
+        If it has not been defined, compute it.
+
+        :return: root node index
+        """
+
+        if self._rootIndex is None:
+            root = [nodeIndex for nodeIndex in self.nodeIndices
+                    if self.in_degree(nodeIndex) == 0]
+            if len(root) != 1:
+                raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
+            self._rootIndex = root[0]
+
+        return self._rootIndex
+
+    @property
+    def root(self):
+        """
+        Returns the root node (primary vertex) of the tree.
+        If it has not been defined, compute it.
+
+        :return: root node
+        """
+
+        rootIndex = self.rootIndex
+        root = self.indexToNode(rootIndex)
+
+        return root
+   
 
     @property
     def canonName(self):
@@ -440,47 +744,6 @@ class GenericSMS(object):
 
         return self._nodeCanonNames[nodeIndex]
 
-    def out_degree(self, nodeIndex):
-        """
-        Computes the number of outgoing edges from the node
-        (number of daughters).
-
-        :param nodeIndex: Node index (int)
-
-        :return: Number of outgoing edges (int)
-        """
-
-        if nodeIndex not in self.nodeIndices:
-            return 0
-        else:
-            return len(self.daughterIndices(nodeIndex))
-
-    def in_degree(self, nodeIndex):
-        """
-        Computes the number of incoming edges to the node
-        (number of parents).
-
-        :param nodeIndex: Node index (int)
-
-        :return: Number of incoming edges (1 or 0)
-        """
-
-        if nodeIndex in self._predecessors:
-            if self._predecessors[nodeIndex] is not None:
-                return 1
-
-        return 0
-
-    def number_of_nodes(self):
-        """
-        Returns the total number of nodes in the Tree.
-
-
-        :return: Number of nodes (int)
-        """
-
-        return len(self.nodeIndices)
-
     def genIndexIterator(self, nodeIndex=None,
                          includeLeaves=False, ignoreInclusiveNodes=False):
         """
@@ -540,7 +803,6 @@ class GenericSMS(object):
         nodes = self.daughterIndices(nodeIndex,ignoreInclusiveNodes)
 
         visited = set()   # Store visited nodes
-        depth_limit = len(nodes)
         # Loop over nodes
         for node in nodes:
             if node in visited:
@@ -766,26 +1028,6 @@ class GenericSMS(object):
                 return cmp
         return 0
 
-    def compareNodes(self,other,nodeIndex1,nodeIndex2):
-        """
-        Convenience function for defining how nodes are compared
-        within the SMS.
-
-        :param other: TheorySMS object (if other=self compare subtrees of the same SMS).
-        :param nodeIndex1: Index of first node
-        :param nodeIndex2: Index of second node
-
-        :return: 1 if node1 > node2, -1 if node1 < node2, 0 if node1 == node2.
-        """
-
-        # Comparison parameters:
-        node1 = self.indexToNode(nodeIndex1)
-        node2 = other.indexToNode(nodeIndex2)
-
-        # Directly use node comparison:
-        cmp = node1.compareTo(node2)
-        return cmp
-
     def copyTreeFrom(self, other, nodesObjDict):
         """
         Replaces the tree structure (nodes, edges, indices,...)
@@ -959,54 +1201,20 @@ class GenericSMS(object):
                               and new indices as values
         """
 
-        if any(nodeIndex not in nodeIndexDict for nodeIndex in self.nodeIndices):
-            raise SModelSError("Dictionary for relabelling nodes must contain all node indices")
+        super().relabelNodeIndices(nodeIndexDict)
 
-        newMapping = {}
-        newSuccessors = OrderedDict()
-        newPredecessors = {}
         newCanonNames = {}
         newFinalStates = {}
         for oldIndex, newIndex in nodeIndexDict.items():
-            # Update daughter indices
-            newDaughters = []
-            for d in self.daughterIndices(oldIndex):
-                if d in nodeIndexDict:
-                    newDaughters.append(nodeIndexDict[d])
-                else:
-                    newDaughters.append(d)
-
-            newPredecessors.update({d : newIndex
-                                    for d in newDaughters})
-            # Add entry to newSuccessors dict:
-            newSuccessors[newIndex] = newDaughters
-            # Add entry to newMapping dict
-            newMapping[newIndex] = self.indexToNode(oldIndex)
-            # Add entry to canonNames dict
             if oldIndex in self._nodeCanonNames:
                 newCanonNames[newIndex] = self._nodeCanonNames[oldIndex]
             if oldIndex in self._finalStates:
                 newFinalStates[newIndex] = self._finalStates[oldIndex]
 
         # Update dicts:
-        self._successors = newSuccessors
-        self._predecessors = newPredecessors
-        self._nodesMapping = newMapping
         self._nodeCanonNames = newCanonNames
         self._finalStates = newFinalStates
         self._rootIndex = nodeIndexDict[self.rootIndex]
-
-    def updateNodeObjects(self, nodeObjectDict):
-        """
-        Update the node index -> node object mapping.
-        Only affects the indices appearing in nodeObjectDict.
-
-        :param nodeObjectDict: Dictionary with current node indices as keys
-                              and new node objects as values
-        """
-
-        for nodeIndex, newObj in nodeObjectDict.items():
-            self._nodesMapping[nodeIndex] = newObj
 
     def checkConsistency(self):
         """
