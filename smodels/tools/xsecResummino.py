@@ -264,7 +264,7 @@ class XSecResummino(XSecBase):
                 Xsection.info.order = i
                 Xsection.info.sqrts = float(self.sqrt) * TeV
                 Xsection.info.label = "WAOUW"
-                Xsection.pid = (particle_1, particle_2)
+                Xsection.full_pid = (2212,2212,particle_1, particle_2)
                 Xsections.add(Xsection)
             return
 
@@ -274,7 +274,7 @@ class XSecResummino(XSecBase):
         Xsection.info.order = order
         Xsection.info.sqrts = float(self.sqrt) * TeV
         Xsection.info.label = "WAOUW"
-        Xsection.pid = (particle_1, particle_2)
+        Xsection.full_pid = (2212,2212,particle_1, particle_2)
         Xsections.add(Xsection)
         return
             

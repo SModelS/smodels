@@ -44,7 +44,8 @@ class GenericGraph(object):
         Returns a string listing the graph nodes.
         """
 
-        gStr = ",".join([f'{nodeIndex}:{str(node)}' for nodeIndex,node in self._nodesMapping.items()])
+        gStr = ",".join([f'({self.indexToNode(nI)} > {str([d for d in self.daughters(nI)])})' 
+                         for nI in self.nodeIndices])
 
         return gStr
 
