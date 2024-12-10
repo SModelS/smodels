@@ -134,7 +134,7 @@ class NNUpperLimitComputer:
                 realname = f"{realname}[{srname[p1+1:]}]"
                 assert realname in self.nsignals, \
                   f"cannot find sr name {realname} in {self.nsignals}"
-            smodelsname = self.data.globalInfo
+            # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
             tot = smyield + signal
             syields.append ( tot )
@@ -164,7 +164,7 @@ class NNUpperLimitComputer:
                 "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
         if abs(poi_test)<1e-7:
             if abs(nll0obs-nll1obs)>1e-4:
-                logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}." )
+                logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
                 # ret["nll_obs_1"]=nll0obs
             if abs(nll0exp-nll1exp)>1e-4:
                 logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1obs {nll1exp:.4f}." )
