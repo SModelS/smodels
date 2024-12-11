@@ -80,13 +80,45 @@ class Model(object):
             return False
 
         return True
+    
+    def getSingleParticle(self,**kwargs):
+        """
+        Return a Particle object found in one of the particles or multiparticles
+        in the model with the listed attributes.
+        If the argument particleList is given, search within the particles
+        in this list instead.
+
+        :return: Particle object or None if no particle is found
+        """
+
+        if 'particleList' not in kwargs:
+            particles = self.BSMparticles[:] + self.SMparticles[:]
+        else:
+            particles = kwargs.pop('particleList')
+
+        for p in particles:
+            if isinstance(p,MultiParticle):
+                # Look into the particles within the multiparticle
+                newkwargs = {**kwargs, 'particleList' : p.particles[:]}
+                p_return = self.getSingleParticle(**newkwargs)
+                if p_return is not None:
+                    return p_return
+            else:
+                if any(not hasattr(p, attr) for attr in kwargs.keys()):
+                    continue
+                if any(getattr(p, attr) != value for attr, value in kwargs.items()):
+                    continue
+                return p
+        
+        # if not particle is found, return None
+        return None
 
     def getParticle(self, **kwargs):
         """
-        Return a single particle object with the listed attributes.
+        Return a particle or multiparticle object with the listed attributes.
         If no particle is found or more than one particle is found, raise an error.
 
-        :returns: Particle object
+        :returns: Particle/MultiParticle object  or None if no particle is found
         """
 
         particleList = self.getParticlesWith(**kwargs)
@@ -108,7 +140,7 @@ class Model(object):
         For instance, if MP.particles = [e-,e+] and [e-] already appears in the list,
         MP will not be added.
 
-        :returns: List of particle objects
+        :returns: List of Particle or MultiParticle objects
         """
 
         particleList = []
