@@ -1,0 +1,94 @@
+#
+#                              ======================
+#                              | THE SUSYHIT OUTPUT |
+#                              ======================
+#
+#
+#              ------------------------------------------------------
+#              |     This is the output of the SUSY-HIT package     |
+#              |  created by A.Djouadi, M.Muehlleitner and M.Spira. |
+#              |  In case of problems with SUSY-HIT email to        |
+#              |           margarete.muehlleitner@cern.ch           |
+#              |           michael.spira@psi.ch                     |
+#              |           abdelhak.djouadi@cern.ch                 |
+#              ------------------------------------------------------
+#
+#              ------------------------------------------------------
+#              |  SUSY Les Houches Accord - MSSM Spectrum + Decays  |
+#              |              based on the decay programs           |
+#              |                                                    |
+#              |                     SDECAY 1.2                     |
+#              |                                                    |
+#              |  Authors: M.Muhlleitner, A.Djouadi and Y.Mambrini  |
+#              |  Ref.:    Comput.Phys.Commun.168(2005)46           |
+#              |           [hep-ph/0311167]                         |
+#              |                                                    |
+#              |                     HDECAY 3.302                   |
+#              |                                                    |
+#              |  By: A.Djouadi,J.Kalinowski,M.Muhlleitner,M.Spira  |
+#              |  Ref.:    Comput.Phys.Commun.108(1998)56           |
+#              |           [hep-ph/9704448]                         |
+#              |                                                    |
+#              |                                                    |
+#              |  If not stated otherwise all DRbar couplings and   |
+#              |  soft SUSY breaking masses are given at the scale  |
+#              |  Q=  0.29052880E+03
+#              |                                                    |
+#              ------------------------------------------------------
+#
+#
+#
+BLOCK MINPAR  # Input parameters - minimal models
+         1     2.00000000E+02   # 1350.0
+         2     1.60000000E+02   # 50.02
+         3     1.00000000E+01   # tanb
+         4     1.00000000E+00   # sign(mu)
+         5    -4.00000000E+02   # A0
+#
+BLOCK MASS  # Mass Spectrum
+# PDG code           mass       particle
+        25     1.00000000E+03        
+   1000001     1350.0    #    ~d_L
+   1000022     50.0    #    ~chi_10
+##
+Block QNUMBERS 1000001  # dl 
+        1 -1  # 3 times electric charge
+        2 1  # number of spin states (2S+1)
+        3 3  # colour rep (1: singlet, 3: triplet, 8: octet)
+        4 1  # Particle/Antiparticle distinction (0=own anti)
+Block QNUMBERS 1000022  # n1 
+        1 0  # 3 times electric charge
+        2 2  # number of spin states (2S+1)
+        3 1  # colour rep (1: singlet, 3: triplet, 8: octet)
+        4 0  # Particle/Antiparticle distinction (0=own anti)
+
+#
+#
+#                             =================
+#                             |The decay table|
+#                             =================
+#
+# - The QCD corrections to the decays gluino -> squark  + quark
+#                                     squark -> gaugino + quark_prime
+#                                     squark -> squark_prime + Higgs
+#                                     squark -> gluino  + quark
+#   are included.
+#
+# - The multi-body decays for the inos, stops and sbottoms are included.
+#
+# - The loop induced decays for the gluino, neutralinos and stops
+#   are included.
+#
+# - The SUSY decays of the top quark are included.
+#
+#
+#         PDG            Width
+DECAY   1000001     1.00000000E+00   # sdown_L decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         1   # BR(~d_L -> ~chi_10 d)
+
+
+
+XSECTION  1.30E+03  2212 2212 2 1000022 1000022 # 200000 evts, pythia8 [pb]
+  0  0  0  0  0  0    4.65346355E-03 SModelSv2.2.1
+
