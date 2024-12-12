@@ -197,9 +197,6 @@ DECAY  24   2.085000e+00
 DECAY  25   4.070000e-03
 #
 #      PDG        Width
-DECAY  51   0.000000e+00
-#
-#      PDG        Width
 DECAY  52   0.000000e+00
 #
 #      PDG        Width
