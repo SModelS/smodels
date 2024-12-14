@@ -76,9 +76,9 @@ class DecomposerTest(unittest.TestCase):
         self.assertTrue(len(topList.getSMSList()) == 10)
         expectedWeights = {str(sorted(['N1','N1'])).replace(' ','') : 0.020,
                            str(sorted(['sta_1','sta_1~'])).replace(' ','') : 0.26,
-                           str(sorted(['sta_1','sta_1~','N1~'])).replace(' ','') : 0.13,
+                           str(sorted(['sta_1','sta_1~','N1'])).replace(' ','') : 0.13,
                            str(sorted(['sta_1~','sta_1','N1'])).replace(' ','') : 0.13,
-                           str(sorted(['sta_1~','sta_1','N1~','N1'])).replace(' ','') : 0.065}
+                           str(sorted(['sta_1~','sta_1','N1','N1'])).replace(' ','') : 0.065}
 
         for sms in topList.getSMSList():
             bsmLabels = str(sorted([str(node) for node in sms.nodes if node.isSM is False]))

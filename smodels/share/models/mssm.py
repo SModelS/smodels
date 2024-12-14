@@ -70,10 +70,10 @@ sleptons = [sel,snel,ser] + [smul,snmul,smur] + [sta1,sntal,sta2]
 inos = [gluino] + [n1,n2,n3,n4] + [c1,c2] # + [g]
 
 rOdd = squarks + sleptons + inos
-rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
+rOddC = [p.chargeConjugate() for p in rOdd if not p.isSelfConjugate]  #Define the charge conjugates
 
 bsm_higgs = [H,A0,H0]
-bsm_higgsC = [p.chargeConjugate() for p in bsm_higgs]
+bsm_higgsC = [p.chargeConjugate() for p in bsm_higgs if not p.isSelfConjugate]
 
 #Generic BSM particles:
 

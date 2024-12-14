@@ -34,7 +34,7 @@ class FinalStateCompTest(unittest.TestCase):
     def testFinalState(self):
 
 
-        stringEl = "(PV > gluino(1),gluino(2)), (gluino(1) > b,b,N2(3)), (gluino(2) > b,t+,C1-(4)), (N2(3) > N1,b,b), (C1-(4) > N1~,q,q)"
+        stringEl = "(PV > gluino(1),gluino(2)), (gluino(1) > b,b,N2(3)), (gluino(2) > b,t+,C1-(4)), (N2(3) > N1,b,b), (C1-(4) > N1,q,q)"
         sms = fromString(stringEl, model=model)
 
         # Compress SMS:
@@ -45,7 +45,7 @@ class FinalStateCompTest(unittest.TestCase):
         self.assertEqual(fsSMS.missingX,10*fb)
 
 
-        stringEl = "(PV > gluino(1),gluino(2)), (gluino(1) > mu-,nu,b,N2(3)), (gluino(2) > b,t+,C1-(4)), (N2(3) > N1,b,b), (C1-(4) > N1~,e-,e+)"
+        stringEl = "(PV > gluino(1),gluino(2)), (gluino(1) > mu-,nu,b,N2(3)), (gluino(2) > b,t+,C1-(4)), (N2(3) > N1,b,b), (C1-(4) > N1,e-,e+)"
         sms = fromString(stringEl, model=model)
 
         # Compress SMS:

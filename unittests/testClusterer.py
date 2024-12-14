@@ -391,8 +391,8 @@ class ClustererTest(unittest.TestCase):
         smsDict = decomposer.decompose(model, sigmacut, massCompress=True, invisibleCompress=True, minmassgap=mingap)
 
         # Select SMS:
-        smsFilter = ['(PV > C1-(1),N2(2)), (C1-(1) > N1~,W-), (N2(2) > N1,Z)', 
-                     '(PV > C1-(1),N3(2)), (C1-(1) > N1~,W-), (N3(2) > N1,Z)', 
+        smsFilter = ['(PV > C1-(1),N2(2)), (C1-(1) > N1,W-), (N2(2) > N1,Z)', 
+                     '(PV > C1-(1),N3(2)), (C1-(1) > N1,W-), (N3(2) > N1,Z)', 
                      '(PV > N2(1),C1+(2)), (N2(1) > N1,Z), (C1+(2) > N1,W+)',                     
                      '(PV > C1+(1),N2(2)), (C1+(1) > N1,W+), (N2(2) > N1,Z)', 
                      '(PV > N3(1),C1+(2)), (N3(1) > N1,Z), (C1+(2) > N1,W+)',

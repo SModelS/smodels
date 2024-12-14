@@ -48,11 +48,11 @@ class ErasePromptTest(unittest.TestCase):
 
 
         # Only neutralino and SM particles should have charges:
-        chargesKeptA = {'N1': 0, 'q': sorted([-2./3., -1./3., 1./3., 2./3.]),'N1~' : 0}
+        chargesKeptA = {'N1': 0, 'q': sorted([-2./3., -1./3., 1./3., 2./3.]),'N1' : 0}
         # Only squarks with same charge should be combined:
         chargesKeptB = {'sc_L/sc_R/su_L/su_R': 2./3., 'sc_L~/sc_R~/su_L~/su_R~': -2./3., 
                         'N1': 0, 'q': sorted([-2./3., -1./3., 1./3., 2./3.]),
-                        'N1~' : 0}
+                        'N1' : 0}
         
         
         eChargesA = {}
