@@ -31,13 +31,14 @@ class Particle(object):
 
         Possible properties for arguments.
         isSM: True/False
+        isSelfConjugate: True/False (Default is False)
         label: str, e.g. 'e-'
         pdg: number in pdg
         mass: mass of the particle
         echarge: electric charge as multiples of the unit charge
         colordim: color dimension of the particle
         spin: spin of the particle
-        totalwidth: total width
+        totalwidth: total width        
         """
 
         if not kwargs and not attributesDict:
@@ -58,6 +59,7 @@ class Particle(object):
             return obj
 
         newParticle = super(Particle, cls).__new__(cls)
+        newParticle.isSelfConjugate = False
         for attr, value in attrDict.items():
             setattr(newParticle, attr, value)
         newParticle._id = Particle.getID()
@@ -274,6 +276,10 @@ class Particle(object):
         :return: the charge conjugate particle (Particle object)
         """
 
+
+        if hasattr(self,'isSelfConjugate') and self.isSelfConjugate:
+            return self
+        
         particleAttr = dict(self.__dict__.items())
         for attr, value in particleAttr.items():
             if attr in ['pdg', 'eCharge'] and isinstance(value, (float, int)):

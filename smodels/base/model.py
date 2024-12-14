@@ -36,6 +36,7 @@ class Model(object):
         # and these are used to store masses, decays,...
         self.BSMparticles = BSMparticles[:]  # at initialization assume all particles will be used
         self.SMparticles = SMparticles[:]
+        self.singleParticles = self.getSingleParticles()
         for p in self.SMparticles:
             p.isSM = True
         for p in self.BSMparticles:
@@ -81,34 +82,39 @@ class Model(object):
 
         return True
     
-    def getSingleParticle(self,**kwargs):
+    def getSingleParticles(self):
+        """
+        Get a list of Particles objects from the particles
+        and multiparticles stored in BSMparticles and SMparticles.
+        """
+
+        particles = self.BSMparticles[:] + self.SMparticles[:]
+        # Replace MultiParticles by single particles:
+        while any(isinstance(p,MultiParticle) for p in particles):
+            for ip,p in enumerate(particles):
+                if isinstance(p,MultiParticle):
+                    particles += particles.pop(ip).particles[:]
+                    break
+    
+        return particles
+    
+    def pdgToParticle(self,pdg):
         """
         Return a Particle object found in one of the particles or multiparticles
-        in the model with the listed attributes.
-        If the argument particleList is given, search within the particles
-        in this list instead.
+        in the model with the given pdg.
+        If only a particle with -pdg is present in the model, return its charge conjugate.
 
         :return: Particle object or None if no particle is found
         """
 
-        if 'particleList' not in kwargs:
-            particles = self.BSMparticles[:] + self.SMparticles[:]
-        else:
-            particles = kwargs.pop('particleList')
-
-        for p in particles:
-            if isinstance(p,MultiParticle):
-                # Look into the particles within the multiparticle
-                newkwargs = {**kwargs, 'particleList' : p.particles[:]}
-                p_return = self.getSingleParticle(**newkwargs)
-                if p_return is not None:
-                    return p_return
-            else:
-                if any(not hasattr(p, attr) for attr in kwargs.keys()):
-                    continue
-                if any(getattr(p, attr) != value for attr, value in kwargs.items()):
-                    continue
-                return p
+        
+        all_pdgs = [p.pdg for p in self.singleParticles]
+        if pdg in all_pdgs:
+            p = self.singleParticles[all_pdgs.index(pdg)]
+            return p
+        elif -pdg in all_pdgs:
+            p = self.singleParticles[all_pdgs.index(-pdg)]
+            return p.chargeConjugate()
         
         # if not particle is found, return None
         return None
@@ -258,25 +264,6 @@ class Model(object):
 
         return massDict, decaysDict, xsections
 
-    def getSMandBSMList(self):
-        """
-        Get the list of SM and BSM particles, according to the isSM value
-        defined for each particle.
-
-        :return: list with PDGs of even particles, list with PDGs of odd particles
-        """
-
-        allPDGs = list(set(self.getValuesFor('pdg')))
-        smPDGs = []
-        bsmPDGs = []
-        for pdg in allPDGs:
-            if all(p.isSM for p in self.getParticlesWith(pdg=pdg)):
-                smPDGs.append(pdg)
-            elif all(not p.isSM for p in self.getParticlesWith(pdg=pdg)):
-                bsmPDGs.append(pdg)
-
-        return smPDGs, bsmPDGs
-
     def filterCrossSections(self):
         """
         Remove cross-sections for even particles or particles which do not belong to the model.
@@ -285,7 +272,8 @@ class Model(object):
         :return: Number of cross-sections after filter.
         """
 
-        smPDGs, bsmPDGs = self.getSMandBSMList()
+        smPDGs = [p.pdg for p in self.singleParticles if p.isSM]
+        bsmPDGs = [p.pdg for p in self.singleParticles if not p.isSM]
         allPDGs = smPDGs+bsmPDGs
         for xsec in self.xsections.xSections[:]:
             if any(pid not in allPDGs for pid in xsec.pid):
@@ -375,13 +363,10 @@ class Model(object):
                 #  Convert PDGs to particle objects:
                 daughters = []
                 for pid in newDecay.ids:
-                    daughter = self.getParticlesWith(pdg=pid)
+                    daughter = self.pdgToParticle(pid)
                     if not daughter:
                         raise SModelSError("Particle with PDG = %i was not found in model. Check the model definitions." % pid)
-                    elif len(daughter) > 1:
-                        raise SModelSError("Multiple particles defined with PDG = %i. PDG ids must be unique." % pid)
-                    else:
-                        daughter = daughter[0]
+                    
                     daughters.append(daughter)
                 newDecay.daughters = daughters
                 particle.decays.append(newDecay)
@@ -415,6 +400,30 @@ class Model(object):
                     for attr in ignorePromptQNumbers:
                         if hasattr ( particle, attr ):
                             delattr(particle, attr)
+
+    def setVertices(self,decaysDict,SMvertices=[]):
+        """
+        Creates a list of vertices with Particle objects
+        using a dictionary with the decays.
+        """
+
+
+        allVertices = []
+        for pdg,particleData in decaysDict.items():
+            mom = self.pdgToParticle(pdg)
+            if mom is None: # Particle was not found in model
+                continue
+            for decay in particleData.decays:
+                ids = decay.ids
+                daughters = [self.pdgToParticle(d_pdg) for d_pdg in ids]
+                # If any of the daughters is not in the model, skip
+                if any(d is None for d in daughters):
+                    continue
+ 
+                allVertices.append((mom,daughters))
+
+        self.vertices = allVertices
+
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
                         roundMasses = 1, ignorePromptQNumbers=[],
@@ -462,6 +471,9 @@ class Model(object):
             logger.info("Loaded %i BSM particles (%i particles not found in %s)"
                         % (len(self.BSMparticles), len(self.allBSMparticles)-len(self.BSMparticles),
                            self.inputFile))
+            
+        # Update list of single particles
+        self.singleParticles = self.getSingleParticles()
 
         #  Remove cross-sections for even particles:
         nXsecs = self.filterCrossSections()
@@ -471,12 +483,16 @@ class Model(object):
             logger.error(msg)
             raise SModelSError(msg)
 
+        # Get model vertices from decays and quantum numbers
+        self.setVertices(decaysDict)
+
         #Set particle masses:
         self.setMasses(massDict,roundMasses,minMass)
 
         #  Set particle decays
         self.setDecays(decaysDict, promptWidth, stableWidth, ignorePromptQNumbers)
 
+        
         #  Reset particle equality from all particles:
         for p in Particle.getinstances():
             p._comp = {p._id: 0}

@@ -129,15 +129,17 @@ def getParticlesFromSLHA(slhafile):
         newParticle = Particle(isSM=False, label=label, pdg=pdg,
                                eCharge=numbers[1]/3.,
                                colordim=numbers[3],
-                               spin=(numbers[2]-1.)/2.)
+                               spin=(numbers[2]-1.)/2.,
+                               isSelfConjugate=(not bool(numbers[4])))
 
         BSMList.append(newParticle)
-        if numbers[4]:  # Particle is not its own anti-particle
+        if not newParticle.isSelfConjugate:  # Particle is not its own anti-particle
+            newParticle.isSelfConjugate = False
             newParticleC = newParticle.chargeConjugate()
             if any(p.pdg == newParticleC.pdg for p in BSMList):
                 continue
             BSMList.append(newParticleC)
-
+        
     return BSMList
 
 def getParticlesFromModule(modelFile):

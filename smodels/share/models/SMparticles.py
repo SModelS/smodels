@@ -50,21 +50,19 @@ tC = t.chargeConjugate()
 # -----------------------------------------------------------------------------------------------------------------------------
 
 # Gauge bosons:
-g = Particle(isSM=True, label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, totalwidth=0.*GeV)
-photon = Particle(isSM=True, label='photon', pdg=22, mass=0.*MeV, eCharge=0, colordim=1, spin=1, totalwidth=0.*GeV, _isInvisible=False)
-Z = Particle(isSM=True, label='Z', pdg=23, mass=91.*GeV, eCharge=0, colordim=1, spin=1, totalwidth=2.5*GeV, _isInvisible=False)
-# We group each electrically neutral gauge boson with its antiparticle:
-g = MultiParticle('g', [g, g.chargeConjugate('g')])
-photon = MultiParticle('photon', [photon, photon.chargeConjugate('photon')])
-Z = MultiParticle('Z', [Z, Z.chargeConjugate('Z')])
+g = Particle(isSM=True, label='g', pdg=21, mass=0.*MeV, eCharge=0, colordim=8, spin=1, totalwidth=0.*GeV, 
+             isSelfConjugate=True)
+photon = Particle(isSM=True, label='photon', pdg=22, mass=0.*MeV, eCharge=0, colordim=1, spin=1, totalwidth=0.*GeV, 
+                  _isInvisible=False, isSelfConjugate=True)
+Z = Particle(isSM=True, label='Z', pdg=23, mass=91.*GeV, eCharge=0, colordim=1, spin=1, totalwidth=2.5*GeV, 
+             _isInvisible=False, isSelfConjugate=True)
 W = Particle(isSM=True, label='W+', pdg=24, mass=80.*GeV, eCharge=1, colordim=1, spin=1, totalwidth=2.0*GeV)
 WC = W.chargeConjugate()
 # -----------------------------------------------------------------------------------------------------------------------------
 
 # Higgs:
-higgs = Particle(isSM=True, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth=0.*GeV, _isInvisible=False)
-# Group higgs and conjugate in single particle:
-higgs = MultiParticle('higgs', [higgs, higgs.chargeConjugate('higgs')])
+higgs = Particle(isSM=True, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, colordim=1, spin=0, totalwidth=0.*GeV, 
+                 _isInvisible=False, isSelfConjugate=True)
 # -----------------------------------------------------------------------------------------------------------------------------
 
 # Pions
@@ -74,7 +72,7 @@ piz = Particle(isSM=True, label='pi0', pdg=111, mass=140.*MeV, eCharge=0, colord
 pion = MultiParticle('pion', [pip, piz, pip.chargeConjugate(), piz.chargeConjugate('pi0')])
 
 # A dummy particle to represent the primary vertex (production mode)
-pv = Particle(isSM=True, label='PV', pdg=0)
+pv = Particle(isSM=True, label='PV', pdg=0, isSelfConjugate=True)
 
 leptons = [e, mu, ta, eC, muC, taC, nu]
 gauge = [g, photon, Z, W, WC]

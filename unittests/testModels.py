@@ -20,6 +20,7 @@ import subprocess
 from smodels.base.smodelsLogging import logger
 from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
+from smodels.base.particle import Particle,MultiParticle
 
 setLogLevel('error')
 
@@ -107,8 +108,8 @@ class ModelsTest(unittest.TestCase):
         BSMList = getParticlesFromSLHA("./testFiles/slha/idm_example.slha")
         BSMList = sorted(BSMList, key = lambda p: p.pdg)
 
-        h2 = Particle(isSM=False,label='h2',pdg=35,eCharge=0.0,colordim=1,spin=0.0)
-        h3 = Particle(isSM=False,label='h3',pdg=36,eCharge=0.0,colordim=1,spin=0.0)
+        h2 = Particle(isSM=False,label='h2',pdg=35,eCharge=0.0,colordim=1,spin=0.0,isSelfConjugate=True)
+        h3 = Particle(isSM=False,label='h3',pdg=36,eCharge=0.0,colordim=1,spin=0.0,isSelfConjugate=True)
         hp = Particle(isSM=False,label='h+',pdg=37,eCharge=1.0,colordim=1,spin=0.0)
         hm = Particle(isSM=False,label='h-',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0)
         BSMListDefault = [hm,h2,h3,hp]
@@ -173,7 +174,74 @@ class ModelsTest(unittest.TestCase):
                     continue
                 self.assertEqual(val,valB)
 
+    def testSingleParticle(self):
 
+        filename = "./testFiles/slha/gluino_squarks.slha"
+        runtime.modelFile = 'mssmQNumbers.slha'
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        self.assertEqual(len(model.singleParticles),90)
+        for p in model.singleParticles:
+            self.assertTrue(isinstance(p,Particle))
+        model.updateParticles(filename)
+        self.assertEqual(len(model.singleParticles),90)
+        for p in model.singleParticles:
+            self.assertTrue(isinstance(p,Particle))
+
+    def testPDG2Particle(self):
+
+        filename = "./testFiles/slha/gluino_squarks.slha"
+        runtime.modelFile = 'mssmQNumbers.slha'
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(filename)
+        
+        # Check u quark
+        u = model.pdgToParticle(2)
+        self.assertTrue(isinstance(u,Particle))
+        self.assertFalse(isinstance(u,MultiParticle))
+        self.assertEqual(u.pdg,2)
+
+        # Check u* quark
+        ubar = model.pdgToParticle(-2)
+        self.assertTrue(isinstance(ubar,Particle))
+        self.assertFalse(isinstance(ubar,MultiParticle))
+        self.assertEqual(ubar.pdg,-2)
+
+        # Check photon (should be its anti-particle)
+        a = model.pdgToParticle(22)
+        self.assertTrue(isinstance(a,Particle))
+        self.assertEqual(a.pdg,22)
+        abar = model.pdgToParticle(-22) # Should return photon!
+        self.assertTrue(abar is a)
+        self.assertEqual(abar.pdg,22)
+
+    def testSelfConjugate(self):
+
+        runtime.modelFile = 'mssmQNumbers.slha'
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        self.assertEqual(len(model.BSMparticles),55)
+        n1 = model.pdgToParticle(1000022)
+        self.assertTrue(n1.isSelfConjugate)
+        ul = model.pdgToParticle(1000002)
+        self.assertFalse(ul.isSelfConjugate)
+        self.assertTrue(n1.chargeConjugate() is n1)
+        self.assertFalse(ul.chargeConjugate() is ul)
+
+    def testGetVertices(self):
+
+        filename = "./testFiles/slha/gluino_squarks.slha"
+        runtime.modelFile = 'mssmQNumbers.slha'
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(filename)
+        self.assertEqual(len(model.vertices),277)
+        for v in model.vertices:
+            self.assertTrue(isinstance(v[0],Particle))
+            for p in v[1]:
+                self.assertTrue(isinstance(p,Particle))
+        
     def removeOutputs(self, f):
         """ remove cruft outputfiles """
         for i in [ f, f.replace(".py",".pyc" ), f.replace(".py",".smodels") ]:

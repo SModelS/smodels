@@ -44,12 +44,12 @@ sntal = Particle(isSM=False, label='snta_L', pdg=1000016, eCharge=0, colordim=1,
 sta2 = Particle(isSM=False, label='sta_2', pdg=2000015, eCharge=-1, colordim=1, spin=0)
 
 #Gluino:
-gluino = Particle(isSM=False, label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2)
+gluino = Particle(isSM=False, label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2,isSelfConjugate=True)
 #Neutralinos
-n1 = Particle(isSM=False, label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2)
-n2 = Particle(isSM=False, label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2)
-n3 = Particle(isSM=False, label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2)
-n4 = Particle(isSM=False, label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2)
+n1 = Particle(isSM=False, label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n2 = Particle(isSM=False, label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n3 = Particle(isSM=False, label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n4 = Particle(isSM=False, label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
 
 #Gravitino:
 # g = Particle(isSM=False, label='G', pdg=1000039, eCharge=0, colordim=1, spin=3./2)
@@ -61,8 +61,8 @@ c2 = Particle(isSM=False, label='C2+', pdg=1000037, eCharge=1, colordim=1, spin=
 ##### R-even  ###############
 #Higgs
 H = Particle(isSM=False, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
-A0 = Particle(isSM=False, label='A0', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False)
-H0 = Particle(isSM=False, label='H0', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False)
+A0 = Particle(isSM=False, label='A0', pdg=36, eCharge=0, colordim=1, spin=0, _isInvisible=False,isSelfConjugate=True)
+H0 = Particle(isSM=False, label='H0', pdg=35, eCharge=0, colordim=1, spin=0, _isInvisible=False,isSelfConjugate=True)
 
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]

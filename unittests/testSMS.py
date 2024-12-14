@@ -215,14 +215,14 @@ class SMSTest(unittest.TestCase):
         sms1 += sms2
         self.assertEqual(sms1.weightList[0].value,32.*fb)
         self.assertEqual(sms1.pdg,[None, 1000021, 1000021,
-                                    [1000022, 1000023], [21, -21],
-                                    [1000022, 1000023], [21, -21]])
+                                    [1000022, 1000023], 21,
+                                    [1000022, 1000023], 21])
 
         sms1 += sms3
         self.assertEqual(sms1.weightList[0].value,34.*fb)
         self.assertEqual(sms1.pdg,[None, 1000021, 1000021,
-                                    [1000022, 1000023], [21, -21],
-                                    [1000022, 1000023], [21, -21]])
+                                    [1000022, 1000023], 21,
+                                    [1000022, 1000023], 21])
 
 
 if __name__ == "__main__":
