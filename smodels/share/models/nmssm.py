@@ -48,38 +48,38 @@ sta2 = Particle(isSM=False, label='sta_2', pdg=2000015, eCharge=-1, colordim=1, 
 
 
 #Gluino:
-gluino = Particle(isSM=False, label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2)
+gluino = Particle(isSM=False, label='gluino', pdg=1000021, eCharge=0, colordim=8, spin=1./2,isSelfConjugate=True)
 #Neutralinos
-n1 = Particle(isSM=False, label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2)
-n2 = Particle(isSM=False, label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2)
-n3 = Particle(isSM=False, label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2)
-n4 = Particle(isSM=False, label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2)
-n5 = Particle(isSM=False, label='N5', pdg=1000045, eCharge=0, colordim=1, spin=1./2)
+n1 = Particle(isSM=False, label='N1', pdg=1000022, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n2 = Particle(isSM=False, label='N2', pdg=1000023, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n3 = Particle(isSM=False, label='N3', pdg=1000025, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n4 = Particle(isSM=False, label='N4', pdg=1000035, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
+n5 = Particle(isSM=False, label='N5', pdg=1000045, eCharge=0, colordim=1, spin=1./2,isSelfConjugate=True)
 
 #Charginos
 c1 = Particle(isSM=False, label='C1+', pdg=1000024, eCharge=1, colordim=1, spin=1./2)
 c2 = Particle(isSM=False, label='C2+', pdg=1000037, eCharge=1, colordim=1, spin=1./2)
 
 #Graviton
-gravitino = Particle(isSM=False, label='G', pdg=1000039, eCharge=1, colordim=1, spin=1./2)
+gravitino = Particle(isSM=False, label='G', pdg=1000039, eCharge=1, colordim=1, spin=1./2,isSelfConjugate=True)
 
 ##### R-even  ###############
 #Higgs
 H = Particle(isSM=False, label='H+', pdg=37, eCharge=+1, colordim=1, spin=0)
-H2 = Particle(isSM=False, label='H2', pdg=35, eCharge=0, colordim=1, spin=0)
-H3 = Particle(isSM=False, label='H3', pdg=45, eCharge=0, colordim=1, spin=0)
-A1 = Particle(isSM=False, label='A1', pdg=36, eCharge=0, colordim=1, spin=0)
-A2 = Particle(isSM=False, label='A2', pdg=46, eCharge=0, colordim=1, spin=0)
+H2 = Particle(isSM=False, label='H2', pdg=35, eCharge=0, colordim=1, spin=0,isSelfConjugate=True)
+H3 = Particle(isSM=False, label='H3', pdg=45, eCharge=0, colordim=1, spin=0,isSelfConjugate=True)
+A1 = Particle(isSM=False, label='A1', pdg=36, eCharge=0, colordim=1, spin=0,isSelfConjugate=True)
+A2 = Particle(isSM=False, label='A2', pdg=46, eCharge=0, colordim=1, spin=0,isSelfConjugate=True)
 
 squarks = [sdl,sul,sdr,sur] + [ssl,scl,ssr,scr] + [sb1,st1,sb2,st2]
 sleptons = [sel,snel,ser] + [smul,snmul,smur] + [sta1,sntal,sta2]
 inos = [gluino] + [n1,n2,n3,n4,n5] + [c1,c2] + [gravitino]
 
 rOdd = squarks + sleptons + inos
-rOddC = [p.chargeConjugate() for p in rOdd]  #Define the charge conjugates
+rOddC = [p.chargeConjugate() for p in rOdd if not p.isSelfConjugate] #Define the charge conjugates
 
 bsm_higgs = [H,H2,H3,A1,A2]
-bsm_higgsC = [p.chargeConjugate() for p in bsm_higgs]
+bsm_higgsC = [p.chargeConjugate() for p in bsm_higgs if not p.isSelfConjugate]
 
 #Generic BSM particles:
 
