@@ -186,7 +186,7 @@ class TestSMSSort(unittest.TestCase):
                               ('H0', 'H-'), ('PV', 'H-'), 
                               ('PV', 'H0')])
       
-      stringProc = "(PV > st_1~(1),st_1(2)), (st_1~(1) > N2~(3),t-), (st_1(2) > N2(4),t+), (N2~(3) > N1,e-,e+), (N2(4) > N1,nu,nu)"
+      stringProc = "(PV > st_1~(1),st_1(2)), (st_1~(1) > N2(3),t-), (st_1(2) > N2(4),t+), (N2(3) > N1,e-,e+), (N2(4) > N1,nu,nu)"
       # Hack to create a theory element from a string:
       expSMS = ExpSMS.from_string(stringProc, model=model)
       tree = TheorySMS()
@@ -201,20 +201,20 @@ class TestSMSSort(unittest.TestCase):
 
       self.assertEqual(nodes_and_indices,[('PV', 0), ('st_1~', 1), 
                                           ('st_1', 2), ('t-', 3), 
-                                          ('N2~', 4), ('t+', 5), 
+                                          ('N2', 4), ('t+', 5), 
                                           ('N2', 6), ('N1', 7), 
                                           ('e-', 8), ('e+', 9), 
                                           ('N1', 10), ('nu', 11), 
                                           ('nu', 12)])
-      self.assertEqual(edges,[('N2', 'N1'), ('N2', 'nu'), 
-                              ('N2', 'nu'), ('N2~', 'N1'), 
-                              ('N2~', 'e+'), ('N2~', 'e-'), 
+      self.assertEqual(edges,[('N2', 'N1'), ('N2', 'N1'), 
+                              ('N2', 'e+'), ('N2', 'e-'),
+                              ('N2', 'nu'), ('N2', 'nu'),  
                               ('PV', 'st_1'), ('PV', 'st_1~'), 
                               ('st_1', 'N2'), ('st_1', 't+'), 
-                              ('st_1~', 'N2~'), ('st_1~', 't-')])
+                              ('st_1~', 'N2'), ('st_1~', 't-')])
       
 
-      stringProc = "(PV > st_1~(1),st_1(2)), (st_1~(1) > N2~(3),t-), (st_1(2) > N2(4),t+), (N2~(3) > N1,e+,e-), (N2(4) > N1,nu,nu)"
+      stringProc = "(PV > st_1~(1),st_1(2)), (st_1~(1) > N2(3),t-), (st_1(2) > N2(4),t+), (N2(3) > N1,e+,e-), (N2(4) > N1,nu,nu)"
       # Hack to create a theory element from a string:
       expSMS = ExpSMS.from_string(stringProc, model=model)
       treeB = TheorySMS()
@@ -228,17 +228,17 @@ class TestSMSSort(unittest.TestCase):
 
       self.assertEqual(nodes_and_indices,[('PV', 0), ('st_1~', 1), 
                                           ('st_1', 2), ('t-', 3), 
-                                          ('N2~', 4), ('t+', 5), 
+                                          ('N2', 4), ('t+', 5), 
                                           ('N2', 6), ('N1', 7), 
                                           ('e-', 8), ('e+', 9), 
                                           ('N1', 10), ('nu', 11), 
                                           ('nu', 12)])
-      self.assertEqual(edges,[('N2', 'N1'), ('N2', 'nu'), 
-                              ('N2', 'nu'), ('N2~', 'N1'), 
-                              ('N2~', 'e+'), ('N2~', 'e-'), 
+      self.assertEqual(edges,[('N2', 'N1'), ('N2', 'N1'), 
+                              ('N2', 'e+'), ('N2', 'e-'), 
+                              ('N2', 'nu'), ('N2', 'nu'),
                               ('PV', 'st_1'), ('PV', 'st_1~'), 
                               ('st_1', 'N2'), ('st_1', 't+'), 
-                              ('st_1~', 'N2~'), ('st_1~', 't-')])
+                              ('st_1~', 'N2'), ('st_1~', 't-')])
       
       self.assertTrue(tree == treeB)
 

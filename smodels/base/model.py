@@ -159,8 +159,10 @@ class Model(object):
                     continue
                 if any(getattr(p, attr) != value for attr, value in kwargs.items()):
                     continue
-
+                # Match found. Add original particle to particle list
+                # and go to next particle
                 particleList.append(particle)
+                break
 
         # Remove repeated entries. If the list contains a Particle and a MultiParticle
         # which contains the Particle, remove the MultiParticle

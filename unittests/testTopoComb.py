@@ -56,7 +56,7 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
         predXSecs,rvalues={},{}
         for case in [ "T1", "T5", "mixed" ]:
             filename = self.createSLHAFile( case=case )
-            BSMList = [gluino,st1,n1,st1.chargeConjugate(),n1.chargeConjugate(),gluino.chargeConjugate()]
+            BSMList = [gluino,st1,n1,st1.chargeConjugate()]
             model = Model(BSMList,SMList)
             model.updateParticles(filename)
             deco = decompose(model)
