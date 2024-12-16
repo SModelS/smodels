@@ -1,6 +1,6 @@
 """
-.. module:: genericSMS
-   :synopsis: This is a base class for describing Simplified Model Topologies  using a rooted tree syntax.
+.. module:: genericGraph
+   :synopsis: This is a base class for describing graphs.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 

@@ -12,6 +12,7 @@ from smodels.base.physicsUnits import GeV
 from smodels.base import lheReader, crossSection
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.exceptions import SModelSBaseError as SModelSError
+from smodels.base.vertexGraph import VertexGraph
 
 class Model(object):
     """
@@ -427,7 +428,10 @@ class Model(object):
                 if any(d is None for d in daughters):
                     continue
  
-                allVertices.append((mom,daughters))
+                vertex = VertexGraph(incoming=[mom],
+                                    outgoing=daughters)
+                if not vertex in allVertices:
+                    allVertices.append(vertex)
 
         self.vertices = allVertices
 
