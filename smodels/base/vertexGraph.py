@@ -24,6 +24,9 @@ class VertexGraph(GenericGraph):
         Initialize the vertex with the given incoming and outgoing particles.
         The Vertex is always created with a single incoming particle and all the other
         particles are set as outgoing (through charge conjugation, if necessary).
+        In addition the vertex is rearranged to a canonical form: the BSM particle
+        with largest pdg is the incoming particle and if the incoming particle pdg
+        is negative, the vertex is conjugated (so the incoming pdg is always positive).
 
         :param incoming: List of Particle objects entering the vertex (i.e. X for X -> a,b)
         :param outgoing: List of Particle objects exiting the vertex (i.e. a,b for X -> a,b)
