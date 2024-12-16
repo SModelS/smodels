@@ -36,26 +36,24 @@ class VertexGraph(GenericGraph):
 
         # Create a graph with a single incoming particle
         # (the BSM particle with largest pdg)
-        all_particles = sorted(list(incoming)+list(outgoing), 
+        ## First define all particles as incoming:
+        all_particles = list(incoming) + [p.chargeConjugate() for p in outgoing]
+        ## Sort all particles by BSM and pdg values
+        all_particles = sorted(all_particles, 
                               key = lambda p: (not p.isSM,abs(p.pdg)), reverse=True)
         if len(all_particles) > 0:
             in_particle = all_particles[0]
-            out_particles = []
-            for p in incoming:
-                # The other incoming particles become outgoing through charge conjugation
-                if p is in_particle:
-                    continue
-                out_particles.append(p.chargeConjugate())
-            for p in outgoing:
-                # The other outgoing particles remain as outgoing 
-                if p is in_particle:
-                    continue
-                out_particles.append(p)
+            out_particles = [p.chargeConjugate() for p in all_particles[1:]]
 
             # Now if in_particle has a negative PDG, conjugate the vertex:
             if in_particle.pdg < 0:
                 in_particle = in_particle.chargeConjugate()
                 out_particles = [p.chargeConjugate() for p in out_particles[:]]
+
+            # Finally sort outgoing particles again
+            out_particles = sorted(out_particles, 
+                                    key = lambda p: (not p.isSM,abs(p.pdg)), 
+                                    reverse=True)
 
             self.add_node(in_particle,0)
             self.add_nodes_from(out_particles)

@@ -37,13 +37,13 @@ s = Particle(isSM=True, label='s', pdg=3, mass=0.*MeV, eCharge=(-1./3.), colordi
 q = MultiParticle('q', [u, d, s, u.chargeConjugate(), d.chargeConjugate(), s.chargeConjugate()])
 c = Particle(isSM=True, label='c', pdg=4, mass=1.28*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth=0.*GeV)
 # Group c and c* in a single particle:
-c = MultiParticle('c', [c, c.chargeConjugate('c')])
+c = MultiParticle('c', [c, c.chargeConjugate()])
 # -----------------------------------------------------------------------------------------------------------------------------
 
 # Heavy quarks:
 b = Particle(isSM=True, label='b', pdg=5, mass=4.7*GeV, eCharge=(-1./3.), colordim=3, spin=1./2, totalwidth=0.*GeV)
 # Group b and b* in a single particle:
-b = MultiParticle('b', [b, b.chargeConjugate('b')])
+b = MultiParticle('b', [b, b.chargeConjugate()])
 # (We want to be able to differentiate between t+ and t-, so we define both particles:
 t = Particle(isSM=True, label='t+', pdg=6, mass=173.1*GeV, eCharge=(2./3.), colordim=3, spin=1./2, totalwidth=1.4*GeV)
 tC = t.chargeConjugate()
@@ -69,7 +69,7 @@ higgs = Particle(isSM=True, label='higgs', pdg=25, mass=125.*GeV, eCharge=0, col
 pip = Particle(isSM=True, label='pi+', pdg=211, mass=140.*MeV, eCharge=+1, colordim=1, spin=0, totalwidth=0.*GeV)
 piz = Particle(isSM=True, label='pi0', pdg=111, mass=140.*MeV, eCharge=0, colordim=1, spin=0, totalwidth=0.*GeV)
 # Group all pions in a single particle:
-pion = MultiParticle('pion', [pip, piz, pip.chargeConjugate(), piz.chargeConjugate('pi0')])
+pion = MultiParticle('pion', [pip, piz, pip.chargeConjugate(), piz.chargeConjugate()])
 
 # A dummy particle to represent the primary vertex (production mode)
 pv = Particle(isSM=True, label='PV', pdg=0, isSelfConjugate=True)

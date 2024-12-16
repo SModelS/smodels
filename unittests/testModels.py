@@ -21,6 +21,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
 from smodels.base.particle import Particle,MultiParticle
+from smodels.base.vertexGraph import VertexGraph
 
 setLogLevel('error')
 
@@ -236,11 +237,11 @@ class ModelsTest(unittest.TestCase):
         BSMList = load()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(filename)
-        self.assertEqual(len(model.vertices),277)
+        self.assertEqual(len(model.vertices),270)
         for v in model.vertices:
-            self.assertTrue(isinstance(v[0],Particle))
-            for p in v[1]:
-                self.assertTrue(isinstance(p,Particle))
+            self.assertTrue(isinstance(v,VertexGraph))
+            if model.vertices.count(v) > 1:
+                print(v)
         
     def removeOutputs(self, f):
         """ remove cruft outputfiles """
