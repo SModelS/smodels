@@ -10,7 +10,7 @@
    * How to sort production diagrams?
  * Develop syntax for describing production diagrams in the database
  * Add production diagram to Txnames
- * Modify the CMS-EXO-20-004-eff analysis and replace TRV1 and TRS1 by qqbar > BSM anf g g > BSM
+ * Modify the CMS-EXO-20-004-eff analysis and replace TRV1 and TRS1 by qqbar > BSM and g g > BSM
 
  ### Step 1: vectorlike quarks
 
@@ -20,6 +20,6 @@
     <img src="PVinfoStep1.png" alt="Diagrams for step" width=65% height=45% />
   </p>
 
-  * Include limits from vectorlike quarks to the database 
+  * Include limits for vectorlike quarks to the database 
 
 
