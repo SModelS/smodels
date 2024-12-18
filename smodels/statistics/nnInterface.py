@@ -91,7 +91,7 @@ class NNUpperLimitComputer:
     def getMostSensitiveModel ( self ):
         if hasattr ( self, "mostSensitiveModel" ):
             return self.mostSensitiveModel
-        jsonfiles = list(self.data.globalInfo.smYields.keys())
+        jsonfiles = list(self.data.globalInfo.onnxMeta.keys())
         if len(jsonfiles)==1:
             self.mostSensitiveModel = jsonfiles[0]
             return self.mostSensitiveModel
@@ -119,14 +119,11 @@ class NNUpperLimitComputer:
         except (TypeError,IndexError) as e:
             pass
 
-        #for modelname,model in self.data.globalInfo.smYields.items():
-        #    compute_upper_limit(model)
-        #choose_most_sensitive_model
         if modelToUse == None:
             modelToUse = self.getMostSensitiveModel ( )
 
         syields = []
-        for srname,smyield in self.data.globalInfo.smYields[modelToUse].items():
+        for srname,smyield in self.data.globalInfo.onnxMeta[modelToUse]["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
             # ic ( realname )
@@ -147,9 +144,9 @@ class NNUpperLimitComputer:
         #    print ( f"inputErrors {self.data.globalInfo.inputErrors[modelToUse]}" )
         for i,x in enumerate(scaled_signal_yields[0]):
             t = 0. # x
-            err = self.data.globalInfo.inputErrors[modelToUse][i]
+            err = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i]
             if err > 1e-20:
-                t = (x - self.data.globalInfo.inputMeans[modelToUse][i])/err
+                t = (x - self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i])/err
             #else:
             #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_signal_yields[0][i]=t
@@ -159,18 +156,18 @@ class NNUpperLimitComputer:
         arr = self.regressors[modelToUse]["session"].run(None, {"input_1":scaled_signal_yields})
         # print ( f"@@arr {arr}" )
         arr = arr[0][0]
-        nll0obs =  self.data.globalInfo.nll_obs_mu0[modelToUse]
-        nll0exp =  self.data.globalInfo.nll_exp_mu0[modelToUse]
-        nllA0obs =  self.data.globalInfo.nllA_obs_mu0[modelToUse]
-        nllA0exp =  self.data.globalInfo.nllA_exp_mu0[modelToUse]
-        expDelta = self.data.globalInfo.inputMeans[modelToUse][-4]
-        obsDelta = self.data.globalInfo.inputMeans[modelToUse][-3]
-        expDeltaA = self.data.globalInfo.inputMeans[modelToUse][-2]
-        obsDeltaA = self.data.globalInfo.inputMeans[modelToUse][-1]
-        expErr = self.data.globalInfo.inputErrors[modelToUse][-4]
-        obsErr = self.data.globalInfo.inputErrors[modelToUse][-3]
-        expErrA = self.data.globalInfo.inputErrors[modelToUse][-2]
-        obsErrA = self.data.globalInfo.inputErrors[modelToUse][-1]
+        nll0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nll_obs_mu0"]
+        nll0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nll_exp_mu0"]
+        nllA0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nllA_obs_mu0"]
+        nllA0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nllA_exp_mu0"]
+        expDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-4]
+        obsDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-3]
+        expDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-2]
+        obsDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-1]
+        expErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-4]
+        obsErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-3]
+        expErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-2]
+        obsErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-1]
         nll1exp = nll0exp + arr[-4]*expErr + expDelta
         nll1obs = nll0obs + arr[-3]*obsErr + obsDelta
         nllA1exp = nllA0exp + arr[-2]*expErrA + expDeltaA

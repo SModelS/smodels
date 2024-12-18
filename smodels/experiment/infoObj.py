@@ -144,6 +144,7 @@ class Info(object):
                 sys.exit(-1)
         self.onnxes, self.smYields, self.inputMeans = {}, {}, {}
         self.inputErrors, self.nll_exp_mu0, self.nll_obs_mu0 = {}, {}, {}
+        self.onnxMeta = {}
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
             with open ( fullPath, "rb" ) as f:
@@ -214,17 +215,18 @@ class Info(object):
                         nll_obs_max = [None,values[-5]]
                     if nll_exp_max != None:
                         nll_exp_max = [None,values[-7]]
-            self.smYields[onnxFile] = smYields
-            self.inputMeans[onnxFile] = inputMeans
-            self.inputErrors[onnxFile] = inputErrors
-            self.nll_exp_mu0[onnxFile] = nll_exp_mu0
-            self.nll_obs_mu0[onnxFile] = nll_obs_mu0
-            self.nllA_exp_mu0[onnxFile] = nllA_exp_mu0
-            self.nllA_obs_mu0[onnxFile] = nllA_obs_mu0
-            self.nll_exp_max[onnxFile] = nll_exp_max
-            self.nll_obs_max[onnxFile] = nll_obs_max
-            self.nllA_exp_max[onnxFile] = nllA_exp_max
-            self.nllA_obs_max[onnxFile] = nllA_obs_max
+            self.onnxMeta[onnxFile]={}
+            self.onnxMeta[onnxFile]["smYields"]=smYields
+            self.onnxMeta[onnxFile]["inputMeans"]=inputMeans
+            self.onnxMeta[onnxFile]["inputErrors"]=inputErrors
+            self.onnxMeta[onnxFile]["nll_exp_mu0"]=nll_exp_mu0
+            self.onnxMeta[onnxFile]["nll_obs_mu0"]=nll_obs_mu0
+            self.onnxMeta[onnxFile]["nllA_exp_mu0"]=nllA_exp_mu0
+            self.onnxMeta[onnxFile]["nllA_obs_mu0"]=nllA_obs_mu0
+            self.onnxMeta[onnxFile]["nll_exp_max"]=nll_exp_max
+            self.onnxMeta[onnxFile]["nll_obs_max"]=nll_obs_max
+            self.onnxMeta[onnxFile]["nllA_exp_max"]=nllA_exp_max
+            self.onnxMeta[onnxFile]["nllA_obs_max"]=nllA_obs_max
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
