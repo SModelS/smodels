@@ -153,12 +153,15 @@ class Info(object):
             m = onnx.load ( fullPath )
             smYields, inputMeans, inputErrors = {}, [], []
             nll_exp_mu0, nll_obs_mu0 = None, None
+            nllA_exp_mu0, nllA_obs_mu0 = None, None
+            nll_exp_max, nll_obs_max = None, None
+            nllA_exp_max, nllA_obs_max = None, None
             # smYields = []
             import json
             for em in m.metadata_props:
                 if em.key == "bkg_yields":
                     st = eval(em.value)
-                    for l in st:
+                    for l in st: ## the sm yields are tuple of (name,value)
                         smYields[ l[0] ] = l[1]
                     #    smYields.append ( l[1] )
                 if em.key == "standardization_mean":
@@ -167,13 +170,38 @@ class Info(object):
                     inputErrors = eval(em.value)
                 elif em.key == 'nLL_exp_mu0':
                     nll_exp_mu0 = json.loads(em.value)
+                elif em.key == 'nLL_exp_max':
+                    nll_exp_max = json.loads(em.value)
+                elif em.key == 'nLL_obs_max':
+                    nll_obs_max = json.loads(em.value)
+                elif em.key == 'nLLA_exp_max':
+                    nllA_exp_max = json.loads(em.value)
+                elif em.key == 'nLLA_obs_max':
+                    nllA_obs_max = json.loads(em.value)
                 elif em.key == 'nLL_obs_mu0':
                     nll_obs_mu0 = json.loads(em.value)
+                elif em.key == 'nLLA_exp_mu0':
+                    nllA_exp_mu0 = json.loads(em.value)
+                elif em.key == 'nLLA_obs_mu0':
+                    nllA_obs_mu0 = json.loads(em.value)
+                elif em.key == 'y_min':
+                    values = json.loads(em.value)
+                    if True: ## not_override
+                        nllA_obs_max = [None,values[-1]]
+                        nllA_exp_max = [None,values[-3]]
+                        nll_obs_max = [None,values[-5]]
+                        nll_exp_max = [None,values[-7]]
             self.smYields[onnxFile] = smYields
             self.inputMeans[onnxFile] = inputMeans
             self.inputErrors[onnxFile] = inputErrors
             self.nll_exp_mu0[onnxFile] = nll_exp_mu0
             self.nll_obs_mu0[onnxFile] = nll_obs_mu0
+            self.nllA_exp_mu0[onnxFile] = nllA_exp_mu0
+            self.nllA_obs_mu0[onnxFile] = nllA_obs_mu0
+            self.nll_exp_max[onnxFile] = nll_exp_max
+            self.nll_obs_max[onnxFile] = nll_obs_max
+            self.nllA_exp_max[onnxFile] = nllA_exp_max
+            self.nllA_obs_max[onnxFile] = nllA_obs_max
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,

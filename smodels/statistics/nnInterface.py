@@ -107,7 +107,7 @@ class NNUpperLimitComputer:
         return self.mostSensitiveModel
 
     def negative_log_likelihood(self, poi_test,
-        modelToUse : Union[None,str] = None):
+        modelToUse : Union[None,str] = None ):
         """ the method that really wraps around the llhd computation.
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
@@ -138,9 +138,13 @@ class NNUpperLimitComputer:
             signal = float ( self.nsignals[realname]*poi_test )
             tot = smyield + signal
             syields.append ( tot )
+            # print ( f"@@0 the smyield of {srname} is {smyield} poi_test is {poi_test} signal {signal}" )
 
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
 
+        #if poi_test == 0.:
+        #    print ( f"inputMeans {self.data.globalInfo.inputMeans[modelToUse]}" )
+        #    print ( f"inputErrors {self.data.globalInfo.inputErrors[modelToUse]}" )
         for i,x in enumerate(scaled_signal_yields[0]):
             t = 0. # x
             err = self.data.globalInfo.inputErrors[modelToUse][i]
@@ -150,24 +154,37 @@ class NNUpperLimitComputer:
             #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_signal_yields[0][i]=t
 
+        if poi_test == 0.:
+            print ( f"@@X we evaluate at {scaled_signal_yields}" )
         arr = self.regressors[modelToUse]["session"].run(None, {"input_1":scaled_signal_yields})
+        # print ( f"@@arr {arr}" )
         arr = arr[0][0]
         nll0obs =  self.data.globalInfo.nll_obs_mu0[modelToUse]
         nll0exp =  self.data.globalInfo.nll_exp_mu0[modelToUse]
-        expDelta = self.data.globalInfo.inputMeans[modelToUse][-2]
-        obsDelta = self.data.globalInfo.inputMeans[modelToUse][-1]
-        expErr = self.data.globalInfo.inputErrors[modelToUse][-2]
-        obsErr = self.data.globalInfo.inputErrors[modelToUse][-1]
-        nll1exp = nll0exp + arr[0]*expErr + expDelta
-        nll1obs = nll0obs + arr[1]*obsErr + obsDelta
+        nllA0obs =  self.data.globalInfo.nllA_obs_mu0[modelToUse]
+        nllA0exp =  self.data.globalInfo.nllA_exp_mu0[modelToUse]
+        expDelta = self.data.globalInfo.inputMeans[modelToUse][-4]
+        obsDelta = self.data.globalInfo.inputMeans[modelToUse][-3]
+        expDeltaA = self.data.globalInfo.inputMeans[modelToUse][-2]
+        obsDeltaA = self.data.globalInfo.inputMeans[modelToUse][-1]
+        expErr = self.data.globalInfo.inputErrors[modelToUse][-4]
+        obsErr = self.data.globalInfo.inputErrors[modelToUse][-3]
+        expErrA = self.data.globalInfo.inputErrors[modelToUse][-2]
+        obsErrA = self.data.globalInfo.inputErrors[modelToUse][-1]
+        nll1exp = nll0exp + arr[-4]*expErr + expDelta
+        nll1obs = nll0obs + arr[-3]*obsErr + obsDelta
+        nllA1exp = nllA0exp + arr[-2]*expErrA + expDeltaA
+        nllA1obs = nllA0obs + arr[-1]*obsErrA + obsDeltaA
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
-                "nll_obs_0": nll0obs, "nll_obs_1": nll1obs }
+                "nll_obs_0": nll0obs, "nll_obs_1": nll1obs,
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": nllA1exp,
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": nllA1obs }
         if abs(poi_test)<1e-7:
             if abs(nll0obs-nll1obs)>1e-4:
                 logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
                 # ret["nll_obs_1"]=nll0obs
             if abs(nll0exp-nll1exp)>1e-4:
-                logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1obs {nll1exp:.4f}." )
+                logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
                 # ret["nll_exp_1"]=nll0exp
         return ret
 
@@ -182,7 +199,7 @@ class NNUpperLimitComputer:
         nninfo["hasgreeted"] = True
 
     def likelihood( self, mu=1.0, return_nll=False, expected=False,
-              modelToUse : Union[None,str] = None ):
+              modelToUse : Union[None,str] = None, asimov : bool = False ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -192,13 +209,18 @@ class NNUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         :param modelToUse: if given, compute likelihood for that model.
+        :param asimov: if true, compute for asimov data
         If None compute for most sensitive analysis.
         """
         ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
         if expected:
             nll = ret['nll_exp_1']
+            if asimov:
+                nll = ret['nllA_exp_1']
         else:
             nll = ret['nll_obs_1']
+            if asimov:
+                nll = ret['nllA_obs_1']
 
         logger.debug( f"Calling likelihood")
         return self.exponentiateNLL ( nll, not return_nll )
@@ -217,7 +239,8 @@ class NNUpperLimitComputer:
 
     def lmax( self, return_nll=False, expected=False,
               allowNegativeSignals=True,
-              modelToUse : Union[None,str] = None ):
+              modelToUse : Union[None,str] = None,
+              asimov : bool = False ):
         """
         Returns the (negative log) max likelihood
 
@@ -228,48 +251,31 @@ class NNUpperLimitComputer:
         :param allowNegativeSignals: if False, then negative nsigs are
         replaced with 0.
         :param modelToUse: if given, compute lmax for that model.
+        :param asimov: if true, compute for asimov data
         If None compute for most sensitive analysis.
         """
         if modelToUse == None:
             modelToUse = self.getMostSensitiveModel ( )
-        nll0 = self.likelihood ( 0., expected = expected, return_nll = True )
-        def getNLL ( mu ):
-            d = self.negative_log_likelihood (mu)
-            if mu==0.0 and expected:
-                nll = d['nll_exp_0']
-            elif mu==0.0 and not expected:
-                nll = d['nll_obs_0']
-            elif mu!=0.0 and expected:
-                nll = d['nll_exp_1']
-            elif mu!=0.0 and not expected:
-                nll = d['nll_obs_1']
+        # FIXME heed asimov
+        muhat,nllmin = self.data.globalInfo.nll_obs_max
+        if asimov:
+            muhat,nllmin = self.data.globalInfo.nllA_obs_max
+            if expected:
+                muhat,nllmin = self.data.globalInfo.nllA_exp_max
+        elif expected:
+            muhat,nllmin = self.data.globalInfo.nll_exp_max
+        ## FIXME compute sigma_mu, compute via nllA
+        sigma_mu = 0.
+        ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
 
-            return nll
-
-        ret = { "nll_min": nll0, "muhat": 0., "sigma_mu": 0. }
-
-        muini = [ 0.0, 1.0, 3.0, -1.0, 10.0, 0.1, -0.1 ]
-        if not allowNegativeSignals:
-            muini = [ 0.0, 1.0, 3.0, 10.0, 0.1 ]
-        for mu0 in muini:
-            o = optimize.minimize ( getNLL, mu0, method="Nelder-Mead" )
-            # print ( f"@@6 o={o} nll0 {nll0}" )
-            # sys.exit()
-            if o.success == True:
-                muhat = o.x[0]
-                if not allowNegativeSignals and muhat < 0.:
-                    continue
-                nll_min = o.fun
-                #    muhat = 0.
-                #    nll_min = nll0
-                if 0. < nll_min < ret["nll_min"]:
-                    ret = { "nll_min": nll_min, "muhat": muhat }
+        """
         ret["nll0"]=nll0
         ret["lmax"]=ret["nll_min"] # FIXME the lmax name!!!
         ret["expected"]=expected
         o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
         sigma_mu = np.sqrt ( o.hess_inv[0][0] )
         ret["sigma_mu"]=sigma_mu
+        """
 
         return ret
 
@@ -341,7 +347,7 @@ class NNUpperLimitComputer:
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
                              return_nll=True, modelToUse = modelToUse )
-        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
@@ -370,7 +376,7 @@ class NNUpperLimitComputer:
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, modelToUse = modelToUse )
+            nllA = self.likelihood(mu, return_nll=True, modelToUse = modelToUse, asimov = True )
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
 
         from smodels.base import runtime
