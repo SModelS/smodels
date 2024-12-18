@@ -171,13 +171,33 @@ class Info(object):
                 elif em.key == 'nLL_exp_mu0':
                     nll_exp_mu0 = json.loads(em.value)
                 elif em.key == 'nLL_exp_max':
-                    nll_exp_max = json.loads(em.value)
+                    tmp = json.loads(em.value)
+                    if len(tmp)==2:
+                        if math.isfinite(tmp[1]):
+                            nll_exp_max = tmp
+                        if nll_exp_max[0]==None:
+                            nll_exp_max[0]=tmp[0]
                 elif em.key == 'nLL_obs_max':
-                    nll_obs_max = json.loads(em.value)
+                    tmp = json.loads(em.value)
+                    if len(tmp)==2:
+                        if math.isfinite(tmp[1]):
+                            nll_obs_max = tmp
+                        if nll_obs_max[0]==None:
+                            nll_obs_max[0]=tmp[0]
                 elif em.key == 'nLLA_exp_max':
-                    nllA_exp_max = json.loads(em.value)
+                    tmp = json.loads(em.value)
+                    if len(tmp)==2:
+                        if math.isfinite(tmp[1]):
+                            nllA_exp_max = tmp
+                        if nllA_exp_max[0]==None:
+                            nllA_exp_max[0]=tmp[0]
                 elif em.key == 'nLLA_obs_max':
-                    nllA_obs_max = json.loads(em.value)
+                    tmp = json.loads(em.value)
+                    if len(tmp)==2:
+                        if math.isfinite(tmp[1]):
+                            nllA_obs_max = tmp
+                        if nllA_obs_max[0]==None:
+                            nllA_obs_max[0]=tmp[0]
                 elif em.key == 'nLL_obs_mu0':
                     nll_obs_mu0 = json.loads(em.value)
                 elif em.key == 'nLLA_exp_mu0':
@@ -186,10 +206,13 @@ class Info(object):
                     nllA_obs_mu0 = json.loads(em.value)
                 elif em.key == 'y_min':
                     values = json.loads(em.value)
-                    if True: ## not_override
+                    if nllA_obs_max != None:
                         nllA_obs_max = [None,values[-1]]
+                    if nllA_exp_max != None:
                         nllA_exp_max = [None,values[-3]]
+                    if nll_obs_max != None:
                         nll_obs_max = [None,values[-5]]
+                    if nll_exp_max != None:
                         nll_exp_max = [None,values[-7]]
             self.smYields[onnxFile] = smYields
             self.inputMeans[onnxFile] = inputMeans
