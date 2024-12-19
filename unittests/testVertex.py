@@ -17,8 +17,8 @@ from smodels.base import runtime
 from smodels.tools.particlesLoader import load
 from smodels.base.smodelsLogging import logger
 from smodels.base.model import Model
-from smodels.share.models.SMparticles import SMList,proton
-from smodels.experiment.defaultFinalStates import anyBSM
+from smodels.share.models.SMparticles import SMList,proton,q
+from smodels.experiment.defaultFinalStates import anyBSM, MET
 from smodels.base.vertexGraph import VertexGraph
 from smodels.base.inclusiveObjects import InclusiveValue
 
@@ -78,17 +78,41 @@ class VertexTest(unittest.TestCase):
         BSMList = load()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(filename)
+        self.assertEqual(len(model.vertices),3)
         
         
         anyBSM.pdg = InclusiveValue() # Just needs to be larger than the proton pdg
-        proton.pdg = 2212
+        dm = model.pdgToParticle(52)
+        dmbar = model.pdgToParticle(-52)
+        y1 = model.pdgToParticle(55)
         prodV1 = VertexGraph(incoming=[proton,proton],outgoing=[anyBSM])
         nmatches = 0
         for v in model.vertices:
             if v.matchTo(prodV1) is not None:
                 nmatches +=1
         self.assertEqual(nmatches,2)
-        self.assertEqual(len(model.vertices),3)
+
+        prodV2 = VertexGraph(incoming=[anyBSM],outgoing=[q,q])
+        nmatches = 0
+        for v in model.vertices:
+            if v.matchTo(prodV2) is not None:
+                nmatches +=1
+        self.assertEqual(nmatches,2)
+
+        prodV3 = VertexGraph(incoming=[y1],outgoing=[dm,dmbar])
+        nmatches = 0
+        for v in model.vertices:
+            if v.matchTo(prodV3) is not None:
+                nmatches +=1
+        self.assertEqual(nmatches,1)
+
+        prodV4 = VertexGraph(incoming=[dm,dmbar],outgoing=[y1.chargeConjugate()])
+        nmatches = 0
+        for v in model.vertices:
+            if v.matchTo(prodV4) is not None:
+                nmatches +=1
+        self.assertEqual(nmatches,1)
+
 
 
 

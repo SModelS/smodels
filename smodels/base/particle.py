@@ -6,7 +6,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-import itertools
 import weakref
 
 
@@ -129,6 +128,16 @@ class Particle(object):
         else:
             Particle._lastID += 1
         return Particle._lastID
+    
+    def getPdg(self):
+        """
+        Returns the particle PDG if defined, otherwise returns None
+        """
+
+        if hasattr(self,'pdg'):
+            return self.pdg
+        else:
+            return None
 
     def __cmp__(self, other):
         """
@@ -398,6 +407,7 @@ class MultiParticle(Particle):
         attrDict.update(kwargs)
         attrDict.pop('_id', None)
         attrDict.pop('_comp', None)
+        attrDict.pop('isSelfConjugate', None)
         for obj in Particle.getinstances()[:]:
             if not isinstance(obj, MultiParticle):
                 continue
@@ -544,16 +554,57 @@ class MultiParticle(Particle):
 
     def __iadd__(self, other):
         return self.__add__(other)
+    
+    def chargeConjugate(self, label=None):
+        """
+        Returns the charge conjugate MultiParticle (conjugates all of its particles).
+        If all particles in self are selfconjugate, returns self.
+        Also, if charge conjugating all particles result in the same particle list,
+        returns self.
+
+        :parameter label: If defined, defines the label of the charge conjugated particle.
+
+        :return: the charge conjugate MultiParticle
+        """
+
+        if all(p.isSelfConjugate for p in self.particles):
+            return self
+        
+        conj_particles = [p.chargeConjugate() for p in self.particles[:]]
+        
+        particleAttr = dict(self.__dict__.items())
+        particleAttr['particles'] = conj_particles
+        if label is None:
+            label = self.label+'~'
+            label = label.replace('~~','') # Double conjugation is the same as no conjugation
+        particleAttr['label'] = label
+        pConjugate = MultiParticle(**particleAttr)
+
+        return pConjugate
 
     def getPdgs(self):
         """
         pdgs appearing in MultiParticle
-        :return: list of pgds of particles in the MultiParticle
+        :return: list of pgds of all particles in the MultiParticle
         """
 
-        pdgs = [particle.pdg for particle in self.particles]
+        pdgs = []
+        for p in self.particles:
+            pdg = p.pdg
+            if isinstance(pdg,list):
+                pdgs += pdg
+            else:
+                pdgs.append(pdg)
 
         return pdgs
+    
+    def getPdg(self):
+        """
+        Returns the largest PDG appearing in the particles stored in self.
+        (Convenience method for obtaining a single PDG for the MultiParticle)
+        """
+
+        return max(self.getPdgs())
 
     def getLabels(self):
         """

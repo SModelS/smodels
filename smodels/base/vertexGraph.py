@@ -37,21 +37,29 @@ class VertexGraph(GenericGraph):
         # (the BSM particle with largest pdg)
         ## First define all particles as incoming:
         all_particles = list(incoming) + [p.chargeConjugate() for p in outgoing]
+        for p in all_particles:
+            if not hasattr(p,'pdg'):
+                raise SModelSError(f"VertexGraphs should only be created with particles with the pdg attribute (missing in {p})")
+            if not hasattr(p,'isSM'):
+                raise SModelSError(f"VertexGraphs should only be created with particles with the isSM attribute (missing in {p})")
+        
+        
         ## Sort all particles by BSM and pdg values
+        ## (for MultiParticles use the largest pdg for sorting)
         all_particles = sorted(all_particles, 
-                              key = lambda p: (not p.isSM,abs(p.pdg)), reverse=True)
+                              key = lambda p: (not p.isSM,abs(p.getPdg())), reverse=True)
         if len(all_particles) > 0:
             in_particle = all_particles[0]
             out_particles = [p.chargeConjugate() for p in all_particles[1:]]
 
-            # Now if in_particle has a negative PDG, conjugate the vertex:
-            if in_particle.pdg < 0:
+            # Now if in_particle only has negative PDGs, conjugate the vertex:
+            if in_particle.getPdg() < 0:
                 in_particle = in_particle.chargeConjugate()
                 out_particles = [p.chargeConjugate() for p in out_particles[:]]
 
             # Finally sort outgoing particles again
             out_particles = sorted(out_particles, 
-                                    key = lambda p: (not p.isSM,abs(p.pdg)), 
+                                    key = lambda p: (not p.isSM,abs(p.getPdg())), 
                                     reverse=True)
 
             self.add_node(in_particle,0)
@@ -101,16 +109,50 @@ class VertexGraph(GenericGraph):
     def __ne__(self, other):
         return not self.__eq__(other)
     
+    def cycle(self,n=1):
+        """
+        Rotate the vertex by n cycles .
+        For n=1: vertex A > B, C goes to vertex C > A, B).
+        For n=2: vertex A > B, C goes to vertex B > C, A)...
+
+        :param n: Number of cycles
+
+        :return: Rotated GraphVertex object
+        """
+
+        old_indices = self.nodeIndices()
+        newNode_indices = old_indices[n:]
+        newNode_indices += old_indices[:n]
+
+        newVertex = VertexGraph()
+        for i,nodeIndex in enumerate(newNode_indices):
+            d = self.indexToNode(nodeIndex)
+            # Charge conjugate
+            # if a final state is moving to an initial state
+            if i == 0 and nodeIndex != 0:
+                d = d.chargeConjugate()
+            # Charge conjugate
+            # if an initial state is moving to a final state
+            elif nodeIndex == 0 and i != 0:
+                d = d.chargeConjugate()
+            newVertex.add_node(d,i)
+            # Add edge if the node is not the initial state 
+            if i != 0:
+                newVertex.add_edge(0,i)
+
+        return newVertex
     
     def matchTo(self,other):
         """
         Check if it matches other, i.e. if the incoming particles match and
         if all of the outgoing particles match (irrespective of the ordering).
+        The matching is based only on the Particle's pdgs and whether they are
+        a SM or BSM particle.
         
         :param other: VertexGraph object.
         
-        :return: a new VertexGraph object with the daughters from sorted according to
-                 theirs matches to the daughters in other.
+        :return: a new VertexGraph object with the daughters ordered according to
+                 other.
         """
 
 
