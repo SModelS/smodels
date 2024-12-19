@@ -17,8 +17,10 @@ from smodels.base import runtime
 from smodels.tools.particlesLoader import load
 from smodels.base.smodelsLogging import logger
 from smodels.base.model import Model
-from smodels.share.models.SMparticles import SMList
+from smodels.share.models.SMparticles import SMList,proton
+from smodels.experiment.defaultFinalStates import anyBSM
 from smodels.base.vertexGraph import VertexGraph
+from smodels.base.inclusiveObjects import InclusiveValue
 
 setLogLevel('error')
 
@@ -69,7 +71,24 @@ class VertexTest(unittest.TestCase):
         self.assertEqual(v,v2)
         
 
+    def testVertexMatching(self):
 
+        filename = "./testFiles/slha/TRV1_1800_300_300.slha"
+        runtime.modelFile = './testFiles/slha/TRV1_1800_300_300.slha'
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(filename)
+        
+        
+        anyBSM.pdg = InclusiveValue() # Just needs to be larger than the proton pdg
+        proton.pdg = 2212
+        prodV1 = VertexGraph(incoming=[proton,proton],outgoing=[anyBSM])
+        nmatches = 0
+        for v in model.vertices:
+            if v.matchTo(prodV1) is not None:
+                nmatches +=1
+        self.assertEqual(nmatches,2)
+        self.assertEqual(len(model.vertices),3)
 
 
 

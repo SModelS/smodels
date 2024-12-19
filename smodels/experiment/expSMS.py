@@ -317,10 +317,6 @@ class ExpSMS(GenericSMS):
                     finalMap[d1] = edges.pop(d1)
 
 
-        # print('Left=',left_nodes)
-        # print('Right=',right_nodes)
-        # print('edges=',edges)
-
         # If number of left and right nodes do not match,
         # there will be no full matching:
         if len(left_nodes) != len(right_nodes):

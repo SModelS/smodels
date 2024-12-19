@@ -37,6 +37,15 @@ class InclusiveValue(int):
 
     def __ne__(self, other):
         return self.__cmp__(other) != 0
+    
+    def __mul__(self,other):
+        return InclusiveValue()
+    
+    def __rmul__(self,other):
+        return self.__mul__(other)
+    
+    def __neg__(self):
+        return InclusiveValue()
 
 
 class InclusiveList(list):

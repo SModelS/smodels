@@ -240,8 +240,6 @@ class ModelsTest(unittest.TestCase):
         self.assertEqual(len(model.vertices),270)
         for v in model.vertices:
             self.assertTrue(isinstance(v,VertexGraph))
-            if model.vertices.count(v) > 1:
-                print(v)
         
     def removeOutputs(self, f):
         """ remove cruft outputfiles """

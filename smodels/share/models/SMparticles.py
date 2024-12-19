@@ -74,6 +74,9 @@ pion = MultiParticle('pion', [pip, piz, pip.chargeConjugate(), piz.chargeConjuga
 # A dummy particle to represent the primary vertex (production mode)
 pv = Particle(isSM=True, label='PV', pdg=0, isSelfConjugate=True)
 
+# Define a proton just for convenience (should not be included in SMList!)
+proton = MultiParticle('p',[g,q])
+
 leptons = [e, mu, ta, eC, muC, taC, nu]
 gauge = [g, photon, Z, W, WC]
 quarks = [q, c, b, t, tC]

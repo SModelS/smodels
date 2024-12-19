@@ -9,8 +9,7 @@
 
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.genericGraph import GenericGraph
-from collections import OrderedDict
-from itertools import product
+import itertools
 
 
 class VertexGraph(GenericGraph):
@@ -102,3 +101,65 @@ class VertexGraph(GenericGraph):
     def __ne__(self, other):
         return not self.__eq__(other)
     
+    
+    def matchTo(self,other):
+        """
+        Check if it matches other, i.e. if the incoming particles match and
+        if all of the outgoing particles match (irrespective of the ordering).
+        
+        :param other: VertexGraph object.
+        
+        :return: a new VertexGraph object with the daughters from sorted according to
+                 theirs matches to the daughters in other.
+        """
+
+
+        # Get node objects
+        mom1 = self.indexToNode(0)
+        mom2 = other.indexToNode(0)
+
+        # Compare incoming particles
+        comp = mom1.cmpProperties(mom2,
+                                properties=['isSM','pdg'])
+        if comp != 0:
+            return None
+        
+        daughters1 = self.daughters(0)
+        daughter2_indices = other.daughterIndices(0)
+        daughters2 = other.indexToNode(daughter2_indices)
+        # GO over all permutations of daughters1:
+        for daughters1_perm in itertools.permutations(daughters1):
+            daughters1_perm = list(daughters1_perm)
+            matches = {i2 : None for i2 in daughter2_indices}
+            for i2,d2 in zip(daughter2_indices,daughters2):
+                for i1,d1 in enumerate(daughters1_perm):
+                    comp = d1.cmpProperties(d2,
+                                            properties=['isSM','pdg'])
+                    if comp == 0:
+                        matches[i2] = d1
+                        daughters1_perm.pop(i1)
+                        break
+                # If no matches were found for d2
+                # go to the next daughters1 permutation
+                if matches[i2] is None:
+                    break
+                
+            # If all daughters from other have been matched
+            # there is no need to look for other permutations
+            if all(d_match is not None for d_match in matches.values()):
+                break
+        
+        # If after going over all permutations
+        # there are still unmatched daughers, return None
+        if any(d_match is None for d_match in matches.values()):
+            return None
+
+        # Create new vertex following the indices in other:
+        matchedVertex = VertexGraph()
+        matchedVertex.add_node(mom1,0)
+        for i2,d1 in matches.items():
+            matchedVertex.add_node(d1,i2)
+            if i2 != 0:
+                matchedVertex.add_edge(0,i2)
+
+        return matchedVertex
