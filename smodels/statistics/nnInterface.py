@@ -254,13 +254,13 @@ class NNUpperLimitComputer:
         if modelToUse == None:
             modelToUse = self.getMostSensitiveModel ( )
         # FIXME heed asimov
-        muhat,nllmin = self.data.globalInfo.nll_obs_max
+        muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nll_obs_max"]
         if asimov:
-            muhat,nllmin = self.data.globalInfo.nllA_obs_max
+            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nllA_obs_max"]
             if expected:
-                muhat,nllmin = self.data.globalInfo.nllA_exp_max
+                muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nllA_exp_max"]
         elif expected:
-            muhat,nllmin = self.data.globalInfo.nll_exp_max
+            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nll_exp_max"]
         ## FIXME compute sigma_mu, compute via nllA
         sigma_mu = 0.
         ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
@@ -336,7 +336,7 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         """
         fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
-        mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
         nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True,
                 modelToUse = modelToUse )

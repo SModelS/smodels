@@ -158,7 +158,7 @@ class Info(object):
             nll_exp_max, nll_obs_max = None, None
             nllA_exp_max, nllA_obs_max = None, None
             # smYields = []
-            import json
+            import json, math
             for em in m.metadata_props:
                 if em.key == "bkg_yields":
                     st = eval(em.value)
