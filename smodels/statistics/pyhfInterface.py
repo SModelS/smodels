@@ -967,6 +967,8 @@ class PyhfUpperLimitComputer:
             lmax = self.exponentiateNLL(lmax, not return_nll)
 
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
+            if return_nll:
+                ret = { "nll_min": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             self.data.cached_lmaxes[expected][workspace_index] = ret
             if old_index == None:
                 self.data.cached_lmaxes[expected][None] = ret

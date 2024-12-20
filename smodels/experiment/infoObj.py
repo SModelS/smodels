@@ -145,21 +145,36 @@ class Info(object):
         self.onnxes, self.smYields, self.inputMeans = {}, {}, {}
         self.inputErrors, self.nll_exp_mu0, self.nll_obs_mu0 = {}, {}, {}
         self.onnxMeta = {}
+
+        def fillValues ( container, value ):
+            """ given <value> fill in <container>, if value is sensible 
+            :param container: the container to fill
+            :param value: the container, value to copy from
+            """
+            tmp = json.loads(value)
+            if type(tmp) in [ list, tuple ] and len(tmp)==2:
+                if math.isfinite(tmp[1]):
+                    container = tmp
+                if container[0]==None:
+                    container[0]=tmp[0]
+
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
+            # print ( f"@@8", fullPath )
             with open ( fullPath, "rb" ) as f:
                 self.onnxes[onnxFile] = f.read()
                 f.close()
             import onnx
             m = onnx.load ( fullPath )
             smYields, inputMeans, inputErrors = {}, [], []
-            nll_exp_mu0, nll_obs_mu0 = None, None
-            nllA_exp_mu0, nllA_obs_mu0 = None, None
-            nll_exp_max, nll_obs_max = None, None
-            nllA_exp_max, nllA_obs_max = None, None
+            nll_exp_mu0, nll_obs_mu0 = [ None ]*2, [ None ]*2
+            nllA_exp_mu0, nllA_obs_mu0 = [ None ]*2, [ None ]*2
+            nll_exp_max, nll_obs_max = [None ]*2, [ None ]*2
+            nllA_exp_max, nllA_obs_max = [ None ]*2, [ None ]*2
             # smYields = []
             import json, math
             for em in m.metadata_props:
+                # print ( "@@1 emkey", em.key, em.value )
                 if em.key == "bkg_yields":
                     st = eval(em.value)
                     for l in st: ## the sm yields are tuple of (name,value)
@@ -172,33 +187,13 @@ class Info(object):
                 elif em.key == 'nLL_exp_mu0':
                     nll_exp_mu0 = json.loads(em.value)
                 elif em.key == 'nLL_exp_max':
-                    tmp = json.loads(em.value)
-                    if len(tmp)==2:
-                        if math.isfinite(tmp[1]):
-                            nll_exp_max = tmp
-                        if nll_exp_max[0]==None:
-                            nll_exp_max[0]=tmp[0]
+                    fillValues ( nll_exp_max, em.value )
                 elif em.key == 'nLL_obs_max':
-                    tmp = json.loads(em.value)
-                    if len(tmp)==2:
-                        if math.isfinite(tmp[1]):
-                            nll_obs_max = tmp
-                        if nll_obs_max[0]==None:
-                            nll_obs_max[0]=tmp[0]
+                    fillValues ( nll_obs_max, em.value )
                 elif em.key == 'nLLA_exp_max':
-                    tmp = json.loads(em.value)
-                    if len(tmp)==2:
-                        if math.isfinite(tmp[1]):
-                            nllA_exp_max = tmp
-                        if nllA_exp_max[0]==None:
-                            nllA_exp_max[0]=tmp[0]
+                    fillValues ( nllA_exp_max, em.value )
                 elif em.key == 'nLLA_obs_max':
-                    tmp = json.loads(em.value)
-                    if len(tmp)==2:
-                        if math.isfinite(tmp[1]):
-                            nllA_obs_max = tmp
-                        if nllA_obs_max[0]==None:
-                            nllA_obs_max[0]=tmp[0]
+                    fillValues ( nllA_obs_max, em.value )
                 elif em.key == 'nLL_obs_mu0':
                     nll_obs_mu0 = json.loads(em.value)
                 elif em.key == 'nLLA_exp_mu0':
@@ -207,6 +202,7 @@ class Info(object):
                     nllA_obs_mu0 = json.loads(em.value)
                 elif em.key == 'y_min':
                     values = json.loads(em.value)
+                    # print ( f"@@X ymin", values )
                     if nllA_obs_max != None:
                         nllA_obs_max = [None,values[-1]]
                     if nllA_exp_max != None:

@@ -283,9 +283,9 @@ class TheoryPrediction(object):
     def lmax(self, expected=False, return_nll : bool = False ):
         """likelihood at mu_hat"""
 
-        if not "nllmax" in self.cachedObjs[expected]:
+        if not "nll_min" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
-        return self.nllToLikelihood ( self.cachedObjs[expected]["nllmax"],
+        return self.nllToLikelihood ( self.cachedObjs[expected]["nll_min"],
                 return_nll )
 
     @whenDefined
@@ -365,8 +365,8 @@ class TheoryPrediction(object):
         :param expected: computed expected quantities, not observed
         """
 
-        if not "lmax" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"] = {}
+        if not "nll_min" in self.cachedObjs[expected]:
+            self.cachedObjs[expected]["nll_min"] = {}
             self.cachedObjs[expected]["muhat"] = {}
             self.cachedObjs[expected]["sigma_mu"] = {}
 
@@ -376,7 +376,7 @@ class TheoryPrediction(object):
         if llhdDict not in [ None, {} ]:
             self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
             self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
-            self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
+            self.cachedObjs[expected]["nll_min"] = llhdDict["nll_min"]
             self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
             self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 

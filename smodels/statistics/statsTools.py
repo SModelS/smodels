@@ -368,7 +368,8 @@ class StatsComputer:
         ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
         if ret is None:
             return {}
-        lmax = ret['lmax']
+        # print ( f"@@R ret {ret}" )
+        lmax = ret['nll_min']
 
         lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )
         ret["lbsm"] = lbsm
@@ -378,13 +379,13 @@ class StatsComputer:
             if return_nll:
                 if lsm < lmax: ## if return_nll is off, its the other way
                     muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
+                    logger.debug(f"lsm={lsm:.2g} > nll_min({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["nll_min"] = lsm
                     ret["muhat"] = 0.0
                 if lbsm < lmax:
                     muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
+                    logger.debug(f"lbsm={lbsm:.2g} > nll_min({muhat:.2g})={lmax:.2g}: will correct")
+                    ret["nll_min"] = lbsm
                     ret["muhat"] = 1.0
             else:
                 if lsm > lmax:

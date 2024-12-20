@@ -137,6 +137,9 @@ class NNUpperLimitComputer:
             syields.append ( tot )
             # print ( f"@@0 the smyield of {srname} is {smyield} poi_test is {poi_test} signal {signal}" )
 
+        #for i in range(4):
+        #    syields.append(0.)
+
         scaled_signal_yields = np.array( [syields], dtype=np.float32 )
 
         #if poi_test == 0.:
@@ -151,8 +154,8 @@ class NNUpperLimitComputer:
             #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_signal_yields[0][i]=t
 
-        if poi_test == 0.:
-            print ( f"@@X we evaluate at {scaled_signal_yields}" )
+        #if poi_test == 0.:
+        #    print ( f"@@X we evaluate at {scaled_signal_yields}" )
         arr = self.regressors[modelToUse]["session"].run(None, {"input_1":scaled_signal_yields})
         # print ( f"@@arr {arr}" )
         arr = arr[0][0]
@@ -170,6 +173,8 @@ class NNUpperLimitComputer:
         obsErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-1]
         nll1exp = nll0exp + arr[-4]*expErr + expDelta
         nll1obs = nll0obs + arr[-3]*obsErr + obsDelta
+        #print ( f"@@3 nllA0exp", nllA0exp )
+        #print ( f"@@5 onnxMeta", self.data.globalInfo.onnxMeta )
         nllA1exp = nllA0exp + arr[-2]*expErrA + expDeltaA
         nllA1obs = nllA0obs + arr[-1]*obsErrA + obsDeltaA
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
