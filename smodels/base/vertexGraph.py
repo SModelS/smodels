@@ -44,17 +44,14 @@ class VertexGraph(GenericGraph):
                               key = lambda p: (not p.isSM,p.getPdg()), reverse=True)
         
         # Store all particles as final states (outgoing) for fast comparison
-        n = 0
         for p in incoming:
-            nodeIndex = self.add_node(n)    
+            nodeIndex = self.add_node(p)    
             self.all_particles_dict[nodeIndex]= p.chargeConjugate()
             self.incoming_nodes.append(nodeIndex)
-            n += 1
         for p in outgoing:
-            nodeIndex = self.add_node(n)
+            nodeIndex = self.add_node(p)
             self.all_particles_dict[nodeIndex]= p
             self.outgoing_nodes.append(nodeIndex)
-            n += 1
 
         self.add_edges_from(itertools.product(self.incoming_nodes,self.outgoing_nodes))
 
@@ -85,67 +82,35 @@ class VertexGraph(GenericGraph):
         :return: True/False
         """
 
-        if sorted(self.inPDGs()) != sorted(other.inPDGs()):
-            return False
-
-        if sorted(self.outPDGs()) != sorted(other.outPDGs()):
+        if len(self.all_particles_dict) != len(other.all_particles_dict):
             return False
         
-        return True
+        pdgsA = [p.getPdg() for p in self.all_particles_dict.values()]
+        pdgsB = [p.getPdg() for p in other.all_particles_dict.values()]
+        
+        return sorted(pdgsA) == sorted(pdgsB)
+        
     
     def __ne__(self, other):
         return not self.__eq__(other)
     
-    def indexToNode(self, nodeIndex):
+    def chargeConjugate(self):
         """
-        Returns the particle with index nodeIndex.
-        If nodeIndex is in outgoing_nodes, return particle
-        stored in self.all_particles_dict, otherwise
-        returns the conjugate of the particle in 
-        self.all_particles_dict.
-
-        :param nodeIndex: Integer
-
-        :return: Particle object
+        Returns a new vertex with the charge conjugation of
+        all the incoming and outgoing particles
         """
-        
-        if isinstance(nodeIndex,int):
-            particle = self.all_particles_dict[nodeIndex]
-            if nodeIndex in self.outgoing_nodes:
-                return particle
-            else:
-                return particle.chargeConjugate()
-        elif isinstance(nodeIndex,(list,tuple)):
-            particles = []
-            for n in nodeIndex:
-                particle = self.all_particles_dict[n]
-                if nodeIndex in self.outgoing_nodes:
-                    particles.append(particle)
-                else:
-                    particles.append(particle.chargeConjugate())
-            
-            return particles
-        else:
-            raise SModelSError("Can not convert object of type %s to nodes" %str(type(nodeIndex)))
-            
-        
 
-    def inPDGs(self):
-
-        pdgList = []
-        for nodeIndex in self.incoming_nodes:
-            pdgList.append(self.indexToNode(nodeIndex).getPdg())
+        incoming = [self.indexToNode(nodeIndex).chargeConjugate()
+                    for nodeIndex in self.incoming_nodes]
         
-        return pdgList
-    
-    def outPDGs(self):
+        outgoing = [self.indexToNode(nodeIndex).chargeConjugate()
+                    for nodeIndex in self.outgoing_nodes]
 
-        pdgList = []
-        for nodeIndex in self.outgoing_nodes:
-            pdgList.append(self.indexToNode(nodeIndex).getPdg())
-        
-        return pdgList
-    
+
+        conjVertex = VertexGraph(incoming=incoming, outgoing=outgoing)
+
+        return conjVertex
+
     
     def matchTo(self,other):
         """
@@ -200,8 +165,11 @@ class VertexGraph(GenericGraph):
         # Create new vertex following the indices in other:
         matchedVertex = VertexGraph()
         for nodeB in other.nodeIndices:
-            matchedA = matchDict[nodeB]
-            partA = self.indexToNode(matchedA)
+            nodeA = matchDict[nodeB]
+            partA = dictA[nodeA]
+            # If it is an incoming node, add the conjugated particle
+            if nodeB in other.incoming_nodes:
+                partA = partA.chargeConjugate()
             matchedVertex.add_node(partA,nodeB)
         matchedVertex.incoming_nodes = other.incoming_nodes[:]
         matchedVertex.outgoing_nodes = other.outgoing_nodes[:]

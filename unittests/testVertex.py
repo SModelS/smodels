@@ -36,9 +36,10 @@ class VertexTest(unittest.TestCase):
         model.updateParticles(filename)
         v = model.vertices[0]
         
-        # Complex conjugation should result in the same vertex
-        v2 = VertexGraph(incoming=[v.indexToNode(0).chargeConjugate()],
-                 outgoing=[p.chargeConjugate() for p in v.daughters(0)])
+        # Switching incoming and outgoing plus charge conjugation should
+        # result in the same vertex
+        v2 = VertexGraph(outgoing=[v.indexToNode(0).chargeConjugate()],
+                 incoming=[p.chargeConjugate() for p in v.daughters(0)])
         self.assertEqual(v,v2)
         
         # Transposing one particle from the final state to the initial state
@@ -49,7 +50,7 @@ class VertexTest(unittest.TestCase):
 
         # Now charge-conjugation of only one state should not be equivalent
         v4 = VertexGraph(incoming=[v.indexToNode(0).chargeConjugate()],
-                 outgoing=[p for p in v.daughters(0)])
+                 outgoing=[p for p in v.daughters(0)])      
         self.assertNotEqual(v,v4)
 
     def testVertexConjugate(self):
@@ -68,7 +69,9 @@ class VertexTest(unittest.TestCase):
         b = model.pdgToParticle(5)
         v2 = VertexGraph(incoming=[go],outgoing=[x1p,tbar,b])
         # v2 = x1+ > go t+ b~
-        self.assertEqual(v,v2)
+        self.assertNotEqual(v,v2)
+        v2Conj = v2.chargeConjugate()
+        self.assertEqual(v,v2Conj)
         
 
     def testVertexMatching(self):
