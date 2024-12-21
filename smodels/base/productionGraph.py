@@ -9,7 +9,16 @@
 
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.genericGraph import GenericGraph
-import itertools
+from smodels.share.models.SMparticles import proton
+from smodels.base.vertexGraph import VertexGraph
+from smodels.base.inclusiveObjects import InclusiveValue
+from smodels.base.particle import Particle,MultiParticle
+
+
+# Used to construct generic z2-odd and z2-even particles:
+anyBSM = Particle(label='anyBSM', isSM=False, isSelfConjugate=True, pdg = InclusiveValue())
+anySM = Particle(label='anySM', isSM=True,  isSelfConjugate=True, pdg = InclusiveValue())
+anyParticle = MultiParticle(label='*', particles=[anyBSM,anySM])
 
 
 class ProductionGraph(GenericGraph):
@@ -33,143 +42,107 @@ class ProductionGraph(GenericGraph):
 
         GenericGraph.__init__(self)
 
-        # Create a graph with a single incoming particle
-        # (the BSM particle with largest pdg)
-        ## First define all particles as incoming:
-        all_particles = list(incoming) + [p.chargeConjugate() for p in outgoing]
-        for p in all_particles:
-            if not hasattr(p,'pdg'):
-                raise SModelSError(f"VertexGraphs should only be created with particles with the pdg attribute (missing in {p})")
-            if not hasattr(p,'isSM'):
-                raise SModelSError(f"VertexGraphs should only be created with particles with the isSM attribute (missing in {p})")
-        
-        
-        ## Sort all particles by BSM and pdg values
-        ## (for MultiParticles use the largest pdg for sorting)
-        all_particles = sorted(all_particles, 
-                              key = lambda p: (not p.isSM,abs(p.getPdg())), reverse=True)
-        if len(all_particles) > 0:
-            in_particle = all_particles[0]
-            out_particles = [p.chargeConjugate() for p in all_particles[1:]]
 
-            # Now if in_particle only has negative PDGs, conjugate the vertex:
-            if in_particle.getPdg() < 0:
-                in_particle = in_particle.chargeConjugate()
-                out_particles = [p.chargeConjugate() for p in out_particles[:]]
+def get2to1ProdGraph(model,initialStates=[proton,proton],finalState=anyBSM):
+    """
+    Get a list of 2 > 1 production graphs with the given initial states and the given
+    final state using the vertices from the model.
+    The initialStates and finalState arguments can be used to select the desired set of possible
+    production diagrams.
 
-            # Finally sort outgoing particles again
-            out_particles = sorted(out_particles, 
-                                    key = lambda p: (not p.isSM,abs(p.getPdg())), 
-                                    reverse=True)
+    :param initialStates: List of 2 initial states (Particle or MultiParticle objects) for the hard scattering
+    :param finalState: Final state (Particle or MultiParticle objects) for the hard scattering
 
-            self.add_node(in_particle,0)
-            self.add_nodes_from(out_particles)
-            # Add an edge from the incoming particle to all the outgoing ones
-            self.add_edges_from([(0,i) for i in range(1,len(out_particles)+1)])
+    :return:
+    """
 
-
-    def __repr__(self):
-        """
-        Returns the string representation of the graph.
-        """
-
-        return str(self)
+    if len(initialStates) != 2:
+        raise SModelSError(f"2to1 production graphs should have two initial states defined (instead of {initialStates})")
     
-    def __str__(self):
-        """
-        Returns a string listing the graph nodes.
-        """
-
-        gStr = str(self.indexToNode(0)) + " > "
-        gStr += ",".join([str(d) for d in self.daughters(0)])
-
-        return gStr
+    if not isinstance(finalState,(Particle,MultiParticle)):
+        raise SModelSError(f"Final state should be a Particle or a MultiParticle object and not {type(finalState)}")
     
-    def __eq__(self, other):
-        """
-        Define vertex equality based on the vertex PDGs.
+    # Create the vertex defining the 2->1 process:
+    prodV = VertexGraph(incoming=initialStates,outgoing=[finalState])
 
-        :return: True/False
-        """
+    # Get vertices from model
+    modelVertices = model.vertices
 
-        momA_pdg = self.indexToNode(0).pdg
-        momB_pdg = other.indexToNode(0).pdg
+    # Get matched vertices:
+    matchedV = []
+    for mVertex in modelVertices:
+        matchV = mVertex.matchTo(prodV)
+        if matchV is None:
+            continue
+        matchedV.append(matchV)
 
-        if momA_pdg != momB_pdg:
-            return False
+    return matchedV
+
+
+def get2to2ProdGraph(model,initialStates=[proton,proton],
+                     finalStates=[anyBSM,anyParticle],
+                     channels=['s','t','u']):
+    """
+    Get a list of 2 > 2 production graphs with the given initial states and the given
+    finals states using the vertices from the model.
+    The initialStates and finalState arguments can be used to select the desired set of possible
+    production diagrams.
+
+    :param initialStates: List of 2 initial states (Particle or MultiParticle objects) for the hard scattering
+    :param finalStates: List of 2 final states (Particle or MultiParticle objects) for the hard scattering
+    :param channels: List of strings specifying which channels to consider (possible channels are s,t, or u) 
+
+    :return:
+    """
+
+    if len(initialStates) != 2:
+        raise SModelSError(f"2to2 production graphs should have two initial states defined (instead of {initialStates})")
+    if len(finalStates) != 2:
+        raise SModelSError(f"2to2 production graphs should have two final states defined (instead of {finalStates})")
+
+
+    matches = {}
+    # Create the generic vertices defining the 2->2 s-channel process:
+    if any('s' == channel for channel in channels):
+        # Get vertices from model
+        modelVertices = model.vertices
+        inParticles = initialStates[:]
+        outParticles = finalStates[:]
+        prodL_schannel = VertexGraph(incoming=inParticles,outgoing=[anyParticle])
+        matched_schannel = []
+        for mVertexL in modelVertices:
+            matched_left = mVertexL.matchTo(prodL_schannel)
+            if matched_left is None:
+                continue
+            # Create the right vertex with the incoming particle given by
+            #  same particle outgoing from the left vertex
+            propParticle = matched_left.indexToNode(matched_left.outgoing_nodes[0])
+            prodR_schannel = VertexGraph(incoming=[propParticle],outgoing=outParticles)
+            for mVertexR in modelVertices:
+                matched_right = mVertexR.matchTo(prodR_schannel)
+                if matched_right is None:
+                    continue
+                matched_schannel.append((matched_left,matched_right))
         
-        daughtersA_pdg = sorted([p.pdg for p in self.daughters(0)])
-        daughtersB_pdg = sorted([p.pdg for p in other.daughters(0)])
+        matches['s'] = matched_schannel
 
-        if daughtersA_pdg != daughtersB_pdg:
-            return False
-        
-        return True
+    # For a t-channel we just need to switch one initial state with one final state:
+    if any('t' == channel for channel in channels):
+        inParticles = [initialStates[0],finalStates[0]]
+        outParticles = [initialStates[1],finalStates[1]]
+        # With this change we can just use the s-channel result
+        matches['t'] = get2to2ProdGraph(model,initialStates=inParticles,
+                                        finalStates=outParticles,
+                                        channels=['s'])['s']
     
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    # For a u-channel we just need to another switch between one initial state and one final state:
+    if any('u' == channel for channel in channels):
+        inParticles = [initialStates[0],finalStates[1]]
+        outParticles = [initialStates[1],finalStates[0]]
+        # With this change we can just use the s-channel result
+        matches['u'] = get2to2ProdGraph(model,initialStates=inParticles,
+                                        finalStates=outParticles,
+                                        channels=['s'])['s']
+
+    return matches
     
-    
-    def matchTo(self,other):
-        """
-        Check if it matches other, i.e. if the incoming particles match and
-        if all of the outgoing particles match (irrespective of the ordering).
-        The matching is based only on the Particle's pdgs and whether they are
-        a SM or BSM particle.
-        
-        :param other: VertexGraph object.
-        
-        :return: a new VertexGraph object with the daughters ordered according to
-                 other.
-        """
-
-
-        # Get node objects
-        mom1 = self.indexToNode(0)
-        mom2 = other.indexToNode(0)
-
-        # Compare incoming particles
-        comp = mom1.cmpProperties(mom2,
-                                properties=['isSM','pdg'])
-        if comp != 0:
-            return None
-        
-        daughters1 = self.daughters(0)
-        daughter2_indices = other.daughterIndices(0)
-        daughters2 = other.indexToNode(daughter2_indices)
-        # GO over all permutations of daughters1:
-        for daughters1_perm in itertools.permutations(daughters1):
-            daughters1_perm = list(daughters1_perm)
-            matches = {i2 : None for i2 in daughter2_indices}
-            for i2,d2 in zip(daughter2_indices,daughters2):
-                for i1,d1 in enumerate(daughters1_perm):
-                    comp = d1.cmpProperties(d2,
-                                            properties=['isSM','pdg'])
-                    if comp == 0:
-                        matches[i2] = d1
-                        daughters1_perm.pop(i1)
-                        break
-                # If no matches were found for d2
-                # go to the next daughters1 permutation
-                if matches[i2] is None:
-                    break
-                
-            # If all daughters from other have been matched
-            # there is no need to look for other permutations
-            if all(d_match is not None for d_match in matches.values()):
-                break
-        
-        # If after going over all permutations
-        # there are still unmatched daughers, return None
-        if any(d_match is None for d_match in matches.values()):
-            return None
-
-        # Create new vertex following the indices in other:
-        matchedVertex = VertexGraph()
-        matchedVertex.add_node(mom1,0)
-        for i2,d1 in matches.items():
-            matchedVertex.add_node(d1,i2)
-            if i2 != 0:
-                matchedVertex.add_edge(0,i2)
-
-        return matchedVertex

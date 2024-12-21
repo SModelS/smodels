@@ -11,6 +11,8 @@
 from smodels.base.particle import Particle, MultiParticle
 from smodels.share.models.SMparticles import SMList, e, eC, mu, muC, ta, taC, pion, t, tC, W, WC, g, q, c, nu
 from smodels.base.model import Model
+from smodels.base.inclusiveObjects import InclusiveValue
+
 
 # Below we define all particles that are relevant for the database constraints.
 # One must avoid defining non-unique labels, so there is a one-to-one correspondence
@@ -34,9 +36,9 @@ jetList = MultiParticle('jet', [q, c, g, pion])
 nuList = nu
 
 # Used to construct generic z2-odd and z2-even particles:
-anyBSM = Particle(label='anyBSM', isSM=False)
-anySM = Particle(label='anySM', isSM=True)
-anyParticle = Particle(label='*')
+anyBSM = Particle(label='anyBSM', isSM=False, isSelfConjugate=True)
+anySM = Particle(label='anySM', isSM=True,  isSelfConjugate=True)
+anyParticle = Particle(label='*', isSelfConjugate=True)
 
 # Used to construct BSM final states:
 MET = Particle(label='MET', isSM=False, eCharge=0, colordim=1)

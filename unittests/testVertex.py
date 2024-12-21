@@ -53,6 +53,19 @@ class VertexTest(unittest.TestCase):
                  outgoing=[p for p in v.daughters(0)])      
         self.assertNotEqual(v,v4)
 
+        # Now check that the charge-conjugation still works
+        # if some of the BSM particles are self-conjugate
+        n4 = model.pdgToParticle(1000035)
+        x1m = model.pdgToParticle(-1000024)
+        x1p = model.pdgToParticle(1000024)
+        Wp = model.pdgToParticle(24)
+        Wm = model.pdgToParticle(-24)
+        v5 = VertexGraph(incoming=[n4], outgoing=[x1m,Wp])
+        self.assertTrue(v5._canonical_is_conjugated)  
+        v5b = VertexGraph(incoming=[n4], outgoing=[x1p,Wm])
+        self.assertFalse(v5b._canonical_is_conjugated)
+        self.assertEqual(v5,v5b)
+
     def testVertexConjugate(self):
 
         runtime.modelFile = 'mssmQNumbers.slha'

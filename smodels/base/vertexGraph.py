@@ -39,10 +39,12 @@ class VertexGraph(GenericGraph):
         self.outgoing_nodes = []
 
         for p in incoming+outgoing:
-            if (not hasattr(p,'pdg')) and p.getPdg() is None:
+            if (not hasattr(p,'pdg')) and (p.getPdg() is None):
                 raise SModelSError(f"VertexGraphs should only be created with particles with the pdg attribute (missing in {p})")
             if not hasattr(p,'isSM'):
                 raise SModelSError(f"VertexGraphs should only be created with particles with the isSM attribute (missing in {p})")
+            if not hasattr(p,'isSelfConjugate'):
+                raise SModelSError(f"VertexGraphs should only be created with particles with the isSelfConjugated attribute (missing in {p})")
         
         # Sort incoming and outgoing by pdg and iSM:
         incoming = sorted(incoming, 
@@ -60,9 +62,10 @@ class VertexGraph(GenericGraph):
             self._canonical_rep_dict[nodeIndex]= p
             self.outgoing_nodes.append(nodeIndex)
 
-        # Check if the maximum PDG is positive
+        # Check if the maximum PDG out of the non self-conjufate
+        # particles is negative
         allPDGs = [p.getPdg() 
-                    for p in self._canonical_rep_dict.values()]
+                    for p in self._canonical_rep_dict.values() if not p.isSelfConjugate]
         # If not, conjugate the canonical representation
         if allPDGs and max(allPDGs) != max([abs(pdg) for pdg in allPDGs]):
             self._canonical_is_conjugated = True
@@ -180,9 +183,11 @@ class VertexGraph(GenericGraph):
         
         # Create new vertex following the indices in other:
         matchedVertex = VertexGraph()
+        matchedVertex._canonical_is_conjugated = other._canonical_is_conjugated
         for nodeB in other.nodeIndices:
             nodeA = matchDict[nodeB]
             partA = dictA[nodeA]
+            matchedVertex._canonical_rep_dict[nodeB] = partA
             # If it is an incoming node, add the conjugated particle
             if nodeB in other.incoming_nodes:
                 partA = partA.chargeConjugate()
