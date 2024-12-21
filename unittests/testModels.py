@@ -237,7 +237,7 @@ class ModelsTest(unittest.TestCase):
         BSMList = load()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(filename)
-        self.assertEqual(len(model.vertices),434)
+        self.assertEqual(len(model.vertices),270)
         for v in model.vertices:
             self.assertTrue(isinstance(v,VertexGraph))
         

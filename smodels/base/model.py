@@ -433,10 +433,6 @@ class Model(object):
                 if not vertex in allVertices:
                     allVertices.append(vertex)
 
-                # Also append the charge conjgated vertex
-                vertexConj = vertex.chargeConjugate()
-                if not vertexConj in allVertices:
-                    allVertices.append(vertexConj)
 
         self.vertices = allVertices
 

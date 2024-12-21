@@ -21,13 +21,20 @@ class VertexGraph(GenericGraph):
     def __init__(self,incoming=[],outgoing=[]):
         """
         Initialize the vertex with the given incoming and outgoing particles.
+        The canonical representation of the graph is a simple list of particles
+        with all particles considered as outgoing, so incoming particles are conjugated.
+        In addition if the particle with the largest PDG (in absolute value) is an anti-particle
+        (pdg < 0), all the particles in the list are conjugated. 
+        With these convention any cycle of the vertex as well as the conjugated vertex
+        are represented by the same canonical representation.
 
         :param incoming: List of Particle objects entering the vertex (i.e. X for X -> a,b)
         :param outgoing: List of Particle objects exiting the vertex (i.e. a,b for X -> a,b)
         """
 
         GenericGraph.__init__(self)
-        self.all_particles_dict = {}
+        self._canonical_rep_dict = {}
+        self._canonical_is_conjugated = False
         self.incoming_nodes = []
         self.outgoing_nodes = []
 
@@ -43,15 +50,24 @@ class VertexGraph(GenericGraph):
         outgoing = sorted(outgoing, 
                               key = lambda p: (not p.isSM,p.getPdg()), reverse=True)
         
-        # Store all particles as final states (outgoing) for fast comparison
+        # Store all particles in the canonical rep as outgoing 
         for p in incoming:
             nodeIndex = self.add_node(p)    
-            self.all_particles_dict[nodeIndex]= p.chargeConjugate()
+            self._canonical_rep_dict[nodeIndex]= p.chargeConjugate()
             self.incoming_nodes.append(nodeIndex)
         for p in outgoing:
             nodeIndex = self.add_node(p)
-            self.all_particles_dict[nodeIndex]= p
+            self._canonical_rep_dict[nodeIndex]= p
             self.outgoing_nodes.append(nodeIndex)
+
+        # Check if the maximum PDG is positive
+        allPDGs = [p.getPdg() 
+                    for p in self._canonical_rep_dict.values()]
+        # If not, conjugate the canonical representation
+        if allPDGs and max(allPDGs) != max([abs(pdg) for pdg in allPDGs]):
+            self._canonical_is_conjugated = True
+            for nodeIndex,p in self._canonical_rep_dict.items():
+                self._canonical_rep_dict[nodeIndex] = p.chargeConjugate()
 
         self.add_edges_from(itertools.product(self.incoming_nodes,self.outgoing_nodes))
 
@@ -82,11 +98,11 @@ class VertexGraph(GenericGraph):
         :return: True/False
         """
 
-        if len(self.all_particles_dict) != len(other.all_particles_dict):
+        if len(self._canonical_rep_dict) != len(other._canonical_rep_dict):
             return False
         
-        pdgsA = [p.getPdg() for p in self.all_particles_dict.values()]
-        pdgsB = [p.getPdg() for p in other.all_particles_dict.values()]
+        pdgsA = [p.getPdg() for p in self._canonical_rep_dict.values()]
+        pdgsB = [p.getPdg() for p in other._canonical_rep_dict.values()]
         
         return sorted(pdgsA) == sorted(pdgsB)
         
@@ -127,8 +143,8 @@ class VertexGraph(GenericGraph):
                  ordered according to other.
         """
 
-        dictA = self.all_particles_dict
-        dictB = other.all_particles_dict
+        dictA = self._canonical_rep_dict
+        dictB = other._canonical_rep_dict
         if len(dictA) != len(dictB):
             return None
 
@@ -169,6 +185,10 @@ class VertexGraph(GenericGraph):
             partA = dictA[nodeA]
             # If it is an incoming node, add the conjugated particle
             if nodeB in other.incoming_nodes:
+                partA = partA.chargeConjugate()
+            # If the canonical represation of other includes charge conjugation
+            # conjugate the particle
+            if other._canonical_is_conjugated:
                 partA = partA.chargeConjugate()
             matchedVertex.add_node(partA,nodeB)
         matchedVertex.incoming_nodes = other.incoming_nodes[:]

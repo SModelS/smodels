@@ -69,7 +69,7 @@ class VertexTest(unittest.TestCase):
         b = model.pdgToParticle(5)
         v2 = VertexGraph(incoming=[go],outgoing=[x1p,tbar,b])
         # v2 = x1+ > go t+ b~
-        self.assertNotEqual(v,v2)
+        self.assertEqual(v,v2)
         v2Conj = v2.chargeConjugate()
         self.assertEqual(v,v2Conj)
         
