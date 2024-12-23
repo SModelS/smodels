@@ -85,7 +85,7 @@ def get2to2ProdGraph(model,initialStates=[proton,proton],
     """
     Get a list of 2 > 2 production graphs with the given initial states and the given
     finals states using the vertices from the model.
-    The initialStates and finalState arguments can be used to select the desired set of possible
+    The initialStates, finalState and channels arguments can be used to select the desired set of possible
     production diagrams.
 
     :param initialStates: List of 2 initial states (Particle or MultiParticle objects) for the hard scattering
@@ -130,7 +130,7 @@ def get2to2ProdGraph(model,initialStates=[proton,proton],
     if any('t' == channel for channel in channels):
         inParticles = [initialStates[0],finalStates[0]]
         outParticles = [initialStates[1],finalStates[1]]
-        # With this change we can just use the s-channel result
+        # With this change we can just recycle the s-channel calculation
         matches['t'] = get2to2ProdGraph(model,initialStates=inParticles,
                                         finalStates=outParticles,
                                         channels=['s'])['s']
@@ -139,7 +139,7 @@ def get2to2ProdGraph(model,initialStates=[proton,proton],
     if any('u' == channel for channel in channels):
         inParticles = [initialStates[0],finalStates[1]]
         outParticles = [initialStates[1],finalStates[0]]
-        # With this change we can just use the s-channel result
+        # With this change we can just recycle the s-channel calculation
         matches['u'] = get2to2ProdGraph(model,initialStates=inParticles,
                                         finalStates=outParticles,
                                         channels=['s'])['s']

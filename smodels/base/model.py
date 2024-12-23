@@ -21,7 +21,7 @@ class Model(object):
     cross-sections.
     """
 
-    def __init__(self, BSMparticles, SMparticles, label=None):
+    def __init__(self, BSMparticles, SMparticles, SMvertices = [], label=None):
         """
         Initializes the model
         :parameter BSMparticles: list with BSM particle objects
@@ -38,6 +38,7 @@ class Model(object):
         self.BSMparticles = BSMparticles[:]  # at initialization assume all particles will be used
         self.SMparticles = SMparticles[:]
         self.singleParticles = self.getSingleParticles()
+        self.vertices = SMvertices[:]
         for p in self.SMparticles:
             p.isSM = True
         for p in self.BSMparticles:
@@ -409,14 +410,28 @@ class Model(object):
                         if hasattr ( particle, attr ):
                             delattr(particle, attr)
 
-    def setVertices(self,decaysDict,SMvertices=[]):
+    def setVertices(self,decaysDict):
+        """
+        Creates a list of vertices with Particle objects
+        using a dictionary with the decays.
+        """
+
+        all_vertices = self.getVerticesFromDecays(decaysDict)
+        all_vertices += self.getVerticesFromQNumbers()
+        # Remove redundant vertices:
+        for vertex in all_vertices:
+            if not vertex in self.vertices:
+                self.vertices.append(vertex)
+
+    def getVerticesFromDecays(self,decaysDict):
         """
         Creates a list of vertices with Particle objects
         using a dictionary with the decays.
         """
 
 
-        allVertices = []
+        vertices = []
+        # Get vertices from decays
         for pdg,particleData in decaysDict.items():
             mom = self.pdgToParticle(pdg)
             if mom is None: # Particle was not found in model
@@ -427,14 +442,37 @@ class Model(object):
                 # If any of the daughters is not in the model, skip
                 if any(d is None for d in daughters):
                     continue
- 
+
                 vertex = VertexGraph(incoming=[mom],
                                     outgoing=daughters)
-                if not vertex in allVertices:
-                    allVertices.append(vertex)
+                if not vertex in vertices:
+                    vertices.append(vertex)
+        
+        return vertices
+    
+    def getVerticesFromQNumbers(self):
+        """
+        Add a gluon-BSM-BSM~ and photon-BSM-BSM~ for BSM particles
+        which carry color and/or electric charge
+        """
 
+        gluon = self.pdgToParticle(21)
+        photon = self.pdgToParticle(22)
+        vertices = []
+        for p in self.singleParticles:
+            if p.isSM:
+                continue
+            if hasattr(p,'colordim') and p.colordim != 1:
+                vertex = VertexGraph(incoming=[gluon],
+                                    outgoing=[p,p.chargeConjugate()])
+                vertices.append(vertex)
+            if hasattr(p,'eCharge') and p.eCharge != 0:
+                vertex = VertexGraph(incoming=[photon],
+                                    outgoing=[p,p.chargeConjugate()])
+                vertices.append(vertex)
 
-        self.vertices = allVertices
+        return vertices
+
 
 
     def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
