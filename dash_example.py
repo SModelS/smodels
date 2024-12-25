@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-.. module:: runSModelS
-   :synopsis: Main code for running SModelS.
+.. module:: runSModelSDash
+   :synopsis: Main code for running SModelS with a dashboard interface.
 
 """
 
@@ -133,4 +133,10 @@ def update_table(clickData):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import webbrowser
+    webbrowser.open_new('http://127.0.0.1:8050/')
+    
+    app.run(debug=True,port=8050)
+    
+    
+    
