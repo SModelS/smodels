@@ -304,7 +304,7 @@ class XSecResummino(XSecBase):
             result = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
         elif type_writing == None:
             result = [results[0].split(" ")[2][1:], results[1].split(" ")[2][1:], results[2].split(" ")[2][1:]]
-            print(result)
+            #print(result)
             _ = ['LO', 'NLO', 'NLO+NLL']
             for i in range(self.maxOrder+1):
                 logger.info(f"Cross section is {result[i]} pb for ({particle_1},{particle_2}) channel at {_[i]} in perturbation theory")
