@@ -249,7 +249,7 @@ class XSecResummino(XSecBase):
                 NLL = data[i+3][:-1]
                 Infos.append((LO,NLO,NLL))
         if len(Infos) == 0:
-            raise RuntimeError("Please check your slha file and that you have resummino correctly installed with the install.sh script in the lib/resummino folder")
+            raise RuntimeError("Please check your slha file. Also make sure that you have resummino correctly installed via the install.sh script in the lib/resummino folder")
         return Infos[0]
 
     def create_xsection(self, result : float, particle_1 : int, particle_2: int, order : int, Xsections) -> None:
@@ -746,7 +746,6 @@ class XSecResummino(XSecBase):
                         future.result()  # Catch exceptions if any
                     except Exception as e:
                         logger.error(f"Error processing file #{idx} ({future.task[2]}): {e}")
-                        import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
         shutil.rmtree(self.resummino_in)
         shutil.rmtree(self.resummino_out)
