@@ -31,6 +31,7 @@ import shutil
 import requests
 import tarfile
 from itertools import combinations
+from typing import Tuple
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
@@ -156,13 +157,16 @@ class XSecResummino(XSecBase):
             command = f"{resummino_bin} {input_file} --nlo"
         if order == 2:
             command = f"{resummino_bin} {input_file}"
-
+        with open(output_file, 'w') as f:
+            subprocess.run(command, shell=True, stdout=f,stderr=f, text=True)
+        """
         with open(output_file, 'w') as f:
             if self.verbosity == "debug":
                 subprocess.run(command, shell=True, stdout=f,stderr=os.sys.stderr, text=True)
             else:
                 with open("/dev/null", "w") as errorhandle:
-                    subprocess.run(command, shell=True, stdout=f,stderr=errorhandle, text=True)
+                    subprocess.run(command, shell=True, stdout=f,stderr=f, text=True)
+        """
 
 
     def launch_resummino(self, input_file : str, slha_file : str, output_file : str, particle_1 : int,
@@ -231,26 +235,27 @@ class XSecResummino(XSecBase):
             self.modify_outgoing_particles(input_file, input_file, particle_1, particle_2)
             self.launch_resummino(input_file, slha_file, output_file, particle_1, particle_2, num_try, order, Xsections, log)
 
-
-    def search_in_output(self, output_file : str):
+    def search_in_output(self, output_file : str) -> Tuple:
         """
         Search in the .out files of resummino (in tempfiles) to get the cross section
         asked by the users, then extract the LO,NLO and NLL+NLO.
         If you want to get the incertainties given by resummino, 
         you have everything here in LO, NLO and NLL.
         """
-        Infos = []
+        infos, errors = [], []
         with open(output_file, 'r') as f:
             data = f.readlines()
-        for i in range(len(data)):
-            if "Results:" in data[i]:
+        for i,d in enumerate(data):
+            if "Results:" in d:
                 LO = data[i+1][:-1] #[:-1] to get rid of the \n
                 NLO = data[i+2][:-1]
                 NLL = data[i+3][:-1]
-                Infos.append((LO,NLO,NLL))
-        if len(Infos) == 0:
-            raise RuntimeError("Please check your slha file. Also make sure that you have resummino correctly installed via the install.sh script in the lib/resummino folder")
-        return Infos[0]
+                infos.append((LO,NLO,NLL))
+            if "error: " in d:
+                errors.append ( d.strip().replace("error: ","") )
+        if len(infos) == 0:
+            raise RuntimeError(f"{' '.join(errors)} Please check your slha file. Also make sure that you have resummino correctly installed via the install.sh script in the lib/resummino folder")
+        return infos[0]
 
     def create_xsection(self, result : float, particle_1 : int, particle_2: int, order : int, Xsections) -> None:
         """
