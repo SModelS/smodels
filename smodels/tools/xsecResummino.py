@@ -735,6 +735,8 @@ class XSecResummino(XSecBase):
             # We launch the program with maximum performance, change if necessary
             with ProcessPoolExecutor(max_workers=self.ncpu) as executor:
                 futures = {executor.submit(self.calculate_one_slha, *task): idx + 1 for idx, task in enumerate(tasks)}
+                for f,t in zip (futures,tasks):
+                    f.task = t ## attach task so we can look things up later
 
                 for future in as_completed(futures):
                     processed_count += 1
@@ -743,7 +745,8 @@ class XSecResummino(XSecBase):
                     try:
                         future.result()  # Catch exceptions if any
                     except Exception as e:
-                        logger.error(f"Error processing file {idx}: {e}")
+                        logger.error(f"Error processing file #{idx} ({future.task[2]}): {e}")
+                        import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
         shutil.rmtree(self.resummino_in)
         shutil.rmtree(self.resummino_out)
