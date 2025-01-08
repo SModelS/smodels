@@ -683,7 +683,7 @@ class XSecResummino(XSecBase):
             self.particles.append(-1000037)
         channels = list(combinations(self.particles, 2))
         
-        excluded_combinations = [(-1000024, -1000037), (1000024, 1000037)]
+        excluded_combinations = [(-1000024, -1000037), (1000024, 1000037), (-1000037, -1000024), (1000037, 1000024)]
         channels = [pair for pair in channels if pair not in excluded_combinations]
         mode = 'check'
             
