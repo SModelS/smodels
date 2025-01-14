@@ -1,7 +1,8 @@
-Release v3.0.2, xxx xx xxx 202x
+Release v3.0.2, xxx xx xxx 2025
 =======================================================
 
   * Small fix in pyhf caching code (results should not change)
+  * Fixes with parallelisation of resummino cross section computer
 
 Release v3.0.1, Thu 31 Oct 2024
 =======================================================

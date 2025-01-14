@@ -37,6 +37,7 @@ New in Version 3.0.2:
 ^^^^^^^^^^^^^^^^^^^^^
 
   * Small fix in pyhf caching code (results should not change)
+  * Fixes with parallelisation of :ref:`resummino cross section <xsecResummino>` computer
 
 New in Version 3.0.1:
 ^^^^^^^^^^^^^^^^^^^^^
