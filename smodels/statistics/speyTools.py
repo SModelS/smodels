@@ -13,10 +13,10 @@ __all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List
 from spey import ExpectationType, StatisticalModel, get_backend
-from smodels.tools.smodelsLogging import logger
-from smodels.tools.physicsUnits import fb
+from smodels.base.smodelsLogging import logger
+from smodels.base.physicsUnits import fb
 from smodels.experiment.datasetObj import DataSet
-from smodels.theory.crossSection import XSection
+from smodels.base.crossSection import XSection
 import numpy as np
 
 _debug = { "writePoint": False } # for debugging only
