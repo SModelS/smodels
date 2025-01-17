@@ -12,8 +12,6 @@ from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
-# from smodels.statistics.statsTools import StatsComputer
-from smodels.statistics.speyTools import SpeyComputer as StatsComputer
 from typing import Union, Text, Dict
 import numpy as np
 
@@ -145,6 +143,11 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
+        from smodels.base import runtime
+        if runtime._experimental["spey"]:
+            from smodels.statistics.speyTools import SpeyComputer as StatsComputer
+        else:
+            from smodels.statistics.statsTools import StatsComputer
 
         if self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature

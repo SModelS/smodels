@@ -15,7 +15,8 @@ from typing import Union
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
 
-_experimental = { "truncatedgaussians": False } ## experimental features
+_experimental = { "truncatedgaussians": False,
+                  "spey": False } ## experimental features
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
