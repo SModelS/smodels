@@ -177,17 +177,23 @@ class NNUpperLimitComputer:
         #print ( f"@@5 onnxMeta", self.data.globalInfo.onnxMeta )
         nllA1exp = nllA0exp + arr[-2]*expErrA + expDeltaA
         nllA1obs = nllA0obs + arr[-1]*obsErrA + obsDeltaA
+            
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
                 "nll_obs_0": nll0obs, "nll_obs_1": nll1obs,
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": nllA1exp,
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": nllA1obs }
-        if abs(poi_test)<1e-7:
+        if abs(poi_test)<1e-10:
             if abs(nll0obs-nll1obs)>1e-4:
                 logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
                 # ret["nll_obs_1"]=nll0obs
             if abs(nll0exp-nll1exp)>1e-4:
                 logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
                 # ret["nll_exp_1"]=nll0exp
+            if False:
+                ret["nll_exp_1"]=ret["nll_exp_0"]
+                ret["nll_obs_1"]=ret["nll_obs_0"]
+                ret["nllA_obs_1"]=ret["nllA_obs_0"]
+                ret["nllA_exp_1"]=ret["nllA_exp_0"]
         return ret
 
     def welcome(self):
