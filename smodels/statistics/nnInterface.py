@@ -178,10 +178,10 @@ class NNUpperLimitComputer:
         nllA1exp = nllA0exp + arr[-2]*expErrA + expDeltaA
         nllA1obs = nllA0obs + arr[-1]*obsErrA + obsDeltaA
             
-        ret = { "nll_exp_0": nll0exp, "nll_exp_1": nll1exp,
-                "nll_obs_0": nll0obs, "nll_obs_1": nll1obs,
-                "nllA_exp_0": nllA0exp, "nllA_exp_1": nllA1exp,
-                "nllA_obs_0": nllA0obs, "nllA_obs_1": nllA1obs }
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
+                "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         if abs(poi_test)<1e-10:
             if abs(nll0obs-nll1obs)>1e-4:
                 logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
