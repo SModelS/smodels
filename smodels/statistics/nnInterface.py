@@ -163,20 +163,27 @@ class NNUpperLimitComputer:
         nll0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nll_exp_mu0"]
         nllA0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nllA_obs_mu0"]
         nllA0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nllA_exp_mu0"]
-        expDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-4]
-        obsDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-3]
-        expDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-2]
-        obsDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][-1]
-        expErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-4]
-        obsErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-3]
-        expErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-2]
-        obsErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][-1]
-        nll1exp = nll0exp + arr[-4]*expErr + expDelta
-        nll1obs = nll0obs + arr[-3]*obsErr + obsDelta
-        #print ( f"@@3 nllA0exp", nllA0exp )
+        i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
+        expDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_exp]
+        obsDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_obs]
+        expDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_expA]
+        obsDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_obsA]
+        expErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_exp]
+        obsErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_obs]
+        expErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_expA]
+        obsErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_obsA]
+        nll1exp = nll0exp + arr[i_exp]*expErr + expDelta
+        nll1obs = nll0obs + arr[i_obs]*obsErr + obsDelta
         #print ( f"@@5 onnxMeta", self.data.globalInfo.onnxMeta )
-        nllA1exp = nllA0exp + arr[-2]*expErrA + expDeltaA
-        nllA1obs = nllA0obs + arr[-1]*obsErrA + obsDeltaA
+        nllA1exp = nllA0exp + arr[i_expA]*expErrA + expDeltaA
+        nllA1obs = nllA0obs + arr[i_obsA]*obsErrA + obsDeltaA
+
+        if False and poi_test == 0.:
+            print ( f"@@5 nll0obs {nll0obs} {nll0exp}" )
+            print ( f"@@5 nllA0obs {nllA0obs} {nllA0exp}" )
+            print ( f"@@5 poi_test {poi_test}" )
+            print ( f"@@5 nll1obs {float(nll1obs)} {float(nll1exp)}" )
+            print ( f"@@5 nllA1obs {float(nllA1obs)} {float(nllA1exp)}" )
             
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
