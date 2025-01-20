@@ -45,7 +45,7 @@ class Info(object):
             for i, tag in enumerate(tags):
                 if not tag:
                     continue
-                if tag.startswith("# "):  # a comment!
+                if tag.startswith("#"):  # a comment!
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
