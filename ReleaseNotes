@@ -3,8 +3,7 @@ Release v3.0.2, xxx xx xxx 2025
 
   * Small fix in pyhf caching code (results should not change)
   * Fixes with parallelisation of resummino cross section computer
-  * Tiny fix to allow '#' without subsequent whitespace as comment in
-  text database
+  * Tiny fix to allow '#' without subsequent whitespace as comment in text database
 
 Release v3.0.1, Thu 31 Oct 2024
 =======================================================
