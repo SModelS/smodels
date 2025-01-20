@@ -38,6 +38,8 @@ New in Version 3.0.2:
 
   * Small fix in pyhf caching code (results should not change)
   * Fixes with parallelisation of :ref:`resummino cross section <xsecResummino>` computer
+  * Tiny fix to allow '#' without subsequent whitespace as comment in
+  text database
 
 New in Version 3.0.1:
 ^^^^^^^^^^^^^^^^^^^^^
