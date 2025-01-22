@@ -142,8 +142,7 @@ class Info(object):
             else:
                 logger.error ( f"mlModels field in {dirp} is a string, but  {len(jsonFileNames)} json files are mentioned!" )
                 sys.exit(-1)
-        self.onnxes, self.smYields, self.inputMeans = {}, {}, {}
-        self.inputErrors, self.nll_exp_mu0, self.nll_obs_mu0 = {}, {}, {}
+        self.onnxes = {}
         self.onnxMeta = {}
 
         def fillValues ( container, value ):
@@ -166,22 +165,22 @@ class Info(object):
                 f.close()
             import onnx
             m = onnx.load ( fullPath )
-            smYields, obsYields, inputMeans, inputErrors = {}, {}, [], []
+            inputMeans, inputErrors = [], []
+            data = { "smYields": {}, "obsYields": {} }
             nll_exp_mu0, nll_obs_mu0 = [ None ]*2, [ None ]*2
             nllA_exp_mu0, nllA_obs_mu0 = [ None ]*2, [ None ]*2
             nll_exp_max, nll_obs_max = [None ]*2, [ None ]*2
             nllA_exp_max, nllA_obs_max = [ None ]*2, [ None ]*2
-            # smYields = []
             import json, math
             for em in m.metadata_props:
                 if em.key == "obs_yields":
                     st = eval(em.value)
                     for l in st: ## the sm yields are tuple of (name,value)
-                        obsYields[ l[0] ]= int ( l[1] )
+                        data["obsYields"][ l[0] ]= int ( l[1] )
                 if em.key == "bkg_yields":
                     st = eval(em.value)
                     for l in st: ## the sm yields are tuple of (name,value)
-                        smYields[ l[0] ] = l[1]
+                        data["smYields"][ l[0] ] = l[1]
                 if em.key == "standardization_mean":
                     inputMeans = eval(em.value)
                 elif em.key == "standardization_std":
@@ -214,8 +213,8 @@ class Info(object):
                     if nll_exp_max != None:
                         nll_exp_max = [None,values[-7]]
             self.onnxMeta[onnxFile]={}
-            self.onnxMeta[onnxFile]["smYields"]=smYields
-            self.onnxMeta[onnxFile]["obsYields"]=obsYields
+            self.onnxMeta[onnxFile]["smYields"]=data["smYields"]
+            self.onnxMeta[onnxFile]["obsYields"]=data["obsYields"]
             self.onnxMeta[onnxFile]["inputMeans"]=inputMeans
             self.onnxMeta[onnxFile]["inputErrors"]=inputErrors
             self.onnxMeta[onnxFile]["nll_exp_mu0"]=nll_exp_mu0
