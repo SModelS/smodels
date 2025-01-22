@@ -10,7 +10,7 @@
 
 from __future__ import print_function
 import sys
-import os, copy
+import os
 current = os.getcwd()
 sys.path.append(current)
 
@@ -515,9 +515,9 @@ class XSecResummino(XSecBase):
 
             #remove the .slha
             if not os.path.isfile(slha_folder):
-                slha_file_name = slha[:-5]
+                slha_file_name = os.path.splitext(slha)[0]
             else:
-                slha_file_name = name[:-5]
+                slha_file_name = os.path.splitext(name)[0]
             
 
             resummino_in_file = os.path.join(self.resummino_in,f"resummino_{slha_file_name}.in")
