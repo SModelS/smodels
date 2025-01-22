@@ -8,7 +8,7 @@
 
 """
 
-from typing import Union, Text, Tuple, Callable
+from typing import Union, Text, Tuple, Callable, Dict
 import copy
 import numpy as np
 import sys
@@ -106,6 +106,26 @@ class NNUpperLimitComputer:
         # print ( f"@@0 for now use first model {modelToUse}" )
         return self.mostSensitiveModel
 
+    def isControlRegion ( self, srname : str, modelToUse : str ) -> bool:
+        """ check if srname is control region
+        :returns: true if srname is control region
+        """
+        def isCR ( dct : Dict )-> bool:
+            """ tiny helper """
+            if not "type" in dct:
+                return False
+            return dct["type"]=="CR"
+
+        for dct in self.data.globalInfo.mlModels[modelToUse]:
+            # print ( f"@@ {dct}" )
+            name = dct["onnx"]
+            if name == srname:
+                return isCR ( dct )
+            pname = name+"-0"
+            if pname == srname:
+                return isCR ( dct )
+        return False
+
     def negative_log_likelihood(self, poi_test,
         modelToUse : Union[None,str] = None ):
         """ the method that really wraps around the llhd computation.
@@ -133,6 +153,10 @@ class NNUpperLimitComputer:
                   f"cannot find sr name {realname} in {self.nsignals}"
             # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
+            if self.isControlRegion ( srname, modelToUse ):
+                obsyield = self.data.globalInfo.onnxMeta[modelToUse]["obsYields"][srname]
+                ## seems like a CR! replaced bkgexpected with observed (postfit)
+                smyield = obsyield
             tot = smyield + signal
             syields.append ( tot )
             # print ( f"@@0 the smyield of {srname} is {smyield} poi_test is {poi_test} signal {signal}" )
@@ -184,7 +208,7 @@ class NNUpperLimitComputer:
             print ( f"@@5 poi_test {poi_test}" )
             print ( f"@@5 nll1obs {float(nll1obs)} {float(nll1exp)}" )
             print ( f"@@5 nllA1obs {float(nllA1obs)} {float(nllA1exp)}" )
-            
+
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
