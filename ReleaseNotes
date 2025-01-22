@@ -1,4 +1,4 @@
-Release v3.0.2, xxx xx xxx 2025
+Release v3.0.2, Thu 23 Jan 2025
 =======================================================
 
   * Small fix in pyhf caching code (results should not change)
