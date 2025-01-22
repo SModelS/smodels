@@ -1,0 +1,8 @@
+dataId: SRC_incl
+dataType: efficiencyMap
+observedN: 47
+expectedBG: 37.9
+bgError: 6.2
+upperLimit: 0.21*fb
+expectedUpperLimit: 0.141*fb
+jsonfile: BkgOnly.json
