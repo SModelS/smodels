@@ -58,7 +58,7 @@ def _getSHA1(filename):
 
 # some mechanism to remove lock files if the download got interrupted
 import atexit
-lockfiles = set() 
+lockfiles = set()
 
 def removeLockFiles( lockfiles ):
     """ remove cruft lockfiles """
@@ -73,13 +73,13 @@ def removeLockFiles( lockfiles ):
 atexit.register ( removeLockFiles, lockfiles )
 
 class Database(object):
-    """ 
+    """
     Database object. Holds a list of SubDatabases and the ExpSMS map.
     Delegates all calls to SubDatabases.
     """
 
     def __init__(self, base=None, force_load=None,
-                 progressbar=False, subpickle=True, 
+                 progressbar=False, subpickle=True,
                  combinationsmatrix=None):
         """
         :param base: path to the database, or pickle file (string), or http
@@ -99,17 +99,15 @@ class Database(object):
                      optionally specifying signal regions, e.g. { "anaid1:SR1":
                      ( "anaid2:SR2", "anaid3" ) }
         """
-        
         self.subs = []
-        
         if "_fastlim" in base:  # for backwards compatibility
             base = base.replace("_fastlim", "+fastlim")
         sstrings = base.split("+")
         for ss in sstrings:
             self.subs.append(SubDatabase(ss, force_load,
-                                         progressbar, subpickle, 
+                                         progressbar, subpickle,
                                          combinationsmatrix))
-        
+
 
         # Compute SMS dict with all results
         self._allExpSMSDict = ExpSMSDict(self.expResultList)
@@ -120,7 +118,7 @@ class Database(object):
     @property
     def expResultList(self):
         """
-        The combined list of results, compiled from the 
+        The combined list of results, compiled from the
         the active results in each subdatabase.
         """
 
@@ -235,11 +233,11 @@ class Database(object):
         Select (filter) the results within the database satisfying the restrictions set by the arguments and returns the corresponding results.
         """
 
-        self.selectExpResults(analysisIDs=analysisIDs, datasetIDs=datasetIDs, 
-                             txnames=txnames, dataTypes=dataTypes, 
+        self.selectExpResults(analysisIDs=analysisIDs, datasetIDs=datasetIDs,
+                             txnames=txnames, dataTypes=dataTypes,
                              useNonValidated=useNonValidated,
                              onlyWithExpected=onlyWithExpected)
-        
+
         return self.expResultList[:]
 
     def selectExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
@@ -420,8 +418,8 @@ class SubDatabase(object):
             self._setParticles()
             self.txt_meta.printFastlimBanner()
             return
-        logger.error("when initialising database: force_load=%s is not "
-                     "recognized. Valid values are: pcl, txt, None." % force_load)
+        logger.error( f"when initialising database: force_load={force_load} is not "
+                     "recognized. Valid values are: pcl, txt, None." )
         raise SModelSError()
 
     def __eq__(self, other):
@@ -462,16 +460,21 @@ class SubDatabase(object):
             it needs update, create new binary file, in
             case it does need an update.
         """
-        if not os.path.exists(self.pcl_meta.pathname):
-            logger.info("Creating binary database ")
-            logger.info("(this may take a few minutes, but it's done only once!)")
-            self.loadTextDatabase()
-            self.createBinaryFile()
-        else:
-            if self.needsUpdate():
+        try:
+            if not os.path.exists(self.pcl_meta.pathname):
+                logger.info("Creating binary database ")
+                logger.info("(this may take a few minutes, but it's done only once!)")
+                self.loadTextDatabase()
                 self.createBinaryFile()
             else:
-                self.loadBinaryFile(lastm_only=False)
+                if self.needsUpdate():
+                    self.createBinaryFile()
+                else:
+                    self.loadBinaryFile(lastm_only=False)
+        except Exception as e:
+            import traceback
+            logger.error ( "when loading database: {e}, {traceback.format_exc()}" )
+            sys.exit(-1)
 
     def loadTextDatabase(self):
         """ simply loads the textdabase """
@@ -557,7 +560,7 @@ class SubDatabase(object):
                     t1 = time.time()-t0
                     logger.info("Loaded database from %s in %.1f secs." %
                             (self.pcl_meta.pathname, t1))
-                    self.databaseParticles = None                    
+                    self.databaseParticles = None
                     try:
                         self.databaseParticles = serializer.load(f)
                     except EOFError as e:
@@ -669,7 +672,7 @@ class SubDatabase(object):
     def lockFile ( self, filename : os.PathLike ):
         """ lock the file <filename>
         """
-        lockfile = os.path.join ( os.path.dirname ( filename ), 
+        lockfile = os.path.join ( os.path.dirname ( filename ),
                                   ".lock_"+ os.path.basename ( filename ) )
         ctr = 0
         while ( ctr < 5 ):
@@ -700,7 +703,7 @@ class SubDatabase(object):
     def unlockFile ( self, filename : os.PathLike ):
         """ unlock the file <filename>
         """
-        lockfile = os.path.join ( os.path.dirname ( filename ), 
+        lockfile = os.path.join ( os.path.dirname ( filename ),
                                   ".lock_"+ os.path.basename ( filename ) )
         if lockfile in lockfiles:
             lockfiles.remove( lockfile )
@@ -1079,7 +1082,7 @@ class SubDatabase(object):
         """
 
         self._activeResults = self.getExpResults(analysisIDs, datasetIDs, txnames,
-                                                dataTypes, useNonValidated, 
+                                                dataTypes, useNonValidated,
                                                 onlyWithExpected)
 
     def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],

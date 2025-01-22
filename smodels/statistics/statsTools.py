@@ -10,7 +10,7 @@
 
 """
 
-__all__ = [ "StatsComputer" ]
+__all__ = [ "StatsComputer", "getStatsComputerModule" ]
 
 from typing import Union, Text, Dict, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
@@ -22,6 +22,17 @@ from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from typing import Union, Text
+
+def getStatsComputerModule():
+    """ very single convenience function to centralize
+    switching between our stats code and spey. """
+    from smodels.base import runtime
+    if runtime._experimental["spey"]:
+        from smodels.statistics.speyTools import SpeyComputer as StatsComputer
+        return StatsComputer
+    else:
+        from smodels.statistics.statsTools import StatsComputer
+        return StatsComputer
 
 class StatsComputer:
     __slots__ = [ "nsig", "dataObject", "dataType", "likelihoodComputer", "data",

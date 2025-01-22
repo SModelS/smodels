@@ -12,7 +12,6 @@ from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.statsTools import StatsComputer
 from typing import Union, Text, Dict
 import numpy as np
 
@@ -144,10 +143,12 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
+        from smodels.statistics.statsTools import getStatsComputerModule
+        StatsComputer = getStatsComputerModule()
 
         if self.dataType() == "upperLimit":
-            from smodels.base.runtime import experimentalFeatures
-            if not experimentalFeatures():
+            from smodels.base.runtime import experimentalFeature
+            if not experimentalFeature( "truncatedGaussians" ):
                 computer = 'N/A'
             else:
                 computer = StatsComputer.forTruncatedGaussian(self)
@@ -373,7 +374,8 @@ class TheoryPrediction(object):
             self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
             self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
             self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
-            self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
+            if "sigma_mu" in llhdDict:
+                self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
 
 class TheoryPredictionsCombiner(TheoryPrediction):
@@ -522,6 +524,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
             computer = 'N/A'
         else:
+            from smodels.statistics.statsTools import getStatsComputerModule
+            StatsComputer = getStatsComputerModule()
             computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
 
         self._statsComputer = computer
