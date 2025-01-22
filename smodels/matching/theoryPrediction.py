@@ -143,11 +143,8 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
-        from smodels.base import runtime
-        if runtime._experimental["spey"]:
-            from smodels.statistics.speyTools import SpeyComputer as StatsComputer
-        else:
-            from smodels.statistics.statsTools import StatsComputer
+        from smodels.statistics.statsTools import getStatsComputerModule
+        StatsComputer = getStatsComputerModule()
 
         if self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
@@ -527,11 +524,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
             computer = 'N/A'
         else:
-            from smodels.base import runtime
-            if runtime._experimental["spey"]:
-                from smodels.statistics.speyTools import SpeyComputer as StatsComputer
-            else:
-                from smodels.statistics.statsTools import StatsComputer
+            from smodels.statistics.statsTools import getStatsComputerModule
+            StatsComputer = getStatsComputerModule()
             computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
 
         self._statsComputer = computer
