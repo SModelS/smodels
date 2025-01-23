@@ -12,6 +12,14 @@ share.models.SMparticles module
    :undoc-members:
    :show-inheritance:
 
+share.models.SMvertices module
+------------------------------
+
+.. automodule:: share.models.SMvertices
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 share.models.dgmssm module
 --------------------------
 
