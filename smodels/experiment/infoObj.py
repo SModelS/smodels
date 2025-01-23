@@ -185,33 +185,19 @@ class Info(object):
                     data["inputMeans"] = eval(em.value)
                 elif em.key == "standardization_std":
                     data["inputErrors"] = eval(em.value)
-                elif em.key == 'nLL_exp_mu0':
-                    data["nLL_exp_mu0"] = json.loads(em.value)
-                elif em.key == 'nLL_exp_max':
-                    fillValues ( data["nLL_exp_max"], em.value )
-                elif em.key == 'nLL_obs_max':
-                    fillValues ( data["nLL_obs_max"], em.value )
-                elif em.key == 'nLLA_exp_max':
-                    fillValues ( data["nLLA_exp_max"], em.value )
-                elif em.key == 'nLLA_obs_max':
-                    fillValues ( data["nLLA_obs_max"], em.value )
-                elif em.key == 'nLL_obs_mu0':
-                    data["nLL_obs_mu0"] = json.loads(em.value)
-                elif em.key == 'nLLA_exp_mu0':
-                    data["nLLA_exp_mu0"] = json.loads(em.value)
-                elif em.key == 'nLLA_obs_mu0':
-                    data["nLLA_obs_mu0"] = json.loads(em.value)
+                elif em.key  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
+                                  'nLLA_obs_mu0' ]:
+                    data[em.key] = json.loads(em.value)
+                elif em.key in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
+                                 'nLLA_obs_max', 'nLL_exp_mu0', ]:
+                    fillValues ( em.key, em.value )
                 elif em.key == 'y_min':
                     values = json.loads(em.value)
-                    # print ( f"@@X ymin", values )
-                    if data["nLLA_obs_max"] != None:
-                        data["nLLA_obs_max"] = [None,values[-1]]
-                    if data["nLLA_exp_max"] != None:
-                        data["nLLA_exp_max"] = [None,values[-3]]
-                    if data["nLL_obs_max"] != None:
-                        data["nLL_obs_max"] = [None,values[-5]]
-                    if data["nLL_exp_max"] != None:
-                        data["nLL_exp_max"] = [None,values[-7]]
+                    indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3, 
+                                "nLL_obs_max" : -5, "nLL_exp_max": -7 }
+                    for name,index in indices.items():
+                        if data[name] != None:
+                            data[name] = [None,values[index]]
             self.onnxMeta[onnxFile]={}
             for key,value in data.items():
                 self.onnxMeta[onnxFile][key]=value
