@@ -187,10 +187,10 @@ class NNUpperLimitComputer:
         arr = self.regressors[modelToUse]["session"].run(None, {"input_1":scaled_signal_yields})
         # print ( f"@@arr {arr}" )
         arr = arr[0][0]
-        nll0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nll_obs_mu0"]
-        nll0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nll_exp_mu0"]
-        nllA0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nllA_obs_mu0"]
-        nllA0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nllA_exp_mu0"]
+        nll0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_mu0"]
+        nll0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_mu0"]
+        nllA0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nLLA_obs_mu0"]
+        nllA0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nLLA_exp_mu0"]
         i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
         expDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_exp]
         obsDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_obs]
@@ -307,13 +307,13 @@ class NNUpperLimitComputer:
         if modelToUse == None:
             modelToUse = self.getMostSensitiveModel ( )
         # FIXME maximize this one function
-        muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nll_obs_max"]
+        muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_max"]
         if asimov:
-            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nllA_obs_max"]
+            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_obs_max"]
             if expected:
-                muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nllA_exp_max"]
+                muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_exp_max"]
         elif expected:
-            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nll_exp_max"]
+            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_max"]
         ## FIXME compute sigma_mu, compute via nllA
         sigma_mu = 0.
         #print ( f"@@ we need to maximize here nllmin {nllmin}" )
@@ -331,6 +331,7 @@ class NNUpperLimitComputer:
         #    print ( f"@@ callme {args}" )
         options = { "disp": False, "maxiter": 200 }
 
+        print ( "FIXME expected missing here!!" )
         o = optimize.minimize ( self.negative_log_likelihood, x0=1., 
                 args=(modelToUse,outputType,), tol=1e-8, options = options, 
                 method = "Nelder-Mead" )

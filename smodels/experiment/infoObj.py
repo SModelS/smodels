@@ -166,11 +166,11 @@ class Info(object):
             import onnx
             m = onnx.load ( fullPath )
             data = { "smYields": {}, "obsYields": {}, "inputMeans": [],
-                     "inputErrors": [], "nll_exp_mu0": [ None ]*2,
-                     "nll_obs_mu0": [ None ]*2, "nllA_exp_mu0": [ None ]*2,
-                     "nllA_obs_mu0": [ None ]*2, "nll_exp_max": [ None ]*2,
-                     "nll_obs_max": [ None ]*2, "nllA_exp_max": [ None ]*2,
-                     "nllA_obs_max": [ None ]*2 }
+                     "inputErrors": [], "nLL_exp_mu0": [ None ]*2,
+                     "nLL_obs_mu0": [ None ]*2, "nLLA_exp_mu0": [ None ]*2,
+                     "nLLA_obs_mu0": [ None ]*2, "nLL_exp_max": [ None ]*2,
+                     "nLL_obs_max": [ None ]*2, "nLLA_exp_max": [ None ]*2,
+                     "nLLA_obs_max": [ None ]*2 }
             import json, math
             for em in m.metadata_props:
                 if em.key == "obs_yields":
@@ -186,32 +186,32 @@ class Info(object):
                 elif em.key == "standardization_std":
                     data["inputErrors"] = eval(em.value)
                 elif em.key == 'nLL_exp_mu0':
-                    data["nll_exp_mu0"] = json.loads(em.value)
+                    data["nLL_exp_mu0"] = json.loads(em.value)
                 elif em.key == 'nLL_exp_max':
-                    fillValues ( data["nll_exp_max"], em.value )
+                    fillValues ( data["nLL_exp_max"], em.value )
                 elif em.key == 'nLL_obs_max':
-                    fillValues ( data["nll_obs_max"], em.value )
+                    fillValues ( data["nLL_obs_max"], em.value )
                 elif em.key == 'nLLA_exp_max':
-                    fillValues ( data["nllA_exp_max"], em.value )
+                    fillValues ( data["nLLA_exp_max"], em.value )
                 elif em.key == 'nLLA_obs_max':
-                    fillValues ( data["nllA_obs_max"], em.value )
+                    fillValues ( data["nLLA_obs_max"], em.value )
                 elif em.key == 'nLL_obs_mu0':
-                    data["nll_obs_mu0"] = json.loads(em.value)
+                    data["nLL_obs_mu0"] = json.loads(em.value)
                 elif em.key == 'nLLA_exp_mu0':
-                    data["nllA_exp_mu0"] = json.loads(em.value)
+                    data["nLLA_exp_mu0"] = json.loads(em.value)
                 elif em.key == 'nLLA_obs_mu0':
-                    data["nllA_obs_mu0"] = json.loads(em.value)
+                    data["nLLA_obs_mu0"] = json.loads(em.value)
                 elif em.key == 'y_min':
                     values = json.loads(em.value)
                     # print ( f"@@X ymin", values )
-                    if data["nllA_obs_max"] != None:
-                        data["nllA_obs_max"] = [None,values[-1]]
-                    if data["nllA_exp_max"] != None:
-                        data["nllA_exp_max"] = [None,values[-3]]
-                    if data["nll_obs_max"] != None:
-                        data["nll_obs_max"] = [None,values[-5]]
-                    if data["nll_exp_max"] != None:
-                        data["nll_exp_max"] = [None,values[-7]]
+                    if data["nLLA_obs_max"] != None:
+                        data["nLLA_obs_max"] = [None,values[-1]]
+                    if data["nLLA_exp_max"] != None:
+                        data["nLLA_exp_max"] = [None,values[-3]]
+                    if data["nLL_obs_max"] != None:
+                        data["nLL_obs_max"] = [None,values[-5]]
+                    if data["nLL_exp_max"] != None:
+                        data["nLL_exp_max"] = [None,values[-7]]
             self.onnxMeta[onnxFile]={}
             for key,value in data.items():
                 self.onnxMeta[onnxFile][key]=value
