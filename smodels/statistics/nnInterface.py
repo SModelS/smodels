@@ -127,10 +127,14 @@ class NNUpperLimitComputer:
         return False
 
     def negative_log_likelihood(self, poi_test,
-        modelToUse : Union[None,str] = None ):
+        modelToUse : Union[None,str] = None,
+        outputType : str = "extended" ):
         """ the method that really wraps around the llhd computation.
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
+        :param outputType: if 'extended' return dictionary with all
+        values, if 'observed' return nll_obs_1, if 'expected' return
+        nll_exp_1
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
@@ -225,6 +229,13 @@ class NNUpperLimitComputer:
                 ret["nll_obs_1"]=ret["nll_obs_0"]
                 ret["nllA_obs_1"]=ret["nllA_obs_0"]
                 ret["nllA_exp_1"]=ret["nllA_exp_0"]
+        if outputType == "observed":
+            return ret["nll_obs_1"]
+        if outputType == "expected":
+            return ret["nll_exp_1"]
+        if outputType != "extended": 
+            logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
+            sys.exit(-1)
         return ret
 
     def welcome(self):
@@ -295,7 +306,7 @@ class NNUpperLimitComputer:
         """
         if modelToUse == None:
             modelToUse = self.getMostSensitiveModel ( )
-        # FIXME heed asimov
+        # FIXME maximize this one function
         muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nll_obs_max"]
         if asimov:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nllA_obs_max"]
@@ -305,6 +316,26 @@ class NNUpperLimitComputer:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nll_exp_max"]
         ## FIXME compute sigma_mu, compute via nllA
         sigma_mu = 0.
+        #print ( f"@@ we need to maximize here nllmin {nllmin}" )
+        #print ( f"@@ modelToUse {modelToUse}" )
+
+        outputType = "observed"
+        if expected:
+            outputType = "expected"
+        #print ( f"@@ outputType {outputType} " )
+        #print ( f"@@ nll(0.) {self.negative_log_likelihood(0.,modelToUse, outputType)}" )
+        #print ( f"@@ nll(-.1) {self.negative_log_likelihood(-.1,modelToUse, outputType)}" )
+        #print ( f"@@ nll(.1) {self.negative_log_likelihood(.1,modelToUse, outputType)}" )
+        #bounds=[(-1,10)]
+        #def callme ( args ):
+        #    print ( f"@@ callme {args}" )
+        options = { "disp": False, "maxiter": 200 }
+
+        o = optimize.minimize ( self.negative_log_likelihood, x0=1., 
+                args=(modelToUse,outputType,), tol=1e-8, options = options, 
+                method = "Nelder-Mead" )
+        #print ( f"@@ o={o}" )
+        muhat, nllmin = o.x[0], o.fun
         ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
 
         """
