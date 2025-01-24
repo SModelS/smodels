@@ -347,11 +347,15 @@ class NNUpperLimitComputer:
             # print ( f"@@0 myNLL ret={x}" )
             return ret
 
-        for x0 in [ 0., .1, -.1, 1., -1., 3., -3., 10., -10. ]:
+        method = "Nelder-Mead"
+        initx0s = [ 0., .1, -.1, .3, -.3, 1., -1., 3., -3., 10., -10., 100,-100 ]
+        for x0 in initx0s:
             o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
                     args=(modelToUse,outputType), tol=1e-8, options = options,
-                    method = "Nelder-Mead" )
-            if o.success == True:
+                    method = method, bounds=[(-100,100)] )
+            if o.fun < 0:
+                print ( f"@@ o {o}" )
+            if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
                 # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                 o = differentiate.hessian ( myNLL, np.array ( [ muhat ] ) )
@@ -363,6 +367,13 @@ class NNUpperLimitComputer:
 
                 ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
                 return ret
+            if x0 == initx0s:
+                method = "L-BFGS-B"
+        #print ( f"could not find nll_min" )
+        #print ( f"nll(0) {self.negative_log_likelihood(0.)}" )
+        #print ( f"nll(.1) {self.negative_log_likelihood(.1)}" )
+        #print ( f"nll(-.1) {self.negative_log_likelihood(-.1)}" )
+        #sys.exit()
         logger.warning ( f"could not find nll_min!" )
         return None
 
