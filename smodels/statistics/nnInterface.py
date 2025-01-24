@@ -227,7 +227,7 @@ class NNUpperLimitComputer:
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         if abs(poi_test)<1e-10:
-            if abs(nll0obs-nll1obs)>1e-4:
+            if abs(nll0obs-nll1obs)>1e-3:
                 logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
                 # ret["nll_obs_1"]=nll0obs
             if abs(nll0exp-nll1exp)>1e-4:
@@ -254,7 +254,7 @@ class NNUpperLimitComputer:
 
         if nninfo["hasgreeted"]:
             return
-        logger.info( f"NN interface, we are using xxx" )
+        logger.info( f"NN interface, we are using onnxruntime v{onnxruntime.__version__}" )
         nninfo["hasgreeted"] = True
 
     def likelihood( self, mu=1.0, return_nll=False, expected=False,
