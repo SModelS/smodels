@@ -15,7 +15,7 @@ import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, CLsfromLsb, getNumericalVariance
-from scipy import optimize
+from scipy import optimize, differentiate
 
 nninfo = {
     "hasgreeted": False,
@@ -184,7 +184,8 @@ class NNUpperLimitComputer:
 
         #if poi_test == 0.:
         #    print ( f"@@X we evaluate at {scaled_signal_yields}" )
-        arr = self.regressors[modelToUse]["session"].run(None, {"input_1":scaled_signal_yields})
+        arr = self.regressors[modelToUse]["session"].run(None,
+                {"input_1":scaled_signal_yields})
         # print ( f"@@arr {arr}" )
         arr = arr[0][0]
         nll0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_mu0"]
@@ -233,7 +234,7 @@ class NNUpperLimitComputer:
             return ret["nll_obs_1"]
         if outputType == "expected":
             return ret["nll_exp_1"]
-        if outputType != "extended": 
+        if outputType != "extended":
             logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
             sys.exit(-1)
         return ret
@@ -314,41 +315,48 @@ class NNUpperLimitComputer:
                 muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_exp_max"]
         elif expected:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_max"]
-        ## FIXME compute sigma_mu, compute via nllA
-        sigma_mu = 0.
-        #print ( f"@@ we need to maximize here nllmin {nllmin}" )
-        #print ( f"@@ modelToUse {modelToUse}" )
 
         outputType = "observed"
         if expected:
             outputType = "expected"
         #print ( f"@@ outputType {outputType} " )
-        #print ( f"@@ nll(0.) {self.negative_log_likelihood(0.,modelToUse, outputType)}" )
-        #print ( f"@@ nll(-.1) {self.negative_log_likelihood(-.1,modelToUse, outputType)}" )
-        #print ( f"@@ nll(.1) {self.negative_log_likelihood(.1,modelToUse, outputType)}" )
         #bounds=[(-1,10)]
         #def callme ( args ):
         #    print ( f"@@ callme {args}" )
         options = { "disp": False, "maxiter": 200 }
 
-        print ( "FIXME expected missing here!!" )
-        o = optimize.minimize ( self.negative_log_likelihood, x0=1., 
-                args=(modelToUse,outputType,), tol=1e-8, options = options, 
-                method = "Nelder-Mead" )
-        #print ( f"@@ o={o}" )
-        muhat, nllmin = o.x[0], o.fun
-        ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
+        ## FIXME compute sigma_mu, compute via nllA
 
-        """
-        ret["nll0"]=nll0
-        ret["lmax"]=ret["nll_min"] # FIXME the lmax name!!!
-        ret["expected"]=expected
-        o = optimize.minimize ( getNLL, ret["muhat"], method="BFGS" )
-        sigma_mu = np.sqrt ( o.hess_inv[0][0] )
-        ret["sigma_mu"]=sigma_mu
-        """
+        def myNLL ( x ):
+            # print ( f"@@0 myNLL x={x}" )
+            if type(x) in [ list, np.array, np.ndarray ]:
+                ret = []
+                for xi in x:
+                    ret.append ( myNLL ( xi ) )
+                return np.array ( ret )
+            ret = self.negative_log_likelihood ( x, modelToUse=modelToUse,
+                                                 outputType=outputType )
+            # print ( f"@@0 myNLL ret={x}" )
+            return ret
 
-        return ret
+        for x0 in [ 0., .1, -.1, 1., -1., 3., -3., 10., -10. ]:
+            o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
+                    args=(modelToUse,outputType), tol=1e-8, options = options,
+                    method = "Nelder-Mead" )
+            if o.success == True:
+                muhat, nllmin = o.x[0], o.fun
+                # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+                o = differentiate.hessian ( myNLL, np.array ( [ muhat ] ) )
+                hessian = o.ddf[0][0][0]
+                # print ( f"@@ muhat {muhat} nllmin {nllmin} hessian {hessian}" )
+                sigma_mu = 0.
+                if hessian > 0.:
+                    sigma_mu = np.sqrt ( 1. / hessian )
+
+                ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
+                return ret
+        logger.warning ( f"could not find nll_min!" )
+        return None
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False,
             modelToUse : Union[None,str] = None ):
