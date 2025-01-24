@@ -150,7 +150,6 @@ class NNUpperLimitComputer:
         for srname,smyield in self.data.globalInfo.onnxMeta[modelToUse]["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
-            # ic ( realname )
             if not realname in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
                 assert realname in self.nsignals, \
@@ -184,6 +183,13 @@ class NNUpperLimitComputer:
 
         #if poi_test == 0.:
         #    print ( f"@@X we evaluate at {scaled_signal_yields}" )
+        if len(scaled_signal_yields[0])!=self.regressors[modelToUse]["dim"]:
+            dim_nn = self.regressors[modelToUse]["dim"]
+            dim_input = len(scaled_signal_yields[0])
+            line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
+            logger.error ( "[nnInterface]", line )
+            print ( line )
+            sys.exit()
         arr = self.regressors[modelToUse]["session"].run(None,
                 {"input_1":scaled_signal_yields})
         # print ( f"@@arr {arr}" )
