@@ -157,6 +157,8 @@ class NNUpperLimitComputer:
             # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
             if self.isControlRegion ( srname, modelToUse ):
+                if hasattr ( self.data.globalInfo, "includeCRs" ) and self.data.globalInfo.includeCRs == False:
+                    continue
                 obsyield = self.data.globalInfo.onnxMeta[modelToUse]["obsYields"][srname]
                 ## seems like a CR! replaced bkgexpected with observed (postfit)
                 smyield = obsyield
