@@ -349,23 +349,27 @@ class NNUpperLimitComputer:
 
         method = "Nelder-Mead"
         initx0s = [ 0., .1, -.1, .3, -.3, 1., -1., 3., -3., 10., -10., 100,-100 ]
+        bounds=[(-100,100)]
+        if not allowNegativeSignals:
+            bounds=[(0,100)]
         for x0 in initx0s:
             o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
                     args=(modelToUse,outputType), tol=1e-8, options = options,
-                    method = method, bounds=[(-100,100)] )
-            if o.fun < 0:
-                print ( f"@@ o {o}" )
+                    method = method, bounds=bounds )
+            #if o.fun < 0:
+            #    print ( f"@@ o {o}" )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
                 # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                 o = differentiate.hessian ( myNLL, np.array ( [ muhat ] ) )
                 hessian = o.ddf[0][0][0]
-                # print ( f"@@ muhat {muhat} nllmin {nllmin} hessian {hessian}" )
                 sigma_mu = 0.
                 if hessian > 0.:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
                 ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
+                # print ( f"@@ muhat {muhat} nllmin {nllmin} hessian {hessian} allowNegativeSignals {allowNegativeSignals}" )
+                # print ( f"@@ negative_log_likelihood {self.negative_log_likelihood(muhat)}" )
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
