@@ -325,7 +325,6 @@ class NNUpperLimitComputer:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_max"]
 
         outputType = "observed"
-        print ( f"@@A expected {expected}" )
         if expected:
             outputType = "expected"
         #print ( f"@@ outputType {outputType} " )
@@ -458,7 +457,7 @@ class NNUpperLimitComputer:
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
-        print ( f"@@X getCLsRootFunc expected {expected} nll0 {nll0:.1f} nll0A {nll0A:.1f}" )
+        # print ( f"@@X getCLsRootFunc expected {expected} nll0 {nll0:.1f} nll0A {nll0A:.1f}" )
 
         def clsRootTevatron( mu: float, return_type: Text = "CLs-alpha",
                      modelToUse : Union[None,str] = None ) -> float:
