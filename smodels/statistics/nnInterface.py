@@ -325,6 +325,7 @@ class NNUpperLimitComputer:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_max"]
 
         outputType = "observed"
+        print ( f"@@A expected {expected}" )
         if expected:
             outputType = "expected"
         #print ( f"@@ outputType {outputType} " )
@@ -440,19 +441,24 @@ class NNUpperLimitComputer:
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
         """
-        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
-        mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-        mu_hat = mu_hat if mu_hat is not None else 0.0
-        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True,
-                modelToUse = modelToUse )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
                              return_nll=True, modelToUse = modelToUse )
-        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+        mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+
+        nll0 = nll0A
+        
+        if expected != "posteriori":
+            fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
+            mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat = mu_hat if mu_hat is not None else 0.0
+            nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True,
+                    modelToUse = modelToUse )
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
+        print ( f"@@X getCLsRootFunc expected {expected} nll0 {nll0:.1f} nll0A {nll0A:.1f}" )
 
         def clsRootTevatron( mu: float, return_type: Text = "CLs-alpha",
                      modelToUse : Union[None,str] = None ) -> float:
@@ -477,8 +483,10 @@ class NNUpperLimitComputer:
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             nllA = self.likelihood(mu, return_nll=True, modelToUse = modelToUse, asimov = True )
+            nll = nllA
+            if expected != "posteriori":
+                nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
 
         from smodels.base import runtime
