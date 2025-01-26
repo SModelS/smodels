@@ -1126,8 +1126,9 @@ class PyhfUpperLimitComputer:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         try:
                             CLs = float(result[1].tolist())
-                        except TypeError:
-                            CLs = float(result[1][0])
+                        except (TypeError,IndexError):
+                            # CLs = float(result[1][0])
+                            CLs = float(result)
                     else:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         CLs = float(result)
