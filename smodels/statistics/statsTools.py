@@ -429,7 +429,7 @@ class StatsComputer:
 
     def transform ( self, expected ):
         """ SL only. transform the data to expected or observed """
-        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             return
         self.likelihoodComputer.transform ( expected )
 

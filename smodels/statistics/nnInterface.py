@@ -493,13 +493,3 @@ class NNUpperLimitComputer:
         if useTevatron:
             return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootAsimov
-
-
-    def transform ( self, expected : Union [ Text, bool ] ):
-        """ replace the actual observations with backgrounds,
-            if expected is True or 'posteriori' """
-        # always start from scratch
-        # self.model = copy.deepcopy ( self.origModel )
-        if expected == False:
-            return
-        self.data.observed = self.model.backgrounds
