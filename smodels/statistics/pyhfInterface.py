@@ -1318,7 +1318,8 @@ class PyhfUpperLimitComputer:
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
-            print ( f"@@pyhfInterface.getUpperLimitOnMu  {ul} expected {expected}" )
+            if expected == "posteriori":
+                print ( f"@@pyhfInterface.getUpperLimitOnMu r={1./ul:.3f} expected {expected}" )
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":

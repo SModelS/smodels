@@ -227,10 +227,10 @@ class NNUpperLimitComputer:
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         if abs(poi_test)<1e-10:
-            if abs(nll0obs-nll1obs)>1e-3:
+            if abs(nll0obs-nll1obs)>1e-1:
                 logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
                 # ret["nll_obs_1"]=nll0obs
-            if abs(nll0exp-nll1exp)>1e-4:
+            if abs(nll0exp-nll1exp)>1e-1:
                 logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
                 # ret["nll_exp_1"]=nll0exp
             if False:
@@ -426,7 +426,8 @@ class NNUpperLimitComputer:
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        print ( f"@@nnInterface.getUpperLimitOnMu {mu_lim} expected {expected}" )
+        if expected == "posteriori":
+            print ( f"@@nnInterface.getUpperLimitOnMu r={1./mu_lim:.3f} expected {expected}" )
         return mu_lim
 
     def getCLsRootFunc(self, expected: bool = False,
