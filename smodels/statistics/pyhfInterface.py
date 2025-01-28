@@ -1111,6 +1111,7 @@ class PyhfUpperLimitComputer:
                         try:
                             args["return_tail_probs"]=True
                             ret = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                            print ( f"@@pyhfInterface hypotest ret {ret}" )
                             result = ret[0]
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
@@ -1166,19 +1167,8 @@ class PyhfUpperLimitComputer:
                     with np.testing.suppress_warnings() as sup:
                         if pyhfinfo["backend"] == "numpy":
                             sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                        # ic ( workspace["channels"][0]["samples"][0]["data"] )
-                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
-                            # print ( f"@@0 -----" )
-                            # args["return_tail_probs"]=True
-                            # result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                            #print ( f"@@1 my mu {mu}" )
-                            #asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), \
-                            #        model, None, None, None )
-                            #print ( f"@@2 my asimov data {asimov_data[:3]}" )
                             pars = model.config.suggested_init()
-                            # pars[model.config.poi_index]=mu
                             # look at test_statistics:_tmu_like!!
                             tnll = pyhf.infer.mle.fixed_poi_fit(mu, workspace.data(model), model, return_fitted_val=True )
                             nll = float ( tnll[1] ) / 2.
@@ -1196,13 +1186,12 @@ class PyhfUpperLimitComputer:
                             nll0A = maxNllhA / 2.
 
                             from smodels.statistics.basicStats import CLsfromNLL
-                            # cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
                             big_muhat = (muhat[model.config.poi_index]>mu)
                             ret = CLsfromNLL (nllA, nll0A, nll, nll0, \
                                     big_muhat, return_type="CLs", return_tail_probs = True )
-                            if expected == "posteriori":
-                                print ( f"@@pyhfInterace clsRootAsimov mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f}" )
                             cls = ret["ret"]
+                            if True: # expected == "posteriori":
+                                print ( f"@@pyhfInterface clsRootAsimov expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} cls {cls}" )
 
                             end = time.time()
                             return 1.0 - self.cl - cls
@@ -1225,8 +1214,8 @@ class PyhfUpperLimitComputer:
                 else:
                     ret = clsRootPyhf(mu) ## thats the actual pyhf version
                     ret2 = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
-                    if expected == "posteriori":
-                       print ( f"@@pyhfInterface clsRoot mu {mu} pyhf {ret} asimov {ret2} expected {expected}" )
+                    if True: # expected == "posteriori":
+                       print ( f"@@pyhfInterface clsRoot expected {expected} mu {mu:.3f} pyhf {ret} asimov {ret2}" )
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
                 #if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
                 #    # pass
