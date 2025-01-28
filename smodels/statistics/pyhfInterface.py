@@ -1172,16 +1172,14 @@ class PyhfUpperLimitComputer:
                             # look at test_statistics:_tmu_like!!
                             tnll = pyhf.infer.mle.fixed_poi_fit(mu, workspace.data(model), model, return_fitted_val=True )
                             nll = float ( tnll[1] ) / 2.
-                            tnllA = pyhf.infer.mle.fixed_poi_fit(mu, workspace_expected.data(model), model, return_fitted_val=True )
-                            nllA = float ( tnll[1] ) / 2.
+                            asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), model, None, None, None )
+                            tnllA = pyhf.infer.mle.fixed_poi_fit(mu, asimov_data, model, return_fitted_val=True )
+                            nllA = float ( tnllA[1] ) / 2.
 
                             muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             nll0 = maxNllh / 2.
-                            #muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
-                            #    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                            # nll0A = maxNllhA
-                            muhatA, maxNllhA, o = pyhf.infer.mle.fit(workspace_expected.data(model), model,
+                            muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             nll0A = maxNllhA / 2.
 
@@ -1191,7 +1189,7 @@ class PyhfUpperLimitComputer:
                                     big_muhat, return_type="CLs", return_tail_probs = True )
                             cls = ret["ret"]
                             if True: # expected == "posteriori":
-                                print ( f"@@pyhfInterface clsRootAsimov expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} cls {cls}" )
+                                print ( f"@@pyhfInterface clsRootAsimov expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} alpha-cls {.05-cls}" )
 
                             end = time.time()
                             return 1.0 - self.cl - cls
