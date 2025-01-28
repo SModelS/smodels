@@ -426,7 +426,7 @@ class NNUpperLimitComputer:
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        # print ( f"@@5 getUpperLimitOnMu mu_hat {mu_hat} {sigma_mu} mu_lim {mu_lim}" )
+        print ( f"@@nnInterface.getUpperLimitOnMu {mu_lim} expected {expected}" )
         return mu_lim
 
     def getCLsRootFunc(self, expected: bool = False,

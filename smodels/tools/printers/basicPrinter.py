@@ -30,7 +30,8 @@ class BasicPrinter(object):
         self.filename = filename
         self.output = output
         self.printingOrder = []
-        self.typeofexpectedvalues = "apriori"
+        # self.typeofexpectedvalues = "apriori"
+        self.typeofexpectedvalues = "posteriori"
         self.toPrint = []
         self.outputFormat = outputFormat
 
