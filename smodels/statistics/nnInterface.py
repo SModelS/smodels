@@ -487,6 +487,8 @@ class NNUpperLimitComputer:
             nll = nllA
             if expected != "posteriori":
                 nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
+            if expected == "posteriori":
+                print ( f"@@nnInterface.clsRoot mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f}" ) 
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
 
         from smodels.base import runtime

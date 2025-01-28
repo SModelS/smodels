@@ -1111,7 +1111,6 @@ class PyhfUpperLimitComputer:
                         try:
                             args["return_tail_probs"]=True
                             ret = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                            # print ( f"@@pyhfInterface: their CL values {ret}" )
                             result = ret[0]
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
@@ -1181,37 +1180,31 @@ class PyhfUpperLimitComputer:
                             pars = model.config.suggested_init()
                             # pars[model.config.poi_index]=mu
                             # look at test_statistics:_tmu_like!!
-                            # nll = .5 * pyhf.infer.mle.twice_nll ( pars, workspace.data(model), model )
                             tnll = pyhf.infer.mle.fixed_poi_fit(mu, workspace.data(model), model, return_fitted_val=True )
-                            nll = float ( tnll[1] )
-                            #print ( f"@@3 my nll is {nll}" )
-                            #tnllA = pyhf.infer.mle.fixed_poi_fit(mu, asimov_data, model, return_fitted_val = True ) 
-                            #nllA = float ( tnllA[1] )
+                            nll = float ( tnll[1] ) / 2.
                             tnllA = pyhf.infer.mle.fixed_poi_fit(mu, workspace_expected.data(model), model, return_fitted_val=True )
-                            nllA = float ( tnll[1] )
+                            nllA = float ( tnll[1] ) / 2.
 
-                            #print ( f"@@3 my nllA is {nllA}" )
                             muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                            nll0 = maxNllh
-                            #print ( f"@@4 my nll0 is {nll0}" )
+                            nll0 = maxNllh / 2.
                             #muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
                             #    return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                             # nll0A = maxNllhA
                             muhatA, maxNllhA, o = pyhf.infer.mle.fit(workspace_expected.data(model), model,
                                 return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                            nll0A = maxNllhA
+                            nll0A = maxNllhA / 2.
 
-                            #print ( f"@@4 my nll: {nll} nll0: {nll0} nllA: {nllA} nll0A is {nll0A}" )
                             from smodels.statistics.basicStats import CLsfromNLL
                             # cls = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., return_type="CLs" )
                             big_muhat = (muhat[model.config.poi_index]>mu)
-                            ret = CLsfromNLL (nllA/2., nll0A/2., nll/2., nll0/2., \
+                            ret = CLsfromNLL (nllA, nll0A, nll, nll0, \
                                     big_muhat, return_type="CLs", return_tail_probs = True )
+                            if expected == "posteriori":
+                                print ( f"@@pyhfInterace clsRootAsimov mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f}" )
                             cls = ret["ret"]
 
                             end = time.time()
-                            #print ( f"@@5 my cls is {cls}" )
                             return 1.0 - self.cl - cls
                             
                         except Exception as e:
@@ -1231,6 +1224,9 @@ class PyhfUpperLimitComputer:
                     ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
                 else:
                     ret = clsRootPyhf(mu) ## thats the actual pyhf version
+                    ret2 = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
+                    if expected == "posteriori":
+                       print ( f"@@pyhfInterface clsRoot mu {mu} pyhf {ret} asimov {ret2} expected {expected}" )
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
                 #if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
                 #    # pass
