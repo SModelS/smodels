@@ -1,3 +1,3 @@
 #!/bin/sh
 
-./runSModelS.py -p mine.ini -f ./TChiWH_525_200_525_200.slha
+./runSModelS.py -p 1908.ini -f ./TChiWH_525_200_525_200.slha

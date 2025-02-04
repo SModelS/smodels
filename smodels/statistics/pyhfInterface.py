@@ -1111,7 +1111,6 @@ class PyhfUpperLimitComputer:
                         try:
                             args["return_tail_probs"]=True
                             ret = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                            print ( f"@@pyhfInterface hypotest ret {ret}" )
                             result = ret[0]
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
