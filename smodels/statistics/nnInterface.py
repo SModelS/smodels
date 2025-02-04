@@ -16,6 +16,7 @@ import onnxruntime
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, CLsfromLsb, getNumericalVariance
 from scipy import optimize, differentiate
+from smodels_utils.helper.terminalcolors import *
 
 nninfo = {
     "hasgreeted": False,
@@ -134,7 +135,8 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         :param outputType: if 'extended' return dictionary with all
         values, if 'observed' return nll_obs_1, if 'expected' return
-        nll_exp_1
+        nll_exp_1, if 'asimov' return nllA_obs_1, if 'asimov_exp'
+        return nllA_exp_1
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
@@ -242,6 +244,10 @@ class NNUpperLimitComputer:
             return ret["nll_obs_1"]
         if outputType == "expected":
             return ret["nll_exp_1"]
+        if outputType == "asimov":
+            return ret["nllA_obs_1"]
+        if outputType == "asimov_exp":
+            return ret["nllA_exp_1"]
         if outputType != "extended":
             logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
             sys.exit(-1)
@@ -325,8 +331,10 @@ class NNUpperLimitComputer:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_max"]
 
         outputType = "observed"
-        if expected:
+        if expected == True:
             outputType = "expected"
+        if expected == "posteriori":
+            outputType = "asimov"
         #print ( f"@@ outputType {outputType} " )
         #bounds=[(-1,10)]
         #def callme ( args ):
@@ -426,7 +434,7 @@ class NNUpperLimitComputer:
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                 allowNegative = allowNegativeSignals )
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        if expected == "posteriori":
+        if False and expected == "posteriori":
             print ( f"@@nnInterface.getUpperLimitOnMu r={1./mu_lim:.3f} expected {expected}" )
         return mu_lim
 
@@ -449,12 +457,17 @@ class NNUpperLimitComputer:
 
         nll0 = nll0A
         
-        if expected != "posteriori":
+        if True: # expected != "posteriori":
             fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
-            mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
             mu_hat = mu_hat if mu_hat is not None else 0.0
-            nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True,
-                    modelToUse = modelToUse )
+        if False: # expected == "posteriori":
+            fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
+            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat = mu_hat if mu_hat is not None else 0.0
+            #nll02 = self.likelihood(.298, expected=False, return_nll=True,
+            #        modelToUse = modelToUse )
+            #print ( f"@@nnInterface.D nll0 {nll0} nll(.298) {nll02}" )
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
@@ -488,8 +501,8 @@ class NNUpperLimitComputer:
             if expected != "posteriori":
                 nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
-            if True: # expected == "posteriori":
-                print ( f"@@nnInterface.clsRootAsimov expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} ret {ret}" ) 
+            if False and expected == "posteriori" and abs(mu-.765)<.1:
+                print ( f"@@nnInterface.clsRoot   {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} ret {ret}{RESET}" ) 
             return ret
 
         from smodels.base import runtime

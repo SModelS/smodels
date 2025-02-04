@@ -22,6 +22,7 @@ logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
 from typing import Dict, List
+from smodels_utils.helper.terminalcolors import *
 
 jsonver = ""
 try:
@@ -1187,8 +1188,10 @@ class PyhfUpperLimitComputer:
                             ret = CLsfromNLL (nllA, nll0A, nll, nll0, \
                                     big_muhat, return_type="CLs", return_tail_probs = True )
                             cls = ret["ret"]
-                            if True: # expected == "posteriori":
-                                print ( f"@@pyhfInterface clsRootAsimov expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} alpha-cls {.05-cls}" )
+                            if False and expected == "posteriori" and abs(mu-.762)<.1:
+                                print ( f"@@pyhfInterface {GREEN}data {workspace.data(model)[:10]}{RESET}" )
+                                print ( f"@@pyhfInterface.clsRoot {GREEN}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {muhat[model.config.poi_index]:.3f} alpha-cls {.05-cls}{RESET}" )
+                                # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
                             end = time.time()
                             return 1.0 - self.cl - cls
@@ -1211,8 +1214,8 @@ class PyhfUpperLimitComputer:
                 else:
                     # ret = clsRootPyhf(mu) ## thats the actual pyhf version
                     ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
-                    if True: # expected == "posteriori":
-                       print ( f"@@pyhfInterface clsRoot expected {expected} mu {mu:.3f} {ret}" ) # pyhf {ret} asimov {ret2}" )
+                    if False: # expected == "posteriori":
+                       print ( f"@@pyhfInterface clsRoot expected {expected} mu {mu:.3f} ret={ret}" ) # pyhf {ret} asimov {ret2}" )
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
                 #if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
                 #    # pass
