@@ -490,6 +490,7 @@ class NNUpperLimitComputer:
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
             if True: # expected == "posteriori":
                 print ( f"@@nnInterface.clsRootAsimov expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} ret {ret}" ) 
+            return ret
 
         from smodels.base import runtime
         useTevatron = runtime.experimentalFeature ( "tevatroncls" )
