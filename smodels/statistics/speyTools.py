@@ -371,6 +371,9 @@ class SpeyComputer:
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             sys.exit(-1)
+        except spey.system.exceptions.AsimovTestStatZero as e:
+            logger.debug ( f"spey returned: {e}. will interpret as ul=inf" )
+            ret = float("inf")
         ret = float(ret) # cast for the printers
         if limit_on_xsec:
             totsig = self.nsig
