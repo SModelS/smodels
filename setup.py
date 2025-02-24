@@ -128,6 +128,7 @@ setup(
                            'runSModelS.py=smodels.tools.runSModelS:main',
                            'smodelsTools.py=smodels.tools.smodelsTools:main' ]
     },
+    python_requires='>=3.7',
     install_requires=requirements(),
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
