@@ -9,3 +9,4 @@ parameterized
 matplotlib
 redirector
 line_profiler
+spey
