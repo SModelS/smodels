@@ -143,6 +143,7 @@ setup(
               'smodels.decomposition',
               'smodels.matching',
               'smodels.tools',
+              'smodels.tools.printers',
               'smodels.base',
               'smodels.statistics',
               'smodels.experiment'],
