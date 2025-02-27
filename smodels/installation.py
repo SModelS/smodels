@@ -184,7 +184,7 @@ def banner():
 def fixpermissions():
     """ make sure that all filepermissions are such that
         we can compile the wrappers for pythia and nllfast. """
-    from smodels.tools.smodelsLogging import logger
+    from smodels.base.smodelsLogging import logger
     import glob
     Dir = "%ssmodels/lib/" % installDirectory()
     try:
@@ -208,7 +208,7 @@ def databasePath ( label ):
     :returns: URL, e.g. https://smodels.github.io/database/official
     """
     if not label in __dblabels__:
-        from smodels.tools.smodelsLogging import logger
+        from smodels.base.smodelsLogging import logger
         logger.warning ( "cannot identify label %s" % label )
         return label
     if label == None:
