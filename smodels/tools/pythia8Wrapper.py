@@ -173,6 +173,9 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
 
         """
+        if self.maycompile:
+            self.checkInstallation( compile = True )
+        print ( f"@@X running", self.maycompile )
         # Change pythia configuration file, if defined:
         if self.pythiacard:
             pythiacard_default = self.cfgfile
