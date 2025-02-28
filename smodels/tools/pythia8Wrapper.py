@@ -175,7 +175,6 @@ class Pythia8Wrapper(WrapperBase):
         """
         if self.maycompile:
             self.checkInstallation( compile = True )
-        print ( f"@@X running", self.maycompile )
         # Change pythia configuration file, if defined:
         if self.pythiacard:
             pythiacard_default = self.cfgfile
