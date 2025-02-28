@@ -150,6 +150,7 @@ setup(
     include_package_data = True,
     test_suite='test',
     long_description=read('smodels/README.rst'),
+    long_description_content_type="text/x-rst",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",
