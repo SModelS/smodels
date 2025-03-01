@@ -148,7 +148,7 @@ setup(
               'smodels.statistics',
               'smodels.experiment'],
     include_package_data = True,
-    test_suite='test',
+    test_suite='unittests',
     long_description=read('smodels/README.rst'),
     long_description_content_type="text/x-rst",
     classifiers=[

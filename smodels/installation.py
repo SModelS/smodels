@@ -40,7 +40,7 @@ def test_requirements():
             return False
     return True
 
-def resolve_dependencies( as_user = True ):
+def resolve_dependencies( as_user = True, verbose = True ):
     """ method that is meant to resolve the SModelS dependencies,
     via pip install --user. Warns you if pip cannot be found.
     :params as_user: if False, try system-wide install.
@@ -54,8 +54,10 @@ def resolve_dependencies( as_user = True ):
     try:
         import pip
     except (ModuleNotFoundError,ImportError) as e:
-        print ( "error: pip not found. cannot install requirements. Maybe try easy_install pip" )
-        sys.exit()
+        if verbose:
+            print ( "warning: pip not found. cannot install requirements. Maybe try easy_install pip" )
+        return
+        # sys.exit()
     cmd = [ sys.executable, '-m', 'pip', 'install', '--upgrade', '-r', req ]
     if as_user:
         o = subprocess.getoutput ( " ".join ( [ sys.executable, '-m', 'pip', 'install', '--user', '--dry-run', 'pyslha' ] ) )
