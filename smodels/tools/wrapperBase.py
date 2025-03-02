@@ -66,23 +66,23 @@ class WrapperBase(object):
         os.chmod ( self.executablePath, mode )
         return True
 
-    def compile(self):
+    def compile ( self ):
         """
         Try to compile the tool.
         """
         if not self.maycompile:
             logger.error("Asking to compile, but auto-compilation turned off for %s", self.name )
             return
-        logger.debug("Trying to compile %s", self.name)
-        cmd = "cd %s; make" % self.srcPath
+        logger.info( f"Trying to compile {self.name}" )
+        cmd = f"cd {self.srcPath}; make"
         out = executor.getoutput(cmd)
         # out = subprocess.check_output ( cmd, shell=True, universal_newlines=True )
         logger.debug(out)
         if not os.path.exists ( self.executablePath ):
             if self.maycompile: ## should have worked
-                logger.error ( "Compilation of %s failed. Is the %s compiler installed?" % ( self.name, self.compiler ) )
+                logger.error ( f"Compilation of {self.name} failed. Is the {self.compiler} compiler installed?" )
             sys.exit()
-        logger.info ( "Compilation of %s succeeded!" % ( self.name ) )
+        logger.info ( f"Compilation of {self.name} succeeded!" )
         return True
 
 
@@ -96,10 +96,10 @@ class WrapperBase(object):
         """
         if not os.path.exists(self.executablePath):
             if compile:
-                logger.warning("%s executable not found. Trying to compile it now. This may take a while." % self.name )
+                logger.warning( f"{self.name} executable not found. Trying to compile it now. This may take a while." )
                 self.compile()
             else:
-                logger.warning("%s executable not found." % self.name )
+                logger.warning( f"{self.name} executable not found." )
                 self.complain()
                 return False
         if not os.path.exists(self.executablePath):

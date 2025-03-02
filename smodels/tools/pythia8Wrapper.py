@@ -122,11 +122,11 @@ class Pythia8Wrapper(WrapperBase):
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
         sleep = 0.
-        while not os.path.exists ( xmldoc ): # if this disappears, start from scratch
+        while not os.path.exists ( xmldoc ) or not os.path.exists ( self.executablePath ): # if this disappears, start from scratch
             import time
             sleep += .5
             time.sleep ( sleep )
-            if sleep > .5 and not os.path.exists ( xmldoc ): 
+            if sleep > .5 and not os.path.exists ( xmldoc ) or not os.path.exists ( self.executablePath ):
                 if compile:
                     # after a few seconds, delete, if compile is true
                     import shutil
@@ -134,6 +134,7 @@ class Pythia8Wrapper(WrapperBase):
                     rm = xmldoc[:p-1]
                     if False:
                         shutil.rmtree ( rm, ignore_errors = True )
+                    self.compile()
                 exists = False
                 break
 
@@ -148,12 +149,12 @@ class Pythia8Wrapper(WrapperBase):
 
     def getXmldoc ( self ):
         """ get the content of xml.doc """
-        xmldoc = self.executablePath.replace("pythia8.exe", "xml.doc")
-        logger.debug("exe path=%s" % self.executablePath)
+        xmldoc = self.executablePath.replace( "pythia8.exe", "xml.doc" )
+        logger.debug( f"exe path={self.executablePath}" )
         if not os.path.exists ( xmldoc ):
             return None
         if os.path.exists(xmldoc):
-            logger.debug("xml.doc found at %s." % xmldoc)
+            logger.debug(f"xml.doc found at {xmldoc}.")
             with open(xmldoc) as f:
                 xmlDir = f.read()
                 toadd = os.path.join(os.path.dirname(xmldoc), xmlDir.strip())
