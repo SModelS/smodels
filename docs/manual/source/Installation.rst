@@ -86,6 +86,9 @@ Installation Methods
    Instead, this will be done on the fly, at runtime, upon call of the :ref:`cross section computer(s) <xsecCalc>`.
    The external tools will also be located in the above smodels installation directory (<installdir>/lib/...).
 
+ * SModelS is also `indexed on conda-forge <https://anaconda.org/conda-forge/smodels>`_. Install via: ::
+
+     conda install conda-forge::smodels
 
  * Finally, SModelS is `indexed on pypi <https://pypi.org/project/smodels/>`_. Thus, if *pip3* (or *pip*) is installed in your machine, it is possible to install SModelS  without downloading the source code: ::
 
