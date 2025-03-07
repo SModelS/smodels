@@ -2,7 +2,7 @@
 
 """
 .. module:: speyTools
-   :synopsis: a module that contains tools and convenience methods 
+   :synopsis: a module that contains tools and convenience methods
               that we use in connection with spey.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -28,7 +28,7 @@ class SpeyComputer:
     __slots__ = [ "speyModels", "dataset", "backendType", "nsig",
                   "model_index" ]
 
-    def __init__ ( self, dataset, backendType : str, nsig : Union[float,list], 
+    def __init__ ( self, dataset, backendType : str, nsig : Union[float,list],
                    deltas_rel : Union[None,float] = None ):
         """ initialise with dataset.
         :param dataset: a smodels (combined)dataset, or a onnx file (for now, will change)
@@ -50,8 +50,8 @@ class SpeyComputer:
         """ retrieve the statistical model """
         assert self.backendType in [ "1bin", "SL", "ML", "pyhf" ], f"unknown backend type {self.backendType}"
         if hasattr ( self.dataset.globalInfo, "onnxFile" ):
-            # an onnxfile is defined, we use it!  
-            return self.getNNModel ( nsig ) 
+            # an onnxfile is defined, we use it!
+            return self.getNNModel ( nsig )
         if self.backendType == "pyhf":
             return self.getStatModelsPyhf ( nsig )
         if self.dataset.getType() == "efficiencyMap":
@@ -62,11 +62,12 @@ class SpeyComputer:
     def create ( cls, dataset : DataSet, xsection : XSection,
                  predictions, deltas_rel : float ):
         """ generic entry point for theoryPrediction. given the
-            data, create the appropriate SpeyComputer 
+            data, create the appropriate SpeyComputer
+
         :param dataset: the dataset to create the stats model for
         :param xsection: the cross section, needed just as a scale factor
         :param predictions: the individual predictions, in case of multiple SRs
-        for e.g. upper limits on them
+            for e.g. upper limits on them
         """
         dataType = dataset.getType()
         if dataType == "upperLimit":
@@ -120,10 +121,10 @@ class SpeyComputer:
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a SpeyComputer
-        """        
-        computer = SpeyComputer(dataset=dataset, backendType="1bin", 
+        """
+        computer = SpeyComputer(dataset=dataset, backendType="1bin",
                                 nsig=nsig, deltas_rel=deltas_rel)
-        
+
         return computer
 
     @classmethod
@@ -136,14 +137,14 @@ class SpeyComputer:
 
         :returns: a StatsComputer
         """
-        
-        computer = SpeyComputer(dataset=dataset,  
-                                backendType="SL", 
+
+        computer = SpeyComputer(dataset=dataset,
+                                backendType="SL",
                                  nsig=nsig, deltas_rel=deltas_rel)
         return computer
 
     def getNNModel ( self, nsig ):
-        """ here is the code for how we create a spey speyModel that uses an NN 
+        """ here is the code for how we create a spey speyModel that uses an NN
             as its backend """
         #For the moment, the ml-likelihood backned has to be dowanloaded and installed manually. In the future, the backend could be directly embedded and installed in SmodelS.
 #        import sys
@@ -153,13 +154,13 @@ class SpeyComputer:
 #        sys.path.append(MLlikePath)
         import spey
         stat_wrapper = spey.get_backend('ml.likelihoods')
-        
+
         #The current ML-likelihood backend takes a local path. This has to be
         #updated, I think the idea is that the backend takes 'dataset' as input,
 #        where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded
 #        by SmodelS beforehand. It seems to be the more consistent wrt the other
 #        backends.
-        
+
         #network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
         onnxBlob=self.dataset.globalInfo.onnx
         # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
@@ -182,13 +183,15 @@ class SpeyComputer:
         """
         Create a statistical model from multibin data.
 
-        :param nsig: number of signal events. For simplified likelihood backend this input can
-        contain `np.array` or `List[float]` which contains signal yields per region.
-        For `pyhf` backend this input expected to be a JSON-patch i.e. `List[Dict]`,
-        see `pyhf` documentation for details on JSON-patch format.
+        :param nsig: number of signal events. For simplified likelihood backend
+            this input can contain `np.array` or `List[float]` which contains
+            signal yields per region.
+            For `pyhf` backend this input expected to be a JSON-patch
+            i.e. `List[Dict]`, see `pyhf` documentation for details on
+            JSON-patch format.
         :param delta_sys: systematic uncertainty on signal. Currently unused.
-        :param allow_negative_signal: if True, the expected upper limit on mu, 
-        used to find the best statistical model, can be negative.
+        :param allow_negative_signal: if True, the expected upper limit on mu,
+            used to find the best statistical model, can be negative.
 
         :returns: spey StatisticalModel object.
 
@@ -264,14 +267,14 @@ class SpeyComputer:
             analysis = dataset.globalInfo.id
 
             speyModel = stat_wrapper( analysis = analysis,
-                            signal_patch = signal_patch, 
+                            signal_patch = signal_patch,
                             background_only_model = inputJson )
             models.append ( speyModel )
         self.speyModels = models
         self.model_index = self.getBestCombinationIndex( data )
         return models
 
-    def getStatModelSingleBin(self, nsig: Union[float, np.ndarray], 
+    def getStatModelSingleBin(self, nsig: Union[float, np.ndarray],
             delta_sys : Union[None,float] = None,
             allow_negative_signal : bool = False
     ):
@@ -316,7 +319,8 @@ class SpeyComputer:
     def get_five_values ( self, expected : Union [ bool, Text ],
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
-        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
+        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
+
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
              correct, if necessary
         """
@@ -356,11 +360,12 @@ class SpeyComputer:
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
            limit_on_xsec : bool = False, model_index : Union [int,None] = None ) -> float:
-        """ simple frontend, to spey::poi_upper_limit 
+        """ simple frontend to spey::poi_upper_limit
+
         :param limit_on_xsec: if True, then return the limit on the
-                              cross section
+            cross section
         :param model_index: if None, then get upper limit for most sensitive model,
-                           if integer, get UL for that model
+            if integer, get UL for that model
         """
         if model_index == None:
             model_index = self.model_index
@@ -379,7 +384,7 @@ class SpeyComputer:
             totsig = self.nsig
             if type ( self.nsig ) in [ list ]:
                 totsig = sum ( self.nsig )
-            xsec = totsig / self.dataset.globalInfo.lumi    
+            xsec = totsig / self.dataset.globalInfo.lumi
             ret = ret * xsec
         return ret
 
@@ -406,7 +411,7 @@ class SpeyComputer:
         return i_best
 
 
-    def asimov_likelihood ( self, poi_test : float, expected : Union[bool,Text], 
+    def asimov_likelihood ( self, poi_test : float, expected : Union[bool,Text],
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
@@ -424,7 +429,7 @@ class SpeyComputer:
 
         :returns: a StatsComputer
         """
-        computer = SpeyComputer(dataset=dataset, backendType="pyhf", 
+        computer = SpeyComputer(dataset=dataset, backendType="pyhf",
                                 nsig=nsig, deltas_rel=deltas_rel)
         return computer
 
@@ -434,7 +439,7 @@ class SpeyComputer:
         if poi_test < config.minimum_poi:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text], 
+    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi ( poi_test )
@@ -452,7 +457,7 @@ class SpeyComputer:
         :returns: tuple of muhat,lmax
         """
         expected = self.translateExpectationType ( expected )
-        speyret = self.speyModels[self.model_index].maximize_likelihood ( expected = expected, 
+        speyret = self.speyModels[self.model_index].maximize_likelihood ( expected = expected,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": float(speyret[0]), "lmax": float(speyret[1]) }
@@ -474,7 +479,7 @@ class SpeyComputer:
 
     def maximize_asimov_likelihood ( self, expected : Union[bool,Text],
            return_nll : bool = False ) -> Tuple[float,float]:
-        """ simple frontend to spey functionality 
+        """ simple frontend to spey functionality
         :param return_nll: if True, return negative log likelihood
         :param allow_negative_signal: allow also negative muhats
         :returns: tuple of muhat,lmax
@@ -483,7 +488,7 @@ class SpeyComputer:
         # init = self.getSpeyInitialisation ( True )
         # opt = init["optimiser"]
         # opt["test_statistics"]="qmutilde"
-        ret = self.speyModels[self.model_index].maximize_asimov_likelihood ( expected = expected, 
+        ret = self.speyModels[self.model_index].maximize_asimov_likelihood ( expected = expected,
             return_nll = return_nll ) # , **opt )
         assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
         for k,v in ret.items():
@@ -500,7 +505,7 @@ class SimpleSpeyDataSet:
     """ a very simple data class that can replace a smodels.dataset,
     for 1d SL data only. used for testing and in dataPreparation """
     class SimpleInfo:
-        def __init__ ( self, observedN : float, expectedBG : float, 
+        def __init__ ( self, observedN : float, expectedBG : float,
                        bgError : float ):
             self.observedN = observedN
             self.expectedBG = expectedBG
@@ -549,7 +554,8 @@ class SpeyAnalysesCombosComputer:
 
     def poi_upper_limit ( self, expected : Union [ bool, Text ],
            limit_on_xsec : bool = False ) -> float:
-        """ simple frontend, to spey::poi_upper_limit 
+        """ simple frontend, to spey::poi_upper_limit
+
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
         """
@@ -561,7 +567,7 @@ class SpeyAnalysesCombosComputer:
             ret = ret * totxsec
         return ret
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text], 
+    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         expected = SpeyComputer.translateExpectationType ( expected )
@@ -578,7 +584,7 @@ class SpeyAnalysesCombosComputer:
         :returns: tuple of muhat,lmax
         """
         expected = SpeyComputer.translateExpectationType ( expected )
-        speyret = self.speyModel.maximize_likelihood ( expected = expected, 
+        speyret = self.speyModel.maximize_likelihood ( expected = expected,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": float(speyret[0]), "lmax": float(speyret[1]) }
@@ -591,9 +597,11 @@ class SpeyAnalysesCombosComputer:
     def get_five_values ( self, expected : Union [ bool, Text ],
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
-        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat) 
+        """ method returning the Five Values:
+        l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
+
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
-             correct, if necessary
+            correct, if necessary
         """
         ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
         lmax = ret['lmax']
@@ -639,7 +647,7 @@ class SpeyAnalysesCombosComputer:
                                             test_statistics=test_statistic )
         return float(sigma_mu)
 
-    
+
 if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
     # nobs,bg,bgerr,lumi = 0, 1., 0.2, 35.9/fb
