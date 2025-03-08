@@ -3,7 +3,6 @@ Release v3.0.3, Thu xx Mar 2025
 
   * Fixes in build info to prepare for conda-forge
   * Fixed wrong imports, overlooked in refactoring from v2 -> v3 
-  * Tiny fix in error message for exceptions when loading database
   * Fixed pythia8 autocompile
 
 Release v3.0.2, Thu 23 Jan 2025
