@@ -1,0 +1,53 @@
+Input status: 1
+Decomposition output status: 1 #decomposition was successful
+================================================================================
+========================================================
+||                                                        ||
+||                    Topologies Table                    ||
+||                                                        ||
+========================================================
+=====================================================
+Topology: 111010100110101000
+Total Global topology weight :
+Sqrts: 8.00E+00 [TeV], Weight:5.72E-01 [pb]
+Total Number of SMS: 1
+========================================================
+||                                                        ||
+||                 Theory Predictions and                 ||
+||                Experimental Constraints                ||
+||                                                        ||
+========================================================
+---------------Analysis Label = ATLAS-SUSY-2013-02
+-------------------Dataset Label = (UL)
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 5.72E-01 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.81E+01 [fb]
+Observed r-value: 15
+---------------Analysis Label = CMS-SUS-13-012
+-------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
+-------------------Txname Labels = ['T1']
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 1.72E-03 [pb]
+Theory conditions:  None
+Observed experimental limit: 3.86E-01 [fb]
+Expected experimental limit: 2.64E-01 [fb]
+Observed r-value: 4.45
+Expected r-value: 6.507
+nll: 25.09
+nll_min: 2.647   -2log(L/L_max): 44.89
+nll_SM: 3.021   -2log(L/L_SM): 44.14
+Total cross-section for missing topologies (fb):  0.000E+00
+Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
+Total cross-section for missing topologies with prompt decays (fb):  0.000E+00
+Total cross-section for topologies outside the grid (fb):  0.000E+00
+================================================================================
+No missing topologies found
+================================================================================
+No missing topologies with displaced decays found
+================================================================================
+No missing topologies with prompt decays found
+================================================================================
+No topologies outside the grid found
+================================================================================

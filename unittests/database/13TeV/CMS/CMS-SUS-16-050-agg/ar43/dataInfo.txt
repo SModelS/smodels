@@ -1,0 +1,8 @@
+dataId: ar43
+dataType: efficiencyMap
+observedN: 4
+expectedBG: 4.7
+bgError: 1.6090369790654284
+upperLimit: 0.149722*fb
+expectedUpperLimit: 0.187126*fb
+aggregated: t2b2MT2400__500MET250__450
