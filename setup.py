@@ -128,6 +128,7 @@ setup(
                            'runSModelS.py=smodels.tools.runSModelS:main',
                            'smodelsTools.py=smodels.tools.smodelsTools:main' ]
     },
+    python_requires='>=3.8',
     install_requires=requirements(),
     data_files=dataFiles() ,
     description=("A tool for interpreting simplified-model results from the "
@@ -142,12 +143,14 @@ setup(
               'smodels.decomposition',
               'smodels.matching',
               'smodels.tools',
+              'smodels.tools.printers',
               'smodels.base',
               'smodels.statistics',
               'smodels.experiment'],
     include_package_data = True,
-    test_suite='test',
+    test_suite='unittests',
     long_description=read('smodels/README.rst'),
+    long_description_content_type="text/x-rst",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",

@@ -473,7 +473,7 @@ class SubDatabase(object):
                     self.loadBinaryFile(lastm_only=False)
         except Exception as e:
             import traceback
-            logger.error ( "when loading database: {e}, {traceback.format_exc()}" )
+            logger.error ( f"when loading database: {e}, {traceback.format_exc()}" )
             sys.exit(-1)
 
     def loadTextDatabase(self):

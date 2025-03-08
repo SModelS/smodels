@@ -5,9 +5,9 @@ name: SModelS Validation
 
 on:
   push:
-    branches: [ main, develop, release/* ]
+    branches: [ develop, release/* ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ develop ]
   # Enables manual action execution.
   workflow_dispatch:
 

@@ -76,11 +76,23 @@ pypi: clean
 
 testpypi: clean
 	## testpypi user is smodels, repository is https://test.pypi.org/legacy/
-	# to install from testpypi: 
+	# to install from testpypi:
+	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels
+	python -m pip install build
+	rm -rf dist
+#python3 setup.py sdist bdist_wheel
+	python -m build .
+	twine check --strict dist/*
+	twine upload -r pypitest dist/smodels-*.tar.gz
+
+testpypiold: clean
+	## testpypi user is smodels, repository is https://test.pypi.org/legacy/
+	# to install from testpypi:
 	# pip3 install --user --upgrade --index-url https://test.pypi.org/simple/ smodels
 	rm -rf dist
 	python3 setup.py sdist bdist_wheel
 	twine upload -r pypitest dist/smodels-*.tar.gz
+
 
 tarballs:
 	cd distribution && make tarballs

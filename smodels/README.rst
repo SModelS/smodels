@@ -3,6 +3,9 @@
 .. |PyPI version| image:: https://badge.fury.io/py/smodels.svg
    :target: https://badge.fury.io/py/smodels
 
+.. |Anaconda version| image:: https://anaconda.org/conda-forge/smodels/badges/version.svg
+   :target: https://anaconda.org/conda-forge/smodels/
+
 .. |GitHub Project| image:: https://img.shields.io/badge/GitHub--blue?style=social&logo=GitHub
    :target: https://github.com/SModelS
 
@@ -18,7 +21,7 @@
 .. |Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/SModelS/tutorials/blob/main/index.ipynb
 
-|GitHub Project| |PyPI version| |CodeFactor| |Colab| |Docs|
+|GitHub Project| |PyPI version| |Anaconda version| |CodeFactor| |Colab| |Docs|
 
 ==============
 SModelS v3
