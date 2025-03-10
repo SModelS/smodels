@@ -20,8 +20,8 @@ class OverrideInstall(install):
 
     def run(self):
         #uid, gid = 0, 0
-        install.run(self) # calling install.run(self) insures that everything 
-                # that happened previously still happens, 
+        install.run(self) # calling install.run(self) insures that everything
+                # that happened previously still happens,
         install_as_user = True
         try:
             import getpass
@@ -38,7 +38,7 @@ class OverrideInstall(install):
                     self.do_egg_install()
                 except Exception as e:
                     pass
-        # so the installation does not break! 
+        # so the installation does not break!
         # here we start with doing our overriding and private magic ..
         mode = 0o777
         for filepath in self.get_outputs():
@@ -88,8 +88,8 @@ def dataFiles ():
     ret = []
     ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
     for directory in [ "smodels/share/", "smodels/share/models/",
-          "smodels/etc/", "smodels/lib/nllfast/nllfast-1.2/", 
-          "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/", 
+          "smodels/etc/", "smodels/lib/", "smodels/lib/nllfast/nllfast-1.2/",
+          "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/",
           "smodels/lib/pythia6/", "smodels/lib/pythia8/", "smodels/lib/resummino/" ]:
         ret.append ((directory, listDirectory (directory)))
     for directory in ["inputFiles/slha/", "inputFiles/lhe/" ]:
@@ -108,8 +108,8 @@ def compile():
         return
     needs_build = False
     for i in sys.argv[1:]:
-        if i in [ "build", "build_ext", "build_clib", "install", 
-                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb", 
+        if i in [ "build", "build_ext", "build_clib", "install",
+                  "install_lib", "bdist", "bdist_rpm", "bdist_dumb",
                   "bdist_wininst", "bdist_wheel", "develop"]:
             needs_build = True
     if not needs_build:
