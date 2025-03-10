@@ -70,8 +70,11 @@ builddeb: buildrpm
 
 pypi: clean
 	## pypi user is walten, repository is https://upload.pypi.org/legacy/
+	python -m pip install build
 	rm -rf dist
-	python3 setup.py sdist bdist_wheel
+#	python3 setup.py sdist bdist_wheel
+	python -m build .
+	twine check --strict dist/*
 	twine upload dist/smodels-*.tar.gz
 
 testpypi: clean
