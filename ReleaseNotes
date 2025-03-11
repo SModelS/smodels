@@ -1,3 +1,8 @@
+Release v3.0.3.post1, Mon 10 Mar 2025
+=======================================================
+
+  * Tiny fix to setup.py to make smodels/lib/check_fortran_compiler.sh to be packaged
+
 Release v3.0.3, Mon 10 Mar 2025
 =======================================================
 
