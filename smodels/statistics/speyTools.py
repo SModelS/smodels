@@ -13,6 +13,7 @@ __all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List
 from spey import ExpectationType, StatisticalModel, get_backend
+from spey.system.exceptions import AsimovTestStatZero
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.experiment.datasetObj import DataSet
@@ -206,7 +207,7 @@ class SpeyComputer:
             if hasattr ( ds.dataInfo, "thirdMoment" ):
                 thirdmomenta.append ( ds.dataInfo.thirdMoment )
         if len(thirdmomenta)==0: # SLv1
-            stat_wrapper = get_backend("default_pdf.correlated_background")
+            stat_wrapper = get_backend("default.correlated_background")
             if _debug["writePoint"]:
                 f=open ( "data.txt","wt" )
                 f.write ( f"obsN={obsN}\n" )
@@ -376,7 +377,7 @@ class SpeyComputer:
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             sys.exit(-1)
-        except spey.system.exceptions.AsimovTestStatZero as e:
+        except AsimovTestStatZero as e:
             logger.debug ( f"spey returned: {e}. will interpret as ul=inf" )
             ret = float("inf")
         ret = float(ret) # cast for the printers
