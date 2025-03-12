@@ -36,8 +36,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.0.3.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  * Tiny fix to setup.py to make smodels/lib/check_fortran_compiler.sh to be package
-d
+  * Tiny fix to setup.py to make smodels/lib/check_fortran_compiler.sh to be packaged
 
 New in Version 3.0.3:
 ^^^^^^^^^^^^^^^^^^^^^
