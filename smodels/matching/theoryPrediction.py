@@ -144,7 +144,6 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
-
         if self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
             if not experimentalFeature( "truncatedGaussians" ):
@@ -777,7 +776,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
+    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile() \
+        and not expResult.hasMLModel():
         return None
 
     txnameList = []

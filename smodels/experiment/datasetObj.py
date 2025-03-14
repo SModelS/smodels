@@ -473,6 +473,8 @@ class CombinedDataSet(object):
             self.type = "simplified"
         if hasattr(self.globalInfo, "jsonFiles"):
             self.type = "pyhf"
+        if hasattr(self.globalInfo, "mlModels"):
+            self.type = "nn"
 
     def __str__(self):
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
