@@ -140,8 +140,8 @@ class Info(object):
                 # allow shorthand notation for entries with only one json file
                 self.mlModels = { onnxFile: jsonFileName }
             else:
-                logger.error ( f"mlModels field in {dirp} is a string, but  {len(jsonFileNames)} json files are mentioned!" )
-                sys.exit(-1)
+                logger.error ( f"mlModels field in {dirp} is a string, but {len(jsonFileNames)} json files are mentioned!" )
+                import sys; sys.exit(-1)
         self.onnxes = {}
         self.onnxMeta = {}
 
@@ -159,7 +159,6 @@ class Info(object):
 
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
-            # print ( f"@@8", fullPath )
             with open ( fullPath, "rb" ) as f:
                 self.onnxes[onnxFile] = f.read()
                 f.close()
@@ -193,6 +192,9 @@ class Info(object):
                     fillValues ( em.key, em.value )
                 elif em.key == 'y_min':
                     values = json.loads(em.value)
+                    if len(values)<7:
+                        logger.error ( f"'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
+                        import sys; sys.exit(-1)
                     indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3, 
                                 "nLL_obs_max" : -5, "nLL_exp_max": -7 }
                     for name,index in indices.items():
