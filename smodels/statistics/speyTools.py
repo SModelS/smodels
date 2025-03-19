@@ -12,6 +12,7 @@
 __all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List
+import sys
 from spey import ExpectationType, StatisticalModel, get_backend
 import spey
 try:
@@ -152,7 +153,6 @@ class SpeyComputer:
         """ here is the code for how we create a spey speyModel that uses an NN
             as its backend """
         #For the moment, the ml-likelihood backned has to be dowanloaded and installed manually. In the future, the backend could be directly embedded and installed in SmodelS.
-#        import sys
 #        MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
 #        MLlikePath='/home/walten/git/ML_LHClikelihoods/'
 
