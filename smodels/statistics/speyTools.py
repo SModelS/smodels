@@ -234,7 +234,10 @@ class SpeyComputer:
             )
             return [ speyModel ]
         # SLv2
-        stat_wrapper = get_backend("default_pdf.third_moment_expansion")
+        try:
+            stat_wrapper = get_backend("default.third_moment_expansion")
+        except ImportError as e:
+            stat_wrapper = get_backend("default_pdf.third_moment_expansion")
         speyModel = stat_wrapper( data = obsN,
                         background_yields = bg, covariance_matrix = cov,
                         signal_yields = nsig,
