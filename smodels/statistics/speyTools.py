@@ -13,7 +13,11 @@ __all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List
 from spey import ExpectationType, StatisticalModel, get_backend
-from spey.system.exceptions import AsimovTestStatZero
+import spey
+try:
+    from spey.system.exceptions import AsimovTestStatZero
+except ImportError: # comes only with newer versions of spey
+    AsimovTestStatZero = Exception # a dummy so we can still try
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.experiment.datasetObj import DataSet
@@ -207,7 +211,10 @@ class SpeyComputer:
             if hasattr ( ds.dataInfo, "thirdMoment" ):
                 thirdmomenta.append ( ds.dataInfo.thirdMoment )
         if len(thirdmomenta)==0: # SLv1
-            stat_wrapper = get_backend("default.correlated_background")
+            try:
+                stat_wrapper = get_backend("default.correlated_background")
+            except spey.PluginError as e: ## older spey?
+                stat_wrapper = get_backend("default_pdf.correlated_background")
             if _debug["writePoint"]:
                 f=open ( "data.txt","wt" )
                 f.write ( f"obsN={obsN}\n" )
