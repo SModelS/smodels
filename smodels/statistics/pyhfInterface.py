@@ -300,13 +300,20 @@ class PyhfData:
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             if "observations" in ws:
                 self.updatePyhfNames ( jsName, ws["observations"] )
+                patchedChannels = set()
+                allChannels = set ( [ x["name"] for x in ws["observations"] ] )
                 for i_r, region in enumerate ( self.jsonFiles[jsName] ):
                     for i_ch, ch in enumerate(ws["observations"]):
                         ## create a patch for the region, but only if channel matches
                         patch, patchType = self.createPatchForRegion ( region, i_ch, ch, jsName )
                         if patch != None:
                             wsChannelsInfo[patchType].append(patch)
+                            patchedChannels.add ( ch['name'] )
                             break
+                if allChannels != patchedChannels:
+                    logger.error ( f"could not patch {' '.join(allChannels-patchedChannels)} for {jsName}. Check the database!" )
+                    sys.exit()
+
 
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
