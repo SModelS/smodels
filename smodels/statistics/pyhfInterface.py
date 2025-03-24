@@ -312,7 +312,7 @@ class PyhfData:
                             break
                 if allChannels != patchedChannels:
                     logger.error ( f"could not patch {' '.join(allChannels-patchedChannels)} for {jsName}. Check the database!" )
-                    sys.exit()
+                    # sys.exit()
 
 
             wsChannelsInfo["otherRegions"].sort(
