@@ -191,8 +191,8 @@ class NNUpperLimitComputer:
             dim_nn = self.regressors[modelToUse]["dim"]
             dim_input = len(scaled_signal_yields[0])
             line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
-            logger.error ( "[nnInterface]", line )
-            print ( line )
+            logger.error ( f"[nnInterface] {line}" )
+            print ( f"[nnInterface] {line}" )
             sys.exit()
         arr = self.regressors[modelToUse]["session"].run(None,
                 {"input_1":scaled_signal_yields})
