@@ -44,9 +44,12 @@ class Info(object):
             if not "smodels" in region:
                 region["smodels"]=None
             if forNN:
-                if not "onnx" in region and "pyhf" in region:
-                    region["onnx"]=region["pyhf"]
-                    region.pop("pyhf")
+                if not "onnx" in region:
+                    if "pyhf" in region:
+                        region["onnx"]=region["pyhf"]
+                        region.pop("pyhf")
+                    else:
+                        region["onnx"]=region["smodels"]
             newregions.append ( region )
         return newregions
 
