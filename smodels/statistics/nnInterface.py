@@ -155,7 +155,7 @@ class NNUpperLimitComputer:
             if not realname in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
                 assert realname in self.nsignals, \
-                  f"cannot find sr name {realname} in {self.nsignals}"
+                  f"nnInterface: cannot find sr name {realname} in {self.nsignals}"
             # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
             if self.isControlRegion ( srname, modelToUse ):
