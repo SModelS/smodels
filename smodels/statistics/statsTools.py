@@ -245,7 +245,6 @@ class StatsComputer:
         """
         globalInfo = self.dataObject.globalInfo
         mlModels = globalInfo.mlModels
-        jsonFiles = globalInfo.jsonFiles
         nsignals = {}
         translator = {}
         import sys
@@ -253,6 +252,8 @@ class StatsComputer:
             # mlModel is e.g. model.onnx, pointer is either SRcombined.json
             # or directly the list of SRs, like in jsonFiles
             if type(pointer) in [ str ]:
+                # points to a json file, so we copy the SRs from there!
+                jsonFiles = globalInfo.jsonFiles
                 if pointer not in globalInfo.jsonFiles.keys():
                     logger.error ( f"no '{pointer}' defined in 'jsonFiles'!" )
                     sys.exit(-1)
