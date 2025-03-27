@@ -18,12 +18,12 @@ from smodels.base.smodelsLogging import logger
 class Info(object):
     """
     Holds the meta data information contained in a .txt file
-    (luminosity, sqrts, experimentID,...). Its attributes are generated according 
+    (luminosity, sqrts, experimentID,...). Its attributes are generated according
     to the lines in the .txt file which contain "info_tag: value".
     """
 
     def canonizeRegions ( self, regions : list, forNN : bool = False ) -> list:
-        """ given a list of regions in globalInfo.txt in any of the 
+        """ given a list of regions in globalInfo.txt in any of the
         jsonFiles, jsonFiles_FullLikelihood, or mlModels fields,
         return a canonical version of that list: strings in
         that list get transformed into dictionaries, if region type is
@@ -50,6 +50,9 @@ class Info(object):
                         region.pop("pyhf")
                     else:
                         region["onnx"]=region["smodels"]
+            else:
+                if not "pyhf" in region:
+                    region["pyhf"]=region["smodels"]
             newregions.append ( region )
         return newregions
 
@@ -149,7 +152,7 @@ class Info(object):
         self.onnxMeta = {}
 
         def fillValues ( container, value ):
-            """ given <value> fill in <container>, if value is sensible 
+            """ given <value> fill in <container>, if value is sensible
             :param container: the container to fill
             :param value: the container, value to copy from
             """
@@ -198,7 +201,7 @@ class Info(object):
                     if len(values)<7:
                         logger.error ( f"'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
                         import sys; sys.exit(-1)
-                    indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3, 
+                    indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3,
                                 "nLL_obs_max" : -5, "nLL_exp_max": -7 }
                     for name,index in indices.items():
                         if data[name] != None:
