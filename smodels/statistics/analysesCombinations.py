@@ -59,22 +59,22 @@ class AnaCombLikelihoodComputer(object):
         except:
             pass
 
-        llhd = 1.0
+        nll = 0.0
         changed = False
         for tp in self.theoryPredictions:
-            tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
+            tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached)
             if tmp != None:
-                llhd = llhd * tmp
+                nll = nll + tmp     #Add neg log llhds
                 changed = True
             else:
                 return None
         if changed == False:
             return None
-        if return_nll:
-            if llhd == 0.0:  # cut off nll at 999
-                return 999.0
-            return -np.log(llhd)
-        return llhd
+        if not return_nll:
+            llhd = np.exp(-nll)
+            return llhd
+        
+        return nll
 
     def lmax(
         self,
