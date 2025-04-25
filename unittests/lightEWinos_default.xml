@@ -85,6 +85,7 @@
         <input_file>./testFiles/slha/lightEWinos.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
+        <minmassgapisr>5.0</minmassgapisr>
         <model>share.models.mssm</model>
         <ncpus>1</ncpus>
         <promptwidth>1e-11</promptwidth>

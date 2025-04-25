@@ -69,6 +69,8 @@ class SLHAPrinter(TxTPrinter):
             keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters['promptwidth'])
         if 'stablewidth' in obj.parameters:
             keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters['stablewidth'])
+        if 'minmassgapISR' in obj.parameters:
+            keysDict[10] = "%-25s #minimum mass gap for ISR mass compression [GeV]\n" % (obj.parameters['minmassgapISR'])
 
         output = "BLOCK SModelS_Settings\n"
         for key in sorted(list(keysDict.keys())):

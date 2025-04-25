@@ -29,7 +29,8 @@ class SMSIdTest(unittest.TestCase):
                               ignorePromptQNumbers=['spin','eCharge','colordim']) #Make sure C1 and N2 are treated as prompt
         ## model.describe()
 
-        topDict = decomposer.decompose(model, sigmacut= 0.1*fb, massCompress=True, invisibleCompress=True, minmassgap= 5*GeV)
+        topDict = decomposer.decompose(model, sigmacut= 0.1*fb, massCompress=True, invisibleCompress=True, 
+                                       minmassgap= 5*GeV, minmassgapISR= 5*GeV)
         database.selectExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'])
         allTheorypredictions = [tp for tp in theoryPredictionsFor(database, topDict) if 'EXO' not in tp.analysisId()]
         tpDict = {tp.analysisId() : [] for tp in allTheorypredictions}

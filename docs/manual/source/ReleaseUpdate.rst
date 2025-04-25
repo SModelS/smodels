@@ -33,6 +33,12 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+
+New in Version 3.1.0:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controling the mass compression leading to ISR signatures
+
 New in Version 3.0.3.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

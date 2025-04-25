@@ -66,6 +66,10 @@ def testPoint(inputFile, outputDir, parser, database):
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
+    if parser.has_option("parameters","minmassgapISR"):
+        minmassgapISR = parser.getfloat("parameters", "minmassgapISR") * GeV
+    else:
+        minmassgapISR = 1.0*GeV
 
     """Setup output printers"""
     masterPrinter = MPrinter()
@@ -143,7 +147,8 @@ def testPoint(inputFile, outputDir, parser, database):
                                               "options", "doCompress"),
                                           invisibleCompress=parser.getboolean(
                                               "options", "doInvisible"),
-                                          minmassgap=minmassgap)
+                                          minmassgap=minmassgap,
+                                          minmassgapISR=minmassgapISR)
     except SModelSError as e:
         print("Exception %s %s" % (e, type(e)))
         """ Update status to fail, print error message and exit """

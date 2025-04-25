@@ -188,7 +188,12 @@ Below we give more detailed information about each entry in the parameters file.
 .. _parameterFileMinmassgap:
 
   * **minmassgap** (float): maximum value of the mass difference (in GeV) for
-    perfoming :ref:`mass compression <massComp>`. *Only used if doCompress = True*
+    performing :ref:`mass compression <massComp>`. *Only used if doCompress = True*
+
+.. _parameterFileMinmassgapISR:
+
+  * **minmassgapISR** (float): maximum value of the mass difference (in GeV) for
+    performing :ref:`mass compression <massComp>` leading to ISR signatures. *Only used if doCompress = True*
 
 .. _parameterFileMaxcond:
 

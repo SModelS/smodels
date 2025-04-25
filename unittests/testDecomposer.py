@@ -95,7 +95,8 @@ class DecomposerTest(unittest.TestCase):
 
 
         tested = False
-        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=False, invisibleCompress=False, minmassgap=5.*GeV )
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=False, invisibleCompress=False, 
+                                     minmassgap=5.*GeV, minmassgapISR=5.*GeV )
         toposExpected = {'[][1]' : 1,'[][2]' : 14,'[1][1]' : 1,'[1][2]' : 25,'[2][2]' : 72,
                          '[][2,2]' : 44,'[1][1,1]' : 2,'[1][1,2]' : 22,'[2][1,2]' : 48,
                          '[2][2,2]' : 284,'[1,1][1,1]' : 5,'[1,1][1,2]' : 22,'[1,2][1,2]' : 120,
@@ -115,7 +116,8 @@ class DecomposerTest(unittest.TestCase):
             self.assertEqual(evenParticles,"[[[t+],[t-]],[[q],[W+]]]")
             self.assertEqual(len(sms.ancestors),1)
 
-        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=False, invisibleCompress=True, minmassgap=5.*GeV )
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=False, invisibleCompress=True, 
+                                     minmassgap=5.*GeV, minmassgapISR=5*GeV )
         toposExpected = {"[][]" : 1,"[][1]" : 2,"[][2]" : 22,"[1][1]" : 4,"[1][2]" : 25,"[2][2]" : 72,
                          "[][2,2]" : 44,"[1][1,1]" : 4,"[1][1,2]" : 42,"[2][1,2]" : 48,"[2][2,2]" : 284,
                          "[1,1][1,1]" : 5,"[1,1][1,2]" : 22,"[1,2][1,2]" : 120,"[1][1,1,1]" : 2,"[1][1,2,2]" : 72,
@@ -140,7 +142,8 @@ class DecomposerTest(unittest.TestCase):
             self.assertEqual(len(sms.ancestors), 1)
 
 
-        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=True, invisibleCompress=False, minmassgap=5.*GeV)
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=True, invisibleCompress=False, 
+                                     minmassgap=5.*GeV, minmassgapISR=5*GeV)
         toposExpected = {"[][]" : 1,"[][1]" : 8,"[][2]" : 14,"[1][1]" : 4,"[1][2]" : 29,"[2][2]" : 72,
                         "[][1,2]" : 2,"[][2,2]" : 44,"[1][1,1]" : 4,"[1][1,2]" : 34,"[2][1,2]" : 48,
                         "[2][2,2]" : 284,"[1,1][1,1]" : 17,"[1,1][1,2]" : 22,"[1,2][1,2]" : 120,
@@ -162,7 +165,8 @@ class DecomposerTest(unittest.TestCase):
             self.assertTrue(dm < 5.0)
 
 
-        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=True, invisibleCompress=True, minmassgap=5.*GeV )
+        topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=True, invisibleCompress=True, 
+                                     minmassgap=5.*GeV, minmassgapISR=5*GeV )
         smsIDs = {29+8 : ExpSMS.from_string("[[['b']],[['b']]]",finalState=['MET','MET'], model=finalStates),
                  30+8 : ExpSMS.from_string("[[['b']],[['t+']]]",finalState=['MET','MET'], model=finalStates),
                  32+8 : ExpSMS.from_string("[[['b']],[['t+']]]",finalState=['MET','MET'], model=finalStates),
@@ -259,7 +263,8 @@ class DecomposerTest(unittest.TestCase):
         
         sigmacut = 1*fb
         topDict = decomposer.decompose(model, sigmacut= sigmacut, 
-                                       massCompress=True, invisibleCompress=False, minmassgap=5*GeV)
+                                       massCompress=True, invisibleCompress=False, 
+                                       minmassgap=5*GeV, minmassgapISR=5*GeV)
         nUnique = 489
         self.assertEqual(nUnique,len(topDict.getSMSList()))
 
@@ -278,7 +283,7 @@ class DecomposerTest(unittest.TestCase):
         sigmacut = 0.1*fb
         topDict = decomposer.decompose(model, sigmacut= sigmacut, 
                             massCompress=True, 
-                            invisibleCompress=True, minmassgap=5*GeV)
+                            invisibleCompress=True, minmassgap=5*GeV, minmassgapISR=5*GeV)
         nUnique = 1452
         self.assertEqual(nUnique,len(topDict.getSMSList()))
         topSummary = []

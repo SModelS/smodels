@@ -149,6 +149,16 @@ states, depending on the boost of the parent state, may not always be soft.
 It is recommended to choose values of :ref:`minmassgap <parameterFileMinmassgap>`
 between 1-10 GeV; the default value is 5 GeV.
 
+One exception to the procedure described above applies to the full compression of SMS leading to
+topologies without decays and only with MET final states, i.e. *PV > MET + MET + ... MET*.
+Since mono-X searches can be very sensitive to small mass differences, a separate parameter
+controls the compression to these type of SMS, :ref:`minmassgapISR <parameterFileMinmassgapISR>` (:math:`\delta m_{ISR}`).
+Only when all the mass differences are smaller than :math:`\delta m_{ISR}` the SMS is allowed
+to be fully compressed to a simple *PV > MET + MET + ... MET* topology.
+It is recommended to set this parameter to values smaller than :ref:`minmassgap <parameterFileMinmassgap>`,
+i.e 1 GeV.
+
+
 * **Mass compression is implemented by the** `massCompress <decomposition.html#decomposition.theorySMS.TheorySMS.massCompress>`_ **method**.
 
 .. _invComp:

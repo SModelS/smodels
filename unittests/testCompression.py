@@ -93,5 +93,35 @@ class CompressionTest(unittest.TestCase):
                 self.assertTrue(dm < 5.0)
         self.assertTrue(tested)
 
+    def testMassISR(self):
+
+        slhafile="./testFiles/slha/higgsinoStop.slha"
+        model = Model(BSMList,SMList)
+        model.updateParticles(slhafile,promptWidth = 1e-12*GeV,
+                                ignorePromptQNumbers=['spin','eCharge','colordim'])
+        
+        # Decompose without allowing for ISR compression
+        topos = decomposer.decompose(model, 1000*fb, massCompress=True, invisibleCompress=False, 
+                                    minmassgap=10.*GeV,minmassgapISR=0*GeV)
+        self.assertEqual(len(topos.getSMSList()),14)
+        self.assertFalse(110100 in topos) # Check that PV > A + B is not in topos
+
+        # Decompose without allowing for ISR compression up to 1*GeV
+        topos = decomposer.decompose(model, 1000*fb, massCompress=True, invisibleCompress=False, 
+                                    minmassgap=10.*GeV,minmassgapISR=1*GeV)
+        self.assertEqual(len(topos.getSMSList()),14)
+        self.assertFalse(110100 in topos) # Check that PV > A + B is not in topos
+
+        # Decompose without allowing for ISR compression up to 5*GeV
+        # (now C2-N1 should be compressed)
+        topos = decomposer.decompose(model, 1000*fb, massCompress=True, invisibleCompress=False, 
+                                    minmassgap=10.*GeV,minmassgapISR=5*GeV)
+        self.assertEqual(len(topos.getSMSList()),15)
+        self.assertTrue(110100 in topos) # Check that PV > A + B is in topos
+        smsISR = topos[110100][0]
+        self.assertEqual(str(smsISR),"(PV > N1/N1~,N1/N1~)")
+
+
+
 if __name__ == "__main__":
     unittest.main()
