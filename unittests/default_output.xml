@@ -365,6 +365,7 @@
         <input_file>./testFiles/slha/gluino_squarks.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
+        <minmassgapisr>5.0</minmassgapisr>
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>

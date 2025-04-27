@@ -2,6 +2,7 @@ smodelsOutputDefault={
     'OutputStatus': {
         'sigmacut': 0.03,
         'minmassgap': 5.0,
+        'minmassgapisr' : 5.0,
         'maxcond': 0.2,
         'ncpus': -6,
         'model': 'share.models.mssm',

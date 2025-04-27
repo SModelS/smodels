@@ -460,21 +460,19 @@ class TheorySMS(GenericSMS):
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)
 
-        # Check if the compressed SMS corresponds to pure MET, i.e. PV > MET + MET +... + MET
-        isISR = False
-        primaryMoms = newSMS.daughterIndices(newSMS.rootIndex)
-        # Check if all primary mothers are final states and all are MET
-        if all(newSMS.out_degree(mom) == 0 for mom in primaryMoms):
-            if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):
-                isISR = True
-        # If the compressed SMS is pure MET and the maximum compressed mass difference
-        # is above minmassgapISR, redo the compression, but with minmassgap set to maxCompMassDiff
+        # Check if any of the compressions violates minmassgapISR
+        # and if the compressed SMS corresponds to pure MET, i.e. PV > MET + MET +... + MET
+        if maxCompMassDiff >= minmassgapISR:
+            primaryMoms = newSMS.daughterIndices(newSMS.rootIndex)
+            # Check if all primary mothers are final states and are MET
+            if all(newSMS.out_degree(mom) == 0 for mom in primaryMoms):
+                if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):                    
+        # Redo the compression, but with minmassgap set to maxCompMassDiff
         # This way at least one of the steps in the compression will not be performed and the
         # compressed SMS will not be pure MET. 
-        # Also, it guarantees that only the largest mass difference is the one left uncompressed
+        # Also, it guarantees that the largest mass difference is the one left uncompressed
         # (we set minmassgap slightly below maxCompMassDiff for numerical estability)
-        if isISR and maxCompMassDiff >= minmassgapISR:
-            return self.massCompress(minmassgap=(0.999*maxCompMassDiff),
+                    return self.massCompress(minmassgap=(0.999*maxCompMassDiff),
                                      minmassgapISR=minmassgapISR)
         else:
             return newSMS

@@ -73,7 +73,7 @@ class CompressionTest(unittest.TestCase):
         model = Model(BSMList,SMList)
         model.updateParticles(slhafile,promptWidth = 1e-12*GeV,
                               ignorePromptQNumbers=['spin','eCharge','colordim'])
-        topos = decomposer.decompose(model, .1*fb, True, False, 5.*GeV)
+        topos = decomposer.decompose(model, .1*fb, True, False, 5.*GeV, 5.*GeV)
         for topo in topos:
             vertnumb = canonNameToVertNumb(topos,topo)
             if vertnumb !="[1][1]":
