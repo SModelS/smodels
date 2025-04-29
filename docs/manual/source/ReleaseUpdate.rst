@@ -38,6 +38,8 @@ New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controling the mass compression leading to ISR signatures
+  * Small fixes in analyses combinations, better handling of exceptions in likelihood 
+computations
 
 New in Version 3.0.3.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
