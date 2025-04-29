@@ -173,7 +173,9 @@ class AnaCombLikelihoodComputer(object):
                 pass
             hessian = invh[0][0]
             nll_ = o.fun
-            if hessian > 0.0 and nll_ < 998.0 and o.success:  # found a maximum. all good.
+            #removed if condition: "and nll_ < 998.0", because sometimes nll_ > 998.0. Not necessarily a bad thing?
+            #However lmax = np.exp(-nll_) for large nll -> 0
+            if hessian > 0.0 and o.success:  # found a maximum. all good. #and nll_ < 998.0
                 break
             # the hessian is negative meaning we found a maximum, not a minimum
             if hessian <= 0.0:
@@ -183,7 +185,7 @@ class AnaCombLikelihoodComputer(object):
                 )
         mu_hat = o.x[0]
         lmax = np.exp(-o.fun)  # fun is *always* nll
-        if hessian < 0.0 or nll_ > 998.0:
+        if hessian < 0.0:    #or nll_ > 998.0: again remove nll_ cut
             logger.error(
                 "tried with several starting points to find maximum, always ended up in minimum. "
                 "bailing out."
@@ -196,7 +198,7 @@ class AnaCombLikelihoodComputer(object):
         retllh = lmax
         if return_nll:
             retllh = nll_
-        ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}
+        ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}       #return nll_ too in the dictionary?
         return ret
 
     def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False ):
