@@ -75,7 +75,7 @@ class RFailsTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         equals = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05,
-                            ignore=['input_file', 'smodels_version', 'ncpus'])
+                            ignore=['input_file', 'smodels_version', 'database_version', 'ncpus'])
         if not equals:
             logger.error ( f"{outputfile}!={defaultfile}" )
 

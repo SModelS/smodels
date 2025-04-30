@@ -193,12 +193,12 @@ def sortXML(xmltree):
 def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
 
     if len(xmldefault) != len(xmlnew):
-        logger.warning("lengths of document %d != %d" % (len(xmldefault), len(xmlnew)))
+        logger.warning( f"lengths of document {len(xmldefault)} != {len(xmlnew)}" )
         return False
     for i, el in enumerate(xmldefault):
         newel = xmlnew[i]
         if len(el) != len(newel):
-            logger.warning("lengths of elements %s and %s differ (%d != %d)" % (el.tag,newel.tag,len(el), len(newel)))
+            logger.warning( f"lengths of elements {el.tag} and {newel.tag} differ ({len(el)} != {len(newel)})" )
             return False
         if len(el) == 0:
             if el.tag in ignore:
@@ -221,10 +221,10 @@ def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
             if isinstance(el.text, float) and isinstance(newel.text, float):
                 diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
                 if diff > allowedRelDiff:
-                    logger.warning("values %s and %s differ" % (el.text, newel.text))
+                    logger.warning( f"values {el.text} and {newel.text} differ" )
                     return False
             elif newel.text != el.text:
-                logger.warning("texts %s and %s differ" % (el.text, newel.text))
+                logger.warning( f"texts {el.text} and {newel.text} differ" )
                 return False
         else:
             if not compareXML(el, newel, allowedRelDiff, ignore):
@@ -245,7 +245,7 @@ def compareSLHA(slhadefault, slhanew, allowedRelDiff):
 
     for b in defaultData.blocks:
         if len(defaultData.blocks[b].entries) != len(newData.blocks[b].entries):
-            logger.error('Numbers of entries in block %s differ' % (defaultData.blocks[b].name))
+            logger.error( f'Numbers of entries in block {defaultData.blocks[b].name} differ' )
             return False
         keys = defaultData.blocks[b].keys()
         bkeys = newData.blocks[b].keys()
@@ -320,11 +320,11 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
     with redirector.stdout_redirected(to=to):
         out = join(iDir(), "unittests/unitTestOutput")
         setLogLevel(level)
-        run(filename, parameterFile=join(iDir(), "unittests/%s" % inifile),
+        run(filename, parameterFile=join(iDir(), f"unittests/{inifile}" ),
             outputDir=out, db=database, timeout=timeout,
             development=development)
         setLogLevel(oldlevel)
-        sfile = join(iDir(), "unittests/unitTestOutput/%s.py" % basename(filename))
+        sfile = join(iDir(), f"unittests/unitTestOutput/{basename(filename)}.py" )
         return sfile
 
 
