@@ -466,7 +466,7 @@ class TheorySMS(GenericSMS):
             primaryMoms = newSMS.daughterIndices(newSMS.rootIndex)
             # Check if all primary mothers are final states and are MET
             if all(newSMS.out_degree(mom) == 0 for mom in primaryMoms):
-                if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):                    
+                if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):                      
         # Redo the compression, but with minmassgap set to maxCompMassDiff
         # This way at least one of the steps in the compression will not be performed and the
         # compressed SMS will not be pure MET. 
@@ -474,8 +474,8 @@ class TheorySMS(GenericSMS):
         # (we set minmassgap slightly below maxCompMassDiff for numerical estability)
                     return self.massCompress(minmassgap=(0.999*maxCompMassDiff),
                                      minmassgapISR=minmassgapISR)
-        else:
-            return newSMS
+
+        return newSMS
 
     def invisibleCompress(self):
         """
