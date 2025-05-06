@@ -1,9 +1,8 @@
 Release v3.1.0, xxx
 =======================================================
 
-  * Introduced minmassgapISR parameter for controling the mass compression leading to ISR signatures
-  * Small fixes in analyses combinations, better handling of exceptions in likelihood computations
-
+  * Introduced minmassgapISR parameter for controlling the mass compression for ISR topologies
+  * Small fixes in analyses combinations, better handling exceptions in likelihood computations
 
 Release v3.0.3.post1, Mon 10 Mar 2025
 =======================================================

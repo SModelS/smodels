@@ -37,9 +37,8 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controling the mass compression leading to ISR signatures
-  * Small fixes in analyses combinations, better handling of exceptions in likelihood 
-computations
+  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies
+  * Small fixes in analyses combinations, better handling exceptions in likelihood computations
 
 New in Version 3.0.3.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
