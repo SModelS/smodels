@@ -1,5 +1,5 @@
  * docutils>=0.3
- * numpy>=1.22.0
+ * numpy>=1.26.0
  * scipy>=1.0.0
  * sympy>=1.0.0
  * unum>=4.0.0
