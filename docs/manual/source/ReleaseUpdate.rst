@@ -37,7 +37,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies
+  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations
   * |database| extension: CMS-EXO-20-004
 
