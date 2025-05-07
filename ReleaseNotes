@@ -3,6 +3,7 @@ Release v3.1.0, xxx
 
   * Introduced minmassgapISR parameter for controlling the mass compression for ISR topologies
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations
+  * Database extension: CMS-EXO-20-004
 
 Release v3.0.3.post1, Mon 10 Mar 2025
 =======================================================

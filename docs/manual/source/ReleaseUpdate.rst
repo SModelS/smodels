@@ -39,6 +39,7 @@ New in Version 3.1.0:
 
   * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations
+  * |database| extension: CMS-EXO-20-004
 
 New in Version 3.0.3.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
