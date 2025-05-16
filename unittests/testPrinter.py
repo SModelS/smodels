@@ -73,7 +73,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlNew)
         comp = compareXML(xmlDefault, xmlNew,
                       allowedRelDiff=0.05,
-                      ignore=['input_file', 'smodels_version', 'ncpus'])
+                      ignore=['input_file', 'smodels_version', 'database_version', 'ncpus'])
         if not comp:
             logger.error ( f"{outputfile} and {defFile} differ!" )
         self.assertTrue(comp)
@@ -131,7 +131,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         ret = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05, 
-               ignore=['input_file', 'smodels_version', 'ncpus' ] )
+               ignore=['input_file', 'smodels_version', 'database_version', 'ncpus' ] )
         if not ret:
             logger.error ( f"difference between {defFile} and {outputfile}" )
 
@@ -186,7 +186,7 @@ class RunPrinterTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         equals = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05,
-                            ignore=['input_file', 'smodels_version', 'ncpus'])
+                            ignore=['input_file', 'smodels_version', 'database_version', 'ncpus'])
         if not equals:
             logger.error ( f"{outputfile}!={defaultfile}" )
 
