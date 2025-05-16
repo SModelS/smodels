@@ -559,7 +559,9 @@ def setExperimentalFeatures(featuresDict):
         if not feature in runtime._experimental:
             logger.warning ( f"'{feature}' is not a known experimental feature. will ignore." )
             continue
-        flag = bool(featuresDict[feature])
+        flag = False
+        if featuresDict[feature].lower() in [ "true", "1", "yes" ]:
+           flag = True
         runtime._experimental[feature]=flag
 
 def getAllInputFiles(inFile):
