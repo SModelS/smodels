@@ -151,15 +151,15 @@ Below we give more detailed information about each entry in the parameters file.
     * **combineAnas** (list of results): list of analysis IDs to be combined. *All the analyses are assumed to be fully uncorrelated*, so use with caution! Available from v2.2.0 onwards.
 
 
-* *experimentalFeatures*: enable specific features that are not (yet) considered part of SModelS. use with care!
+* *experimentalFeatures*: enable specific features that are not (yet) considered part of SModelS. Use with care!
 
 .. _parameterTruncatedGaussians:
 
-  * **truncatedgaussians** (True/False): set to True to enable truncated gaussian as approximate likelihoods for UL-based results
+  * **truncatedgaussians** (True/False): set to True to enable truncated gaussian as approximate likelihoods for UL-based results. Use at your own risk!
 
 .. _parameterSpey:
 
-  * **spey** (True/False): set to True to enable experimental spey interface
+  * **spey** (True/False): set to True to enable experimental spey interface. Use at your own risk!
 
 .. _parameterFileParticles:
 
