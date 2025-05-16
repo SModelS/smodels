@@ -31,7 +31,7 @@ def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()
     keywords = [ "cpp", "nllfast", "pythia", "xsec", "interactiveplot",
-                 "server", "loadlatest", "notebook", "recipes" ]
+                 "server", "loadlatest", "notebook", "recipes", "resummino" ]
     for keyword in keywords:
         if keyword in t:
             return False
