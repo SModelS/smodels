@@ -98,10 +98,10 @@ class RFailsTest(unittest.TestCase):
         warnings.filterwarnings( action='ignore', category=RuntimeWarning )
         out = "./unitTestOutput"
         dirname = "./testFiles/rfails/"
-        from smodels.statistics import pyhfInterface
+        # from smodels.statistics import pyhfInterface
 
         # Reduce the number of attempts 
-        pyhfInterface.nattempts_max = 5
+        # pyhfInterface.nattempts_max = 5
         database = Database('official')
         runMain(dirname,inifile='testParameters_rfails.ini',
                              overridedatabase = database,suppressStdout=True )
