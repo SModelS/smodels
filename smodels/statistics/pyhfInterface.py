@@ -1202,7 +1202,11 @@ class PyhfUpperLimitComputer:
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
             logger.debug("Starting brent bracketing")
-            ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = optimize.toms748(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3, full_output=True )
+            if ul[1].converged:
+                ul = ul[0]
+            else:
+                ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale

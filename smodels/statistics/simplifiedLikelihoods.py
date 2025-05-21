@@ -487,7 +487,11 @@ class LikelihoodComputer:
             if upper_v < 0.0:
                 logger.debug("did not find an upper value with rootfinder(upper) > 0.")
                 return self.extendedOutput(extended_output, 0.0)
-            mu_hat = optimize.brentq(self.dNLLdMu, lower, upper, args=(theta_hat, ), rtol=1e-9)
+            mu_hat = optimize.toms748(self.dNLLdMu, lower, upper, args=(theta_hat, ), rtol=1e-9, full_output = True )
+            if mu_hat[1].converged:
+                mu_hat = mu_hat[0]
+            else:
+                mu_hat = optimize.brentq(self.dNLLdMu, lower, upper, args=(theta_hat, ), rtol=1e-9)
             if not allowNegativeSignals and mu_hat < 0.0:
                 mu_hat = 0.0
                 theta_hat, _ = self.findThetaHat(mu_hat)
@@ -1029,7 +1033,11 @@ class UpperLimitComputer:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=False )
         except SModelSError as e:
             return None
-        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        mu_lim = optimize.toms748(clsRoot, a, b, rtol=1e-03, xtol=1e-06, full_output = True )
+        if mu_lim[1].converged:
+            mu_lim = mu_lim[0]
+        else:
+            mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         logger.debug ( f"muhat={mu_hat}+-{sigma_mu} a,b={a,b} mu_lim={mu_lim}" )
         return mu_lim
 

@@ -210,8 +210,13 @@ class TruncatedGaussians:
         except ValueError as e:
             logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
             logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
-            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02)
-            logger.error ( f"retry with tol=1e-2 seemed to have worked" )
+            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02, full_output = True )
+            if muhat[1].converged:
+                muhat = muhat[0]
+                logger.error ( f"retry with tol=1e-2 seemed to have worked" )
+            else:
+                muhat = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
+                logger.error ( f"retry with brentq seemed to have worked" )
         return muhat
 
     def _computeLlhd( self, mu, muhat, return_nll):

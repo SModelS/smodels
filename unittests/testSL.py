@@ -197,7 +197,7 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual ( muhat, 1., 5 )
         self.assertAlmostEqual ( sigma_mu, 0.655333438756686, 5 )
         # self.assertAlmostEqual ( lComp.sigma_mu, 0.6123724356957945 )
-        self.assertAlmostEqual ( ulProf, 2.4412989438119546, 5 )
+        self.assertAlmostEqual ( ulProf, 2.441164052041879, 5 )
         # self.assertAlmostEqual ( ulProf, 2.537934980801342, 5 )
 
 
