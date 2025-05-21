@@ -14,9 +14,9 @@ import jsonpatch
 import warnings
 import jsonschema
 import copy
-from scipy import optimize
 import numpy as np
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import findRoot
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
@@ -1201,12 +1201,7 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            logger.debug("Starting brent bracketing")
-            ul = optimize.toms748(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3, full_output=True )
-            if ul[1].converged:
-                ul = ul[0]
-            else:
-                ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = findRoot ( clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3 )
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale

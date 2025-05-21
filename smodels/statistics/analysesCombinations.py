@@ -14,7 +14,8 @@
 import numpy as np
 from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
+from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
+     findRoot
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
@@ -213,11 +214,7 @@ class AnaCombLikelihoodComputer(object):
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                                      allowNegative = allowNegativeSignals )
-        mu_lim = optimize.toms748(clsRoot, a, b, rtol=1e-03, xtol=1e-06, full_output=True)
-        if mu_lim[1].converged:
-            mu_lim = mu_lim[0]
-        else:
-            mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False, allowNegativeSignals= False):
