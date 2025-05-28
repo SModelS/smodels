@@ -84,8 +84,11 @@ def unzip():
                 member_path = os.path.join(path, member.name)
                 if not is_within_directory(path, member_path):
                     raise Exception("Attempted Path Traversal in Tar File")
-
-            tar.extractall(path,filter="data") # , members, numeric_owner
+            if sys.version_info.major >= 3 and sys.version_info.minor >= 12:
+                # python >= 3.12 wants us to specify a filter!
+                tar.extractall(path,filter="data")
+            else:
+                tar.extractall(path)
 
 
         safe_extract(f)
