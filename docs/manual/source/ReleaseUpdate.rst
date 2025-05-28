@@ -40,6 +40,7 @@ New in Version 3.1.0:
   * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations
   * Slightly different way of finding upper limits, UL computations may vary slightly numerically
+  * Bumped up pythia8 from 8308 to 8315
   * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM)
 
 New in Version 3.0.3.post1:
