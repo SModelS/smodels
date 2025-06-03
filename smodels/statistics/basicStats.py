@@ -13,6 +13,7 @@ from smodels.base.smodelsLogging import logger
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text
+from collections.abc import Callable
 
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 

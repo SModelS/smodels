@@ -14,9 +14,9 @@ import jsonpatch
 import warnings
 import jsonschema
 import copy
-from scipy import optimize
 import numpy as np
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import findRoot
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
@@ -683,7 +683,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if True and workspace_index in self.data.cached_likelihoods[expected] and \
+        if workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
 
@@ -1304,14 +1304,11 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            logger.debug("Starting brent bracketing")
-            ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = findRoot ( clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3 )
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
-            #if expected == "posteriori":
-            #    print ( f"@@pyhfInterface.getUpperLimitOnMu r={1./ul:.3f} expected {expected}" )
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
