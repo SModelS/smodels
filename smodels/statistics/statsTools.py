@@ -10,7 +10,7 @@
 
 """
 
-__all__ = [ "StatsComputer" ]
+__all__ = [ "StatsComputer", "getStatsComputerModule" ]
 
 from typing import Union, Text, Dict, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
@@ -23,6 +23,17 @@ from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from typing import Union, Text
+
+def getStatsComputerModule():
+    """ very single convenience function to centralize
+    switching between our stats code and spey. """
+    from smodels.base import runtime
+    if runtime._experimental["spey"]:
+        from smodels.statistics.speyTools import SpeyComputer as StatsComputer
+        return StatsComputer
+    else:
+        from smodels.statistics.statsTools import StatsComputer
+        return StatsComputer
 
 class StatsComputer:
     __slots__ = [ "nsig", "dataObject", "dataType", "likelihoodComputer", "data",
@@ -230,7 +241,7 @@ class StatsComputer:
 
     def addRegionsForNN ( self, regions : dict, translator : dict,
                           nsignals : dict ):
-        """ for neural networks, add the regions information contained 
+        """ for neural networks, add the regions information contained
         in dict to translator, and to nsignals
         """
         for region in regions:
@@ -285,12 +296,12 @@ class StatsComputer:
         # Filtering the json files by looking at the available datasets
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
-            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ): 
+            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ):
                 if not isinstance(region,dict):
                     raise SModelSError("The jsonFiles field should contain lists \
                                        of strings or dictionaries \
                                        (%s is not allowed)" %type(region))
-                
+
                 globalInfo.jsonFiles[jsName][ir] = region
                 if region['type'] == 'SR':
                     jsonSRs.append(region['smodels'])
