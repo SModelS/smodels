@@ -57,12 +57,12 @@ def CLsfromNLL(
 
     return CLs - 0.05
 
-def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args : tuple = (), 
+def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args : tuple = (),
                rtol : float = 8.881784197001252e-16, xtol : float = 2e-12 ) -> float:
-    """ find the root of the function "func", within [lower_bound,upper_bound]. 
+    """ find the root of the function "func", within [lower_bound,upper_bound].
     We first try the faster toms748. If that doesnt converge, we fall back to brentq.
     :param func: the callable function to find the root for
-    :param lower_bound: lower end of bracket 
+    :param lower_bound: lower end of bracket
     :param upper_bound: upper end of bracket
     :param rtol: rtol for both toms748 and brentq
     :param xtol: xtol for both toms748 and brentq
@@ -70,7 +70,7 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args :
     """
     logger.debug("Starting root finding")
     from scipy import optimize
-    root = optimize.toms748( func, lower_bound, upper_bound, args=args, rtol=rtol, 
+    root = optimize.toms748( func, lower_bound, upper_bound, args=args, rtol=rtol,
                              xtol=xtol, full_output=True )
     if root[1].converged:
         root = root[0]
