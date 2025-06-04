@@ -1219,8 +1219,8 @@ class PyhfUpperLimitComputer:
                 if asimovIsExpected:
                     ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
                 else:
-                    # ret = clsRootPyhf(mu) ## thats the actual pyhf version
-                    ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
+                    ret = clsRootPyhf(mu) ## thats the actual pyhf version
+                    # ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
                     if False: # expected == "posteriori":
                        print ( f"@@pyhfInterface clsRoot expected {expected} mu {mu:.3f} ret={ret}" ) # pyhf {ret} asimov {ret2}" )
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
