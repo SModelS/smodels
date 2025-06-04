@@ -14,9 +14,9 @@ import jsonpatch
 import warnings
 import jsonschema
 import copy
-from scipy import optimize
 import numpy as np
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import findRoot
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
@@ -301,13 +301,20 @@ class PyhfData:
             smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             if "observations" in ws:
                 self.updatePyhfNames ( jsName, ws["observations"] )
+                patchedChannels = set()
+                allChannels = set ( [ x["name"] for x in ws["observations"] ] )
                 for i_r, region in enumerate ( self.jsonFiles[jsName] ):
                     for i_ch, ch in enumerate(ws["observations"]):
                         ## create a patch for the region, but only if channel matches
                         patch, patchType = self.createPatchForRegion ( region, i_ch, ch, jsName )
                         if patch != None:
                             wsChannelsInfo[patchType].append(patch)
+                            patchedChannels.add ( ch['name'] )
                             break
+                if allChannels != patchedChannels:
+                    logger.error ( f"could not patch {' '.join(allChannels-patchedChannels)} for {jsName}. Check the database!" )
+                    # sys.exit()
+
 
             wsChannelsInfo["otherRegions"].sort(
                 key=lambda path: int(path['path'].split("/")[-1]), reverse=True
@@ -676,7 +683,7 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if True and workspace_index in self.data.cached_likelihoods[expected] and \
+        if workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
 
@@ -1212,8 +1219,8 @@ class PyhfUpperLimitComputer:
                 if asimovIsExpected:
                     ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
                 else:
-                    # ret = clsRootPyhf(mu) ## thats the actual pyhf version
-                    ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
+                    ret = clsRootPyhf(mu) ## thats the actual pyhf version
+                    # ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
                     if False: # expected == "posteriori":
                        print ( f"@@pyhfInterface clsRoot expected {expected} mu {mu:.3f} ret={ret}" ) # pyhf {ret} asimov {ret2}" )
                 # print ( f"@@X compare {old},{ret} (expected={expected})" )
@@ -1297,14 +1304,11 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            logger.debug("Starting brent bracketing")
-            ul = optimize.brentq(clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3)
+            ul = findRoot ( clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3 )
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
             self.data.cachedULs[expected][workspace_index] = ul
-            #if expected == "posteriori":
-            #    print ( f"@@pyhfInterface.getUpperLimitOnMu r={1./ul:.3f} expected {expected}" )
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":

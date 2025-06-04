@@ -12,7 +12,6 @@ from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.statsTools import StatsComputer
 from typing import Union, Text, Dict
 import numpy as np
 
@@ -144,6 +143,9 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
+        from smodels.statistics.statsTools import getStatsComputerModule
+        StatsComputer = getStatsComputerModule()
+
         if self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
             if not experimentalFeature( "truncatedGaussians" ):
@@ -521,11 +523,14 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         upper limits), set the computer to 'N/A'.
         """
 
+
         # First make sure all theory predictions in the combiner
         # have well-defined stats models
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
             computer = 'N/A'
         else:
+            from smodels.statistics.statsTools import getStatsComputerModule
+            StatsComputer = getStatsComputerModule()
             computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
 
         self._statsComputer = computer
