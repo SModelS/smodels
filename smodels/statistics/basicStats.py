@@ -88,20 +88,21 @@ def CLsfromNLL(
     qmu = 0.0 if big_muhat else qmu
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
-    if qA < 0.0:
+    if qA < 0:
         qA = 0.0
+    qA = 0.0 if big_muhat else qA # added by RM
     sqA = np.sqrt(qA)
-    #print ( f"@@X my big_muhat {big_muhat}" )
-    #print ( f"@@X my qmu {qmu} qmu_A {qA}" )
-    #print ( f"@@X my sqmu {sqmu} sqmu_A {sqA} condition {sqmu<=sqA}" )
+    # print ( f"@@X my big_muhat {big_muhat}" )
+    # print ( f"@@X my qmu {qmu} qmu_A {qA}" )
+    # print ( f"@@X my sqmu {sqmu} sqmu_A {sqA} condition {sqmu<=sqA}" )
     if sqmu <= sqA:
         CLsb = 1.0 - stats.norm.cdf(sqmu)
         CLb = stats.norm.cdf(sqA - sqmu)
     else:
         CLsb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA))
         CLb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA))
-        #print ( f"@@X my old for CLsb i evaluate at {qmu/(2*sqA)}+{qA/(2*sqA)}: {CLsb}" )
-        #print ( f"@@X my old for CLb i evaluate at {qmu/(2*sqA)}-{qA/(2*sqA)}: {CLb}" )
+        # print ( f"@@X my old for CLsb i evaluate at {qmu/(2*sqA)}+{qA/(2*sqA)}: {CLsb}" )
+        # print ( f"@@X my old for CLb i evaluate at {qmu/(2*sqA)}-{qA/(2*sqA)}: {CLb}" )
         #CLsb = 1.0 if qA == 0.0 else 0.5
         #CLb = 1.0 if qA == 0.0 else stats.norm.cdf( sqA )
         #print ( f"@@X my new for CLsb i evaluate at {sqA}: {CLb}" )
