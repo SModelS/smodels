@@ -22,7 +22,6 @@ logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
 from typing import Dict, List
-from smodels_utils.helper.terminalcolors import *
 
 jsonver = ""
 try:
@@ -58,7 +57,7 @@ pyhfinfo = {
 }
 
 def setBackend ( backend : str ) -> bool:
-    """
+    """ 
     try to setup backend to <backend>
 
     :param backend: one of: numpy (default), pytorch, jax, tensorflow
@@ -1076,18 +1075,7 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def clsRootTevatron(mu : float ) -> float:
-                """ compute CLs, the tevatron way. """
-                nll_sb = self.likelihood ( mu, expected = expected, return_nll=True )
-                nll_b = self.likelihood ( 0, expected = expected, return_nll=True )
-                from smodels.statistics.basicStats import CLsfromLsb, getNumericalVariance
-                sigma2_b = getNumericalVariance ( self, 0. )
-                sigma2_sb = getNumericalVariance ( self, mu )
-                CLs = CLsfromLsb(nll_sb, nll_b, sigma2_sb, sigma2_b, return_type="CLs" )
-                return 1.0 - self.cl - CLs
-
-            def clsRootPyhf(mu : float ) -> float:
-                """ thats the original code to get cls from pyhf """
+            def clsRoot(mu : float ) -> float:
                 # If expected == False, use unmodified (but patched) workspace
                 # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
                 # If expected == posteriori, use unmodified (but patched) workspace
@@ -1116,10 +1104,11 @@ class PyhfUpperLimitComputer:
                     with np.testing.suppress_warnings() as sup:
                         if pyhfinfo["backend"] == "numpy":
                             sup.filter(RuntimeWarning, r"invalid value encountered in log")
+                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                        # ic ( workspace["channels"][0]["samples"][0]["data"] )
+                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
-                            args["return_tail_probs"]=True
-                            ret = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                            result = ret[0]
+                            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
                             result = float("nan")
@@ -1133,103 +1122,13 @@ class PyhfUpperLimitComputer:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         try:
                             CLs = float(result[1].tolist())
-                        except (TypeError,IndexError):
-                            # CLs = float(result[1][0])
-                            CLs = float(result)
+                        except TypeError:
+                            CLs = float(result[1][0])
                     else:
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         CLs = float(result)
                     # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
-                    # print ( f"@@ their CLs is {CLs}" )
                     return 1.0 - self.cl - CLs
-
-            def clsRootAsimov(mu : float ) -> float:
-                """ here is our code that allows to plug in different data """
-                # If expected == False, use unmodified (but patched) workspace
-                # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
-                # If expected == posteriori, use unmodified (but patched) workspace
-                workspace = self.updateWorkspace(workspace_index, expected=expected)
-                workspace_expected = self.updateWorkspace(workspace_index, expected=True)
-                # Same modifiers_settings as those use when running the 'pyhf cls' command line
-                msettings = {
-                    "normsys": {"interpcode": "code4"},
-                    "histosys": {"interpcode": "code4p"},
-                }
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
-                    model = workspace.model(modifier_settings=msettings)
-                    bounds = model.config.suggested_bounds()
-                    bounds[model.config.poi_index] = (0, 10)
-                    start = time.time()
-                    args = {}
-                    args["return_expected"] = expected == "posteriori"
-                    args["par_bounds"] = bounds
-                    # args["maxiter"]=100000
-                    pver = float(pyhf.__version__[:3])
-                    stat = "qtilde"
-                    if pver < 0.6:
-                        args["qtilde"] = True
-                    else:
-                        args["test_stat"] = stat
-                    with np.testing.suppress_warnings() as sup:
-                        if pyhfinfo["backend"] == "numpy":
-                            sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                        try:
-                            pars = model.config.suggested_init()
-                            # look at test_statistics:_tmu_like!!
-                            tnll = pyhf.infer.mle.fixed_poi_fit(mu, workspace.data(model), model, return_fitted_val=True )
-                            nll = float ( tnll[1] ) / 2.
-                            asimov_data = pyhf.infer.calculators.generate_asimov_data ( 0., workspace.data(model), model, None, None, None )
-                            tnllA = pyhf.infer.mle.fixed_poi_fit(mu, asimov_data, model, return_fitted_val=True )
-                            nllA = float ( tnllA[1] ) / 2.
-
-                            muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
-                                return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                            nll0 = maxNllh / 2.
-                            muhatA, maxNllhA, o = pyhf.infer.mle.fit(asimov_data, model,
-                                return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
-                            nll0A = maxNllhA / 2.
-
-                            from smodels.statistics.basicStats import CLsfromNLL
-                            big_muhat = (muhat[model.config.poi_index]>mu)
-                            ret = CLsfromNLL (nllA, nll0A, nll, nll0, \
-                                    big_muhat, return_type="CLs", return_tail_probs = True )
-                            cls = ret["ret"]
-                            if False and expected == "posteriori" and abs(mu-.762)<.1:
-                                print ( f"@@pyhfInterface {GREEN}data {workspace.data(model)[:10]}{RESET}" )
-                                print ( f"@@pyhfInterface.clsRoot {GREEN}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {muhat[model.config.poi_index]:.3f} alpha-cls {.05-cls}{RESET}" )
-                                # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
-
-                            end = time.time()
-                            return 1.0 - self.cl - cls
-                            
-                        except Exception as e:
-                            logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
-                            return None
-                    return None
-
-            def clsRoot ( mu : float ):
-                """ central 'switch' for how to compute cls """
-                from smodels.base import runtime
-                useTevatron = runtime.experimentalFeature ( "tevatroncls" )
-                if useTevatron:
-                    return clsRootTevatron(mu)
-                asimovIsExpected = runtime.experimentalFeature ( "asimovisexpected" )
-                #print ( f"@@x ----- starting mu={mu} expected={expected}" )
-                if asimovIsExpected:
-                    ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
-                else:
-                    ret = clsRootPyhf(mu) ## thats the actual pyhf version
-                    # ret = clsRootAsimov(mu) ## this one plugs in the expected values for asimov
-                    if False: # expected == "posteriori":
-                       print ( f"@@pyhfInterface clsRoot expected {expected} mu {mu:.3f} ret={ret}" ) # pyhf {ret} asimov {ret2}" )
-                # print ( f"@@X compare {old},{ret} (expected={expected})" )
-                #if abs ( ( old - ret ) / ( old + ret ) ) > 1e-9:
-                #    # pass
-                #    print ( f"@@ clsRoot values differ: {old}!={ret}. stopping." )
-                #    sys.exit()
-                # print ( f"@@x -----------" )
-                return ret
 
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
