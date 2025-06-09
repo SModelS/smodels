@@ -75,8 +75,10 @@ download_file() {
 }
 
 if [ ! -d "$install_dir/lhapdf" ]; then
-    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    tar xf "LHAPDF-$LHAPDF_VERSION.tar.gz"
+#    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    download_file "https://gitlab.com/hepcedar/lhapdf/-/archive/lhapdf-$LHAPDF_VERSION/lhapdf-lhapdf-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    tar xzf "LHAPDF-$LHAPDF_VERSION.tar.gz"
+	  mv "lhapdf-lhapdf-$LHAPDF_VERSION" "LHAPDF-$LHAPDF_VERSION"
     cd "LHAPDF-$LHAPDF_VERSION"
     ./configure --prefix=$install_dir/lhapdf --disable-python
     make -j"$num_cores_to_use"
