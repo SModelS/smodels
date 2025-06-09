@@ -96,7 +96,7 @@ fi
 if [ ! -d "$install_dir/lhapdf" ]; then
     if ! download_and_install_lhapdf "https://smodels.github.io/resummino/LHAPDF-$LHAPDF_VERSION.tar.gz"; then
         echo "Failed to download from smodels.github.io, trying hepforge.org..."
-        download_and_install_lhapdf "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz"
+        download_and_install_lhapdf "https://gitlab.com/hepcedar/lhapdf/-/archive/lhapdf-$LHAPDF_VERSION/lhapdf-lhapdf-$LHAPDF_VERSION.tar.gz"
     fi
 fi
 
