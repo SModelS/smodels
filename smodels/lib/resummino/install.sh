@@ -75,13 +75,18 @@ download_file() {
 }
 
 download_and_install_lhapdf() {
+    cd $install_dir
     download_file "$1" "LHAPDF-$LHAPDF_VERSION.tar.gz"
     tar xzf "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    if [ ! -d "LHAPDF-$LHAPDF_VERSION" ]; then
+        echo "LHAPDF-$LHAPDF_VERSION directory missing, something went wrong. exiting."
+        exit -1
+    fi
     cd "LHAPDF-$LHAPDF_VERSION"
     ./configure --prefix=$install_dir/lhapdf --disable-python
     make -j"$num_cores_to_use"
     make install
-    cd ..
+    cd $install_dir
     download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" "PDF4LHC21_40.tar.gz"
     tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
     cd $install_dir
@@ -110,6 +115,7 @@ download_and_install_resummino() {
         make -j"$num_cores_to_use"
         make install
         cd ..
+		    cp $install_dir/resummino-$RESUMMINO_VERSION/bin/resummino $install_dir/resummino_install/bin/
         return 0
     else
         return 1
