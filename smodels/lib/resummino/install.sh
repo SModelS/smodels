@@ -74,9 +74,8 @@ download_file() {
     fi
 }
 
-if [ ! -d "$install_dir/lhapdf" ]; then
-#    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    download_file "https://gitlab.com/hepcedar/lhapdf/-/archive/lhapdf-$LHAPDF_VERSION/lhapdf-lhapdf-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+download_and_install_lhapdf() {
+    download_file "$1" "LHAPDF-$LHAPDF_VERSION.tar.gz"
     tar xzf "LHAPDF-$LHAPDF_VERSION.tar.gz"
 	  mv "lhapdf-lhapdf-$LHAPDF_VERSION" "LHAPDF-$LHAPDF_VERSION"
     cd "LHAPDF-$LHAPDF_VERSION"
@@ -87,20 +86,12 @@ if [ ! -d "$install_dir/lhapdf" ]; then
     download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" "PDF4LHC21_40.tar.gz"
 	  tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
     cd $install_dir
-fi
-
-download_and_install_lhapdf() {
-    download_file "$1" "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    tar xf "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    cd "LHAPDF-$LHAPDF_VERSION" || { echo "Error: Unable to change directory to LHAPDF-$LHAPDF_VERSION"; return 1; }
-    ./configure --prefix=$install_dir/lhapdf --disable-python
-    make -j"$num_cores_to_use"
-    make install
-    cd ..
-    download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" "PDF4LHC21_40.tar.gz"
-	  tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
-    cd $install_dir
 }
+
+if [ ! -d "$install_dir/lhapdf" ]; then
+#    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    download_and_install_lhapdf "https://gitlab.com/hepcedar/lhapdf/-/archive/lhapdf-$LHAPDF_VERSION/lhapdf-lhapdf-$LHAPDF_VERSION.tar.gz"
+fi
 
 if [ ! -d "$install_dir/lhapdf" ]; then
     if ! download_and_install_lhapdf "https://smodels.github.io/resummino/LHAPDF-$LHAPDF_VERSION.tar.gz"; then
