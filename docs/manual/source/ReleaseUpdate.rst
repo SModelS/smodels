@@ -41,6 +41,7 @@ New in Version 3.1.0:
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations
   * Slightly different way of finding upper limits, UL computations may vary slightly numerically
   * Bumped up pythia8 from 8308 to 8315
+  * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
   * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM)
 
 New in Version 3.0.3.post1:

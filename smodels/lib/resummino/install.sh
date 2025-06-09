@@ -1,7 +1,7 @@
 #!/bin/bash
 
 install_dir=$PWD
-LHAPDF_VERSION="6.5.4"
+LHAPDF_VERSION="6.5.5"
 RESUMMINO_VERSION="3.1.2"
 
 mkdir -p $install_dir
