@@ -77,7 +77,7 @@ download_file() {
 download_and_install_lhapdf() {
     download_file "$1" "LHAPDF-$LHAPDF_VERSION.tar.gz"
     tar xzf "LHAPDF-$LHAPDF_VERSION.tar.gz"
-	  mv "lhapdf-lhapdf-$LHAPDF_VERSION" "LHAPDF-$LHAPDF_VERSION"
+    mv "lhapdf-lhapdf-$LHAPDF_VERSION" "LHAPDF-$LHAPDF_VERSION"
     cd "LHAPDF-$LHAPDF_VERSION"
     ./configure --prefix=$install_dir/lhapdf --disable-python
     make -j"$num_cores_to_use"
@@ -95,7 +95,7 @@ fi
 
 if [ ! -d "$install_dir/lhapdf" ]; then
     if ! download_and_install_lhapdf "https://smodels.github.io/resummino/LHAPDF-$LHAPDF_VERSION.tar.gz"; then
-        echo "Failed to download from smodels.github.io, trying hepforge.org..."
+        echo "Failed to download from smodels.github.io, trying gitlab.com ..."
         download_and_install_lhapdf "https://gitlab.com/hepcedar/lhapdf/-/archive/lhapdf-$LHAPDF_VERSION/lhapdf-lhapdf-$LHAPDF_VERSION.tar.gz"
     fi
 fi
