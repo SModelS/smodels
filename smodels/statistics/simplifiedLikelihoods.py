@@ -948,8 +948,7 @@ class UpperLimitComputer:
         plus mu_hat and sigma_mu
 
         :param model: statistical model
-        :param expected: EvaluationType: observed: compute observed, apriori: compute a priori expected, \
-            aposteriori: compute a posteriori expected
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """

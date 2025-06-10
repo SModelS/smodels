@@ -23,6 +23,7 @@ from smodels.experiment.expSMS import ExpSMS
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.txnameDataObj import TxNameData
 from smodels.experiment.reweighting import defaultEffReweight, defaultULReweight
+from smodels.statistics.basicStats import EvaluationType
 import numpy as np
 import unum
 import math
@@ -809,7 +810,7 @@ class TxName(object):
         else:
             return fillvalue
 
-    def getULFor(self, sms, expected=False, mass=None):
+    def getULFor(self, sms, expected : EvaluationType = EvaluationType.observed, mass=None):
         """
         Returns the upper limit (or expected) for SMS (only for upperLimit-type).
         Includes the lifetime reweighting (ul/reweight).
@@ -842,7 +843,7 @@ class TxName(object):
                      else m for m in massFlat]
             reweightF = 1.0
 
-        if not expected:
+        if expected == EvaluationType.observed:
             ul = self.txnameData.getValueFor(point)
         else:
             if not self.txnameDataExp:

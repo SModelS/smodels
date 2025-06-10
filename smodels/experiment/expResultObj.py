@@ -14,6 +14,7 @@ from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, cleanWalk
+from smodels.statistics.basicStats import EvaluationType
 
 try:
     import cPickle as serializer
@@ -215,7 +216,7 @@ class ExpResult(object):
         # nothing found? default is: False
         return False
 
-    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
+    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected : EvaluationType = EvaluationType.observed,
                          txname=None, sms=None, compute=False, mass=None):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
