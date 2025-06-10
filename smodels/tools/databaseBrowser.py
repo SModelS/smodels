@@ -13,6 +13,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom,getValuesForObj
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.databaseObj import Database,ExpResult
+from smodels.statistics.basicStats import EvaluationType
 
 #logger.setLevel(level=logging.INFO)
 
@@ -137,7 +138,7 @@ class Browser(object):
 
         return expres.getEfficiencyFor(txname=txname, mass=massarray, dataset=dataset)
 
-    def getULFor(self,expid,txname,massarray, expected=False ):
+    def getULFor(self,expid,txname,massarray, expected : EvaluationType = EvaluationType.observed ):
         """
         Get an upper limit for the given experimental id, the txname,
         and the massarray.
