@@ -20,6 +20,7 @@ from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLi
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
+from smodels.statistics.basicStats import EvaluationType
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from typing import Union, Text
 
@@ -135,13 +136,13 @@ class StatsComputer:
             return None
 
         eul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=True
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=EvaluationType.apriori
         )
         if eul is None:
             return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=EvaluationType.observed
         ) / theorypred.xsection
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
@@ -305,7 +306,7 @@ class StatsComputer:
                                                             deltas_rel=self.deltas_sys)
         self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
 
-    def get_five_values ( self, expected : Union [ bool, Text ],
+    def get_five_values ( self, expected : EvaluationType,
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """
@@ -349,7 +350,7 @@ class StatsComputer:
 
         return ret
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
+    def likelihood ( self, poi_test : float, expected : EvaluationType,
                             return_nll : bool ) -> float:
         """ simple frontend to individual computers """
         self.transform ( expected )
@@ -368,7 +369,7 @@ class StatsComputer:
         return self.likelihoodComputer.likelihood ( poi_test,
                                                 return_nll = return_nll, **kwargs)
 
-    def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
+    def CLs ( self, poi_test : float = 1., expected : EvaluationType = EvaluationType.observed ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( expected )
         if hasattr ( self.likelihoodComputer, "CLs" ):

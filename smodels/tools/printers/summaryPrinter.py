@@ -170,7 +170,7 @@ class SummaryPrinter(TxTPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = obj.getRValue()
-        r_expected = obj.getRValue(expected=True)
+        r_expected = obj.getRValue(expected=EvaluationType.apriori)
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )

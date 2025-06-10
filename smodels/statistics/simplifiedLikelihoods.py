@@ -15,11 +15,10 @@ from functools import reduce
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Optional, Union, Tuple
-from smodels.statistics.basicStats import findRoot
+from smodels.statistics.basicStats import findRoot, EvaluationType
 
 import numpy as np
-import math
-import copy
+import math, copy, sys
 
 try:
     from smodels.base.smodelsLogging import logger
@@ -289,17 +288,17 @@ class LikelihoodComputer:
         self.origModel = copy.deepcopy ( data )
         self.model = data
 
-    def transform ( self, expected : Union [ Text, bool ] ):
+    def transform ( self, expected : EvaluationType ):
         """ replace the actual observations with backgrounds,
             if expected is True or "posteriori" """
         # always start from scratch
         self.model = copy.deepcopy ( self.origModel )
-        if expected == False:
+        if expected == EvaluationType.observed:
             return
         self.model.observed = self.model.backgrounds
-        if expected == True:
+        if expected == EvaluationType.apriori:
             return
-        if not expected == "posteriori":
+        if not expected == EvaluationType.aposteriori:
             logger.error ( f"dont know the expected value {expected}" )
             sys.exit(-1)
         thetahat, _ = self.findThetaHat(0.)
@@ -913,7 +912,7 @@ class UpperLimitComputer:
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, model, expected=False, trylasttime=False
+        self, model, expected : EvaluationType = EvaluationType.observed, trylasttime : bool = False
     ):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -941,7 +940,7 @@ class UpperLimitComputer:
     def getCLsRootFunc(
         self,
         model: Data,
-        expected: Optional[Union[bool, Text]] = False,
+        expected: Optional[EvaluationType] = EvaluationType.observed,
         trylasttime: Optional[bool] = False,
     ) -> Tuple:
         """
@@ -949,8 +948,8 @@ class UpperLimitComputer:
         plus mu_hat and sigma_mu
 
         :param model: statistical model
-        :param expected: false: compute observed, true: compute a priori expected, \
-            "posteriori": compute a posteriori expected
+        :param expected: EvaluationType: observed: compute observed, apriori: compute a priori expected, \
+            aposteriori: compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
@@ -958,10 +957,10 @@ class UpperLimitComputer:
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
         oldmodel = model
-        if expected:
+        if expected in [ EvaluationType.aposteriori, EvaluationType.apriori ]:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
-            if expected == "posteriori":
+            if expected == EvaluationType.aposteriori:
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
@@ -1008,15 +1007,15 @@ class UpperLimitComputer:
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, model, expected=False, trylasttime=False
+        self, model, expected : EvaluationType = EvaluationType.observed, trylasttime : bool = False
     ):
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
         for each signal regio/dataset), by using
         the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
+        :params expected: evaluation type: if observed, compute observed,
+                          apriori: compute a priori expected, aposteriori:
                           compute a posteriori expected
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on the signal strength multiplier mu
@@ -1037,7 +1036,7 @@ class UpperLimitComputer:
     def computeCLs(
         self,
         model: Data,
-        expected: Union[bool, Text] = False,
+        expected: Union[EvaluationType] = EvaluationType.observed,
         trylasttime: bool = False,
         return_type: Text = "1-CLs",
     ) -> float:
@@ -1045,9 +1044,9 @@ class UpperLimitComputer:
         Compute the exclusion confidence level of the model (1-CLs).
 
         :param model: statistical model
-        :param expected: if false, compute observed,
-                         true: compute a priori expected, "posteriori":
-                         compute a posteriori expected
+        :params expected: evaluation type: if observed, compute observed,
+                          apriori: compute a priori expected, aposteriori:
+                          compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
                             CLs-alpha: returns CLs - 0.05 (alpha)

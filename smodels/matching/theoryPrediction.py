@@ -312,6 +312,7 @@ class TheoryPrediction(object):
     @whenDefined
     def muhat(self, expected : EvaluationType = EvaluationType.observed ):
         """position of maximum likelihood"""
+        assert type(expected) == EvaluationType, "use evaluation types!"
 
         if not "muhat" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
@@ -460,8 +461,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # Now sort by highest priority and then by highest expected r-value:
         selectedTPs = sorted(
             selectedTPs, key=lambda tp: (priority[tp.dataType()],
-                                         tp.getRValue(expected=True) is not None,
-                                         tp.getRValue(expected=True))
+                                         tp.getRValue(expected=EvaluationType.apriori) is not None,
+                                         tp.getRValue(expected=EvaluationType.apriori))
         )
         # Now get a single TP for each result
         # (the highest ranking analyses with r != None come last and are kept in the dict)
@@ -534,7 +535,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         self._statsComputer = computer
 
-    def getLlhds(self,muvals,expected=False,normalize=True):
+    def getLlhds(self,muvals,expected : EvaluationType = EvaluationType.observed, normalize : bool = True):
         """
         Facility to access the likelihoods for the individual analyses and the combined
         likelihood.
@@ -882,7 +883,7 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec/dataset.getSRUpperLimit(expected=True)).asNumber()
+        expectedR = (xsec/dataset.getSRUpperLimit(expected=EvaluationType.apriori)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred

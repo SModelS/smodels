@@ -41,10 +41,8 @@ class BasicPrinter(object):
     def getTypeOfExpected(self):
         """ tiny convenience function for what expected values to print,
             apriori (True) or posteriori """
-        expected = True
-        if self.typeofexpectedvalues == "posteriori":
-            expected = "posteriori"
-        return expected
+        from smodels.statistics.basicStats import EvaluationType
+        return EvaluationType.fromStringOrBool ( self.typeofexpectedvalues )
 
     @property
     def filename(self):
