@@ -316,9 +316,12 @@ class SpeyComputer:
     @classmethod
     def translateExpectationType ( cls, expected : EvaluationType ) -> spey.ExpectationType:
         """ translate the specification for expected values from smodels
-            lingo to spey convention """
+            lingo to spey convention
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        """
         if type(expected)==ExpectationType:
             return expected
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         expectedDict = { EvaluationType.observed: spey.ExpectationType.observed,
                          EvaluationType.apriori: spey.ExpectationType.apriori,
                          EvaluationType.aposteriori: spey.ExpectationType.aposteriori}
@@ -580,7 +583,10 @@ class SpeyAnalysesCombosComputer:
 
     def likelihood ( self, poi_test : float, expected : EvaluationType,
                             return_nll : bool ) -> float:
-        """ simple frontend to spey functionality """
+        """ simple frontend to spey functionality
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         expected = SpeyComputer.translateExpectationType ( expected )
         ret = self.speyModel.likelihood ( poi_test = poi_test,
             expected = expected, return_nll = return_nll )
@@ -590,6 +596,7 @@ class SpeyAnalysesCombosComputer:
            allow_negative_signal : bool = True,
            return_nll : bool = False  ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
         :param return_nll: if True, return negative log likelihood
         :param allow_negative_signal: allow also negative muhats
         :returns: tuple of muhat,lmax

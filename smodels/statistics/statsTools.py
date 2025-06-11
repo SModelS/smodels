@@ -370,7 +370,10 @@ class StatsComputer:
                                                 return_nll = return_nll, **kwargs)
 
     def CLs ( self, poi_test : float = 1., expected : EvaluationType = EvaluationType.observed ) -> Union[float,None]:
-        """ compute CLs value for a given value of the poi """
+        """ compute CLs value for a given value of the poi 
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         # self.transform ( expected )
         if hasattr ( self.likelihoodComputer, "CLs" ):
             return self.likelihoodComputer.CLs ( poi_test, expected )
@@ -382,14 +385,16 @@ class StatsComputer:
             return
         self.likelihoodComputer.transform ( expected )
 
-    def maximize_likelihood ( self, expected : Union[bool,Text],
+    def maximize_likelihood ( self, expected : EvaluationType,
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
         :returns: Dictionary of llhd (llhd at mu_hat), \
                   muhat, sigma_mu (sigma of mu_hat), \
                   optionally also theta_hat
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         self.transform ( expected )
         kwargs = { }
         if self.dataType == "pyhf":

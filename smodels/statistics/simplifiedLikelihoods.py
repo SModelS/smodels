@@ -411,8 +411,8 @@ class LikelihoodComputer:
         return hessian
 
     #def findMuHat(
-    def findMuHatViaBracketing( self, allowNegativeSignals=False,
-        extended_output=False, nll=False ):
+    def findMuHatViaBracketing( self, allowNegativeSignals : bool=False,
+        extended_output : bool =False, nll : bool =False ):
         """
         Find the most likely signal strength mu via a brent bracketing technique
         given the relative signal strengths in each dataset (signal region).
@@ -920,12 +920,11 @@ class UpperLimitComputer:
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         ul = self.getUpperLimitOnMu( model, expected=expected, 
                                      trylasttime=trylasttime)
 
@@ -952,6 +951,7 @@ class UpperLimitComputer:
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         if model.zeroSignal():
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None

@@ -680,6 +680,7 @@ class PyhfUpperLimitComputer:
         :param return_nll: if true, return nll, not llhd
         :param expected: EvaluationType (observed, apriori, or aposteriori)
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         if workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
@@ -880,6 +881,7 @@ class PyhfUpperLimitComputer:
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         if workspace_index in self.data.cached_lmaxes[expected]:
             return self.data.cached_lmaxes[expected][workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
@@ -984,6 +986,7 @@ class PyhfUpperLimitComputer:
         :param workspace_index: the index of the workspace to retrieve from the corresponding list
         :param expected: EvaluationType (observed, apriori, or aposteriori)
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         if self.nWS == 1:
             if expected == EvaluationType.apriori:
                 return self.workspaces_expected[0]
@@ -1004,13 +1007,13 @@ class PyhfUpperLimitComputer:
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if apriori: uses expected SM backgrounds as signals
-                          - else: uses 'self.nsignals'
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
         :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
+        assert type(expected)==EvaluationType, "use EvaluationTypes!"
         if self.data.totalYield == 0.:
             return None
         else:
@@ -1034,8 +1037,7 @@ class PyhfUpperLimitComputer:
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
-                          - else: uses 'self.nsignals'
+        :param expected: EvaluationType (observed, apriori, or aposteriori)
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
