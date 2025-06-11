@@ -16,7 +16,7 @@ import jsonschema
 import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import findRoot, EvaluationType
+from smodels.statistics.basicStats import findRoot, NllEvalType
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
@@ -114,9 +114,9 @@ class PyhfData:
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
-        self.cached_likelihoods = { EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {} }  ## cache of likelihoods (actually twice_nlls)
-        self.cached_lmaxes = { EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {} }  # cache of lmaxes (actually twice_nlls)
-        self.cachedULs = { EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {}}
+        self.cached_likelihoods = { NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {} }  ## cache of likelihoods (actually twice_nlls)
+        self.cached_lmaxes = { NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {} }  # cache of lmaxes (actually twice_nlls)
+        self.cachedULs = { NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {}}
         self.cacheBestCombo = None # memorize also whats the best combo
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
             jsonFiles = {}
@@ -670,7 +670,7 @@ class PyhfUpperLimitComputer:
         return init_pars
 
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
-                    expected : EvaluationType = EvaluationType.observed ):
+                    expected : NllEvalType = NllEvalType.observed ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -678,9 +678,9 @@ class PyhfUpperLimitComputer:
         :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
         :param return_nll: if true, return nll, not llhd
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         if workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
@@ -791,7 +791,7 @@ class PyhfUpperLimitComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.getUpperLimitOnMu(expected = EvaluationType.apriori, workspace_index=i_ws)
+                ul = self.getUpperLimitOnMu(expected = NllEvalType.apriori, workspace_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -869,7 +869,7 @@ class PyhfUpperLimitComputer:
 
 
     def lmax( self, workspace_index : Union[None,int] = None, return_nll : bool =False, 
-              expected : EvaluationType = EvaluationType.observed,
+              expected : NllEvalType = NllEvalType.observed,
               allowNegativeSignals : bool = False) -> float:
         """
         Returns the negative log max likelihood
@@ -877,11 +877,11 @@ class PyhfUpperLimitComputer:
         :param return_nll: if true, return nll, not llhd
         :param workspace_index: supply index of workspace to use. If None, \
             choose index of best combo
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         if workspace_index in self.data.cached_lmaxes[expected]:
             return self.data.cached_lmaxes[expected][workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
@@ -979,41 +979,41 @@ class PyhfUpperLimitComputer:
             # print ( f"@@11 ret {ret}" )
             return ret
 
-    def updateWorkspace(self, workspace_index : Union[None,int] = None, expected : EvaluationType = EvaluationType.observed ):
+    def updateWorkspace(self, workspace_index : Union[None,int] = None, expected : NllEvalType = NllEvalType.observed ):
         """
         Small method used to return the appropriate workspace
 
         :param workspace_index: the index of the workspace to retrieve from the corresponding list
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         if self.nWS == 1:
-            if expected == EvaluationType.apriori:
+            if expected == NllEvalType.apriori:
                 return self.workspaces_expected[0]
             else:
                 return self.workspaces[0]
         else:
             if workspace_index == None:
                 logger.error("No workspace index was provided.")
-            if expected == EvaluationType.apriori:
+            if expected == NllEvalType.apriori:
                 return self.workspaces_expected[workspace_index]
             else:
                 return self.workspaces[workspace_index]
 
-    def getUpperLimitOnSigmaTimesEff(self, expected : EvaluationType = EvaluationType.observed, workspace_index : Union[None,int] = None):
+    def getUpperLimitOnSigmaTimesEff(self, expected : NllEvalType = NllEvalType.observed, workspace_index : Union[None,int] = None):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
             - by default, the combination of the workspaces contained into self.workspaces
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
         :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         if self.data.totalYield == 0.:
             return None
         else:
@@ -1030,20 +1030,20 @@ class PyhfUpperLimitComputer:
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
-    def getUpperLimitOnMu(self, expected : EvaluationType = EvaluationType.observed, workspace_index : Union[None,int]=None) -> float:
+    def getUpperLimitOnMu(self, expected : NllEvalType = NllEvalType.observed, workspace_index : Union[None,int]=None) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         self.__init__(self.data, self.cl, self.lumi)
         if workspace_index in self.data.cachedULs[expected]:
             ret = self.data.cachedULs[expected][workspace_index]
@@ -1089,7 +1089,7 @@ class PyhfUpperLimitComputer:
                     bounds[model.config.poi_index] = (0, 10)
                     start = time.time()
                     args = {}
-                    args["return_expected"] = expected == EvaluationType.aposteriori
+                    args["return_expected"] = expected == NllEvalType.aposteriori
                     args["par_bounds"] = bounds
                     # args["maxiter"]=100000
                     pver = float(pyhf.__version__[:3])
@@ -1109,12 +1109,12 @@ class PyhfUpperLimitComputer:
                         except Exception as e:
                             logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
                             result = float("nan")
-                            if expected == EvaluationType.aposteriori:
+                            if expected == NllEvalType.aposteriori:
                                 result = [float("nan")] * 2
                     end = time.time()
                     logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
                     logger.debug(f"result for {mu} {result}")
-                    if expected == EvaluationType.aposteriori:
+                    if expected == NllEvalType.aposteriori:
                         logger.debug("computing a-posteriori expected limit")
                         logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
                         try:

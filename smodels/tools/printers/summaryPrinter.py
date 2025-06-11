@@ -13,7 +13,7 @@ from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import fb, TeV
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
 import unum
@@ -67,7 +67,7 @@ class SummaryPrinter(TxTPrinter):
         maxcoll = {"CMS": {"obs": -1., "exp": -1, "anaid": "?"},
                    "ATLAS": {"obs": -1., "exp": -1, "anaid": "?"}}
         for theoPred in obj._theoryPredictions:
-            r = theoPred.getRValue(expected=EvaluationType.observed)
+            r = theoPred.getRValue(expected=NllEvalType.observed)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             expResult = theoPred.expResult
             coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
@@ -83,7 +83,7 @@ class SummaryPrinter(TxTPrinter):
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             txnames = theoPred.txnames
-            ul = theoPred.getUpperLimit(expected=EvaluationType.observed)
+            ul = theoPred.getUpperLimit(expected=NllEvalType.observed)
             uls = str(ul)
             if isinstance(ul, unum.Unum):
                 uls = "%10.3E" % ul.asNumber(fb)
@@ -91,7 +91,7 @@ class SummaryPrinter(TxTPrinter):
             if signalRegion is None:
                 signalRegion = '(UL)'
             value = theoPred.xsection
-            r = theoPred.getRValue(expected=EvaluationType.observed)
+            r = theoPred.getRValue(expected=NllEvalType.observed)
             r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
             if r is not None:
                 rs = "%10.3E" % r
@@ -170,7 +170,7 @@ class SummaryPrinter(TxTPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = obj.getRValue()
-        r_expected = obj.getRValue(expected=EvaluationType.apriori)
+        r_expected = obj.getRValue(expected=NllEvalType.apriori)
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )

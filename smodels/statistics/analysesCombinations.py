@@ -15,7 +15,7 @@ import numpy as np
 from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
-     findRoot, EvaluationType
+     findRoot, NllEvalType
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
@@ -43,7 +43,7 @@ class AnaCombLikelihoodComputer(object):
     def likelihood(
         self,
         mu: float = 1.0,
-        expected: EvaluationType = EvaluationType.observed,
+        expected: NllEvalType = NllEvalType.observed,
         return_nll: bool = False,
         useCached: bool = True,
     ) -> float:
@@ -51,11 +51,11 @@ class AnaCombLikelihoodComputer(object):
         Compute the likelihood at a given mu
 
         :param mu: signal strength
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will use the cached values from the theoryPrediction objects (if available)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         try:
             mu = mu[0]  # some of these methods use arrays with a single element
         except:
@@ -81,20 +81,20 @@ class AnaCombLikelihoodComputer(object):
     def lmax(
         self,
         allowNegativeSignals: bool = False,
-        expected: EvaluationType = EvaluationType.observed,
+        expected: NllEvalType = NllEvalType.observed,
         return_nll: bool = False,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param return_nll: if true, return negative log max likelihood instead of lmax
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
                   output is requested, it returns a dictionary with mu_hat, \
                   sigma_mu -- the standard deviation around mu_hat, and lmax, \
                   i.e. the likelihood at mu_hat
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
 
         muhats, weighted = [], []
         totweight = 0.0
@@ -202,15 +202,15 @@ class AnaCombLikelihoodComputer(object):
         ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}       #return nll_ too in the dictionary?
         return ret
 
-    def getUpperLimitOnMu( self, expected : EvaluationType = EvaluationType.observed, 
+    def getUpperLimitOnMu( self, expected : NllEvalType = NllEvalType.observed, 
                            allowNegativeSignals : bool = False ) -> float:
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :returns: upper limit on signal strength multiplier mu
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                                                         allowNegativeSignals=allowNegativeSignals)
 
@@ -219,7 +219,7 @@ class AnaCombLikelihoodComputer(object):
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    def getUpperLimitOnSigmaTimesEff(self, expected : EvaluationType = EvaluationType.observed, 
+    def getUpperLimitOnSigmaTimesEff(self, expected : NllEvalType = NllEvalType.observed, 
             allowNegativeSignals : bool = False):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -242,22 +242,22 @@ class AnaCombLikelihoodComputer(object):
             xsec += tp.xsection
         return ul * xsec
 
-    def getCLsRootFunc(self, expected: EvaluationType = EvaluationType.observed, 
+    def getCLsRootFunc(self, expected: NllEvalType = NllEvalType.observed, 
                        allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
         mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
         nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax(expected=EvaluationType.aposteriori, allowNegativeSignals=allowNegativeSignals,
+        fmh = self.lmax(expected=NllEvalType.aposteriori, allowNegativeSignals=allowNegativeSignals,
                              return_nll=True)
         _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
@@ -270,30 +270,30 @@ class AnaCombLikelihoodComputer(object):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected=EvaluationType.aposteriori, return_nll=True, useCached=False)
+            nllA = self.likelihood(mu, expected=NllEvalType.aposteriori, return_nll=True, useCached=False)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot
 
-    def CLs( self, mu : float = 1., expected: EvaluationType = EvaluationType.observed,
+    def CLs( self, mu : float = 1., expected: NllEvalType = NllEvalType.observed,
              return_type: Text = "CLs" ) -> float:
         """
         Compute the exclusion confidence level of the model
 
         :param mu: compute for the parameter of interest mu
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
         _, _, clsRoot = self.getCLsRootFunc(expected=expected)
 
         return clsRoot(mu, return_type=return_type)
 
-    def getLlhds(self,muvals,expected : EvaluationType = EvaluationType.observed, normalize : bool = True) -> Dict:
+    def getLlhds(self,muvals,expected : NllEvalType = NllEvalType.observed, normalize : bool = True) -> Dict:
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
@@ -301,10 +301,10 @@ class AnaCombLikelihoodComputer(object):
 
         :param muvals: List with values for the signal strenth for which the likelihoods must
                        be evaluated.
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
 
         llhds = {}
         llhds['combined'] = np.array([self.likelihood(mu,expected=expected) for mu in muvals])

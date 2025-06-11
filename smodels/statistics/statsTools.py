@@ -20,7 +20,7 @@ from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLi
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from typing import Union, Text
 
@@ -136,13 +136,13 @@ class StatsComputer:
             return None
 
         eul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=EvaluationType.apriori
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=NllEvalType.apriori
         )
         if eul is None:
             return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=EvaluationType.observed
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=NllEvalType.observed
         ) / theorypred.xsection
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
@@ -306,7 +306,7 @@ class StatsComputer:
                                                             deltas_rel=self.deltas_sys)
         self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
 
-    def get_five_values ( self, expected : EvaluationType,
+    def get_five_values ( self, expected : NllEvalType,
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """
@@ -350,7 +350,7 @@ class StatsComputer:
 
         return ret
 
-    def likelihood ( self, poi_test : float, expected : EvaluationType,
+    def likelihood ( self, poi_test : float, expected : NllEvalType,
                             return_nll : bool ) -> float:
         """ simple frontend to individual computers """
         self.transform ( expected )
@@ -369,11 +369,11 @@ class StatsComputer:
         return self.likelihoodComputer.likelihood ( poi_test,
                                                 return_nll = return_nll, **kwargs)
 
-    def CLs ( self, poi_test : float = 1., expected : EvaluationType = EvaluationType.observed ) -> Union[float,None]:
+    def CLs ( self, poi_test : float = 1., expected : NllEvalType = NllEvalType.observed ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi 
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         # self.transform ( expected )
         if hasattr ( self.likelihoodComputer, "CLs" ):
             return self.likelihoodComputer.CLs ( poi_test, expected )
@@ -385,16 +385,16 @@ class StatsComputer:
             return
         self.likelihoodComputer.transform ( expected )
 
-    def maximize_likelihood ( self, expected : EvaluationType,
+    def maximize_likelihood ( self, expected : NllEvalType,
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :returns: Dictionary of llhd (llhd at mu_hat), \
                   muhat, sigma_mu (sigma of mu_hat), \
                   optionally also theta_hat
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         self.transform ( expected )
         kwargs = { }
         if self.dataType == "pyhf":

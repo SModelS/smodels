@@ -14,7 +14,7 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 import numpy as np
 import unum
 
@@ -199,14 +199,14 @@ class SLHAPrinter(TxTPrinter):
             # Get list of analyses IDs used in combination:
             expIDs = cRes.analysisId()
             ul = cRes.getUpperLimit()
-            ulExpected = cRes.getUpperLimit(expected=EvaluationType.observed)
+            ulExpected = cRes.getUpperLimit(expected=NllEvalType.observed)
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
 
-            r = self._round(cRes.getRValue(expected=EvaluationType.observed))
-            r_expected = self._round(cRes.getRValue(expected=EvaluationType.apriori))
+            r = self._round(cRes.getRValue(expected=NllEvalType.observed))
+            r_expected = self._round(cRes.getRValue(expected=NllEvalType.apriori))
 
             nll = cRes.likelihood(return_nll=True)
             nllmin = cRes.lmax(return_nll=True)

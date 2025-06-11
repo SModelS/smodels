@@ -11,7 +11,7 @@ from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 from smodels.base.smodelsLogging import logger
 from typing import Union, Text, Dict
 import numpy as np
@@ -40,8 +40,8 @@ class TheoryPrediction(object):
             from smodels.base.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = {EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {}}
-        self.cachedNlls = {EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {}}
+        self.cachedObjs = {NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {}}
+        self.cachedNlls = {NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {}}
         self._statsComputer = None
 
     def __str__(self):
@@ -187,7 +187,7 @@ class TheoryPrediction(object):
 
         self._statsComputer = computer
 
-    def getUpperLimit(self, expected: EvaluationType = EvaluationType.observed ):
+    def getUpperLimit(self, expected: NllEvalType = NllEvalType.observed ):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -198,7 +198,7 @@ class TheoryPrediction(object):
         :param expected: return expected Upper Limit, instead of observed.
         :return: upper limit (Unum object)
         """
-        assert type(expected) == EvaluationType, "use evaluation types!"
+        assert type(expected) == NllEvalType, "use evaluation types!"
 
         # First check if the upper-limit and expected upper-limit have already been computed.
         # If not, compute it and store them.
@@ -217,7 +217,7 @@ class TheoryPrediction(object):
 
         return self.cachedObjs[expected]["UL"]
 
-    def getUpperLimitOnMu(self, expected : EvaluationType = EvaluationType.observed ) -> float:
+    def getUpperLimitOnMu(self, expected : NllEvalType = NllEvalType.observed ) -> float:
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
@@ -236,11 +236,11 @@ class TheoryPrediction(object):
 
         return muUL
 
-    def getRValue(self, expected : EvaluationType = EvaluationType.observed ) -> float:
+    def getRValue(self, expected : NllEvalType = NllEvalType.observed ) -> float:
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        assert type(expected) == EvaluationType, "use evaluation types!"
+        assert type(expected) == NllEvalType, "use evaluation types!"
 
         if "r" not in self.cachedObjs[expected]:
             upperLimit = self.getUpperLimit(expected)
@@ -270,7 +270,7 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm(self, expected : EvaluationType = EvaluationType.observed, return_nll : bool = False ):
+    def lsm(self, expected : NllEvalType = NllEvalType.observed, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
         if "nll_sm" not in self.cachedObjs[expected]:
             self.computeStatistics(expected)
@@ -280,7 +280,7 @@ class TheoryPrediction(object):
                return_nll )
 
     @whenDefined
-    def lmax(self, expected : EvaluationType = EvaluationType.observed, return_nll : bool = False ):
+    def lmax(self, expected : NllEvalType = NllEvalType.observed, return_nll : bool = False ):
         """likelihood at mu_hat"""
 
         if not "nllmax" in self.cachedObjs[expected]:
@@ -289,7 +289,7 @@ class TheoryPrediction(object):
                 return_nll )
 
     @whenDefined
-    def CLs(self, mu : float = 1., expected : EvaluationType = EvaluationType.observed ) -> \
+    def CLs(self, mu : float = 1., expected : NllEvalType = NllEvalType.observed ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
         if not "CLs" in self.cachedObjs[expected]:
@@ -301,7 +301,7 @@ class TheoryPrediction(object):
         return cls
 
     @whenDefined
-    def sigma_mu(self, expected : EvaluationType = EvaluationType.observed ):
+    def sigma_mu(self, expected : NllEvalType = NllEvalType.observed ):
         """sigma_mu of mu_hat"""
 
         if not "sigma_mu" in self.cachedObjs[expected]:
@@ -310,9 +310,9 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["sigma_mu"]
 
     @whenDefined
-    def muhat(self, expected : EvaluationType = EvaluationType.observed ):
+    def muhat(self, expected : NllEvalType = NllEvalType.observed ):
         """position of maximum likelihood"""
-        assert type(expected) == EvaluationType, "use evaluation types!"
+        assert type(expected) == NllEvalType, "use evaluation types!"
 
         if not "muhat" in self.cachedObjs[expected]:
             self.computeStatistics(expected)
@@ -320,7 +320,7 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
-    def likelihood(self, mu=1.0, expected : EvaluationType = EvaluationType.observed, 
+    def likelihood(self, mu=1.0, expected : NllEvalType = NllEvalType.observed, 
                    return_nll : bool = False, useCached : bool = True ):
         """
         get the likelihood for a signal strength modifier mu
@@ -358,7 +358,7 @@ class TheoryPrediction(object):
         return np.exp ( - nll ) if nll is not None else None
 
     @whenDefined
-    def computeStatistics(self, expected : EvaluationType = EvaluationType.observed ):
+    def computeStatistics(self, expected : NllEvalType = NllEvalType.observed ):
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
@@ -422,8 +422,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = {EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {}}
-        self.cachedNlls = {EvaluationType.observed: {}, EvaluationType.apriori: {}, EvaluationType.aposteriori: {}}
+        self.cachedObjs = {NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {}}
+        self.cachedNlls = {NllEvalType.observed: {}, NllEvalType.apriori: {}, NllEvalType.aposteriori: {}}
         self._statsComputer = None
 
     @classmethod
@@ -461,8 +461,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # Now sort by highest priority and then by highest expected r-value:
         selectedTPs = sorted(
             selectedTPs, key=lambda tp: (priority[tp.dataType()],
-                                         tp.getRValue(expected=EvaluationType.apriori) is not None,
-                                         tp.getRValue(expected=EvaluationType.apriori))
+                                         tp.getRValue(expected=NllEvalType.apriori) is not None,
+                                         tp.getRValue(expected=NllEvalType.apriori))
         )
         # Now get a single TP for each result
         # (the highest ranking analyses with r != None come last and are kept in the dict)
@@ -535,7 +535,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         self._statsComputer = computer
 
-    def getLlhds(self,muvals,expected : EvaluationType = EvaluationType.observed, normalize : bool = True):
+    def getLlhds(self,muvals,expected : NllEvalType = NllEvalType.observed, normalize : bool = True):
         """
         Facility to access the likelihoods for the individual analyses and the combined
         likelihood.
@@ -883,7 +883,7 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec/dataset.getSRUpperLimit(expected=EvaluationType.apriori)).asNumber()
+        expectedR = (xsec/dataset.getSRUpperLimit(expected=NllEvalType.apriori)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred

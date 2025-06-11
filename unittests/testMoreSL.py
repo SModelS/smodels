@@ -19,7 +19,7 @@ from smodels.decomposition import decomposer
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 import numpy as np
 
 import time
@@ -50,7 +50,7 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=EvaluationType.apriori ) }
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=NllEvalType.apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
@@ -83,7 +83,7 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=EvaluationType.apriori ) }
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=NllEvalType.apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )

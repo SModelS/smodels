@@ -19,7 +19,7 @@ __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 
 from enum import Enum
 
-class EvaluationType(Enum):
+class NllEvalType(Enum):
     """ an enum to account for the different types of likelihood values: observed, 
     a priori expected, a posteriori expected """
     observed = 0
@@ -38,7 +38,7 @@ class EvaluationType(Enum):
             return cls.apriori
         if evaluationType in [ "false", "observed" ]:
             return cls.observed
-        raise SModelSError ( f"EvaluationType {evaluationType} unknown" )
+        raise SModelSError ( f"NllEvalType {evaluationType} unknown" )
 
 def CLsfromNLL(
     nllA: float, nll0A: float, nll: float, nll0: float,
@@ -201,4 +201,4 @@ def chi2FromLmax(llhd, lmax):
     return chi2
 
 if __name__ == "__main__":
-    print ( EvaluationType.fromStringOrBool ( True ) )
+    print ( NllEvalType.fromStringOrBool ( True ) )

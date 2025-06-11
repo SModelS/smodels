@@ -18,7 +18,7 @@ from unitTestHelpers import theorySMSFromString as fromString
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 import numpy as np
 
 slhafile = './testFiles/slha/lightEWinos.slha'
@@ -38,8 +38,8 @@ class InterpolationTest(unittest.TestCase):
         gluino.mass = 650.*GeV
         n1.mass = 50.*GeV
         smsMatch = txname.hasSMSas(sms)
-        observed = txname.getULFor( smsMatch, expected = EvaluationType.observed )
-        expected = txname.getULFor( smsMatch, expected = EvaluationType.apriori )
+        observed = txname.getULFor( smsMatch, expected = NllEvalType.observed )
+        expected = txname.getULFor( smsMatch, expected = NllEvalType.apriori )
         self.assertAlmostEqual(observed.asNumber(fb),49.9,1)
         self.assertAlmostEqual(expected.asNumber(fb),78.5,1)
 

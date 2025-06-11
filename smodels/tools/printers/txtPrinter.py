@@ -13,7 +13,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 from smodels.base.smodelsLogging import logger
 import numpy as np
 from itertools import groupby
@@ -332,7 +332,7 @@ class TxTPrinter(BasicPrinter):
             output += "  " + str(theoryPrediction.conditions) + "\n"
 
             # Get upper limit for the respective prediction:
-            upperLimit = theoryPrediction.getUpperLimit(expected=EvaluationType.observed)
+            upperLimit = theoryPrediction.getUpperLimit(expected=NllEvalType.observed)
             upperLimitExp = theoryPrediction.getUpperLimit(
                 expected=self.getTypeOfExpected())
 
@@ -341,7 +341,7 @@ class TxTPrinter(BasicPrinter):
                 output += "Expected experimental limit: " + \
                     str(upperLimitExp) + "\n"
             srv = self._formatNumber(
-                theoryPrediction.getRValue(expected=EvaluationType.observed), 4)
+                theoryPrediction.getRValue(expected=NllEvalType.observed), 4)
             output += "Observed r-value: %s\n" % srv
             if upperLimitExp is not None:
                 serv = self._formatNumber(theoryPrediction.getRValue(

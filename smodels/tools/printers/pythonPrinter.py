@@ -17,7 +17,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 from collections import OrderedDict
 import unum
 import time
@@ -272,7 +272,7 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = self._round(theoryPrediction.getRValue(expected=EvaluationType.observed))
+            r = self._round(theoryPrediction.getRValue(expected=NllEvalType.observed))
             r_expected = self._round(theoryPrediction.getRValue(
                 expected=self.getTypeOfExpected()))
 
@@ -401,14 +401,14 @@ class PyPrinter(BasicPrinter):
         # Get list of analyses used in combination:
         expIDs = obj.analysisId()
         ul = obj.getUpperLimit()
-        ulExpected = obj.getUpperLimit(expected=EvaluationType.apriori)
+        ulExpected = obj.getUpperLimit(expected=NllEvalType.apriori)
         if isinstance(ul, unum.Unum):
             ul = ul.asNumber(fb)
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
-        r = self._round(obj.getRValue(expected=EvaluationType.observed))
-        r_expected = self._round(obj.getRValue(expected=EvaluationType.apriori))
+        r = self._round(obj.getRValue(expected=NllEvalType.observed))
+        r_expected = self._round(obj.getRValue(expected=NllEvalType.apriori))
 
         nll = self._round(obj.likelihood( return_nll = True ))
         nllmin = self._round(obj.lmax( return_nll = True ))

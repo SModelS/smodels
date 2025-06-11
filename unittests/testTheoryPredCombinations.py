@@ -22,7 +22,7 @@ from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import fb, GeV, TeV
 from smodels.matching.modelTester import getCombiner
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 import numpy as np
 import unittest
 import os
@@ -62,7 +62,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
         self.assertAlmostEqual(ulmu, 3.41744, 3)
-        ulmu_exp = combiner.getUpperLimitOnMu(expected=EvaluationType.apriori)
+        ulmu_exp = combiner.getUpperLimitOnMu(expected=NllEvalType.apriori)
         self.assertAlmostEqual(ulmu_exp, 2.143318, 3)
 
     def testByHandComputed ( self ):
@@ -131,7 +131,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()        
-        fmh = combiner.statsComputer.get_five_values(expected=EvaluationType.observed)
+        fmh = combiner.statsComputer.get_five_values(expected=NllEvalType.observed)
         mu_hat, lmax = fmh["muhat"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
@@ -179,7 +179,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             "ATLAS-SUSY-2019-09": (0.231855657, "combined"),
         }
         # Make sure each ID appears only once:
-        selectedIDs = {tp.analysisId() : (tp.getRValue(expected=EvaluationType.apriori),tp.dataType())
+        selectedIDs = {tp.analysisId() : (tp.getRValue(expected=NllEvalType.apriori),tp.dataType())
                         for tp in combiner.theoryPredictions}
         self.assertEqual(sorted(list(selectedIDs.keys())),sorted(list(goodIDs.keys())))
         # Check if the correct predictions were selected:
@@ -196,7 +196,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
         self.assertAlmostEqual(combiner.getRValue() / 0.2771301968, 1., 2)        
         self.assertAlmostEqual(combiner.CLs(), 0.46721329662185557, 2 )
-        self.assertAlmostEqual(combiner.CLs( expected = EvaluationType.apriori ), 0.5295734024482494, 2 )
+        self.assertAlmostEqual(combiner.CLs( expected = NllEvalType.apriori ), 0.5295734024482494, 2 )
         self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.6474406370750514, 2 )
 
 

@@ -15,7 +15,7 @@ from functools import reduce
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Optional, Union, Tuple
-from smodels.statistics.basicStats import findRoot, EvaluationType
+from smodels.statistics.basicStats import findRoot, NllEvalType
 
 import numpy as np
 import math, copy, sys
@@ -288,17 +288,17 @@ class LikelihoodComputer:
         self.origModel = copy.deepcopy ( data )
         self.model = data
 
-    def transform ( self, expected : EvaluationType ):
+    def transform ( self, expected : NllEvalType ):
         """ replace the actual observations with backgrounds,
             if expected is True or "posteriori" """
         # always start from scratch
         self.model = copy.deepcopy ( self.origModel )
-        if expected == EvaluationType.observed:
+        if expected == NllEvalType.observed:
             return
         self.model.observed = self.model.backgrounds
-        if expected == EvaluationType.apriori:
+        if expected == NllEvalType.apriori:
             return
-        if not expected == EvaluationType.aposteriori:
+        if not expected == NllEvalType.aposteriori:
             logger.error ( f"dont know the expected value {expected}" )
             sys.exit(-1)
         thetahat, _ = self.findThetaHat(0.)
@@ -912,7 +912,7 @@ class UpperLimitComputer:
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, model, expected : EvaluationType = EvaluationType.observed, trylasttime : bool = False
+        self, model, expected : NllEvalType = NllEvalType.observed, trylasttime : bool = False
     ):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -920,11 +920,11 @@ class UpperLimitComputer:
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         ul = self.getUpperLimitOnMu( model, expected=expected, 
                                      trylasttime=trylasttime)
 
@@ -939,7 +939,7 @@ class UpperLimitComputer:
     def getCLsRootFunc(
         self,
         model: Data,
-        expected: Optional[EvaluationType] = EvaluationType.observed,
+        expected: Optional[NllEvalType] = NllEvalType.observed,
         trylasttime: Optional[bool] = False,
     ) -> Tuple:
         """
@@ -947,19 +947,19 @@ class UpperLimitComputer:
         plus mu_hat and sigma_mu
 
         :param model: statistical model
-        :param expected: EvaluationType (observed, apriori, or aposteriori)
+        :param expected: NllEvalType (observed, apriori, or aposteriori)
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
-        assert type(expected)==EvaluationType, "use EvaluationTypes!"
+        assert type(expected)==NllEvalType, "use NllEvalTypes!"
         if model.zeroSignal():
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
         oldmodel = model
-        if expected in [ EvaluationType.aposteriori, EvaluationType.apriori ]:
+        if expected in [ NllEvalType.aposteriori, NllEvalType.apriori ]:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
-            if expected == EvaluationType.aposteriori:
+            if expected == NllEvalType.aposteriori:
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
@@ -1006,7 +1006,7 @@ class UpperLimitComputer:
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, model, expected : EvaluationType = EvaluationType.observed, trylasttime : bool = False
+        self, model, expected : NllEvalType = NllEvalType.observed, trylasttime : bool = False
     ):
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
@@ -1035,7 +1035,7 @@ class UpperLimitComputer:
     def computeCLs(
         self,
         model: Data,
-        expected: Union[EvaluationType] = EvaluationType.observed,
+        expected: Union[NllEvalType] = NllEvalType.observed,
         trylasttime: bool = False,
         return_type: Text = "1-CLs",
     ) -> float:

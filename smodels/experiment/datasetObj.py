@@ -18,7 +18,7 @@ from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesFor
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
-from smodels.statistics.basicStats import EvaluationType
+from smodels.statistics.basicStats import NllEvalType
 import itertools
 
 # if on, will check for overlapping constraints
@@ -340,7 +340,7 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, expected : EvaluationType =EvaluationType.observed, txnames=None,
+    def getUpperLimitFor(self, sms=None, expected : NllEvalType =NllEvalType.observed, txnames=None,
                          compute=False, alpha=0.05, deltas_rel=0.2,
                          mass=None):
         """
@@ -414,7 +414,7 @@ class DataSet(object):
                            self.getType())
             return None
 
-    def getSRUpperLimit(self,expected : EvaluationType = EvaluationType.observed ):
+    def getSRUpperLimit(self,expected : NllEvalType = NllEvalType.observed ):
         """
         Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
@@ -428,7 +428,7 @@ class DataSet(object):
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
-        if expected in [ EvaluationType.apriori, EvaluationType.aposteriori ]:
+        if expected in [ NllEvalType.apriori, NllEvalType.aposteriori ]:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
                 logger.info("expectedUpperLimit field not found. Returning None instead.")
                 return None
