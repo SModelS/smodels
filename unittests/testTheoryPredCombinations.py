@@ -196,7 +196,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
         self.assertAlmostEqual(combiner.getRValue() / 0.2771301968, 1., 2)        
         self.assertAlmostEqual(combiner.CLs(), 0.46721329662185557, 2 )
-        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.5295734024482494, 2 )
+        self.assertAlmostEqual(combiner.CLs( expected = EvaluationType.apriori ), 0.5295734024482494, 2 )
         self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.6474406370750514, 2 )
 
 
