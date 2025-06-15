@@ -55,6 +55,13 @@ class ExpResult(object):
             folders.append((root, files))
         folders.sort()
         self.datasets = []
+        hasJsons = hasattr(self.globalInfo, "jsonFiles" )
+        if hasJsons:
+            dsOrder = []
+            for jsonFileName,SRs in self.globalInfo.jsonFiles.items():
+                for SR in SRs:
+                    dsOrder.append ( SR['smodels'] )
+            self.globalInfo.datasetOrder = dsOrder
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
