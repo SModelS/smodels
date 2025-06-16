@@ -297,7 +297,9 @@ class PyhfData:
             if sigInCRs and not self.includeCRs:
                 logger.warning("Signal in CRs but includeCRs = False. CRs will still be removed.")
 
-            smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
+            # smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
+            smodelsRegions = self.jsonFiles[jsName]
+            #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
             if "observations" in ws:
                 self.updatePyhfNames ( jsName, ws["observations"] )
                 patchedChannels = set()
