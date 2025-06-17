@@ -60,7 +60,7 @@ class ExpResult(object):
             dsOrder = []
             for jsonFileName,SRs in self.globalInfo.jsonFiles.items():
                 for SR in SRs:
-                    if "smodels" in SR and not SR["smodels"] in dsOrder:
+                    if "smodels" in SR and not SR["smodels"] is None and not SR["smodels"] in dsOrder:
                         dsOrder.append ( SR['smodels'] )
             self.globalInfo.datasetOrder = dsOrder
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
