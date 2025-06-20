@@ -747,13 +747,13 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
         try:
             f = pyslha.readSLHAFile(slhafile)
         except Exception as e:
-            logger.error(f"Error reading file {f}: {e}")
+            logger.error(f"Error reading file {slhafile}: {e}")
             raise SModelSError()
     else: # Assume slhafile is a string containing the SLHA file content:
         try:
             f = pyslha.readSLHA(slhafile)
         except Exception as e:
-            logger.error(f"Error reading SLHA string {f}: {e}")
+            logger.error(f"Error reading SLHA string {slhafile}: {e}")
             raise SModelSError()
         
     for production in f.xsections:
