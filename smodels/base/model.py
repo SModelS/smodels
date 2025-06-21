@@ -215,7 +215,9 @@ class Model(object):
                         import time
                         if ctr < 2:
                             logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
-                        time.seep ( ctr**2 )
+                        if ctr == 3: # we could not solve it
+                            raise e
+                        time.sleep ( ctr )
                         
             else:
                 res = pyslha.readSLHA(inputFile)

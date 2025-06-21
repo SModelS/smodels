@@ -744,17 +744,31 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     xSecsInFile = XSectionList()
     # Check if slhafile is a valid file:
     if os.path.isfile(slhafile):
+        ctr = 0
         try:
-            f = pyslha.readSLHAFile(slhafile)
+            while ctr < 3:
+                try:
+                    ctr += 1
+                    f = pyslha.readSLHAFile(slhafile)
+                except pyslha.ParseError as e:
+                    logger.error ( f"could not read {inputFile}: {e}" )
+                    import time
+                    if ctr < 2:
+                        logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
+                    if ctr == 3: # we could not solve it
+                        raise e
+                    time.sleep ( ctr )
         except Exception as e:
-            logger.error(f"Error reading file {slhafile}: {e}")
-            raise SModelSError()
+            line = f"Error reading file {slhafile}: {e}"
+            # logger.error( line )
+            raise SModelSError( line )
     else: # Assume slhafile is a string containing the SLHA file content:
         try:
             f = pyslha.readSLHA(slhafile)
         except Exception as e:
-            logger.error(f"Error reading SLHA string {slhafile}: {e}")
-            raise SModelSError()
+            line = f"Error reading SLHA string {slhafile}: {e}"
+            # logger.error( line )
+            raise SModelSError( line )
         
     for production in f.xsections:
         process = f.xsections.get(production)
