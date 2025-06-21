@@ -44,7 +44,7 @@ New in Version 3.1.0:
   * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
   * Fixed an issue with missing 'pyhf' fields in globalInfo.txt:jsonFiles
   * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM)
-  * Small fixes in |database|: ATLAS-SUSY-2018-05 (UL), ATLAS-SUSY-2018-31 (EM)
+  * Small fixes in |database|: ATLAS-SUSY-2018-05 (EM,UL), ATLAS-SUSY-2018-31 (EM)
     -- results for these analyses may vary with respect to the previous version!
 
 New in Version 3.0.3.post1:
