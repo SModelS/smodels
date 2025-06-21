@@ -205,7 +205,18 @@ class Model(object):
         try:
             sys.stderr = None
             if os.path.isfile(inputFile):
-                res = pyslha.readSLHAFile(inputFile)
+                ctr = 0
+                while ctr < 3:
+                    try:
+                        ctr += 1
+                        res = pyslha.readSLHAFile(inputFile)
+                    except pyslha.ParseError as e:
+                        logger.error ( f"could not read {inputFile}: {e}" )
+                        import time
+                        if ctr < 2:
+                            logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
+                        time.seep ( ctr**2 )
+                        
             else:
                 res = pyslha.readSLHA(inputFile)
             massDict = res.blocks['MASS']
