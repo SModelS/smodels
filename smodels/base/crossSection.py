@@ -751,7 +751,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
                     ctr += 1
                     f = pyslha.readSLHAFile(slhafile)
                 except pyslha.ParseError as e:
-                    logger.error ( f"could not read {inputFile}: {e} [attempt #{ctr}]" )
+                    logger.error ( f"could not read {slhafile}: {e} [attempt #{ctr}]" )
                     import time
                     if ctr < 2:
                         logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
