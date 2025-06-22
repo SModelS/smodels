@@ -206,7 +206,8 @@ class Model(object):
             sys.stderr = None
             if os.path.isfile(inputFile):
                 ctr = 0
-                while ctr < 3:
+                nmax = 4
+                while ctr < nmax:
                     try:
                         ctr += 1
                         res = pyslha.readSLHAFile(inputFile)
@@ -215,11 +216,11 @@ class Model(object):
                         import time
                         if ctr < 2:
                             logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
-                        if ctr == 3: # we could not solve it
+                        if ctr == nmax: # we could not solve it
                             if hasattr ( e, "msg" ):
                                 e.msg += f" [attempt #{ctr}]"
                             raise e
-                        time.sleep ( ctr )
+                        time.sleep ( .1 + ( ctr - 1 ) )
 
             else:
                 res = pyslha.readSLHA(inputFile)

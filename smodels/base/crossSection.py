@@ -745,8 +745,9 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     # Check if slhafile is a valid file:
     if os.path.isfile(slhafile):
         ctr = 0
+        nmax = 4
         try:
-            while ctr < 3:
+            while ctr < nmax:
                 try:
                     ctr += 1
                     f = pyslha.readSLHAFile(slhafile)
@@ -755,11 +756,11 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
                     import time
                     if ctr < 2:
                         logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
-                    if ctr == 3: # we could not solve it
+                    if ctr == nmax: # we could not solve it
                         if hasattr ( e, "msg" ):
                             e.msg += f" [attempt #{ctr}]"
                         raise e
-                    time.sleep ( ctr )
+                    time.sleep ( .1 + ( ctr - 1 ) )
         except Exception as e:
             line = f"Error reading file {slhafile}: {e}"
             # logger.error( line )
