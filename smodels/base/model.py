@@ -182,7 +182,7 @@ class Model(object):
         :param inputFile: input file (SLHA or LHE), can also be a string containing the SLHA file
 
         :return: dictionary with masses, dictionary with decays and XSectionList object
-        """
+        """ 
 
         # Download input file, if requested
         if inputFile.startswith("http") or inputFile.startswith("ftp"):
@@ -205,23 +205,7 @@ class Model(object):
         try:
             sys.stderr = None
             if os.path.isfile(inputFile):
-                ctr = 0
-                nmax = 4
-                while ctr < nmax:
-                    try:
-                        ctr += 1
-                        res = pyslha.readSLHAFile(inputFile)
-                    except pyslha.ParseError as e:
-                        logger.error ( f"could not read {inputFile}: {e} [attempt #{ctr}]" )
-                        import time
-                        if ctr < 2:
-                            logger.error ( f"will try a few more times (in case of network errors on a network file system), then stop" )
-                        if ctr == nmax: # we could not solve it
-                            if hasattr ( e, "msg" ):
-                                e.msg += f" [attempt #{ctr}]"
-                            raise e
-                        time.sleep ( .1 + ( ctr - 1 ) )
-
+                res = pyslha.readSLHAFile(inputFile)
             else:
                 res = pyslha.readSLHA(inputFile)
             massDict = res.blocks['MASS']

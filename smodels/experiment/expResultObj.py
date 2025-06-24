@@ -58,10 +58,20 @@ class ExpResult(object):
         hasJsons = hasattr(self.globalInfo, "jsonFiles" )
         if hasJsons:
             dsOrder = []
-            for jsonFileName,SRs in self.globalInfo.jsonFiles.items():
+            for SRs in self.globalInfo.jsonFiles.values():
+                if not isinstance(SRs,list):
+                    raise SModelSExperimentError(f"The entries in jsonFiles keys should be a list and not {type(SRs)}")
                 for SR in SRs:
-                    if "smodels" in SR and not SR["smodels"] is None and not SR["smodels"] in dsOrder:
-                        dsOrder.append ( SR['smodels'] )
+                    if not isinstance(SR,dict):
+                        raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
+                    # In case the smodels label is not defined, ignore SR
+                    if not ("smodels" is SR):
+                        continue
+                    smodelsLabel = SR["smodels"]
+                    if smodelsLabel is None or smodelsLabel in dsOrder:
+                        continue
+                    # Store the dataset following the order defined in globalInfo.jsonFiles
+                    dsOrder.append ( smodelsLabel )
             self.globalInfo.datasetOrder = dsOrder
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
