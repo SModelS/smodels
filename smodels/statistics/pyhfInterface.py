@@ -313,7 +313,7 @@ class PyhfData:
                             patchedChannels.add ( ch['name'] )
                             break
                 if allChannels != patchedChannels:
-                    logger.error ( f"could not patch {' '.join(allChannels-patchedChannels)} for {jsName}. Check the database!" )
+                    logger.debug ( f"could not patch {' '.join(allChannels-patchedChannels)} for {jsName}. Check the database!" )
                     # sys.exit()
 
 
