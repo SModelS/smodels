@@ -37,14 +37,15 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
-  * Small fixes in analyses combinations, better handling exceptions in likelihood computations
+  * Small fixes in analyses combinations, better handling exceptions in likelihood computations,
+    we thank Leo Constantin for help with a bug fix concerning failed likelihood computation
   * Slightly different way of finding upper limits, UL computations may vary slightly numerically
+  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
   * Bumped up pythia8 from 8308 to 8315
   * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
-  * Fixed an issue with missing 'pyhf' fields in globalInfo.txt:jsonFiles
-  * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM)
-  * Small fixes in |database|: ATLAS-SUSY-2018-14 (UL), ATLAS-SUSY-2018-05 (EM), ATLAS-SUSY-2018-31 (EM)
+  * Improved the syntax of pyhf fields in globalInfo.txt:jsonFiles
+  * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM).
+  * Small fixes in |database|: ATLAS-SUSY-2018-14 (UL), ATLAS-SUSY-2018-31 (EM)
     -- results for these analyses may vary with respect to the previous version!
 
 New in Version 3.0.3.post1:
