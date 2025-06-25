@@ -753,7 +753,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
             f = pyslha.readSLHA(slhafile)
         except Exception as e:
             raise SModelSError(f"Error reading SLHA string {slhafile}: {e}")
-        
+
     for production in f.xsections:
         process = f.xsections.get(production)
         for pxsec in process.xsecs:

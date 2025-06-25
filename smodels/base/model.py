@@ -182,7 +182,7 @@ class Model(object):
         :param inputFile: input file (SLHA or LHE), can also be a string containing the SLHA file
 
         :return: dictionary with masses, dictionary with decays and XSectionList object
-        """ 
+        """
 
         # Download input file, if requested
         if inputFile.startswith("http") or inputFile.startswith("ftp"):

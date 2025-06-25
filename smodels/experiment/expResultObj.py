@@ -65,7 +65,7 @@ class ExpResult(object):
                     if not isinstance(SR,dict):
                         raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
                     # In case the smodels label is not defined, ignore SR
-                    if not ("smodels" is SR):
+                    if not "smodels" in SR:
                         continue
                     smodelsLabel = SR["smodels"]
                     if smodelsLabel is None or smodelsLabel in dsOrder:
