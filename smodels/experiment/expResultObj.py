@@ -95,6 +95,11 @@ class ExpResult(object):
             dsOrder = [dsOrder]
         for dsname in dsOrder:
             self.datasets.append(datasets[dsname])
+        # now append the rest
+        for dsName,ds in datasets.items():
+            if dsName not in dsOrder:
+                self.datasets.append ( ds )
+                self.globalInfo.datasetOrder.append ( dsName )
         if len(self.datasets) != len(dsOrder):
             raise SModelSExperimentError("lengths of datasets and datasetOrder mismatch")
 
