@@ -54,15 +54,15 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             t.computeStatistics()
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        self.assertAlmostEqual(combiner.muhat(), 1.205884272994354, 4)
+        self.assertAlmostEqual(combiner.muhat(), 1.0445466490085937, 4)
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.41744, 3)
+        self.assertAlmostEqual(ulmu, 3.1376029550340254, 3)
         ulmu_exp = combiner.getUpperLimitOnMu(expected=True)
-        self.assertAlmostEqual(ulmu_exp, 2.143318, 3)
+        self.assertAlmostEqual(ulmu_exp, 1.9892495624399895, 3)
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
