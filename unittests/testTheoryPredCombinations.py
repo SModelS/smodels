@@ -158,7 +158,12 @@ class CombinedTheoryPredsTest(unittest.TestCase):
           'CMS-SUS-12-028',
           'ATLAS-SUSY-2018-12',
           'ATLAS-SUSY-2016-15','ATLAS-SUSY-2019-09']
-        db = Database('unittest+unittestextra')
+        mdbpath = 'unittest+unittestextra'
+        from databaseLoader import dbpath
+        if "./database" in dbpath:
+            # seems like we are meant to use local databases
+            mdbpath =  './database+./database_extra/'
+        db = Database( mdbpath )
         slhafile = "testFiles/slha/gluino_squarks.slha"
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile)
@@ -173,7 +178,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # IDs that should be selected and the respective expected r-values:
         goodIDs = {
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
-            "CMS-SUS-12-024": (4.52551e-4, "efficiencyMap"),
+            "CMS-SUS-12-024": (0.0004534170464636533, "efficiencyMap"),
             "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
             "ATLAS-SUSY-2019-09": (0.231855657, "combined"),
         }

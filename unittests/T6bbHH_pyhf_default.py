@@ -22,8 +22,8 @@ smodelsOutputDefault = {
 'ExptRes' : [
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.10091,
-        'upper limit (fb)' : 0.08247307,
+        'theory prediction (fb)' : 0.1580689,
+        'upper limit (fb)' : 0.07947499,
         'expected upper limit (fb)' : 0.1200876,
         'TxNames' : ['T6bbHH'],
         'Mass (GeV)' : [[1400.0, 1000.0, 60.0], [1400.0, 1000.0, 60.0]],

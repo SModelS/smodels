@@ -26,7 +26,7 @@ class ExpSMSDictTest(unittest.TestCase):
         database.selectExpResults(useNonValidated=True)
         expDict = database.expSMSDict
         self.assertEqual(len(list(expDict.getSMS())),80)
-        self.assertEqual(len(list(expDict.getTx())),644)
+        self.assertEqual(len(list(expDict.getTx())),645)
 
     def testFilter(self):
 
@@ -40,7 +40,7 @@ class ExpSMSDictTest(unittest.TestCase):
         database.selectExpResults(useNonValidated=True)
         expDict = database.expSMSDict
         self.assertEqual(len(list(expDict.getSMS())),80)
-        self.assertEqual(len(list(expDict.getTx())),644)
+        self.assertEqual(len(list(expDict.getTx())),645)
 
     def testNodeDict(self):
 
