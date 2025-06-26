@@ -44,7 +44,8 @@ class RunPrinterTest(unittest.TestCase):
             logger.error ( f"{outputfile} and {defaultfile} differ!" )
 
         self.assertEqual(default, output)
-        self.removeOutputs(outputfile)
+        if default != output:
+            self.removeOutputs(outputfile)
 
         smodelsOutput = importModule(out)
         # Test python output
@@ -56,13 +57,14 @@ class RunPrinterTest(unittest.TestCase):
                                           key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top",
-                           fname="./unitTestOutput/printer_output.py")
-        if default != output:
-            logger.error ( f"{outputfile} and gluino_squarks_default.py differ!" )
+                           fname=out,fname2="gluino_squarks_default.py")
+        if not equals:
+            logger.error ( f"{out} and gluino_squarks_default.py differ!" )
 
         self.assertTrue(equals)
-        self.removeOutputs(out)
-        self.removeOutputs('./debug.log')  
+        if equals:
+            self.removeOutputs(out)
+            self.removeOutputs('./debug.log')
 
         outputfile = out.replace('.py', '.xml')
         defFile = "default_output.xml"
@@ -77,8 +79,9 @@ class RunPrinterTest(unittest.TestCase):
         if not comp:
             logger.error ( f"{outputfile} and {defFile} differ!" )
         self.assertTrue(comp)
-        self.removeOutputs(outputfile)
-        self.removeOutputs('./debug.log')
+        if comp:
+            self.removeOutputs(outputfile)
+            self.removeOutputs('./debug.log')
 
         outputfile = out.replace('.py', '.smodelsslha')
 
@@ -130,7 +133,7 @@ class RunPrinterTest(unittest.TestCase):
         xmlNew = ElementTree.parse(outputfile).getroot()
         sortXML(xmlDefault)
         sortXML(xmlNew)
-        ret = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05, 
+        ret = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05,
                ignore=['input_file', 'smodels_version', 'database_version', 'ncpus' ] )
         if not ret:
             logger.error ( f"difference between {defFile} and {outputfile}" )
@@ -171,11 +174,11 @@ class RunPrinterTest(unittest.TestCase):
                            ignore=ignoreFields, where="top")
         if not equals:
             logger.error ( f"{out} differs from lightEWinos_default.py" )
-            
+
         self.assertTrue(equals)
         if equals:
             self.removeOutputs(out)
-            self.removeOutputs('./debug.log')       
+            self.removeOutputs('./debug.log')
 
 
         # Check XML output:
@@ -194,7 +197,7 @@ class RunPrinterTest(unittest.TestCase):
         if equals:
             self.removeOutputs(outputfile)
             self.removeOutputs('./debug.log')
-        
+
 
         # Check SLHA output:
         outputfile = out.replace('.py', '.smodelsslha')
@@ -207,7 +210,7 @@ class RunPrinterTest(unittest.TestCase):
         if comp:
             self.removeOutputs(outputfile)
 
-    
+
     def testPythonPrinterNodesMap(self):
 
         slhafile = "./testFiles/slha/simplyGluino.slha"
