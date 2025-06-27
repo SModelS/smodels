@@ -745,6 +745,26 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
     return tpList
 
+def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
+    """ is a given dataset mentioned in the combination?
+    we are allowing datasets in an expResult that is not mentioned
+    in the combination of that result.
+    :returns: true if its in, false if it is not in, None if there is no combination
+    """
+    assert hasattr ( dataset, "dataInfo" ), "why does the dataset here not have a dataInfo?"
+    dataId = dataset.dataInfo.dataId
+    if hasattr ( expResult.globalInfo, "jsonFiles" ):
+        for regionSet in expResult.globalInfo.jsonFiles.values():
+            for region in regionSet:
+                if dataId == region["smodels"]:
+                    return True
+        return False
+    if hasattr ( expResult.globalInfo, "datasetOrder" ):
+        for ds in expResult.globalInfo.datasetOrder:
+            if dataId == ds:
+                return True
+        return False
+    return None
 
 def _getCombinedResultFor(dataSetResults, expResult):
     """
@@ -793,6 +813,10 @@ def _getCombinedResultFor(dataSetResults, expResult):
         txnameList += pred.txnames
         smsList += pred.smsList
         avgSMSlist.append(pred.avgSMS)
+        if not _isDatasetInCombination ( pred.dataset, expResult ):
+            print ( f"@@ {pred.dataset.dataInfo.dataId} is out" )
+            continue
+        print ( f"@@ {pred.dataset.dataInfo.dataId} is in" )
         if totalXsec is None:
             totalXsec = pred.xsection
         else:
