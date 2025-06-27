@@ -724,9 +724,10 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 else:
                     tpe = "SR"
 
-                if tpe is None:
-                    logger.error(f"Could not find type of region {theoPred.dataType()} from {theoPred.analysisId()}")
-                    raise SModelSError()
+                #if tpe is None:
+                #    this probably just means that the signal region is not mentioned in the jsonFiles. thats allowed.
+                #    logger.debug(f"Could not find type of region {theoPred.dataset.dataInfo.dataId} from {theoPred.analysisId()}")
+                    # raise SModelSError()
 
                 if tpe == "SR":
                     theoPred.upperLimit = theoPred.getUpperLimit()
