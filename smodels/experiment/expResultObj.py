@@ -95,13 +95,16 @@ class ExpResult(object):
             dsOrder = [dsOrder]
         for dsname in dsOrder:
             self.datasets.append(datasets[dsname])
-        # now append the rest
-        for dsName,ds in datasets.items():
-            if dsName not in dsOrder:
-                self.datasets.append ( ds )
-                self.globalInfo.datasetOrder.append ( dsName )
+        if type(self.globalInfo.datasetOrder)==tuple:
+            self.globalInfo.datasetOrder = list ( self.globalInfo.datasetOrder )
+        # now append the rest -- but only for json file case
+        if hasJsons:
+            for dsName,ds in datasets.items():
+                if dsName not in dsOrder:
+                    self.datasets.append ( ds )
+                    self.globalInfo.datasetOrder.append ( dsName )
         if len(self.datasets) != len(dsOrder):
-            raise SModelSExperimentError("lengths of datasets and datasetOrder mismatch")
+            raise SModelSExperimentError( f"lengths of datasets and datasetOrder mismatch in {self.globalInfo.id}")
 
     def writePickle(self, dbVersion):
         """ write the pickle file """
