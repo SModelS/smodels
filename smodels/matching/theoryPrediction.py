@@ -814,9 +814,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
         smsList += pred.smsList
         avgSMSlist.append(pred.avgSMS)
         if not _isDatasetInCombination ( pred.dataset, expResult ):
-            print ( f"@@ {pred.dataset.dataInfo.dataId} is out" )
             continue
-        print ( f"@@ {pred.dataset.dataInfo.dataId} is in" )
         if totalXsec is None:
             totalXsec = pred.xsection
         else:
