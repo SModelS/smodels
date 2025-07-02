@@ -134,9 +134,9 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
             continue
         closestr, closest = float("inf"), None
         if i > ntrials or ( b < 0 and not allowNegative ):
-            bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 10000.0, 100000.0, 1000000.0 ]
+            bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10., 1e2, -1e2, 1e3, 1e-2, -1e-2, 1e-3, -1e-3, 1e4, 1e5, 1e6, 1e8 ]
             if not allowNegative:
-                bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001, 10000.0, 100000.0, 1000000.0 ]
+                bvalues = [1.0, 0.0, 3.0, 10.0, 1e-1, 1e2, 1e3, 1e-2, 1e-3, 1e4, 1e5, 1e6, 1e8 ]
             for b in bvalues:
                 rb = rootfinder(b)
                 if rb is None: # if cls computation failed, try with next b value
@@ -152,6 +152,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                 logger.error(f"closest to zero rootfinder({closest})={closestr}")
                 logger.error(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
                 raise SModelSError()
+    if a > b: a,b=b,a
     return a, b
 
 def deltaChi2FromLlhd(likelihood):
