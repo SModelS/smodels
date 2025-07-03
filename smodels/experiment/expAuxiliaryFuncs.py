@@ -583,6 +583,9 @@ def concatenateLines ( oldcontent ):
     tmp=""
     import re
     for i,line in enumerate ( oldcontent ):
+        p1 = line.find ( "#" )
+        if p1 > -1:
+            line = line[:p1]
         tmp+=line.strip()
         ## if next line starts with tab or whitespace or "}",
         ## merge the lines
