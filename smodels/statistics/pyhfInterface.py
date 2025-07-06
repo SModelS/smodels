@@ -918,6 +918,7 @@ class PyhfUpperLimitComputer:
                 if allowNegativeSignals:
                     bounds[model.config.poi_index] = (-5., 10. )
 
+                o = None
                 try:
                     muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
