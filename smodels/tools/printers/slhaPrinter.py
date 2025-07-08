@@ -198,14 +198,14 @@ class SLHAPrinter(TxTPrinter):
             # Get list of analyses IDs used in combination:
             expIDs = cRes.analysisId()
             ul = cRes.getUpperLimit()
-            ulExpected = cRes.getUpperLimit(expected=True)
+            ulExpected = cRes.getUpperLimit(expected=self.getTypeOfExpected())
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
 
             r = self._round(cRes.getRValue(expected=False))
-            r_expected = self._round(cRes.getRValue(expected=True))
+            r_expected = self._round(cRes.getRValue(expected=self.getTypeOfExpected()))
 
             nll = cRes.likelihood(return_nll=True)
             nllmin = cRes.lmax(return_nll=True)

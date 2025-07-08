@@ -400,14 +400,14 @@ class PyPrinter(BasicPrinter):
         # Get list of analyses used in combination:
         expIDs = obj.analysisId()
         ul = obj.getUpperLimit()
-        ulExpected = obj.getUpperLimit(expected=True)
+        ulExpected = obj.getUpperLimit(expected=self.getTypeOfExpected())
         if isinstance(ul, unum.Unum):
             ul = ul.asNumber(fb)
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
         r = self._round(obj.getRValue(expected=False))
-        r_expected = self._round(obj.getRValue(expected=True))
+        r_expected = self._round(obj.getRValue(expected=self.getTypeOfExpected()))
 
         nll = self._round(obj.likelihood( return_nll = True ))
         nllmin = self._round(obj.lmax( return_nll = True ))
