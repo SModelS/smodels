@@ -46,6 +46,7 @@ class AnaCombLikelihoodComputer(object):
         expected: Union[bool, Text] = False,
         return_nll: bool = False,
         useCached: bool = True,
+        asimov : Union[None,float] = None,
     ) -> float:
         """
         Compute the likelihood at a given mu
@@ -63,7 +64,12 @@ class AnaCombLikelihoodComputer(object):
         nll = 0.0
         changed = False
         for tp in self.theoryPredictions:
-            tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached)
+            tmp = None
+            if hasattr ( tp.dataset, "type" ) and tp.dataset.type == "pyhf" and asimov != None:
+                tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached,asimov=asimov )
+            else:
+
+                tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached)
             if tmp != None:
                 nll = nll + tmp     #Add neg log llhds
                 changed = True
@@ -82,6 +88,7 @@ class AnaCombLikelihoodComputer(object):
         allowNegativeSignals: bool = False,
         expected: Union[bool, Text] = False,
         return_nll: bool = False,
+        asimov : Union[None,float] = None,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
 
@@ -215,6 +222,10 @@ class AnaCombLikelihoodComputer(object):
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                                      allowNegative = allowNegativeSignals )
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
+        if expected==True:
+            print ( f"@@0 analysesCombinations.getUpperLimitOnMu r_exp {1./mu_lim}" )
+            for tp in self.theoryPredictions:
+                print ( f"  `- individual {tp.analysisId()}: {1./tp.getUpperLimitOnMu(expected=True)}" )
         return mu_lim
 
     def getUpperLimitOnSigmaTimesEff(self, expected=False, allowNegativeSignals= False):
@@ -253,7 +264,7 @@ class AnaCombLikelihoodComputer(object):
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True)
+                             return_nll=True, asimov=0.)
         _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
@@ -265,7 +276,7 @@ class AnaCombLikelihoodComputer(object):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
+            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False,asimov=0.)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot

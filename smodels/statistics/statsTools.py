@@ -307,21 +307,22 @@ class StatsComputer:
 
     def get_five_values ( self, expected : Union [ bool, Text ],
                       return_nll : bool = False,
-                      check_for_maxima : bool = False )-> Dict:
+                      check_for_maxima : bool = False,
+                      asimov : Union[None,float] = None )-> Dict:
         """
         Return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
 
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
                                  correct, if necessary
         """
-        ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
+        ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll, asimov = asimov )
         if ret is None:
             return {}
         lmax = ret['lmax']
 
-        lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )
+        lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll, asimov = asimov)
         ret["lbsm"] = lbsm
-        lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll )
+        lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll, asimov = asimov)
         ret["lsm"] = lsm
         if check_for_maxima:
             if return_nll:
@@ -350,11 +351,12 @@ class StatsComputer:
         return ret
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text],
-                            return_nll : bool ) -> float:
+                     return_nll : bool, asimov : Union[None,float] ) -> float:
         """ simple frontend to individual computers """
         self.transform ( expected )
         kwargs = {}
         if self.dataType == "pyhf":
+            kwargs["asimov"]=asimov
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
@@ -382,7 +384,8 @@ class StatsComputer:
         self.likelihoodComputer.transform ( expected )
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
-           return_nll : bool = False ) -> dict:
+           return_nll : bool = False,
+           asimov : Union [None,float] = None ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
         :returns: Dictionary of llhd (llhd at mu_hat), \

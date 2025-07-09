@@ -315,7 +315,8 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
-    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True):
+    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True,
+                   asimov : Union[None,float] = None ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood. if "posteriori",
@@ -338,7 +339,7 @@ class TheoryPrediction(object):
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
                                              expected = expected,
-                                             return_nll = True )
+                                             return_nll = True, asimov = asimov )
         self.cachedNlls[expected][mu] = nll
 
         if abs(mu) < 1e-5:
@@ -390,8 +391,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         If called with a list containing a single TheoryPrediction, return the TheoryPrediction object.
         Otherwise, create a TheoryPredictionsCombiner object.
         """
-
-        if len(theoryPredictions) == 1:
+        if False: # len(theoryPredictions) == 1:
             return theoryPredictions[0]
         else:
             tpCombiner = super(TheoryPredictionsCombiner, cls).__new__(cls)

@@ -21,7 +21,7 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
-from typing import Dict, List
+from typing import Dict, List, Union
 
 jsonver = ""
 try:
@@ -672,7 +672,7 @@ class PyhfUpperLimitComputer:
         return init_pars
 
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
-                    expected=False):
+                    expected=False, asimov : Union[None,float]=None ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -683,6 +683,8 @@ class PyhfUpperLimitComputer:
         :param expected: if False, compute expected values, if True, \
             compute a priori expected, if "posteriori" compute posteriori \
             expected
+        :param asimov: if number, compute for asimov data with mu being
+        the number given
         """
         if workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
@@ -722,6 +724,8 @@ class PyhfUpperLimitComputer:
                 }
                 model = workspace.model(modifier_settings=msettings)
                 wsData = workspace.data(model)
+                if asimov != None:
+                    wsData = pyhf.infer.calculators.generate_asimov_data(asimov,wsData,model,None,None,None)
 
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
@@ -872,7 +876,7 @@ class PyhfUpperLimitComputer:
 
 
     def lmax( self, workspace_index=None, return_nll=False, expected=False,
-              allowNegativeSignals=False):
+              allowNegativeSignals=False, asimov : Union[None,float] = None ):
         """
         Returns the negative log max likelihood
 
@@ -884,6 +888,8 @@ class PyhfUpperLimitComputer:
             expected
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
+        :param asimov: if number, compute for asimov data with mu being
+        the number given
         """
         if workspace_index in self.data.cached_lmaxes[expected]:
             return self.data.cached_lmaxes[expected][workspace_index]
@@ -910,6 +916,9 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
+            data = workspace.data(model)
+            if asimov != None:
+                data = pyhf.infer.calculators.generate_asimov_data(asimov,data,model,None,None,None)
             muhat, maxNllh = model.config.suggested_init(), float("nan")
             sigma_mu = float("nan")
             # obs = workspace.data(model)
@@ -920,7 +929,7 @@ class PyhfUpperLimitComputer:
 
                 o = None
                 try:
-                    muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                    muhat, maxNllh, o = pyhf.infer.mle.fit(data, model,
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                     #removed jacobain way of computing sigma_mu
 
@@ -1004,7 +1013,8 @@ class PyhfUpperLimitComputer:
             else:
                 return self.workspaces[workspace_index]
 
-    def getUpperLimitOnSigmaTimesEff(self, expected=False, workspace_index=None):
+    def getUpperLimitOnSigmaTimesEff(self, expected=False, workspace_index=None,
+            asimov : Union[None,float] = None ):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
             - by default, the combination of the workspaces contained into self.workspaces
@@ -1016,12 +1026,14 @@ class PyhfUpperLimitComputer:
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
                                 - else: choose best combo
+        :param asimov: if number, compute for asimov data with mu being
+        the number given
         :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
         if self.data.totalYield == 0.:
             return None
         else:
-            ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index)
+            ul = self.getUpperLimitOnMu( expected=expected, workspace_index=workspace_index, asimov = asimov )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -1034,7 +1046,7 @@ class PyhfUpperLimitComputer:
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
-    def getUpperLimitOnMu(self, expected=False, workspace_index=None):
+    def getUpperLimitOnMu(self, expected=False, workspace_index=None, asimov : Union[None,float] = None ):
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
