@@ -977,19 +977,21 @@ class UpperLimitComputer:
         sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
         nll0 = computer.likelihood( mu_hat, return_nll=True)
-        aModel = copy.deepcopy(model)
-        if model.isLinear():
-            aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)]) # old
-        else:
-            aModel.observed = model.A + theta_hat0 + model.C * theta_hat0**2 / model.B**2
-        aModel.name = aModel.name + "A"
-        # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
-        compA = LikelihoodComputer(aModel )
-        ## compute
-        mu_hatA = compA.findMuHat()
-        # TODO convert rel_signals to signals
-        nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
-        # return 1.
+        nll0A = nll0
+        if expected != True:
+            aModel = copy.deepcopy(model)
+            if model.isLinear():
+                aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)]) # old
+            else:
+                aModel.observed = model.A + theta_hat0 + model.C * theta_hat0**2 / model.B**2
+            aModel.name = aModel.name + "A"
+            # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
+            compA = LikelihoodComputer(aModel )
+            ## compute
+            mu_hatA = compA.findMuHat()
+            # TODO convert rel_signals to signals
+            nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
+            # return 1.
 
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:
             """
@@ -1002,7 +1004,9 @@ class UpperLimitComputer:
                         CLs: returns CLs value
             """
             nll = computer.likelihood(mu, return_nll=True)
-            nllA = compA.likelihood(mu, return_nll=True)
+            nllA = nll
+            if expected != True:
+                nllA = compA.likelihood(mu, return_nll=True)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
 
         return mu_hat, sigma_mu, clsRoot

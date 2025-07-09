@@ -252,9 +252,11 @@ class AnaCombLikelihoodComputer(object):
         nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True)
-        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        nll0A = nll0
+        if expected != True:
+            fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
+                                 return_nll=True)
+            _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
@@ -265,7 +267,9 @@ class AnaCombLikelihoodComputer(object):
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
+            nllA = nll
+            if expected != True:
+                nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot
