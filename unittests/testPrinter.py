@@ -33,7 +33,7 @@ class RunPrinterTest(unittest.TestCase):
     def testPrintersV2(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
-        out = runMain(slhafile,suppressStdout=False)
+        out = runMain(slhafile,suppressStdout=True)
         outputfile = out.replace('.py', '.smodels')
 
         defaultfile = "gluino_squarks_default.smodels"
@@ -98,7 +98,7 @@ class RunPrinterTest(unittest.TestCase):
 
         slhafile = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(slhafile, inifile='testParameters_exp.ini',
-                             suppressStdout = False )
+                             suppressStdout = True )
         smodelsOutput = importModule(outputfile)
 
         if self.definingRun:
@@ -150,7 +150,7 @@ class RunPrinterTest(unittest.TestCase):
 
         slhafile = "./testFiles/slha/lightEWinos.slha"
         out = runMain(slhafile,inifile="testPrinters_parameters.ini",
-                suppressStdout = False )
+                suppressStdout = True )
 
         # Check Summary output
         outputfile = out.replace('.py', '.smodels')
@@ -217,7 +217,7 @@ class RunPrinterTest(unittest.TestCase):
         slhafile = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(slhafile,
                 inifile='testPrinters_parameters_nodeMap.ini',
-                suppressStdout = False )
+                suppressStdout = True )
         smodelsOutput = importModule(outputfile)
         from simplyGluino_default_nodesMap import smodelsOutputDefault
 
