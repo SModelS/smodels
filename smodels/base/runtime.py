@@ -16,6 +16,7 @@ from typing import Union
 modelFile="smodels.share.models.mssm"
 
 _experimental = { "truncatedgaussians": False,
+                  "writepatchedjsons": False,
                   "spey": False } ## experimental features
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
