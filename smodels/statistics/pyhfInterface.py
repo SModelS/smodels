@@ -601,20 +601,17 @@ class PyhfUpperLimitComputer:
 
             return workspaces
 
-    def writePatchedJsons ( self ) -> bool:
+    def writePatchedJsons ( self, filename : os.PathLike = "patched_workspace.json" ) -> bool:
         """ debug method to write out patched json files. 
         :returns: true if something was written
         """
+        logger.info ( f"dumping patched json model to {filename}" )
         from smodels.base.runtime import experimentalFeature
         if not experimentalFeature ( "writepatchedjsons" ):
             return False
         import json
-        for workspace,(jsonFile,SRs) in zip(self.workspaces,self.data.jsonFiles.items()):
-            filename = jsonFile.replace(".json","_patched.json")
-            # filename = f"{self.data.globalInfo.id}_{filename}"
-            logger.info ( f"dumping patched version of {jsonFile}:{self.data.globalInfo.id} to {filename}" )
-            # workspace._comment = self.data.globalInfo.id
-            with open ( filename, "wt" ) as f:
+        with open ( filename, "wt" ) as f:
+            for workspace in self.workspaces:
                 json.dump ( workspace, f, indent=2 )
             f.close()
         return True
