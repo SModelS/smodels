@@ -280,7 +280,7 @@ class StatsComputer:
             signalUncertainty = globalInfo.signalUncertainty
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty, globalInfo)
+        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty)
         if data.errorFlag:
             return None
         self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )

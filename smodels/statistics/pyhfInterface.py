@@ -110,11 +110,10 @@ class PyhfData:
     """
 
     def __init__( self, nsignals : Dict[str, Dict], inputJsons, jsonFiles=None,
-                  includeCRs : bool = False, signalUncertainty=None, globalInfo = None ):
+                  includeCRs=False, signalUncertainty=None):
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
-        self.globalInfo = globalInfo
         self.cached_likelihoods = { False: {}, True: {}, "posteriori": {} }  ## cache of likelihoods (actually twice_nlls)
         self.cached_lmaxes = { False: {}, True: {}, "posteriori": {} }  # cache of lmaxes (actually twice_nlls)
         self.cachedULs = { False: {}, True: {}, "posteriori": {}}
@@ -300,6 +299,7 @@ class PyhfData:
 
             # smodelsRegions = self.nsignals[jsName].values() # CR and SR names implemented in the database
             smodelsRegions = self.jsonFiles[jsName]
+            #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
             if "observations" in ws:
                 self.updatePyhfNames ( jsName, ws["observations"] )
                 patchedChannels = set()
@@ -396,7 +396,6 @@ class PyhfUpperLimitComputer:
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
         self.workspaces_expected = self.wsMaker(apriori=True)
-        self.writePatchedJsons()
         self.cl = cl
         self.scale = 1.0
         self.sigma_mu = None
@@ -600,22 +599,6 @@ class PyhfUpperLimitComputer:
                 workspaces.append(ws)
 
             return workspaces
-
-    def writePatchedJsons ( self, filename : os.PathLike = "patched_workspace.json" ) -> bool:
-        """ debug method to write out patched json files. 
-        :returns: true if something was written
-        """
-        logger.info ( f"dumping patched json model to {filename}" )
-        from smodels.base.runtime import experimentalFeature
-        if not experimentalFeature ( "writepatchedjsons" ):
-            return False
-        import json
-        with open ( filename, "wt" ) as f:
-            for workspace in self.workspaces:
-                json.dump ( workspace, f, indent=2 )
-            f.close()
-        return True
-
 
     def backup(self):
         self.bu_signal = copy.deepcopy(self.data.nsignals)
@@ -1124,6 +1107,7 @@ class PyhfUpperLimitComputer:
                             sup.filter(RuntimeWarning, r"invalid value encountered in log")
                         # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
                         # ic ( workspace["channels"][0]["samples"][0]["data"] )
+                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                         try:
                             result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
                         except Exception as e:
