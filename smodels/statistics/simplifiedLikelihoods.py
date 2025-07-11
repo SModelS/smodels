@@ -96,6 +96,19 @@ class Data:
         self.deltas_rel = deltas_rel
         self._computeABC()
 
+    def generateAsimovData ( self, theta_hat : list, mu : float = 0. ):
+        """ generate a model with Asimov data out of the current model 
+        :param theta_hat: the profiled nuisance parameters
+        :returns: Data object
+        """
+        newModel = copy.deepcopy(self)
+        if newModel.isLinear():
+            newModel.observed = array([mu*s + x + y for s, x, y in zip(self.nsignal, self.backgrounds, theta_hat)]) # old
+        else:
+            newModel.observed = mu*self.nsignal + self.A + theta_hat + self.C * theta_hat**2 / self.B**2
+        newModel.name = self.name + "A"
+        return newModel
+
     def totalCovariance(self, nsig):
         """get the total covariance matrix, taking into account
         also signal uncertainty for the signal hypothesis <nsig>.
@@ -773,7 +786,6 @@ class LikelihoodComputer:
         if self.debug_mode:
             self.theta_hat = theta_hat
         ret = self.llhdOfTheta( theta_hat, return_nll )
-
         return ret
 
     def lmax(self, return_nll=False, allowNegativeSignals=False):
@@ -979,13 +991,7 @@ class UpperLimitComputer:
         sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
 
         nll0 = computer.likelihood( mu_hat, return_nll=True)
-        aModel = copy.deepcopy(model)
-        if model.isLinear():
-            aModel.observed = array([x + y for x, y in zip(model.backgrounds, theta_hat0)]) # old
-        else:
-            aModel.observed = model.A + theta_hat0 + model.C * theta_hat0**2 / model.B**2
-        aModel.name = aModel.name + "A"
-        # print ( f"SL finding mu hat with {aModel.signal_rel}: mu_hatA, obs: {aModel.observed}" )
+        aModel = model.generateAsimovData( theta_hat0, 0. )
         compA = LikelihoodComputer(aModel )
         ## compute
         mu_hatA = compA.findMuHat()
