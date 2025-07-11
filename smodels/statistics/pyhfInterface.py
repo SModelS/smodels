@@ -21,7 +21,7 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
-from typing import Dict, List
+from typing import Dict, List, Union, Text
 
 jsonver = ""
 try:
@@ -57,7 +57,7 @@ pyhfinfo = {
 }
 
 def setBackend ( backend : str ) -> bool:
-    """ 
+    """
     try to setup backend to <backend>
 
     :param backend: one of: numpy (default), pytorch, jax, tensorflow
@@ -1030,6 +1030,86 @@ class PyhfUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
+    def CLs( self, mu : float, expected : Union[bool,str],
+             return_type: Text = "CLs",
+             workspace_index : Union[int,None] = None ) -> float:
+        """
+        Compute the exclusion confidence level of the model
+
+        :param mu: compute for the parameter of interest mu
+        :param expected: if false, compute observed, true: compute a priori expected
+        :param return_type: (Text) can be one of:
+        "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
+        CLs-alpha: returns CLs - 0.05
+        alpha-CLs: return 0.05 - CLs
+        1-CLs: returns 1-CLs value
+        CLs: returns CLs value
+        """
+        assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+        # If expected == False, use unmodified (but patched) workspace
+        # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
+        # If expected == posteriori, use unmodified (but patched) workspace
+        if workspace_index == None:
+            workspace_index = self.getBestCombinationIndex()
+        if workspace_index == None:
+            return None
+        workspace = self.updateWorkspace(workspace_index, expected=expected)
+        # Same modifiers_settings as those use when running the 'pyhf cls' command line
+        msettings = {
+            "normsys": {"interpcode": "code4"},
+            "histosys": {"interpcode": "code4p"},
+        }
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+            model = workspace.model(modifier_settings=msettings)
+            bounds = model.config.suggested_bounds()
+            bounds[model.config.poi_index] = (0, 10)
+            start = time.time()
+            args = {}
+            args["return_expected"] = expected == "posteriori"
+            args["par_bounds"] = bounds
+            # args["maxiter"]=100000
+            pver = float(pyhf.__version__[:3])
+            stat = "qtilde"
+            if pver < 0.6:
+                args["qtilde"] = True
+            else:
+                args["test_stat"] = stat
+            with np.testing.suppress_warnings() as sup:
+                if pyhfinfo["backend"] == "numpy":
+                    sup.filter(RuntimeWarning, r"invalid value encountered in log")
+                # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
+                # ic ( workspace["channels"][0]["samples"][0]["data"] )
+                # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+                try:
+                    result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                except Exception as e:
+                    logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
+                    result = float("nan")
+                    if expected == "posteriori":
+                        result = [float("nan")] * 2
+            end = time.time()
+            logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
+            logger.debug(f"result for {mu} {result}")
+            if expected == "posteriori":
+                logger.debug("computing a-posteriori expected limit")
+                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                try:
+                    CLs = float(result[1].tolist())
+                except TypeError:
+                    CLs = float(result[1][0])
+            else:
+                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                CLs = float(result)
+            if return_type == "1-CLs":
+                return 1.0 - CLs
+            elif return_type == "CLs":
+                return CLs
+            elif return_type == "CLs-alpha":
+                return CLs - 1 + self.cl
+            # return_type == "alpha-CLs"
+            return 1 - self.cl - CLs
+
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
@@ -1076,61 +1156,6 @@ class PyhfUpperLimitComputer:
                 logger.debug("Best combination index not found")
                 return None
 
-            def clsRoot(mu : float ) -> float:
-                # If expected == False, use unmodified (but patched) workspace
-                # If expected == True, use modified workspace where observations = sum(bkg) (and patched)
-                # If expected == posteriori, use unmodified (but patched) workspace
-                workspace = self.updateWorkspace(workspace_index, expected=expected)
-                # Same modifiers_settings as those use when running the 'pyhf cls' command line
-                msettings = {
-                    "normsys": {"interpcode": "code4"},
-                    "histosys": {"interpcode": "code4p"},
-                }
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
-                    model = workspace.model(modifier_settings=msettings)
-                    bounds = model.config.suggested_bounds()
-                    bounds[model.config.poi_index] = (0, 10)
-                    start = time.time()
-                    args = {}
-                    args["return_expected"] = expected == "posteriori"
-                    args["par_bounds"] = bounds
-                    # args["maxiter"]=100000
-                    pver = float(pyhf.__version__[:3])
-                    stat = "qtilde"
-                    if pver < 0.6:
-                        args["qtilde"] = True
-                    else:
-                        args["test_stat"] = stat
-                    with np.testing.suppress_warnings() as sup:
-                        if pyhfinfo["backend"] == "numpy":
-                            sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                        # print ("expected", expected, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                        # ic ( workspace["channels"][0]["samples"][0]["data"] )
-                        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
-                        try:
-                            result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
-                        except Exception as e:
-                            logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
-                            result = float("nan")
-                            if expected == "posteriori":
-                                result = [float("nan")] * 2
-                    end = time.time()
-                    logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
-                    logger.debug(f"result for {mu} {result}")
-                    if expected == "posteriori":
-                        logger.debug("computing a-posteriori expected limit")
-                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                        try:
-                            CLs = float(result[1].tolist())
-                        except TypeError:
-                            CLs = float(result[1][0])
-                    else:
-                        logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
-                        CLs = float(result)
-                    # logger.debug(f"Call of clsRoot({mu}) -> {1.0 - CLs}" )
-                    return 1.0 - self.cl - CLs
-
             # Rescaling signals so that mu is in [0, 10]
             factor = 3.0
             wereBothLarge = False
@@ -1138,7 +1163,6 @@ class PyhfUpperLimitComputer:
             nattempts = 0
             nNan = 0
             lo_mu, med_mu, hi_mu = 0.2, 1.0, 5.0
-            # ic ( "A", lo_mu, hi_mu, clsRoot(lo_mu), clsRoot(hi_mu) )
             # print ( "starting with expected", expected )
             while "mu is not in [lo_mu,hi_mu]":
                 nattempts += 1
@@ -1152,9 +1176,9 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = clsRoot(lo_mu)
-                # rt5 = clsRoot(med_mu)
-                rt10 = clsRoot(hi_mu)
+                rt1 = self.CLs(lo_mu, expected, "alpha-CLs", workspace_index )
+                # rt5 = CLs(med_mu)
+                rt10 = self.CLs(hi_mu, expected, "alpha-CLs", workspace_index )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1162,7 +1186,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = clsRoot(med_mu)
+                    rt5 = self.CLs(med_mu, expected, "alpha-CLs", workspace_index )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1174,7 +1198,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = clsRoot(med_mu)
+                    rt5 = self.CLs(med_mu, expected, "alpha-CLs", workspace_index )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1204,7 +1228,7 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            ul = findRoot ( clsRoot, lo_mu, hi_mu, rtol=1e-3, xtol=1e-3 )
+            ul = findRoot ( self.CLs, lo_mu, hi_mu, args=(expected, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale

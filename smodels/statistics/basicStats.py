@@ -30,11 +30,12 @@ def CLsfromNLL(
     :param nll0: negative log likelihood at muhat
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
+                        alpha-CLs: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
     :return: Cls-type value, see above
     """
-    assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+    assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
     qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
@@ -54,8 +55,10 @@ def CLsfromNLL(
         return 1.0 - CLs
     elif return_type == "CLs":
         return CLs
-
-    return CLs - 0.05
+    elif return_type == "CLs-alpha":
+        return CLs - 0.05
+    # return_type == "alpha-CLs"
+    return 0.05 - CLs
 
 def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args : tuple = (),
                rtol : float = 8.881784197001252e-16, xtol : float = 2e-12 ) -> float:

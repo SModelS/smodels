@@ -279,10 +279,11 @@ class AnaCombLikelihoodComputer(object):
         :param expected: if false, compute observed, true: compute a priori expected
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
+                        alpha-CLs: returns 0.05 - CLs \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
         """
-        assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+        assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
         _, _, clsRoot = self.getCLsRootFunc(expected=expected)
 
         return clsRoot(mu, return_type=return_type)
