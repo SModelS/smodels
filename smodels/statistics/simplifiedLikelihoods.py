@@ -882,6 +882,23 @@ class LikelihoodComputer:
             return ret
         return mu_hat
 
+    def generateAsimovComputer ( self, mu : float = 0. ):
+        """ given the current computer with its model,
+        generate a model with asimov data for a given mu.
+        :param mu: signal strength to create Asimov data for.
+
+        :returns: LikelihoodComputer, with theta_hat as data member
+        """
+        theta_hat, _ = self.findThetaHat( mu )
+        # mu_hat = self.findMuHat( allowNegativeSignals=False, extended_output=False)
+        # sigma_mu = self.getSigmaMu(mu_hat, theta_hat0)
+
+        # nll0 = computer.likelihood( mu_hat, return_nll=True)
+        aModel = self.model.generateAsimovData( theta_hat, mu )
+        newComputer = LikelihoodComputer(aModel )
+        newComputer.theta_hat = theta_hat
+        return newComputer
+
     def chi2(self ):
         """
         Computes the chi2 for a given number of observed events nobs given
@@ -987,12 +1004,15 @@ class UpperLimitComputer:
                 ### FIXME!
         computer = LikelihoodComputer(model )
         mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
-        theta_hat0, _ = computer.findThetaHat( 0. )
-        sigma_mu = computer.getSigmaMu(mu_hat, theta_hat0)
-
+        compA = computer.generateAsimovComputer ( 0. )
+        sigma_mu = computer.getSigmaMu(mu_hat, compA.theta_hat)
         nll0 = computer.likelihood( mu_hat, return_nll=True)
-        aModel = model.generateAsimovData( theta_hat0, 0. )
-        compA = LikelihoodComputer(aModel )
+
+        theta_hat0 = compA.theta_hat
+        # theta_hat0, _ = computer.findThetaHat( 0. )
+
+        #aModel = model.generateAsimovData( theta_hat0, 0. )
+        # compA = LikelihoodComputer(aModel )
         ## compute
         mu_hatA = compA.findMuHat()
         # TODO convert rel_signals to signals
