@@ -33,8 +33,8 @@ class SLTest(unittest.TestCase):
         )
         m.zeroSignal()
 
-        ulComp = UpperLimitComputer( cl=.95 )
-        ulProf = ulComp.getUpperLimitOnMu ( m )
+        ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu ( )
         self.assertEqual(ulProf, None )
 
     def testPathologicalModel2(self):
@@ -50,8 +50,8 @@ class SLTest(unittest.TestCase):
         )
         m.zeroSignal()
 
-        ulComp = UpperLimitComputer( cl=.95 )
-        ulProf = ulComp.getUpperLimitOnMu(m )
+        ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu( )
         self.assertAlmostEqual(ulProf, 1920.7547785412298, 1 )
 
     def testModel8(self):
@@ -70,8 +70,8 @@ class SLTest(unittest.TestCase):
                   third_moment = [ 0. ] * 8,
                   nsignal= nsignal,
                   name="CMS-NOTE-2017-001 model",deltas_rel=0. )
-        ulComp = UpperLimitComputer ( cl=.95 )
-        ulProf = ulComp.getUpperLimitOnMu ( m )
+        ulComp = UpperLimitComputer ( LikelihoodComputer ( m ) , cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu ( )
         self.assertAlmostEqual( ulProf / 131.58637474312224, 1.0, 2 )
 
     def createModel(self,n=3):
@@ -94,9 +94,9 @@ class SLTest(unittest.TestCase):
 
         """ take first n SRs of model-90 """
         m = self.createModel ( 3 )
-        ulComp = UpperLimitComputer( cl=.95 )
         lComp = LikelihoodComputer( m )
-        ulProf = ulComp.getUpperLimitOnMu( m )
+        ulComp = UpperLimitComputer( lComp, cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu(  )
         self.assertAlmostEqual( ulProf / 2163.1435825822646, 1.0, 3 )
         ## Nick's profiling code gets for n=3 ul=2135.66
         ret = lComp.lmax ( )
@@ -138,8 +138,8 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual( muhat, 1. )
         self.assertAlmostEqual( sigma_mu, 32.31764780503341 )
 
-        ulComp = UpperLimitComputer( cl=.95 )
-        ul = ulComp.getUpperLimitOnMu( m )
+        ulComp = UpperLimitComputer( LikelihoodComputer ( m ), cl=.95 )
+        ul = ulComp.getUpperLimitOnMu( )
         ## Nick's profiling code gets for n=3 ul=2135.66
         self.assertAlmostEqual(ul / 61.26914, 1.0, 1)
 
@@ -147,8 +147,8 @@ class SLTest(unittest.TestCase):
 
         """ take first 10 SRs of model-90 """
         m = self.createModel ( 10 )
-        ulComp = UpperLimitComputer( cl=.95 )
-        ulProf = ulComp.getUpperLimitOnMu( m )
+        ulComp = UpperLimitComputer( LikelihoodComputer ( m ), cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu( )
         self.assertAlmostEqual( ulProf / 365.6091713369213, 1.0, 2 )
         ## Nick's profiling code gets for n=10 ul=357.568
 
@@ -156,8 +156,8 @@ class SLTest(unittest.TestCase):
         m = self.createModel(40)
         import time
 
-        ulComp = UpperLimitComputer( cl=.95 )
-        ulProf = ulComp.getUpperLimitOnMu ( m )
+        ulComp = UpperLimitComputer( LikelihoodComputer(m), cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu ( )
         self.assertAlmostEqual( ulProf / 61.03436726595563, 1.0, 2 )
 
     def testTrivialModel ( self ):
@@ -190,8 +190,8 @@ class SLTest(unittest.TestCase):
         # mu_hat is (observed - background) / signal
         # (as it's the same for all regions)
         # it's 1.0
-        ulComp = UpperLimitComputer( cl=.95 )
-        ulProf = ulComp.getUpperLimitOnMu ( m )
+        ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
+        ulProf = ulComp.getUpperLimitOnMu ( )
         pprint ( "ulProf", ulProf )
         self.assertAlmostEqual ( lmax, lm, 3 )
         self.assertAlmostEqual ( muhat, 1., 5 )

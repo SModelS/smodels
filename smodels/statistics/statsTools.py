@@ -187,7 +187,7 @@ class StatsComputer:
                      nsignal = self.nsig )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( )
+        self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 
     def getComputerMultiBinSL(self):
         """
@@ -218,7 +218,7 @@ class StatsComputer:
                      deltas_rel = self.deltas_sys, lumi=dataset.getLumi() )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( )
+        self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 
     def getComputerPyhf(self ):
         """
@@ -371,8 +371,8 @@ class StatsComputer:
     def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( expected )
-        if hasattr ( self.likelihoodComputer, "CLs" ):
-            return self.likelihoodComputer.CLs ( poi_test, expected )
+        if hasattr ( self.upperLimitComputer, "CLs" ):
+            return self.upperLimitComputer.CLs ( poi_test, expected )
         return None
 
     def transform ( self, expected ):
@@ -380,6 +380,14 @@ class StatsComputer:
         if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
             return
         self.likelihoodComputer.transform ( expected )
+
+    def restore ( self, expected ):
+        """ SL only. transform the data to expected or observed """
+        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+            return
+        if expected != False:
+            return
+        self.likelihoodComputer.model = self.likelihoodComputer.origModel
 
     def maximize_likelihood ( self, expected : Union[bool,Text],
            return_nll : bool = False ) -> dict:
@@ -427,11 +435,12 @@ class StatsComputer:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                        expected = expected, workspace_index = index )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
+            self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(self.data,
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
                        expected = expected )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(self.data,
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
                        expected = expected )
         elif self.dataType in ["analysesComb"]:
             if limit_on_xsec:

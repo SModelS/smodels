@@ -66,9 +66,9 @@ class StatisticsTest(unittest.TestCase):
         nsig = 3.0
         nobs, nbg = 35, 30
         m = Data(nobs, nbg, 0.001, None, nsig )
-        ulcomp = UpperLimitComputer()
-        ulobs = ulcomp.getUpperLimitOnMu(m)
-        ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
+        ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
+        ulobs = ulcomp.getUpperLimitOnMu()
+        ulexp = ulcomp.getUpperLimitOnMu( expected=True )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
         ret = computer.lmax ( return_nll = False)
         doPrint = False
@@ -122,11 +122,11 @@ class StatisticsTest(unittest.TestCase):
         nsig = 35.0
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
-        ulcomp = UpperLimitComputer()
-        ulexpmu = ulcomp.getUpperLimitOnMu(m, expected=True)
+        ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
+        ulexpmu = ulcomp.getUpperLimitOnMu( expected=True)
         # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
         self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
-        ulobsmu = ulcomp.getUpperLimitOnMu(m)
+        ulobsmu = ulcomp.getUpperLimitOnMu()
         # ulobsmu should roughly equal sqrt(100*2 / 35. + ( 110 -100 ) / 35. = 85
         self.assertAlmostEqual ( ulobsmu, 0.834560746, 3 )
         llhdcomp = LikelihoodComputer(m)
@@ -158,8 +158,8 @@ class StatisticsTest(unittest.TestCase):
 
     def testUpperLimit(self):
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
-        comp = UpperLimitComputer()
-        re = comp.getUpperLimitOnMu(m)
+        comp = UpperLimitComputer( LikelihoodComputer(m) )
+        re = comp.getUpperLimitOnMu()
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
     def testExperimentalFeatureOff(self):

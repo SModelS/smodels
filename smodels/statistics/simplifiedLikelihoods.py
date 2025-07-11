@@ -905,15 +905,16 @@ class LikelihoodComputer:
 class UpperLimitComputer:
     debug_mode = False
 
-    def __init__(self, cl: float = 0.95):
+    def __init__(self, likelihoodComputer, cl: float = 0.95):
 
         """
         :param cl: desired quantile for limits
         """
+        self.likelihoodComputer = likelihoodComputer
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, model, expected=False, trylasttime=False
+        self, expected=False, trylasttime=False
     ):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -927,7 +928,8 @@ class UpperLimitComputer:
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
-        ul = self.getUpperLimitOnMu( model, expected=expected, 
+        model = self.likelihoodComputer.model
+        ul = self.getUpperLimitOnMu( expected=expected,
                                      trylasttime=trylasttime)
 
         if ul == None:
@@ -940,7 +942,6 @@ class UpperLimitComputer:
 
     def getCLsRootFunc(
         self,
-        model: Data,
         expected: Optional[Union[bool, Text]] = False,
         trylasttime: Optional[bool] = False,
     ) -> Tuple:
@@ -954,6 +955,7 @@ class UpperLimitComputer:
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
+        model = self.likelihoodComputer.model
         if model.zeroSignal():
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
@@ -1008,7 +1010,7 @@ class UpperLimitComputer:
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, model, expected=False, trylasttime=False
+        self, expected=False, trylasttime=False
     ):
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
@@ -1022,7 +1024,7 @@ class UpperLimitComputer:
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
-            model, expected, trylasttime
+            expected = expected, trylasttime = trylasttime
         )
         if mu_hat == None:
             return None
@@ -1034,12 +1036,12 @@ class UpperLimitComputer:
         logger.debug ( f"muhat={mu_hat}+-{sigma_mu} a,b={a,b} mu_lim={mu_lim}" )
         return mu_lim
 
-    def computeCLs(
+    def CLs(
         self,
-        model: Data,
+        mu : float = 1.0,
         expected: Union[bool, Text] = False,
         trylasttime: bool = False,
-        return_type: Text = "1-CLs",
+        return_type: Text = "CLs",
     ) -> float:
         """
         Compute the exclusion confidence level of the model (1-CLs).
@@ -1054,8 +1056,8 @@ class UpperLimitComputer:
                             1-CLs: returns 1-CLs value
                             CLs: returns CLs value
         """
-        _, _, clsRoot = self.getCLsRootFunc(model, expected, trylasttime )
-        ret = clsRoot(1.0, return_type=return_type)
+        _, _, clsRoot = self.getCLsRootFunc( expected, trylasttime )
+        ret = clsRoot(mu, return_type=return_type)
         # its not an uppser limit on mu, its on nsig
         return ret
 
@@ -1137,10 +1139,10 @@ if __name__ == "__main__":
         nsignal=nsignal,
         name="CMS-NOTE-2017-001 model",
     )
-    ulComp = UpperLimitComputer( cl=0.95)
+    ulComp = UpperLimitComputer( LikelihoodComputer(m), cl=0.95)
 
-    ul = ulComp.getUpperLimitOnMu(m )
-    cls = ulComp.computeCLs(m )
+    ul = ulComp.getUpperLimitOnMu( )
+    cls = ulComp.CLs( 1. )
     print("ul (profiled)", ul)
     print("CLs (profiled)", cls)
 
