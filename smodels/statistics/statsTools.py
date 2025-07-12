@@ -185,7 +185,7 @@ class StatsComputer:
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
                      nsignal = self.nsig )
-        self.data = data
+        # self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 
@@ -350,7 +350,7 @@ class StatsComputer:
         return ret
 
     def likelihood ( self, poi_test : float, expected : Union[bool,Text],
-                            return_nll : bool ) -> float:
+                  return_nll : bool, asimov : Union[None,float] = None ) -> float:
         """ simple frontend to individual computers """
         self.transform ( expected )
         kwargs = {}
@@ -365,8 +365,13 @@ class StatsComputer:
             kwargs["expected"]=expected
         elif self.dataType == "analysesComb":
             kwargs["expected"]=expected
-        return self.likelihoodComputer.likelihood ( poi_test,
+        if asimov != None and self.dataType == "SL":
+            acomputer = self.likelihoodComputer.generateAsimovComputer ( asimov )
+            ret =acomputer.likelihood ( poi_test, return_nll = return_nll, **kwargs )
+            return ret
+        ret = self.likelihoodComputer.likelihood ( poi_test,
                                                 return_nll = return_nll, **kwargs)
+        return ret
 
     def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """

@@ -111,7 +111,7 @@ BLOCK SModelS_Exclusion
  10 8 N/A                            #nll_SM
 
 BLOCK SModelS_CombinedAnas
- 1 1 1.334E-01                      #r value
+ 1 1 1.200E-01                      #r value
  1 2 2.101E-01                      #expected r value
  1 3 9.26E+00                       #nll
  1 4 8.92E+00                       #nll_min

@@ -360,10 +360,10 @@ def compareScanSummary(outA, outB, allowedRelDiff):
             elif isinstance(ptA[col], (float, int)):
                 diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
                 if diff > allowedRelDiff:
-                    logger.error("values for %s differ by %s in %s" % (col, diff, fname))
+                    logger.error( f"values for {col} differ by {diff} ({ptA[col]} vs {ptB[col]}) in {fname}" )
                     return False
             else:
-                logger.error("values for %s differ in %s" % (col, fname))
+                logger.error(f"values for {col} differ in {fname}" )
                 return False
     return True
 

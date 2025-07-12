@@ -46,6 +46,7 @@ class AnaCombLikelihoodComputer(object):
         expected: Union[bool, Text] = False,
         return_nll: bool = False,
         useCached: bool = True,
+        asimov: Union[None,float] = None,
     ) -> float:
         """
         Compute the likelihood at a given mu
@@ -63,7 +64,7 @@ class AnaCombLikelihoodComputer(object):
         nll = 0.0
         changed = False
         for tp in self.theoryPredictions:
-            tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached)
+            tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached,asimov=asimov)
             if tmp != None:
                 nll = nll + tmp     #Add neg log llhds
                 changed = True
@@ -82,6 +83,7 @@ class AnaCombLikelihoodComputer(object):
         allowNegativeSignals: bool = False,
         expected: Union[bool, Text] = False,
         return_nll: bool = False,
+        asimov: Union[None,float] = None,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
 
@@ -99,7 +101,9 @@ class AnaCombLikelihoodComputer(object):
         muhats, weighted = [], []
         totweight = 0.0
         for tp in self.theoryPredictions:
-            muhat = tp.muhat(expected=expected)
+            muhat = asimov
+            if asimov is None:
+                muhat = tp.muhat(expected=expected)
             sigma_mu = tp.sigma_mu(expected=expected)
             if sigma_mu in [None, 0.0]:
                 sigma_mu = 1.0  # unity weights if no weights
@@ -112,7 +116,7 @@ class AnaCombLikelihoodComputer(object):
         if len(muhats)==1:
             if muhat < 0. and not allowNegativeSignals:
                 muhat = 0.
-            retllh = self.theoryPredictions[0].likelihood ( muhat, return_nll = return_nll, expected = expected )
+            retllh = self.theoryPredictions[0].likelihood ( muhat, return_nll = return_nll, expected = expected, asimov=asimov )
             ret = {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": retllh}
             return ret
 
@@ -135,7 +139,7 @@ class AnaCombLikelihoodComputer(object):
                 x = float(mu[0])
             else:
                 x = float(mu)
-            return self.likelihood(x, expected=expected, return_nll=True, useCached=False)
+            return self.likelihood(x, expected=expected, return_nll=True, useCached=False, asimov=asimov)
 
         if allowNegativeSignals:
             toTry += [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1]
@@ -239,7 +243,7 @@ class AnaCombLikelihoodComputer(object):
             xsec += tp.xsection
         return ul * xsec
 
-    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
+    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
@@ -249,11 +253,11 @@ class AnaCombLikelihoodComputer(object):
         fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
         mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
-        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
+        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True,asimov=None )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True)
+        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals,
+                             return_nll=True, asimov = 0. )
         _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
@@ -264,8 +268,9 @@ class AnaCombLikelihoodComputer(object):
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
+            nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False, asimov = None)
+            nllA = self.likelihood(mu, expected=expected, return_nll=True, useCached=False, asimov = 0. )
+
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot
@@ -286,7 +291,7 @@ class AnaCombLikelihoodComputer(object):
         assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
         _, _, clsRoot = self.getCLsRootFunc(expected=expected)
 
-        return clsRoot(mu, return_type=return_type)
+        return float(clsRoot(mu, return_type=return_type))
 
     def getLlhds(self,muvals,expected=False,normalize=True):
         """
