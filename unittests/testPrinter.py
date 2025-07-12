@@ -44,7 +44,7 @@ class RunPrinterTest(unittest.TestCase):
             logger.error ( f"{outputfile} and {defaultfile} differ!" )
 
         self.assertEqual(default, output)
-        if default != output:
+        if default == output:
             self.removeOutputs(outputfile)
 
         smodelsOutput = importModule(out)
