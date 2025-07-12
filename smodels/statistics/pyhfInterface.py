@@ -1030,6 +1030,26 @@ class PyhfUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
+    def generateAsimovData ( self, mu : float = 0., workspace_index : Union[int,None] = None ) -> list:
+        """ generate asimov data for the model for signal strength mu
+        :returns: list with asimov data
+        """
+        msettings = {
+            "normsys": {"interpcode": "code4"},
+            "histosys": {"interpcode": "code4p"},
+        }
+        if workspace_index == None:
+            workspace_index = self.getBestCombinationIndex()
+        if workspace_index == None:
+            return None
+        workspace = self.updateWorkspace(workspace_index, expected=False)
+        #with warnings.catch_warnings():
+        #    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+        model = workspace.model(modifier_settings=msettings)
+        data = workspace.data(model)
+        ad = pyhf.infer.calculators.generate_asimov_data(mu_test, data, model, None, None, None)
+        return ad
+
     def CLs( self, mu : float, expected : Union[bool,str],
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None ) -> float:
