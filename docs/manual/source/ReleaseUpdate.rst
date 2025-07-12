@@ -39,6 +39,8 @@ New in Version 3.1.0:
 
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations,
     we thank Leo Constantin for help with a bug fix concerning failed likelihood computation
+  * Fixed an inconsistency with the upper limits from analysis combinations. analysis-combined ULs may
+    be different by up to ~ 10%
   * Slightly different way of finding upper limits, UL computations may vary slightly numerically
   * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
   * Bumped up pythia8 from 8308 to 8315
