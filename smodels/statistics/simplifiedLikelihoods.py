@@ -55,9 +55,10 @@ class Data:
         covariance,
         third_moment=None,
         nsignal=None,
-        name="model",
-        deltas_rel=0.2,
+        name : str = "model",
+        deltas_rel : float = 0.2,
         lumi=None,
+        asimov : Union[None,float] = None
     ):
         """
         :param observed: number of observed events per dataset
@@ -68,6 +69,7 @@ class Data:
         :param deltas_rel: the assumed relative error on the signal hypotheses.
                            The default is 20%.
         :param lumi: luminosity of dataset in 1/fb, or None
+        :param asimov: None if not asimov data, else signal strength of asimov data
         """
         self.observed = self.convert(observed)  # Make sure observed number of events are integers
         ## self.observed = np.around(self.convert(observed)) #Make sure observed number of events are integers
@@ -75,6 +77,7 @@ class Data:
         self.n = len(self.observed)
         self.covariance = self._convertCov(covariance)
         self.nsignal = self.convert(nsignal)
+        self.asimov = asimov
         self.lumi = lumi
         if self.nsignal is None:
             if len(self.backgrounds) == 1:
@@ -97,7 +100,7 @@ class Data:
         self._computeABC()
 
     def generateAsimovData ( self, theta_hat : list, mu : float = 0. ):
-        """ generate a model with Asimov data out of the current model 
+        """ generate a model with Asimov data out of the current model
         :param theta_hat: the profiled nuisance parameters
         :returns: Data object
         """
@@ -107,6 +110,7 @@ class Data:
         else:
             newModel.observed = mu*self.nsignal + self.A + theta_hat + self.C * theta_hat**2 / self.B**2
         newModel.name = self.name + "A"
+        newModel.asimov = mu
         return newModel
 
     def totalCovariance(self, nsig):
@@ -1085,6 +1089,7 @@ class UpperLimitComputer:
         _, _, clsRoot = self.getCLsRootFunc( expected, trylasttime )
         ret = clsRoot(mu, return_type=return_type)
         # its not an uppser limit on mu, its on nsig
+        print ( f"@@SL0 been asked to compute CLs mu={mu} asimov={self.likelihoodComputer.model.asimov}: {ret}" )
         return ret
 
 
