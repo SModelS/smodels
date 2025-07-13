@@ -55,6 +55,7 @@ class AnaCombLikelihoodComputer(object):
         :param expected: if True, compute expected likelihood, else observed
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will use the cached values from the theoryPrediction objects (if available)
+        :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
         try:
             mu = mu[0]  # some of these methods use arrays with a single element

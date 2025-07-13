@@ -297,7 +297,7 @@ class TheoryPrediction(object):
         return cls
 
     @whenDefined
-    def sigma_mu(self, expected=False):
+    def sigma_mu(self, expected : bool =False):
         """sigma_mu of mu_hat"""
 
         if not "sigma_mu" in self.cachedObjs[expected]:
@@ -306,7 +306,7 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["sigma_mu"]
 
     @whenDefined
-    def muhat(self, expected=False):
+    def muhat(self, expected : bool =False):
         """position of maximum likelihood"""
 
         if not "muhat" in self.cachedObjs[expected]:
@@ -315,7 +315,8 @@ class TheoryPrediction(object):
         return self.cachedObjs[expected]["muhat"]
 
     @whenDefined
-    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True):
+    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True,
+            asimov : Union[None,float] = None ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood. if "posteriori",
@@ -323,8 +324,13 @@ class TheoryPrediction(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value, if available
         """
+        useCached = False
+        print ( f"@@TP1 fixme cache this!!" )
+
         if useCached and mu in self.cachedNlls[expected]:
-            nll = self.cachedNlls[expected][mu]
+            if not asimov in self.cachedNlls[expected]:
+                self.cachedNlls[expected][asimov]={}
+            nll = self.cachedNlls[expected][asimov][mu]
             return self.nllToLikelihood ( nll, return_nll )
 
         if useCached:
@@ -337,8 +343,7 @@ class TheoryPrediction(object):
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
-                                             expected = expected,
-                                             return_nll = True )
+                       expected = expected, return_nll = True, asimov = asimov )
         self.cachedNlls[expected][mu] = nll
 
         if abs(mu) < 1e-5:

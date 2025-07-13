@@ -355,12 +355,15 @@ class StatsComputer:
         self.transform ( expected )
         kwargs = {}
         if self.dataType == "pyhf":
+            if asimov != None:
+                kwargs["asimov"]=asimov
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-            return self.likelihoodComputer.likelihood (
+            ret = self.likelihoodComputer.likelihood (
                     poi_test, return_nll = return_nll,
                     expected = expected, **kwargs )
+            return ret
         elif self.dataType == "truncGaussian":
             kwargs["expected"]=expected
         elif self.dataType == "analysesComb":
@@ -368,8 +371,8 @@ class StatsComputer:
         if asimov != None and self.dataType == "SL":
             acomputer = self.likelihoodComputer.generateAsimovComputer ( asimov )
             ret =acomputer.likelihood ( poi_test, return_nll = return_nll, **kwargs )
-            return ret
-        ret = self.likelihoodComputer.likelihood ( poi_test,
+        else:
+            ret = self.likelihoodComputer.likelihood ( poi_test,
                                                 return_nll = return_nll, **kwargs)
         return ret
 

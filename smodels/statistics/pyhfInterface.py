@@ -672,7 +672,7 @@ class PyhfUpperLimitComputer:
         return init_pars
 
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
-                    expected=False):
+                    expected=False, asimov : Union[None,float] = None ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -684,7 +684,8 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if workspace_index in self.data.cached_likelihoods[expected] and \
+        print ( f"@@PI0 FIXME cache this!!!" )
+        if False and workspace_index in self.data.cached_likelihoods[expected] and \
                 mu in self.data.cached_likelihoods[expected][workspace_index]:
             return self.data.cached_likelihoods[expected][workspace_index][mu]
 
@@ -722,6 +723,8 @@ class PyhfUpperLimitComputer:
                 }
                 model = workspace.model(modifier_settings=msettings)
                 wsData = workspace.data(model)
+                if asimov != None:
+                    wsData = pyhf.infer.calculators.generate_asimov_data(asimov, wsData, model, None, None, None) 
 
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
