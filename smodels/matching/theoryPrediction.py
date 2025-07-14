@@ -39,8 +39,8 @@ class TheoryPrediction(object):
             from smodels.base.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
+        self.cachedObjs = { None: {False: {}, True: {}, "posteriori": {} }, 0.: {False: {}, True: {}, "posteriori": {}} }
+        self.cachedNlls = { None: {False: {}, True: {}, "posteriori": {}}, 0.: {False: {}, True: {}, "posteriori": {}} }
         self._statsComputer = None
 
     def __str__(self):
@@ -200,7 +200,7 @@ class TheoryPrediction(object):
 
         # First check if the upper-limit and expected upper-limit have already been computed.
         # If not, compute it and store them.
-        if "UL" not in self.cachedObjs[expected]:
+        if "UL" not in self.cachedObjs[None][expected]:
             ul = None
             if self.dataType() == "efficiencyMap":
                 ul = self.dataset.getSRUpperLimit(expected=expected)
@@ -211,9 +211,9 @@ class TheoryPrediction(object):
             if self.dataType() == "combined":
                 ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                         limit_on_xsec = True)
-            self.cachedObjs[expected]["UL"] = ul
+            self.cachedObjs[None][expected]["UL"] = ul
 
-        return self.cachedObjs[expected]["UL"]
+        return self.cachedObjs[None][expected]["UL"]
 
     def getUpperLimitOnMu(self, expected=False):
         """
@@ -238,17 +238,17 @@ class TheoryPrediction(object):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        if "r" not in self.cachedObjs[expected]:
+        if "r" not in self.cachedObjs[None][expected]:
             upperLimit = self.getUpperLimit(expected)
             if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
                 r = None
-                self.cachedObjs[expected]["r"] = r
+                self.cachedObjs[None][expected]["r"] = r
                 return r
             else:
                 r = (self.totalXsection()/upperLimit).asNumber()
-                self.cachedObjs[expected]["r"] = r
+                self.cachedObjs[None][expected]["r"] = r
                 return r
-        return self.cachedObjs[expected]["r"]
+        return self.cachedObjs[None][expected]["r"]
 
     def whenDefined(function):
         """
@@ -268,86 +268,78 @@ class TheoryPrediction(object):
     @whenDefined
     def lsm(self, expected=False, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        if "nll_sm" not in self.cachedObjs[expected]:
+        if "nll_sm" not in self.cachedObjs[None][expected]:
             self.computeStatistics(expected)
-        if "nll_sm" not in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lsm"] = None
-        return self.nllToLikelihood ( self.cachedObjs[expected]["nll_sm"],
+        if "nll_sm" not in self.cachedObjs[None][expected]:
+            self.cachedObjs[None][expected]["lsm"] = None
+        return self.nllToLikelihood ( self.cachedObjs[None][expected]["nll_sm"],
                return_nll )
 
     @whenDefined
     def lmax(self, expected=False, return_nll : bool = False ):
         """likelihood at mu_hat"""
-
-        if not "nllmax" in self.cachedObjs[expected]:
+        if not "nllmax" in self.cachedObjs[None][expected]:
             self.computeStatistics(expected)
-        return self.nllToLikelihood ( self.cachedObjs[expected]["nllmax"],
+        return self.nllToLikelihood ( self.cachedObjs[None][expected]["nllmax"],
                 return_nll )
 
     @whenDefined
     def CLs(self, mu : float = 1., expected : Union[Text,bool] = False ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        if not "CLs" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["CLs"] = {}
-        if mu in self.cachedObjs[expected]["CLs"]:
-            return self.cachedObjs[expected]["CLs"][mu]
+        if not "CLs" in self.cachedObjs[None][expected]:
+            self.cachedObjs[None][expected]["CLs"] = {}
+        if mu in self.cachedObjs[None][expected]["CLs"]:
+            return self.cachedObjs[None][expected]["CLs"][mu]
         cls = self.statsComputer.CLs ( poi_test = mu, expected = expected )
-        self.cachedObjs[expected]["CLs"][mu] = cls
+        self.cachedObjs[None][expected]["CLs"][mu] = cls
         return cls
 
     @whenDefined
     def sigma_mu(self, expected : bool =False):
         """sigma_mu of mu_hat"""
 
-        if not "sigma_mu" in self.cachedObjs[expected]:
+        if not "sigma_mu" in self.cachedObjs[None][expected]:
             self.computeStatistics(expected)
 
-        return self.cachedObjs[expected]["sigma_mu"]
+        return self.cachedObjs[None][expected]["sigma_mu"]
 
     @whenDefined
     def muhat(self, expected : bool =False):
         """position of maximum likelihood"""
-
-        if not "muhat" in self.cachedObjs[expected]:
+        if not "muhat" in self.cachedObjs[None][expected]:
             self.computeStatistics(expected)
 
-        return self.cachedObjs[expected]["muhat"]
+        return self.cachedObjs[None][expected]["muhat"]
 
     @whenDefined
-    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True,
+    def likelihood(self, mu=1.0, expected=False, return_nll=False,
             asimov : Union[None,float] = None ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute expected, not observed likelihood. if "posteriori",
                          compute expected posteriori.
         :param return_nll: if True, return negative log likelihood, else likelihood
-        :param useCached: if True, will return the cached value, if available
         """
-        useCached = False
-        print ( f"@@TP1 fixme cache this!!" )
-
-        if useCached and mu in self.cachedNlls[expected]:
-            if not asimov in self.cachedNlls[expected]:
-                self.cachedNlls[expected][asimov]={}
-            nll = self.cachedNlls[expected][asimov][mu]
+        assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
+        if mu in self.cachedNlls[asimov][expected]:
+            nll = self.cachedNlls[asimov][expected][mu]
             return self.nllToLikelihood ( nll, return_nll )
 
-        if useCached:
-            if "nll" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
-                nll = self.cachedObjs[expected]["nll"]
-                return self.nllToLikelihood ( nll, return_nll )
-            if "nll_sm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
-                nllsm = self.cachedObjs[expected]["nll_sm"]
-                return self.nllToLikelihood ( nllsm, return_nll )
+        if "nll" in self.cachedObjs[asimov][expected] and abs(mu - 1.0) < 1e-5:
+            nll = self.cachedObjs[asimov][expected]["nll"]
+            return self.nllToLikelihood ( nll, return_nll )
+        if "nll_sm" in self.cachedObjs[asimov][expected] and abs(mu) < 1e-5:
+            nllsm = self.cachedObjs[asimov][expected]["nll_sm"]
+            return self.nllToLikelihood ( nllsm, return_nll )
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
                        expected = expected, return_nll = True, asimov = asimov )
-        self.cachedNlls[expected][mu] = nll
+        self.cachedNlls[asimov][expected][mu] = nll
 
         if abs(mu) < 1e-5:
-            self.cachedObjs[expected]["nll_sm"] = nll
+            self.cachedObjs[asimov][expected]["nll_sm"] = nll
 
         return self.nllToLikelihood ( nll, return_nll )
 
@@ -366,21 +358,21 @@ class TheoryPrediction(object):
         :param expected: computed expected quantities, not observed
         """
 
-        if not "lmax" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"] = {}
-            self.cachedObjs[expected]["muhat"] = {}
-            self.cachedObjs[expected]["sigma_mu"] = {}
+        if not "lmax" in self.cachedObjs[None][expected]:
+            self.cachedObjs[None][expected]["lmax"] = {}
+            self.cachedObjs[None][expected]["muhat"] = {}
+            self.cachedObjs[None][expected]["sigma_mu"] = {}
 
         # Compute likelihoods and related parameters:
         llhdDict = self.statsComputer.get_five_values(expected = expected,
                      return_nll = True )
         if llhdDict not in [ None, {} ]:
-            self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
-            self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
-            self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
-            self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
+            self.cachedObjs[None][expected]["nll"] = llhdDict["lbsm"]
+            self.cachedObjs[None][expected]["nll_sm"] = llhdDict["lsm"]
+            self.cachedObjs[None][expected]["nllmax"] = llhdDict["lmax"]
+            self.cachedObjs[None][expected]["muhat"] = llhdDict["muhat"]
             if "sigma_mu" in llhdDict:
-                self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
+                self.cachedObjs[None][expected]["sigma_mu"] = llhdDict["sigma_mu"]
 
 
 class TheoryPredictionsCombiner(TheoryPrediction):
@@ -422,8 +414,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
+        self.cachedObjs = { None: {False: {}, True: {}, "posteriori": {}}, 0.: {False: {}, True: {}, "posteriori": {}} }
+        self.cachedNlls = { None: {False: {}, True: {}, "posteriori": {}}, 0.: {False: {}, True: {}, "posteriori": {}} }
         self._statsComputer = None
 
     @classmethod
