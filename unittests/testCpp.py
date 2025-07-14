@@ -51,7 +51,7 @@ class CppTest(unittest.TestCase):
 
     def writeDebug ( self, txt ):
         """ write debugging file """
-        print ( "test failed. writing output to debug.txt" )
+        print ( "test failed. writing output to testCpp.dbg" )
         f=open("testCpp.dbg","w")
         for i in txt:
             f.write ( i+ "\n" )

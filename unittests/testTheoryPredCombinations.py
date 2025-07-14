@@ -109,7 +109,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # scipy.stats.norm.pdf(x, 9., 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.01880727876784458
         defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
-        tpreds = theoryPredictionsFor(database, smstopos, 
+        tpreds = theoryPredictionsFor(database, smstopos,
                                       combinedResults=False, useBestDataset=False)
         for t in tpreds:
             t.computeStatistics()
@@ -129,7 +129,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # combination:
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
-        combiner.computeStatistics()        
+        combiner.computeStatistics()
         fmh = combiner.statsComputer.get_five_values(expected=False)
         mu_hat, lmax = fmh["muhat"], fmh["lmax"]
         lsm = combiner.lsm()
@@ -148,7 +148,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
     def testFilter(self):
         import warnings
         warnings.filterwarnings("ignore", category=DeprecationWarning)
-        warnings.filterwarnings("ignore", category=UserWarning)        
+        warnings.filterwarnings("ignore", category=UserWarning)
         from smodels.base import runtime
         runtime._experimental["truncatedgaussians"] = True
 
@@ -172,7 +172,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         smstopos = decomposer.decompose(model,
                                         sigmacut, massCompress=True, invisibleCompress=True,
                                         minmassgap=mingap)
-        tpreds =  theoryPredictionsFor(db, smstopos, 
+        tpreds =  theoryPredictionsFor(db, smstopos,
                                        combinedResults=True, useBestDataset=False)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
         # IDs that should be selected and the respective expected r-values:
@@ -198,10 +198,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
         self.assertAlmostEqual(combiner.likelihood() / 6.1811227091720504e-27, 1., 2)
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / 0.2771301968, 1., 2)        
-        self.assertAlmostEqual(combiner.CLs(), 0.4691236159252321, 2 )
+        self.assertAlmostEqual(combiner.getRValue() / 0.26067132943352256, 1., 2)
+        self.assertAlmostEqual(combiner.CLs(), 0.5745589222694297, 2 )
         self.assertAlmostEqual(combiner.CLs( expected = True ), 0.6370833948782422, 2 )
-        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.6474406370750514, 2 )
+        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.7752652260987847, 2 )
 
 
     def testGetCombiner(self):
@@ -219,7 +219,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(lsm, 0.1009, 2)
         self.assertAlmostEqual(lbsm,0.15356, 2)
         self.assertAlmostEqual(lmax, 0.21210, 2)
-        self.assertAlmostEqual(combiner.getRValue(), 0.12097018506013166, 4)
+        self.assertAlmostEqual(combiner.getRValue(), 0.11720210380623013, 4)
 
         # Also check if likelihood dict is defined:
         muvals = np.linspace(0.,3.,10)

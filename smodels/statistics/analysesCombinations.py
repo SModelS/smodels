@@ -45,7 +45,6 @@ class AnaCombLikelihoodComputer(object):
         mu: float = 1.0,
         expected: Union[bool, Text] = False,
         return_nll: bool = False,
-        useCached: bool = True,
         asimov: Union[None,float] = None,
     ) -> float:
         """
@@ -54,7 +53,6 @@ class AnaCombLikelihoodComputer(object):
         :param mu: signal strength
         :param expected: if True, compute expected likelihood, else observed
         :param return_nll: if True, return negative log likelihood, else likelihood
-        :param useCached: if True, will use the cached values from the theoryPrediction objects (if available)
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
         try:
@@ -65,7 +63,7 @@ class AnaCombLikelihoodComputer(object):
         nll = 0.0
         changed = False
         for tp in self.theoryPredictions:
-            tmp = tp.likelihood(mu, expected=expected, return_nll=True, useCached=useCached,asimov=asimov)
+            tmp = tp.likelihood(mu, expected=expected, return_nll=True, asimov=asimov)
             if tmp != None:
                 nll = nll + tmp     #Add neg log llhds
                 changed = True
@@ -140,7 +138,7 @@ class AnaCombLikelihoodComputer(object):
                 x = float(mu[0])
             else:
                 x = float(mu)
-            return self.likelihood(x, expected=expected, return_nll=True, useCached=False, asimov=asimov)
+            return self.likelihood(x, expected=expected, return_nll=True, asimov=asimov)
 
         if allowNegativeSignals:
             toTry += [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1]
@@ -269,8 +267,8 @@ class AnaCombLikelihoodComputer(object):
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False, asimov = None)
-            nllA = self.likelihood(mu, expected=expected, return_nll=True, useCached=False, asimov = 0. )
+            nll = self.likelihood(mu, return_nll=True, expected=expected, asimov = None)
+            nllA = self.likelihood(mu, expected=expected, return_nll=True, asimov = 0. )
 
             return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
 
