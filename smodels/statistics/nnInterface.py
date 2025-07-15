@@ -98,7 +98,7 @@ class NNUpperLimitComputer:
             return self.mostSensitiveModel
         mumin,modelToUse=float("inf"),None
         for model in jsonfiles:
-            mu = model.getUpperLimitOnMu ( expected=True, modelToUse = model )
+            mu = self.getUpperLimitOnMu ( expected=True, modelToUse = model )
             if mu < mumin:
                 modelToUse = model
                 mumin = mu
