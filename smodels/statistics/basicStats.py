@@ -30,8 +30,6 @@ def getNumericalVariance ( obj, mu : float )-> float:
     if len(h)==0: # if all are negative, invert them
         h = np.abs ( hessian )
     h = np.mean ( h ) / dx /dx
-    #if h < 0.:
-    #    print ( f"@@X hessians {h} {hessian}" )
     return 1./h
 
 def CLsfromLsb( nll_sb: float, nll_b: float,
@@ -93,22 +91,12 @@ def CLsfromNLL(
         qA = 0.0
     qA = 0.0 if big_muhat else qA # added by RM
     sqA = np.sqrt(qA)
-    # print ( f"@@X my big_muhat {big_muhat}" )
-    # print ( f"@@X my qmu {qmu} qmu_A {qA}" )
-    # print ( f"@@X my sqmu {sqmu} sqmu_A {sqA} condition {sqmu<=sqA}" )
     if sqmu <= sqA:
         CLsb = 1.0 - stats.norm.cdf(sqmu)
         CLb = stats.norm.cdf(sqA - sqmu)
     else:
         CLsb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA))
         CLb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA))
-        # print ( f"@@X my old for CLsb i evaluate at {qmu/(2*sqA)}+{qA/(2*sqA)}: {CLsb}" )
-        # print ( f"@@X my old for CLb i evaluate at {qmu/(2*sqA)}-{qA/(2*sqA)}: {CLb}" )
-        #CLsb = 1.0 if qA == 0.0 else 0.5
-        #CLb = 1.0 if qA == 0.0 else stats.norm.cdf( sqA )
-        #print ( f"@@X my new for CLsb i evaluate at {sqA}: {CLb}" )
-
-    # print ( f"@@X my CLsb={CLsb} CLb={CLb} qmu {qmu} qmu_A {qA}" )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
 
@@ -147,7 +135,7 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args :
     return root
 
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
-         allowNegative = True ):
+         allowNegative = True, args : dict = {} ):
     """find a, b for brent bracketing
 
     :param mu_hat: mu that maximizes likelihood
@@ -160,7 +148,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
     sigma_mu = min(sigma_mu, 100.) # there is a maximum on sigma_mu
     # the root should be roughly at mu_hat + 2*sigma_mu
     a = mu_hat + 1.5 * sigma_mu
-    ra = rootfinder(a)
+    ra = rootfinder(a,**args)
     ntrials = 20
     i = 0
     foundExtra = False
@@ -168,13 +156,13 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
         # if this is negative, we move it to the left
         i += 1
         a -= (i**2.0) * sigma_mu
-        ra = rootfinder(a)
+        ra = rootfinder(a,**args)
         if i > ntrials or a < -10000.0 or ra is None or ( a < 0 and not allowNegative ):
             avalues = [0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1, 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
             if not allowNegative:
                 avalues = [0.0, 1.0, 3.0, 10.0, 0.1, 0.01, .001, 100., .0001 ]
             for a in avalues:
-                ra = rootfinder(a)
+                ra = rootfinder(a,**args)
                 if ra is None: # if cls computation failed, try with next a value
                     continue
                 if ra > 0.0:
@@ -191,21 +179,23 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
     i = 0
     foundExtra = False
     b = mu_hat + 2.5 * sigma_mu
-    rb = rootfinder(b)
+    rb = rootfinder(b,**args)
     while rb > 0.0:
         # if this is positive, we move it to the right
         i += 1
         b += (i**2.0) * sigma_mu
-        rb = rootfinder(b)
+        rb = rootfinder(b,**args)
         if rb is None: # if cls computation failed, try with a bigger b value
             continue
         closestr, closest = float("inf"), None
+        memoize = {}
         if i > ntrials or ( b < 0 and not allowNegative ):
             bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 10000.0, 100000.0, 1000000.0 ]
             if not allowNegative:
                 bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001, 10000.0, 100000.0, 1000000.0 ]
             for b in bvalues:
-                rb = rootfinder(b)
+                rb = rootfinder(b,**args)
+                memoize[b]=float(rb)
                 if rb is None: # if cls computation failed, try with next b value
                     continue
                 if rb < 0.0:
@@ -216,6 +206,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                     closest = b
             if not foundExtra:
                 logger.error(f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")
+                logger.error(f"memoize {memoize}" )
                 logger.error(f"closest to zero rootfinder({closest})={closestr}")
                 logger.error(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
                 raise SModelSError()

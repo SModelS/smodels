@@ -20,6 +20,7 @@ from smodels_utils.helper.terminalcolors import *
 
 nninfo = {
     "hasgreeted": False,
+    "repeat": 0
 }
 
 class NNData:
@@ -98,13 +99,14 @@ class NNUpperLimitComputer:
             return self.mostSensitiveModel
         mumin,modelToUse=float("inf"),None
         for model in jsonfiles:
+            # print ( f"@@NN54 getMostSensitiveModel model is {model}" )
             mu = self.getUpperLimitOnMu ( expected=True, modelToUse = model )
             if mu < mumin:
                 modelToUse = model
                 mumin = mu
         self.mostSensitiveModel = modelToUse
         self.mumin = mumin
-        # print ( f"@@0 for now use first model {modelToUse}" )
+        # print ( f"@@NN32 getMostSensitiveModel for now use model {modelToUse}" )
         return self.mostSensitiveModel
 
     def isControlRegion ( self, srname : str, modelToUse : str ) -> bool:
@@ -149,6 +151,9 @@ class NNUpperLimitComputer:
             modelToUse = self.getMostSensitiveModel ( )
 
         syields = []
+        if False and not modelToUse in self.data.globalInfo.onnxMeta:
+            print ( f"@@NN77 we dont have {modelToUse} in meta:" )
+            print ( f"meta {self.data.globalInfo.onnxMeta}" )
         for srname,smyield in self.data.globalInfo.onnxMeta[modelToUse]["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -230,10 +235,12 @@ class NNUpperLimitComputer:
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         if abs(poi_test)<1e-10:
             if abs(nll0obs-nll1obs)>1e-1:
-                logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
+                #logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
                 # ret["nll_obs_1"]=nll0obs
+                pass
             if abs(nll0exp-nll1exp)>1e-1:
-                logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
+                pass
+                # logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
                 # ret["nll_exp_1"]=nll0exp
             if False:
                 ret["nll_exp_1"]=ret["nll_exp_0"]
@@ -424,15 +431,21 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
+        nninfo["repeat"]=nninfo["repeat"]+1
+        if nninfo["repeat"]>10:
+            sys.exit()
+        # print ( f"@@NN13 getUpperLimitOnMu modelToUse {modelToUse}" )
         if modelToUse == None:
             if hasattr ( self, "mumin" ):
                 return self.mumin
             modelToUse = self.getMostSensitiveModel()
+        self.mostSensitiveModel = modelToUse
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                               allowNegativeSignals=allowNegativeSignals,
                               modelToUse = modelToUse)
+        # print ( f"@@NN76 clsRoot {clsRoot} expected {expected} modelToUse {modelToUse}" )
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
-                allowNegative = allowNegativeSignals )
+                allowNegative = allowNegativeSignals, args={"return_type": "CLs-alpha", "modelToUse": modelToUse})
         mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
         if False and expected == "posteriori":
             print ( f"@@nnInterface.getUpperLimitOnMu r={1./mu_lim:.3f} expected {expected}" )
@@ -449,6 +462,7 @@ class NNUpperLimitComputer:
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
         """
+        # print ( f"@@NN88 getCLsRootFunc modelToUse {modelToUse}" )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
@@ -501,8 +515,8 @@ class NNUpperLimitComputer:
             if expected != "posteriori":
                 nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
-            if False and expected == "posteriori" and abs(mu-.765)<.1:
-                print ( f"@@nnInterface.clsRoot   {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} ret {ret}{RESET}" ) 
+            if True: # False and expected == "posteriori" and abs(mu-.765)<.1:
+                print ( f"@@nnInterface.clsRootAsimov {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {modelToUse} {RESET}" ) 
             return ret
 
         from smodels.base import runtime
