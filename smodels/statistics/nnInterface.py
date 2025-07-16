@@ -126,7 +126,7 @@ class NNUpperLimitComputer:
             return dct["type"]=="CR"
 
         for dct in self.data.globalInfo.mlModels[modelToUse]:
-            # print ( f"@@ {dct}" )
+            # print ( f"@@NN12 {dct}" )
             name = dct["onnx"]
             if name == srname:
                 return isCR ( dct )
@@ -176,7 +176,7 @@ class NNUpperLimitComputer:
                 smyield = obsyield
             tot = smyield + signal
             syields.append ( tot )
-            # print ( f"@@0 the smyield of {srname} is {smyield} poi_test is {poi_test} signal {signal}" )
+            # print ( f"@@NN10 the smyield of {srname} is {smyield} poi_test is {poi_test} signal {signal}" )
 
         #for i in range(4):
         #    syields.append(0.)
@@ -196,7 +196,7 @@ class NNUpperLimitComputer:
             scaled_signal_yields[0][i]=t
 
         #if poi_test == 0.:
-        #    print ( f"@@X we evaluate at {scaled_signal_yields}" )
+        #    print ( f"@@NNX we evaluate at {scaled_signal_yields}" )
         if len(scaled_signal_yields[0])!=self.regressors[modelToUse]["dim"]:
             dim_nn = self.regressors[modelToUse]["dim"]
             dim_input = len(scaled_signal_yields[0])
@@ -206,7 +206,7 @@ class NNUpperLimitComputer:
             sys.exit()
         arr = self.regressors[modelToUse]["session"].run(None,
                 {"input_1":scaled_signal_yields})
-        # print ( f"@@arr {arr}" )
+        # print ( f"@@NNA arr {arr}" )
         arr = arr[0][0]
         nll0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_mu0"]
         nll0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_mu0"]
@@ -223,7 +223,7 @@ class NNUpperLimitComputer:
         obsErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_obsA]
         nll1exp = nll0exp + arr[i_exp]*expErr + expDelta
         nll1obs = nll0obs + arr[i_obs]*obsErr + obsDelta
-        #print ( f"@@5 onnxMeta", self.data.globalInfo.onnxMeta )
+        #print ( f"@@NN5 onnxMeta", self.data.globalInfo.onnxMeta )
         nllA1exp = nllA0exp + arr[i_expA]*expErrA + expDeltaA
         nllA1obs = nllA0obs + arr[i_obsA]*obsErrA + obsDeltaA
 
@@ -350,16 +350,16 @@ class NNUpperLimitComputer:
             outputType = "expected"
         if expected == "posteriori":
             outputType = "asimov"
-        #print ( f"@@ outputType {outputType} " )
+        #print ( f"@@NNO outputType {outputType} " )
         #bounds=[(-1,10)]
         #def callme ( args ):
-        #    print ( f"@@ callme {args}" )
+        #    print ( f"@@NN7 callme {args}" )
         options = { "disp": False, "maxiter": 200 }
 
         ## FIXME compute sigma_mu, compute via nllA
 
         def myNLL ( x ):
-            # print ( f"@@0 myNLL x={x}" )
+            # print ( f"@@NN8 myNLL x={x}" )
             if type(x) in [ list, np.array, np.ndarray ]:
                 ret = []
                 for xi in x:
@@ -367,7 +367,7 @@ class NNUpperLimitComputer:
                 return np.array ( ret )
             ret = self.negative_log_likelihood ( x, modelToUse=modelToUse,
                                                  outputType=outputType )
-            # print ( f"@@0 myNLL ret={x}" )
+            # print ( f"@@NN90 myNLL ret={x}" )
             return ret
 
         method = "Nelder-Mead"
@@ -380,7 +380,7 @@ class NNUpperLimitComputer:
                     args=(modelToUse,outputType), tol=1e-8, options = options,
                     method = method, bounds=bounds )
             #if o.fun < 0:
-            #    print ( f"@@ o {o}" )
+            #    print ( f"@@NN44 o {o}" )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
                 # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
@@ -391,8 +391,8 @@ class NNUpperLimitComputer:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
                 ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
-                # print ( f"@@ muhat {muhat} nllmin {nllmin} hessian {hessian} allowNegativeSignals {allowNegativeSignals}" )
-                # print ( f"@@ negative_log_likelihood {self.negative_log_likelihood(muhat)}" )
+                # print ( f"@@NN45 muhat {muhat} nllmin {nllmin} hessian {hessian} allowNegativeSignals {allowNegativeSignals}" )
+                # print ( f"@@NN47 negative_log_likelihood {self.negative_log_likelihood(muhat)}" )
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
@@ -493,7 +493,7 @@ class NNUpperLimitComputer:
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
-        # print ( f"@@X getCLsRootFunc expected {expected} nll0 {nll0:.1f} nll0A {nll0A:.1f}" )
+        # print ( f"@@NNX getCLsRootFunc expected {expected} nll0 {nll0:.1f} nll0A {nll0A:.1f}" )
 
         def clsRootTevatron( mu: float, return_type: Text = "CLs-alpha",
                      modelToUse : Union[None,str] = None ) -> float:
