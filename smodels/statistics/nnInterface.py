@@ -523,7 +523,7 @@ class NNUpperLimitComputer:
             if expected != "posteriori":
                 nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse, asimov = False )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
-            if True: # False and expected == "posteriori" and abs(mu-.765)<.1:
+            if False: # False and expected == "posteriori" and abs(mu-.765)<.1:
                 print ( f"@@nnInterface.clsRootAsimov {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {self.mostSensitiveModel} {RESET}" )
             return ret
 
