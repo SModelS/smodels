@@ -67,6 +67,8 @@ class NNUpperLimitComputer:
         """
 
         self.data = data
+        self.mostSensitiveModel = None
+        self.mumin = None
         import onnxruntime
         self.regressors = {}
         for jsonfilename,onnx in self.data.globalInfo.onnxes.items():
@@ -90,8 +92,12 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
-    def getMostSensitiveModel ( self ):
-        if hasattr ( self, "mostSensitiveModel" ):
+    def getMostSensitiveModel ( self, model : Union[None,str] = None ):
+        self.mostSensitiveModel = "NNAsimov_new_v1.onnx"
+        if model != None:
+            self.mostSensitiveModel = model
+            return model
+        if self.mostSensitiveModel != None:
             return self.mostSensitiveModel
         jsonfiles = list(self.data.globalInfo.onnxMeta.keys())
         if len(jsonfiles)==1:
@@ -147,8 +153,7 @@ class NNUpperLimitComputer:
         except (TypeError,IndexError) as e:
             pass
 
-        if modelToUse == None:
-            modelToUse = self.getMostSensitiveModel ( )
+        modelToUse = self.getMostSensitiveModel ( modelToUse )
 
         syields = []
         if False and not modelToUse in self.data.globalInfo.onnxMeta:
@@ -160,7 +165,7 @@ class NNUpperLimitComputer:
             if not realname in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
                 assert realname in self.nsignals, \
-                  f"nnInterface: cannot find sr name {realname} in {self.nsignals}"
+                  f"nnInterface: cannot find sr name {realname} in {list(self.nsignals.keys())}"
             # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
             if self.isControlRegion ( srname, modelToUse ):
@@ -222,12 +227,13 @@ class NNUpperLimitComputer:
         nllA1exp = nllA0exp + arr[i_expA]*expErrA + expDeltaA
         nllA1obs = nllA0obs + arr[i_obsA]*obsErrA + obsDeltaA
 
-        if False and poi_test == 0.:
-            print ( f"@@5 nll0obs {nll0obs} {nll0exp}" )
-            print ( f"@@5 nllA0obs {nllA0obs} {nllA0exp}" )
-            print ( f"@@5 poi_test {poi_test}" )
-            print ( f"@@5 nll1obs {float(nll1obs)} {float(nll1exp)}" )
-            print ( f"@@5 nllA1obs {float(nllA1obs)} {float(nllA1exp)}" )
+        if False and poi_test == 3.:
+            print ( f"@@NN5 obsDelta {obsDelta} expDelta {expDelta}" )
+            print ( f"@@NN5 nll0obs {nll0obs} nll0exp {nll0exp}" )
+            print ( f"@@NN5 nllA0obs {nllA0obs} nllA0exp {nllA0exp}" )
+            print ( f"@@NN5 poi_test {poi_test}" )
+            print ( f"@@NN5 nll1obs {float(nll1obs)} nll1exp {float(nll1exp)}" )
+            print ( f"@@NN5 nllA1obs {float(nllA1obs)} nll1Aexp {float(nllA1exp)}" )
 
         ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
@@ -326,9 +332,11 @@ class NNUpperLimitComputer:
         :param asimov: if true, compute for asimov data
         If None compute for most sensitive analysis.
         """
-        if modelToUse == None:
-            modelToUse = self.getMostSensitiveModel ( )
+        modelToUse = self.getMostSensitiveModel ( modelToUse )
         # FIXME maximize this one function
+        if not modelToUse in self.data.globalInfo.onnxMeta:
+            print ( f"[nnInterface] no {modelToUse} in {self.data.globalInfo.onnxMeta.keys()}" )
+            sys.exit()
         muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_max"]
         if asimov:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_obs_max"]
@@ -436,7 +444,7 @@ class NNUpperLimitComputer:
             sys.exit()
         # print ( f"@@NN13 getUpperLimitOnMu modelToUse {modelToUse}" )
         if modelToUse == None:
-            if hasattr ( self, "mumin" ):
+            if self.mumin != None:
                 return self.mumin
             modelToUse = self.getMostSensitiveModel()
         self.mostSensitiveModel = modelToUse
@@ -470,7 +478,7 @@ class NNUpperLimitComputer:
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
 
         nll0 = nll0A
-        
+
         if True: # expected != "posteriori":
             fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
             mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
@@ -513,10 +521,10 @@ class NNUpperLimitComputer:
             nllA = self.likelihood(mu, return_nll=True, modelToUse = modelToUse, asimov = True )
             nll = nllA
             if expected != "posteriori":
-                nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse )
+                nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse, asimov = False )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
             if True: # False and expected == "posteriori" and abs(mu-.765)<.1:
-                print ( f"@@nnInterface.clsRootAsimov {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {modelToUse} {RESET}" ) 
+                print ( f"@@nnInterface.clsRootAsimov {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {self.mostSensitiveModel} {RESET}" )
             return ret
 
         from smodels.base import runtime
