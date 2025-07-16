@@ -93,7 +93,7 @@ class NNUpperLimitComputer:
         self.welcome()
 
     def getMostSensitiveModel ( self, model : Union[None,str] = None ):
-        self.mostSensitiveModel = "NNAsimov_new_v1.onnx"
+        #  self.mostSensitiveModel = "NNAsimov_new_v1.onnx"
         if model != None:
             self.mostSensitiveModel = model
             return model
@@ -165,7 +165,7 @@ class NNUpperLimitComputer:
             if not realname in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
                 assert realname in self.nsignals, \
-                  f"nnInterface: cannot find sr name {realname} in {list(self.nsignals.keys())}"
+                  f"nnInterface: cannot find sr name {realname} in {' '.join(self.nsignals.keys())}"
             # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
             if self.isControlRegion ( srname, modelToUse ):
