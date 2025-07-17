@@ -15,6 +15,7 @@ import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, CLsfromLsb, getNumericalVariance
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from scipy import optimize, differentiate
 from smodels_utils.helper.terminalcolors import *
 
@@ -67,8 +68,7 @@ class NNUpperLimitComputer:
         """
 
         self.data = data
-        self.mostSensitiveModel = None
-        self.mumin = None
+        # first thing we do, we determine whats the most sensitive model
         import onnxruntime
         self.regressors = {}
         for jsonfilename,onnx in self.data.globalInfo.onnxes.items():
@@ -83,37 +83,51 @@ class NNUpperLimitComputer:
         # self.regressor_dim = self.regressor.get_inputs()[0].shape[1]
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
+        self.determineMostSensitiveModel()
         logger.debug("Signals : {}".format(self.nsignals))
         # self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.cl = cl
-        self.sigma_mu = None
+        
         self.alreadyBeenThere = (
             False  # boolean to detect wether self.signals has returned to an older value
         )
         self.welcome()
 
-    def getMostSensitiveModel ( self, model : Union[None,str] = None ):
-        #  self.mostSensitiveModel = "NNAsimov_new_v1.onnx"
-        if model != None:
-            self.mostSensitiveModel = model
-            return model
-        if self.mostSensitiveModel != None:
-            return self.mostSensitiveModel
+    def determineMostSensitiveModel ( self ):
+        """ determines the most sensitive model, stores all the ULs
+        that were needed to compute that.
+        """
         jsonfiles = list(self.data.globalInfo.onnxMeta.keys())
+        # print ( f"@@NN66 determineMostSensitiveModel jsonfiles {jsonfiles}" )
+        self.cachedULs= { None: {} }
         if len(jsonfiles)==1:
             self.mostSensitiveModel = jsonfiles[0]
-            return self.mostSensitiveModel
-        mumin,modelToUse=float("inf"),None
+            ulmu = self.getUpperLimitOnMu ( expected=True, modelToUse = self.mostSensitiveModel )
+            self.cachedULs[self.mostSensitiveModel] = {}
+            self.cachedULs[self.mostSensitiveModel][True]=ulmu
+            self.cachedULs[None][True]=ulmu
+            return
+        mumin,mostSensitiveModel=float("inf"),None
+        # print ( f"@@NN66 more than one!" )
         for model in jsonfiles:
-            # print ( f"@@NN54 getMostSensitiveModel model is {model}" )
-            mu = self.getUpperLimitOnMu ( expected=True, modelToUse = model )
-            if mu < mumin:
-                modelToUse = model
-                mumin = mu
-        self.mostSensitiveModel = modelToUse
-        self.mumin = mumin
-        # print ( f"@@NN32 getMostSensitiveModel for now use model {modelToUse}" )
-        return self.mostSensitiveModel
+            ulmu = float("inf")
+            try:
+                # print ( f"@@NN99 get ulmu for {model}" )
+                ulmu = self.getUpperLimitOnMu ( expected=True, modelToUse = model )
+                self.cachedULs[model] = { True: ulmu }
+                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
+            except SModelSError as e:
+                self.cachedULs[model] = { True: ulmu }
+                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
+                continue
+            if ulmu < mumin:
+                mumin = ulmu
+                mostSensitiveModel = model
+        self.cachedULs[None][True]=mumin # the smallest expected UL
+        ## the most sensitive model and its upper limit we store separately
+        self.mostSensitiveModel = mostSensitiveModel
+        self.mumin = mumin # the smallest expected UL
+        # print ( f"@@NN35 determineMostSensitiveModel after {model} {self.mostSensitiveModel}" )
 
     def isControlRegion ( self, srname : str, modelToUse : str ) -> bool:
         """ check if srname is control region
@@ -153,7 +167,8 @@ class NNUpperLimitComputer:
         except (TypeError,IndexError) as e:
             pass
 
-        modelToUse = self.getMostSensitiveModel ( modelToUse )
+        if modelToUse == None:
+            modelToUse = self.mostSensitiveModel
 
         syields = []
         if False and not modelToUse in self.data.globalInfo.onnxMeta:
@@ -292,9 +307,10 @@ class NNUpperLimitComputer:
         """
         ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
         if expected:
-            nll = ret['nll_exp_1']
             if asimov:
                 nll = ret['nllA_exp_1']
+            else:
+                nll = ret['nll_exp_1']
         else:
             nll = ret['nll_obs_1']
             if asimov:
@@ -332,7 +348,8 @@ class NNUpperLimitComputer:
         :param asimov: if true, compute for asimov data
         If None compute for most sensitive analysis.
         """
-        modelToUse = self.getMostSensitiveModel ( modelToUse )
+        if modelToUse == None:
+            modelToUse = self.mostSensitiveModel
         # FIXME maximize this one function
         if not modelToUse in self.data.globalInfo.onnxMeta:
             print ( f"[nnInterface] no {modelToUse} in {self.data.globalInfo.onnxMeta.keys()}" )
@@ -439,24 +456,31 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        nninfo["repeat"]=nninfo["repeat"]+1
-        if nninfo["repeat"]>10:
-            sys.exit()
+        #nninfo["repeat"]=nninfo["repeat"]+1
+        #if nninfo["repeat"]>10:
+        #    sys.exit()
         # print ( f"@@NN13 getUpperLimitOnMu modelToUse {modelToUse}" )
+        if modelToUse in self.cachedULs:
+            if expected in self.cachedULs[modelToUse]:
+                return self.cachedULs[modelToUse][expected]
+        else:
+            self.cachedULs[modelToUse]={}
         if modelToUse == None:
-            if self.mumin != None:
-                return self.mumin
-            modelToUse = self.getMostSensitiveModel()
-        self.mostSensitiveModel = modelToUse
+            modelToUse = self.mostSensitiveModel
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                               allowNegativeSignals=allowNegativeSignals,
                               modelToUse = modelToUse)
-        # print ( f"@@NN76 clsRoot {clsRoot} expected {expected} modelToUse {modelToUse}" )
+        # print ( f"@@NN76 clsRoot expected {expected} modelToUse {modelToUse}" )
+        clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse }
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
-                allowNegative = allowNegativeSignals, args={"return_type": "CLs-alpha", "modelToUse": modelToUse})
-        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
-        if False and expected == "posteriori":
-            print ( f"@@nnInterface.getUpperLimitOnMu r={1./mu_lim:.3f} expected {expected}" )
+                allowNegative = allowNegativeSignals, args=clsRootArgs,
+                    verbose = False )
+        mu_lim = optimize.brentq(clsRoot, a, b, args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06)
+        if False: # False and expected == "posteriori":
+            print ( f"@@NN473 getUpperLimitOnMu r={1./mu_lim:.3f} expected {expected}" )
+        if not modelToUse in self.cachedULs:
+            self.cachedULs[modelToUse]={}
+        self.cachedULs[modelToUse][expected]=mu_lim # store
         return mu_lim
 
     def getCLsRootFunc(self, expected: bool = False,
@@ -518,17 +542,18 @@ class NNUpperLimitComputer:
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
+            # print ( f"@@NN732 clsRootAsimov modelToUse {modelToUse}" )
             nllA = self.likelihood(mu, return_nll=True, modelToUse = modelToUse, asimov = True )
             nll = nllA
             if expected != "posteriori":
                 nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse, asimov = False )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
-            if False: # False and expected == "posteriori" and abs(mu-.765)<.1:
-                print ( f"@@nnInterface.clsRootAsimov {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {self.mostSensitiveModel} {RESET}" )
+            if False: #  and expected == "posteriori" and abs(mu-.765)<.1:
+                print ( f"@@NN653 {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {modelToUse} {RESET}" )
             return ret
 
-        from smodels.base import runtime
-        useTevatron = runtime.experimentalFeature ( "tevatroncls" )
-        if useTevatron:
-            return mu_hat, sigma_mu, clsRootTevatron
+        #from smodels.base import runtime
+        #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
+        #if useTevatron:
+        #    return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootAsimov
