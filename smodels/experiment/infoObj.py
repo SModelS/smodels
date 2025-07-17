@@ -151,6 +151,17 @@ class Info(object):
         self.onnxes = {}
         self.onnxMeta = {}
 
+        def removeSignalRegions ( channels : list, dictionary : dict ) -> dict:
+            """ remove a list of signal regions called "channels" from the dictionary of values.
+            :returns: pruned dictionary
+            """
+            newDict = {}
+            for SRname,value in dictionary.items():
+                if SRname in channels:
+                    continue
+                newDict[SRname]=value
+            return newDict
+
         def fillValues ( container, value ):
             """ given <value> fill in <container>, if value is sensible
             :param container: the container to fill
@@ -162,6 +173,8 @@ class Info(object):
                     container = tmp
                 if container[0]==None:
                     container[0]=tmp[0]
+
+        removeChannels = {}
 
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
@@ -176,8 +189,12 @@ class Info(object):
                      "nLLA_obs_mu0": [ None ]*2, "nLL_exp_max": [ None ]*2,
                      "nLL_obs_max": [ None ]*2, "nLLA_exp_max": [ None ]*2,
                      "nLLA_obs_max": [ None ]*2 }
+            removeChannels=[]
             import json, math
             for em in m.metadata_props:
+                if em.key == "remove_channels":
+                    # remove these channels at the end, so that order does not matter
+                    removeChannels = eval(em.value)
                 if em.key == "obs_yields":
                     st = eval(em.value)
                     for l in st: ## the sm yields are tuple of (name,value)
@@ -206,6 +223,30 @@ class Info(object):
                     for name,index in indices.items():
                         if data[name] != None:
                             data[name] = [None,values[index]]
+            if len(removeChannels)>0:
+                #print ( f"@@IO0 now removing {len(removeChannels)}" )
+                #print ( f"@@IO1 {len(data['obsYields'])})" )
+                #print ( f"@@IO2 {len(data['inputMeans'])}" )
+                data["smYields"]=removeSignalRegions ( removeChannels, data["smYields"] )
+                data["obsYields"]=removeSignalRegions ( removeChannels, data["obsYields"] )
+            #data["inputMeans"]=removeSignalRegions ( removeChannels, data["inputMeans"] )
+            #data["inputErrors"]=removeSignalRegions ( removeChannels, data["inputErrors"] )
+            """
+
+            newSMYields, newObsYields, newMeans, newErrors = {}, {}, [], []
+            for i,SRname in enumerate(data["smYields"].keys()):
+                if SRname in removeChannels:
+                    continue
+                newSMYields[SRname]=data["smYields"]
+                newObsYields[SRname]=data["obsYields"]
+                newMeans.append ( data["inputMeans"][i] )
+                newErrors.append ( data["inputErrors"][i] )
+            data["smYields"] = newSMYields
+            data["obsYields"] = newObsYields
+            data["inputMeans"] = newMeans +  data["inputMeans"][-4:]
+            data["inputErrors"] = newErrors + data ["inputErrors"][-4:]
+            """
+            # ['smYields', 'obsYields', 'inputMeans', 'inputErrors' ]
             self.onnxMeta[onnxFile]={}
             for key,value in data.items():
                 self.onnxMeta[onnxFile][key]=value
