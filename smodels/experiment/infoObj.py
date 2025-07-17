@@ -159,6 +159,9 @@ class Info(object):
             for SRname,value in dictionary.items():
                 if SRname in channels:
                     continue
+                p1 = SRname.rfind("-")
+                if p1 > 0 and SRname[:p1] in channels:
+                    continue
                 newDict[SRname]=value
             return newDict
 
@@ -174,8 +177,6 @@ class Info(object):
                 if container[0]==None:
                     container[0]=tmp[0]
 
-        removeChannels = {}
-
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
             with open ( fullPath, "rb" ) as f:
@@ -189,12 +190,13 @@ class Info(object):
                      "nLLA_obs_mu0": [ None ]*2, "nLL_exp_max": [ None ]*2,
                      "nLL_obs_max": [ None ]*2, "nLLA_exp_max": [ None ]*2,
                      "nLLA_obs_max": [ None ]*2 }
-            removeChannels=[]
+            remove_channels=[]
             import json, math
             for em in m.metadata_props:
                 if em.key == "remove_channels":
                     # remove these channels at the end, so that order does not matter
-                    removeChannels = eval(em.value)
+                    remove_channels = eval(em.value)
+                    # data["remove_channels"] = remove_channels
                 if em.key == "obs_yields":
                     st = eval(em.value)
                     for l in st: ## the sm yields are tuple of (name,value)
@@ -223,19 +225,19 @@ class Info(object):
                     for name,index in indices.items():
                         if data[name] != None:
                             data[name] = [None,values[index]]
-            if len(removeChannels)>0:
-                #print ( f"@@IO0 now removing {len(removeChannels)}" )
+            if len(remove_channels)>0:
+                #print ( f"@@IO0 now removing {len(remove_channels)}" )
                 #print ( f"@@IO1 {len(data['obsYields'])})" )
                 #print ( f"@@IO2 {len(data['inputMeans'])}" )
-                data["smYields"]=removeSignalRegions ( removeChannels, data["smYields"] )
-                data["obsYields"]=removeSignalRegions ( removeChannels, data["obsYields"] )
-            #data["inputMeans"]=removeSignalRegions ( removeChannels, data["inputMeans"] )
-            #data["inputErrors"]=removeSignalRegions ( removeChannels, data["inputErrors"] )
+                data["smYields"]=removeSignalRegions ( remove_channels, data["smYields"] )
+                data["obsYields"]=removeSignalRegions ( remove_channels, data["obsYields"] )
+            #data["inputMeans"]=removeSignalRegions ( remove_channels, data["inputMeans"] )
+            #data["inputErrors"]=removeSignalRegions ( remove_channels, data["inputErrors"] )
             """
 
             newSMYields, newObsYields, newMeans, newErrors = {}, {}, [], []
             for i,SRname in enumerate(data["smYields"].keys()):
-                if SRname in removeChannels:
+                if SRname in remove_channels:
                     continue
                 newSMYields[SRname]=data["smYields"]
                 newObsYields[SRname]=data["obsYields"]
