@@ -135,7 +135,7 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args :
     return root
 
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
-         allowNegative = True, args : dict = {} ):
+         allowNegative = True, args : dict = {}, verbose :  bool = True ):
     """find a, b for brent bracketing
 
     :param mu_hat: mu that maximizes likelihood
@@ -144,6 +144,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
     :param allowNegative: if False, then do not allow a or b to become negative
     :returns: the interval a,b
     """
+    msg = logger.error if verbose else logger.debug
     sigma_mu = max(sigma_mu, 0.5)  # there is a minimum on sigma_mu
     sigma_mu = min(sigma_mu, 100.) # there is a maximum on sigma_mu
     # the root should be roughly at mu_hat + 2*sigma_mu
@@ -169,10 +170,10 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                     foundExtra = True
                     break
             if not foundExtra:
-                logger.error(
+                msg(
                     f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
-                logger.error(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
+                msg(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
                 raise SModelSError(
                     f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
@@ -205,10 +206,10 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                     closestr = rb
                     closest = b
             if not foundExtra:
-                logger.error(f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")
-                logger.error(f"memoize {memoize}" )
-                logger.error(f"closest to zero rootfinder({closest})={closestr}")
-                logger.error(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
+                msg(f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")
+                msg(f"memoize {memoize}" )
+                msg(f"closest to zero rootfinder({closest})={closestr}")
+                msg(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
                 raise SModelSError()
     return a, b
 
