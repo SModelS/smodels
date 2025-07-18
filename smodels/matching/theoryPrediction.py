@@ -14,6 +14,7 @@ from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from typing import Union, Text, Dict
 import numpy as np
+from functools import cache
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
 
@@ -186,7 +187,8 @@ class TheoryPrediction(object):
 
         self._statsComputer = computer
 
-    def getUpperLimit(self, expected=False):
+    @cache
+    def getUpperLimit(self, expected : bool = False):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -198,22 +200,19 @@ class TheoryPrediction(object):
         :return: upper limit (Unum object)
         """
 
-        # First check if the upper-limit and expected upper-limit have already been computed.
-        # If not, compute it and store them.
-        if "UL" not in self.cachedObjs[None][expected]:
+        if self.dataType() == "efficiencyMap":
+            ul = self.dataset.getSRUpperLimit(expected=expected)
+        if self.dataType() == "upperLimit":
+            ul = self.dataset.getUpperLimitFor(
+                sms=self.avgSMS, txnames=self.txnames, expected=expected
+            )
+        if self.dataType() == "combined":
+            ul = self.statsComputer.poi_upper_limit(expected = expected,
+                                                    limit_on_xsec = True)
+        else:
             ul = None
-            if self.dataType() == "efficiencyMap":
-                ul = self.dataset.getSRUpperLimit(expected=expected)
-            if self.dataType() == "upperLimit":
-                ul = self.dataset.getUpperLimitFor(
-                    sms=self.avgSMS, txnames=self.txnames, expected=expected
-                )
-            if self.dataType() == "combined":
-                ul = self.statsComputer.poi_upper_limit(expected = expected,
-                                                        limit_on_xsec = True)
-            self.cachedObjs[None][expected]["UL"] = ul
 
-        return self.cachedObjs[None][expected]["UL"]
+        return ul
 
     def getUpperLimitOnMu(self, expected=False):
         """
@@ -234,21 +233,18 @@ class TheoryPrediction(object):
 
         return muUL
 
+    @cache
     def getRValue(self, expected=False):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        if "r" not in self.cachedObjs[None][expected]:
-            upperLimit = self.getUpperLimit(expected)
-            if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
-                r = None
-                self.cachedObjs[None][expected]["r"] = r
-                return r
-            else:
-                r = (self.totalXsection()/upperLimit).asNumber()
-                self.cachedObjs[None][expected]["r"] = r
-                return r
-        return self.cachedObjs[None][expected]["r"]
+        upperLimit = self.getUpperLimit(expected)
+        if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
+            r = None
+        else:
+            r = (self.totalXsection()/upperLimit).asNumber()
+        
+        return r
 
     def whenDefined(function):
         """
@@ -264,54 +260,48 @@ class TheoryPrediction(object):
                 return function(self, *args, **kwargs)
 
         return wrapper
-
+    
     @whenDefined
     def lsm(self, expected=False, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        if "nll_sm" not in self.cachedObjs[None][expected]:
-            self.computeStatistics(expected)
-        if "nll_sm" not in self.cachedObjs[None][expected]:
-            self.cachedObjs[None][expected]["lsm"] = None
-        return self.nllToLikelihood ( self.cachedObjs[None][expected]["nll_sm"],
-               return_nll )
+        
+        llhDict = self.computeStatistics(expected)
+        
+        return self.nllToLikelihood (llhDict["nll_sm"],return_nll )
 
     @whenDefined
     def lmax(self, expected=False, return_nll : bool = False ):
         """likelihood at mu_hat"""
-        if not "nllmax" in self.cachedObjs[None][expected]:
-            self.computeStatistics(expected)
-        return self.nllToLikelihood ( self.cachedObjs[None][expected]["nllmax"],
-                return_nll )
+        
+        llhDict = self.computeStatistics(expected)
 
+        return self.nllToLikelihood(llhDict["nllmax"],return_nll )
+
+    @cache
     @whenDefined
     def CLs(self, mu : float = 1., expected : Union[Text,bool] = False ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        if not "CLs" in self.cachedObjs[None][expected]:
-            self.cachedObjs[None][expected]["CLs"] = {}
-        if mu in self.cachedObjs[None][expected]["CLs"]:
-            return self.cachedObjs[None][expected]["CLs"][mu]
-        cls = self.statsComputer.CLs ( poi_test = mu, expected = expected )
-        self.cachedObjs[None][expected]["CLs"][mu] = cls
+        
+        cls = self.statsComputer.CLs(poi_test = mu, expected = expected)
         return cls
 
     @whenDefined
     def sigma_mu(self, expected : bool =False):
         """sigma_mu of mu_hat"""
 
-        if not "sigma_mu" in self.cachedObjs[None][expected]:
-            self.computeStatistics(expected)
+        llhDict = self.computeStatistics(expected)
 
-        return self.cachedObjs[None][expected]["sigma_mu"]
+        return llhDict["sigma_mu"]
 
     @whenDefined
     def muhat(self, expected : bool =False):
         """position of maximum likelihood"""
-        if not "muhat" in self.cachedObjs[None][expected]:
-            self.computeStatistics(expected)
+        
+        llhDict = self.computeStatistics(expected)
 
-        return self.cachedObjs[None][expected]["muhat"]
-
+        return llhDict["muhat"]
+    
     @whenDefined
     def likelihood(self, mu=1.0, expected=False, return_nll=False,
             asimov : Union[None,float] = None ):
@@ -349,8 +339,9 @@ class TheoryPrediction(object):
             return nll
         return np.exp ( - nll ) if nll is not None else None
 
+    @cache
     @whenDefined
-    def computeStatistics(self, expected=False):
+    def computeStatistics(self, expected : bool = False) -> Dict:
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
@@ -358,22 +349,10 @@ class TheoryPrediction(object):
         :param expected: computed expected quantities, not observed
         """
 
-        if not "lmax" in self.cachedObjs[None][expected]:
-            self.cachedObjs[None][expected]["lmax"] = {}
-            self.cachedObjs[None][expected]["muhat"] = {}
-            self.cachedObjs[None][expected]["sigma_mu"] = {}
-
         # Compute likelihoods and related parameters:
         llhdDict = self.statsComputer.get_five_values(expected = expected,
-                     return_nll = True )
-        if llhdDict not in [ None, {} ]:
-            self.cachedObjs[None][expected]["nll"] = llhdDict["lbsm"]
-            self.cachedObjs[None][expected]["nll_sm"] = llhdDict["lsm"]
-            self.cachedObjs[None][expected]["nllmax"] = llhdDict["lmax"]
-            self.cachedObjs[None][expected]["muhat"] = llhdDict["muhat"]
-            if "sigma_mu" in llhdDict:
-                self.cachedObjs[None][expected]["sigma_mu"] = llhdDict["sigma_mu"]
-
+                                                        return_nll = True)
+        return llhdDict
 
 class TheoryPredictionsCombiner(TheoryPrediction):
     """
