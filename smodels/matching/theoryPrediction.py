@@ -12,8 +12,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
-from smodels.tools.caching import roundCache
-from functools import lru_cache
+from smodels.tools.caching import roundCache,lru_cache
 from typing import Union, Text, Dict
 import numpy as np
 
