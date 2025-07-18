@@ -12,9 +12,13 @@ from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
+from smodels.tools.caching import roundCache
+from functools import lru_cache
 from typing import Union, Text, Dict
 import numpy as np
-from functools import cache
+
+mu_digits = 5 # number of digits for rounding the mu argument when computing likelihoods
+
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
 
@@ -40,13 +44,14 @@ class TheoryPrediction(object):
             from smodels.base.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = { None: {False: {}, True: {}, "posteriori": {} }, 0.: {False: {}, True: {}, "posteriori": {}} }
-        self.cachedNlls = { None: {False: {}, True: {}, "posteriori": {}}, 0.: {False: {}, True: {}, "posteriori": {}} }
         self._statsComputer = None
 
     def __str__(self):
         ret = "%s:%s" % (self.analysisId(), self.totalXsection())
         return ret
+    
+    def __hash__(self):
+        return id(self)
 
     def dataId(self):
         """
@@ -187,7 +192,7 @@ class TheoryPrediction(object):
 
         self._statsComputer = computer
 
-    @cache
+    @lru_cache
     def getUpperLimit(self, expected : bool = False):
         """
         Get the upper limit on sigma*eff.
@@ -202,11 +207,11 @@ class TheoryPrediction(object):
 
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(expected=expected)
-        if self.dataType() == "upperLimit":
+        elif self.dataType() == "upperLimit":
             ul = self.dataset.getUpperLimitFor(
-                sms=self.avgSMS, txnames=self.txnames, expected=expected
-            )
-        if self.dataType() == "combined":
+                sms=self.avgSMS, txnames=self.txnames, 
+                expected=expected)
+        elif self.dataType() == "combined":
             ul = self.statsComputer.poi_upper_limit(expected = expected,
                                                     limit_on_xsec = True)
         else:
@@ -233,11 +238,12 @@ class TheoryPrediction(object):
 
         return muUL
 
-    @cache
+    @lru_cache
     def getRValue(self, expected=False):
         """
         Get the r value = theory prediction / experimental upper limit
         """
+
         upperLimit = self.getUpperLimit(expected)
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None
@@ -267,7 +273,7 @@ class TheoryPrediction(object):
         
         llhDict = self.computeStatistics(expected)
         
-        return self.nllToLikelihood (llhDict["nll_sm"],return_nll )
+        return self.nllToLikelihood (llhDict["lsm"],return_nll )
 
     @whenDefined
     def lmax(self, expected=False, return_nll : bool = False ):
@@ -275,10 +281,10 @@ class TheoryPrediction(object):
         
         llhDict = self.computeStatistics(expected)
 
-        return self.nllToLikelihood(llhDict["nllmax"],return_nll )
-
-    @cache
+        return self.nllToLikelihood(llhDict["lmax"],return_nll )
+    
     @whenDefined
+    @lru_cache
     def CLs(self, mu : float = 1., expected : Union[Text,bool] = False ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
@@ -303,6 +309,7 @@ class TheoryPrediction(object):
         return llhDict["muhat"]
     
     @whenDefined
+    @roundCache(argname="mu",argpos=1,digits=mu_digits)    
     def likelihood(self, mu=1.0, expected=False, return_nll=False,
             asimov : Union[None,float] = None ):
         """
@@ -312,24 +319,9 @@ class TheoryPrediction(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
-        if mu in self.cachedNlls[asimov][expected]:
-            nll = self.cachedNlls[asimov][expected][mu]
-            return self.nllToLikelihood ( nll, return_nll )
-
-        if "nll" in self.cachedObjs[asimov][expected] and abs(mu - 1.0) < 1e-5:
-            nll = self.cachedObjs[asimov][expected]["nll"]
-            return self.nllToLikelihood ( nll, return_nll )
-        if "nll_sm" in self.cachedObjs[asimov][expected] and abs(mu) < 1e-5:
-            nllsm = self.cachedObjs[asimov][expected]["nll_sm"]
-            return self.nllToLikelihood ( nllsm, return_nll )
-
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
                        expected = expected, return_nll = True, asimov = asimov )
-        self.cachedNlls[asimov][expected][mu] = nll
-
-        if abs(mu) < 1e-5:
-            self.cachedObjs[asimov][expected]["nll_sm"] = nll
 
         return self.nllToLikelihood ( nll, return_nll )
 
@@ -339,8 +331,8 @@ class TheoryPrediction(object):
             return nll
         return np.exp ( - nll ) if nll is not None else None
 
-    @cache
     @whenDefined
+    @lru_cache
     def computeStatistics(self, expected : bool = False) -> Dict:
         """
         Compute the likelihoods, and upper limit for this theory prediction.
@@ -393,8 +385,6 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = { None: {False: {}, True: {}, "posteriori": {}}, 0.: {False: {}, True: {}, "posteriori": {}} }
-        self.cachedNlls = { None: {False: {}, True: {}, "posteriori": {}}, 0.: {False: {}, True: {}, "posteriori": {}} }
         self._statsComputer = None
 
     @classmethod

@@ -19,7 +19,7 @@ from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
-
+from smodels.matching.theoryPrediction import mu_digits
 
 
 class AnaCombLikelihoodComputer(object):
@@ -54,23 +54,25 @@ class AnaCombLikelihoodComputer(object):
         :param expected: if True, compute expected likelihood, else observed
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
+
         """
+
+        if not self.theoryPredictions:
+            return None
+
         try:
             mu = mu[0]  # some of these methods use arrays with a single element
         except:
             pass
 
         nll = 0.0
-        changed = False
         for tp in self.theoryPredictions:
             tmp = tp.likelihood(mu, expected=expected, return_nll=True, asimov=asimov)
-            if tmp != None:
-                nll = nll + tmp     #Add neg log llhds
-                changed = True
-            else:
+            if tmp is None:
                 return None
-        if changed == False:
-            return None
+            else:
+                nll = nll + tmp     #Add neg log llhds
+
         if not return_nll:
             llhd = np.exp(-nll)
             return llhd
@@ -162,7 +164,12 @@ class AnaCombLikelihoodComputer(object):
             ]
             # if bounds[1] < bounds[0]:
             #    logger.error ( f"bounds are reversed, this should not happen" )
-            o = optimize.minimize(fun, mu0, bounds=bounds, tol=1e-9)
+            # Define the minimum step for computing the hessian based on the 
+            # number of digits kept for the likelihood mu argument
+            hess_min_step = 2*10**(-mu_digits)
+            o = optimize.minimize(fun, mu0, bounds=bounds, tol=1e-9, 
+                                  options={'eps' : hess_min_step})
+
             if not o.success:
                 logger.debug(
                     f"combiner.lmax did not terminate successfully: {o.message} "
@@ -270,7 +277,11 @@ class AnaCombLikelihoodComputer(object):
             nll = self.likelihood(mu, return_nll=True, expected=expected, asimov = None)
             nllA = self.likelihood(mu, expected=expected, return_nll=True, asimov = 0. )
 
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
+            ret = None
+            if nll and nllA is not None:
+                ret = CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type)
+
+            return ret
 
         return mu_hat, sigma_mu, clsRoot
 

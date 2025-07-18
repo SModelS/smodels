@@ -13,7 +13,7 @@ import sys
 
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.tools.caching import _memoize
+from smodels.tools.caching import roundCache
 from scipy.linalg import svd, LinAlgError
 import numpy as np
 import math
@@ -53,6 +53,10 @@ class TxNameData(object):
     def __str__(self):
         """ a simple unique string identifier, mostly for _memoize """
         return str(self._id)
+    
+    def __hash__(self):
+        """ a simple unique identifier, mostly for caching """
+        return id(self)
 
     def round_to_n(self, x, n):
         if x == 0.0:
@@ -123,7 +127,7 @@ class TxNameData(object):
 
         return point
 
-    @_memoize
+    @roundCache(argname="point",argpos=1,digits=2)
     def getValueFor(self, point):
         """
         Returns the UL or efficiency for the point.
