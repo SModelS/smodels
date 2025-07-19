@@ -1233,7 +1233,6 @@ class PyhfUpperLimitComputer:
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
-            self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
