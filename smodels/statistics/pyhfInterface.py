@@ -17,6 +17,8 @@ import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import findRoot
+from smodels.tools.caching import roundCache,lru_cache
+from smodels.matching.theoryPrediction import mu_digits
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
@@ -114,12 +116,6 @@ class PyhfData:
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
-        ## cache of likelihoods (actually twice_nlls)
-        self.cached_likelihoods = { None: { False: {}, True: {}, "posteriori": {} }, 0.: { False: {}, True: {}, "posteriori": {} } }
-        # cache of lmaxes (actually twice_nlls
-        self.cached_lmaxes = { None: { False: {}, True: {}, "posteriori": {} }, 0.: { False: {}, True: {}, "posteriori": {} } }
-        self.cachedULs = { False: {}, True: {}, "posteriori": {}}
-        self.cacheBestCombo = None # memorize also whats the best combo
         if jsonFiles is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
             jsonFiles = {}
             for jFile,sregions in nsignals.items():
@@ -673,6 +669,7 @@ class PyhfUpperLimitComputer:
                                 break
         return init_pars
 
+    # @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
                     expected=False, asimov : Union[None,float] = None ):
         """
@@ -686,10 +683,6 @@ class PyhfUpperLimitComputer:
             compute a priori expected, if "posteriori" compute posteriori \
             expected
         """
-        if workspace_index in self.data.cached_likelihoods[asimov][expected] and \
-                mu in self.data.cached_likelihoods[asimov][expected][workspace_index]:
-            return self.data.cached_likelihoods[asimov][expected][workspace_index][mu]
-
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
             logger.error("workspace index is float")
@@ -725,7 +718,7 @@ class PyhfUpperLimitComputer:
                 model = workspace.model(modifier_settings=msettings)
                 wsData = workspace.data(model)
                 if asimov != None:
-                    wsData = pyhf.infer.calculators.generate_asimov_data(asimov, wsData, model, None, None, None) 
+                    wsData = pyhf.infer.calculators.generate_asimov_data(asimov, wsData, model, None, None, None)
 
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
                     1.0, wsData, model, return_fitted_val=True, maxiter=200
@@ -767,27 +760,17 @@ class PyhfUpperLimitComputer:
                 ret = float(ret)
             except:
                 ret = float(ret[0])
-            # Cache the likelihood (but do we use it?)
-            if not workspace_index in self.data.cached_likelihoods[asimov][expected]:
-                self.data.cached_likelihoods[asimov][expected][workspace_index]={}
             ret = self.exponentiateNLL(ret, not return_nll)
-            self.data.cached_likelihoods[asimov][expected][
-                workspace_index
-            ][mu] = ret
-            if old_index == None:
-                if not None in self.data.cached_likelihoods[asimov][expected]:
-                    self.data.cached_likelihoods[asimov][expected][None]={}
-                self.data.cached_likelihoods[asimov][expected][None][mu] = ret
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
+            # print ( f"@@PI likelihood {mu} {workspace_index} {expected} {asimov} {ret}" )
             return ret
 
+    # @lru_cache
     def getBestCombinationIndex(self):
         """find the index of the best expected combination"""
         if self.nWS == 1:
             return 0
-        if self.data.cacheBestCombo != None:
-            return self.data.cacheBestCombo
         logger.debug( f"Finding best expected combination among {self.nWS} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
@@ -804,7 +787,6 @@ class PyhfUpperLimitComputer:
             if ul < ulMin:
                 ulMin = ul
                 i_best = i_ws
-        self.data.cacheBestCombo = i_best
         return i_best
 
     def exponentiateNLL(self, twice_nll, doIt):
@@ -873,8 +855,7 @@ class PyhfUpperLimitComputer:
         #return the inverse hessian at the poi
         return 1.0/hessian
 
-
-
+    # @lru_cache
     def lmax( self, workspace_index=None, return_nll=False, expected=False,
               allowNegativeSignals=False):
         """
@@ -889,8 +870,6 @@ class PyhfUpperLimitComputer:
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
-        if workspace_index in self.data.cached_lmaxes[None][expected]:
-            return self.data.cached_lmaxes[None][expected][workspace_index]
         # logger.error("expected flag needs to be heeded!!!")
         logger.debug("Calling lmax")
         with warnings.catch_warnings():
@@ -981,10 +960,6 @@ class PyhfUpperLimitComputer:
             lmax = self.exponentiateNLL(lmax, not return_nll)
 
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
-            self.data.cached_lmaxes[None][expected][workspace_index] = ret
-            if old_index == None:
-                self.data.cached_lmaxes[None][expected][None] = ret
-            # print ( f"@@11 ret {ret}" )
             return ret
 
     def updateWorkspace(self, workspace_index=None, expected=False):
@@ -1138,6 +1113,7 @@ class PyhfUpperLimitComputer:
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
+    # @lru_cache
     def getUpperLimitOnMu(self, expected=False, workspace_index=None):
         """
         Compute the upper limit on the signal strength modifier with:
@@ -1153,9 +1129,6 @@ class PyhfUpperLimitComputer:
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         self.__init__(self.data, self.cl, self.lumi)
-        if workspace_index in self.data.cachedULs[expected]:
-            ret = self.data.cachedULs[expected][workspace_index]
-            return ret
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
@@ -1256,7 +1229,6 @@ class PyhfUpperLimitComputer:
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale
-            self.data.cachedULs[expected][workspace_index] = ul
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":

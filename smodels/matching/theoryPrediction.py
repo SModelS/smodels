@@ -12,8 +12,11 @@ from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
+from smodels.tools.caching import roundCache,lru_cache
 from typing import Union, Text, Dict
 import numpy as np
+
+mu_digits = 5 # number of digits for rounding the mu argument when computing likelihoods
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
 
