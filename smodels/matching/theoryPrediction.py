@@ -189,6 +189,7 @@ class TheoryPrediction(object):
 
         self._statsComputer = computer
 
+    @lru_cache
     def getUpperLimit(self, expected=False):
         """
         Get the upper limit on sigma*eff.
@@ -200,23 +201,16 @@ class TheoryPrediction(object):
         :param expected: return expected Upper Limit, instead of observed.
         :return: upper limit (Unum object)
         """
-
-        # First check if the upper-limit and expected upper-limit have already been computed.
-        # If not, compute it and store them.
-        if "UL" not in self.cachedObjs[None][expected]:
-            ul = None
-            if self.dataType() == "efficiencyMap":
-                ul = self.dataset.getSRUpperLimit(expected=expected)
-            if self.dataType() == "upperLimit":
-                ul = self.dataset.getUpperLimitFor(
-                    sms=self.avgSMS, txnames=self.txnames, expected=expected
-                )
-            if self.dataType() == "combined":
-                ul = self.statsComputer.poi_upper_limit(expected = expected,
-                                                        limit_on_xsec = True)
-            self.cachedObjs[None][expected]["UL"] = ul
-
-        return self.cachedObjs[None][expected]["UL"]
+        if self.dataType() == "efficiencyMap":
+            ul = self.dataset.getSRUpperLimit(expected=expected)
+        if self.dataType() == "upperLimit":
+            ul = self.dataset.getUpperLimitFor(
+                sms=self.avgSMS, txnames=self.txnames, expected=expected
+            )
+        if self.dataType() == "combined":
+            ul = self.statsComputer.poi_upper_limit(expected = expected,
+                                                    limit_on_xsec = True)
+        return ul
 
     def getUpperLimitOnMu(self, expected=False):
         """
@@ -237,21 +231,18 @@ class TheoryPrediction(object):
 
         return muUL
 
+    @lru_cache
     def getRValue(self, expected=False):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        if "r" not in self.cachedObjs[None][expected]:
-            upperLimit = self.getUpperLimit(expected)
-            if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
-                r = None
-                self.cachedObjs[None][expected]["r"] = r
-                return r
-            else:
-                r = (self.totalXsection()/upperLimit).asNumber()
-                self.cachedObjs[None][expected]["r"] = r
-                return r
-        return self.cachedObjs[None][expected]["r"]
+        upperLimit = self.getUpperLimit(expected)
+        if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
+            r = None
+            return r
+        else:
+            r = (self.totalXsection()/upperLimit).asNumber()
+            return r
 
     def whenDefined(function):
         """
@@ -279,6 +270,7 @@ class TheoryPrediction(object):
                return_nll )
 
     @whenDefined
+    @lru_cache
     def lmax(self, expected=False, return_nll : bool = False ):
         """likelihood at mu_hat"""
         if not "nllmax" in self.cachedObjs[None][expected]:
