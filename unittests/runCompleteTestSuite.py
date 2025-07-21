@@ -162,9 +162,9 @@ if __name__ == "__main__":
         cleanDatabase()
     else:
         if not args.notebooks:
-            print('Notebooks WILL NOT be tested.')
+            print('[runCompleteTestSuite] Notebooks WILL NOT be tested.')
         if args.reduced:
-            print('Reduced set of unit tests')
+            print('[runCompleteTestSuite] Reduced set of unit tests')
 
         if args.parallel:
             parallel_run(args.verbose, args.notebooks, args.reduced)
