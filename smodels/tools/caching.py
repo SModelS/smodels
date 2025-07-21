@@ -26,7 +26,8 @@ def roundObj(obj, digits : int):
     return new_obj
 
 def roundCache(argname = None, argpos : int = 0,
-               digits : int = 5, maxsize: int = 128):
+               digits : int = 5, maxsize: int = 128,
+               verbose : bool = False, turnoff : bool = False ):
     """
     Returns the cached function called with the argument defined
     by argname and in the position argpos rounded to the
@@ -45,38 +46,16 @@ def roundCache(argname = None, argpos : int = 0,
             elif argpos < len(rounded_args):
                 rounded_args[argpos] = roundObj(rounded_args[argpos],digits)
             rounded_args = tuple(rounded_args)
+            if verbose:
+                print ( f"[cache] mu={args[1]} kwargs {kwargs} returns {func_cache(*rounded_args, **rounded_kwargs)}" )
+                print ( f"[cache]              orig {function(*rounded_args, **rounded_kwargs)}" )
+            if turnoff:
+                return function(*rounded_args, **rounded_kwargs )
             return func_cache(*rounded_args, **rounded_kwargs)
 
         return wrapper
 
     return roundCacheDec
-
-def _toString(arg):
-    try:
-        return "%.2f" % arg.asNumber(fb)
-    except (AttributeError, IncompatibleUnitsError):
-        pass
-    try:
-        return "%.3f" % arg.asNumber(GeV)
-    except (AttributeError, IncompatibleUnitsError):
-        pass
-    try:
-        return "%.2f" % arg.asNumber(1/fb)
-    except (AttributeError, IncompatibleUnitsError):
-        pass
-    if type(arg) == float:
-        return "%.2f" % arg
-    if type(arg) == int:
-        return "%d" % arg
-    if type(arg) == str:
-        return "%s" % arg
-    if type(arg) in [list, tuple]:
-        argstring = ""
-        for newarg in arg:
-            argstring += _toString(newarg) + " "
-        argstring = argstring[:-1]
-        return argstring
-    return "%s" % (str(arg))
 
 if __name__ == "__main__":
     from typing import Union, Text
