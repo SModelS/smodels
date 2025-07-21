@@ -41,7 +41,7 @@ def checkPythonRequirements(requirements_path : os.PathLike ="../smodels/share/r
     # Filter out comments and empty lines
     requirements = [line.strip() for line in requirements if line.strip() and not line.strip().startswith("#")]
 
-    print(f"Checking {len(requirements)} requirement(s)...\n")
+    print(f"[unitTestHelpers] Checking {len(requirements)} python dependencies ... ", end="" )
     for req in requirements:
         try:
             pkg_resources.require(req)
@@ -55,6 +55,7 @@ def checkPythonRequirements(requirements_path : os.PathLike ="../smodels/share/r
         except Exception as e:
             print(f"❌ Error checking {req}: {e}")
             sys.exit()
+    print ( "we are good." )
 
 def canonNameToVertNumb(topoDict,cName):
     """

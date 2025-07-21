@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 .. module:: caching
    :synopsis: The memoize technique, for caching.
@@ -13,14 +15,14 @@ from smodels.base.physicsUnits import GeV, fb
 
 import numpy as np
 from collections.abc import Iterable
-from functools import lru_cache,wraps
+from functools import lru_cache, cache, wraps
 
 def roundObj(obj, digits : int):
-
+    """ round <obj> to <digits> digits """
     if isinstance(obj,Iterable):
         new_obj = tuple([np.round(x,digits) for x in obj])
     else:
-        new_obj = np.round(obj,digits)
+        new_obj = float(np.round(obj,digits))
     return new_obj
 
 def roundCache(argname = None, argpos : int = 0,
@@ -43,9 +45,6 @@ def roundCache(argname = None, argpos : int = 0,
             elif argpos < len(rounded_args):
                 rounded_args[argpos] = roundObj(rounded_args[argpos],digits)
             rounded_args = tuple(rounded_args)
-            #print ( f"@@CA roundCache {rounded_args} {kwargs} {func_cache(*rounded_args, **rounded_kwargs)} {function(*rounded_args, **rounded_kwargs)}" )
-            #print ( f"@@CA guess1: function(0.,None,True,False,None) {function(0.,None,True,False,None)}" )
-            #print ( f"@@CA guess2: function(0.,None,True,False,0.) {function(0.,None,True,False,0.)}" )
             return func_cache(*rounded_args, **rounded_kwargs)
 
         return wrapper
@@ -133,3 +132,34 @@ def _memoize(func):
         argstring = _toString(args)
         return Cache.add(argstring, func(*args))
     return _wrap
+
+if __name__ == "__main__":
+    from typing import Union, Text
+    class TestCase:
+        def __init__ ( self ):
+            self.bla = 0
+        @roundCache(argname='mu',argpos=1,digits=5)
+        def myfunc ( self, mu : float = 0., expected : Union[Text,bool] = False,
+                         asimov : Union[None,float] = None ):
+            print ( "calling myfunc" )
+            ret = mu
+            if expected == True:
+                ret += 10.
+            if expected == "posteriori":
+                ret += 20.
+            if asimov != None:
+                ret += 1000.*(asimov+1000.)
+            #if asimov == None:
+            #    ret = None
+            return ret
+
+
+    test = TestCase()
+    print ( test.myfunc ( 1. ) )
+    print ( test.myfunc ( 1. ) )
+    print ( test.myfunc ( mu=1. ) )
+    print ( test.myfunc ( mu=1. ) )
+    print ( test.myfunc ( 1.,expected=True, asimov=0. ) )
+    print ( test.myfunc ( 1.,expected=True, asimov=0. ) )
+    print ( test.myfunc ( 1.,True, asimov=0. ) )
+    print ( test.myfunc ( 1.,True, asimov=0. ) )
