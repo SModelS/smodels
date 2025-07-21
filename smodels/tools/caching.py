@@ -15,7 +15,7 @@ from smodels.base.physicsUnits import GeV, fb
 
 import numpy as np
 from collections.abc import Iterable
-from functools import lru_cache, cache, wraps
+from functools import lru_cache, wraps
 
 def roundObj(obj, digits : int):
     """ round <obj> to <digits> digits """
@@ -78,61 +78,6 @@ def _toString(arg):
         return argstring
     return "%s" % (str(arg))
 
-
-class Cache:
-    """ a class for storing results from interpolation """
-    _cache = {}
-    _cache_order = []
-    n_stored = 1000  # number of interpolations we keep per result
-
-    @staticmethod
-    def size():
-        return len(Cache._cache_order)
-
-    @staticmethod
-    def _clear_garbage():
-        """
-        every once in a while we clear the garbage, i.e.
-        discard half of the cached interpolations
-        """
-        if len(Cache._cache_order) < Cache.n_stored:
-            return
-        ns2 = int(Cache.n_stored / 2)
-        for i in range(ns2):
-            Cache._cache.pop(Cache._cache_order[i])  # remove
-        Cache._cache_order = Cache._cache_order[ns2:]
-
-    @staticmethod
-    def reset():
-        """ completely reset the cache """
-        Cache._cache = {}
-        Cache._cache_order = []
-
-    @staticmethod
-    def add(key, value):
-        if key in Cache._cache_order:
-            return value
-        Cache._cache_order.append(key)
-        Cache._cache[key] = value
-        Cache._clear_garbage()
-        return value
-
-
-def _memoize(func):
-    """
-    Serves as a wrapper to cache the results of func, since this is a
-    computationally expensive function.
-
-    """
-    @wraps(func)
-    def _wrap(*args):
-        """
-        Wrapper for the function to be memoized
-        """
-        argstring = _toString(args)
-        return Cache.add(argstring, func(*args))
-    return _wrap
-
 if __name__ == "__main__":
     from typing import Union, Text
     class TestCase:
@@ -149,8 +94,8 @@ if __name__ == "__main__":
                 ret += 20.
             if asimov != None:
                 ret += 1000.*(asimov+1000.)
-            #if asimov == None:
-            #    ret = None
+            if asimov == None:
+                ret = None
             return ret
 
 
