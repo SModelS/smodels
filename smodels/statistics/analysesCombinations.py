@@ -19,8 +19,8 @@ from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
-
-
+from smodels.tools.caching import roundCache, lru_cache
+from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
 
@@ -40,6 +40,7 @@ class AnaCombLikelihoodComputer(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(
         self,
         mu: float = 1.0,
@@ -74,6 +75,7 @@ class AnaCombLikelihoodComputer(object):
         if not return_nll:
             llhd = np.exp(-nll)
             return llhd
+# print ( f"@@AC mu={mu} expected {expected} asimov {asimov} nll {nll}" )
         
         return nll
 

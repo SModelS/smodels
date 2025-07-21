@@ -16,7 +16,7 @@ from smodels.tools.caching import roundCache,lru_cache
 from typing import Union, Text, Dict
 import numpy as np
 
-mu_digits = 5 # number of digits for rounding the mu argument when computing likelihoods
+mu_digits = 8 # number of digits for rounding the mu argument when computing likelihoods
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
 
