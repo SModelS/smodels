@@ -669,7 +669,7 @@ class PyhfUpperLimitComputer:
                                 break
         return init_pars
 
-    # @roundCache(argname='mu',argpos=1,digits=mu_digits)
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
                     expected=False, asimov : Union[None,float] = None ):
         """
@@ -1029,7 +1029,7 @@ class PyhfUpperLimitComputer:
         ad = pyhf.infer.calculators.generate_asimov_data(mu_test, data, model, None, None, None)
         return ad
 
-    # @lru_cache
+    # @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float, expected : Union[bool,str],
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None ) -> float:
