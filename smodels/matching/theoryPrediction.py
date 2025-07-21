@@ -308,6 +308,7 @@ class TheoryPrediction(object):
         return self.cachedObjs[None][expected]["muhat"]
 
     @whenDefined
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(self, mu=1.0, expected=False, return_nll=False,
             asimov : Union[None,float] = None ):
         """
@@ -317,26 +318,11 @@ class TheoryPrediction(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
-        if mu in self.cachedNlls[asimov][expected]:
-            nll = self.cachedNlls[asimov][expected][mu]
-            return self.nllToLikelihood ( nll, return_nll )
-
-        if "nll" in self.cachedObjs[asimov][expected] and abs(mu - 1.0) < 1e-8:
-            nll = self.cachedObjs[asimov][expected]["nll"]
-            return self.nllToLikelihood ( nll, return_nll )
-        if "nll_sm" in self.cachedObjs[asimov][expected] and abs(mu) < 1e-8:
-            nllsm = self.cachedObjs[asimov][expected]["nll_sm"]
-            return self.nllToLikelihood ( nllsm, return_nll )
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
-                       expected = expected, return_nll = True, asimov = asimov )
-        self.cachedNlls[asimov][expected][mu] = nll
-
-        if abs(mu) < 1e-8:
-            self.cachedObjs[asimov][expected]["nll_sm"] = nll
-
-        return self.nllToLikelihood ( nll, return_nll )
+                       expected = expected, return_nll = return_nll, asimov = asimov )
+        return nll
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
         """ if not return_nll, then compute likelihood from nll """
