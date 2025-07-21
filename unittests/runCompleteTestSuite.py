@@ -27,6 +27,9 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
 from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "fatal" )
 
+from unitTestHelpers import checkPythonRequirements
+checkPythonRequirements()
+
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()

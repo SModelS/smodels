@@ -24,6 +24,38 @@ from smodels.base.physicsUnits import fb
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 
+import pkg_resources
+import sys
+from pathlib import Path
+
+def checkPythonRequirements(requirements_path : os.PathLike ="../smodels/share/requirements.txt"):
+    """ simple function to check if the python requirements are met """
+    req_path = Path(requirements_path)
+    if not req_path.exists():
+        print(f"❌ Requirements file not found: {requirements_path}")
+        sys.exit(1)
+
+    with req_path.open() as f:
+        requirements = f.read().splitlines()
+
+    # Filter out comments and empty lines
+    requirements = [line.strip() for line in requirements if line.strip() and not line.strip().startswith("#")]
+
+    print(f"Checking {len(requirements)} requirement(s)...\n")
+    for req in requirements:
+        try:
+            pkg_resources.require(req)
+            # print(f"✅ {req}")
+        except pkg_resources.DistributionNotFound as e:
+            print(f"❌ Missing package: {req} -> {e}")
+            sys.exit()
+        except pkg_resources.VersionConflict as e:
+            print(f"❌ Version conflict: {req} -> {e.report()}")
+            sys.exit()
+        except Exception as e:
+            print(f"❌ Error checking {req}: {e}")
+            sys.exit()
+
 def canonNameToVertNumb(topoDict,cName):
     """
     Convert canonical name to old vertnumb notation (in string format)

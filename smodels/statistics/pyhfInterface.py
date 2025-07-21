@@ -17,7 +17,7 @@ import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import findRoot
-from smodels.tools.caching import roundCache,lru_cache
+from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
@@ -766,7 +766,7 @@ class PyhfUpperLimitComputer:
             # print ( f"@@PI likelihood {mu} {workspace_index} {expected} {asimov} {ret}" )
             return ret
 
-    # @lru_cache
+    @lru_cache
     def getBestCombinationIndex(self):
         """find the index of the best expected combination"""
         if self.nWS == 1:
@@ -855,7 +855,7 @@ class PyhfUpperLimitComputer:
         #return the inverse hessian at the poi
         return 1.0/hessian
 
-    # @lru_cache
+    @lru_cache
     def lmax( self, workspace_index=None, return_nll=False, expected=False,
               allowNegativeSignals=False):
         """
@@ -1029,6 +1029,7 @@ class PyhfUpperLimitComputer:
         ad = pyhf.infer.calculators.generate_asimov_data(mu_test, data, model, None, None, None)
         return ad
 
+    # @lru_cache
     def CLs( self, mu : float, expected : Union[bool,str],
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None ) -> float:
@@ -1113,7 +1114,7 @@ class PyhfUpperLimitComputer:
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
-    # @lru_cache
+    @lru_cache
     def getUpperLimitOnMu(self, expected=False, workspace_index=None):
         """
         Compute the upper limit on the signal strength modifier with:
