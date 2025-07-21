@@ -1029,14 +1029,32 @@ class PyhfUpperLimitComputer:
         ad = pyhf.infer.calculators.generate_asimov_data(mu_test, data, model, None, None, None)
         return ad
 
-    # @roundCache(argname='mu',argpos=1,digits=mu_digits)
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float, expected : Union[bool,str],
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None ) -> float:
         """
-        Compute the exclusion confidence level of the model
+        This is the CLs method that heeds self.scale, i.e. you give it the
+        _absolute_ mu
 
         :param mu: compute for the parameter of interest mu
+        :param expected: if false, compute observed, true: compute a priori expected
+        :param return_type: (Text) can be one of:
+        "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
+        CLs-alpha: returns CLs - 0.05
+        alpha-CLs: return 0.05 - CLs
+        1-CLs: returns 1-CLs value
+        CLs: returns CLs value
+        """
+        return self._CLs ( mu / self.scale, expected, return_type, workspace_index )
+
+    def _CLs( self, mu_rel : float, expected : Union[bool,str],
+             return_type: Text = "CLs",
+             workspace_index : Union[int,None] = None ) -> float:
+        """
+        This is our internal method to compute CLs.
+
+        :param mu_rel: compute for the parameter of interest mu_rel
         :param expected: if false, compute observed, true: compute a priori expected
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
@@ -1082,25 +1100,26 @@ class PyhfUpperLimitComputer:
                 # ic ( workspace["channels"][0]["samples"][0]["data"] )
                 # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                 try:
-                    result = pyhf.infer.hypotest(mu, workspace.data(model), model, **args)
+                    result = pyhf.infer.hypotest(mu_rel, workspace.data(model), model, **args)
                 except Exception as e:
-                    logger.error(f"when testing hypothesis {mu}, caught exception: {e}")
+                    logger.error(f"when testing hypothesis {mu_rel}, caught exception: {e}")
                     result = float("nan")
                     if expected == "posteriori":
                         result = [float("nan")] * 2
             end = time.time()
             logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
-            logger.debug(f"result for {mu} {result}")
+            logger.debug(f"result for {mu_rel} {result}")
             if expected == "posteriori":
                 logger.debug("computing a-posteriori expected limit")
-                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                logger.debug("expected = {}, mu_rel = {}, result = {}".format(expected, mu_rel, result))
                 try:
                     CLs = float(result[1].tolist())
                 except TypeError:
                     CLs = float(result[1][0])
             else:
-                logger.debug("expected = {}, mu = {}, result = {}".format(expected, mu, result))
+                logger.debug("expected = {}, mu_rel = {}, result = {}".format(expected, mu_rel, result))
                 CLs = float(result)
+            # print ( f"@@PI0 CLs for {mu_rel}*{self.scale} {expected} {workspace_index} {self.nsignals} = {CLs}" )
             if return_type == "1-CLs":
                 return 1.0 - CLs
             elif return_type == "CLs":
@@ -1174,9 +1193,9 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = self.CLs(lo_mu, expected, "alpha-CLs", workspace_index )
+                rt1 = self._CLs(lo_mu, expected, "alpha-CLs", workspace_index )
                 # rt5 = CLs(med_mu)
-                rt10 = self.CLs(hi_mu, expected, "alpha-CLs", workspace_index )
+                rt10 = self._CLs(hi_mu, expected, "alpha-CLs", workspace_index )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1184,7 +1203,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = self.CLs(med_mu, expected, "alpha-CLs", workspace_index )
+                    rt5 = self._CLs(med_mu, expected, "alpha-CLs", workspace_index )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1196,7 +1215,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = self.CLs(med_mu, expected, "alpha-CLs", workspace_index )
+                    rt5 = self._CLs(med_mu, expected, "alpha-CLs", workspace_index )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1226,7 +1245,7 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            ul = findRoot ( self.CLs, lo_mu, hi_mu, args=(expected, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
+            ul = findRoot ( self._CLs, lo_mu, hi_mu, args=(expected, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             ul = ul * self.scale

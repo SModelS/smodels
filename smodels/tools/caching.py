@@ -25,9 +25,9 @@ def roundObj(obj, digits : int):
         new_obj = float(np.round(obj,digits))
     return new_obj
 
-def roundCache(argname = None, argpos : int = 0,
-               digits : int = 5, maxsize: int = 128,
-               verbose : bool = False, turnoff : bool = False ):
+def roundCache(argname = None, argpos : int = 0, digits : int = 8,
+        maxsize: int = 128, verbose : bool = False,
+        turnoff : bool = False ):
     """
     Returns the cached function called with the argument defined
     by argname and in the position argpos rounded to the
