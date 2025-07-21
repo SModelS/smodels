@@ -55,7 +55,7 @@ def checkPythonRequirements(requirements_path : os.PathLike ="../smodels/share/r
         except Exception as e:
             print(f"❌ Error checking {req}: {e}")
             sys.exit()
-    print ( "we are good." )
+    print ( "all requirements are met." )
 
 def canonNameToVertNumb(topoDict,cName):
     """

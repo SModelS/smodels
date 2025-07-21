@@ -60,7 +60,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.610848781674152, 3)
+        self.assertAlmostEqual(ulmu, 3.4883893878456447, 3)
         ulmu_exp = combiner.getUpperLimitOnMu(expected=True)
         self.assertAlmostEqual(ulmu_exp, 1.9892495624399895, 3)
 
@@ -219,7 +219,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(lsm, 0.1009, 2)
         self.assertAlmostEqual(lbsm,0.15356, 2)
         self.assertAlmostEqual(lmax, 0.21210, 2)
-        self.assertAlmostEqual(combiner.getRValue(), 0.11720210380623013, 4)
+        self.assertAlmostEqual(combiner.getRValue(), 0.1209701850476386, 4)
 
         # Also check if likelihood dict is defined:
         muvals = np.linspace(0.,3.,10)

@@ -321,10 +321,10 @@ class TheoryPrediction(object):
             nll = self.cachedNlls[asimov][expected][mu]
             return self.nllToLikelihood ( nll, return_nll )
 
-        if "nll" in self.cachedObjs[asimov][expected] and abs(mu - 1.0) < 1e-5:
+        if "nll" in self.cachedObjs[asimov][expected] and abs(mu - 1.0) < 1e-8:
             nll = self.cachedObjs[asimov][expected]["nll"]
             return self.nllToLikelihood ( nll, return_nll )
-        if "nll_sm" in self.cachedObjs[asimov][expected] and abs(mu) < 1e-5:
+        if "nll_sm" in self.cachedObjs[asimov][expected] and abs(mu) < 1e-8:
             nllsm = self.cachedObjs[asimov][expected]["nll_sm"]
             return self.nllToLikelihood ( nllsm, return_nll )
 
@@ -333,7 +333,7 @@ class TheoryPrediction(object):
                        expected = expected, return_nll = True, asimov = asimov )
         self.cachedNlls[asimov][expected][mu] = nll
 
-        if abs(mu) < 1e-5:
+        if abs(mu) < 1e-8:
             self.cachedObjs[asimov][expected]["nll_sm"] = nll
 
         return self.nllToLikelihood ( nll, return_nll )
