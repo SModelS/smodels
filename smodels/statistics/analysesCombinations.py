@@ -76,9 +76,10 @@ class AnaCombLikelihoodComputer(object):
             llhd = np.exp(-nll)
             return llhd
 # print ( f"@@AC mu={mu} expected {expected} asimov {asimov} nll {nll}" )
-        
+
         return nll
 
+    @lru_cache
     def lmax(
         self,
         allowNegativeSignals: bool = False,
@@ -207,6 +208,7 @@ class AnaCombLikelihoodComputer(object):
         ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}       #return nll_ too in the dictionary?
         return ret
 
+    @lru_cache
     def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False ):
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
@@ -276,6 +278,7 @@ class AnaCombLikelihoodComputer(object):
 
         return mu_hat, sigma_mu, clsRoot
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1., expected: Union[Text,bool] = False,
              return_type: Text = "CLs" ):
         """
