@@ -791,6 +791,8 @@ class LikelihoodComputer:
         :param return_nll: if true, return nll instead of likelihood
         :returns: profile likelihood and error code (0=no error)
         """
+        if expected != False:
+            self.transform ( expected )
         if asimov != None:
             assert abs(asimov)<1e-20, "we currently treat asimov data only with mu=0."
             if self.asimovComputer == None:
