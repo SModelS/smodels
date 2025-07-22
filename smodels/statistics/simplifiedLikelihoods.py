@@ -113,7 +113,7 @@ class Data:
         newModel.asimov = mu
         return newModel
 
-    def totalCovariance(self, nsig):
+    def totalCovariance(self, nsig : list ):
         """get the total covariance matrix, taking into account
         also signal uncertainty for the signal hypothesis <nsig>.
         If nsig is None, the predefined signal hypothesis is taken.
@@ -132,7 +132,7 @@ class Data:
             return True
         return len(self.nsignal[self.nsignal > 0.0]) == 0
 
-    def var_s(self, nsig=None):
+    def var_s(self, nsig : Union[None,list] = None):
         """
         The signal variances. Convenience function.
 
@@ -177,7 +177,7 @@ class Data:
         return array(obj)
 
     def __str__(self):
-        return self.name + " (%d dims)" % self.n
+        return self.name + f" ({self.n} dims)"
 
     def _convertCov(self, obj):
 
@@ -364,8 +364,7 @@ class LikelihoodComputer:
                 else:
                     # n_pred[ctr]=1e-5
                     raise Exception(
-                        "we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle."
-                        % ctr
+                        f"we have a zero value in the denominator at pos {ctr}, with a non-zero numerator. dont know how to handle."
                     )
         ret = -model.observed * nsig / n_pred + nsig
 
@@ -604,9 +603,7 @@ class LikelihoodComputer:
                 ret = gaussian * (reduce(lambda x, y: x * y, poisson))
             return float(ret)
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % (e, model.V))
-            # raise Exception("ValueError %s, %s" % ( e, model.totalCovariance(self.nsig) ))
-            # raise Exception("ValueError %s, %s" % ( e, model.V ))
+            raise Exception( f"ValueError {e}, {model.V}" )
 
     def dNLLdTheta(self, theta):
         """the derivative of nll as a function of the thetas.
@@ -716,7 +713,7 @@ class LikelihoodComputer:
                 d1 = distance(thetamaxes[-2], thetamax)
                 d2 = distance(thetamaxes[-3], thetamaxes[-2])
                 if d1 > d2:
-                    raise Exception("diverging when computing thetamax: %f > %f" % (d1, d2))
+                    raise Exception( f"diverging when computing thetamax: {d1} > {d2}" )
                 if d1 < 1e-5:
                     return thetamax
         return thetamax
@@ -772,7 +769,6 @@ class LikelihoodComputer:
             ret_c = optimize.fmin_tnc(
                 self.llhdOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0, bounds=bounds
             )
-            # print ( "[findThetaHat] mu=%s bg=%s observed=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/model.efficiencies[0], model.backgrounds, model.observed,model.covariance, self.nsig, ret_c[0], self.nllOfNuisances(ret_c[0]) ) )
             if ret_c[-1] not in [0, 1, 2]:
                 return ret_c[0], ret_c[-1]
             else:
@@ -782,8 +778,8 @@ class LikelihoodComputer:
             ret = ret_c[0]
             return ret, -2
         except (IndexError, ValueError) as e:
-            logger.error("exception: %s. ini[-3:]=%s" % (e, ini[-3:]))
-            raise Exception("cov-1=%s" % (model.covariance + model.var_s(nsig)) ** (-1))
+            logger.error( f"exception: {e}. ini[-3:]={ini[-3:]}" )
+            raise Exception( f"cov-1={model.covariance + model.var_s(nsig)**(-1)}")
         return ini, -1
 
     def likelihood(self, mu : float, return_nll : bool = False ):
@@ -941,7 +937,7 @@ class LikelihoodComputer:
         chi2 = 2 * (llhd - maxllhd)
 
         if not np.isfinite(chi2):
-            logger.error("chi2 is not a finite number! %s,%s,%s" % (chi2, llhd, maxllhd))
+            logger.error( f"chi2 is not a finite number! {chi2},{llhd},{maxllhd}")
         # Return the test statistic -2log(H0/H1)
         return chi2
 
@@ -1100,7 +1096,7 @@ class UpperLimitComputer:
         _, _, clsRoot = self.getCLsRootFunc( expected, trylasttime )
         ret = clsRoot(mu, return_type=return_type)
         # its not an uppser limit on mu, its on nsig
-        print ( f"@@SL0 been asked to compute CLs mu={mu} asimov={self.likelihoodComputer.model.asimov}: {ret}" )
+        # print ( f"@@SL0 been asked to compute CLs mu={mu} asimov={self.likelihoodComputer.model.asimov}: {ret}" )
         return ret
 
 
