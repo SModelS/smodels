@@ -355,8 +355,7 @@ class StatsComputer:
         self.transform ( expected )
         kwargs = {}
         if self.dataType == "pyhf":
-            if asimov != None:
-                kwargs["asimov"]=asimov
+            kwargs["asimov"]=asimov
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
