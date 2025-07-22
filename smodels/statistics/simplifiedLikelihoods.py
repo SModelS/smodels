@@ -345,19 +345,20 @@ class LikelihoodComputer:
             mu = float(mu[0])
         if theta_hat == None:
             theta_hat, _ = self.findThetaHat ( mu )
-        nsig = self.model.nsignal
-        if not self.model.isLinear():
+        model = self.model
+        nsig = model.nsignal
+        if not model.isLinear():
             logger.debug("implemented only for linear model")
         # n_pred^i := mu s_i + b_i + theta_i
         # NLL = sum_i [ - n_obs^i * ln ( n_pred^i ) + n_pred^i ]
         # d NLL / d mu = sum_i [ - ( n_obs^i * s_ i ) / n_pred_i + s_i ]
 
         # Define relative signal strengths:
-        n_pred = mu * nsig + self.model.backgrounds + theta_hat
+        n_pred = mu * nsig + model.backgrounds + theta_hat
 
         for ctr, d in enumerate(n_pred):
             if d == 0.0:
-                if (self.model.observed[ctr] * nsig[ctr]) == 0.0:
+                if (model.observed[ctr] * nsig[ctr]) == 0.0:
                     #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
                     n_pred[ctr] = 1e-5
                 else:
@@ -366,7 +367,7 @@ class LikelihoodComputer:
                         "we have a zero value in the denominator at pos %d, with a non-zero numerator. dont know how to handle."
                         % ctr
                     )
-        ret = -self.model.observed * nsig / n_pred + nsig
+        ret = -model.observed * nsig / n_pred + nsig
 
         if type(ret) in [array, ndarray, list]:
             ret = sum(ret)
@@ -381,11 +382,12 @@ class LikelihoodComputer:
     def findAvgr(self, theta_hat ):
         """from the difference observed - background, find got inital
         values for lower and upper"""
-        mu_c = self.model.observed - self.model.backgrounds - theta_hat
+        model = self.model
+        mu_c = model.observed - model.backgrounds - theta_hat
         mu_r, wmu_r = [], []
         hessian = self.d2NLLdMu2 ( 1., theta_hat )
         wtot = 0.0
-        for s in zip(mu_c, self.model.nsignal, hessian):
+        for s in zip(mu_c, model.nsignal, hessian):
             if s[1] > 1e-16:
                 w = 1. # 1e-5
                 if s[2] > 0.0:
@@ -410,22 +412,23 @@ class LikelihoodComputer:
         # nll=-nobs*ln(mu*s + b + theta) + ( mu*s + b + theta)
         # d nll / d mu = - nobs * s / ( mu*s + b + theta) + s
         # d2nll / dmu2 = nobs * s**2 / ( mu*s + b + theta )**2
-        n_pred = mu * self.model.nsignal + self.model.backgrounds + theta_hat
+        model = self.model
+        n_pred = mu * model.nsignal + model.backgrounds + theta_hat
         for i, s in enumerate(n_pred):
             if s == 0.0: # the denominator in the hessian is 0?
-                if (self.model.observed[i] * self.model.nsignal[i]) == 0.0:
+                if (model.observed[i] * model.nsignal[i]) == 0.0:
                     #    logger.debug("zero denominator, but numerator also zero, so we set denom to 1.")
                     n_pred[i] = 1.0
                 else:
                     raise Exception( f"we have a zero value in the denominator at pos {i}, with a non-zero numerator. dont know how to handle." )
-        obs = self.model.observed
+        obs = model.observed
         if sum(obs)==0 and not allowZeroHessian:
-            obs = self.model.backgrounds
-        hessian = obs * self.model.nsignal**2 / n_pred**2
+            obs = model.backgrounds
+        hessian = obs * model.nsignal**2 / n_pred**2
         if sum(hessian) == 0.0 and not allowZeroHessian:
             # if all observations are zero, we replace them by the expectations
-            if sum(self.model.observed) == 0:
-                hessian = self.model.nsignal**2 / n_pred
+            if sum(model.observed) == 0:
+                hessian = model.nsignal**2 / n_pred
         return hessian
 
     #def findMuHat(
@@ -445,9 +448,10 @@ class LikelihoodComputer:
         sigma_mu -- the standard deviation around mu_hat, and lmax, \
         i.e. the likelihood at mu_hat
         """
-        if (self.model.backgrounds == self.model.observed).all():
+        model = self.model
+        if (model.backgrounds == model.observed).all():
             return self.extendedOutput(extended_output, 0.0)
-        nsig = self.model.nsignal
+        nsig = model.nsignal
 
         if type(nsig) in [list, ndarray]:
             nsig = array(nsig)
@@ -458,10 +462,10 @@ class LikelihoodComputer:
 
         ## we need a very rough initial guess for mu(hat), to come
         ## up with a first theta
-        # self.nsig = array([0.]*len(self.model.observed))
+        # self.nsig = array([0.]*len(model.observed))
         self.mu = 1.
         ## we start with theta_hat being all zeroes
-        # theta_hat = array([0.]*len(self.model.observed))
+        # theta_hat = array([0.]*len(model.observed))
         mu_hat_old, mu_hat = 0.0, 1.0
         ctr = 0
         widener = 3.0
@@ -524,7 +528,8 @@ class LikelihoodComputer:
         Get an estimate for the standard deviation of mu at <mu>, from
         the inverse hessian
         """
-        if not self.model.isLinear():
+        model = self.model
+        if not model.isLinear():
             logger.debug("implemented only for linear model")
         # d^2 mu NLL / d mu^2 = sum_i [ n_obs^i * s_i**2 / n_pred^i**2 ]
         hessian = self.d2NLLdMu2 ( mu, theta_hat, allowZeroHessian = False )
@@ -533,7 +538,7 @@ class LikelihoodComputer:
             hessian = 1e-10
         """
             # if all observations are zero, we replace them by the expectations
-            if sum(self.model.observed) == 0:
+            if sum(model.observed) == 0:
                 hessian = sum(nsig**2 / n_pred)
         """
         stderr = float(np.sqrt(1.0 / hessian))
@@ -548,15 +553,16 @@ class LikelihoodComputer:
         :param theta: nuisance parameters
         :params nll: if True, compute negative log likelihood
         """
+        model = self.model
         # theta = array ( thetaA )
-        # ntot = self.model.backgrounds + self.nsig
-        nsig = self.mu * self.model.nsignal
-        if self.model.isLinear():
-            lmbda = self.model.backgrounds + nsig + theta
+        # ntot = model.backgrounds + self.nsig
+        nsig = self.mu * model.nsignal
+        if model.isLinear():
+            lmbda = model.backgrounds + nsig + theta
         else:
-            lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+            lmbda = nsig + model.A + theta + model.C * theta**2 / model.B**2
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
-        obs = self.model.observed
+        obs = model.observed
 
         def is_integer(x):
             if type(x) in [int, np.int64]:
@@ -581,9 +587,9 @@ class LikelihoodComputer:
                 poisson = np.exp(logpoiss)
         try:
             M = [0.0] * len(theta)
-            C = self.model.V
-            # if self.model.n == 1: I think not a good idea
-            #    C = self.model.totalCovariance(self.nsig)
+            C = model.V
+            # if model.n == 1: I think not a good idea
+            #    C = model.totalCovariance(self.nsig)
             dTheta = theta - M
             expon = -0.5 * np.dot(np.dot(dTheta, self.weight), dTheta) + self.logcoeff
             # print ( "expon", expon, "coeff", self.coeff )
@@ -598,46 +604,48 @@ class LikelihoodComputer:
                 ret = gaussian * (reduce(lambda x, y: x * y, poisson))
             return float(ret)
         except ValueError as e:
-            raise Exception("ValueError %s, %s" % (e, self.model.V))
-            # raise Exception("ValueError %s, %s" % ( e, self.model.totalCovariance(self.nsig) ))
-            # raise Exception("ValueError %s, %s" % ( e, self.model.V ))
+            raise Exception("ValueError %s, %s" % (e, model.V))
+            # raise Exception("ValueError %s, %s" % ( e, model.totalCovariance(self.nsig) ))
+            # raise Exception("ValueError %s, %s" % ( e, model.V ))
 
     def dNLLdTheta(self, theta):
         """the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood."""
-        # print ( f"nsig {self.nsig} {self.model.nsignal}" )
-        nsig = self.mu * self.model.nsignal
-        if self.model.isLinear():
-            xtot = theta + self.model.backgrounds + nsig
+        model = self.model
+        # print ( f"nsig {self.nsig} {model.nsignal}" )
+        nsig = self.mu * model.nsignal
+        if model.isLinear():
+            xtot = theta + model.backgrounds + nsig
             xtot[xtot <= 0.0] = 1e-30  ## turn zeroes to small values
-            nllp_ = self.ones - self.model.observed / xtot + np.dot(theta, self.weight)
+            nllp_ = self.ones - model.observed / xtot + np.dot(theta, self.weight)
             return nllp_
-        lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+        lmbda = nsig + model.A + theta + model.C * theta**2 / model.B**2
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
-        # nllp_ = ( self.ones - self.model.observed / lmbda + np.dot( theta , self.weight ) ) * ( self.ones + 2*self.model.C * theta / self.model.B**2 )
-        T = self.ones + 2 * self.model.C / self.model.B**2 * theta
-        nllp_ = T - self.model.observed / lmbda * (T) + np.dot(theta, self.weight)
+        # nllp_ = ( self.ones - model.observed / lmbda + np.dot( theta , self.weight ) ) * ( self.ones + 2*model.C * theta / model.B**2 )
+        T = self.ones + 2 * model.C / model.B**2 * theta
+        nllp_ = T - model.observed / lmbda * (T) + np.dot(theta, self.weight)
         return nllp_
 
     def d2NLLdTheta2(self, theta):
         """the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood."""
         # xtot = theta + self.ntot
-        nsig = self.mu * self.model.nsignal
-        if self.model.isLinear():
-            xtot = theta + self.model.backgrounds + nsig
+        model = self.model
+        nsig = self.mu * model.nsignal
+        if model.isLinear():
+            xtot = theta + model.backgrounds + nsig
             xtot[xtot <= 0.0] = 1e-30  ## turn zeroes to small values
-            nllh_ = self.weight + np.diag(self.model.observed / (xtot**2))
+            nllh_ = self.weight + np.diag(model.observed / (xtot**2))
             return nllh_
-        lmbda = nsig + self.model.A + theta + self.model.C * theta**2 / self.model.B**2
+        lmbda = nsig + model.A + theta + model.C * theta**2 / model.B**2
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
-        T = self.ones + 2 * self.model.C / self.model.B**2 * theta
+        T = self.ones + 2 * model.C / model.B**2 * theta
         # T_i = 1_i + 2*c_i/B_i**2 * theta_i
         nllh_ = (
             self.weight
-            + np.diag(self.model.observed * T**2 / (lmbda**2))
-            - np.diag(self.model.observed / lmbda * 2 * self.model.C / self.model.B**2)
-            + np.diag(2 * self.model.C / self.model.B**2)
+            + np.diag(model.observed * T**2 / (lmbda**2))
+            - np.diag(model.observed / lmbda * 2 * model.C / model.B**2)
+            + np.diag(2 * model.C / model.B**2)
         )
         return nllh_
 
@@ -652,9 +660,10 @@ class LikelihoodComputer:
         # nll = - nobs ln(ntot + theta) - ntot - theta - theta**2/(2 delta**2)
         # dnll/dtheta = - nobs / ( ntot + theta ) + 1 + theta / delta**2
         # theta**2 + theta * ( delta**2 + ntot ) + delta**2 * ( ntot-nobs) = 0
-        nsig = mu * self.model.nsignal
+        model = self.model
+        nsig = mu * model.nsignal
         self.mu = mu
-        sigma2 = covb + self.model.var_s(nsig)  ## np.diag ( (self.model.deltas)**2 )
+        sigma2 = covb + model.var_s(nsig)  ## np.diag ( (model.deltas)**2 )
         ## for now deal with variances only
         ntot = nb + nsig
         cov = np.array(sigma2)
@@ -721,30 +730,30 @@ class LikelihoodComputer:
         mu = float(mu)
         if np.isinf ( mu ):
             return None
-        nsig = mu * self.model.nsignal
+        model = self.model
+        nsig = mu * model.nsignal
 
         ## first step is to disregard the covariances and solve the
         ## quadratic equations
         ini = self.getThetaHat(
-            self.model.observed, self.model.backgrounds, mu, self.model.covariance, 0
-        )
-        self.cov_tot = self.model.V
-        # if self.model.n == 1:
-        #    self.cov_tot = self.model.totalCovariance ( nsig )
-        # if not self.model.isLinear():
-        # self.cov_tot = self.model.V + self.model.var_s(nsig)
-        # self.cov_tot = self.model.totalCovariance (nsig)
+            model.observed, model.backgrounds, mu, model.covariance, 0)
+        self.cov_tot = model.V
+        # if model.n == 1:
+        #    self.cov_tot = model.totalCovariance ( nsig )
+        # if not model.isLinear():
+        # self.cov_tot = model.V + model.var_s(nsig)
+        # self.cov_tot = model.totalCovariance (nsig)
         self.weight = np.linalg.inv(self.cov_tot)
         # self.coeff = 1.
         logdet = np.linalg.slogdet(self.cov_tot)
-        self.logcoeff = -self.model.n / 2 * np.log(2 * np.pi) - 0.5 * logdet[1]
-        # self.coeff = (2*np.pi)**(-self.model.n/2) * np.exp(-.5* logdet[1] )
-        # print ( "coeff", self.coeff, "n", self.model.n, "det", np.linalg.slogdet ( self.cov_tot ) )
+        self.logcoeff = -model.n / 2 * np.log(2 * np.pi) - 0.5 * logdet[1]
+        # self.coeff = (2*np.pi)**(-model.n/2) * np.exp(-.5* logdet[1] )
+        # print ( "coeff", self.coeff, "n", model.n, "det", np.linalg.slogdet ( self.cov_tot ) )
         # print ( "cov_tot", self.cov_tot[:10] )
         self.ones = 1.0
-        if type(self.model.observed) in [list, ndarray]:
-            self.ones = np.ones(len(self.model.observed))
-        self.gammaln = special.gammaln(self.model.observed + 1)
+        if type(model.observed) in [list, ndarray]:
+            self.ones = np.ones(len(model.observed))
+        self.gammaln = special.gammaln(model.observed + 1)
         try:
             ret_c = optimize.fmin_ncg(
                 self.llhdOfTheta,
@@ -755,15 +764,15 @@ class LikelihoodComputer:
                 disp=0,
             )
             # then always continue with TNC
-            if type(self.model.observed) in [int, float]:
-                bounds = [(-10 * self.model.observed, 10 * self.model.observed)]
+            if type(model.observed) in [int, float]:
+                bounds = [(-10 * model.observed, 10 * model.observed)]
             else:
-                bounds = [(-10 * x, 10 * x) for x in self.model.observed]
+                bounds = [(-10 * x, 10 * x) for x in model.observed]
             ini = ret_c
             ret_c = optimize.fmin_tnc(
                 self.llhdOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0, bounds=bounds
             )
-            # print ( "[findThetaHat] mu=%s bg=%s observed=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/self.model.efficiencies[0], self.model.backgrounds, self.model.observed,self.model.covariance, self.nsig, ret_c[0], self.nllOfNuisances(ret_c[0]) ) )
+            # print ( "[findThetaHat] mu=%s bg=%s observed=%s V=%s, nsig=%s theta=%s, nll=%s" % ( self.nsig[0]/model.efficiencies[0], model.backgrounds, model.observed,model.covariance, self.nsig, ret_c[0], self.nllOfNuisances(ret_c[0]) ) )
             if ret_c[-1] not in [0, 1, 2]:
                 return ret_c[0], ret_c[-1]
             else:
@@ -774,7 +783,7 @@ class LikelihoodComputer:
             return ret, -2
         except (IndexError, ValueError) as e:
             logger.error("exception: %s. ini[-3:]=%s" % (e, ini[-3:]))
-            raise Exception("cov-1=%s" % (self.model.covariance + self.model.var_s(nsig)) ** (-1))
+            raise Exception("cov-1=%s" % (model.covariance + model.var_s(nsig)) ** (-1))
         return ini, -1
 
     def likelihood(self, mu : float, return_nll : bool = False ):
@@ -798,14 +807,15 @@ class LikelihoodComputer:
         :param return_nll: return nll instead of likelihood
         :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
         """
-        if len(self.model.observed) == 1:
-            dn = self.model.observed - self.model.backgrounds
+        model = self.model
+        if len(model.observed) == 1:
+            dn = model.observed - model.backgrounds
             if not allowNegativeSignals and dn[0] < 0.0:
                 dn = [0.0]
             muhat = float(dn[0])
-            if abs(self.model.nsignal) > 1e-100:
-                muhat = float(dn[0] / self.model.nsignal[0])
-            #sigma_mu2 = np.sqrt(self.model.observed[0] / self.model.nsignal[0] + self.model.covariance[0][0] )
+            if abs(model.nsignal) > 1e-100:
+                muhat = float(dn[0] / model.nsignal[0])
+            #sigma_mu2 = np.sqrt(model.observed[0] / model.nsignal[0] + model.covariance[0][0] )
             theta_hat = self.findThetaHat( muhat )
             sigma_mu = self.getSigmaMu ( muhat, theta_hat[0] )
             ret= self.likelihood( return_nll=return_nll, mu = muhat )
@@ -915,15 +925,16 @@ class LikelihoodComputer:
 
         """
 
+        model = self.model
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
         llhd = self.likelihood(1., return_nll=True)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
         # (keeping the same % error on signal):
-        if len(self.model.observed) == 1:
+        if len(model.observed) == 1:
             # TODO this nsig initiation seems wrong and changing maxllhd to likelihood
             # fails ./testStatistics.py : zero division error in L115
-            mu_hat = ( self.model.observed - self.model.backgrounds ) / self.model.nsignal
+            mu_hat = ( model.observed - model.backgrounds ) / model.nsignal
             maxllhd = self.likelihood (mu_hat, return_nll=True )
         else:
             maxllhd = self.lmax( return_nll=True, allowNegativeSignals=False)
