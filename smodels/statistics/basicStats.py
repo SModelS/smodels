@@ -12,10 +12,40 @@ from scipy import stats
 from smodels.base.smodelsLogging import logger
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from typing import Text
+from typing import Text, Union
 from collections.abc import Callable
 
 __all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
+
+from enum import Enum
+
+class NllEvalType(Enum):
+    """ an enum to account for the different types of likelihood values: observed,
+    a priori expected, a posteriori expected """
+    observed = 0
+    aposteriori = 1
+    apriori = 2
+
+    @classmethod
+    def init ( cls, evaluationType : Union[str,bool] ):
+        """ get evaluationtype either from a string (e.g. 'priori') or a bool
+            (true is posteriori, false is observed)
+        """
+        evaluationType = str(evaluationType).lower().replace("_","")
+        if evaluationType in [ "posteriori", "aposteriori", "posterior" ]:
+            return cls.aposteriori
+        if evaluationType in [ "apriori", "prior", "priori", "true" ]:
+            return cls.apriori
+        if evaluationType in [ "false", "observed", "obs" ]:
+            return cls.observed
+        raise SModelSError ( f"NllEvalType {evaluationType} unknown" )
+
+    def __eq__ ( self, other ):
+        if type ( other ) == NllEvalType:
+            return super().__eq__ ( other  )
+        if type ( other ) in [ bool, str ]:
+            return super().__eq__ ( NllEvalType.init ( other ) )
+        raise SModelSError ( f"comparing a NllEvalType with {type(other)}" )
 
 def CLsfromNLL(
         nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,
