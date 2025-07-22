@@ -670,8 +670,10 @@ class PyhfUpperLimitComputer:
         return init_pars
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood( self, mu=1.0, workspace_index=None, return_nll=False,
-                    expected=False, asimov : Union[None,float] = None ):
+    def likelihood( self, mu : float = 1.0,
+            workspace_index : Union[None,int] =None,
+            return_nll : bool = False, expected : Union[Text,bool] =False,
+            asimov : Union[None,float] = None ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -705,7 +707,7 @@ class PyhfUpperLimitComputer:
                         for regionName in self.data.nsignals[jsName].keys():
                             self.data.nsignals[jsName][regionName] = self.data.nsignals[jsName][regionName]*mu
                 self.__init__(self.data, self.cl, self.lumi)
-                model,data = self.generateAsimovData ( asimov, workspace_index = 
+                model,data = self.generateAsimovData ( asimov, workspace_index =
                        workspace_index, expected = expected )
 
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
@@ -997,7 +999,7 @@ class PyhfUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
-    def generateAsimovData ( self, mu : Union[None,float] = 0., 
+    def generateAsimovData ( self, mu : Union[None,float] = 0.,
             workspace_index : Union[int,None] = None,
             expected : Union[Text,bool] = False ) -> list:
         """ generate asimov data for the model for signal strength mu
