@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 
-from smodels.statistics.basicStats import NllEvalType
+from smodels.statistics.basicStats import NllEvalType, observed, aposteriori, apriori
 
 class EvalTypeTest(unittest.TestCase):
 
@@ -25,11 +25,14 @@ class EvalTypeTest(unittest.TestCase):
         posteriori2 =  NllEvalType.init ( "aposteriori" )
         self.assertTrue( obs == obs2 )
         self.assertTrue( obs == obs )
+        self.assertTrue( obs == observed )
         self.assertTrue( obs != prior )
         self.assertTrue( obs != posteriori )
         self.assertTrue( prior != posteriori )
         self.assertTrue( prior == prior2 )
+        self.assertTrue( prior == apriori )
         self.assertTrue( posteriori == posteriori2 )
+        self.assertTrue( posteriori == aposteriori )
 
 if __name__ == "__main__":
     unittest.main()

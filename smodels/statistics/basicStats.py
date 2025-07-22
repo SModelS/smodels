@@ -40,12 +40,18 @@ class NllEvalType(Enum):
             return cls.observed
         raise SModelSError ( f"NllEvalType {evaluationType} unknown" )
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __eq__ ( self, other ):
         if type ( other ) == NllEvalType:
             return super().__eq__ ( other  )
         if type ( other ) in [ bool, str ]:
             return super().__eq__ ( NllEvalType.init ( other ) )
         raise SModelSError ( f"comparing a NllEvalType with {other}({type(other)})" )
+
+## convenience
+observed, aposteriori, apriori = NllEvalType.observed, NllEvalType.aposteriori, NllEvalType.apriori
 
 def CLsfromNLL(
         nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,

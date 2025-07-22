@@ -99,4 +99,4 @@ def nCPUs():
     return None
 
 if __name__ == "__main__":
-    print ( "This machine has %d CPUs" % nCPUs() )
+    print ( f"This machine has {nCPUs()} CPUs" )
