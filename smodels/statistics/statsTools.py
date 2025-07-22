@@ -353,20 +353,16 @@ class StatsComputer:
                   return_nll : bool, asimov : Union[None,float] = None ) -> float:
         """ simple frontend to individual computers """
         self.transform ( expected )
-        kwargs = { "expected": expected }
+        kwargs = { "expected": expected, "asimov": asimov }
         if self.dataType == "pyhf":
-            kwargs["asimov"]=asimov
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
             ret = self.likelihoodComputer.likelihood (
                     poi_test, return_nll = return_nll, **kwargs )
             return ret
-        if asimov != None and self.dataType == "SL":
-            kwargs["asimov"]=asimov
-        else:
-            ret = self.likelihoodComputer.likelihood ( poi_test,
-                                                return_nll = return_nll, **kwargs)
+        ret = self.likelihoodComputer.likelihood ( poi_test,
+                                            return_nll = return_nll, **kwargs)
         return ret
 
     def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
