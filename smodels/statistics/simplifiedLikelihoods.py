@@ -305,6 +305,7 @@ class LikelihoodComputer:
         """
         self.origModel = copy.deepcopy ( data )
         self.model = data
+        self.asimovComputer = None
 
     def transform ( self, expected : Union [ Text, bool ] ):
         """ replace the actual observations with backgrounds,
@@ -782,13 +783,19 @@ class LikelihoodComputer:
             raise Exception( f"cov-1={model.covariance + model.var_s(nsig)**(-1)}")
         return ini, -1
 
-    def likelihood(self, mu : float, return_nll : bool = False ):
+    def likelihood(self, mu : float, return_nll : bool = False,
+           asimov : Union[None,float] = None  ):
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
         :param return_nll: if true, return nll instead of likelihood
         :returns: profile likelihood and error code (0=no error)
         """
+        if asimov != None:
+            assert abs(asimov)<1e-20, "we currently treat asimov data only with mu=0."
+            if self.asimovComputer == None:
+                self.asimovComputer = self.generateAsimovComputer(asimov)
+            return self.likelihood(mu,return_nll,asimov=None)
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat, _ = self.findThetaHat(mu)

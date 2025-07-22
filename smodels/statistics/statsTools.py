@@ -369,8 +369,7 @@ class StatsComputer:
         elif self.dataType == "analysesComb":
             kwargs["expected"]=expected
         if asimov != None and self.dataType == "SL":
-            acomputer = self.likelihoodComputer.generateAsimovComputer ( asimov )
-            ret =acomputer.likelihood ( poi_test, return_nll = return_nll, **kwargs )
+            kwargs["asimov"]=asimov
         else:
             ret = self.likelihoodComputer.likelihood ( poi_test,
                                                 return_nll = return_nll, **kwargs)
