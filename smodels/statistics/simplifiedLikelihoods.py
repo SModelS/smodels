@@ -784,7 +784,7 @@ class LikelihoodComputer:
         return ini, -1
 
     def likelihood(self, mu : float, return_nll : bool = False,
-           asimov : Union[None,float] = None  ):
+           expected : Union[Text,bool]=False, asimov : Union[None,float] = None  ):
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
