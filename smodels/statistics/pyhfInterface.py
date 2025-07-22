@@ -705,23 +705,11 @@ class PyhfUpperLimitComputer:
                         for regionName in self.data.nsignals[jsName].keys():
                             self.data.nsignals[jsName][regionName] = self.data.nsignals[jsName][regionName]*mu
                 self.__init__(self.data, self.cl, self.lumi)
-                ### allow this, for computation of l_SM
-                # if self.zeroSignalsFlag[workspace_index] == True:
-                #    logger.warning( f"Workspace number {workspace_index} has zero signals" )
-                #    return None
-                workspace = self.updateWorkspace(workspace_index, expected=expected)
-                # Same modifiers_settings as those used when running the 'pyhf cls' command line
-                msettings = {
-                    "normsys": {"interpcode": "code4"},
-                    "histosys": {"interpcode": "code4p"},
-                }
-                model = workspace.model(modifier_settings=msettings)
-                wsData = workspace.data(model)
-                if asimov != None:
-                    wsData = pyhf.infer.calculators.generate_asimov_data(asimov, wsData, model, None, None, None)
+                model,data = self.generateAsimovData ( asimov, workspace_index = 
+                       workspace_index, expected = expected )
 
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
-                    1.0, wsData, model, return_fitted_val=True, maxiter=200
+                    1.0, data, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.error(f"pyhf fixed_poi_fit failed for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
@@ -1009,9 +997,12 @@ class PyhfUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
-    def generateAsimovData ( self, mu : float = 0., workspace_index : Union[int,None] = None ) -> list:
+    def generateAsimovData ( self, mu : Union[None,float] = 0., 
+            workspace_index : Union[int,None] = None,
+            expected : Union[Text,bool] = False ) -> list:
         """ generate asimov data for the model for signal strength mu
-        :returns: list with asimov data
+        :param mu: if None, then actually return the original data
+        :returns: tuple with workspace and list with asimov data
         """
         msettings = {
             "normsys": {"interpcode": "code4"},
@@ -1021,13 +1012,15 @@ class PyhfUpperLimitComputer:
             workspace_index = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
-        workspace = self.updateWorkspace(workspace_index, expected=False)
+        workspace = self.updateWorkspace(workspace_index, expected=expected)
         #with warnings.catch_warnings():
         #    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
         model = workspace.model(modifier_settings=msettings)
         data = workspace.data(model)
-        ad = pyhf.infer.calculators.generate_asimov_data(mu_test, data, model, None, None, None)
-        return ad
+        if mu == None:
+            return (model,data)
+        ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model, None, None, None)
+        return (model,ad)
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float, expected : Union[bool,str],
