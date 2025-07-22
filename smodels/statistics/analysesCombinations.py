@@ -274,7 +274,8 @@ class AnaCombLikelihoodComputer(object):
             nll = self.likelihood(mu, return_nll=True, expected=expected, asimov = None)
             nllA = self.likelihood(mu, expected=expected, return_nll=True, asimov = 0. )
 
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll and nllA is not None else None
+            return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
+					         return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot
 
