@@ -15,7 +15,7 @@ from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Union
 from collections.abc import Callable
 
-__all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
+__all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
 
 from enum import Enum
 
@@ -28,8 +28,8 @@ class NllEvalType(Enum):
 
     @classmethod
     def init ( cls, evaluationType : Union[str,bool] ):
-        """ get evaluationtype either from a string (e.g. 'priori') or a bool
-            (true is posteriori, false is observed)
+        """ get evaluationtype either from a string (e.g. 'posteriori') or a bool
+            (true is priori, false is observed)
         """
         evaluationType = str(evaluationType).lower().replace("_","")
         if evaluationType in [ "posteriori", "aposteriori", "posterior" ]:
@@ -45,7 +45,7 @@ class NllEvalType(Enum):
             return super().__eq__ ( other  )
         if type ( other ) in [ bool, str ]:
             return super().__eq__ ( NllEvalType.init ( other ) )
-        raise SModelSError ( f"comparing a NllEvalType with {type(other)}" )
+        raise SModelSError ( f"comparing a NllEvalType with {other}({type(other)})" )
 
 def CLsfromNLL(
         nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,
