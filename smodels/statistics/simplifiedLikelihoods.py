@@ -14,6 +14,7 @@ from numpy import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from typing import Text, Optional, Union, Tuple
 from smodels.statistics.basicStats import findRoot
 
@@ -312,12 +313,12 @@ class LikelihoodComputer:
             if expected is True or "posteriori" """
         # always start from scratch
         self.model = copy.deepcopy ( self.origModel )
-        if expected == False:
+        if expected == observed:
             return
         self.model.observed = self.model.backgrounds
-        if expected == True:
+        if expected == apriori:
             return
-        if not expected == "posteriori":
+        if not expected == aposteriori:
             logger.error ( f"dont know the expected value {expected}" )
             sys.exit(-1)
         thetahat, _ = self.findThetaHat(0.)
@@ -791,7 +792,7 @@ class LikelihoodComputer:
         :param return_nll: if true, return nll instead of likelihood
         :returns: profile likelihood and error code (0=no error)
         """
-        if expected != False:
+        if expected != observed:
             self.transform ( expected )
         if asimov != None:
             assert abs(asimov)<1e-20, "we currently treat asimov data only with mu=0."
@@ -1009,10 +1010,10 @@ class UpperLimitComputer:
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
         oldmodel = model
-        if expected:
+        if expected in [ apriori, aposteriori ]:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
-            if expected == "posteriori":
+            if expected == aposteriori:
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
