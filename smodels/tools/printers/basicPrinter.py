@@ -8,6 +8,7 @@
 import sys
 import os
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 import numpy as np
 import time
 
@@ -30,20 +31,20 @@ class BasicPrinter(object):
         self.filename = filename
         self.output = output
         self.printingOrder = []
-        self.typeofexpectedvalues = "apriori"
+        self.typeofexpectedvalues = apriori
         self.toPrint = []
         self.outputFormat = outputFormat
 
         if filename and os.path.isfile(filename):
-            logger.warning("Removing file %s" % filename)
+            logger.warning( f"Removing file {filename}" )
             os.remove(filename)
 
     def getTypeOfExpected(self):
         """ tiny convenience function for what expected values to print,
             apriori (True) or posteriori """
-        expected = True
-        if self.typeofexpectedvalues == "posteriori":
-            expected = "posteriori"
+        expected = apriori
+        if self.typeofexpectedvalues in [ "aposteriori", "posteriori", aposteriori ]:
+            expected = aposteriori
         return expected
 
     @property

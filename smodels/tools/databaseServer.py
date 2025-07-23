@@ -4,6 +4,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
 from smodels.tools.caching import Cache
 import socket, atexit, time, os, sys, copy
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 import unum
 
 unum.Unum.VALUE_FORMAT = "%0.16E"
@@ -130,11 +131,10 @@ class DatabaseServer:
         for ibr,br in enumerate(massv):
             for iel,el in enumerate(br):
                     massvunits[ibr][iel]=el*GeV
-        expected = False 
+        expected = observed
         if tokens[0] == "exp":
-            expected = True
-        self.log ( 'looking up for %s,%s,%s,%s' % \
-                      ( anaId, dType, txname, massv ) )
+            expected = apriori
+        self.log ( f'looking up for {anaId},{dType},{txname},{massv}' )
         for exp in self.expResults:
             if not exp.globalInfo.id == anaId:
                 continue
@@ -151,7 +151,7 @@ class DatabaseServer:
                     coords = txn.txnameData.dataToCoordinates ( massv, txn.txnameData._V,
                              txn.txnameData.delta_x ) 
                     res = None
-                    if expected:
+                    if expected != observed:
                         if txn.txnameDataExp != None:
                             res = txn.txnameDataExp.getValueForPoint ( coords )
                     else:

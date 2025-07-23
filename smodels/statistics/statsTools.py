@@ -383,7 +383,7 @@ class StatsComputer:
         """ SL only. transform the data to expected or observed """
         if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
             return
-        if expected != False:
+        if expected != observed:
             return
         self.likelihoodComputer.model = self.likelihoodComputer.origModel
 
