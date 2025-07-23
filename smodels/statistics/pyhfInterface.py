@@ -19,6 +19,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import findRoot
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
@@ -672,7 +673,7 @@ class PyhfUpperLimitComputer:
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu : float = 1.0,
             workspace_index : Union[None,int] =None,
-            return_nll : bool = False, expected : Union[Text,bool] =False,
+            return_nll : bool = False, expected : NllEvalType=observed,
             asimov : Union[None,float] = None ):
         """
         Returns the value of the likelihood. \
@@ -681,9 +682,7 @@ class PyhfUpperLimitComputer:
         :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
         :param return_nll: if true, return nll, not llhd
-        :param expected: if False, compute expected values, if True, \
-            compute a priori expected, if "posteriori" compute posteriori \
-            expected
+        :param expected: one of: observed, apriori, aposteriori
         """
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
@@ -771,7 +770,7 @@ class PyhfUpperLimitComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.getUpperLimitOnMu(expected=True, workspace_index=i_ws)
+                ul = self.getUpperLimitOnMu(expected=apriori, workspace_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -846,7 +845,7 @@ class PyhfUpperLimitComputer:
         return 1.0/hessian
 
     @lru_cache
-    def lmax( self, workspace_index=None, return_nll=False, expected=False,
+    def lmax( self, workspace_index=None, return_nll=False, expected : NllEvalType=observed,
               allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
@@ -854,9 +853,7 @@ class PyhfUpperLimitComputer:
         :param return_nll: if true, return nll, not llhd
         :param workspace_index: supply index of workspace to use. If None, \
             choose index of best combo
-        :param expected: if False, compute expected values, if True, \
-            compute a priori expected, if "posteriori" compute posteriori \
-            expected
+        :param expected: one of: observed, apriori, aposteriori
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
@@ -952,7 +949,7 @@ class PyhfUpperLimitComputer:
             ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
             return ret
 
-    def updateWorkspace(self, workspace_index=None, expected=False):
+    def updateWorkspace(self, workspace_index=None, expected : NllEvalType=observed ):
         """
         Small method used to return the appropriate workspace
 
@@ -961,26 +958,26 @@ class PyhfUpperLimitComputer:
                         if True, retuns the modified (and patched) workspace, where obs = sum(bkg). Used for computing apriori expected limit.
         """
         if self.nWS == 1:
-            if expected == True:
+            if expected == apriori:
                 return self.workspaces_expected[0]
             else:
                 return self.workspaces[0]
         else:
             if workspace_index == None:
                 logger.error("No workspace index was provided.")
-            if expected == True:
+            if expected == apriori:
                 return self.workspaces_expected[workspace_index]
             else:
                 return self.workspaces[workspace_index]
 
-    def getUpperLimitOnSigmaTimesEff(self, expected=False, workspace_index=None):
+    def getUpperLimitOnSigmaTimesEff(self, expected : NllEvalType=observed, workspace_index=None):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
             - by default, the combination of the workspaces contained into self.workspaces
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
+        :param expected:  - if set to apriori: uses expected SM backgrounds as signals
                           - else: uses 'self.nsignals'
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
@@ -1001,7 +998,7 @@ class PyhfUpperLimitComputer:
 
     def generateAsimovData ( self, mu : Union[None,float] = 0.,
             workspace_index : Union[int,None] = None,
-            expected : Union[Text,bool] = False ) -> list:
+            expected : NllEvalType=observed ) -> list:
         """ generate asimov data for the model for signal strength mu
         :param mu: if None, then actually return the original data
         :returns: tuple with workspace and list with asimov data
@@ -1025,7 +1022,7 @@ class PyhfUpperLimitComputer:
         return (model,ad)
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def CLs( self, mu : float, expected : Union[bool,str],
+    def CLs( self, mu : float, expected : NllEvalType,
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None ) -> float:
         """
@@ -1033,7 +1030,7 @@ class PyhfUpperLimitComputer:
         _absolute_ mu
 
         :param mu: compute for the parameter of interest mu
-        :param expected: if false, compute observed, true: compute a priori expected
+        :param expected: if observed, compute observed, apriori: compute a priori expected
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
         CLs-alpha: returns CLs - 0.05
@@ -1043,14 +1040,14 @@ class PyhfUpperLimitComputer:
         """
         return self._CLs ( mu / self.scale, expected, return_type, workspace_index )
 
-    def _CLs( self, mu_rel : float, expected : Union[bool,str],
+    def _CLs( self, mu_rel : float, expected : NllEvalType,
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None ) -> float:
         """
         This is our internal method to compute CLs.
 
         :param mu_rel: compute for the parameter of interest mu_rel
-        :param expected: if false, compute observed, true: compute a priori expected
+        :param expected: one of: observed, apriori, aposteriori
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
         CLs-alpha: returns CLs - 0.05
@@ -1079,7 +1076,7 @@ class PyhfUpperLimitComputer:
             bounds[model.config.poi_index] = (0, 10)
             start = time.time()
             args = {}
-            args["return_expected"] = expected == "posteriori"
+            args["return_expected"] = expected == aposteriori
             args["par_bounds"] = bounds
             # args["maxiter"]=100000
             pver = float(pyhf.__version__[:3])
@@ -1099,12 +1096,12 @@ class PyhfUpperLimitComputer:
                 except Exception as e:
                     logger.error(f"when testing hypothesis {mu_rel}, caught exception: {e}")
                     result = float("nan")
-                    if expected == "posteriori":
+                    if expected == aposteriori:
                         result = [float("nan")] * 2
             end = time.time()
             logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
             logger.debug(f"result for {mu_rel} {result}")
-            if expected == "posteriori":
+            if expected == aposteriori:
                 logger.debug("computing a-posteriori expected limit")
                 logger.debug("expected = {}, mu_rel = {}, result = {}".format(expected, mu_rel, result))
                 try:
@@ -1129,14 +1126,14 @@ class PyhfUpperLimitComputer:
     # looking for mu bounds
     # Usage of the index allows for rescaling
     @lru_cache
-    def getUpperLimitOnMu(self, expected=False, workspace_index=None):
+    def getUpperLimitOnMu(self, expected : NllEvalType=observed, workspace_index=None):
         """
         Compute the upper limit on the signal strength modifier with:
             - by default, the combination of the workspaces contained into self.workspaces
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to 'True': uses expected SM backgrounds as signals
+        :param expected:  - if set to apriori: uses expected SM backgrounds as signals
                           - else: uses 'self.nsignals'
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
