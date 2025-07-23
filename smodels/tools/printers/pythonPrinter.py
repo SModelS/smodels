@@ -17,6 +17,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from collections import OrderedDict
 import unum
 import time
@@ -271,7 +272,7 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = self._round(theoryPrediction.getRValue(expected=False))
+            r = self._round(theoryPrediction.getRValue(expected=observed))
             r_expected = self._round(theoryPrediction.getRValue(
                 expected=self.getTypeOfExpected()))
 
@@ -406,7 +407,7 @@ class PyPrinter(BasicPrinter):
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
-        r = self._round(obj.getRValue(expected=False))
+        r = self._round(obj.getRValue(expected=observed))
         r_expected = self._round(obj.getRValue(expected=self.getTypeOfExpected()))
 
         nll = self._round(obj.likelihood( return_nll = True ))
