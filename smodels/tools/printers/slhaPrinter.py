@@ -14,6 +14,7 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 import numpy as np
 import unum
 
@@ -204,7 +205,7 @@ class SLHAPrinter(TxTPrinter):
             if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
 
-            r = self._round(cRes.getRValue(expected=False))
+            r = self._round(cRes.getRValue(expected=observed))
             r_expected = self._round(cRes.getRValue(expected=self.getTypeOfExpected()))
 
             nll = cRes.likelihood(return_nll=True)
