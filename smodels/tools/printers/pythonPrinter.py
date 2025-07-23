@@ -272,7 +272,7 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = self._round(theoryPrediction.getRValue(expected=observed))
+            r = self._round(theoryPrediction.getRValue(expected=False))
             r_expected = self._round(theoryPrediction.getRValue(
                 expected=self.getTypeOfExpected()))
 
@@ -407,7 +407,7 @@ class PyPrinter(BasicPrinter):
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
-        r = self._round(obj.getRValue(expected=observed))
+        r = self._round(obj.getRValue(expected=False))
         r_expected = self._round(obj.getRValue(expected=self.getTypeOfExpected()))
 
         nll = self._round(obj.likelihood( return_nll = True ))
