@@ -20,6 +20,7 @@ from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from databaseLoader import database
 from smodels.decomposition import decomposer
 from math import floor, log10
@@ -35,7 +36,7 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
         ulcomp = UpperLimitComputer()
         ulobs = ulcomp.getUpperLimitOnMu(m)
-        ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
+        ulexp = ulcomp.getUpperLimitOnMu(m, expected=apriori)
         print("ulobs", ulobs)
         print("ulexp", ulexp)
         f = open("llhds.csv", "wt")
@@ -68,7 +69,7 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig )
         ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
         ulobs = ulcomp.getUpperLimitOnMu()
-        ulexp = ulcomp.getUpperLimitOnMu( expected=True )
+        ulexp = ulcomp.getUpperLimitOnMu( expected=apriori )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
         ret = computer.lmax ( return_nll = False)
         doPrint = False
@@ -123,7 +124,7 @@ class StatisticsTest(unittest.TestCase):
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
         ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
-        ulexpmu = ulcomp.getUpperLimitOnMu( expected=True)
+        ulexpmu = ulcomp.getUpperLimitOnMu( expected=apriori )
         # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
         self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
         ulobsmu = ulcomp.getUpperLimitOnMu()
