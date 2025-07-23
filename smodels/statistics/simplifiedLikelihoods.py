@@ -308,7 +308,7 @@ class LikelihoodComputer:
         self.model = data
         self.asimovComputer = None
 
-    def transform ( self, expected : Union [ Text, bool ] ):
+    def transform ( self, expected : NllEvalType ):
         """ replace the actual observations with backgrounds,
             if expected is True or "posteriori" """
         # always start from scratch
@@ -785,7 +785,7 @@ class LikelihoodComputer:
         return ini, -1
 
     def likelihood(self, mu : float, return_nll : bool = False,
-           expected : Union[Text,bool]=False, asimov : Union[None,float] = None  ):
+           expected : NllEvalType=observed, asimov : Union[None,float] = None  ):
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
@@ -964,7 +964,7 @@ class UpperLimitComputer:
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, expected=False, trylasttime=False
+        self, expected : NllEvalType = observed, trylasttime : bool =False
     ):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -972,9 +972,7 @@ class UpperLimitComputer:
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :params expected: one of: observed, apriori, aposteriori
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
@@ -992,7 +990,7 @@ class UpperLimitComputer:
 
     def getCLsRootFunc(
         self,
-        expected: Optional[Union[bool, Text]] = False,
+        expected: NllEvalType=observed,
         trylasttime: Optional[bool] = False,
     ) -> Tuple:
         """
@@ -1058,16 +1056,14 @@ class UpperLimitComputer:
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, expected=False, trylasttime=False
+        self, expected : NllEvalType=observed, trylasttime : bool =False
     ):
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
         for each signal regio/dataset), by using
         the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :params expected: one of: observed, apriori, aposteriori
         :params trylasttime: if True, then dont try extra
         :returns: upper limit on the signal strength multiplier mu
         """
@@ -1087,7 +1083,7 @@ class UpperLimitComputer:
     def CLs(
         self,
         mu : float = 1.0,
-        expected: Union[bool, Text] = False,
+        expected: NllEvalType=observed,
         trylasttime: bool = False,
         return_type: Text = "CLs",
     ) -> float:
