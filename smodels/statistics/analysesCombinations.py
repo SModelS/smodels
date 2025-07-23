@@ -20,6 +20,7 @@ import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
 from smodels.tools.caching import roundCache, lru_cache
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
@@ -44,7 +45,7 @@ class AnaCombLikelihoodComputer(object):
     def likelihood(
         self,
         mu: float = 1.0,
-        expected: Union[bool, Text] = False,
+        expected : NllEvalType = observed,
         return_nll: bool = False,
         asimov: Union[None,float] = None,
     ) -> float:
@@ -52,7 +53,7 @@ class AnaCombLikelihoodComputer(object):
         Compute the likelihood at a given mu
 
         :param mu: signal strength
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
@@ -83,15 +84,14 @@ class AnaCombLikelihoodComputer(object):
     def lmax(
         self,
         allowNegativeSignals: bool = False,
-        expected: Union[bool, Text] = False,
+        expected : NllEvalType = observed,
         return_nll: bool = False,
         asimov: Union[None,float] = None,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: if true, compute expected prior (=lsm), if "posteriori" \
-                         compute posteriori expected
+        :param expected: one of: observed, apriori, aposteriori
         :param return_nll: if true, return negative log max likelihood instead of lmax
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
                   output is requested, it returns a dictionary with mu_hat, \
@@ -209,11 +209,11 @@ class AnaCombLikelihoodComputer(object):
         return ret
 
     @lru_cache
-    def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False ):
+    def getUpperLimitOnMu(self, expected : NllEvalType=observed, allowNegativeSignals = False ):
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: one of: observed, apriori, aposteriori
         :returns: upper limit on signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
@@ -224,16 +224,14 @@ class AnaCombLikelihoodComputer(object):
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    def getUpperLimitOnSigmaTimesEff(self, expected=False, allowNegativeSignals= False):
+    def getUpperLimitOnSigmaTimesEff(self, expected : NllEvalType=observed, allowNegativeSignals= False):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :param expected: one of: observed, apriori, aposteriori
         :returns: upper limit on fiducial cross section
         """
         ul = self.getUpperLimitOnMu(expected=expected,
@@ -246,12 +244,13 @@ class AnaCombLikelihoodComputer(object):
             xsec += tp.xsection
         return ul * xsec
 
-    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False ) -> Tuple[float, float, Callable]:
+    def getCLsRootFunc(self, expected : NllEvalType=observed, 
+			    allowNegativeSignals : bool = False ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: one of: observed, apriori, aposteriori
         """
         fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
         mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
@@ -275,18 +274,18 @@ class AnaCombLikelihoodComputer(object):
             nllA = self.likelihood(mu, expected=expected, return_nll=True, asimov = 0. )
 
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
-					         return_type=return_type) if nll and nllA is not None else None
+                     return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def CLs( self, mu : float = 1., expected: Union[Text,bool] = False,
+    def CLs( self, mu : float = 1., expected : NllEvalType=observed,
              return_type: Text = "CLs" ):
         """
         Compute the exclusion confidence level of the model
 
         :param mu: compute for the parameter of interest mu
-        :param expected: if false, compute observed, true: compute a priori expected
+        :param expected: one of: observed, apriori, aposteriori
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         alpha-CLs: returns 0.05 - CLs \
@@ -298,7 +297,8 @@ class AnaCombLikelihoodComputer(object):
 
         return float(clsRoot(mu, return_type=return_type))
 
-    def getLlhds(self,muvals,expected=False,normalize=True):
+    def getLlhds(self,muvals,expected : NllEvalType=observed,
+			     normalize : bool =True):
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
@@ -306,7 +306,7 @@ class AnaCombLikelihoodComputer(object):
 
         :param muvals: List with values for the signal strenth for which the likelihoods must
                        be evaluated.
-        :param expected: If True returns the expected likelihood values.
+        :param expected: one of: observed, apriori, aposteriori
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
 
