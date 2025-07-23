@@ -324,7 +324,7 @@ class SpeyComputer:
                          aposteriori: ExpectationType.aposteriori}
         if expected in expectedDict:
             return expectedDict[expected]
-        logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
+        logger.error( f'{expected} is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' )
         return None
 
     def get_five_values ( self, expected : NllEvalType,
@@ -413,7 +413,7 @@ class SpeyComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.poi_upper_limit(expected=True, model_index=i_ws)
+                ul = self.poi_upper_limit(expected=apriori, model_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:

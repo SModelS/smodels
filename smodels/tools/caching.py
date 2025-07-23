@@ -15,6 +15,7 @@ from smodels.base.physicsUnits import GeV, fb
 
 import numpy as np
 from collections.abc import Iterable
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from functools import lru_cache, wraps
 
 def roundObj(obj, digits : int):
@@ -63,13 +64,13 @@ if __name__ == "__main__":
         def __init__ ( self ):
             self.bla = 0
         @roundCache(argname='mu',argpos=1,digits=5)
-        def myfunc ( self, mu : float = 0., expected : Union[Text,bool] = False,
+        def myfunc ( self, mu : float = 0., expected : NllEvalType = observed,
                          asimov : Union[None,float] = None ):
             print ( "calling myfunc" )
             ret = mu
-            if expected == True:
+            if expected == apriori:
                 ret += 10.
-            if expected == "posteriori":
+            if expected == aposteriori:
                 ret += 20.
             if asimov != None:
                 ret += 1000.*(asimov+1000.)
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     print ( test.myfunc ( 1. ) )
     print ( test.myfunc ( mu=1. ) )
     print ( test.myfunc ( mu=1. ) )
-    print ( test.myfunc ( 1.,expected=True, asimov=0. ) )
-    print ( test.myfunc ( 1.,expected=True, asimov=0. ) )
-    print ( test.myfunc ( 1.,True, asimov=0. ) )
-    print ( test.myfunc ( 1.,True, asimov=0. ) )
+    print ( test.myfunc ( 1.,expected=apriori, asimov=0. ) )
+    print ( test.myfunc ( 1.,expected=apriori, asimov=0. ) )
+    print ( test.myfunc ( 1.,apriori, asimov=0. ) )
+    print ( test.myfunc ( 1.,apriori, asimov=0. ) )
