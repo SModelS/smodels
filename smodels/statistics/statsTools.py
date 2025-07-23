@@ -18,6 +18,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
@@ -135,13 +136,13 @@ class StatsComputer:
             return None
 
         eul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=True
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=apriori
         )
         if eul is None:
             return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
+            element=theorypred.avgElement, txnames=theorypred.txnames, expected=observed
         ) / theorypred.xsection
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
@@ -305,7 +306,7 @@ class StatsComputer:
                                                             deltas_rel=self.deltas_sys)
         self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
 
-    def get_five_values ( self, expected : Union [ bool, Text ],
+    def get_five_values ( self, expected : NllEvalType,
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """
@@ -349,7 +350,7 @@ class StatsComputer:
 
         return ret
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
+    def likelihood ( self, poi_test : float, expected : NllEvalType,
                   return_nll : bool, asimov : Union[None,float] = None ) -> float:
         """ simple frontend to individual computers """
         self.transform ( expected )
@@ -365,7 +366,7 @@ class StatsComputer:
                                             return_nll = return_nll, **kwargs)
         return ret
 
-    def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
+    def CLs ( self, poi_test : float = 1., expected : NllEvalType=observed ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( expected )
         if hasattr ( self.upperLimitComputer, "CLs" ):
@@ -386,7 +387,7 @@ class StatsComputer:
             return
         self.likelihoodComputer.model = self.likelihoodComputer.origModel
 
-    def maximize_likelihood ( self, expected : Union[bool,Text],
+    def maximize_likelihood ( self, expected : NllEvalType,
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
@@ -412,7 +413,7 @@ class StatsComputer:
                                    **kwargs )
         return ret
 
-    def poi_upper_limit ( self, expected : Union [ bool, Text ],
+    def poi_upper_limit ( self, expected : NllEvalType,
            limit_on_xsec : bool = False ) -> float:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
