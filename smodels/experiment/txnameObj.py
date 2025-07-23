@@ -14,6 +14,7 @@ import os
 from smodels.base import physicsUnits
 from smodels.base.genericSMS import GenericSMS
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 
 from smodels.experiment.expAuxiliaryFuncs import (smsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth,
@@ -809,7 +810,7 @@ class TxName(object):
         else:
             return fillvalue
 
-    def getULFor(self, sms, expected=False, mass=None):
+    def getULFor(self, sms, expected : NllEvalType = observed, mass=None):
         """
         Returns the upper limit (or expected) for SMS (only for upperLimit-type).
         Includes the lifetime reweighting (ul/reweight).
@@ -842,7 +843,7 @@ class TxName(object):
                      else m for m in massFlat]
             reweightF = 1.0
 
-        if not expected:
+        if expected != apriori:
             ul = self.txnameData.getValueFor(point)
         else:
             if not self.txnameDataExp:

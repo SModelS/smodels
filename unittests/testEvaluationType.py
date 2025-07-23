@@ -26,13 +26,17 @@ class EvalTypeTest(unittest.TestCase):
         self.assertTrue( obs == obs2 )
         self.assertTrue( obs == obs )
         self.assertTrue( obs == observed )
+        self.assertTrue( obs == False )
+        self.assertTrue( obs != True )
         self.assertTrue( obs != prior )
         self.assertTrue( obs != posteriori )
         self.assertTrue( prior != posteriori )
         self.assertTrue( prior == prior2 )
         self.assertTrue( prior == apriori )
+        self.assertTrue( prior == True )
         self.assertTrue( posteriori == posteriori2 )
         self.assertTrue( posteriori == aposteriori )
+        self.assertTrue( posteriori == "posteriori" )
 
 if __name__ == "__main__":
     unittest.main()
