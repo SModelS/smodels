@@ -15,6 +15,7 @@ from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
@@ -413,7 +414,7 @@ class DataSet(object):
                            self.getType())
             return None
 
-    def getSRUpperLimit(self,expected=False):
+    def getSRUpperLimit(self,expected : NllEvalType = observed ):
         """
         Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
@@ -427,7 +428,7 @@ class DataSet(object):
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
-        if expected:
+        if expected != observed:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
                 logger.info("expectedUpperLimit field not found. Returning None instead.")
                 return None
