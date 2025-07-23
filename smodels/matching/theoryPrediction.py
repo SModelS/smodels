@@ -10,6 +10,7 @@ from smodels.base.physicsUnits import TeV, fb
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
@@ -188,7 +189,7 @@ class TheoryPrediction(object):
         self._statsComputer = computer
 
     @lru_cache
-    def getUpperLimit(self, expected=False):
+    def getUpperLimit(self, expected : NllEvalType = observed ):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -210,7 +211,7 @@ class TheoryPrediction(object):
                                                     limit_on_xsec = True)
         return ul
 
-    def getUpperLimitOnMu(self, expected=False):
+    def getUpperLimitOnMu(self, expected : NllEvalType = observed ):
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
@@ -230,7 +231,7 @@ class TheoryPrediction(object):
         return muUL
 
     @lru_cache
-    def getRValue(self, expected=False):
+    def getRValue(self, expected : NllEvalType = observed ):
         """
         Get the r value = theory prediction / experimental upper limit
         """
@@ -258,40 +259,40 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm(self, expected=False, return_nll : bool = False ):
+    def lsm(self, expected : NllEvalType = observed, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
         llhDict = self.computeStatistics(expected)
         return self.nllToLikelihood (llhDict["lsm"],return_nll )
 
     @whenDefined
-    def lmax(self, expected=False, return_nll : bool = False ):
+    def lmax(self, expected : NllEvalType = observed, return_nll : bool = False ):
         """likelihood at mu_hat"""
         llhDict = self.computeStatistics(expected)
         return self.nllToLikelihood (llhDict["lmax"],return_nll )
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def CLs(self, mu : float = 1., expected : Union[Text,bool] = False ) -> \
+    def CLs(self, mu : float = 1., expected : NllEvalType = observed ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
         cls = self.statsComputer.CLs ( poi_test = mu, expected = expected )
         return cls
 
     @whenDefined
-    def sigma_mu(self, expected : bool =False):
+    def sigma_mu(self, expected : NllEvalType = observed ):
         """sigma_mu of mu_hat"""
         llhDict = self.computeStatistics(expected)
         return llhDict["sigma_mu"]
 
     @whenDefined
-    def muhat(self, expected : bool =False):
+    def muhat(self, expected : NllEvalType = observed ):
         """position of maximum likelihood"""
         llhDict = self.computeStatistics(expected)
         return llhDict["muhat"]
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood(self, mu=1.0, expected=False, return_nll=False,
+    def likelihood(self, mu=1.0, expected : NllEvalType = observed, return_nll=False,
             asimov : Union[None,float] = None ):
         """
         get the likelihood for a signal strength modifier mu
@@ -314,7 +315,7 @@ class TheoryPrediction(object):
 
     @whenDefined
     @lru_cache
-    def computeStatistics(self, expected=False):
+    def computeStatistics(self, expected : NllEvalType = observed ):
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
@@ -403,8 +404,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # Now sort by highest priority and then by highest expected r-value:
         selectedTPs = sorted(
             selectedTPs, key=lambda tp: (priority[tp.dataType()],
-                                         tp.getRValue(expected=True) is not None,
-                                         tp.getRValue(expected=True))
+                                         tp.getRValue(expected=apriori) is not None,
+                                         tp.getRValue(expected=apriori))
         )
         # Now get a single TP for each result
         # (the highest ranking analyses with r != None come last and are kept in the dict)
