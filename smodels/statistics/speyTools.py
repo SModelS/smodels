@@ -22,6 +22,7 @@ except ImportError: # comes only with newer versions of spey
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.experiment.datasetObj import DataSet
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.base.crossSection import XSection
 import numpy as np
 
@@ -313,21 +314,20 @@ class SpeyComputer:
         return [ speyModel ]
 
     @classmethod
-    def translateExpectationType ( cls, expected : Union [ bool, Text ] ) -> ExpectationType:
+    def translateExpectationType ( cls, expected : NllEvalType ) -> ExpectationType:
         """ translate the specification for expected values from smodels
             lingo to spey convention """
         if type(expected)==ExpectationType:
             return expected
-        expectedDict = {False: ExpectationType.observed,
-                        True: ExpectationType.apriori,
-                        "apriori": ExpectationType.apriori,
-                        "posteriori": ExpectationType.aposteriori}
+        expectedDict = { observed: ExpectationType.observed,
+                         apriori: ExpectationType.apriori,
+                         aposteriori: ExpectationType.aposteriori}
         if expected in expectedDict:
             return expectedDict[expected]
         logger.error('%s is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' %expected)
         return None
 
-    def get_five_values ( self, expected : Union [ bool, Text ],
+    def get_five_values ( self, expected : NllEvalType,
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
@@ -369,7 +369,7 @@ class SpeyComputer:
         return ret
 
 
-    def poi_upper_limit ( self, expected : Union [ bool, Text ],
+    def poi_upper_limit ( self, expected : NllEvalType,
            limit_on_xsec : bool = False, model_index : Union [int,None] = None ) -> float:
         """ simple frontend to spey::poi_upper_limit
 
@@ -422,7 +422,7 @@ class SpeyComputer:
         return i_best
 
 
-    def asimov_likelihood ( self, poi_test : float, expected : Union[bool,Text],
+    def asimov_likelihood ( self, poi_test : float, expected : NllEvalType,
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
@@ -450,7 +450,7 @@ class SpeyComputer:
         if poi_test < config.minimum_poi:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
+    def likelihood ( self, poi_test : float, expected : NllEvalType,
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi ( poi_test )
@@ -459,7 +459,7 @@ class SpeyComputer:
             expected = expected, return_nll = return_nll )
         return float(ret)
 
-    def maximize_likelihood ( self, expected : Union[bool,Text],
+    def maximize_likelihood ( self, expected : NllEvalType,
            allow_negative_signal : bool = True,
            return_nll : bool = False  ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
@@ -478,7 +478,8 @@ class SpeyComputer:
             ret = { "muhat": 0., "lmax": float(llhd0) }
         return ret
 
-    def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allow_negative_signal : bool = False ) -> float:
+    def sigma_mu ( self, poi_test : float, expected : NllEvalType, 
+                   allow_negative_signal : bool = False ) -> float:
         """ determine sigma at poi_test.
         :param: FIXME allow_negative_signal should not be needed!
         """
@@ -488,7 +489,7 @@ class SpeyComputer:
                                             test_statistics=test_statistic )
         return float(sigma_mu)
 
-    def maximize_asimov_likelihood ( self, expected : Union[bool,Text],
+    def maximize_asimov_likelihood ( self, expected : NllEvalType,
            return_nll : bool = False ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
         :param return_nll: if True, return negative log likelihood
@@ -563,7 +564,7 @@ class SpeyAnalysesCombosComputer:
         for tp in self.theorypreds:
             print ( f"    {tp.analysisId()}:{tp.dataId()}" )
 
-    def poi_upper_limit ( self, expected : Union [ bool, Text ],
+    def poi_upper_limit ( self, expected : NllEvalType,
            limit_on_xsec : bool = False ) -> float:
         """ simple frontend, to spey::poi_upper_limit
 
@@ -578,7 +579,7 @@ class SpeyAnalysesCombosComputer:
             ret = ret * totxsec
         return ret
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
+    def likelihood ( self, poi_test : float, expected : NllEvalType,
                             return_nll : bool ) -> float:
         """ simple frontend to spey functionality """
         expected = SpeyComputer.translateExpectationType ( expected )
@@ -586,7 +587,7 @@ class SpeyAnalysesCombosComputer:
             expected = expected, return_nll = return_nll )
         return float(ret)
 
-    def maximize_likelihood ( self, expected : Union[bool,Text],
+    def maximize_likelihood ( self, expected : NllEvalType,
            allow_negative_signal : bool = True,
            return_nll : bool = False  ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
@@ -605,7 +606,7 @@ class SpeyAnalysesCombosComputer:
             ret = { "muhat": 0., "lmax": float(l0) }
         return ret
 
-    def get_five_values ( self, expected : Union [ bool, Text ],
+    def get_five_values ( self, expected : NllEvalType,
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """ method returning the Five Values:
@@ -648,7 +649,8 @@ class SpeyAnalysesCombosComputer:
 # print ( "five values", ret, [ type(v) for k,v in ret.items() ] )
         return ret
 
-    def sigma_mu ( self, poi_test : float, expected : Union[bool,Text], allow_negative_signal : bool = False ) -> float:
+    def sigma_mu ( self, poi_test : float, expected : NllEvalType, 
+                   allow_negative_signal : bool = False ) -> float:
         """ determine sigma at poi_test.
         :param: FIXME allow_negative_signal should not be needed!
         """
@@ -666,7 +668,7 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
     computer = SpeyComputer ( dataset, "1bin", 1. )
-    ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
+    ul = computer.poi_upper_limit ( expected = observed, limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )
+    ule = computer.poi_upper_limit ( expected = apriori, limit_on_xsec = True )
     print ( "ule", ule )

@@ -401,7 +401,7 @@ class StatsComputer:
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-                if expected != False:
+                if expected != observed:
                     kwargs["expected"] = expected
         elif self.dataType == "truncGaussian":
             kwargs["expected"]=expected
@@ -484,7 +484,7 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleStatsDataSet ( nobs, bg, bgerr, lumi )
     computer = StatsComputer ( dataset, 1. )
-    ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
+    ul = computer.poi_upper_limit ( expected = observed, limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )
+    ule = computer.poi_upper_limit ( expected = apriori, limit_on_xsec = True )
     print ( "ule", ule )

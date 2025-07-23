@@ -18,6 +18,7 @@ from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from typing import Text, Optional, Union, Dict
 from smodels.statistics.basicStats import deltaChi2FromLlhd
 
@@ -57,7 +58,7 @@ class TruncatedGaussians:
     def likelihood ( self, mu : Union[float,None], return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
-            expected : Union[Text,bool] = False ) -> Union[None,float]:
+            expected : NllEvalType = observed ) -> Union[None,float]:
         """ return the likelihood, as a function of mu
 
         :param mu: number of signal events, if None then mu = muhat
@@ -82,7 +83,7 @@ class TruncatedGaussians:
     def lmax ( self, return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
-            expected : Union[bool,Text] = False ) -> Dict:
+            expected : NllEvalType = observed ) -> Dict:
         """
         Return the likelihood, as a function of mu
 
@@ -104,7 +105,7 @@ class TruncatedGaussians:
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
         muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
         # llhd evaluated at mu_hat 
-        if expected:
+        if expected != observed:
             muhat = 0.
         lmax = self.likelihood ( muhat, return_nll=return_nll )
 
@@ -115,7 +116,7 @@ class TruncatedGaussians:
             return_nll : Optional[bool] = False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6, 
-            expected : Union[bool,Text] = False ) -> float:
+            expected : NllEvalType = observed ) -> float:
         """ return the likelihood, as a function of nsig
 
         :param mu: signal strength
@@ -140,7 +141,7 @@ class TruncatedGaussians:
                 xa = -self.expectedUpperLimitOnMu
                 xb = 1
                 muhat = 0.
-                if expected == False:
+                if expected == observed:
                     muhat = self._findMuhat( xa, xb )
                 ret = self._computeLlhd(mu, muhat, return_nll = return_nll )
                 return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
@@ -149,7 +150,7 @@ class TruncatedGaussians:
                 return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
         muhat = 0.
-        if expected == False:
+        if expected == observed:
             xa = -self.expectedUpperLimitOnMu
             xb = self.expectedUpperLimitOnMu
             muhat = self._findMuhat(xa,xb)
