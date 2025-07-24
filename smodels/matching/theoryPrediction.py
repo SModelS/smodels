@@ -308,7 +308,7 @@ class TheoryPrediction(object):
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(self, mu=1.0, evaluationType : NllEvalType = observed, return_nll=False,
-            asimov : Union[None,float] = None ):
+            asimov : Union[None,float] = None, **kwargs ):
         """
         get the likelihood for a signal strength modifier mu
         :param expected: compute evaluationType, not observed likelihood. if "posteriori",
@@ -316,6 +316,12 @@ class TheoryPrediction(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
+        if "expected" in kwargs:
+            import warnings
+            warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
+            evaluationType = kwargs["expected"]
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
