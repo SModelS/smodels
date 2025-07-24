@@ -62,7 +62,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
         self.assertAlmostEqual(ulmu, 3.4883893878456447, 3)
-        ulmu_exp = combiner.getUpperLimitOnMu(expected=apriori)
+        ulmu_exp = combiner.getUpperLimitOnMu(evaluationType=apriori)
         self.assertAlmostEqual(ulmu_exp, 1.9892495624399895, 3)
 
     def testByHandComputed ( self ):
@@ -131,7 +131,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        fmh = combiner.statsComputer.get_five_values(expected=observed)
+        fmh = combiner.statsComputer.get_five_values(evaluationType=observed)
         mu_hat, lmax = fmh["muhat"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
@@ -176,7 +176,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         tpreds =  theoryPredictionsFor(db, smstopos,
                                        combinedResults=True, useBestDataset=False)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
-        # IDs that should be selected and the respective expected r-values:
+        # IDs that should be selected and the respective evaluationType r-values:
         goodIDs = {
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
             "CMS-SUS-12-024": (0.0004534170464636533, "efficiencyMap"),
@@ -184,7 +184,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             "ATLAS-SUSY-2019-09": (0.231855657, "combined"),
         }
         # Make sure each ID appears only once:
-        selectedIDs = {tp.analysisId() : (tp.getRValue(expected=apriori),tp.dataType())
+        selectedIDs = {tp.analysisId() : (tp.getRValue(evaluationType=apriori),tp.dataType())
                         for tp in combiner.theoryPredictions}
         self.assertEqual(sorted(list(selectedIDs.keys())),sorted(list(goodIDs.keys())))
         # Check if the correct predictions were selected:
@@ -201,7 +201,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
         self.assertAlmostEqual(combiner.getRValue() / 0.26067132943352256, 1., 2)
         self.assertAlmostEqual(combiner.CLs(), 0.5745589222694297, 2 )
-        self.assertAlmostEqual(combiner.CLs( expected = apriori ), 0.6370833948782422, 2 )
+        self.assertAlmostEqual(combiner.CLs( evaluationType = apriori ), 0.6370833948782422, 2 )
         self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.7752652260987847, 2 )
 
 

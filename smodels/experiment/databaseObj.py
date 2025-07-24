@@ -259,7 +259,7 @@ class Database(object):
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
-        :param onlyWithExpected: Return only those results that have expected values
+        :param onlyWithExpected: Return only those results that have evaluationType values
                  also. Note that this is trivially fulfilled for all efficiency maps.
         """
 
@@ -1074,7 +1074,7 @@ class SubDatabase(object):
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
-        :param onlyWithExpected: Return only those results that have expected values
+        :param onlyWithExpected: Return only those results that have evaluationType values
                  also. Note that this is trivially fulfilled for all efficiency maps.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result
@@ -1113,7 +1113,7 @@ class SubDatabase(object):
                             Can be wildcarded with usual shell wildcards: * ? [<letters>]
         :param useNonValidated: If False, the results with validated = False
                                 will not be included
-        :param onlyWithExpected: Return only those results that have expected values
+        :param onlyWithExpected: Return only those results that have evaluationType values
                  also. Note that this is trivially fulfilled for all efficiency maps.
         :returns: list of ExpResult objects or the ExpResult object if the list
                   contains only one result

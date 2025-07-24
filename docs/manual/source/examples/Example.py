@@ -155,7 +155,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         nllsm = combiner.lsm( return_nll = True )
         print("\n\nCombined analyses:", combiner.analysisId())
         print("Combined r value: %1.3E" % combiner.getRValue())
-        print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
+        print("Combined r value (evaluationType): %1.3E" % combiner.getRValue(evaluationType=True))
         print("Likelihoods: nll, nll_min, nll_SM = %.3f, %.3f, %.3f\n" % (nll, nllmin, nllsm))
 
     print("\n Combination of analyses done in %1.2fm" %((time.time()-t0)/60.))

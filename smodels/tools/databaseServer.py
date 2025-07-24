@@ -131,9 +131,9 @@ class DatabaseServer:
         for ibr,br in enumerate(massv):
             for iel,el in enumerate(br):
                     massvunits[ibr][iel]=el*GeV
-        expected = observed
+        evaluationType = observed
         if tokens[0] == "exp":
-            expected = apriori
+            evaluationType = apriori
         self.log ( f'looking up for {anaId},{dType},{txname},{massv}' )
         for exp in self.expResults:
             if not exp.globalInfo.id == anaId:
@@ -151,7 +151,7 @@ class DatabaseServer:
                     coords = txn.txnameData.dataToCoordinates ( massv, txn.txnameData._V,
                              txn.txnameData.delta_x ) 
                     res = None
-                    if expected != observed:
+                    if evaluationType != observed:
                         if txn.txnameDataExp != None:
                             res = txn.txnameDataExp.getValueForPoint ( coords )
                     else:

@@ -2,7 +2,7 @@
 
 """
 .. module:: testEvaluationType
-   :synopsis: Tests if the evalutionType works as expected (pun intended)
+   :synopsis: Tests if the evalutionType works as evaluationType (pun intended)
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 

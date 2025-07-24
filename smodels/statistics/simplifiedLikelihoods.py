@@ -63,7 +63,7 @@ class Data:
     ):
         """
         :param observed: number of observed events per dataset
-        :param backgrounds: expected bg per dataset
+        :param backgrounds: evaluationType bg per dataset
         :param covariance: uncertainty in background, as a covariance matrix
         :param nsignal: number of signal events in each dataset
         :param name: give the model a name, just for convenience
@@ -137,7 +137,7 @@ class Data:
         """
         The signal variances. Convenience function.
 
-        :param nsig: If None, it will use the model expected number of signal events,
+        :param nsig: If None, it will use the model evaluationType number of signal events,
                     otherwise will return the variances for the input value using the relative
                     signal uncertainty defined for the model.
 
@@ -277,7 +277,7 @@ class Data:
 
     def rel_signals(self, mu):
         """
-        Returns the number of expected relative signal events, for all datasets,
+        Returns the number of evaluationType relative signal events, for all datasets,
         given total signal strength mu. For mu=1, the sum of the numbers = 1.
 
         :param mu: Total number of signal events summed over all datasets.
@@ -287,7 +287,7 @@ class Data:
 
     def nsignals(self, mu):
         """
-        Returns the number of expected signal events, for all datasets,
+        Returns the number of evaluationType signal events, for all datasets,
         given total signal strength mu.
 
         :param mu: Total number of signal events summed over all datasets.
@@ -308,18 +308,18 @@ class LikelihoodComputer:
         self.model = data
         self.asimovComputer = None
 
-    def transform ( self, expected : NllEvalType ):
+    def transform ( self, evaluationType : NllEvalType ):
         """ replace the actual observations with backgrounds,
-            if expected is True or "posteriori" """
+            if evaluationType is True or "posteriori" """
         # always start from scratch
         self.model = copy.deepcopy ( self.origModel )
-        if expected == observed:
+        if evaluationType == observed:
             return
         self.model.observed = self.model.backgrounds
-        if expected == apriori:
+        if evaluationType == apriori:
             return
-        if not expected == aposteriori:
-            logger.error ( f"dont know the expected value {expected}" )
+        if not evaluationType == aposteriori:
+            logger.error ( f"dont know the evaluationType value {expected}" )
             sys.exit(-1)
         thetahat, _ = self.findThetaHat(0.)
         if type(self.model.backgrounds) in [float, np.float64,
@@ -785,15 +785,15 @@ class LikelihoodComputer:
         return ini, -1
 
     def likelihood(self, mu : float, return_nll : bool = False,
-           expected : NllEvalType=observed, asimov : Union[None,float] = None  ):
+           evaluationType : NllEvalType=observed, asimov : Union[None,float] = None  ):
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
         :param return_nll: if true, return nll instead of likelihood
         :returns: profile likelihood and error code (0=no error)
         """
-        if expected != observed:
-            self.transform ( expected )
+        if evaluationType != observed:
+            self.transform ( evaluationType )
         if asimov != None:
             assert abs(asimov)<1e-20, "we currently treat asimov data only with mu=0."
             if self.asimovComputer == None:
@@ -923,7 +923,7 @@ class LikelihoodComputer:
         """
         Computes the chi2 for a given number of observed events nobs given
         the predicted background nb, error on this background deltab,
-        expected number of signal events nsig and the relative error on
+        evaluationType number of signal events nsig and the relative error on
         signal (deltas_rel).
 
         :param nsig: number of signal events
@@ -964,7 +964,7 @@ class UpperLimitComputer:
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, expected : NllEvalType = observed, trylasttime : bool =False
+        self, evaluationType : NllEvalType = observed, trylasttime : bool =False
     ):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -977,7 +977,7 @@ class UpperLimitComputer:
         :returns: upper limit on fiducial cross section
         """
         model = self.likelihoodComputer.model
-        ul = self.getUpperLimitOnMu( expected=expected,
+        ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
                                      trylasttime=trylasttime)
 
         if ul == None:
@@ -990,7 +990,7 @@ class UpperLimitComputer:
 
     def getCLsRootFunc(
         self,
-        expected: NllEvalType=observed,
+        evaluationType: NllEvalType=observed,
         trylasttime: Optional[bool] = False,
     ) -> Tuple:
         """
@@ -998,7 +998,7 @@ class UpperLimitComputer:
         plus mu_hat and sigma_mu
 
         :param model: statistical model
-        :param expected: false: compute observed, true: compute a priori expected, \
+        :param expected: false: compute observed, true: compute a priori evaluationType, \
             "posteriori": compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
@@ -1008,10 +1008,10 @@ class UpperLimitComputer:
             """only zeroes in efficiencies? cannot give a limit!"""
             return None, None, None
         oldmodel = model
-        if expected in [ apriori, aposteriori ]:
+        if evaluationType in [ apriori, aposteriori ]:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
-            if expected == aposteriori:
+            if evaluationType == aposteriori:
                 tempc = LikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
@@ -1056,7 +1056,7 @@ class UpperLimitComputer:
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, expected : NllEvalType=observed, trylasttime : bool =False
+        self, evaluationType : NllEvalType=observed, trylasttime : bool =False
     ):
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
@@ -1068,7 +1068,7 @@ class UpperLimitComputer:
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
-            expected = expected, trylasttime = trylasttime
+            evaluationType = evaluationType, trylasttime = trylasttime
         )
         if mu_hat == None:
             return None
@@ -1083,7 +1083,7 @@ class UpperLimitComputer:
     def CLs(
         self,
         mu : float = 1.0,
-        expected: NllEvalType=observed,
+        evaluationType: NllEvalType=observed,
         trylasttime: bool = False,
         return_type: Text = "CLs",
     ) -> float:
@@ -1092,7 +1092,7 @@ class UpperLimitComputer:
 
         :param model: statistical model
         :param expected: if false, compute observed,
-                         true: compute a priori expected, "posteriori":
+                         true: compute a priori evaluationType, "posteriori":
                          compute a posteriori expected
         :param trylasttime: if True, then dont try extra
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
@@ -1100,7 +1100,7 @@ class UpperLimitComputer:
                             1-CLs: returns 1-CLs value
                             CLs: returns CLs value
         """
-        _, _, clsRoot = self.getCLsRootFunc( expected, trylasttime )
+        _, _, clsRoot = self.getCLsRootFunc( evaluationType, trylasttime )
         ret = clsRoot(mu, return_type=return_type)
         # its not an uppser limit on mu, its on nsig
         # print ( f"@@SL0 been asked to compute CLs mu={mu} asimov={self.likelihoodComputer.model.asimov}: {ret}" )

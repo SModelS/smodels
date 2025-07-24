@@ -120,7 +120,7 @@ class SLHAPrinter(TxTPrinter):
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
-            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
@@ -199,14 +199,14 @@ class SLHAPrinter(TxTPrinter):
             # Get list of analyses IDs used in combination:
             expIDs = cRes.analysisId()
             ul = cRes.getUpperLimit()
-            ulExpected = cRes.getUpperLimit(expected=self.getTypeOfExpected())
+            ulExpected = cRes.getUpperLimit(evaluationType=self.getTypeOfExpected())
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
 
-            r = self._round(cRes.getRValue(expected=observed))
-            r_expected = self._round(cRes.getRValue(expected=self.getTypeOfExpected()))
+            r = self._round(cRes.getRValue(evaluationType=observed))
+            r_expected = self._round(cRes.getRValue(evaluationType=self.getTypeOfExpected()))
 
             nll = cRes.likelihood(return_nll=True)
             nllmin = cRes.lmax(return_nll=True)
@@ -227,7 +227,7 @@ class SLHAPrinter(TxTPrinter):
             if r_expected is not None:
                 output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
             else:
-                output += " %d 2 NaN                            #expected r value (failed to compute expected r-value)\n" % (cter)
+                output += " %d 2 NaN                            #expected r value (failed to compute evaluationType r-value)\n" % (cter)
             output += " %d 3 %s #nll\n" % (cter, nll)
             output += " %d 4 %s #nll_min\n" % (cter, nllmin)
             output += " %d 5 %s #nll_SM\n" % (cter, nllsm)

@@ -21,7 +21,7 @@ from enum import Enum
 
 class NllEvalType(Enum):
     """ an enum to account for the different types of likelihood values: observed,
-    a priori expected, a posteriori expected """
+    a priori evaluationType, a posteriori evaluationType """
     observed = 0
     aposteriori = 1
     apriori = 2

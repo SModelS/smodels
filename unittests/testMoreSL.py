@@ -50,7 +50,7 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=apriori ) }
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( evaluationType=apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
@@ -83,7 +83,7 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=apriori ) }
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( evaluationType=apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )

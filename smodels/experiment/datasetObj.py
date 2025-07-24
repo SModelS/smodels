@@ -340,7 +340,7 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, expected=False, txnames=None,
+    def getUpperLimitFor(self, sms=None, evaluationType=False, txnames=None,
                          compute=False, alpha=0.05, deltas_rel=0.2,
                          mass=None):
         """
@@ -351,7 +351,7 @@ class DataSet(object):
         will be rescaled according to the lifetimes of the SMS intermediate particles.
         If SMS is not defined, but mass is given, compute the UL using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
 
         :param txname: TxName object or txname string (only for UL-type results)
@@ -360,17 +360,17 @@ class DataSet(object):
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
+        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events.
+                        from evaluationType and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
         :return: upper limit (Unum object)
         """
 
         if self.getType() == 'efficiencyMap':
-            upperLimit = self.getSRUpperLimit(expected=expected)
+            upperLimit = self.getSRUpperLimit(evaluationType=evaluationType)
             if upperLimit is None:
                 return None
             if (upperLimit/fb).normalize()._unit:
@@ -405,7 +405,7 @@ class DataSet(object):
 
             for tx in self.txnameList:
                 if tx == txname or tx.txName == txname:
-                    upperLimit = tx.getULFor(sms, expected, mass=mass)
+                    upperLimit = tx.getULFor(sms, evaluationType, mass=mass)
 
             return upperLimit
 
@@ -414,12 +414,12 @@ class DataSet(object):
                            self.getType())
             return None
 
-    def getSRUpperLimit(self,expected : NllEvalType = observed ):
+    def getSRUpperLimit(self,evaluationType : NllEvalType = observed ):
         """
         Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
-        :param expected: If True, return the expected limit ( i.e. Nobserved = NexpectedBG )
+        :param expected: If True, return the evaluationType limit ( i.e. Nobserved = NexpectedBG )
 
         :return: upper limit value
         """
@@ -428,7 +428,7 @@ class DataSet(object):
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
-        if expected != observed:
+        if evaluationType != observed:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
                 logger.info("expectedUpperLimit field not found. Returning None instead.")
                 return None

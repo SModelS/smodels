@@ -20,7 +20,7 @@ class BasicPrinter(object):
 
     def __init__(self, output, filename, outputFormat = 'current'):
         """
-        :ivar str typeofexpectedvalues: what type of expected values to print,
+        :ivar str typeofexpectedvalues: what type of evaluationType values to print,
               apriori or posteriori
         """
 
@@ -40,12 +40,12 @@ class BasicPrinter(object):
             os.remove(filename)
 
     def getTypeOfExpected(self):
-        """ tiny convenience function for what expected values to print,
+        """ tiny convenience function for what evaluationType values to print,
             apriori (True) or posteriori """
-        expected = apriori
+        evaluationType = apriori
         if self.typeofexpectedvalues in [ "aposteriori", "posteriori", aposteriori ]:
-            expected = aposteriori
-        return expected
+            evaluationType = aposteriori
+        return evaluationType
 
     @property
     def filename(self):

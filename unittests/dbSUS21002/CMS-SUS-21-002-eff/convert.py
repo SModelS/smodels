@@ -95,7 +95,7 @@ for i in range(len(b_veto_nobs)):
     order.append ( f"'{dsname}'" )
     dataset = DataSetInput( dsname )
     dataset.setInfo(dataType = 'efficiencyMap', dataId = dsname,
-                    observedN = b_veto_nobs[i], expectedBG = b_veto_nbg[i], bgError = b_veto_bgerr[i], comment = dsname )
+                    observedN = b_veto_nobs[i], evaluationTypeBG = b_veto_nbg[i], bgError = b_veto_bgerr[i], comment = dsname )
 
     #+++++++++txName block+++++++++++++++++
 
@@ -167,7 +167,7 @@ for i in range(len(WH_SR_nobs)):
     dataset = DataSetInput( dsname )
     order.append ( f"'{dsname}'" )
     dataset.setInfo(dataType = 'efficiencyMap', dataId = dsname,
-                    observedN = WH_SR_nobs[i], expectedBG = WH_SR_nbg[i],bgError=WH_SR_bgerr[i],comment=dsname)
+                    observedN = WH_SR_nobs[i], evaluationTypeBG = WH_SR_nbg[i],bgError=WH_SR_bgerr[i],comment=dsname)
 
     #+++++++++txName block+++++++++++++++++
 
@@ -237,7 +237,7 @@ for i in range(len(W_SR_nobs)):
     dataset = DataSetInput( dsname )
     order.append ( f"'{dsname}'" )
     dataset.setInfo(dataType = 'efficiencyMap', dataId = dsname,
-                    observedN = W_SR_nobs[i], expectedBG = W_SR_nbg[i], bgError = W_SR_bgerr[i], comment = dsname )
+                    observedN = W_SR_nobs[i], evaluationTypeBG = W_SR_nbg[i], bgError = W_SR_bgerr[i], comment = dsname )
 
     #+++++++++txName block+++++++++++++++++
     TChiWW=dataset.addTxName('TChiWW')
@@ -305,7 +305,7 @@ for i in range(len(H_SR_nobs)):
     dataset = DataSetInput( dsname )
     order.append ( f"'{dsname}'" )
     dataset.setInfo(dataType = 'efficiencyMap', dataId = dsname,
-                    observedN = H_SR_nobs[i], expectedBG = H_SR_nbg[i], bgError = H_SR_bgerr[i], comment = dsname )
+                    observedN = H_SR_nobs[i], evaluationTypeBG = H_SR_nbg[i], bgError = H_SR_bgerr[i], comment = dsname )
 
     #+++++++++txName block+++++++++++++++++
     TChiWW=dataset.addTxName('TChiWW')

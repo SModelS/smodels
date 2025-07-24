@@ -36,7 +36,7 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
         ulcomp = UpperLimitComputer()
         ulobs = ulcomp.getUpperLimitOnMu(m)
-        ulexp = ulcomp.getUpperLimitOnMu(m, expected=apriori)
+        ulexp = ulcomp.getUpperLimitOnMu(m, evaluationType=apriori)
         print("ulobs", ulobs)
         print("ulexp", ulexp)
         f = open("llhds.csv", "wt")
@@ -69,7 +69,7 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig )
         ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
         ulobs = ulcomp.getUpperLimitOnMu()
-        ulexp = ulcomp.getUpperLimitOnMu( expected=apriori )
+        ulexp = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
         ret = computer.lmax ( return_nll = False)
         doPrint = False
@@ -124,7 +124,7 @@ class StatisticsTest(unittest.TestCase):
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
         ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
-        ulexpmu = ulcomp.getUpperLimitOnMu( expected=apriori )
+        ulexpmu = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
         self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
         ulobsmu = ulcomp.getUpperLimitOnMu()
@@ -252,7 +252,7 @@ class StatisticsTest(unittest.TestCase):
     def testLikelihood(self):
         """
         Compare the computed chi2 from a given observed
-        and expected upper limit and a theory prediction
+        and evaluationType upper limit and a theory prediction
         with the previously known result for the value of
         the chi2.
 

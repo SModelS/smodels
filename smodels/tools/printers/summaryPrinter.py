@@ -66,8 +66,8 @@ class SummaryPrinter(TxTPrinter):
         maxcoll = {"CMS": {"obs": -1., "exp": -1, "anaid": "?"},
                    "ATLAS": {"obs": -1., "exp": -1, "anaid": "?"}}
         for theoPred in obj._theoryPredictions:
-            r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            r = theoPred.getRValue(evaluationType=False)
+            r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
             expResult = theoPred.expResult
             coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
             if (r_expected is not None) and (r_expected > maxcoll[coll]["exp"]):
@@ -82,7 +82,7 @@ class SummaryPrinter(TxTPrinter):
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             txnames = theoPred.txnames
-            ul = theoPred.getUpperLimit(expected=False)
+            ul = theoPred.getUpperLimit(evaluationType=False)
             uls = str(ul)
             if isinstance(ul, unum.Unum):
                 uls = "%10.3E" % ul.asNumber(fb)
@@ -90,8 +90,8 @@ class SummaryPrinter(TxTPrinter):
             if signalRegion is None:
                 signalRegion = '(UL)'
             value = theoPred.xsection
-            r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            r = theoPred.getRValue(evaluationType=False)
+            r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
             if r is not None:
                 rs = "%10.3E" % r
             else:
@@ -169,7 +169,7 @@ class SummaryPrinter(TxTPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = obj.getRValue()
-        r_expected = obj.getRValue(expected=self.getTypeOfExpected())
+        r_expected = obj.getRValue(evaluationType=self.getTypeOfExpected())
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )
@@ -181,9 +181,9 @@ class SummaryPrinter(TxTPrinter):
         else:
             output += f"combined r-value: NaN (failed to compute r-value)\n"
         if r_expected is not None:
-            output += f"combined r-value (expected): {r_expected:10.3E}\n"
+            output += f"combined r-value (evaluationType): {r_expected:10.3E}\n"
         else:
-            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
+            output += f"combined r-value (evaluationType): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

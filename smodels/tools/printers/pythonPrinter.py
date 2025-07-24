@@ -207,7 +207,7 @@ class PyPrinter(BasicPrinter):
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(
-                expected=self.getTypeOfExpected())
+                evaluationType=self.getTypeOfExpected())
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
@@ -272,9 +272,9 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = self._round(theoryPrediction.getRValue(expected=False))
+            r = self._round(theoryPrediction.getRValue(evaluationType=False))
             r_expected = self._round(theoryPrediction.getRValue(
-                expected=self.getTypeOfExpected()))
+                evaluationType=self.getTypeOfExpected()))
 
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
@@ -401,14 +401,14 @@ class PyPrinter(BasicPrinter):
         # Get list of analyses used in combination:
         expIDs = obj.analysisId()
         ul = obj.getUpperLimit()
-        ulExpected = obj.getUpperLimit(expected=self.getTypeOfExpected())
+        ulExpected = obj.getUpperLimit(evaluationType=self.getTypeOfExpected())
         if isinstance(ul, unum.Unum):
             ul = ul.asNumber(fb)
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
-        r = self._round(obj.getRValue(expected=False))
-        r_expected = self._round(obj.getRValue(expected=self.getTypeOfExpected()))
+        r = self._round(obj.getRValue(evaluationType=False))
+        r_expected = self._round(obj.getRValue(evaluationType=self.getTypeOfExpected()))
 
         nll = self._round(obj.likelihood( return_nll = True ))
         nllmin = self._round(obj.lmax( return_nll = True ))

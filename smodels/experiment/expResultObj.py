@@ -185,7 +185,7 @@ class ExpResult(object):
         matches the Txname.
         If SMS is not defined, but mass is given, give the efficiency using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param txname: TxName object or txname string (only for UL-type results)
@@ -241,7 +241,7 @@ class ExpResult(object):
         # nothing found? default is: False
         return False
 
-    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
+    def getUpperLimitFor(self, dataID=None, alpha=0.05, evaluationType=False,
                          txname=None, sms=None, compute=False, mass=None):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
@@ -252,18 +252,18 @@ class ExpResult(object):
         Txname.
         If SMS is not defined, but mass is given, compute the UL using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
-        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
+        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param sms: SMS object
         :param mass: Mass array
         :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events.
+                        from evaluationType and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
         :return: upper limit (Unum object)
@@ -271,7 +271,7 @@ class ExpResult(object):
 
         dataset = self.getDataset(dataID)
         if dataset:
-            upperLimit = dataset.getUpperLimitFor(sms=sms, expected=expected,
+            upperLimit = dataset.getUpperLimitFor(sms=sms, evaluationType=evaluationType,
                                                   txnames=txname,
                                                   compute=compute, alpha=alpha,
                                                   mass=mass)

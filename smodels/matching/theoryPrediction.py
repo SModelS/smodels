@@ -154,7 +154,7 @@ class TheoryPrediction(object):
                 computer = 'N/A'
             else:
                 computer = StatsComputer.forTruncatedGaussian(self)
-                if computer is None: # No expected UL available
+                if computer is None: # No evaluationType UL available
                     computer = 'N/A'
 
         elif self.dataType() == "efficiencyMap":
@@ -189,7 +189,7 @@ class TheoryPrediction(object):
         self._statsComputer = computer
 
     @lru_cache
-    def getUpperLimit(self, expected : NllEvalType = observed ):
+    def getUpperLimit(self, evaluationType : NllEvalType = observed ):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -197,31 +197,31 @@ class TheoryPrediction(object):
         For combined results, returns the upper limit on the
         total sigma*eff (for all signal regions/datasets).
 
-        :param expected: return expected Upper Limit, instead of observed.
+        :param expected: return evaluationType Upper Limit, instead of observed.
         :return: upper limit (Unum object)
         """
         if self.dataType() == "efficiencyMap":
-            ul = self.dataset.getSRUpperLimit(expected=expected)
+            ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType)
         if self.dataType() == "upperLimit":
             ul = self.dataset.getUpperLimitFor(
-                sms=self.avgSMS, txnames=self.txnames, expected=expected
+                sms=self.avgSMS, txnames=self.txnames, evaluationType=evaluationType
             )
         if self.dataType() == "combined":
-            ul = self.statsComputer.poi_upper_limit(expected = expected,
+            ul = self.statsComputer.poi_upper_limit(evaluationType = evaluationType,
                                                     limit_on_xsec = True)
         return ul
 
-    def getUpperLimitOnMu(self, expected : NllEvalType = observed ):
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed ):
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
         (i.e. mu_UL = upper limit/theory xsec)
 
-        :param expected: if True, compute expected upper limit, else observed
+        :param evaluationType: if True, compute evaluationType upper limit, else observed
         :returns: upper limit on signal strength multiplier mu
         """
 
-        upperLimit = self.getUpperLimit(expected=expected)
+        upperLimit = self.getUpperLimit(evaluationType=evaluationType)
         xsec = self.totalXsection()
         if xsec is None or upperLimit is None:
             return None
@@ -231,11 +231,11 @@ class TheoryPrediction(object):
         return muUL
 
     @lru_cache
-    def getRValue(self, expected : NllEvalType = observed ):
+    def getRValue(self, evaluationType : NllEvalType = observed ):
         """
         Get the r value = theory prediction / experimental upper limit
         """
-        upperLimit = self.getUpperLimit(expected)
+        upperLimit = self.getUpperLimit(evaluationType)
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None
             return r
@@ -259,52 +259,52 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm(self, expected : NllEvalType = observed, return_nll : bool = False ):
+    def lsm(self, evaluationType : NllEvalType = observed, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        llhDict = self.computeStatistics(expected)
+        llhDict = self.computeStatistics(evaluationType)
         return self.nllToLikelihood (llhDict["lsm"],return_nll )
 
     @whenDefined
-    def lmax(self, expected : NllEvalType = observed, return_nll : bool = False ):
+    def lmax(self, evaluationType : NllEvalType = observed, return_nll : bool = False ):
         """likelihood at mu_hat"""
-        llhDict = self.computeStatistics(expected)
+        llhDict = self.computeStatistics(evaluationType)
         return self.nllToLikelihood (llhDict["lmax"],return_nll )
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def CLs(self, mu : float = 1., expected : NllEvalType = observed ) -> \
+    def CLs(self, mu : float = 1., evaluationType : NllEvalType = observed ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        cls = self.statsComputer.CLs ( poi_test = mu, expected = expected )
+        cls = self.statsComputer.CLs ( poi_test = mu, evaluationType = evaluationType )
         return cls
 
     @whenDefined
-    def sigma_mu(self, expected : NllEvalType = observed ):
+    def sigma_mu(self, evaluationType : NllEvalType = observed ):
         """sigma_mu of mu_hat"""
-        llhDict = self.computeStatistics(expected)
+        llhDict = self.computeStatistics(evaluationType)
         return llhDict["sigma_mu"]
 
     @whenDefined
-    def muhat(self, expected : NllEvalType = observed ):
+    def muhat(self, evaluationType : NllEvalType = observed ):
         """position of maximum likelihood"""
-        llhDict = self.computeStatistics(expected)
+        llhDict = self.computeStatistics(evaluationType)
         return llhDict["muhat"]
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood(self, mu=1.0, expected : NllEvalType = observed, return_nll=False,
+    def likelihood(self, mu=1.0, evaluationType : NllEvalType = observed, return_nll=False,
             asimov : Union[None,float] = None ):
         """
         get the likelihood for a signal strength modifier mu
-        :param expected: compute expected, not observed likelihood. if "posteriori",
-                         compute expected posteriori.
+        :param expected: compute evaluationType, not observed likelihood. if "posteriori",
+                         compute evaluationType posteriori.
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
-                       expected = expected, return_nll = return_nll, asimov = asimov )
+                       evaluationType = evaluationType, return_nll = return_nll, asimov = asimov )
         return nll
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
@@ -315,15 +315,15 @@ class TheoryPrediction(object):
 
     @whenDefined
     @lru_cache
-    def computeStatistics(self, expected : NllEvalType = observed ):
+    def computeStatistics(self, evaluationType : NllEvalType = observed ):
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
         attributes.
-        :param expected: computed expected quantities, not observed
+        :param expected: computed evaluationType quantities, not observed
         """
         # Compute likelihoods and related parameters:
-        llhdDict = self.statsComputer.get_five_values(expected = expected,
+        llhdDict = self.statsComputer.get_five_values(evaluationType = evaluationType,
                      return_nll = True )
         return llhdDict
 
@@ -375,7 +375,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         Select the results from theoryPrediction list which match one
         of the IDs in anaIDs. If there are multiple predictions for the
         same ID for which a likelihood is available, it gives priority
-        to the ones with largest expected r-values.
+        to the ones with largest evaluationType r-values.
 
         :param theoryPredictions: list of TheoryPrediction objects
         :param anaIDs: list with the analyses IDs (in string format) to be combined
@@ -401,11 +401,11 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         # Define a hierarchy for the results:
         priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
-        # Now sort by highest priority and then by highest expected r-value:
+        # Now sort by highest priority and then by highest evaluationType r-value:
         selectedTPs = sorted(
             selectedTPs, key=lambda tp: (priority[tp.dataType()],
-                                         tp.getRValue(expected=apriori) is not None,
-                                         tp.getRValue(expected=apriori))
+                                         tp.getRValue(evaluationType=apriori) is not None,
+                                         tp.getRValue(evaluationType=apriori))
         )
         # Now get a single TP for each result
         # (the highest ranking analyses with r != None come last and are kept in the dict)
@@ -478,7 +478,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         self._statsComputer = computer
 
-    def getLlhds(self,muvals,expected=False,normalize=True):
+    def getLlhds(self,muvals,evaluationType=False,normalize=True):
         """
         Facility to access the likelihoods for the individual analyses and the combined
         likelihood.
@@ -487,7 +487,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         :param muvals: List with values for the signal strenth for which the likelihoods must
                        be evaluated.
-        :param expected: If True returns the expected likelihood values.
+        :param expected: If True returns the evaluationType likelihood values.
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
 
@@ -795,7 +795,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
 def _getBestResult(dataSetResults):
     """
-    Returns the best result according to the expected upper limit.
+    Returns the best result according to the evaluationType upper limit.
     If a combined result is included in the list, always return it.
 
     :param datasetPredictions: list of TheoryPredictionList objects
@@ -815,7 +815,7 @@ def _getBestResult(dataSetResults):
 
 
     # For efficiency-map analyses with multipler signal regions,
-    # select the best one according to the expected upper limit:
+    # select the best one according to the evaluationType upper limit:
     bestExpectedR = 0.0
     bestXsec = 0.0*fb
     bestPred = None
@@ -849,7 +849,7 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec/dataset.getSRUpperLimit(expected=True)).asNumber()
+        expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=True)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred

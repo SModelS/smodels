@@ -60,8 +60,8 @@ for i,name in enumerate(datasetNames):
 #+++++++ dataset block ++++++++++++++
     dataset = DataSetInput(name)
     dataset.setInfo(dataType = 'efficiencyMap', dataId = name, 
-                    observedN=observedNs[i], expectedBG=expectedBGs[i], bgError=bgErrors[i],
-                    upperLimit = obsUpperLimits[i], expectedUpperLimit = expUpperLimits[i])
+                    observedN=observedNs[i], evaluationTypeBG=evaluationTypeBGs[i], bgError=bgErrors[i],
+                    upperLimit = obsUpperLimits[i], evaluationTypeUpperLimit = expUpperLimits[i])
 
     #+++++++ txnames ++++++++++++++++++++
     #+++++++ next txName block ++++++++++++++

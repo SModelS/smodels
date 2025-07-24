@@ -48,7 +48,7 @@ def replace (element):
     element = element.replace('DF','_DF')
     return element
 
-######## tables = {topology_1 : {SR_1 : {observed : x, expected : y, bgError : z}, SR_2 : {...}, ... }, topology_2 : {...}, ... } ########
+######## tables = {topology_1 : {SR_1 : {observed : x, evaluationType : y, bgError : z}, SR_2 : {...}, ... }, topology_2 : {...}, ... } ########
 tables={}
 with open("orig/ANA-SUSY-2019-09-PAPER.csv",newline='') as csvfile :
     reader = csv.reader(csvfile, delimiter=" ") #Every space is a seperator between two elements of the row
@@ -115,7 +115,7 @@ for topo in tables : #To go through the results
             #+++++++ dataset block ++++++++++++++
             locals()[SR] = DataSetInput(SR) #locals() converts its string argument inside [] into a local variable
             locals()[SR].setInfo(dataType = 'efficiencyMap', dataId = SR,
-                            observedN = tables[topo][SR]['observed'], expectedBG = tables[topo][SR]['expected'], bgError = tables[topo][SR]['bgError'])
+                            observedN = tables[topo][SR]['observed'], evaluationTypeBG = tables[topo][SR]['expected'], bgError = tables[topo][SR]['bgError'])
 
 
             #+++++++ next txName block ++++++++++++++
@@ -155,7 +155,7 @@ for topo in tables : #To go through the results
             #+++++++ dataset block ++++++++++++++
             locals()[SR] = DataSetInput(SR) #locals() converts its string argument inside [] into a local variable
             locals()[SR].setInfo(dataType = 'efficiencyMap', dataId = SR,
-                            observedN = tables[topo][SR]['observed'], expectedBG = tables[topo][SR]['expected'], bgError = tables[topo][SR]['bgError'])
+                            observedN = tables[topo][SR]['observed'], evaluationTypeBG = tables[topo][SR]['expected'], bgError = tables[topo][SR]['bgError'])
 
 
             #+++++++ next mass plane block ++++++++++++++
@@ -217,7 +217,7 @@ for topo in tables : #To go through the results
 SR_WH_0j = DataSetInput('SR_WH_0j') ####################################### No clear description of this more inclusive SR, need to count the SR with n_jet=0 and mll>105 GeV ?
                                     ####################################### Here the SR with mll>105 GeV were not taken into account, even when n_jet=0
 SR_WH_0j.setInfo(dataType = 'efficiencyMap', dataId = 'SR_WH_0j',
-                observedN = 261, expectedBG = 244, bgError = 14)
+                observedN = 261, evaluationTypeBG = 244, bgError = 14)
 
 #+++++++ next txName block ++++++++++++++
 TChiWH                      = SR_WH_0j.addTxName('TChiWH')
@@ -252,7 +252,7 @@ TChiWH_1.addSource("efficiencyMap", ("orig/AuxFig11aAcc:OnshellSR_{low-m_{ll}-0j
 #+++++++ dataset block ++++++++++++++
 SR_WH_nj = DataSetInput('SR_WH_nj')
 SR_WH_nj.setInfo(dataType = 'efficiencyMap', dataId = 'SR_WH_nj',
-                observedN = 488, expectedBG = 492.6, bgError = 26)
+                observedN = 488, evaluationTypeBG = 492.6, bgError = 26)
 
 #+++++++ next txName block ++++++++++++++
 TChiWH                      = SR_WH_nj.addTxName('TChiWH')
@@ -287,7 +287,7 @@ TChiWH_1.addSource("efficiencyMap", ("orig/AuxFig11cAcc:OnshellSR_{low-m_{ll}-nj
 #+++++++ dataset block ++++++++++++++
 SR_WH_DFOS = DataSetInput('SR_WH_DFOS')
 SR_WH_DFOS.setInfo(dataType = 'efficiencyMap', dataId = 'SR_WH_DFOS',
-                observedN = 20, expectedBG = 11.5, bgError = 2.4)
+                observedN = 20, evaluationTypeBG = 11.5, bgError = 2.4)
 
 #+++++++ next txName block ++++++++++++++
 TChiWH                      = SR_WH_DFOS.addTxName('TChiWH')

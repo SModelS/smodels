@@ -194,7 +194,7 @@ class TxNameData(object):
     def _estimateExtrapolationError(self, point):
         """
         When projecting a point from full_dimensionality to self.dimensionality, we
-        estimate the expected extrapolation error with the following
+        estimate the evaluationType extrapolation error with the following
         strategy: we compute the gradient at point P, and let alpha be the
         distance between p and P. We then walk one step of length alpha in
         the direction of the greatest ascent, and the opposite direction.

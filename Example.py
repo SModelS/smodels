@@ -17,6 +17,7 @@ from smodels.tools import coverage
 from smodels.base.smodelsLogging import setLogLevel
 from smodels.tools.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
+from smodels.statistics.basicStats import apriori
 from smodels.base.model import Model
 import time
 setLogLevel("info")
@@ -155,7 +156,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         nllsm = combiner.lsm( return_nll = True )
         print("\n\nCombined analyses:", combiner.analysisId())
         print("Combined r value: %1.3E" % combiner.getRValue())
-        print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
+        print("Combined r value (evaluationType): %1.3E" % combiner.getRValue(evaluationType=apriori))
         print("Likelihoods: nll, nll_min, nll_SM = %.3f, %.3f, %.3f\n" % (nll, nllmin, nllsm))
 
     print("\n Combination of analyses done in %1.2fm" %((time.time()-t0)/60.))

@@ -332,20 +332,20 @@ class TxTPrinter(BasicPrinter):
             output += "  " + str(theoryPrediction.conditions) + "\n"
 
             # Get upper limit for the respective prediction:
-            upperLimit = theoryPrediction.getUpperLimit(expected=observed)
+            upperLimit = theoryPrediction.getUpperLimit(evaluationType=observed)
             upperLimitExp = theoryPrediction.getUpperLimit(
-                expected=self.getTypeOfExpected())
+                evaluationType=self.getTypeOfExpected())
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if upperLimitExp is not None:
                 output += "Expected experimental limit: " + \
                     str(upperLimitExp) + "\n"
             srv = self._formatNumber(
-                theoryPrediction.getRValue(expected=observed), 4)
+                theoryPrediction.getRValue(evaluationType=observed), 4)
             output += "Observed r-value: %s\n" % srv
             if upperLimitExp is not None:
                 serv = self._formatNumber(theoryPrediction.getRValue(
-                    expected=self.getTypeOfExpected()), 4)
+                    evaluationType=self.getTypeOfExpected()), 4)
                 output += "Expected r-value: %s\n" % serv
             nll = theoryPrediction.likelihood( return_nll = True )
             if nll is not None:
@@ -470,7 +470,7 @@ class TxTPrinter(BasicPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = self._formatNumber(obj.getRValue(),4)
-        r_expected = self._formatNumber(obj.getRValue(expected=self.getTypeOfExpected()),4)
+        r_expected = self._formatNumber(obj.getRValue(evaluationType=self.getTypeOfExpected()),4)
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )
@@ -478,7 +478,7 @@ class TxTPrinter(BasicPrinter):
         output += f"Combined Analyses: {expIDs}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n" 
         output += f"combined r-value: {r:s}\n"
-        output += f"combined r-value (expected): {r_expected:s}"
+        output += f"combined r-value (evaluationType): {r_expected:s}"
         output += "\n===================================================== \n"
         output += "\n"
 

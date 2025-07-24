@@ -64,13 +64,13 @@ if __name__ == "__main__":
         def __init__ ( self ):
             self.bla = 0
         @roundCache(argname='mu',argpos=1,digits=5)
-        def myfunc ( self, mu : float = 0., expected : NllEvalType = observed,
+        def myfunc ( self, mu : float = 0., evaluationType : NllEvalType = observed,
                          asimov : Union[None,float] = None ):
             print ( "calling myfunc" )
             ret = mu
-            if expected == apriori:
+            if evaluationType == apriori:
                 ret += 10.
-            if expected == aposteriori:
+            if evaluationType == aposteriori:
                 ret += 20.
             if asimov != None:
                 ret += 1000.*(asimov+1000.)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     print ( test.myfunc ( 1. ) )
     print ( test.myfunc ( mu=1. ) )
     print ( test.myfunc ( mu=1. ) )
-    print ( test.myfunc ( 1.,expected=apriori, asimov=0. ) )
-    print ( test.myfunc ( 1.,expected=apriori, asimov=0. ) )
+    print ( test.myfunc ( 1.,evaluationType=apriori, asimov=0. ) )
+    print ( test.myfunc ( 1.,evaluationType=apriori, asimov=0. ) )
     print ( test.myfunc ( 1.,apriori, asimov=0. ) )
     print ( test.myfunc ( 1.,apriori, asimov=0. ) )

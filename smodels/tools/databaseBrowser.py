@@ -137,7 +137,7 @@ class Browser(object):
 
         return expres.getEfficiencyFor(txname=txname, mass=massarray, dataset=dataset)
 
-    def getULFor(self,expid,txname,massarray, expected=False ):
+    def getULFor(self,expid,txname,massarray, evaluationType=False ):
         """
         Get an upper limit for the given experimental id, the txname,
         and the massarray.
@@ -148,7 +148,7 @@ class Browser(object):
         :param txname: txname (string). ONLY required for upper limit results
         :param massarray: list of masses with units, e.g.
                           [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
-        :param expected: If true, return expected upper limit, otherwise
+        :param expected: If true, return evaluationType upper limit, otherwise
                          return observed upper limit.
         :return: upper limit [fb]
         """
@@ -172,7 +172,7 @@ class Browser(object):
         for tx in txnames:
             if not tx.txName == txname:
                 continue
-            return tx.getULFor(sms=None,mass=massarray,expected=expected)
+            return tx.getULFor(sms=None,mass=massarray,evaluationType=evaluationType)
 
         logger.warning( "Could not find TxName %s ." % (txname))
         return None

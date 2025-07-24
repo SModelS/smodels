@@ -48,7 +48,7 @@ class TxName(object):
         self.globalInfo = globalObj
         self._infoObj = infoObj
         self.txnameData = None
-        self.txnameDataExp = None  # expected Data
+        self.txnameDataExp = None  # evaluationType Data
         self.dataMap = None
         self.axesMap = None
         self._arrayMap = None
@@ -442,7 +442,7 @@ class TxName(object):
 
     def preProcessData(self, rawData):
         """
-        Convert input data (from the upperLimits, expectedUpperLimits or efficiencyMap fields)
+        Convert input data (from the upperLimits, evaluationTypeUpperLimits or efficiencyMap fields)
         to a flat array without units. The output is used to construct the TxNameData object,
         which will further process the data and interpolate it.
         It also builds the dictionary for translating SMS properties to the flat data array.
@@ -810,14 +810,14 @@ class TxName(object):
         else:
             return fillvalue
 
-    def getULFor(self, sms, expected : NllEvalType = observed, mass=None):
+    def getULFor(self, sms, evaluationType : NllEvalType = observed, mass=None):
         """
         Returns the upper limit (or expected) for SMS (only for upperLimit-type).
         Includes the lifetime reweighting (ul/reweight).
         If called for efficiencyMap results raises an error.
         If SMS is not defined, but mass is given, compute the UL using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
 
         :param sms: SMS object or mass array (with units)
@@ -843,7 +843,7 @@ class TxName(object):
                      else m for m in massFlat]
             reweightF = 1.0
 
-        if expected != apriori:
+        if evaluationType != apriori:
             ul = self.txnameData.getValueFor(point)
         else:
             if not self.txnameDataExp:
@@ -994,7 +994,7 @@ class TxName(object):
         """
         Can I construct a likelihood for this map?
         True for all efficiency maps, and for upper limits maps
-        with expected Values.
+        with evaluationType Values.
         """
         if self.dataType == "efficiencyMap":
             return True

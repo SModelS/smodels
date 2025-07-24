@@ -66,7 +66,7 @@ expectedBGs = [1.5,0.06,0.007,0.0017,240.,17.,2.2,0.48]
 bgErrors = [0.3,0.01,0.002,0.0009,20.,2.,0.2,0.07]
 #SR Upper limits from arxiv:1902.01636 (Table 5).
 obsUpperLimits = ['0.09*fb','0.08*fb','0.08*fb','0.08*fb','1.26*fb','0.24*fb','0.10*fb','0.08*fb']
-#Assume expected UL = observed UL (otherwise they will be overwritten)
+#Assume evaluationType UL = observed UL (otherwise they will be overwritten)
 expUpperLimits = ['0.09*fb','0.08*fb','0.08*fb','0.08*fb','1.26*fb','0.24*fb','0.10*fb','0.08*fb']
 
 
@@ -103,8 +103,8 @@ for idataset,name in enumerate(datasetNames):
 #+++++++ dataset block ++++++++++++++
     dataset = DataSetInput(name)
     dataset.setInfo(dataType = 'efficiencyMap', dataId = name,
-            observedN=observedNs[idataset], expectedBG=expectedBGs[idataset], bgError=bgErrors[idataset],
-            upperLimit = obsUpperLimits[idataset], expectedUpperLimit = expUpperLimits[idataset])
+            observedN=observedNs[idataset], evaluationTypeBG=evaluationTypeBGs[idataset], bgError=bgErrors[idataset],
+            upperLimit = obsUpperLimits[idataset], evaluationTypeUpperLimit = expUpperLimits[idataset])
 
     #+++++++ txnames ++++++++++++++++++++
     for tx in txnames:

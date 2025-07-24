@@ -38,8 +38,8 @@ class InterpolationTest(unittest.TestCase):
         gluino.mass = 650.*GeV
         n1.mass = 50.*GeV
         smsMatch = txname.hasSMSas(sms)
-        vobserved = txname.getULFor( smsMatch, expected = observed )
-        vexpected = txname.getULFor( smsMatch, expected = apriori )
+        vobserved = txname.getULFor( smsMatch, evaluationType = observed )
+        vexpected = txname.getULFor( smsMatch, evaluationType = apriori )
         self.assertAlmostEqual(vobserved.asNumber(fb),49.9,1)
         self.assertAlmostEqual(vexpected.asNumber(fb),78.5,1)
 
@@ -54,7 +54,7 @@ class InterpolationTest(unittest.TestCase):
         b1.mass = 650.*GeV
         n1.mass = 50.*GeV
         smsMatch = txname.hasSMSas(sms)
-        expected = txname.getULFor(smsMatch, expected = apriori )
+        expected = txname.getULFor(smsMatch, evaluationType = apriori )
         self.assertTrue(expected is None)
 
     def testInterpolation(self):
