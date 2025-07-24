@@ -716,7 +716,7 @@ class PyhfUpperLimitComputer:
                 logger.error(f"pyhf fixed_poi_fit failed for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
                 # lets try with different initialisation
                 init, n_ = pyhf.infer.mle.fixed_poi_fit(
-                    0.0, workspace.data(model), model, return_fitted_val=True, maxiter=200
+                    0.0, data, model, return_fitted_val=True, maxiter=200
                 )
                 initpars = init.tolist()
                 initpars[model.config.poi_index] = 1.
