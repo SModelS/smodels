@@ -21,6 +21,7 @@ mu_digits = 8 # number of digits for rounding the mu argument when computing lik
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
 
+
 class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
@@ -211,15 +212,21 @@ class TheoryPrediction(object):
                                                     limit_on_xsec = True)
         return ul
 
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed ):
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed, **kwargs ):
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
         (i.e. mu_UL = upper limit/theory xsec)
 
-        :param evaluationType: if True, compute evaluationType upper limit, else observed
+        :param evaluationType: one of: observed, apriori, aposteriori
         :returns: upper limit on signal strength multiplier mu
         """
+        if "expected" in kwargs:
+            import warnings
+            warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
+            evaluationType = kwargs["expected"]
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
 
         upperLimit = self.getUpperLimit(evaluationType=evaluationType)
         xsec = self.totalXsection()
@@ -231,10 +238,18 @@ class TheoryPrediction(object):
         return muUL
 
     @lru_cache
-    def getRValue(self, evaluationType : NllEvalType = observed ):
+    def getRValue(self, evaluationType : NllEvalType = observed, **kwargs ):
         """
         Get the r value = theory prediction / experimental upper limit
+
+        :param evaluationType: one of: observed, apriori, aposteriori
         """
+        if "expected" in kwargs:
+            import warnings
+            warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
+            evaluationType = kwargs["expected"]
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
         upperLimit = self.getUpperLimit(evaluationType)
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None

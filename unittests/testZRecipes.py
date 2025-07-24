@@ -61,9 +61,9 @@ class RecipeTest(unittest.TestCase):
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         t0 = time.time()
         _, error = p.communicate()
-        logger.debug("%s run in %1.2fs" %(notebookFile,time.time()-t0))
+        logger.debug( f"{notebookFile} run in {time.time()-t0:1.2f}s" )
         if p.returncode != 0:
-            logger.debug("Notebook %s failed with error:\n %s" %(notebookFile,error))
+            logger.debug( f"Notebook {notebookFile} failed with error:\n {error}" )
         self.assertEqual(p.returncode,0)
 
 

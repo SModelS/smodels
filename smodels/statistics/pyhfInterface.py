@@ -706,7 +706,7 @@ class PyhfUpperLimitComputer:
                         for regionName in self.data.nsignals[jsName].keys():
                             self.data.nsignals[jsName][regionName] = self.data.nsignals[jsName][regionName]*mu
                 self.__init__(self.data, self.cl, self.lumi)
-                model,data = self.generateAsimovData ( asimov, workspace_index =
+                model,data,workspace = self.generateAsimovData ( asimov, workspace_index =
                        workspace_index, evaluationType = evaluationType )
 
                 _, nllh = pyhf.infer.mle.fixed_poi_fit(
@@ -728,7 +728,7 @@ class PyhfUpperLimitComputer:
                 try:
                     bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
-                        wsData,
+                        data,
                         model,
                         return_fitted_val=True,
                         init_pars=initpars,
@@ -1017,9 +1017,9 @@ class PyhfUpperLimitComputer:
         model = workspace.model(modifier_settings=msettings)
         data = workspace.data(model)
         if mu == None:
-            return (model,data)
+            return (model,data,workspace)
         ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model, None, None, None)
-        return (model,ad)
+        return (model,ad,workspace)
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float, evaluationType : NllEvalType,
