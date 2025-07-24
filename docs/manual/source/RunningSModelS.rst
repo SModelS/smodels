@@ -409,18 +409,18 @@ Below we go step-by-step through this example code:
   the smodels installation folder, simply add "sys.path.append(<smodels installation path>)" before importing smodels. Set SModelS verbosity level.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 16-25
+   :lines: 16-26
 
 * *Define the pyhfbackend to use*. Specify which `pyhfbackend <statistics.html#statistics.pyhfInterface.setBackend>`_ to use. One of: numpy, pytorch, tensorflow, jax.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 27-30
+   :lines: 28-31
 
 * *Set the path to the database URL*. Specify which :ref:`database <databaseStruct>` to use. It can be the path
   to the smodels-database folder, the path to a :ref:`pickle file <databasePickle>` or (starting with v1.1.3) a URL path.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 38-39
+   :lines: 39-40
 
 
 * *Load the BSM particles*. By default SModelS assumes the MSSM particle content. For using SModelS
@@ -428,30 +428,30 @@ Below we go step-by-step through this example code:
   to the path of the model file (see **particles:model** in :ref:`Parameter File <parameterFile>`).
 
 .. literalinclude:: /examples/Example.py
-   :lines: 41-43
+   :lines: 42-44
 
 * *Load the model and set the path to the input file*. Load BSM and SM particle content; specify the location of the input file (must be an SLHA or LHE file, see :ref:`Basic Input <BasicInput>`) and update particles in the model.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 45,48,50-51
+   :lines: 46,49,51-52
 
 * *Set main options for* |decomposition|.
   Specify the values of :ref:`sigmacut <minweight>` and :ref:`minmassgap <massComp>`:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 54-55
+   :lines: 55-56
 
 * |Decompose| *model* using the
   `decomposer.decompose <decomposition.html#decomposition.decomposer.decompose>`_ method. The **doCompress** and **doInvisible** options turn the |mass compression| and |invisible compression| on/off.
 
 .. literalinclude:: /examples/Example.py
-   :lines: 59-61
+   :lines: 60-62
 
 * *Access basic information* from decomposition, using the
   `dictionary of SMS <decomposition.html#decomposition.topologyDict.TopologyDict>`_ (the dictionary has as keys the :ref:`canonical name <canonicalName>` for the topology and as values the list of |SMS topologies| for the corresponding canonical name):
 
 .. literalinclude:: /examples/Example.py
-   :lines: 64-68
+   :lines: 65-69
 
 *output:*
 
@@ -461,7 +461,7 @@ Below we go step-by-step through this example code:
 * *Print information about the SMS topologies* from the decomposition:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 71-77
+   :lines: 72-78
 
 *output:*
 
@@ -473,7 +473,7 @@ Below we go step-by-step through this example code:
   Here, all results are used:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 81
+   :lines: 82
 
 Alternatively, the `getExpResults  <experiment.html#experiment.databaseObj.Database.getExpResults>`_ method
 can take as arguments specific results to be loaded and used.
@@ -482,7 +482,7 @@ can take as arguments specific results to be loaded and used.
   Below we show how to count the number of |ULrs| and |EMrs| loaded:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 87-94
+   :lines: 88-95
 
 *output:*
 
@@ -495,13 +495,13 @@ can take as arguments specific results to be loaded and used.
   `theory prediction objects <matching.html#matching.theoryPrediction.TheoryPrediction>`_:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 99
+   :lines: 100
 
 * *Print the results*. For each |expres|, loop over the corresponding |theory predictions|
   and print the relevant information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 100-109
+   :lines: 101-110
 
 *output:*
 
@@ -512,7 +512,7 @@ can take as arguments specific results to be loaded and used.
   be compared to the |theory prediction| to decide whether a model is excluded or not:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 112
+   :lines: 113
 
 *output:*
 
@@ -525,7 +525,7 @@ can take as arguments specific results to be loaded and used.
   Determine the most constraining result:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 115-121
+   :lines: 116-122
 
 *output:*
 
@@ -536,7 +536,7 @@ can take as arguments specific results to be loaded and used.
   determine if the model has been excluded or not by the selected |express|:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 122-131
+   :lines: 123-132
 
 
 *output:*
@@ -547,17 +547,17 @@ can take as arguments specific results to be loaded and used.
 * *Select analyses*. Using the theory predictions, select a (user-defined) subset of analyses to be combined:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 136-144
+   :lines: 137-145
 
 * *Combine analyses*. Using the selected analyses, combine them under the assumption they are fully uncorrelated:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 151
+   :lines: 152
 
 * *Print the combination*. Print the *r*-values and likelihoods for the combination:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 156-159
+   :lines: 157-160
 
 *output:*
 
@@ -568,7 +568,7 @@ can take as arguments specific results to be loaded and used.
   the :ref:`missing topologies <topCoverage>` and print some basic information:
 
 .. literalinclude:: /examples/Example.py
-   :lines: 164-170
+   :lines: 165-171
 
 
 *output:*
