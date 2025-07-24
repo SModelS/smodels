@@ -24,12 +24,16 @@ from smodels.base.physicsUnits import fb
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 
-import pkg_resources
 import sys
-from pathlib import Path
 
-def checkPythonRequirements(requirements_path : os.PathLike ="../smodels/share/requirements.txt"):
-    """ simple function to check if the python requirements are met """
+def checkPythonRequirements(requirements_path: 
+			os.PathLike = "../smodels/share/requirements.txt"):
+    """ Simple function to check if the Python requirements 
+	  are met using importlib and packaging."""
+    from pathlib import Path
+    from importlib.metadata import version, PackageNotFoundError
+    from packaging.requirements import Requirement
+    from packaging.version import Version
     req_path = Path(requirements_path)
     if not req_path.exists():
         print(f"❌ Requirements file not found: {requirements_path}")
@@ -39,23 +43,27 @@ def checkPythonRequirements(requirements_path : os.PathLike ="../smodels/share/r
         requirements = f.read().splitlines()
 
     # Filter out comments and empty lines
-    requirements = [line.strip() for line in requirements if line.strip() and not line.strip().startswith("#")]
+    requirements = [line.strip() for line in requirements if line.strip() \
+				   and not line.strip().startswith("#")]
 
-    print(f"[unitTestHelpers] Checking {len(requirements)} python dependencies ... ", end="" )
-    for req in requirements:
+    print(f"[unitTestHelpers] Checking {len(requirements)} python dependencies ... ", end="")
+
+    for req_line in requirements:
         try:
-            pkg_resources.require(req)
-            # print(f"✅ {req}")
-        except pkg_resources.DistributionNotFound as e:
-            print(f"❌ Missing package: {req} -> {e}")
-            sys.exit()
-        except pkg_resources.VersionConflict as e:
-            print(f"❌ Version conflict: {req} -> {e.report()}")
-            sys.exit()
+            req = Requirement(req_line)
+            dist_name = req.name
+            installed_version = version(dist_name)
+            if Version(installed_version) not in req.specifier:
+                print(f"\n❌ Version conflict: {req_line} -> installed: {installed_version}")
+                sys.exit(1)
+        except PackageNotFoundError:
+            print(f"\n❌ Missing package: {req_line}")
+            sys.exit(1)
         except Exception as e:
-            print(f"❌ Error checking {req}: {e}")
-            sys.exit()
-    print ( "all requirements are met." )
+            print(f"\n❌ Error checking {req_line}: {e}")
+            sys.exit(1)
+
+    print("all requirements are met.")
 
 def canonNameToVertNumb(topoDict,cName):
     """
