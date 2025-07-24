@@ -43,6 +43,7 @@ New in Version 3.1.0:
     be different by up to ~ 10%
   * Slightly different way of finding upper limits, UL computations may vary slightly numerically
   * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
+  * renamed 'expected' flag to an 'evaluationType' enum throughout the code
   * Bumped up pythia8 from 8308 to 8315
   * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
   * Improved the syntax of pyhf fields in globalInfo.txt:jsonFiles

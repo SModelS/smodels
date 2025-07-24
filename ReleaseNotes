@@ -8,9 +8,9 @@ Release v3.1.0, Wed 25 Jun 2025
   * Slightly different way of finding upper limits, UL computations may vary slightly numerically
   * Introduced minmassgapISR parameter for controlling the mass compression for ISR topologies
     **WARNING:** with the default setting, behavior for ISR topologies differs from previous versions!
+  * renamed 'expected' flag to an 'evaluationType' enum throughout the code
   * Bumped up pythia8 from 8308 to 8315
   * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
-  * renamed 'expected' to 'evaluationType' throughout the code
   * Improved the syntax of pyhf fields in globalInfo.txt:jsonFiles
   * Database extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM)
   * Small fixes in database: ATLAS-SUSY-2018-14 (UL), ATLAS-SUSY-2018-31 (EM), CMS-SUS-20-004 (UL)
