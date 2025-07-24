@@ -181,9 +181,9 @@ class SummaryPrinter(TxTPrinter):
         else:
             output += f"combined r-value: NaN (failed to compute r-value)\n"
         if r_expected is not None:
-            output += f"combined r-value (evaluationType): {r_expected:10.3E}\n"
+            output += f"combined r-value (expected): {r_expected:10.3E}\n"
         else:
-            output += f"combined r-value (evaluationType): NaN (failed to compute r-value)\n"
+            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

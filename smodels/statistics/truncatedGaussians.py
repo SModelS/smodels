@@ -32,7 +32,7 @@ class TruncatedGaussians:
     # in mind only. for discovery mode we need to correct differently
     newCorrectionType = False
 
-    def __init__  ( self, upperLimitOnMu : float, evaluationTypeUpperLimitOnMu : float,
+    def __init__  ( self, upperLimitOnMu : float, expectedUpperLimitOnMu : float,
                     corr : Optional[float] = 0.6, cl=.95 ):
         """
         :param upperLimitOnMu: observed upper limit on signal strength mu

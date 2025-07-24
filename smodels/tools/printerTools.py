@@ -97,7 +97,7 @@ def printScanSummary(outputDict, outputFile):
     # Header:
     header = "#Global results summary (%i files)\n" % len(outputDict)
     header += "#The most constraining analysis corresponds to the one with largest observed r.\n"
-    header += "#The most senstive (ATLAS/CMS) analysis corresponds to the one with largest evaluationType r from those analyses for which this information is available.\n"
+    header += "#The most sensitive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
     if anaList:
         header += "#Analyses used for combination = %s.\n" %(','.join(anaList))
         header += "#r(combined) = nan means no analysis from the above combination set produced results.\n"
@@ -428,7 +428,7 @@ def getInfoFromSummary(output):
             rexp.append(rexpAna)
         elif 'combined r-value:' in line:
             r_comb = float(line.replace('\n','').split(':')[1])
-        elif 'combined r-value (evaluationType):' in line:
+        elif 'combined r-value (expected):' in line:
             rexp_comb = float(line.replace('\n','').split(':')[1])
         elif 'Combined Analyses:' in line:
             anaID_comb = line.replace('\n','').split(':')[1].replace(' ','')

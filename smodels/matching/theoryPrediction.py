@@ -491,7 +491,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
 
-        return self.statsComputer.likelihoodComputer.getLlhds(muvals,expected,normalize)
+        return self.statsComputer.likelihoodComputer.getLlhds(muvals,evaluationType,normalize)
 
     def describe(self):
         """returns a string containing a list of all analysisId and dataIds"""

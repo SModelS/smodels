@@ -601,7 +601,7 @@ class Summary():
                 lvals = [eval(val) for val in lvals.split(',')]
                 for i, label in enumerate(lkeys):
                     setattr(self, 'comb'+label.strip(), lvals[i])
-            elif 'combined r-value (evaluationType)' in line:
+            elif 'combined r-value (expected)' in line:
                 rexp = eval(line.split(':')[1])
                 self.rexpComb = rexp
             elif 'combined r-value' in line:

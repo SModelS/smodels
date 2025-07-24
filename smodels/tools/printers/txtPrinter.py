@@ -478,7 +478,7 @@ class TxTPrinter(BasicPrinter):
         output += f"Combined Analyses: {expIDs}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n" 
         output += f"combined r-value: {r:s}\n"
-        output += f"combined r-value (evaluationType): {r_expected:s}"
+        output += f"combined r-value (expected): {r_expected:s}"
         output += "\n===================================================== \n"
         output += "\n"
 
