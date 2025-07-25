@@ -20,6 +20,30 @@ _experimental = { "truncatedgaussians": False,
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
+def printEnvironmentInfo( args ):
+    """ very simple method that prints out info relevant to debugging
+        machine-dependent problems """
+    print ( args )
+    import importlib, platform
+
+    modules = [ "scipy", "sympy", "numpy",
+        "pyslha", "unum", "pyhf" ]
+
+    print("Environment Information:")
+    print(f"Operating System: {platform.system()} {platform.release()}")
+    print(f"Python Version: {platform.python_version()}")
+    print(f"Machine Architecture: {platform.machine()}")
+    print(f"Processor: {platform.processor()}")
+    print("\nModule Versions:")
+
+    for module_name in modules:
+        try:
+            module = importlib.import_module(module_name)
+            version = getattr(module, '__version__', 'Unknown version attribute')
+            print(f"{module_name:<12}: {version}")
+        except ImportError:
+            print(f"{module_name:<12}: Not installed")
+
 def filetype ( filename ):
     """ obtain information about the filetype of an input file,
         currently only used to discriminate between slha and lhe
@@ -53,12 +77,11 @@ def filetype ( filename ):
         return None
     return None
 
-
 def experimentalFeature( feature : str ) -> Union[None,bool]:
     """ method to check if a certain experimental feature is enabled.
     can be turned on and off via options:experimental in parameters.ini.
     :param feature: ask for feature
-    
+
     :returns: None if feature does not exist, else boolean
     """
     if not feature in _experimental:
@@ -99,4 +122,5 @@ def nCPUs():
     return None
 
 if __name__ == "__main__":
-    print ( f"This machine has {nCPUs()} CPUs" )
+    printEnvironmentInfo()
+    # print ( f"This machine has {nCPUs()} CPUs" )

@@ -142,6 +142,10 @@ def main():
                            action='store_true')
     toolbox.add_argument('-m', '--make', help='compile packages if needed',
                            action='store_true')
+    environ_info = subparsers.add_parser( 'environ-info', description=
+								                     "Simple tool to print out environment info")
+    environ_info.add_argument('-c', '--colors', help='turn on terminal colors',
+                           action='store_true')
     args = parser.parse_args()
 
     from smodels.base import smodelsLogging
@@ -150,6 +154,10 @@ def main():
     from smodels import installation
     if args.subparser_name == 'fixpermissions':
         installation.fixpermissions()
+
+    if args.subparser_name == "environ-info":
+        from smodels.base.runtime import printEnvironmentInfo
+        printEnvironmentInfo( args )
 
     if args.subparser_name == 'installation':
         import sys, os
