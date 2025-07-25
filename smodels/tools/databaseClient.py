@@ -21,7 +21,7 @@ class DatabaseClient:
             if k in verbose:
                 self.verbose = v
         self.logfile = logfile
-        self.pprint ( "starting a database client at %s" % time.asctime() )
+        self.pprint ( f"starting a database client at {time.asctime()}" )
         self.packetlength = 256
         if port == None:
             port = 31770
@@ -29,14 +29,14 @@ class DatabaseClient:
         self.port = port
         if servername == None:
             servername = socket.gethostname()
-            self.pprint ( "determined servername as '%s'" % servername )
+            self.pprint ( f"determined servername as '{servername}'" )
         self.servername = servername
         self.maxtries = 25 ## max numbers of trying to connect
         sstatus = self.findServerStatus()
         self.pprint ( "connecting to %s port %s, rundir is %s. server status is '%s'" % \
                       ( self.servername, self.port, self.rundir, sstatus ) )
         if "SLURM_JOB_ID" in os.environ:
-            self.pprint ( "slurm job id is %s" % os.environ["SLURM_JOB_ID"] )
+            self.pprint ( f"slurm job id is {os.environ['SLURM_JOB_ID']}" )
 
     def send_shutdown ( self ):
         """ send shutdown request to server """
@@ -46,7 +46,7 @@ class DatabaseClient:
     def saveStats ( self ):
         self.pprint ( "client stats after %d queries" % self.nqueries )
         self.pprint ( "=================================" )
-        self.pprint ( "number of results in cache: %d" % len(self.cache) )
+        self.pprint ( f"number of results in cache: {len(self.cache)}" )
         maxhits=[]
         for i in self.cache.values():
             maxhits.append ( i[1] )
@@ -99,7 +99,7 @@ class DatabaseClient:
             message = bytes ( message, "UTF-8" ) 
             # Send data
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
-            self.log ( 'sending "%s"' % message )
+            self.log ( f'sending "{message}"' )
             self.ntries = 0
             while self.ntries < self.maxtries:
                 try:
@@ -119,7 +119,7 @@ class DatabaseClient:
                     data = data.replace(" [fb]","*fb")
                     data = data.replace(" [pb]","*pb")
                     data = eval(data)
-                    self.log ( 'received "%s"' % ( data ) )
+                    self.log ( f'received "{data}"' )
                     return data
 
                 except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
@@ -257,7 +257,7 @@ if __name__ == "__main__":
         p = multiprocessing.Pool( nproc )
         p.map ( stresstest, margs )
         dt = time.time() - t0 
-        print ( "[databaseClient] stress test took %.2f seconds" % dt )
+        print ( f"[databaseClient] stress test took {dt:.2f} seconds" )
         sys.exit()
     client = DatabaseClient ( args.servername, args.port, args.verbosity, 
                               rundir=args.rundir, clientid = 0 )

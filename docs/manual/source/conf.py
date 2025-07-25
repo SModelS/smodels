@@ -67,7 +67,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SModelS'
-copyright = u'%s, %s' % (year, authors() )
+copyright = f'{year}, {authors()}'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

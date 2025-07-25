@@ -47,7 +47,7 @@ class TheoryPrediction(object):
         self._statsComputer = None
 
     def __str__(self):
-        ret = "%s:%s" % (self.analysisId(), self.totalXsection())
+        ret = f"{self.analysisId()}:{self.totalXsection()}"
         return ret
 
     def dataId(self):
@@ -559,7 +559,7 @@ class TheoryPredictionList(object):
     def __str__(self):
         if len(self._theoryPredictions) == 0:
             return "no predictions."
-        ret = "%d predictions: " % len(self._theoryPredictions)
+        ret = f"{len(self._theoryPredictions)} predictions: "
         ret += ", ".join([str(s) for s in self._theoryPredictions])
         return ret
 
@@ -638,7 +638,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
     if not isinstance(database,Database):
         errorMsg = "The argument for theoryPredictionsFor should be a"
-        errorMsg += " database with the selected experimental results and not %s" %type(database)
+        errorMsg += f" database with the selected experimental results and not {type(database)}"
         logger.error(errorMsg)
         raise SModelSError(errorMsg)
 
@@ -911,7 +911,7 @@ def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
     #  Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
         ID = dataset.globalInfo.id
-        logger.error("Sqrt(s) defined with wrong units for %s" % (ID))
+        logger.error(f"Sqrt(s) defined with wrong units for {ID}")
         return False
 
     # Compute relevant SMS weights
@@ -1011,7 +1011,6 @@ def _combineSMS(smsList, dataset, maxDist):
             txnameSMS = [sms for sms in smsList if sms.txname is txname]
             clusters += clusterTools.clusterSMS(txnameSMS, maxDist, dataset)
     else:
-        logger.warning("Unkown data type: %s. Data will be ignored."
-                       % dataset.getType())
+        logger.warning(f"Unkown data type: {dataset.getType()}. Data will be ignored.")
 
     return clusters

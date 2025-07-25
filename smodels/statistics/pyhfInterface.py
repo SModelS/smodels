@@ -384,7 +384,7 @@ class PyhfUpperLimitComputer:
         self.data = data
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
-        logger.debug("Signals : {}".format(self.nsignals))
+        logger.debug(f"Signals : {self.nsignals}")
         self.inputJsons = self.data.inputJsons
         self.channelsInfo = None
         if hasattr ( self.data, "channelsInfo" ):
@@ -441,7 +441,7 @@ class PyhfUpperLimitComputer:
         except AttributeError:
             pass
         self.scale *= factor
-        logger.debug("new signal scale : {}".format(self.scale))
+        logger.debug(f"new signal scale : {self.scale}")
         self.patches = self.patchMaker()
         self.workspaces = self.wsMaker()
         self.workspaces_expected = self.wsMaker(apriori=True)
@@ -565,7 +565,7 @@ class PyhfUpperLimitComputer:
                                 obs["data"] = bkg
                 return [pyhf.Workspace(wsDict)]
             except (pyhf.exceptions.InvalidSpecification, KeyError) as e:
-                logger.error("The json file is corrupted:\n{}".format(e))
+                logger.error(f"The json file is corrupted:\n{e}")
                 return None
         else:
             workspaces = []
@@ -1103,13 +1103,13 @@ class PyhfUpperLimitComputer:
             logger.debug(f"result for {mu_rel} {result}")
             if evaluationType == aposteriori:
                 logger.debug("computing a-posteriori evaluationType limit")
-                logger.debug("expected = {}, mu_rel = {}, result = {}".format(expected, mu_rel, result))
+                logger.debug(f"expected = {expected}, mu_rel = {mu_rel}, result = {result}")
                 try:
                     CLs = float(result[1].tolist())
                 except TypeError:
                     CLs = float(result[1][0])
             else:
-                logger.debug("expected = {}, mu_rel = {}, result = {}".format(evaluationType, mu_rel, result))
+                logger.debug(f"expected = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
                 CLs = float(result)
             # print ( f"@@PI0 CLs for {mu_rel}*{self.scale} {expected} {workspace_index} {self.nsignals} = {CLs}" )
             if return_type == "1-CLs":

@@ -188,7 +188,7 @@ class XSecComputer(XSecBase):
                 logger.error ( "signal strength multipliers need to be supplied as a dictionary, with the keys being tuples of the mothers' pids, e.g. { (1000021, -1000001 ): 0.9, .... }" )
                 sys.exit()
             if len(pids) != 2:
-                logger.warning ( "currently we always only have two mothers, so why are the signal strength multipliers given for %d mothers?" % len(pids) )
+                logger.warning ( f"currently we always only have two mothers, so why are the signal strength multipliers given for {len(pids)} mothers?" )
             known_pids = [ 3000006 ] ## here we can define some exceptional pids
             for pid in pids:
                 if type(pid)==int and (abs(pid) < 1000000 or ( abs(pid) > 3000000 and abs(pid) not in known_pids) ):
@@ -313,7 +313,7 @@ class XSecComputer(XSecBase):
                 self.addMultipliersToFile ( ssmultipliers, inputFile )
             self.addCommentToFile ( comment, inputFile )
         else:
-            logger.info("Computing SLHA cross section from %s." % inputFile )
+            logger.info(f"Computing SLHA cross section from {inputFile}." )
             print()
             print( "     Cross sections:" )
             print( "=======================" )
@@ -333,7 +333,7 @@ class XSecComputer(XSecBase):
                           ssmultipliers=None   ):
         """ compute xsecs for a bunch of slha files """
         for inputFile in inputFiles:
-            logger.debug ( "computing xsec for %s" % inputFile )
+            logger.debug ( f"computing xsec for {inputFile}" )
             self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
 
@@ -342,10 +342,10 @@ class XSecComputer(XSecBase):
         if comment in [ None, "" ]:
             return
         if not os.path.isfile(slhaFile ):
-            logger.error("SLHA file %s not found." % slhaFile )
+            logger.error(f"SLHA file {slhaFile} not found." )
             raise SModelSError()
         outfile = open(slhaFile, 'a')
-        outfile.write ( "# %s\n" % comment )
+        outfile.write ( f"# {comment}\n" )
         outfile.close()
 
     def addMultipliersToFile ( self, ssmultipliers, slhaFile ):
@@ -353,11 +353,11 @@ class XSecComputer(XSecBase):
         if ssmultipliers in [ None, {} ]:
             return
         if not os.path.isfile(slhaFile ):
-            logger.error("SLHA file %s not found." % slhaFile )
+            logger.error(f"SLHA file {slhaFile} not found." )
             raise SModelSError()
         tokens = []
         for k,v in ssmultipliers.items():
-            tokens.append ( "%s:%.4g" % ( k, v ) )
+            tokens.append ( f"{k}:{v:.4g}" )
         newline = "# Signal strength multipliers: " + ", ".join ( tokens )
         with open(slhaFile, 'r' ) as r:
             lines = r.readlines()

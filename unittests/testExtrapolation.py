@@ -29,7 +29,7 @@ def pprint ( energy ):
     units = [ eV, keV, MeV, GeV ]
     for unit in units:
         if energy.asNumber ( unit ) < 1000.:
-            return "%s" % energy.asUnit ( unit )
+            return f"{energy.asUnit(unit)}"
     return energy
 
 class ExtrapolationTest(unittest.TestCase):
@@ -76,7 +76,7 @@ class ExtrapolationTest(unittest.TestCase):
         for eps in numpy.arange ( 2, 9, .3 ):
             e = (10**eps) * eV
             masses = [[ 275.*GeV + e, 175.*GeV ], [ 275.*GeV,175.*GeV - e ]]
-            print ( "%s: %s" % ( pprint ( e ), self.tryWith ( masses ) ))
+            print ( f"{pprint(e)}: {self.tryWith(masses)}")
 
 if __name__ == "__main__":
     # ExtrapolationTest("testWithDirectData").show()

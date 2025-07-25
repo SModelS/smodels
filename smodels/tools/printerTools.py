@@ -31,7 +31,7 @@ def printScanSummary(outputDict, outputFile):
     # All outputs should have the same format
     out = list(outputDict.values())[0]
     if all([(ptype not in out) for ptype in printerTypes]):
-        header = "#In order to build the summary, one of the following types of printer must be available:\n %s \n" % str(printerTypes)
+        header = f"#In order to build the summary, one of the following types of printer must be available:\n {str(printerTypes)} \n"
         with open(outputFile, 'w') as f:
             f.write(header)
         return
@@ -95,11 +95,11 @@ def printScanSummary(outputDict, outputFile):
         anaList = sorted(anaList)
 
     # Header:
-    header = "#Global results summary (%i files)\n" % len(outputDict)
+    header = f"#Global results summary ({len(outputDict)} files)\n"
     header += "#The most constraining analysis corresponds to the one with largest observed r.\n"
     header += "#The most sensitive (ATLAS/CMS) analysis corresponds to the one with largest expected r from those analyses for which this information is available.\n"
     if anaList:
-        header += "#Analyses used for combination = %s.\n" %(','.join(anaList))
+        header += f"#Analyses used for combination = {','.join(anaList)}.\n"
         header += "#r(combined) = nan means no analysis from the above combination set produced results.\n"
 
 
@@ -165,9 +165,9 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
         else:
             keyStr = str(key)
         if ik == 0:
-            output += ' '*ident+"%s : %s" %(keyStr,valStr)
+            output += ' '*ident+f"{keyStr} : {valStr}"
         else:
-            output += "%s : %s" %(' '*ident+keyStr,valStr)
+            output += f"{' ' * ident + keyStr} : {valStr}"
 
         if ik < len(outputDict)-1:
             output += ",\n"
@@ -205,9 +205,9 @@ def formatNestedList(outputList,ident=0,maxLength=50):
             valStr = str(val)
 
         if iv == 0 :
-            output += ' '*ident+'%s' %(valStr)
+            output += ' '*ident+f'{valStr}'
         else:
-            output += '%s' %(' '*ident+valStr)
+            output += f"{' ' * ident + valStr}"
         if iv < len(outputList)-1:
             output += ',\n'
         else:

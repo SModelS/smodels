@@ -174,7 +174,7 @@ class Browser(object):
                 continue
             return tx.getULFor(sms=None,mass=massarray,evaluationType=evaluationType)
 
-        logger.warning( "Could not find TxName %s ." % (txname))
+        logger.warning( f"Could not find TxName {txname} .")
         return None
 
     def getULForSR(self,expid,datasetID):
@@ -206,7 +206,7 @@ class Browser(object):
                 continue
             return dataset.getSRUpperLimit()
 
-        logger.warning ( "Could not find dataset %s ." % (datasetID))
+        logger.warning ( f"Could not find dataset {datasetID} .")
         return None
 
 
@@ -228,7 +228,7 @@ class Browser(object):
         allfields = self.getAttributes()
         for tag,value in restrDict.items():
             if tag in allfields: rDict[tag] = value
-            else: logger.warning("Field/attribute %s not found (will be ignored)." % tag)
+            else: logger.warning(f"Field/attribute {tag} not found (will be ignored).")
 
         results = self.database.expResultList[:]
         for expRes in results[:]:
@@ -286,7 +286,7 @@ def main(args):
 
         header += "\n"
         header += "fb, pb, GeV, TeV defined.\n"
-        header +=  "\nBrowser loaded for %s \n" %( args.path_to_database )
+        header +=  f"\nBrowser loaded for {args.path_to_database} \n"
         header += "Try 'print(browser)' for the list of available results.\n"
         header += "More examples on how to access the database can be found in the SModelS manual.\n"
         header += "\nType 'exit' to exit this session."

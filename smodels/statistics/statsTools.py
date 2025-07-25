@@ -261,8 +261,8 @@ class StatsComputer:
         for ds in datasets:
             if not ds in jsonRegions:
                 logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
-        logger.debug("list of datasets: {}".format(datasets))
-        logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+        logger.debug(f"list of datasets: {datasets}")
+        logger.debug(f"jsonFiles after filtering: {jsonFiles}")
 
         # Constructing the list of signals with subsignals matching each json
         nsignals = {}

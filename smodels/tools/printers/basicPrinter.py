@@ -97,7 +97,7 @@ class BasicPrinter(object):
         d = os.path.dirname(filename)
         if not os.path.exists(d):
             os.makedirs(d)
-            logger.info("creating directory %s" % d)
+            logger.info(f"creating directory {d}")
         return open(filename, mode)
 
     def flush(self):
@@ -144,7 +144,7 @@ class BasicPrinter(object):
             # print ( " `-", len(ret))
             return ret
         except AttributeError as e:
-            logger.warning('Error formating object %s: \n %s' % (typeStr, e))
+            logger.warning(f'Error formating object {typeStr}: \n {e}')
             return False
 
     def _round(self, number, n=6):

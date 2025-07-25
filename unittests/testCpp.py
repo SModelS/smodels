@@ -87,7 +87,7 @@ class CppTest(unittest.TestCase):
             yvals = [v.strip() for v in y.split()]
             if len(xvals) != len(yvals):
                 self.writeDebug( a )
-            self.assertEqual(len(xvals), len(yvals), "Lines:\n %s and \n %s \n differ" %(x,y))
+            self.assertEqual(len(xvals), len(yvals), f"Lines:\n {x} and \n {y} \n differ")
             for i,xv in enumerate(xvals):
                 yv = yvals[i]
                 if "=======" in xv and "=======" in yv:

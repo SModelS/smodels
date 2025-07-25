@@ -16,7 +16,7 @@ import pickle
 def getNotebookData(notebookFile,savePickle=True):
 
     if not os.path.isfile(notebookFile):
-        print('File %s not found' %notebookFile)
+        print(f'File {notebookFile} not found')
         return None
 
     with open(notebookFile,'r') as f:

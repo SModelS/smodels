@@ -57,7 +57,7 @@ class StatisticsTest(unittest.TestCase):
             print("llhd from limits", llhdlim, chi2lim)
             totdir += llhddir * dx
             totlim += llhdlim * dx
-            f.write("%s,%s,%s\n" % (nsig, llhddir, llhdlim ))
+            f.write(f"{nsig},{llhddir},{llhdlim}\n")
         print("total direct", totdir)
         print("total limit", totlim)
         f.close()

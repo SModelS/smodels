@@ -60,7 +60,7 @@ def testPoint(inputFile, outputDir, parser, database):
     if parser.has_option("particles","model"):
         runtime.modelFile = parser.get( "particles", "model" )
     else:
-        logger.debug('Model file has not been defined. Using input file %s to read quantum numbers.' %inputFile)
+        logger.debug(f'Model file has not been defined. Using input file {inputFile} to read quantum numbers.')
         runtime.modelFile = inputFile
 
     """Get run parameters and options from the parser"""
@@ -128,7 +128,7 @@ def testPoint(inputFile, outputDir, parser, database):
                               stableWidth=stableWidth,
                               ignorePromptQNumbers=ignorePromptQNumbers)
     except SModelSError as e:
-        logger.error("Exception %s %s" % (e, type(e)))
+        logger.error(f"Exception {e} {type(e)}")
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         return {os.path.basename(inputFile): masterPrinter}
@@ -150,7 +150,7 @@ def testPoint(inputFile, outputDir, parser, database):
                                           minmassgap=minmassgap,
                                           minmassgapISR=minmassgapISR)
     except SModelSError as e:
-        print("Exception %s %s" % (e, type(e)))
+        print(f"Exception {e} {type(e)}")
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         return {os.path.basename(inputFile): masterPrinter}
@@ -296,7 +296,7 @@ def _cleanList(fileList, inDir):
         tmp = os.path.join(inDir, f)
         if not os.path.isfile(tmp):
             logger.info(
-                "%s does not exist or is not a file. Skipping it." % tmp)
+                f"{tmp} does not exist or is not a file. Skipping it.")
             continue
         cleanedList.append(tmp)
     return cleanedList
@@ -425,14 +425,13 @@ def testPoints(fileList, inDir, outputDir, parser, database,
 
         # Collect output to build global summary:
         scanSummaryFile = os.path.join(outputDir, 'summary.txt')
-        logger.info("A summary of the scan results can be found in %s" %
-                    scanSummaryFile)
+        logger.info(f"A summary of the scan results can be found in {scanSummaryFile}")
         printScanSummary(outputDict, scanSummaryFile)
         # Remove summary log from logger
         logger.removeHandler(fileLog)
         fileLog.close()
 
-    logger.info("Done in %3.2f min" % ((time.time()-t0)/60.))
+    logger.info(f"Done in {(time.time() - t0) / 60.0:3.2f} min")
 
     return None
 
@@ -440,7 +439,7 @@ def testPoints(fileList, inDir, outputDir, parser, database,
 def checkForSemicolon(strng, section, var):
     if ";" in strng:
         logger.warning(
-            "A semicolon(;) has been found in [%s] %s, in your config file. If this was meant as comment, then please a space before it." % (section, var))
+            f"A semicolon(;) has been found in [{section}] {var}, in your config file. If this was meant as comment, then please a space before it.")
 
 
 def loadDatabase(parser, db):
@@ -475,8 +474,7 @@ def loadDatabase(parser, db):
                 force_load = "pcl"
             database = Database(databasePath, force_load=force_load)
     except DatabaseNotFoundException:
-        logger.error("Database not found in ``%s''" %
-                     os.path.realpath(databasePath))
+        logger.error(f"Database not found in ``{os.path.realpath(databasePath)}''")
         sys.exit()
     return database
 
@@ -532,7 +530,7 @@ def getParameters(parameterFile):
         parser = SafeConfigParser()
     ret = parser.read(parameterFile)
     if ret == []:
-        logger.error("No such file or directory: '%s'" % parameterFile)
+        logger.error(f"No such file or directory: '{parameterFile}'")
         sys.exit()
 
     if parser.has_section ( "experimentalFeatures" ):

@@ -51,10 +51,10 @@ def getParticlesFromSLHA(slhafile):
                 break
 
     if not os.path.isfile(filename):
-        logger.error("Model file %s not found." % slhafile)
+        logger.error(f"Model file {slhafile} not found.")
         raise SModelSError()
 
-    logger.debug("Trying to define BSM particles from SLHA input file %s" % filename)
+    logger.debug(f"Trying to define BSM particles from SLHA input file {filename}")
 
     #Read file and extract blocks:
     with open(filename, 'r') as f:
@@ -88,7 +88,7 @@ def getParticlesFromSLHA(slhafile):
         qnumberBlocks[-1].append(l)
 
     if not qnumberBlocks:
-        logger.error("No QNUMBERS blocks were found in %s" %slhafile)
+        logger.error(f"No QNUMBERS blocks were found in {slhafile}")
         raise SModelSError()
 
     #Build list of BSM particles:
@@ -99,7 +99,7 @@ def getParticlesFromSLHA(slhafile):
         if headerInfo[0].replace('-','').replace('+','').isdigit():
             pdg = eval(headerInfo[0])
         else:
-            logger.error("Error obtaining PDG number from QNUMBERS block:\n %s \n" %b)
+            logger.error(f"Error obtaining PDG number from QNUMBERS block:\n {b} \n")
 
         if any(p.pdg == pdg for p in BSMList):
             logger.warning("Particle with pdg %i appears multiple times in QNUMBERS blocks" %pdg)
@@ -115,10 +115,10 @@ def getParticlesFromSLHA(slhafile):
             numbers = dict([x for x in numbers if x])
             numbers = dict([[eval(x),eval(y)] for x,y in numbers.items()])
         except:
-            logger.error("Error reading quantum numbers from block: \n %s \n" %b)
+            logger.error(f"Error reading quantum numbers from block: \n {b} \n")
             continue
         if any(not x in numbers for x in [1,2,3]):
-            logger.error("Missing quantum numbers in block:\n %s\n" %b)
+            logger.error(f"Missing quantum numbers in block:\n {b}\n")
             continue
 
         # Ignore SM blocks:
@@ -155,7 +155,7 @@ def getParticlesFromModule(modelFile):
     sys.path.insert(0, fulldir)
     sys.path.insert(0, ".")
 
-    logger.debug("Trying to load model file: %s" % modelFile)
+    logger.debug(f"Trying to load model file: {modelFile}")
 
     fname = modelFile[:]
     if "/" in fname:
@@ -172,7 +172,7 @@ def getParticlesFromModule(modelFile):
         importName = filename
 
     pM=import_module(importName, package='smodels')
-    logger.debug("Found model file at %s" % pM.__file__)
+    logger.debug(f"Found model file at {pM.__file__}")
     if filename != fname:
         os.remove(filename)
     BSMList = pM.BSMList
@@ -191,6 +191,6 @@ def load():
         try:
             BSMList = getParticlesFromSLHA(modelFile)
         except SModelSError:
-            logger.error("Could not load input model from %s. The file should be either a python module with particle definitions or a SLHA file with QNUMBERS blocks." % modelFile)
+            logger.error(f"Could not load input model from {modelFile}. The file should be either a python module with particle definitions or a SLHA file with QNUMBERS blocks.")
             raise SModelSError()
     return BSMList

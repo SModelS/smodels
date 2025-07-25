@@ -31,9 +31,9 @@ class ExternalPythonTool(object):
             self.pythonPath = i.__file__.replace("/__init__.pyc", "")
         except ImportError as e:
             if optional:
-                logger.debug("could not find %s: %s (but its not necessary for smodels, so dont worry)" % (importname, e))
+                logger.debug(f"could not find {importname}: {e} (but its not necessary for smodels, so dont worry)")
             else:
-                logger.error("could not find %s: %s" % (importname, e))
+                logger.error(f"could not find {importname}: {e}")
 
     def compile ( self ):
         import sys
@@ -97,4 +97,4 @@ pythonTools = { "unum" : ExternalPythonTool("unum"),
 
 if __name__ == "__main__":
     for (name, tool) in pythonTools.items():
-        print("%s: installed in %s" % (name, str(tool.installDirectory())))
+        print(f"{name}: installed in {str(tool.installDirectory())}")

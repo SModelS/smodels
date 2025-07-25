@@ -124,11 +124,11 @@ for idataset,name in enumerate(datasetNames):
         #+++++++ next mass plane block ++++++++++++++
         plane = Txname.addMassPlane(txnames[tx]['massPlane'])
         if not (tx in ['THSCPM1b','THSCPM2b','THSCPM3','THSCPM4','THSCPM8','THSCPM9','THSCPM10','THSCPM11']):
-            dataFile = 'orig/%s_eff_mutrig_%s_noWidth.dat' %(tx,name) #Use maps without width info
+            dataFile = f'orig/{tx}_eff_mutrig_{name}_noWidth.dat' #Use maps without width info
         elif tx in ['THSCPM10','THSCPM11']:
-            dataFile = 'orig/%s_eff_mutrig_reduced_th_%s.dat' %(tx,name)
+            dataFile = f'orig/{tx}_eff_mutrig_reduced_th_{name}.dat'
         else:
-            dataFile = 'orig/%s_eff_mutrig_%s_trimmedwidth.dat' %(tx,name)
+            dataFile = f'orig/{tx}_eff_mutrig_{name}_trimmedwidth.dat'
         plane.addSource(dataLabel = 'efficiencyMap',
                     dataFile = dataFile,
                     coordinateMap = txnames[tx]['coordinates'],

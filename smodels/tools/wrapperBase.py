@@ -59,7 +59,7 @@ class WrapperBase(object):
         chmod 755 on executable, if it exists.  Do nothing, if it doesnt exist.
         """
         if not os.path.exists ( self.executablePath ):
-            logger.error("%s doesnt exist" % self.executablePath )
+            logger.error(f"{self.executablePath} doesnt exist" )
             return False
         import stat
         mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH | stat.S_IROTH
@@ -104,10 +104,10 @@ class WrapperBase(object):
                 return False
         if not os.path.exists(self.executablePath):
             if self.maycompile: ## should have worked
-                logger.error("Compilation of %s failed. Is a according compiler installed?" % self.name )
+                logger.error(f"Compilation of {self.name} failed. Is a according compiler installed?" )
             self.complain()
         if not os.access(self.executablePath, os.X_OK):
-            logger.warning("%s is not executable Trying to chmod" % self.executable)
+            logger.warning(f"{self.executable} is not executable Trying to chmod")
             self.chmod()
         return True
 

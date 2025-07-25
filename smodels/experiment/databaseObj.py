@@ -167,20 +167,19 @@ class Database(object):
     def createBinaryFile(self, filename=None):
         """ create a pcl file from all the subs """
         ## make sure we have a model to pickle with the database!
-        logger.debug(" * create %s" % filename)
+        logger.debug(f" * create {filename}")
         if filename == None:
             filename = self.pcl_meta.pathname
         with open(filename, "wb") as f:
             logger.debug(" * load text database")
-            logger.debug(" * write %s db version %s" %
-                    (filename, self.databaseVersion))
+            logger.debug(f" * write {filename} db version {self.databaseVersion}")
             ptcl = min(4, serializer.HIGHEST_PROTOCOL)
             ## 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl)
 
-            logger.info("%s created." % (filename))
+            logger.info(f"{filename} created.")
 
     def __str__(self):
         # r = [ str(x) for x in self.subs ]
@@ -191,8 +190,7 @@ class Database(object):
         if self.expResultList == None:
             idList += "no experimental results available! "
             return idList
-        idList += "%d experimental results: " % \
-        len(self.expResultList)
+        idList += f"{len(self.expResultList)} experimental results: "
         atlas, cms = [], []
         datasets = 0
         txnames = 0
@@ -210,7 +208,7 @@ class Database(object):
                 atlas.append(expRes)
             if "CMS" in Id:
                 cms.append(expRes)
-        idList += "%d CMS, %d ATLAS, " % (len(cms), len(atlas))
+        idList += f"{len(cms)} CMS, {len(atlas)} ATLAS, "
         for sqrts in s.keys():
             idList += "%d @ %d TeV, " % (s[sqrts], sqrts)
             # idList += expRes.globalInfo.getInfo('id') + ', '
@@ -411,7 +409,7 @@ class SubDatabase(object):
                 codeVersion = installation.version()
                 pclVersion = self.pcl_meta.databaseVersion
                 if codeVersion[0] != pclVersion[0]:
-                    logger.error("major versions of code and database differ! code=%s, database=%s" % (codeVersion[0], pclVersion[0]))
+                    logger.error(f"major versions of code and database differ! code={codeVersion[0]}, database={pclVersion[0]}")
             return
         if self.force_load in [None, "none", "None"]:
             self.loadDatabase()
@@ -481,7 +479,7 @@ class SubDatabase(object):
         if self.txt_meta.databaseVersion and len(self.expResultList) > 0:
             logger.debug("Asked to load database, but has already been loaded. Ignore.")
             return
-        logger.info("Parsing text database at %s" % self.txt_meta.pathname)
+        logger.info(f"Parsing text database at {self.txt_meta.pathname}")
         self.expResultList = self._loadExpResults()
         self.createLinksToModel()
         self.createLinksToCombinationsMatrix()
@@ -573,8 +571,7 @@ class SubDatabase(object):
                 self.pcl_meta.format_version = -1
                 self.pcl_meta.mtime = 0
                 return self
-            logger.error("%s is not readable (%s)." %
-                         (self.pcl_meta.pathname, str(e)))
+            logger.error(f"{self.pcl_meta.pathname} is not readable ({str(e)}).")
             if self.source in ["http", "ftp", "pcl"]:
                 logger.error("source cannot be rebuilt. supply a different path to the database in your ini file.")
                 raise SModelSError()
@@ -620,7 +617,7 @@ class SubDatabase(object):
         if not hasattr(self, 'databaseParticles') or \
                 type(self.databaseParticles) == type(None):
            self._setParticles(self._getParticles())
-        logger.debug(" * create %s" % binfile)
+        logger.debug(f" * create {binfile}")
         with open(binfile, "wb") as f:
             logger.debug(" * load text database")
             self.loadTextDatabase()
@@ -632,7 +629,7 @@ class SubDatabase(object):
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl)
-            logger.info("%s created." % (binfile))
+            logger.info(f"{binfile} created.")
 
     @property
     def databaseVersion(self):
@@ -723,15 +720,15 @@ class SubDatabase(object):
         def sizeof_fmt(num, suffix='B'):
             for unit in ['', 'K', 'M', 'G', 'T', 'P']:
                 if abs(num) < 1024.:
-                    return "%3.1f%s%s" % (num, unit, suffix)
+                    return f"{num:3.1f}{unit}{suffix}"
                 num /= 1024.0
-            return "%.1f%s%s" % (num, 'Yi', suffix)
+            return f"{num:.1f}Yi{suffix}"
 
         import requests
         try:
             r = requests.get(path, timeout=5)
         except requests.exceptions.RequestException as e:
-            logger.error("Exception when trying to fetch database: %s" % e)
+            logger.error(f"Exception when trying to fetch database: {e}")
             logger.error("Consider supplying a different database path in the ini file (possibly a local one)")
             raise SModelSError()
         if r.status_code != 200:
@@ -743,7 +740,7 @@ class SubDatabase(object):
         with open(store, "w") as f:
             f.write(r.text)
         if not "url" in r.json().keys():
-            logger.error("cannot parse json file %s." % path)
+            logger.error(f"cannot parse json file {path}.")
             raise SModelSError()
         size = r.json()["size"]
         cDir, defused = cacheDirectory(create=True, reportIfDefault=True)
@@ -756,10 +753,10 @@ class SubDatabase(object):
                 if sha == r.json()["sha1"]:
                     ## seems it hasnt changed
                     self.force_load = "pcl"
-                    return ("./", "%s" % filename)
+                    return ("./", f"{filename}")
         r2 = requests.get(r.json()["url"], stream=True, timeout=(250, 2000))
         # filename= os.path.join ( cDir, r2.url.split("/")[-1] )
-        msg = "downloading the database from %s and caching in %s." % (path, cDir)
+        msg = f"downloading the database from {path} and caching in {cDir}."
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
         logger.warning(msg)
@@ -787,9 +784,9 @@ class SubDatabase(object):
                 logger.error(f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>")
                 # sys.exit()
         logger.info("fetched %s in %d secs." % (r2.url, time.time()-t0))
-        logger.debug("store as %s" % filename)
+        logger.debug(f"store as {filename}")
         self.force_load = "pcl"
-        return ("./", "%s" % filename)
+        return ("./", f"{filename}")
 
     def fetchFromServer(self, path):
         import requests
@@ -800,7 +797,7 @@ class SubDatabase(object):
             self.source = "ftp"
         cDir = cacheDirectory(create=True)
         store = os.path.join(cDir, path.replace(":", "_").replace("/", "_").replace(".", "_"))
-        logger.debug("need to fetch from server: %s and store to %s" % (path, store))
+        logger.debug(f"need to fetch from server: {path} and store to {store}")
         if not os.path.isfile(store):
             ## completely new! fetch the description and the db!
             return self.fetchFromScratch(path, store)
@@ -821,7 +818,7 @@ class SubDatabase(object):
             if not os.path.isfile(filename):
                 logger.error("Cant find a local copy of the pickle file. Exit.")
                 sys.exit()
-            logger.warning("I do however have a local copy of the file at %s. I work with that." % filename)
+            logger.warning(f"I do however have a local copy of the file at {filename}. I work with that.")
             self.force_load = "pcl"
             return (cDir, filename)
             #return ( cDir, os.path.basename ( filename ) )
@@ -874,17 +871,17 @@ class SubDatabase(object):
             self.source = "pcl"
             if not os.path.exists(tmp):
                 if self.force_load == "pcl":
-                    logger.error("File not found: %s" % tmp)
+                    logger.error(f"File not found: {tmp}")
                     raise SModelSError()
-                logger.info("File not found: %s. Will generate." % tmp)
+                logger.info(f"File not found: {tmp}. Will generate.")
                 base = os.path.dirname(tmp)
                 return (base, tmp)
-            logger.error("Supplied a pcl filename, but %s is not a file." % tmp)
+            logger.error(f"Supplied a pcl filename, but {tmp} is not a file.")
             raise SModelSError()
 
         path = tmp + '/'
         if not os.path.exists(path):
-            logger.error('%s is no valid path!' % path)
+            logger.error(f'{path} is no valid path!')
             raise DatabaseNotFoundException("Database not found")
         m = Meta(path)
         self.source = "txt"
@@ -897,8 +894,7 @@ class SubDatabase(object):
         if self.expResultList == None:
             idList += "no experimental results available! "
             return idList
-        idList += "%d experimental results: " % \
-        len(self.expResultList)
+        idList += f"{len(self.expResultList)} experimental results: "
         atlas, cms = [], []
         datasets = 0
         txnames = 0
@@ -916,7 +912,7 @@ class SubDatabase(object):
                 atlas.append(expRes)
             if "CMS" in Id:
                 cms.append(expRes)
-        idList += "%d CMS, %d ATLAS, " % (len(cms), len(atlas))
+        idList += f"{len(cms)} CMS, {len(atlas)} ATLAS, "
         for sqrts in s.keys():
             idList += "%d @ %d TeV, " % (s[sqrts], sqrts)
             # idList += expRes.globalInfo.getInfo('id') + ', '
@@ -940,7 +936,7 @@ class SubDatabase(object):
             self.databaseParticles = None
         #If input is given, use it to set the databaseParticles attribute:
         if databaseParticles:
-            logger.debug("Setting database particles from %s" % str(databaseParticles))
+            logger.debug(f"Setting database particles from {str(databaseParticles)}")
             self.databaseParticles = databaseParticles
 
         #If still None, fallback to default:
@@ -961,7 +957,7 @@ class SubDatabase(object):
             from importlib import import_module
             sys.path.append(self.txt_meta.pathname)
             pFile = os.path.splitext(particlesFile)[0]
-            logger.debug("Loading database particles from: %s" % fulldir)
+            logger.debug(f"Loading database particles from: {fulldir}")
             modelFile = import_module(pFile, package='smodels')
             if not hasattr(modelFile, 'finalStates'):
                 logger.error("Model definition (finalStates) not found in" % fulldir)
@@ -1023,27 +1019,27 @@ class SubDatabase(object):
         """ create, from pickle file or text files """
         txtmeta = Meta(root,
                        hasFastLim=None, databaseVersion=self.databaseVersion)
-        pclfile = "%s/.%s" % (root, txtmeta.getPickleFileName())
-        logger.debug("Creating %s, pcl=%s" % (root, pclfile))
+        pclfile = f"{root}/.{txtmeta.getPickleFileName()}"
+        logger.debug(f"Creating {root}, pcl={pclfile}")
         expres = None
         try:
             # logger.info( "%s exists? %d" % ( pclfile,os.path.exists( pclfile ) ) )
             if not self.force_load == "txt" and os.path.exists(pclfile):
                 # logger.info( "%s exists" % ( pclfile ) )
                 with open(pclfile, "rb") as f:
-                    logger.debug("Loading: %s" % pclfile)
+                    logger.debug(f"Loading: {pclfile}")
                     ## read meta from pickle
                     pclmeta = serializer.load(f)
                     if not pclmeta.needsUpdate(txtmeta):
-                        logger.debug("we can use expres from pickle file %s" % pclfile)
+                        logger.debug(f"we can use expres from pickle file {pclfile}")
                         expres = serializer.load(f)
                     else:
-                        logger.debug("we cannot use expres from pickle file %s" % pclfile)
-                        logger.debug("txt meta %s" % txtmeta)
-                        logger.debug("pcl meta %s" % pclmeta)
-                        logger.debug("pcl meta needs update %s" % pclmeta.needsUpdate(txtmeta))
+                        logger.debug(f"we cannot use expres from pickle file {pclfile}")
+                        logger.debug(f"txt meta {txtmeta}")
+                        logger.debug(f"pcl meta {pclmeta}")
+                        logger.debug(f"pcl meta needs update {pclmeta.needsUpdate(txtmeta)}")
         except IOError as e:
-            logger.error("exception %s" % e)
+            logger.error(f"exception {e}")
         if not expres:  # create from text file
             expres = ExpResult(root,
                 databaseParticles=self.databaseParticles)
@@ -1197,7 +1193,7 @@ class SubDatabase(object):
                     if type(validated) == str:
                         validated = validated.lower()
                     if (validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
-                        logger.error("value of validated field '%s' in %s unknown." % (validated, expResult))
+                        logger.error(f"value of validated field '{validated}' in {expResult} unknown.")
                     if validated in [None, "none"]:  # FIXME after 1.1.1 this becomes a warning msg?
                         logger.debug("validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." %
                             (expResult.globalInfo.id, dataset.dataInfo.dataId, txname))
@@ -1275,10 +1271,10 @@ if __name__ == "__main__":
         t0 = time.time()
         expResult = db.loadBinaryFile(lastm_only=False)
         t1 = time.time()
-        print("Time it took reading binary db file: %.1f s." % (t1-t0))
+        print(f"Time it took reading binary db file: {t1 - t0:.1f} s.")
         txtdb = db.loadTextDatabase()
         t2 = time.time()
-        print("Time it took reading text   file: %.1f s." % (t2-t1))
+        print(f"Time it took reading text   file: {t2 - t1:.1f} s.")
     if args.read:
         db = db.loadBinaryFile(lastm_only=False)
         listOfExpRes = db.expResultList

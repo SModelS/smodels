@@ -44,12 +44,12 @@ def importPythonOutput(smodelsFile):
         smodelsOutput = smodelsOut.smodelsOutput
 
     except (ImportError,AttributeError,IOError,ValueError,OSError,SyntaxError):
-        logger.debug("Error loading smodels file %s. Does it contain a smodelsOutput dictionary?" %smodelsFile)
+        logger.debug(f"Error loading smodels file {smodelsFile}. Does it contain a smodelsOutput dictionary?")
 
         return False
 
     if not isinstance(smodelsOutput,dict):
-        logger.warning("smodelsOutput in file %s is not a dictionary." %smodelsFile)
+        logger.warning(f"smodelsOutput in file {smodelsFile} is not a dictionary.")
         return False
 
     return smodelsOutput
@@ -79,7 +79,7 @@ def getEntry(inputDict,*keys):
 
     key = keys.pop(0)
     if not key in inputDict:
-        logger.debug('Key %s not found in input dictionary' %key)
+        logger.debug(f'Key {key} not found in input dictionary')
         return False
     else:
         return getEntry(inputDict[key],*keys)
@@ -101,13 +101,13 @@ def getSlhaData(slhaFile):
     """
 
     if not os.path.exists(slhaFile):
-        logger.warning("%s not found. This point will be ignored" % slhaFile )
+        logger.warning(f"{slhaFile} not found. This point will be ignored" )
         return False
 
     try:
         slhaData = pyslha.readSLHAFile(slhaFile)
     except (OSError,pyslha.ParseError) as e:
-        logger.warning("Error reading SLHA file %s: %s" % (slhaFile,e) )
+        logger.warning(f"Error reading SLHA file {slhaFile}: {e}" )
         return False
 
     return slhaData

@@ -38,7 +38,7 @@ class ExpResult(object):
             self.path = "<transient>"
             return
         if not os.path.isdir(path):
-            raise SModelSExperimentError("%s is not a path" % path)
+            raise SModelSExperimentError(f"{path} is not a path")
 
         self.path = path
         if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
@@ -85,7 +85,7 @@ class ExpResult(object):
                     else:
                         self.datasets.append(dataset)
                 except TypeError as e:
-                    logger.warning("Error creating dataset from dir %s:\n %s" % (root, e))
+                    logger.warning(f"Error creating dataset from dir {root}:\n {e}")
                     continue
         if not hasOrder:
             return
@@ -110,8 +110,8 @@ class ExpResult(object):
         """ write the pickle file """
 
         meta = metaObj.Meta(self.path, databaseVersion=dbVersion)
-        pclfile = "%s/.%s" % (self.path, meta.getPickleFileName())
-        logger.debug("writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime()))
+        pclfile = f"{self.path}/.{meta.getPickleFileName()}"
+        logger.debug(f"writing expRes pickle file {pclfile}, mtime={meta.cTime()}")
         f = open(pclfile, "wb")
         ptcl = min(4, serializer.HIGHEST_PROTOCOL)
         serializer.dump(meta, f, protocol=ptcl)
@@ -154,7 +154,7 @@ class ExpResult(object):
         if isinstance(txnames, list):
             for txname in txnames:
                 label += txname + ','
-            label = "%s(%d)," % (label[:-1], len(txnames))
+            label = f"{label[:-1]}({len(txnames)}),"
         else:
             label += txnames + ','
         return label[:-1]
@@ -277,7 +277,7 @@ class ExpResult(object):
                                                   mass=mass)
             return upperLimit
         else:
-            logger.error("Dataset ID %s not found in experimental result %s" % (dataID, self))
+            logger.error(f"Dataset ID {dataID} not found in experimental result {self}")
             return None
 
     def getValuesFor(self, attribute):

@@ -46,7 +46,7 @@ for ifile,mfile in enumerate(maps):
         effpts = [pt[1] for pt in data if pt[1] > 0.]
             
         newMap = open('eff_%s_c%i00.txt'%(newtx,ifile),'w')
-        newMap.write('## %s efficiencies\n' %newtx)
+        newMap.write(f'## {newtx} efficiencies\n')
         header = "## x"
         if ypts: header += '\ty'
         if zpts: header += '\tz'
@@ -54,9 +54,9 @@ for ifile,mfile in enumerate(maps):
         newMap.write(header)
         for i,x in enumerate(xpts):
             line = str(x)
-            if ypts: line += '\t%s' %str(ypts[i])
-            if zpts: line += '\t%s' %str(zpts[i])
-            line += "\t%s" %str(effpts[i])
+            if ypts: line += f'\t{str(ypts[i])}'
+            if zpts: line += f'\t{str(zpts[i])}'
+            line += f"\t{str(effpts[i])}"
             newMap.write(line+'\n')
         newMap.close()
                  
