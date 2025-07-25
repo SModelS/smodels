@@ -23,24 +23,25 @@ _deltas_rel_default = .2 ## the default relative error on the signal strength
 def printEnvironmentInfo( args ):
     """ very simple method that prints out info relevant to debugging
         machine-dependent problems """
-    print ( args )
+    from smodels.base.smodelsLogging import colors
+    colors.on = True if args.colors == True else False
     import importlib, platform
 
     modules = [ "scipy", "sympy", "numpy",
         "pyslha", "unum", "pyhf" ]
 
     print("Environment Information:")
-    print(f"Operating System: {platform.system()} {platform.release()}")
-    print(f"Python Version: {platform.python_version()}")
-    print(f"Machine Architecture: {platform.machine()}")
-    print(f"Processor: {platform.processor()}")
+    print(f"Operating System: {colors.green}{platform.system()} {platform.release()}{colors.reset}")
+    print(f"Python Version: {colors.green}{platform.python_version()}{colors.reset}")
+    print(f"Machine Architecture: {colors.green}{platform.machine()}{colors.reset}")
+    print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
     print("\nModule Versions:")
 
     for module_name in modules:
         try:
             module = importlib.import_module(module_name)
             version = getattr(module, '__version__', 'Unknown version attribute')
-            print(f"{module_name:<12}: {version}")
+            print(f"{module_name:<12}: {colors.green}{version}{colors.reset}")
         except ImportError:
             print(f"{module_name:<12}: Not installed")
 
