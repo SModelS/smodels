@@ -34,7 +34,7 @@ class TopoCombTest(unittest.TestCase):
         if case == "mixed":
             ratios = { "T1": .5, "T5": .5 }
 
-        fname = "%s.slha" % case
+        fname = f"{case}.slha"
         f=open( fname,"w")
         f.write ( """BLOCK MASS  # Mass Spectrum
    1000006     120.           # ~t_1

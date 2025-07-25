@@ -53,7 +53,7 @@ def run(filter=None, testNotebooks=False, reduced=False ):
 
     ret = unittest.TextTestRunner().run(tests)
     if not ret.wasSuccessful():
-        raise AssertionError("%i tests failed" %len(ret.failures))
+        raise AssertionError(f"{len(ret.failures)} tests failed")
 
 
 def verbose_run( filter=None, testNotebooks=False, reduced=False ):
@@ -86,10 +86,9 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
                     a=t.debug()
                 except Exception as e:
                     n_failed += 1
-                    print ( "%s FAILED: %s,%s%s" % \
-                            ( colors.error, type(e), str(e), colors.reset ) )
+                    print ( f"{colors.error} FAILED: {type(e)},{str(e)}{colors.reset}" )
                     continue
-                print ( "%sok%s" % ( colors.info, colors.reset ) )
+                print ( f"{colors.info}ok{colors.reset}" )
 
                 #a=t.run() ## python3
                 # print ( "a=",a )
@@ -128,7 +127,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
     runner = unittest.TextTestRunner()
     ret = runner.run(concurrent_suite)
     if not ret.wasSuccessful():
-        raise AssertionError("%i tests failed" %len(ret.failures))
+        raise AssertionError(f"{len(ret.failures)} tests failed")
 
 
 def cleanDatabase ():

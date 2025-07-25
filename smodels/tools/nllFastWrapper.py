@@ -148,8 +148,7 @@ class NllFastWrapper(WrapperBase):
     def _compute ( self, energy, pIDs, pdf, squarkmass, gluinomass ):
         process = self._getProcessName(pIDs)
         if process == "st":
-            nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                  (process, pdf, squarkmass)
+            nll_run = "./nllfast_" + energy + f" {process} {pdf} {squarkmass}"
         else:
             nll_run = "./nllfast_" + energy + " %s %s %s %s" % \
                   (process, pdf, squarkmass, gluinomass)
@@ -194,8 +193,7 @@ class NllFastWrapper(WrapperBase):
         if process != 'sb' and process != 'gg': return None
         elif process == 'sb': process_dcpl = 'sdcpl'
         elif process == 'gg': process_dcpl = 'gdcpl'
-        nll_run = "./nllfast_" + energy + " %s %s %s" % \
-                          (process_dcpl, pdf, mass)
+        nll_run = "./nllfast_" + energy + f" {process_dcpl} {pdf} {mass}"
         e = energy.replace ( "TeV", "" ).replace ( "*", "" )
         # tool = toolBox.ToolBox().get ( "nllfast%d" % int ( e ) )
         nll_output = self._run(nll_run )
@@ -286,7 +284,7 @@ class NllFastWrapper(WrapperBase):
         if not doDecoupling:
             if gluinomass < 99000. and squarkmass < 99000.:
                 ## dont warn about obviously decoupled cases
-                logger.warning("Masses of (q,g)=(%s,%s) out of NLLfast grid for %s, %s" % ( squarkmass, gluinomass, process, energy ))
+                logger.warning(f"Masses of (q,g)=({squarkmass},{gluinomass}) out of NLLfast grid for {process}, {energy}")
             return (None, None)
 
         # Obtain k-factors from the NLLfast decoupled grid
@@ -359,4 +357,4 @@ nllFastTools = { 7 : NllFastWrapper7(),
 
 if __name__ == "__main__":
     for (sqrts, tool) in nllFastTools.items():
-        print("%s: installed in %s" % (tool.name, tool.installDirectory()))
+        print(f"{tool.name}: installed in {tool.installDirectory()}")

@@ -59,7 +59,7 @@ for SR,data in yields.items():
     dataset = DataSetInput( SR )
     dataset.setInfo( dataType = 'efficiencyMap', dataId = SR, observedN = data["obsN"],
                      expectedBG=data["bgExp"], bgError = data["expErr"],
-                     upperLimit = '%s*fb' % data["ul"] )
+                     upperLimit = f"{data['ul']}*fb" )
 
     T2tt = dataset.addTxName('T2tt')
     # T2tt.checked ="VM"

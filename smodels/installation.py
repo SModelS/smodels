@@ -188,13 +188,13 @@ def fixpermissions():
         we can compile the wrappers for pythia and nllfast. """
     from smodels.base.smodelsLogging import logger
     import glob
-    Dir = "%ssmodels/lib/" % installDirectory()
+    Dir = f"{installDirectory()}smodels/lib/"
     try:
-        Dirs = [ "%spythia6" % Dir, "%spythia8" % Dir ]
-        Dirs += glob.glob("%snllfast/nllfast-*" % Dir )
-        Dirs += glob.glob("%spythia8/xml.doc" % Dir )
+        Dirs = [ f"{Dir}pythia6", f"{Dir}pythia8" ]
+        Dirs += glob.glob(f"{Dir}nllfast/nllfast-*" )
+        Dirs += glob.glob(f"{Dir}pythia8/xml.doc" )
         for p in Dirs:
-            logger.debug ( "chmod 777 %s" % (p) )
+            logger.debug ( f"chmod 777 {p}" )
             os.chmod ( p, 0o777 )
     except OSError:
         print ( "chmod failed (permission error). Please try as root, i.e.:" )
@@ -211,7 +211,7 @@ def databasePath ( label ):
     """
     if not label in __dblabels__:
         from smodels.base.smodelsLogging import logger
-        logger.warning ( "cannot identify label %s" % label )
+        logger.warning ( f"cannot identify label {label}" )
         return label
     if label == None:
         label = "official"

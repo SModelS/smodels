@@ -61,10 +61,10 @@ class TxName(object):
 
         if self.path is None:
             return
-        logger.debug('Creating object based on txname file: %s' % self.path)
+        logger.debug(f'Creating object based on txname file: {self.path}')
         # Open the info file and get the information:
         if not os.path.isfile(path):
-            logger.error("Txname file %s not found" % path)
+            logger.error(f"Txname file {path} not found")
             raise SModelSError()
         txtFile = open(path, 'r')
         txdata = txtFile.read()
@@ -85,8 +85,7 @@ class TxName(object):
             line = content[i]
             value = line.split(':', 1)[1].strip()
             if tags.count(tag) != 1:
-                logger.info("Duplicated field %s found in file %s"
-                            % (tag, self.path))
+                logger.info(f"Duplicated field {tag} found in file {self.path}")
             if ';' in value:
                 value = value.split(';')
             if tag == 'upperLimits':
@@ -185,7 +184,7 @@ class TxName(object):
         cName = smsList[0].canonName
         for sms in smsList[1:]:
             if sms.canonName != cName:
-                msgError = "Txname %s referes to SMS with distinct topologies." % self
+                msgError = f"Txname {self} referes to SMS with distinct topologies."
                 logger.error(msgError)
                 raise SModelSError(msgError)
 
@@ -201,13 +200,13 @@ class TxName(object):
         try:
             res = self.evalConstraintFor(smsList)
         except (TypeError, NameError) as e:
-            msgError = "Can not evaluate constraint %s for %s." % (self._constraintFunc, self)
-            msgError += "\n error: %s" % str(e)
+            msgError = f"Can not evaluate constraint {self._constraintFunc} for {self}."
+            msgError += f"\n error: {str(e)}"
             logger.error(msgError)
             raise SModelSError(msgError)
 
         if res is not None and not isinstance(res, (float, int, unum.Unum,)):
-            msgError = "Constraint for %s returned an invalid value: %s (%s)" % (self, res, type(res))
+            msgError = f"Constraint for {self} returned an invalid value: {res} ({type(res)})"
             logger.error(msgError)
             raise SModelSError(msgError)
 
@@ -222,13 +221,13 @@ class TxName(object):
         try:
             res = self.evalConditionsFor(smsList)
         except (TypeError, NameError) as e:
-            msgError = "Can not evaluate conditions %s for %s." % (self._conditionsFunc, self)
-            msgError += "\n error: %s" % str(e)
+            msgError = f"Can not evaluate conditions {self._conditionsFunc} for {self}."
+            msgError += f"\n error: {str(e)}"
             logger.error(msgError)
             raise SModelSError(msgError)
 
         if res is not None and not isinstance(res, list):
-            msgError = "Conditions for %s returned an invalid value: %s (%s)" % (self, res, type(res))
+            msgError = f"Conditions for {self} returned an invalid value: {res} ({type(res)})"
             logger.error(msgError)
             raise SModelSError(msgError)
 
@@ -314,7 +313,7 @@ class TxName(object):
                 try:
                     axList = eval(ax, {'x' : x, 'y' : y, 'z' : z, 'w' : w})
                 except NameError:
-                    logger.error("Error evaluating axis for txname: %s (%s)" %(self,ax))
+                    logger.error(f"Error evaluating axis for txname: {self} ({ax})")
                     raise SModelSError()
                 axMap = {}
                 for flatArrayIndex,indexMap in self._arrayMap.items():
@@ -363,7 +362,7 @@ class TxName(object):
 
             if checkUnique and any(smsObj == sms for sms in smsMap):
                 msgError = "Duplicate SMS found in: "
-                msgError += "%s in %s" % (stringExpr, self.globalInfo.id)
+                msgError += f"{stringExpr} in {self.globalInfo.id}"
                 logger.error(msgError)
                 raise SModelSError(msgError)
 
@@ -375,7 +374,7 @@ class TxName(object):
 
             # Replace the SMS string by its label
             smsStr = smsStr.replace("'", "").replace(" ", "")
-            exprFunc = exprFunc.replace(smsStr, '%s' % smsObjLabel)
+            exprFunc = exprFunc.replace(smsStr, f'{smsObjLabel}')
 
         return exprFunc, smsMap
 
@@ -459,25 +458,25 @@ class TxName(object):
             data = rawData
 
         if len(data) == 0:
-            logger.error("no data values for %s found" % self)
-            raise SModelSError("no data values for %s found" % self)
+            logger.error(f"no data values for {self} found")
+            raise SModelSError(f"no data values for {self} found")
         elif len(data[0]) < 2:
-            logger.error("No valid data found for %s" % self)
-            raise SModelSError("No valid data found for %s" % self)
+            logger.error(f"No valid data found for {self}")
+            raise SModelSError(f"No valid data found for {self}")
 
         xDataPoint = data[0][0]
         yDataPoint = data[0][1]
         # Store y-unit:
         self.y_unit = removeUnits(yDataPoint, returnUnit=True)[1]
         if not isinstance(self.y_unit, (unum.Unum, float)):
-            raise SModelSError("Error obtaining units from value: %s " % data[0])
+            raise SModelSError(f"Error obtaining units from value: {data[0]} ")
 
         # Define graph->data mapping
         try:
             self.setDataMap(xDataPoint)
         except (IndexError) as e:
-            msgError = "Error constructing dataMap for %s" % self.path
-            msgError += ": %s" % str(e)
+            msgError = f"Error constructing dataMap for {self.path}"
+            msgError += f": {str(e)}"
             logger.error(msgError)
             raise SModelSError(msgError)
         # Transform data:
@@ -551,7 +550,7 @@ class TxName(object):
 
         # Check if the list has been filled:
         if None in xFlat:
-            logger.error("Error transforming point %s" % x)
+            logger.error(f"Error transforming point {x}")
             raise SModelSError()
 
         return xFlat
@@ -623,7 +622,7 @@ class TxName(object):
         # If it was not defined, it should be built from the old
         # nested array format information (generated by convertBracketNotation)
         if not hasattr(self,'_arrayToNodeDict') or not self._arrayToNodeDict:
-            errorMsg = "No information about the data has been found for %s." %(self.path)
+            errorMsg = f"No information about the data has been found for {self.path}."
             errorMsg += " If the constraint was given using the process string"
             errorMsg += " (e.g. PV > ...) format, a dataMap has to be defined."
             logger.error(errorMsg)
@@ -682,7 +681,7 @@ class TxName(object):
             mass = arrayValue
             massUnit = unum.Unum(mass._unit)
         else:
-            logger.error("Can not convert array value %s " % (arrayValue))
+            logger.error(f"Can not convert array value {arrayValue} ")
             raise SModelSError()
 
         return mass, massUnit, width, widthUnit
@@ -715,7 +714,7 @@ class TxName(object):
 
         if not isinstance(sms, GenericSMS):
             msgError = "Input of getReweightingFor must be an SMS object"
-            msgError += " and not %s" % str(type(sms))
+            msgError += f" and not {str(type(sms))}"
             logger.error(msgError)
             raise SModelSError()
 
@@ -768,12 +767,12 @@ class TxName(object):
         """
 
         if not isinstance(value, str):
-            raise SModelSError("Data should be in string format. Format %s found" % type(value))
+            raise SModelSError(f"Data should be in string format. Format {type(value)} found")
 
         try:
             val = eval(value, unitsDict)
         except (NameError, ValueError, SyntaxError):
-            raise SModelSError("data string malformed: %s" % value)
+            raise SModelSError(f"data string malformed: {value}")
 
         return val
 
@@ -902,7 +901,7 @@ class TxName(object):
             else:
                 eff = 1.
         else:
-            logger.error("Unknown txnameData type: %s" % self.dataType)
+            logger.error(f"Unknown txnameData type: {self.dataType}")
             raise SModelSError()
 
         return eff

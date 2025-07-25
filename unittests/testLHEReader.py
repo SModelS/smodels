@@ -40,11 +40,11 @@ def compareDecays(decaysA,decaysB,allowDiff=0.01,minBR=1e-5):
     for idec,decayA in enumerate(dA):
         decayB = dB[idec]
         if sorted(decayA.ids) != sorted(decayB.ids):
-            logger.error("Decay final states differ: %s and %s" %(str(decayA),str(decayB)))
+            logger.error(f"Decay final states differ: {str(decayA)} and {str(decayB)}")
             return False
         
         if 2*abs(decayA.br-decayB.br)/abs(decayA.br+decayB.br) > allowDiff:
-            logger.error("Decay BRs differ: %s and %s" %(str(decayA),str(decayB)))
+            logger.error(f"Decay BRs differ: {str(decayA)} and {str(decayB)}")
             return False
         
     return True

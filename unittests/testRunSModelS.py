@@ -34,7 +34,7 @@ class RunSModelSTest(unittest.TestCase):
         dirname = "./testFiles/slha/"
         runMain(dirname)
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
-        nin = len([i for i in glob.iglob("%s/*slha" % dirname) if not "~" in i])
+        nin = len([i for i in glob.iglob(f"{dirname}/*slha") if not "~" in i])
         if nout != nin:
             logger.error("Number of output files (%d) differ from number of input files (%d)" %
                          (nout, nin))
@@ -46,12 +46,12 @@ class RunSModelSTest(unittest.TestCase):
             t0 = time.time()
             runMain(filename, timeout=1, suppressStdout=True,
                     development=True, inifile="timeout.ini")
-            print("should never get here. time spent:%.1fs " % (time.time()-t0))
+            print(f"should never get here. time spent:{time.time() - t0:.1f}s ")
             self.assertTrue(False)
         except NoTime:
             self.assertTrue(True)
         except Exception as e:
-            print("wrong exception %s %s" % (type(e), e))
+            print(f"wrong exception {type(e)} {e}")
             self.assertTrue(False)
 
     def removeOutputs(self, f):
@@ -70,7 +70,7 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "gluino_squarks_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default import smodelsOutputDefault
@@ -87,8 +87,7 @@ class RunSModelSTest(unittest.TestCase):
             fname = outputfile
             if p > 0:
                 fname = fname[p:]
-            print("[testRunSModelS] %s != %s" %
-                  (fname, "gluino_squarks_default.py"))
+            print(f"[testRunSModelS] {fname} != gluino_squarks_default.py")
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 
@@ -111,8 +110,7 @@ class RunSModelSTest(unittest.TestCase):
             fname = outputfile
             if p > 0:
                 fname = fname[p:]
-            print("[testRunSModelS] %s != %s" %
-                  (fname, "gluino_squarks_default.py"))
+            print(f"[testRunSModelS] {fname} != gluino_squarks_default.py")
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
 
@@ -141,7 +139,7 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "simplyGluino_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from simplyGluino_default import smodelsOutputDefault
@@ -166,7 +164,7 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "longLived_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from longLived_default import smodelsOutputDefault
@@ -185,7 +183,7 @@ class RunSModelSTest(unittest.TestCase):
         if self.definingRun:
             logger.error("This is a definition run! Know what youre doing!")
             default = "lifetime_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             subprocess.getoutput(cmd)
         smodelsOutput = importModule(outputfile)
         from lifetime_default import smodelsOutputDefault

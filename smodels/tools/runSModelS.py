@@ -17,7 +17,7 @@ from smodels.tools import crashReport
 def main():
     import argparse
     """ Set default input and output files """
-    parameterFile = "%s/smodels/etc/parameters_default.ini" % installDirectory()
+    parameterFile = f"{installDirectory()}/smodels/etc/parameters_default.ini"
     outputDir = "./results/"
 
     """ Get the name of input SLHA file and parameter file """

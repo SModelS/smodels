@@ -88,7 +88,7 @@ for ds in datasets:
     TDTM1F_1 = TDTM1F.addMassPlane(2*[[(x,y), x]])
 
     TDTM1F_1.setSources(dataLabels= labels,
-                     dataFiles= ['./orig/TDTM1F_%s_combined.csv'%ds],
+                     dataFiles= [f'./orig/TDTM1F_{ds}_combined.csv'],
                      dataFormats= formats, coordinates = [{x : 1, y: 0, 'value' : 2}] )
     TDTM1F_1.addSource(dataLabel='obsExclusion',
                         dataFile='orig/Wino_ExclusionObs.csv',
@@ -98,7 +98,7 @@ for ds in datasets:
     #Add second plane for interpolation (assume 1.0 GeV is still safe)
     TDTM1F_2 = TDTM1F.addMassPlane(2*[[(x,y), x-1.5]])
     TDTM1F_2.setSources(dataLabels= labels,
-                     dataFiles= ['./orig/TDTM1F_%s_combined.csv'%ds],
+                     dataFiles= [f'./orig/TDTM1F_{ds}_combined.csv'],
                      dataFormats= formats, coordinates = [{x : 1, y: 0, 'value' : 2}] )
 
     #+++++++ next txName block ++++++++++++++
@@ -115,7 +115,7 @@ for ds in datasets:
     TDTM2F_1 = TDTM2F.addMassPlane([[(x,y), x],[x]])
 
     TDTM2F_1.setSources(dataLabels= labels,
-                     dataFiles= ['./orig/TDTM2F_%s_combined.csv'%ds],
+                     dataFiles= [f'./orig/TDTM2F_{ds}_combined.csv'],
                      dataFormats= formats, coordinates = [{x : 1, y: 0, 'value' : 2}] )
     TDTM2F_1.addSource(dataLabel='obsExclusion',
                         dataFile='orig/Wino_ExclusionObs.csv',
@@ -124,7 +124,7 @@ for ds in datasets:
     #Add second plane for interpolation (assume 1.0 GeV is still safe)
     TDTM2F_2 = TDTM2F.addMassPlane([[(x,y), x-1.5],[x-1.5]])
     TDTM2F_2.setSources(dataLabels= labels,
-                     dataFiles= ['./orig/TDTM2F_%s_combined.csv'%ds],
+                     dataFiles= [f'./orig/TDTM2F_{ds}_combined.csv'],
                      dataFormats= formats, coordinates = [{x : 1, y: 0, 'value' : 2}] )
 
 

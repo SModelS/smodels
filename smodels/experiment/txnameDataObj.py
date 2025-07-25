@@ -101,7 +101,7 @@ class TxNameData(object):
         """
 
         if len(point) != self.full_dimensionality and len(point) != self.dimensionality:
-            msgError = "Wrong point dimensions (%i)," % (len(point))
+            msgError = f"Wrong point dimensions ({len(point)}),"
             msgError += " it should be % i(reduced dimensions)" % self.dimensionality
             msgError += " or %i(full dimensionts)" % self.full_dimensionality
             logger.error(msgError)
@@ -306,8 +306,7 @@ class TxNameData(object):
         if negative_values:
             for x in self.y_values:
                 if x < -eps:
-                    logger.error("negative error in result: %f, %s" %
-                                 (x, self._id))
+                    logger.error(f"negative error in result: {x:f}, {self._id}")
                     sys.exit()
         if sum(self.y_values) > 0.:
             return False
@@ -345,7 +344,7 @@ class TxNameData(object):
             n = int(math.ceil(len(M)/2000.))
             Vt = svd(M[::n])[2]
         except LinAlgError as e:
-            raise SModelSError("exception caught when performing singular value decomposition: %s, %s" % (type(e), e))
+            raise SModelSError(f"exception caught when performing singular value decomposition: {type(e)}, {e}")
 
         V = Vt.T
         self._V = V  # self.round ( V )

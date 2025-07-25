@@ -58,7 +58,7 @@ class MPrinter(object):
                 if parser.has_option("options", "combineAnas") and parser.get("options", "combineAnas"):
                     newPrinter.combineanas = 1
             else:
-                logger.warning("Unknown printer format: %s" % str(prt))
+                logger.warning(f"Unknown printer format: {str(prt)}")
                 continue
 
             # Copy stdout options to log options:

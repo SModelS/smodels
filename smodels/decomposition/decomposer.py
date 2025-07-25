@@ -97,7 +97,7 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     smsTopDict.setSMSIds()
 
 
-    logger.debug("decomposer done in %.2f s." % (time.time() - t1))
+    logger.debug(f"decomposer done in {time.time() - t1:.2f} s.")
 
     return smsTopDict
 

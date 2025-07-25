@@ -35,20 +35,20 @@ def compareXSections(dictA,dictB,nevts,relError = 0.1):
     for xsec in commonXsecs:
         diff = abs(list(dictA[xsec].values())[0] - list(dictB[xsec].values())[0])
         if diff > 2.*mcError and (diff/(abs(list(dictA[xsec].values())[0] + list(dictB[xsec].values())[0]))).asNumber() > relError:
-            print ( 'Cross-section for %s differ by (%s +- %s) fb' %(str(xsec),str(diff.asNumber(fb)),str(mcError.asNumber(fb))) )
-            print ( '   %s   %s' %(list(dictA[xsec].values())[0],list(dictB[xsec].values())[0]) )
+            print ( f'Cross-section for {str(xsec)} differ by ({str(diff.asNumber(fb))} +- {str(mcError.asNumber(fb))}) fb' )
+            print ( f'   {list(dictA[xsec].values())[0]}   {list(dictB[xsec].values())[0]}' )
             equalXsecs = False
 
     for xsec in missingXsecs:
         if xsec in dictA:
             if list(dictA[xsec].values())[0] > 2.*mcError:
-                print ( 'Cross-section for %s missing' %str(xsec) )
-                print ( '    %s' %(list(dictA[xsec].values())[0]) )
+                print ( f'Cross-section for {str(xsec)} missing' )
+                print ( f'    {list(dictA[xsec].values())[0]}' )
                 equalXsecs = False
         else:
             if list(dictB[xsec].values())[0] > 2.*mcError:
-                print ( 'Cross-section for %s missing' %str(xsec) )
-                print ( '    %s' %(list(dictB[xsec].values())[0]) )
+                print ( f'Cross-section for {str(xsec)} missing' )
+                print ( f'    {list(dictB[xsec].values())[0]}' )
                 equalXsecs =  False
                 
     return equalXsecs

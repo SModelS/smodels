@@ -238,7 +238,7 @@ def smsInStr(instring):
 
     if 'PV' in outstr and '>' in outstr:
         if '{' not in outstr or '}' not in outstr:
-            raise SModelSError("Elements in %s should be enclosed by curly brackets" % outstr)
+            raise SModelSError(f"Elements in {outstr} should be enclosed by curly brackets")
         elements = re.findall(r"\{(.*?)\}", outstr)
         return elements
 
@@ -277,7 +277,7 @@ def smsInStr(instring):
         for ptc in ptcList:
             # Search for ptc only starting after the last replacement
             iptc += newEl[iptc:].find(ptc)
-            newEl = newEl[:iptc] + newEl[iptc:].replace(ptc, "'%s'" % ptc, 1)
+            newEl = newEl[:iptc] + newEl[iptc:].replace(ptc, f"'{ptc}'", 1)
             iptc += len(ptc) + 1  # Update the position
         newElements.append(newEl)
 
@@ -377,7 +377,7 @@ def bracketToProcessStr(stringSMS,
         bsmNodesDict[(ibr,0)] = nodeIndex
         nodeIndex += 1
         daughtersStr.append('%s(%i)' %(bsmBranch[0],bsmNodesDict[(ibr,0)]))
-    decStr = '(%s > %s)' %(momStr,','.join(daughtersStr))
+    decStr = f"({momStr} > {','.join(daughtersStr)})"
     decayStrings.append(decStr)
 
     # Create decay string for all branches:
@@ -405,7 +405,7 @@ def bracketToProcessStr(stringSMS,
             daughtersStr += ['%s(%i)' %(sm,smNodesDict[(ibr,idec,ism)]) 
                              for ism,sm in enumerate(branches[ibr][idec])]
             # Create decay string:
-            decStr = '(%s > %s)' %(momStr, ','.join(daughtersStr))
+            decStr = f"({momStr} > {','.join(daughtersStr)})"
             decayStrings.append(decStr)
 
     processStr = ', '.join(decayStrings)

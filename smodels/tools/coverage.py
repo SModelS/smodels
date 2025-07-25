@@ -94,9 +94,9 @@ class Uncovered(object):
 
         # Sanity checks:
         if not isinstance(groupFilters, dict):
-            raise SModelSError("groupFilters input should be a Dictionary and not %s" % type(groupFilters))
+            raise SModelSError(f"groupFilters input should be a Dictionary and not {type(groupFilters)}")
         if not isinstance(groupFactors, dict):
-            raise SModelSError("groupFactors input should be a Dictionary and not %s" % type(groupFactors))
+            raise SModelSError(f"groupFactors input should be a Dictionary and not {type(groupFactors)}")
         if sorted(groupFilters.keys()) != sorted(groupFactors.keys()):
             raise SModelSError("Keys in groupFilters and groupFactors do not match")
         if any(not hasattr(gFilter, '__call__') for gFilter in groupFilters.values()):
@@ -426,7 +426,7 @@ class FinalStateSMS(TheorySMS):
         for d in self.daughterIndices(self.rootIndex):
             if self.out_degree(d) == 0:
                 daughter = self.indexToNode(d)
-                finalStates = '(%s)' %str(daughter)
+                finalStates = f'({str(daughter)})'
             else:
                 finalStates = str(tuple(self.daughters(d)[::-1]))
             fsStrs.append(finalStates.replace(' ',''))

@@ -57,21 +57,21 @@ class SLHAPrinter(TxTPrinter):
         if not smodelsversion.startswith("v"):
             smodelsversion = "v" + smodelsversion
 
-        keysDict = {0: "%-25s #SModelS version\n" % (smodelsversion),
-                    1: "%-25s #database version\n" % (obj.databaseVersion.replace(" ", "")),
-                    2: "%-25s #maximum condition violation\n" % (obj.parameters['maxcond']),
-                    3: "%-25s #compression (0 off, 1 on)\n" % (self.docompress),
-                    4: "%-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap']),
-                    5: "%-25s #sigmacut [fb]\n" % (obj.parameters['sigmacut']),
-                    6: "%-25s #signal region combination (0 off, 1 on)\n" % (self.combinesr),
-                    7: "%-25s #analyses combination (0 off, 1 on)\n" % (self.combineanas)}
+        keysDict = {0: f"{smodelsversion:25} #SModelS version\n",
+                    1: f"{obj.databaseVersion.replace(' ', ''):25} #database version\n",
+                    2: f"{obj.parameters['maxcond']:25} #maximum condition violation\n",
+                    3: f"{self.docompress:25} #compression (0 off, 1 on)\n",
+                    4: f"{obj.parameters['minmassgap']:25} #minimum mass gap for mass compression [GeV]\n",
+                    5: f"{obj.parameters['sigmacut']:25} #sigmacut [fb]\n",
+                    6: f"{self.combinesr:25} #signal region combination (0 off, 1 on)\n",
+                    7: f"{self.combineanas:25} #analyses combination (0 off, 1 on)\n"}
 
         if 'promptwidth' in obj.parameters:
-            keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters['promptwidth'])
+            keysDict[8] = f"{obj.parameters['promptwidth']:25} #prompt width [GeV] \n"
         if 'stablewidth' in obj.parameters:
-            keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters['stablewidth'])
+            keysDict[9] = f"{obj.parameters['stablewidth']:25} #stable width [GeV] \n"
         if 'minmassgapISR' in obj.parameters:
-            keysDict[10] = "%-25s #minimum mass gap for ISR mass compression [GeV]\n" % (obj.parameters['minmassgapISR'])
+            keysDict[10] = f"{obj.parameters['minmassgapISR']:25} #minimum mass gap for ISR mass compression [GeV]\n"
 
         output = "BLOCK SModelS_Settings\n"
         for key in sorted(list(keysDict.keys())):
@@ -148,7 +148,7 @@ class SLHAPrinter(TxTPrinter):
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
-                        lv = "%-30.2E" % lv
+                        lv = f"{lv:-30.2E}"
                     else:
                         lv = str(lv)
                     lvals[i] = lv
@@ -214,7 +214,7 @@ class SLHAPrinter(TxTPrinter):
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.float64)):
-                    lv = "%-30.2E" % lv
+                    lv = f"{lv:-30.2E}"
                 else:
                     lv = str(lv)
                 lvals[i] = lv

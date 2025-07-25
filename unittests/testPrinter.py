@@ -106,7 +106,7 @@ class RunPrinterTest(unittest.TestCase):
             logger.error("This is a definition run! Know what youre doing!")
             default = "simplyGluino_default.py"
             outputfile = './unitTestOutput/printer_output_simple.py'
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % (outputfile, default)
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             subprocess.getoutput(cmd)
         from simplyGluino_default_extended import smodelsOutputDefault
 

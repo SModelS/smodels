@@ -42,7 +42,7 @@ def create():
     if os.path.exists ( "xml.doc" ):
         with open ( "xml.doc" ) as f:
             xmldoc_dir = f.read().strip()
-    f=open("%s/ParticleData.xml" % xmldoc_dir )
+    f=open(f"{xmldoc_dir}/ParticleData.xml" )
     g=open("pythia8particles.py","w")
     g.write ( "# created via smodels/lib/parseXml.py,")
     g.write ( " parsing pythia8's ParticleData.xml.\n" )

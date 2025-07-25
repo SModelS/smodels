@@ -76,7 +76,7 @@ class TheorySMS(GenericSMS):
         """
 
         if not isinstance(other,TheorySMS):
-            raise SModelSError("Can not compare TheorySMS and %s" %str(type(other)))
+            raise SModelSError(f"Can not compare TheorySMS and {str(type(other))}")
         elif self.canonName != other.canonName:
             raise SModelSError("Can not add elements with distinct topologies")
 
@@ -124,7 +124,7 @@ class TheorySMS(GenericSMS):
         """
 
         if not isinstance(other,TheorySMS):
-            raise SModelSError("Can not compare TheorySMS and %s" %str(type(other)))
+            raise SModelSError(f"Can not compare TheorySMS and {str(type(other))}")
 
         # Make sure the SMS are sorted
         # (if it has already been sorted, it does nothing)

@@ -155,6 +155,6 @@ def setLogLevel ( level ):
                "error": logging.ERROR, "critical": logging.CRITICAL,
                "fatal": logging.FATAL }
     if not level in levels:
-        logger.error ( "Unknown log level ``%s'' supplied!" % level )
+        logger.error ( f"Unknown log level ``{level}'' supplied!" )
         return
     logger.setLevel ( level = levels[level] )

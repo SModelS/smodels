@@ -50,7 +50,7 @@ class Meta(object):
             hfl="1"
         if self.hasFastLim==False:
             hfl="0"
-        return "db%s.pcl" % ( self.python[0] )
+        return f"db{self.python[0]}.pcl"
         # return "db%s%s.pcl" % ( self.python[0], hfl )
 
     def versionFromFile ( self ):
@@ -76,12 +76,12 @@ class Meta(object):
             # return 'unknown version'
 
     def __str__ ( self ):
-        ret  = "Meta: path =%s\n" % self.pathname
-        ret += "      mtime=%s" % time.ctime ( self.mtime )
+        ret  = f"Meta: path ={self.pathname}\n"
+        ret += f"      mtime={time.ctime(self.mtime)}"
         ret += ", filecount=%d" % self.filecount
-        ret += ", fl=%s" % self.hasFastLim
+        ret += f", fl={self.hasFastLim}"
         ret += ", format_version=%d" % self.format_version
-        ret += ", dbVersion=%s" % self.databaseVersion
+        ret += f", dbVersion={self.databaseVersion}"
         return ret
 
     def isPickle ( self ):
