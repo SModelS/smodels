@@ -17,7 +17,6 @@ from convertNotebook2Test import getNotebookData
 import unittest
 import os,glob
 import sys
-import subprocess
 sys.path.append('../')
 from smodels.base.smodelsLogging import logger
 from smodels.base.smodelsLogging import setLogLevel
@@ -47,7 +46,14 @@ def loadDefaultOutput(notebookFile):
     outputFile = notebookFile.replace('.ipynb', '_output.pcl')
     outputFile = os.path.join(nbdir,outputFile)
     if not os.path.isfile(outputFile):
-        print('File %s not found. (Try running convertNotebook2Test)' % outputFile)
+        print( f'[testNotebooks] File {outputFile} not found. Try running:' )
+        cmd = f'./convertNotebook2Test.py -f notebookTests/{notebookFile}'
+        print ( '[testNotebooks]',cmd )
+        """
+        o = subprocess.getoutput ( cmd )
+        if not os.path.isfile(outputFile):
+            print ( f"[testNotebooks] cmd {cmd} failed: {o}" )
+        """
         return None
 
     with open(outputFile, 'rb') as f:
@@ -61,23 +67,23 @@ class TestNotebook(unittest.TestCase):
     def test_notebook(self, notebookFile):
 
         defaultOutputDict = loadDefaultOutput(notebookFile)
-        errorMsg = "Error fetching default output for %s" %notebookFile
+        errorMsg = f"Error fetching default output for {notebookFile}"
         self.assertTrue(defaultOutputDict is not None,msg=errorMsg)
 
         # Run notebook:
         filename = os.path.join(nbdir,notebookFile)
-        p = subprocess.Popen(["jupyter nbconvert --output-dir='./' --execute --to notebook %s" % filename],
+        p = subprocess.Popen([ f"jupyter nbconvert --output-dir='./' --execute --to notebook {filename}" ],
                           shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         _, error = p.communicate()
         if p.returncode != 0:
-            logger.error("Notebook error: %s" %error)
-        errorMsg = "Error running notebook %s" %notebookFile
+            logger.error( f"Notebook error: {error[:100].decode('utf-8')} ..." )
+        errorMsg = f"Error running notebook {notebookFile}"
         self.assertEqual(p.returncode,0, msg=errorMsg)
 
         # Get notebook output
         outputFile = os.path.basename(notebookFile)
         outputDict = getNotebookData(outputFile, savePickle=False)
-        errorMsg = "Error executing %s (empty dict)" %notebookFile
+        errorMsg = f"Error executing {notebookFile} (empty dict)"
         self.assertTrue(outputDict is not None, msg=errorMsg)
 
         if os.path.isfile(outputFile):
@@ -85,10 +91,10 @@ class TestNotebook(unittest.TestCase):
 
         default_cells = list(defaultOutputDict.keys())
         new_cells = [icell for icell in outputDict.keys() if icell not in default_cells]
-        errorMsg = 'New notebook has %i extra cells (cells = %s)' %(len(new_cells),new_cells)
+        errorMsg = f'New notebook has {len(new_cells)} extra cells (cells = {new_cells})'
         self.assertTrue(len(new_cells) == 0, msg = errorMsg)  # Make sure the notebook has no more cells than the default
         old_cells = [icell for icell in default_cells if icell not in outputDict.keys()]
-        errorMsg = 'Old notebook has %i extra cells (cells = %s)' %(len(old_cells),old_cells)
+        errorMsg = f'Old notebook has {len(old_cells)} extra cells (cells = {old_cells})'
         self.assertTrue(len(old_cells) == 0, msg = errorMsg)  # Make sure the notebook has no more cells than the default
 
 
@@ -98,26 +104,25 @@ class TestNotebook(unittest.TestCase):
         for icell in cells:
             if isinstance(defaultOutputDict[icell], list):
                 for iout, out in enumerate(defaultOutputDict[icell]):
-                    errorMsg = 'Error in cell %i and entry %i' %(icell,iout)
+                    errorMsg = f'Error in cell {icell} and entry {iout}'
                     try:
                         self.assertEqual(out,outputDict[icell][iout], 
                                      msg=errorMsg)
                     except AssertionError as e:
                         passed = False
-                        errorMsg += "\n  Error: %s\n" %(e)
+                        errorMsg += f"\n  Error: {e}\n"
                         print(errorMsg)
             else:
-                errorMsg = 'Error in cell %i' %icell
+                errorMsg = f'Error in cell {icell}'
                 try:
                     self.assertEqual(defaultOutputDict[icell],outputDict[icell], 
                                  msg=errorMsg)
                 except AssertionError as e:
                     passed = False
-                    errorMsg += "\n  Error: %s\n" %(e)
+                    errorMsg += f"\n  Error: {e}\n"
                     print(errorMsg)
 
-        self.assertTrue(passed,msg="The notebook output does not match the one found in %s" 
-                        %(notebookFile.replace('.ipynb', '_output.pcl')))
+        self.assertTrue(passed,msg=f"The notebook output does not match the one found in {notebookFile.replace('.ipynb', '_output.pcl')}")
 
 
 
