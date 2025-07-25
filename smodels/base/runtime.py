@@ -10,7 +10,8 @@
 
 """
 
-from typing import Union
+from typing import Union, Text, Dict
+import os
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
@@ -20,11 +21,11 @@ _experimental = { "truncatedgaussians": False,
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
-def printEnvironmentInfo( args ):
+def printEnvironmentInfo( args : Dict ):
     """ very simple method that prints out info relevant to debugging
         machine-dependent problems """
     from smodels.base.smodelsLogging import colors
-    colors.on = True if args.colors == True else False
+    colors.on = True if "colors" in args and args["colors"] == True else False
     import importlib, platform
 
     modules = [ "scipy", "sympy", "numpy",
@@ -45,7 +46,7 @@ def printEnvironmentInfo( args ):
         except ImportError:
             print(f"{module_name:<12}: Not installed")
 
-def filetype ( filename ):
+def filetype ( filename : os.PathLike ) -> Union[Text,None]:
     """ obtain information about the filetype of an input file,
         currently only used to discriminate between slha and lhe
         files.

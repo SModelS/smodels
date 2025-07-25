@@ -157,7 +157,7 @@ def main():
 
     if args.subparser_name == "environ-info":
         from smodels.base.runtime import printEnvironmentInfo
-        printEnvironmentInfo( args )
+        printEnvironmentInfo( vars(args) )
 
     if args.subparser_name == 'installation':
         import sys, os
