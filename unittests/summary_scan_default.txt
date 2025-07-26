@@ -15,6 +15,7 @@ complicated.slha     ATLAS-SUSY-2013-02        0.388     nan     ATLAS-CONF-2013
 gluinoToTops.slha    CMS-PAS-SUS-15-002        5.52      nan     ATLAS-CONF-2013-037   0.479     0.443         CMS-SUS-13-012      0.844    0.703       1.27         0.884
 gluino_squarks.slha  ATLAS-SUSY-2013-02        0.388     nan     ATLAS-CONF-2013-037   0.00183   0.00209       CMS-SUS-13-012      0.13     0.208       0.12         0.21
 higgsinoStop.slha    ATLAS-SUSY-2013-05        196       nan     ATLAS-CONF-2013-037   37.8      43.2          N/A                 nan      nan         37.8         43.2
+higgsino_spectrum_520_125_dm_4.slha            N/A       nan     N/A                   nan       nan           N/A                 nan      nan         nan          nan
 hscpTest_long.slha   CMS-EXO-13-006            0.5       0.5     N/A                   nan       nan           CMS-EXO-13-006      0.5      0.5         nan          nan
 hscpTest_mid.slha    CMS-EXO-13-006            0.0884    0.0884  N/A                   nan       nan           CMS-EXO-13-006      0.0884   0.0884      nan          nan
 hscpTest_short.slha  CMS-EXO-13-006            0.0406    0.0406  N/A                   nan       nan           CMS-EXO-13-006      0.0406   0.0406      nan          nan
