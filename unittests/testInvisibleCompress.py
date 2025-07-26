@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testMassCompress
-   :synopsis: Tests mass compression.
+.. module:: testInvCompress
+   :synopsis: Tests invisible compression.
 
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -25,7 +25,7 @@ from smodels.base.physicsUnits import fb, GeV,MeV
 setLogLevel('error')
 
 
-class MassCompressTest(unittest.TestCase):
+class InvCompressTest(unittest.TestCase):
     definingRun = False ## meant only to adapt to changes in output format
     ## use with super great care!!
 
