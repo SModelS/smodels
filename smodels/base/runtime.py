@@ -21,9 +21,25 @@ _experimental = { "truncatedgaussians": False,
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
+def checkForIncompatibleModuleVersions():
+    """ for 3.1.0, at release time, we have the problem that scipy 1.16
+    does not work with pyhf 0.7.6. we warn about such situations.
+    """
+    from importlib.metadata import version
+    if version("scipy")[:4] in [ "1.16", "1.17" ]:
+        print ( f"SModelS warning: scipy v{version('scipy')} is installed, but it seems " \
+                 "this version does not work with pyhf 0.7.6. We recommend scipy 1.15.x " \
+                 "and pyhf 0.7.6. You have been warned." )
+        
+checkForIncompatibleModuleVersions()
+
 def printEnvironmentInfo( args : Dict ):
     """ very simple method that prints out info relevant to debugging
-        machine-dependent problems """
+        machine-dependent problems
+    :param args: a dictionary with options, currently only a "colors" option
+    is available
+    :returns: true if all depenendencies are met
+    """
     from smodels.base.smodelsLogging import colors
     colors.on = True if "colors" in args and args["colors"] == True else False
     import importlib, platform
@@ -38,6 +54,7 @@ def printEnvironmentInfo( args : Dict ):
     print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
     print("\nModule Versions:")
 
+    depsMet = True
     for module_name in modules:
         try:
             module = importlib.import_module(module_name)
@@ -45,6 +62,8 @@ def printEnvironmentInfo( args : Dict ):
             print(f"{module_name:<12}: {colors.green}{version}{colors.reset}")
         except ImportError:
             print(f"{module_name:<12}: Not installed")
+            depsMet = False
+    return depsMet
 
 def filetype ( filename : os.PathLike ) -> Union[Text,None]:
     """ obtain information about the filetype of an input file,
