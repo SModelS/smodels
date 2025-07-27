@@ -31,7 +31,7 @@ class MassCompressTest(unittest.TestCase):
 
     def testMassCompA(self):
         
-        slhafile = './testFiles/slha/higgsino_spectrum_520_125_dm_4.slha'
+        slhafile = './testFiles/slha/higgsino_dm_4.slha'
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile, promptWidth=1e-10*GeV,
                               ignorePromptQNumbers=['spin','eCharge','colordim'])
@@ -74,7 +74,7 @@ class MassCompressTest(unittest.TestCase):
 
     def testMassCompB(self):
         
-        slhafile = './testFiles/slha/higgsino_spectrum_520_125_dm_4.slha'
+        slhafile = './testFiles/slha/higgsino_dm_4.slha'
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile, promptWidth=1e-10*GeV,
                               ignorePromptQNumbers=['spin','eCharge','colordim'])
@@ -108,7 +108,7 @@ class MassCompressTest(unittest.TestCase):
 
     def testMassCompC(self):
         
-        slhafile = './testFiles/slha/higgsino_spectrum_520_125_dm_4.slha'
+        slhafile = './testFiles/slha/higgsino_dm_4.slha'
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile, promptWidth=1e-10*GeV,
                               ignorePromptQNumbers=['spin','eCharge','colordim'])
