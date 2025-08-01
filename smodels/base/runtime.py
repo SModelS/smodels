@@ -33,6 +33,30 @@ def checkForIncompatibleModuleVersions():
         
 checkForIncompatibleModuleVersions()
 
+def returnGitCommitId():
+    """ if we are in a git-managed repository, return the git commit id """
+    try:
+        import subprocess
+        # Check if we're inside a Git repository
+        subprocess.run(
+            ['git', 'rev-parse', '--is-inside-work-tree'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
+
+        # Get the current commit hash
+        commit = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'],
+            stderr=subprocess.DEVNULL
+        ).decode('utf-8').strip()
+
+        return commit
+
+    except subprocess.CalledProcessError:
+        # Not a Git repo, or git command failed—do nothing
+        return None
+
 def printEnvironmentInfo( args : Dict ):
     """ very simple method that prints out info relevant to debugging
         machine-dependent problems
@@ -63,6 +87,9 @@ def printEnvironmentInfo( args : Dict ):
         except ImportError:
             print(f"{module_name:<12}: Not installed")
             depsMet = False
+    gitId = returnGitCommitId()
+    if gitId != None:
+        print ( f"\ngit commit: {gitId}" )
     return depsMet
 
 def filetype ( filename : os.PathLike ) -> Union[Text,None]:
