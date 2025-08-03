@@ -306,13 +306,25 @@ class TheoryPrediction(object):
         return llhDict["muhat"]
 
     @whenDefined
+    def nll(self, mu=1.0, evaluationType : NllEvalType = observed,
+            asimov : Union[None,float] = None, **kwargs ) -> float:
+        """
+        get the negative log likelihood for a signal strength modifier mu.
+        this is a method to prepare for a transition to dealing with nlls only
+
+        :param evaluationType: one of: observed, apriori, aposteriori
+        """
+        return self.likelihood ( mu=mu, evaluationType=evaluationType, asimov=asimov,
+                                 return_nll=True )
+
+    @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(self, mu=1.0, evaluationType : NllEvalType = observed, return_nll=False,
-            asimov : Union[None,float] = None, **kwargs ):
+            asimov : Union[None,float] = None, **kwargs ) -> float:
         """
         get the likelihood for a signal strength modifier mu
-        :param expected: compute evaluationType, not observed likelihood. if "posteriori",
-                         compute evaluationType posteriori.
+
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"

@@ -219,6 +219,11 @@ class StatisticsTest(unittest.TestCase):
         pred_signal_strength = prediction.xsection
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
+        nll = prediction.nll()
+        self.assertAlmostEqual(-ill,nll,6)
+        illE = -math.log(prediction.likelihood( evaluationType=aposteriori ))
+        nllE = prediction.nll(evaluationType = aposteriori )
+        self.assertAlmostEqual(illE,nllE,6)
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)

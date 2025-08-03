@@ -41,6 +41,22 @@ class AnaCombLikelihoodComputer(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
 
+    def nll(
+        self,
+        mu: float = 1.0,
+        evaluationType : NllEvalType = observed,
+        asimov: Union[None,float] = None,
+    ) -> float:
+        """
+        Compute the negative log likelihood at a given mu. For now this is
+        just a proxy method to ease transition of codes that depend on SModelS.
+
+        :param mu: signal strength
+        :param expected: one of: observed, apriori, aposteriori
+        :param asimov: if not None, compute llhd for asimov data with mu=asimov
+        """
+        return self.likelihood ( mu, evaluationType, return_nll=True, asimov=asimov )
+
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(
         self,
@@ -244,7 +260,7 @@ class AnaCombLikelihoodComputer(object):
             xsec += tp.xsection
         return ul * xsec
 
-    def getCLsRootFunc(self, evaluationType : NllEvalType=observed, 
+    def getCLsRootFunc(self, evaluationType : NllEvalType=observed,
 			    allowNegativeSignals : bool = False ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,

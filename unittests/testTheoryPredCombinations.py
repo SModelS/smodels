@@ -215,11 +215,16 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         lmax = combiner.lmax()
         lsm = combiner.lsm()
         lbsm = combiner.likelihood(mu=1.0)
+        lbsmE = combiner.likelihood(mu=1.0, evaluationType=apriori)
 
+        nllbsm = combiner.nll( mu=1.0)
+        nllbsmE = combiner.nll( mu=1.0, evaluationType=apriori)
 
         self.assertAlmostEqual(lsm, 0.1009, 2)
         self.assertAlmostEqual(lbsm,0.15356, 2)
         self.assertAlmostEqual(lmax, 0.21210, 2)
+        self.assertAlmostEqual( - np.log(lbsm), nllbsm, 6 )
+        self.assertAlmostEqual( - np.log(lbsmE), nllbsmE, 6 )
         self.assertAlmostEqual(combiner.getRValue(), 0.1209701850476386, 4)
 
         # Also check if likelihood dict is defined:
