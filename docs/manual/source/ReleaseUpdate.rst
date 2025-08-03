@@ -37,16 +37,14 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Small fixes in analyses combinations, better handling exceptions in likelihood computations,
-    we thank Leo Constantin for help with a bug fix concerning failed likelihood computation
-  * Fixed an inconsistency with the upper limits from analysis combinations. analysis-combined ULs may
-    be different by up to ~ 10%
-  * Slightly different way of finding upper limits, UL computations may vary slightly numerically
   * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
+  * Improved the syntax of pyhf fields in globalInfo.txt:jsonFiles
+  * Small fixes in analyses combinations, better handling exceptions in likelihood computations (we thank Leo Constantin for help with a bug fix concerning failed likelihood computations)
+  * Fixed an inconsistency with the upper limits from analysis combinations. analysis-combined ULs may be different by up to ~ 10%
+  * Improved way of finding upper limits, UL computations may vary slightly numerically
   * renamed 'expected' flag to an 'evaluationType' enum throughout the code
   * Bumped up pythia8 from 8308 to 8315
   * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
-  * Improved the syntax of pyhf fields in globalInfo.txt:jsonFiles
   * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM).
   * Small fixes in |database|: ATLAS-SUSY-2018-14 (UL), ATLAS-SUSY-2018-31 (EM), CMS-SUS-20-004 (UL)
     -- results for these analyses may vary with respect to the previous version!
