@@ -842,7 +842,7 @@ class TxName(object):
                      else m for m in massFlat]
             reweightF = 1.0
 
-        if evaluationType != apriori:
+        if evaluationType == observed:
             ul = self.txnameData.getValueFor(point)
         else:
             if not self.txnameDataExp:
