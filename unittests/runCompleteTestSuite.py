@@ -80,7 +80,7 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
                 if filter and (not filter in str(t)):
                     continue
                 n_tests += 1
-                print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
+                print ( f"[#{int(n_tests):3}] {t.id()} ... ", end="" )
                 sys.stdout.flush()
                 try:
                     a=t.debug()

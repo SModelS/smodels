@@ -43,7 +43,7 @@ class CppTest(unittest.TestCase):
         templines = templf.readlines()
         templf.close()
         if "database" in dbpath and not "https" in dbpath:
-                dbpath = "../unittests/"+dbpath
+                dbpath = f"../unittests/{dbpath}"
         parmf = open ( "../cpp/parameters.ini", "wt" )
         for line in templines:
             parmf.write ( line.replace ( "@@DBPATH@@", dbpath ) )
@@ -54,7 +54,7 @@ class CppTest(unittest.TestCase):
         print ( "test failed. writing output to testCpp.dbg" )
         f=open("testCpp.dbg","w")
         for i in txt:
-            f.write ( i+ "\n" )
+            f.write ( f"{i}\n" )
         f.close()
 
     def runExample(self):
@@ -106,7 +106,7 @@ class CppTest(unittest.TestCase):
                     self.assertAlmostEqual( dlt, 0., 1 )
                 else:
                     if xv != yv:
-                        print ( "Error in line #%d:\n%s (your version) vs\n%s (official version)" % (linenr+1, x, y ) )
+                        print ( f"Error in line #{int(linenr + 1)}:\n{x} (your version) vs\n{y} (official version)" )
                         self.writeDebug( a )
                     self.assertEqual(xv, yv)
         ## reset parameter.ini file

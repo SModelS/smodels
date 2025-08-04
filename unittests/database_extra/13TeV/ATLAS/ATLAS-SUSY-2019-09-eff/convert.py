@@ -143,7 +143,7 @@ for topo in tables : #To go through the results
                                             ],
                                 units = [ None ]*2,
                                 dataFormats = [ 'csv' ]*2 )
-            TChiWZ_1.addSource("efficiencyMap", "orig/" + SR + "_efficiency.csv",
+            TChiWZ_1.addSource("efficiencyMap", f"orig/{SR}_efficiency.csv",
                               unit = "", dataFormat = "csv")
 
 
@@ -178,7 +178,7 @@ for topo in tables : #To go through the results
                                               "orig/Fig16bWZExclusion:Wino-bino(+)(Deltam),offshell_Exp.csv"],
                                 units = [ None ]*2,
                                 dataFormats = [ 'csv' ]*2 )
-            TChiWZoff_plus.addSource("efficiencyMap", "orig/" + SR + "_cuts_winobino(+)_efficiency.csv",
+            TChiWZoff_plus.addSource("efficiencyMap", f"orig/{SR}_cuts_winobino(+)_efficiency.csv",
                               unit = "", dataFormat = "csv")
 
             TChiWZoff_plus.efficiencyMap._unit = "71."
@@ -202,7 +202,7 @@ for topo in tables : #To go through the results
                                               ],
                                 units = [ None ]*2,
                                 dataFormats = [ 'csv' ]*2 )
-            TChiWZoff_hino.addSource("efficiencyMap", "orig/" + SR + "_cuts_higgsino_efficiency.csv",
+            TChiWZoff_hino.addSource("efficiencyMap", f"orig/{SR}_cuts_higgsino_efficiency.csv",
                               unit = "", dataFormat = "csv")
 
             TChiWZoff_hino.efficiencyMap._unit = "71."

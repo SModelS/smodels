@@ -24,7 +24,7 @@ class TestReportAll(unittest.TestCase):
         f = os.path.splitext(f)[0]
         extList = ['py','pyc','smodels','smodelsslha','xml']
         for ext in extList:
-            fname= f+'.'+ext
+            fname= f"{f}.{ext}"
             if os.path.exists(fname):
                 os.remove(fname)
 

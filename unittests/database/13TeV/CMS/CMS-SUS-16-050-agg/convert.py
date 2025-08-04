@@ -100,9 +100,9 @@ for ctr,dataset in enumerate(creator):
     T2tt.source ='CMS'
     #+++++++ next mass plane block ++++++++++++++
     T2tt_1 = T2tt.addMassPlane([[x,y]]*2)
-    objNames = 'acc_bin%d' % ctr
+    objNames = f'acc_bin{int(ctr)}'
     if aggregation != None:
-        objNames = [ 'acc_bin%d' % (i-1) for i in aggregation[ctr] ]
+        objNames = [ f'acc_bin{int(i - 1)}' for i in aggregation[ctr] ]
     #----exclusion source----
     T2tt_1.addSource( 'efficiencyMap', 'orig/acc_maps_T2tt.root', 'root',
                       objectName = objNames )

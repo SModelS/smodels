@@ -469,7 +469,7 @@ class Summary():
         fn = self._filename.replace("//", "/")
         final = fn.replace(os.getcwd(), ".")
         if len(final) > 50:
-            final = "..."+final[-47:]
+            final = f"...{final[-47:]}"
         return f"Summary({final})"
 
     def __eq__(self, other):
@@ -608,7 +608,7 @@ class Summary():
                 lkeys = lkeys.split(',')
                 lvals = [eval(val) for val in lvals.split(',')]
                 for i, label in enumerate(lkeys):
-                    setattr(self, 'comb'+label.strip(), lvals[i])
+                    setattr(self, f"comb{label.strip()}", lvals[i])
             elif 'combined r-value (expected)' in line:
                 rexp = eval(line.split(':')[1])
                 self.rexpComb = rexp

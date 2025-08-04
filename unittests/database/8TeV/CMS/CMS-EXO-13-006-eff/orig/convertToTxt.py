@@ -9,7 +9,7 @@ import sys
 import os
 
 
-maps = ['./HSCPc%i00/maps.py'%i for i in range(4)]
+maps = [f'./HSCPc{int(i)}00/maps.py' for i in range(4)]
 
 #Dictionary to convert from original database to the arxiv model labeling convention
 modelsDict = {'M1' : 'T0', 'M2' : 'T0M', 'M3' : 'T2','M4' : 'T2M', 'M5' : 'T6', 'M6' : 'T5M', 'M7' : 'T5', 'M8' : 'T1'}
@@ -45,7 +45,7 @@ for ifile,mfile in enumerate(maps):
             zpts = [pt[0][2] for pt in data if pt[1] > 0.]
         effpts = [pt[1] for pt in data if pt[1] > 0.]
             
-        newMap = open('eff_%s_c%i00.txt'%(newtx,ifile),'w')
+        newMap = open(f'eff_{newtx}_c{int(ifile)}00.txt','w')
         newMap.write(f'## {newtx} efficiencies\n')
         header = "## x"
         if ypts: header += '\ty'
@@ -57,7 +57,7 @@ for ifile,mfile in enumerate(maps):
             if ypts: line += f'\t{str(ypts[i])}'
             if zpts: line += f'\t{str(zpts[i])}'
             line += f"\t{str(effpts[i])}"
-            newMap.write(line+'\n')
+            newMap.write(f"{line}\n")
         newMap.close()
                  
     

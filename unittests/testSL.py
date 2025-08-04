@@ -87,7 +87,7 @@ class SLTest(unittest.TestCase):
         for i in range(n):
             C.append(C_[ncov * i : ncov * i + n])
         m = Data( observed=D, backgrounds=B, covariance=C, third_moment=S,
-            nsignal=sig, name="model%d" % n, deltas_rel=0.0,)
+            nsignal=sig, name=f"model{int(n)}", deltas_rel=0.0,)
         return m
 
     def testModel3(self):
