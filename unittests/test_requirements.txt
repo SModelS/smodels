@@ -1,0 +1,12 @@
+pandas
+torch
+ipynb
+plotly
+nbmake
+jupyter
+pytest
+parameterized
+matplotlib
+redirector
+line_profiler
+spey
