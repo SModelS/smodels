@@ -76,7 +76,7 @@
         <combineanas>ATLAS-CONF-2013-037,CMS-SUS-13-012</combineanas>
         <combinesrs>False</combinesrs>
         <computestatistics>True</computestatistics>
-        <database_version>unittest300</database_version>
+        <database_version>unittest310</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -85,12 +85,13 @@
         <input_file>./testFiles/slha/lightEWinos.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
+        <minmassgapisr>5.0</minmassgapisr>
         <model>share.models.mssm</model>
         <ncpus>1</ncpus>
         <promptwidth>1e-11</promptwidth>
         <reportallsrs>False</reportallsrs>
         <sigmacut>10.0</sigmacut>
-        <smodels_version>3.0.0</smodels_version>
+        <smodels_version>3.1.0</smodels_version>
         <stablewidth>1e-25</stablewidth>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>

@@ -14,6 +14,7 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 import numpy as np
 import unum
 
@@ -56,19 +57,21 @@ class SLHAPrinter(TxTPrinter):
         if not smodelsversion.startswith("v"):
             smodelsversion = "v" + smodelsversion
 
-        keysDict = {0: "%-25s #SModelS version\n" % (smodelsversion),
-                    1: "%-25s #database version\n" % (obj.databaseVersion.replace(" ", "")),
-                    2: "%-25s #maximum condition violation\n" % (obj.parameters['maxcond']),
-                    3: "%-25s #compression (0 off, 1 on)\n" % (self.docompress),
-                    4: "%-25s #minimum mass gap for mass compression [GeV]\n" % (obj.parameters['minmassgap']),
-                    5: "%-25s #sigmacut [fb]\n" % (obj.parameters['sigmacut']),
-                    6: "%-25s #signal region combination (0 off, 1 on)\n" % (self.combinesr),
-                    7: "%-25s #analyses combination (0 off, 1 on)\n" % (self.combineanas)}
+        keysDict = {0: f"{smodelsversion:25} #SModelS version\n",
+                    1: f"{obj.databaseVersion.replace(' ', ''):25} #database version\n",
+                    2: f"{obj.parameters['maxcond']:25} #maximum condition violation\n",
+                    3: f"{self.docompress:25} #compression (0 off, 1 on)\n",
+                    4: f"{obj.parameters['minmassgap']:25} #minimum mass gap for mass compression [GeV]\n",
+                    5: f"{obj.parameters['sigmacut']:25} #sigmacut [fb]\n",
+                    6: f"{self.combinesr:25} #signal region combination (0 off, 1 on)\n",
+                    7: f"{self.combineanas:25} #analyses combination (0 off, 1 on)\n"}
 
         if 'promptwidth' in obj.parameters:
-            keysDict[8] = "%-25s #prompt width [GeV] \n" % (obj.parameters['promptwidth'])
+            keysDict[8] = f"{obj.parameters['promptwidth']:25} #prompt width [GeV] \n"
         if 'stablewidth' in obj.parameters:
-            keysDict[9] = "%-25s #stable width [GeV] \n" % (obj.parameters['stablewidth'])
+            keysDict[9] = f"{obj.parameters['stablewidth']:25} #stable width [GeV] \n"
+        if 'minmassgapISR' in obj.parameters:
+            keysDict[10] = f"{obj.parameters['minmassgapISR']:25} #minimum mass gap for ISR mass compression [GeV]\n"
 
         output = "BLOCK SModelS_Settings\n"
         for key in sorted(list(keysDict.keys())):
@@ -117,7 +120,7 @@ class SLHAPrinter(TxTPrinter):
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
-            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
@@ -145,7 +148,7 @@ class SLHAPrinter(TxTPrinter):
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
-                        lv = "%-30.2E" % lv
+                        lv = f"{lv:-30.2E}"
                     else:
                         lv = str(lv)
                     lvals[i] = lv
@@ -196,14 +199,14 @@ class SLHAPrinter(TxTPrinter):
             # Get list of analyses IDs used in combination:
             expIDs = cRes.analysisId()
             ul = cRes.getUpperLimit()
-            ulExpected = cRes.getUpperLimit(expected=True)
+            ulExpected = cRes.getUpperLimit(evaluationType=self.getTypeOfExpected())
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
                 ulExpected = ulExpected.asNumber(fb)
 
-            r = self._round(cRes.getRValue(expected=False))
-            r_expected = self._round(cRes.getRValue(expected=True))
+            r = self._round(cRes.getRValue(evaluationType=observed))
+            r_expected = self._round(cRes.getRValue(evaluationType=self.getTypeOfExpected()))
 
             nll = cRes.likelihood(return_nll=True)
             nllmin = cRes.lmax(return_nll=True)
@@ -211,7 +214,7 @@ class SLHAPrinter(TxTPrinter):
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.float64)):
-                    lv = "%-30.2E" % lv
+                    lv = f"{lv:-30.2E}"
                 else:
                     lv = str(lv)
                 lvals[i] = lv
@@ -224,7 +227,7 @@ class SLHAPrinter(TxTPrinter):
             if r_expected is not None:
                 output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
             else:
-                output += " %d 2 NaN                            #expected r value (failed to compute expected r-value)\n" % (cter)
+                output += " %d 2 NaN                            #expected r value (failed to compute evaluationType r-value)\n" % (cter)
             output += " %d 3 %s #nll\n" % (cter, nll)
             output += " %d 4 %s #nll_min\n" % (cter, nllmin)
             output += " %d 5 %s #nll_SM\n" % (cter, nllsm)

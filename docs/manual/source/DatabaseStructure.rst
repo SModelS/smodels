@@ -90,10 +90,6 @@ used in the json file; the region type (signal, control, or validation region) i
 specified as ``type`` (default: **SR**). If the pyhf name is omitted, it is assumed to be equal to the 
 SModelS name. If the SModelS name is omitted, we assume **None** as value, indicating
 that there is no corresponding efficiency map implemented; in this case no signal counts will be patched in this region. This is typically the case for control or validation regions. 
-Finally, in case the region names in the pyhf model and in SModelS coincide, a simple name string can be used instead of a dictionary, as is illustrated by the ATLAS-SUSY-2018-14 example:
-
-.. literalinclude:: /literals/globalInfo201814.txt
-   :lines: 14
 
 In case of simplified likelihoods, the covariance matrix is supplied in the ``covariance`` field, with the order of the regions specified in a ``datasetOrder`` field, 
 shown in the example given by ATLAS-SUSY-2018-41:

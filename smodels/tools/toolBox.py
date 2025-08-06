@@ -71,11 +71,11 @@ class ToolBox(object):
         """
 
         if ok == True:
-            ret = "%sinstallation ok!%s" % (colors.green, colors.reset)
+            ret = f"{colors.green}installation ok!{colors.reset}"
             return ret
-        ret = "%sproblem with installation" % colors.red
+        ret = f"{colors.red}problem with installation"
         if type(ok) == str:
-            ret += " (%s)" % ok
+            ret += f" ({ok})"
         ret += colors.reset
         return ret
 
@@ -135,7 +135,7 @@ class ToolBox(object):
         """
         if not tool in self.tools:
             if verbose:
-                logger.error("Asking for non-existent tool ``%s''" % tool)
+                logger.error(f"Asking for non-existent tool ``{tool}''")
             return None
         return self.tools[tool]
 

@@ -90,7 +90,7 @@ properly described by a Poissonian. The complete likelihood thus reads:
 where :math:`n_{obs}` is the number of observed events in the signal region.
 From this likelihood we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
 `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
-We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
+We then search for the value :math:`CL_s = 0.95` using the TOMS algorithm available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.toms748.html>`_. [2]_
 This is used for the computation the observed and expected :math:`r` values.
 
 In addition, SModelS reports *for each* |EMr| :
@@ -158,7 +158,7 @@ should correspond to a second-order effect.
 As above, we compute a 95\% confidence level limit on :math:`\mu` using the :math:`CL_s` (:math:`CL_{sb}/CL_{b}`) limit from the
 test statistic :math:`q_\mu`, as described in Eq. 14 in G. Cowan et al.,
 `Asymptotic formulae for likelihood-based tests <https://arxiv.org/abs/1007.1727>`_.
-We then search for the value :math:`CL_s = 0.95` using the Brent bracketing technique available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_.
+We then search for the value :math:`CL_s = 0.95` using the using the TOMS algorithm available through the `scipy optimize library <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.toms748.html>`_. [2]_
 Note that the limit computed through this procedure applies to the total signal yield summed over all signal regions and assumes
 that the relative signal strengths in each signal region are fixed by the signal hypothesis. As a result, the above limit has to be computed
 for each given input model (or each :ref:`theory prediction <theoryPredictions>`), thus considerably increasing CPU time.
@@ -271,3 +271,5 @@ with the method `BFGS
 The resulting likelihood and :math:`r`-values for the combination are displayed in the :ref:`output <outputDescription>` along with the individual results for each analysis.
 
 .. [1] The statistical significance of the exclusion statement is difficult to quantify exactly, since the model is being tested by a large number of results simultaneously.
+
+.. [2] If the root can not be found using the TOMS algorithm, the scipy `Brent bracketing algorithm <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.brentq.html>`_ is employed.

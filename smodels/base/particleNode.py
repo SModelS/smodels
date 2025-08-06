@@ -134,7 +134,7 @@ class ParticleNode(object):
         if other.isInclusive:
             return -other.compareTo(self)
         if not isinstance(other, ParticleNode):
-            raise SModelSError("Can not compare node to %s" % type(other))
+            raise SModelSError(f"Can not compare node to {type(other)}")
 
         cmp = self.particle.__cmp__(other.particle)
 

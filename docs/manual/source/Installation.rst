@@ -15,7 +15,7 @@ Installation and Deployment
 Standard Installation
 ---------------------
 
-SModelS is a Python library that requires Python version 3.6 or later. It depends on the following *external* Python libraries:
+SModelS is a Python library that requires Python version 3.9 or later. It depends on the following *external* Python libraries:
 
 .. include:: dependencies.rst
 

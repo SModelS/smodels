@@ -6,3 +6,7 @@ install:
 
 clean: 
 	./clean.sh
+
+test:
+	./resummino_install/bin/resummino -h
+	echo

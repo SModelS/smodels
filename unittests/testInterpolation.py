@@ -17,6 +17,7 @@ from databaseLoader import database
 from unitTestHelpers import theorySMSFromString as fromString
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from smodels.base.model import Model
 import numpy as np
 
@@ -37,10 +38,10 @@ class InterpolationTest(unittest.TestCase):
         gluino.mass = 650.*GeV
         n1.mass = 50.*GeV
         smsMatch = txname.hasSMSas(sms)
-        observed = txname.getULFor( smsMatch, expected = False )
-        expected = txname.getULFor( smsMatch, expected = True )
-        self.assertAlmostEqual(observed.asNumber(fb),49.9,1)
-        self.assertAlmostEqual(expected.asNumber(fb),78.5,1)
+        vobserved = txname.getULFor( smsMatch, evaluationType = observed )
+        vexpected = txname.getULFor( smsMatch, evaluationType = apriori )
+        self.assertAlmostEqual(vobserved.asNumber(fb),49.9,1)
+        self.assertAlmostEqual(vexpected.asNumber(fb),78.5,1)
 
     def testExpectedFails(self):
         expRes = database.getExpResults(analysisIDs=["ATLAS-SUSY-2013-05"],
@@ -53,7 +54,7 @@ class InterpolationTest(unittest.TestCase):
         b1.mass = 650.*GeV
         n1.mass = 50.*GeV
         smsMatch = txname.hasSMSas(sms)
-        expected = txname.getULFor(smsMatch, expected = True)
+        expected = txname.getULFor(smsMatch, evaluationType = apriori )
         self.assertTrue(expected is None)
 
     def testInterpolation(self):

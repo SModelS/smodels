@@ -80,7 +80,7 @@ class Pythia8Wrapper(WrapperBase):
         """
         nFile = self.absPath(inputFile)
         if not os.path.exists(nFile):
-            raise IOError("file %s does not exist" % nFile)
+            raise IOError( f"file {nFile} does not exist" )
         return nFile
 
     def __str__(self):
@@ -88,10 +88,10 @@ class Pythia8Wrapper(WrapperBase):
         Describe the current status
 
         """
-        ret = "tool: %s\n" % (self.name)
-        ret += "executable: %s\n" % (self.executablePath)
-        ret += "temp dir: %s\n" % self.tempdir
-        ret += "nevents: %d\n" % self.nevents
+        ret = f"tool: {self.name}\n"
+        ret += f"executable: {self.executablePath}\n"
+        ret += f"temp dir: {self.tempdir}\n"
+        ret += f"nevents: {self.nevents}\n"
         return ret
 
     def unlink(self, unlinkdir=True):
@@ -188,23 +188,16 @@ class Pythia8Wrapper(WrapperBase):
         cfg = self.absPath(self.cfgfile)
         logger.debug("running with cfgfile " + str(cfg))
         lhefile = self.tempDirectory() + "/events.lhe"
-        cmd = "%s -n %d -f %s -s %f -c %s -l %s" % (
-            self.executablePath,
-            self.nevents,
-            slha,
-            self.sqrts,
-            cfg,
-            lhefile,
-        )
+        cmd = f"{self.executablePath} -n {self.nevents} -f {slha} -s {self.sqrts} -c {cfg} -l {lhefile}"
         toadd = self.getXmldoc()
         if toadd != None and os.path.exists ( toadd ):
-            logger.debug("adding -x %s" % toadd)
-            cmd += " -x %s" % toadd
-        logger.debug("Now running ''%s''" % str(cmd))
+            logger.debug( f"adding -x {toadd}" )
+            cmd += f" -x {toadd}"
+        logger.debug( f"Now running ''{cmd}''" )
         out = executor.getoutput(cmd)
-        logger.debug("out=%s" % out)
+        logger.debug( f"out={out}" )
         if not os.path.isfile(lhefile):
-            raise SModelSError("LHE file %s not found" % lhefile)
+            raise SModelSError( f"LHE file {lhefile} not found" )
         lheF = open(lhefile, "r")
         lhedata = lheF.read()
         lheF.close()
@@ -218,7 +211,7 @@ class Pythia8Wrapper(WrapperBase):
             f.write(out + "\n")
             f.write(lhedata + "\n")
             f.close()
-            logger.info("stored everything in %s" % tempfile)
+            logger.info( f"stored everything in {tempfile}" )
 
         # Create memory only file object
         if sys.version[0] == "2":
@@ -242,7 +235,7 @@ class Pythia8Wrapper(WrapperBase):
         Do nothing, if it doesnt exist.
         """
         if not os.path.exists(self.executablePath):
-            logger.error("%s doesnt exist" % self.executablePath)
+            logger.error( f"{self.executablePath} doesnt exist" )
             return False
         import stat
 
@@ -257,11 +250,9 @@ if __name__ == "__main__":
     tool.nevents = 10
     logger.info("installed: " + str(tool.installDirectory()))
     logger.info("check: " + wrapperBase.ok(tool.checkInstallation()))
-    logger.info("seconds per event: %d" % tool.secondsPerEvent)
+    logger.info( f"seconds per event: {tool.secondsPerEvent}" )
     slhafile = "inputFiles/slha/simplyGluino.slha"
     slhapath = os.path.join(installation.installDirectory(), slhafile)
     logger.info("slhafile: " + slhapath)
     output = tool.run(slhapath, unlink=True)
-    # for i in output:
-    #    print ( "%s" % i )
-    logger.info("done: %s" % output)
+    logger.info( f"done: {output}" )

@@ -2,6 +2,7 @@ smodelsOutputDefault = {
 'OutputStatus' : {
     'sigmacut' : 0.03,
     'minmassgap' : 5.0,
+    'minmassgapisr' : 5.0,
     'maxcond' : 0.2,
     'ncpus' : -1,
     'model' : 'share.models.mssm',
@@ -22,8 +23,8 @@ smodelsOutputDefault = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.10091,
-        'upper limit (fb)' : 0.08247307,
-        'expected upper limit (fb)' : 0.1200876,
+        'upper limit (fb)' : 0.07947499,
+        'expected upper limit (fb)' : 0.1101209,
         'TxNames' : ['T6bbHH'],
         'Mass (GeV)' : [[1400.0, 1000.0, 60.0], [1400.0, 1000.0, 60.0]],
         'AnalysisID' : 'ATLAS-SUSY-2018-31',
@@ -31,12 +32,12 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
         'dataType' : 'combined',
-        'r' : 1.223551,
-        'r_expected' : 0.8403036,
+        'r' : 1.269708,
+        'r_expected' : 0.9163569,
         'Width (GeV)' : [[1.0, 1.0, 'stable'], [1.0, 1.0, 'stable']],
-        'nll' : 51.35556035013835,
-        'nll_min' : 48.38229103232457,
-        'nll_SM' : 48.38229103232457
+        'nll' : 55.31969,
+        'nll_min' : 52.29293,
+        'nll_SM' : 52.29293
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.0,

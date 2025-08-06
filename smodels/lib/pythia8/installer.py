@@ -70,31 +70,34 @@ def unzip():
     print ( f"[installer.py] extracting to pythia{ver}" )
     with tarfile.open( tarball, 'r:gz') as f:
         def is_within_directory(directory, target):
-            
+
             abs_directory = os.path.abspath(directory)
             abs_target = os.path.abspath(target)
-        
+
             prefix = os.path.commonprefix([abs_directory, abs_target])
-            
+
             return prefix == abs_directory
-        
+
         def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
-        
+
             for member in tar.getmembers():
                 member_path = os.path.join(path, member.name)
                 if not is_within_directory(path, member_path):
                     raise Exception("Attempted Path Traversal in Tar File")
-        
-            tar.extractall(path) # , members, numeric_owner 
-            
-        
+            if sys.version_info.major >= 3 and sys.version_info.minor >= 12:
+                # python >= 3.12 wants us to specify a filter!
+                tar.extractall(path,filter="data")
+            else:
+                tar.extractall(path)
+
+
         safe_extract(f)
 
 def getNCPUs():
     """ get the number of CPUs to compile pythia8 with """
     ncpus = 4
     try:
-        from smodels.tools.runtime import nCPUs
+        from smodels.base.runtime import nCPUs
         ncpus = nCPUs()
     except Exception as e:
         print ( f"[installer.py] could not determine number of CPUs: {e}" )
@@ -141,12 +144,12 @@ def compilePythia():
     import subprocess
     ps = subprocess.Popen ( cmd, shell=True, stdout = subprocess.PIPE, \
                             stderr = subprocess.STDOUT )
-    for c in iter(lambda: ps.stdout.read(1), b''): 
+    for c in iter(lambda: ps.stdout.read(1), b''):
         sys.stdout.buffer.write(c)
         sys.stdout.buffer.flush()
 
 def protectInstall():
-    """ remove all writable flags from install. when running 
+    """ remove all writable flags from install. when running
     many pythia8 instances in parallel, for some reason they sometimes deleted
     files from the install, making the install unusable """
     # print ( f"fixACLs: {os.getcwd()}" )
@@ -184,13 +187,13 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="pythia8 install script" )
     parser.add_argument( '-i', '--install', help='install pythia8',
-                         action='store_true') 
+                         action='store_true')
     parser.add_argument( '-p', '--protect', help='protect pythia8 install',
-                         action='store_true') 
+                         action='store_true')
     parser.add_argument( '-r', '--remove_protection', help='remove pythia8 install protection',
-                         action='store_true') 
+                         action='store_true')
     parser.add_argument( '-v', '--version', help='report pythiaversion',
-                         action='store_true') 
+                         action='store_true')
     args = parser.parse_args()
     if args.version:
         ver = getVersion()

@@ -17,6 +17,7 @@ from smodels.tools import coverage
 from smodels.base.smodelsLogging import setLogLevel
 from smodels.tools.particlesLoader import load
 from smodels.share.models.SMparticles import SMList
+from smodels.statistics.basicStats import apriori
 from smodels.base.model import Model
 import time
 setLogLevel("info")
@@ -61,9 +62,9 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
                                    minmassgap=mingap)
 
     # Access basic information from decomposition, using the topology list and topology objects:
-    print("\n Decomposition done in %1.2fm" %((time.time()-t0)/60.))
+    print(f"\n Decomposition done in {(time.time() - t0) / 60.0:1.2f}m")
     print("\n Decomposition Results: ")
-    print("\t  Total number of topologies: %i " % len(topDict))
+    print(f"\t  Total number of topologies: {len(topDict)} ")
     nSMS = len(topDict.getSMSList())
     print("\t  Total number of SMS = %i " % nSMS)
 
@@ -98,7 +99,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
     bestResult = None
     allPredictions = theoryPredictionsFor(database, topDict, combinedResults=False)
     for theoryPrediction in allPredictions:
-        print('\n %s ' % theoryPrediction.analysisId())
+        print(f'\n {theoryPrediction.analysisId()} ')
         dataset = theoryPrediction.dataset
         datasetID = theoryPrediction.dataId()
         txnames = sorted([str(txname) for txname in theoryPrediction.txnames])
@@ -113,7 +114,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
 
         # Compute the r-value
         r = theoryPrediction.getRValue()
-        print("r = %1.3E" % r)
+        print(f"r = {r:1.3E}")
         # Compute likelihoods for EM-type results:
         if dataset.getType() == 'efficiencyMap':
             theoryPrediction.computeStatistics()
@@ -124,13 +125,13 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
             bestResult = theoryPrediction.analysisId()
 
     # Print the most constraining experimental result
-    print("\nThe largest r-value (theory/upper limit ratio) is %1.3E" % rmax)
+    print(f"\nThe largest r-value (theory/upper limit ratio) is {rmax:1.3E}")
     if rmax > 1.:
-        print("(The input model is likely excluded by %s)" % bestResult)
+        print(f"(The input model is likely excluded by {bestResult})")
     else:
         print("(The input model is not excluded by the simplified model results)")
 
-    print("\n Theory Predictions done in %1.2fm" %((time.time()-t0)/60.))
+    print(f"\n Theory Predictions done in {(time.time() - t0) / 60.0:1.2f}m")
     t0 = time.time()
     # Select a few results results for combination:
     combineAnas = ['ATLAS-SUSY-2013-11', 'CMS-SUS-13-013']
@@ -154,20 +155,20 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         nllmin = combiner.lmax( return_nll = True )
         nllsm = combiner.lsm( return_nll = True )
         print("\n\nCombined analyses:", combiner.analysisId())
-        print("Combined r value: %1.3E" % combiner.getRValue())
-        print("Combined r value (expected): %1.3E" % combiner.getRValue(expected=True))
-        print("Likelihoods: nll, nll_min, nll_SM = %.3f, %.3f, %.3f\n" % (nll, nllmin, nllsm))
+        print(f"Combined r value: {combiner.getRValue():1.3E}")
+        print(f"Combined r value (evaluationType): {combiner.getRValue(evaluationType=apriori):1.3E}")
+        print(f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n")
 
-    print("\n Combination of analyses done in %1.2fm" %((time.time()-t0)/60.))
+    print(f"\n Combination of analyses done in {(time.time() - t0) / 60.0:1.2f}m")
     t0 = time.time()
     # Find out missing topologies for sqrts=13*TeV:
     uncovered = coverage.Uncovered(topDict, sqrts=13.*TeV)
-    print("\n Coverage done in %1.2fm" %((time.time()-t0)/60.))
+    print(f"\n Coverage done in {(time.time() - t0) / 60.0:1.2f}m")
     # First sort coverage groups by label
     groups = sorted(uncovered.groups[:], key=lambda g: g.label)
     # Print uncovered cross-sections:
     for group in groups:
-        print("\nTotal cross-section for %s (fb): %10.3E\n" % (group.description, group.getTotalXSec()))
+        print(f"\nTotal cross-section for {group.description} (fb): {group.getTotalXSec():10.3E}\n")
 
     missingTopos = uncovered.getGroup('missing (prompt)')
     # Print some of the missing topologies:

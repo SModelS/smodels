@@ -49,15 +49,14 @@ class XSecComputer(XSecBase):
             sys.exit()
         self.nevents = nevents
         if pythiaVersion not in [ 6, 8 ]:
-            logger.error ( "Unknown pythia version %s. Allowed values: 6, 8" % \
-                            ( pythiaVersion ) )
+            logger.error ( f"Unknown pythia version {pythiaVersion}. Allowed values: 6, 8" )
             sys.exit()
         self.pythiaVersion = pythiaVersion
         self.defaulttempdir = defaulttempdir
 
     def _checkSLHA ( self, slhafile ):
         if not os.path.isfile(slhafile):
-            logger.error("SLHA file %s not found.", slhafile)
+            logger.error( f"SLHA file {slhafile} not found." )
             raise SModelSError()
         try:
             f=pyslha.readSLHAFile(slhafile)
@@ -154,7 +153,7 @@ class XSecComputer(XSecBase):
                     stpids.remove(spid)
             else:
                 if type(spid)!=str:
-                    logger.error ( "I have a pid of type %s. Dont know what to do." % \
+                    logger.error ( f"I have a pid of type {type(spid)}. Dont know what to do." % \
                                     type(spid) )
                     sys.exit()
                 jokerpids.append ( spid )
@@ -189,7 +188,7 @@ class XSecComputer(XSecBase):
                 logger.error ( "signal strength multipliers need to be supplied as a dictionary, with the keys being tuples of the mothers' pids, e.g. { (1000021, -1000001 ): 0.9, .... }" )
                 sys.exit()
             if len(pids) != 2:
-                logger.warning ( "currently we always only have two mothers, so why are the signal strength multipliers given for %d mothers?" % len(pids) )
+                logger.warning ( f"currently we always only have two mothers, so why are the signal strength multipliers given for {len(pids)} mothers?" )
             known_pids = [ 3000006 ] ## here we can define some exceptional pids
             for pid in pids:
                 if type(pid)==int and (abs(pid) < 1000000 or ( abs(pid) > 3000000 and abs(pid) not in known_pids) ):
@@ -267,9 +266,7 @@ class XSecComputer(XSecBase):
         self.loXsecs.sort()
         self.xsecs = self.addHigherOrders ( sqrts, slhafile )
         self.xsecs.sort()
-        #for xsec in self.loXsecs:
-        #    logger.debug ( "now writing out xsecs: %s" % xsec.value )
-        logger.debug ( "how many NLL xsecs? %d" % len(self.xsecs) )
+        logger.debug ( f"how many NLL xsecs? {len(self.xsecs)}" )
         return self.xsecs
 
     def computeForOneFile ( self, sqrtses, inputFile, unlink,
@@ -316,7 +313,7 @@ class XSecComputer(XSecBase):
                 self.addMultipliersToFile ( ssmultipliers, inputFile )
             self.addCommentToFile ( comment, inputFile )
         else:
-            logger.info("Computing SLHA cross section from %s." % inputFile )
+            logger.info(f"Computing SLHA cross section from {inputFile}." )
             print()
             print( "     Cross sections:" )
             print( "=======================" )
@@ -336,7 +333,7 @@ class XSecComputer(XSecBase):
                           ssmultipliers=None   ):
         """ compute xsecs for a bunch of slha files """
         for inputFile in inputFiles:
-            logger.debug ( "computing xsec for %s" % inputFile )
+            logger.debug ( f"computing xsec for {inputFile}" )
             self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
 
@@ -345,10 +342,10 @@ class XSecComputer(XSecBase):
         if comment in [ None, "" ]:
             return
         if not os.path.isfile(slhaFile ):
-            logger.error("SLHA file %s not found." % slhaFile )
+            logger.error(f"SLHA file {slhaFile} not found." )
             raise SModelSError()
         outfile = open(slhaFile, 'a')
-        outfile.write ( "# %s\n" % comment )
+        outfile.write ( f"# {comment}\n" )
         outfile.close()
 
     def addMultipliersToFile ( self, ssmultipliers, slhaFile ):
@@ -356,11 +353,11 @@ class XSecComputer(XSecBase):
         if ssmultipliers in [ None, {} ]:
             return
         if not os.path.isfile(slhaFile ):
-            logger.error("SLHA file %s not found." % slhaFile )
+            logger.error(f"SLHA file {slhaFile} not found." )
             raise SModelSError()
         tokens = []
         for k,v in ssmultipliers.items():
-            tokens.append ( "%s:%.4g" % ( k, v ) )
+            tokens.append ( f"{k}:{v:.4g}" )
         newline = "# Signal strength multipliers: " + ", ".join ( tokens )
         with open(slhaFile, 'r' ) as r:
             lines = r.readlines()
@@ -394,7 +391,7 @@ def main(args):
     if args.query:
         return canonizer.queryCrossSections ( args.filename )
     if args.colors:
-        from smodels.tools.colors import colors
+        from smodels.base.smodelsLogging import colors
         colors.on = True
     sqrtses = canonizer.getSqrtses ( args )
     order = canonizer.getOrder ( args )
@@ -426,9 +423,8 @@ def main(args):
             logger.error ( "fork did not succeed! Pid=%d" % pid )
             sys.exit()
         if pid == 0:
-            logger.debug ( "chunk #%d: pid %d (parent %d)." %
-                       ( i, os.getpid(), os.getppid() ) )
-            logger.debug ( " `-> %s" % " ".join ( chunk ) )
+            logger.debug ( f"chunk #{i}: pid {os.getpid()} (parent {os.getppid()})." )
+            logger.debug ( " `-> {' '.join(chunk)}" )
             computer = XSecComputer( order, args.nevents, pythiaVersion, \
                                    not args.noautocompile, canonizer.tempDir(args) )
             toFile = canonizer.writeToFile ( args )
@@ -440,5 +436,5 @@ def main(args):
             children.append ( pid )
     for child in children:
         r = os.waitpid ( child, 0 )
-        logger.debug ( "child %d terminated: %s" % (child,r) )
+        logger.debug ( f"child {child} terminated: {r}" )
     logger.debug ( "all children terminated." )

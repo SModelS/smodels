@@ -66,8 +66,8 @@ class SummaryPrinter(TxTPrinter):
         maxcoll = {"CMS": {"obs": -1., "exp": -1, "anaid": "?"},
                    "ATLAS": {"obs": -1., "exp": -1, "anaid": "?"}}
         for theoPred in obj._theoryPredictions:
-            r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            r = theoPred.getRValue(evaluationType=False)
+            r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
             expResult = theoPred.expResult
             coll = "ATLAS" if "ATLAS" in expResult.globalInfo.id else "CMS"
             if (r_expected is not None) and (r_expected > maxcoll[coll]["exp"]):
@@ -82,33 +82,33 @@ class SummaryPrinter(TxTPrinter):
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
             txnames = theoPred.txnames
-            ul = theoPred.getUpperLimit(expected=False)
+            ul = theoPred.getUpperLimit(evaluationType=False)
             uls = str(ul)
             if isinstance(ul, unum.Unum):
-                uls = "%10.3E" % ul.asNumber(fb)
+                uls = f"{ul.asNumber(fb):10.3E}"
             signalRegion = theoPred.dataset.getID()
             if signalRegion is None:
                 signalRegion = '(UL)'
             value = theoPred.xsection
-            r = theoPred.getRValue(expected=False)
-            r_expected = theoPred.getRValue(expected=self.getTypeOfExpected())
+            r = theoPred.getRValue(evaluationType=False)
+            r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
             if r is not None:
-                rs = "%10.3E" % r
+                rs = f"{r:10.3E}"
             else:
                 rs = "NaN" # r = None means the calculation failed
             if r_expected is not None:
-                rs_expected = "%10.3E" % r_expected
+                rs_expected = f"{r_expected:10.3E}"
             else:
                 rs_expected = "N/A" # r_exp could not be available
 
             output += "%19s  " % (expResult.globalInfo.id)  # ana
             # output += "%4s " % (expResult.globalInfo.sqrts/ TeV)  # sqrts
             # sqrts
-            output += "%2.2E  " % (expResult.globalInfo.sqrts.asNumber(TeV))
+            output += f"{expResult.globalInfo.sqrts.asNumber(TeV):2.2E}  "
             output += "%5s " % theoPred.getmaxCondition()  # condition violation
             # theory cross section , expt upper limit
-            output += "%10.3E %s " % (value.asNumber(fb), uls)
-            output += "%s %s" % (rs, rs_expected)
+            output += f"{value.asNumber(fb):10.3E} {uls} "
+            output += f"{rs} {rs_expected}"
             
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
@@ -138,10 +138,9 @@ class SummaryPrinter(TxTPrinter):
 
         output += "\n \n"
         output += 80 * "=" + "\n"
-        output += "The highest r value is = %.5f from %s" % \
-            (maxr["obs"], maxr["anaid"])
+        output += f"The highest r value is = {maxr['obs']:.5f} from {maxr['anaid']}"
         if maxr["exp"] is not None and maxr["exp"] >= 0.0:
-            output += " (r_expected=%.5f)" % maxr["exp"]
+            output += f" (r_expected={maxr['exp']:.5f})"
         else:
             output += " (r_expected not available)"
         output += "\n"
@@ -169,7 +168,7 @@ class SummaryPrinter(TxTPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = obj.getRValue()
-        r_expected = obj.getRValue(expected=True)
+        r_expected = obj.getRValue(evaluationType=self.getTypeOfExpected())
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )

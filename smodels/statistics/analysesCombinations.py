@@ -14,12 +14,14 @@
 import numpy as np
 from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
+from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
+     findRoot
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
-
-
+from smodels.tools.caching import roundCache, lru_cache
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
 
@@ -39,54 +41,73 @@ class AnaCombLikelihoodComputer(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
 
+    def nll(
+        self,
+        mu: float = 1.0,
+        evaluationType : NllEvalType = observed,
+        asimov: Union[None,float] = None,
+    ) -> float:
+        """
+        Compute the negative log likelihood at a given mu. For now this is
+        just a proxy method to ease transition of codes that depend on SModelS.
+
+        :param mu: signal strength
+        :param expected: one of: observed, apriori, aposteriori
+        :param asimov: if not None, compute llhd for asimov data with mu=asimov
+        """
+        return self.likelihood ( mu, evaluationType, return_nll=True, asimov=asimov )
+
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(
         self,
         mu: float = 1.0,
-        expected: Union[bool, Text] = False,
+        evaluationType : NllEvalType = observed,
         return_nll: bool = False,
-        useCached: bool = True,
+        asimov: Union[None,float] = None,
     ) -> float:
         """
         Compute the likelihood at a given mu
 
         :param mu: signal strength
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
-        :param useCached: if True, will use the cached values from the theoryPrediction objects (if available)
+        :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
         try:
             mu = mu[0]  # some of these methods use arrays with a single element
         except:
             pass
 
-        llhd = 1.0
+        nll = 0.0
         changed = False
         for tp in self.theoryPredictions:
-            tmp = tp.likelihood(mu, expected=expected, useCached=useCached)
+            tmp = tp.likelihood(mu, evaluationType=evaluationType, return_nll=True, asimov=asimov)
             if tmp != None:
-                llhd = llhd * tmp
+                nll = nll + tmp     #Add neg log llhds
                 changed = True
             else:
                 return None
         if changed == False:
             return None
-        if return_nll:
-            if llhd == 0.0:  # cut off nll at 999
-                return 999.0
-            return -np.log(llhd)
-        return llhd
+        if not return_nll:
+            llhd = np.exp(-nll)
+            return llhd
+# print ( f"@@AC mu={mu} evaluationType {expected} asimov {asimov} nll {nll}" )
 
+        return nll
+
+    @lru_cache
     def lmax(
         self,
         allowNegativeSignals: bool = False,
-        expected: Union[bool, Text] = False,
+        evaluationType : NllEvalType = observed,
         return_nll: bool = False,
+        asimov: Union[None,float] = None,
     ) -> Union[Dict, None]:
         """find muhat and lmax.
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: if true, compute expected prior (=lsm), if "posteriori" \
-                         compute posteriori expected
+        :param expected: one of: observed, apriori, aposteriori
         :param return_nll: if true, return negative log max likelihood instead of lmax
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
                   output is requested, it returns a dictionary with mu_hat, \
@@ -98,8 +119,10 @@ class AnaCombLikelihoodComputer(object):
         muhats, weighted = [], []
         totweight = 0.0
         for tp in self.theoryPredictions:
-            muhat = tp.muhat(expected=expected)
-            sigma_mu = tp.sigma_mu(expected=expected)
+            muhat = asimov
+            if asimov is None:
+                muhat = tp.muhat(evaluationType=evaluationType)
+            sigma_mu = tp.sigma_mu(evaluationType=evaluationType)
             if sigma_mu in [None, 0.0]:
                 sigma_mu = 1.0  # unity weights if no weights
             if muhat != None:
@@ -111,7 +134,7 @@ class AnaCombLikelihoodComputer(object):
         if len(muhats)==1:
             if muhat < 0. and not allowNegativeSignals:
                 muhat = 0.
-            retllh = self.theoryPredictions[0].likelihood ( muhat, return_nll = return_nll, expected = expected )
+            retllh = self.theoryPredictions[0].likelihood ( muhat, return_nll = return_nll, evaluationType = evaluationType, asimov=asimov )
             ret = {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": retllh}
             return ret
 
@@ -134,7 +157,7 @@ class AnaCombLikelihoodComputer(object):
                 x = float(mu[0])
             else:
                 x = float(mu)
-            return self.likelihood(x, expected=expected, return_nll=True, useCached=False)
+            return self.likelihood(x, evaluationType=evaluationType, return_nll=True, asimov=asimov)
 
         if allowNegativeSignals:
             toTry += [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1]
@@ -173,7 +196,9 @@ class AnaCombLikelihoodComputer(object):
                 pass
             hessian = invh[0][0]
             nll_ = o.fun
-            if hessian > 0.0 and nll_ < 998.0 and o.success:  # found a maximum. all good.
+            #removed if condition: "and nll_ < 998.0", because sometimes nll_ > 998.0. Not necessarily a bad thing?
+            #However lmax = np.exp(-nll_) for large nll -> 0
+            if hessian > 0.0 and o.success:  # found a maximum. all good. #and nll_ < 998.0
                 break
             # the hessian is negative meaning we found a maximum, not a minimum
             if hessian <= 0.0:
@@ -183,7 +208,7 @@ class AnaCombLikelihoodComputer(object):
                 )
         mu_hat = o.x[0]
         lmax = np.exp(-o.fun)  # fun is *always* nll
-        if hessian < 0.0 or nll_ > 998.0:
+        if hessian < 0.0:    #or nll_ > 998.0: again remove nll_ cut
             logger.error(
                 "tried with several starting points to find maximum, always ended up in minimum. "
                 "bailing out."
@@ -196,37 +221,36 @@ class AnaCombLikelihoodComputer(object):
         retllh = lmax
         if return_nll:
             retllh = nll_
-        ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}
+        ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}       #return nll_ too in the dictionary?
         return ret
 
-    def getUpperLimitOnMu(self, expected=False, allowNegativeSignals = False ):
+    @lru_cache
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, allowNegativeSignals = False ):
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: one of: observed, apriori, aposteriori
         :returns: upper limit on signal strength multiplier mu
         """
-        mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
+        mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
                                                         allowNegativeSignals=allowNegativeSignals)
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                                      allowNegative = allowNegativeSignals )
-        mu_lim = optimize.brentq(clsRoot, a, b, rtol=1e-03, xtol=1e-06)
+        mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    def getUpperLimitOnSigmaTimesEff(self, expected=False, allowNegativeSignals= False):
+    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, allowNegativeSignals= False):
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: if false, compute observed,
-                          true: compute a priori expected, "posteriori":
-                          compute a posteriori expected
+        :param expected: one of: observed, apriori, aposteriori
         :returns: upper limit on fiducial cross section
         """
-        ul = self.getUpperLimitOnMu(expected=expected,
+        ul = self.getUpperLimitOnMu(evaluationType=evaluationType,
                                     allowNegativeSignals=allowNegativeSignals)
 
         if ul == None:
@@ -236,21 +260,22 @@ class AnaCombLikelihoodComputer(object):
             xsec += tp.xsection
         return ul * xsec
 
-    def getCLsRootFunc(self, expected: bool = False, allowNegativeSignals : bool = False) -> Tuple[float, float, Callable]:
+    def getCLsRootFunc(self, evaluationType : NllEvalType=observed,
+			    allowNegativeSignals : bool = False ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
-        :param expected: if True, compute expected likelihood, else observed
+        :param expected: one of: observed, apriori, aposteriori
         """
-        fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals)
+        fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals)
         mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
-        nll0 = self.likelihood(mu_hat, expected=expected, return_nll=True)
-        # a posteriori expected is needed here
+        nll0 = self.likelihood(mu_hat, evaluationType=evaluationType, return_nll=True,asimov=None )
+        # a posteriori evaluationType is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True)
+        fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals,
+                             return_nll=True, asimov = 0. )
         _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
@@ -261,30 +286,35 @@ class AnaCombLikelihoodComputer(object):
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, expected=expected, useCached=False)
-            nllA = self.likelihood(mu, expected="posteriori", return_nll=True, useCached=False)
-            return CLsfromNLL(nllA, nll0A, nll, nll0, return_type=return_type) if nll is not None else None
+            nll = self.likelihood(mu, return_nll=True, evaluationType=evaluationType, asimov = None)
+            nllA = self.likelihood(mu, evaluationType=evaluationType, return_nll=True, asimov = 0. )
+
+            return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
+                     return_type=return_type) if nll and nllA is not None else None
 
         return mu_hat, sigma_mu, clsRoot
 
-    def CLs( self, mu : float = 1., expected: Union[Text,bool] = False,
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
+    def CLs( self, mu : float = 1., evaluationType : NllEvalType=observed,
              return_type: Text = "CLs" ):
         """
         Compute the exclusion confidence level of the model
 
         :param mu: compute for the parameter of interest mu
-        :param expected: if false, compute observed, true: compute a priori expected
+        :param expected: one of: observed, apriori, aposteriori
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
+                        alpha-CLs: returns 0.05 - CLs \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
         """
-        assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
-        _, _, clsRoot = self.getCLsRootFunc(expected=expected)
+        assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+        _, _, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType)
 
-        return clsRoot(mu, return_type=return_type)
+        return float(clsRoot(mu, return_type=return_type))
 
-    def getLlhds(self,muvals,expected=False,normalize=True):
+    def getLlhds(self,muvals,evaluationType : NllEvalType=observed,
+			     normalize : bool =True):
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
@@ -292,17 +322,17 @@ class AnaCombLikelihoodComputer(object):
 
         :param muvals: List with values for the signal strenth for which the likelihoods must
                        be evaluated.
-        :param expected: If True returns the expected likelihood values.
+        :param expected: one of: observed, apriori, aposteriori
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
 
         llhds = {}
-        llhds['combined'] = np.array([self.likelihood(mu,expected=expected) for mu in muvals])
+        llhds['combined'] = np.array([self.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
         tpreds = self.theoryPredictions
         for t in tpreds:
             Id = t.analysisId()
-            t.computeStatistics( expected = expected )
-            l = np.array([t.likelihood(mu,expected=expected) for mu in muvals])
+            t.computeStatistics( evaluationType = evaluationType )
+            l = np.array([t.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
             llhds[Id]=l
 
         if normalize:

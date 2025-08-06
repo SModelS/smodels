@@ -127,7 +127,7 @@ class FileStatus(object):
             self.status = self.filestatus.status
         else:
             self.filestatus = None
-            self.status = -5, 'Unknown input type: %s' % inputType 
+            self.status = -5, f'Unknown input type: {inputType}' 
 
 
 class LheStatus(object):
@@ -148,17 +148,17 @@ class LheStatus(object):
         """
         if not os.path.exists(self.filename):
             # set status flag to -3, as in slha checks for missing input file
-            return -3, "Inputfile %s not found" % self.filename
+            return -3, f"Inputfile {self.filename} not found"
         lhe = lheReader.LheReader(self.filename)
         nevents = lhe.metainfo["nevents"]
         totxsec = lhe.metainfo["totalxsec"]
         sqrts = lhe.metainfo["sqrts"]
         if (not type(sqrts) == type(1 * GeV)) or (not sqrts.asNumber()):
-            return -1, "Center-of-mass energy not found in the input LHE file %s" % self.filename
+            return -1, f"Center-of-mass energy not found in the input LHE file {self.filename}"
         elif not nevents:
-            return -1, "No events found in the input LHE file %s" % self.filename
+            return -1, f"No events found in the input LHE file {self.filename}"
         elif (not type(totxsec) == type(1 * fb)) or (not totxsec.asNumber()):
-            return -1, "Total cross section not found in the input LHE file %s" % self.filename
+            return -1, f"Total cross section not found in the input LHE file {self.filename}"
         return 1, "Input file ok"
 
 
@@ -292,7 +292,7 @@ class SlhaStatus(object):
                 st = -1
         if st == 1:
             msg = "No missing decay blocks"
-        else: msg = "# Missing decay blocks for %s" % str(missing)
+        else: msg = f"# Missing decay blocks for {str(missing)}"
         return st, msg
 
 
@@ -328,7 +328,7 @@ class SlhaStatus(object):
                     elif ptc in self.slha.blocks["MASS"].keys(): 
                         mDau += abs(self.slha.blocks["MASS"][ptc])
                     else:
-                        return -2, "Unknown PID %s in decay of %s" % (str(ptc), str(particle) + ". Add " + str(ptc) + " to smodels/particle.py")
+                        return -2, f"Unknown PID {str(ptc)} in decay of {str(particle) + '. Add ' + str(ptc) + ' to smodels/particle.py'}"
                 if mDau > mMom:
                     st = -1
                     if not str(particle) in badDecay: badDecay += str(particle) + " "

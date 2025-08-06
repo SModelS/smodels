@@ -69,7 +69,7 @@ class GenericSMS(object):
                    for node in self.nodes]
             return val
         except AttributeError:
-            raise AttributeError("Neither SMS nor nodes have attribute ``%s''" % attr)
+            raise AttributeError(f"Neither SMS nor nodes have attribute ``{attr}''")
 
     def add_node(self, node, nodeIndex=None):
         """
@@ -233,7 +233,7 @@ class GenericSMS(object):
         elif isinstance(nodeIndex,tuple):
             return tuple([self._nodesMapping[n] for n in nodeIndex])
         else:
-            raise SModelSError("Can not convert object of type %s to nodes" %str(type(nodeIndex)))
+            raise SModelSError(f"Can not convert object of type {str(type(nodeIndex))} to nodes")
 
     def daughterIndices(self, nodeIndex, ignoreInclusiveNodes=False):
         """
@@ -301,7 +301,7 @@ class GenericSMS(object):
             root = [nodeIndex for nodeIndex in self.nodeIndices
                     if self.in_degree(nodeIndex) == 0]
             if len(root) != 1:
-                raise SModelSError("Malformed Tree, %i root(s) have been found." % len(root))
+                raise SModelSError(f"Malformed Tree, {len(root)} root(s) have been found.")
             self._rootIndex = root[0]
 
         return self._rootIndex
@@ -827,7 +827,7 @@ class GenericSMS(object):
         """
 
         if removeIndicesFrom not in [None, 'SM', 'stable', 'all']:
-            raise SModelSError("removeIndicesFrom = %s value not accepted for treeToString" %removeIndicesFrom)
+            raise SModelSError(f"removeIndicesFrom = {removeIndicesFrom} value not accepted for treeToString")
         rmFrom = removeIndicesFrom
         
         smsStr = ""
@@ -838,14 +838,14 @@ class GenericSMS(object):
             mom = self.indexToNode(momIndex)
             daughters = self.indexToNode(daughterIndices)
             if momIndex == rootIndex: # Always remove from PV
-                smsStr += '(%s > ' % (mom)
+                smsStr += f'({mom} > '
             elif rmFrom is not None:
                 if rmFrom == 'all':
-                    smsStr += '(%s > ' % (mom)
+                    smsStr += f'({mom} > '
                 elif rmFrom == 'SM' and mom.isSM:
-                    smsStr += '(%s > ' % (mom)
+                    smsStr += f'({mom} > '
                 elif rmFrom == 'stable' and self.out_degree(momIndex) == 0:
-                    smsStr += '(%s > ' % (mom)
+                    smsStr += f'({mom} > '
                 else: # Add index
                     smsStr += '(%s(%i) > ' % (mom, momIndex)
             else: # If None, always add index
@@ -856,11 +856,11 @@ class GenericSMS(object):
                 dIndex = daughterIndices[iD]
                 if rmFrom is not None:
                     if rmFrom == 'all':
-                        smsStr += '%s,' % (d)
+                        smsStr += f'{d},'
                     elif rmFrom == 'SM' and d.isSM:
-                        smsStr += '%s,' % (d)
+                        smsStr += f'{d},'
                     elif rmFrom == 'stable' and self.out_degree(dIndex) == 0:
-                        smsStr += '%s,' % (d)
+                        smsStr += f'{d},'
                     else: # Add index
                         smsStr += '%s(%i),' % (d, dIndex)
                 else: # If None, always add index
@@ -887,7 +887,7 @@ class GenericSMS(object):
         intermediateState = []
         branchList = []
         if len(branches) != 2:
-            raise SModelSError("Can not convert tree to bracket with %i branches" % len(branches))
+            raise SModelSError(f"Can not convert tree to bracket with {len(branches)} branches")
         for ib, b in enumerate(branches):
             bIndex = branchIndices[ib]
             intermediateState.append([])
@@ -915,7 +915,7 @@ class GenericSMS(object):
 
                 if daughters:
                     if len(vertexList) != len(daughters) - 1 or len(fstates) > 1:
-                        raise SModelSError("Can not convert tree with Z2-violating decays to bracket: \n  %s" % self.treeToString())
+                        raise SModelSError(f"Can not convert tree with Z2-violating decays to bracket: \n  {self.treeToString()}")
                 intermediateState[ib].append(str(mom))
                 branchList[ib].append(vertexList)
                 finalState += fstates

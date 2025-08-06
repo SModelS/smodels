@@ -48,13 +48,13 @@ class Model(object):
         for pdg in allPDGs:
             p = self.getParticlesWith(pdg=pdg)
             if len(p) > 1:
-                raise SModelSError("PDG = %s has been defined for multiple particles (%s). Check your model definitions." % (pdg, p))
+                raise SModelSError(f"PDG = {pdg} has been defined for multiple particles ({p}). Check your model definitions.")
 
     def __str__(self):
         if not self.label:
-            return 'Model: %s' % self.inputFile
+            return f'Model: {self.inputFile}'
         else:
-            return 'Model: %s' % self.label
+            return f'Model: {self.label}'
 
     def __repr__(self):
 
@@ -146,7 +146,7 @@ class Model(object):
             cleanList.append(particle)
 
         if not cleanList:
-            logger.warning("Particle with attributes %s not found in %s" % (str(kwargs), self))
+            logger.warning(f"Particle with attributes {str(kwargs)} not found in {self}")
 
         return cleanList
 
@@ -182,11 +182,11 @@ class Model(object):
         :param inputFile: input file (SLHA or LHE), can also be a string containing the SLHA file
 
         :return: dictionary with masses, dictionary with decays and XSectionList object
-        """ 
+        """
 
         # Download input file, if requested
         if inputFile.startswith("http") or inputFile.startswith("ftp"):
-            logger.info("Asked for remote slhafile %s. Fetching it." % inputFile)
+            logger.info(f"Asked for remote slhafile {inputFile}. Fetching it.")
             import requests
             r = requests.get(inputFile)
             if r.status_code != 200:
@@ -257,10 +257,10 @@ class Model(object):
         allPDGs = smPDGs+bsmPDGs
         for xsec in self.xsections.xSections[:]:
             if any(pid not in allPDGs for pid in xsec.pid):
-                logger.debug("Cross-section for %s includes particles not belonging to model and will be ignored" % str(xsec.pid))
+                logger.debug(f"Cross-section for {str(xsec.pid)} includes particles not belonging to model and will be ignored")
                 self.xsections.delete(xsec)
             if all(pid in smPDGs for pid in xsec.pid):
-                logger.debug("Cross-section for %s includes only SM particles and will be ignored" % str(xsec.pid))
+                logger.debug(f"Cross-section for {str(xsec.pid)} includes only SM particles and will be ignored")
                 self.xsections.delete(xsec)
 
         return len(self.xsections.xSections)
@@ -280,7 +280,7 @@ class Model(object):
                 continue
 
             if not hasattr(particle, 'pdg'):
-                raise SModelSError("PDG for particle %s has not been defined" % particle.label)
+                raise SModelSError(f"PDG for particle {particle.label} has not been defined")
 
             pdg = particle.pdg
             if abs(pdg) in massDict.keys():
@@ -302,7 +302,7 @@ class Model(object):
                 continue
 
             if not hasattr(particle, 'pdg'):
-                raise SModelSError("PDG for particle %s has not been defined" % particle.label)
+                raise SModelSError(f"PDG for particle {particle.label} has not been defined")
 
             pdg = particle.pdg
             particle.decays = []
@@ -319,12 +319,12 @@ class Model(object):
             particle.totalwidth = abs(particleData.totalwidth)*GeV
             if particle.totalwidth < stableWidth:
                 particle._isStable = True  # Treat particle as stable
-                logger.debug("Particle %s has width below the threshold and will be assumed as stable" % particle.pdg)
+                logger.debug(f"Particle {particle.pdg} has width below the threshold and will be assumed as stable")
                 continue
 
             if particle.totalwidth > promptWidth:
                 particle._isPrompt = True  # Treat particle as prompt
-                logger.debug("Particle %s has width above the threshold and will be assumed as prompt." % particle.pdg)
+                logger.debug(f"Particle {particle.pdg} has width above the threshold and will be assumed as prompt.")
             else:
                 particle.decays.append(None)  # Include possibility for particle being long-lived (non-prompt)
 
@@ -332,7 +332,7 @@ class Model(object):
                 pids = decay.ids
                 missingIDs = set(pids).difference(set(allPDGs))
                 if missingIDs:
-                    logger.info("Particle(s) %s is not defined within model. Decay %s will be ignored" % (missingIDs, decay))
+                    logger.info(f"Particle(s) {missingIDs} is not defined within model. Decay {decay} will be ignored")
                     continue
 
                 #  Conjugated decays if needed
@@ -361,7 +361,7 @@ class Model(object):
                     # Check if the particle can decay to SM only:
                     if decay is not None and all(daughter.isSM for daughter in decay.daughters):
                     # if all(daughter.isSM for daughter in decay.daughters):
-                        logger.warning("Particle %s has a total width/mass = %1.2f. Some results may not be valid for broad resonances!" %(str(particle),float(particle.totalwidth/particle.mass)))
+                        logger.warning(f"Particle {str(particle)} has a total width/mass = {float(particle.totalwidth / particle.mass):1.2f}. Some results may not be valid for broad resonances!")
                         break
 
 
@@ -372,14 +372,14 @@ class Model(object):
             ndecays = len([dec for dec in p.decays if dec is not None])
             if ndecays == 0:
                 if not p.isSM:
-                    logger.warning("No valid decay found for %s. It will be considered stable." % p)
+                    logger.warning(f"No valid decay found for {p}. It will be considered stable.")
                 p.totalwidth = 0.*GeV
 
         # Finally erase attributes of prompt particles
         if ignorePromptQNumbers:
             for particle in self.BSMparticles:
                  if not particle.isSM and particle.totalwidth > promptWidth:
-                    logger.debug("Erasing quantum numbers of (prompt) particle %s." % particle.pdg)
+                    logger.debug(f"Erasing quantum numbers of (prompt) particle {particle.pdg}.")
                     for attr in ignorePromptQNumbers:
                         if hasattr ( particle, attr ):
                             delattr(particle, attr)
@@ -425,7 +425,7 @@ class Model(object):
                 continue
             self.BSMparticles.append(particle.copy())
         if len(self.BSMparticles) == len(self.allBSMparticles):
-            logger.info("Loaded %i BSM particles" % (len(self.BSMparticles)))
+            logger.info(f"Loaded {len(self.BSMparticles)} BSM particles")
         else:
             logger.info("Loaded %i BSM particles (%i particles not found in %s)"
                         % (len(self.BSMparticles), len(self.allBSMparticles)-len(self.BSMparticles),
@@ -434,7 +434,7 @@ class Model(object):
         #  Remove cross-sections for even particles:
         nXsecs = self.filterCrossSections()
         if nXsecs == 0:
-            msg = "No cross-sections found in %s for the BSM particles. " % self.inputFile
+            msg = f"No cross-sections found in {self.inputFile} for the BSM particles. "
             msg += "Check if the model is compatible with the input file."
             logger.error(msg)
             raise SModelSError(msg)

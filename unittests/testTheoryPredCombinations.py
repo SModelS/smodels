@@ -21,6 +21,7 @@ from smodels.share.models.SMparticles import SMList
 from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import fb, GeV, TeV
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from smodels.matching.modelTester import getCombiner
 import numpy as np
 import unittest
@@ -54,15 +55,15 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             t.computeStatistics()
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        self.assertAlmostEqual(combiner.muhat(), 1.205884272994354, 4)
+        self.assertAlmostEqual(combiner.muhat(), 1.0445466490085937, 4)
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.41744, 3)
-        ulmu_exp = combiner.getUpperLimitOnMu(expected=True)
-        self.assertAlmostEqual(ulmu_exp, 2.143318, 3)
+        self.assertAlmostEqual(ulmu, 3.4883893878456447, 3)
+        ulmu_exp = combiner.getUpperLimitOnMu(evaluationType=apriori)
+        self.assertAlmostEqual(ulmu_exp, 1.9892495624399895, 3)
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
@@ -109,7 +110,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # scipy.stats.norm.pdf(x, 9., 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.01880727876784458
         defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
-        tpreds = theoryPredictionsFor(database, smstopos, 
+        tpreds = theoryPredictionsFor(database, smstopos,
                                       combinedResults=False, useBestDataset=False)
         for t in tpreds:
             t.computeStatistics()
@@ -129,8 +130,8 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # combination:
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
-        combiner.computeStatistics()        
-        fmh = combiner.statsComputer.get_five_values(expected=False)
+        combiner.computeStatistics()
+        fmh = combiner.statsComputer.get_five_values(evaluationType=observed)
         mu_hat, lmax = fmh["muhat"], fmh["lmax"]
         lsm = combiner.lsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
@@ -148,7 +149,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
     def testFilter(self):
         import warnings
         warnings.filterwarnings("ignore", category=DeprecationWarning)
-        warnings.filterwarnings("ignore", category=UserWarning)        
+        warnings.filterwarnings("ignore", category=UserWarning)
         from smodels.base import runtime
         runtime._experimental["truncatedgaussians"] = True
 
@@ -158,7 +159,12 @@ class CombinedTheoryPredsTest(unittest.TestCase):
           'CMS-SUS-12-028',
           'ATLAS-SUSY-2018-12',
           'ATLAS-SUSY-2016-15','ATLAS-SUSY-2019-09']
-        db = Database('unittest+unittestextra')
+        mdbpath = 'unittest+unittestextra'
+        from databaseLoader import dbpath
+        if "./database" in dbpath:
+            # seems like we are meant to use local databases
+            mdbpath =  './database+./database_extra/'
+        db = Database( mdbpath )
         slhafile = "testFiles/slha/gluino_squarks.slha"
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         model.updateParticles(inputFile=slhafile)
@@ -167,18 +173,18 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         smstopos = decomposer.decompose(model,
                                         sigmacut, massCompress=True, invisibleCompress=True,
                                         minmassgap=mingap)
-        tpreds =  theoryPredictionsFor(db, smstopos, 
+        tpreds =  theoryPredictionsFor(db, smstopos,
                                        combinedResults=True, useBestDataset=False)
         combiner = TheoryPredictionsCombiner.selectResultsFrom(tpreds, anaids)
-        # IDs that should be selected and the respective expected r-values:
+        # IDs that should be selected and the respective evaluationType r-values:
         goodIDs = {
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
-            "CMS-SUS-12-024": (4.52551e-4, "efficiencyMap"),
+            "CMS-SUS-12-024": (0.0004534170464636533, "efficiencyMap"),
             "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
             "ATLAS-SUSY-2019-09": (0.231855657, "combined"),
         }
         # Make sure each ID appears only once:
-        selectedIDs = {tp.analysisId() : (tp.getRValue(expected=True),tp.dataType())
+        selectedIDs = {tp.analysisId() : (tp.getRValue(evaluationType=apriori),tp.dataType())
                         for tp in combiner.theoryPredictions}
         self.assertEqual(sorted(list(selectedIDs.keys())),sorted(list(goodIDs.keys())))
         # Check if the correct predictions were selected:
@@ -193,10 +199,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
         self.assertAlmostEqual(combiner.likelihood() / 6.1811227091720504e-27, 1., 2)
         self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
-        self.assertAlmostEqual(combiner.getRValue() / 0.2771301968, 1., 2)        
-        self.assertAlmostEqual(combiner.CLs(), 0.46721329662185557, 2 )
-        self.assertAlmostEqual(combiner.CLs( expected = True ), 0.5295734024482494, 2 )
-        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.6474406370750514, 2 )
+        self.assertAlmostEqual(combiner.getRValue() / 0.26067132943352256, 1., 2)
+        self.assertAlmostEqual(combiner.CLs(), 0.5745589222694297, 2 )
+        self.assertAlmostEqual(combiner.CLs( evaluationType = apriori ), 0.6370833948782422, 2 )
+        self.assertAlmostEqual(combiner.CLs( mu=.5 ), 0.7752652260987847, 2 )
 
 
     def testGetCombiner(self):
@@ -209,12 +215,17 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         lmax = combiner.lmax()
         lsm = combiner.lsm()
         lbsm = combiner.likelihood(mu=1.0)
+        lbsmE = combiner.likelihood(mu=1.0, evaluationType=apriori)
 
+        nllbsm = combiner.nll( mu=1.0)
+        nllbsmE = combiner.nll( mu=1.0, evaluationType=apriori)
 
         self.assertAlmostEqual(lsm, 0.1009, 2)
         self.assertAlmostEqual(lbsm,0.15356, 2)
         self.assertAlmostEqual(lmax, 0.21210, 2)
-        self.assertAlmostEqual(combiner.getRValue(), 0.1342, 2)
+        self.assertAlmostEqual( - np.log(lbsm), nllbsm, 6 )
+        self.assertAlmostEqual( - np.log(lbsmE), nllbsmE, 6 )
+        self.assertAlmostEqual(combiner.getRValue(), 0.1209701850476386, 4)
 
         # Also check if likelihood dict is defined:
         muvals = np.linspace(0.,3.,10)

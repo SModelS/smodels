@@ -20,6 +20,7 @@ from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from databaseLoader import database
 from smodels.decomposition import decomposer
 from math import floor, log10
@@ -35,7 +36,7 @@ class StatisticsTest(unittest.TestCase):
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
         ulcomp = UpperLimitComputer()
         ulobs = ulcomp.getUpperLimitOnMu(m)
-        ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
+        ulexp = ulcomp.getUpperLimitOnMu(m, evaluationType=apriori)
         print("ulobs", ulobs)
         print("ulexp", ulexp)
         f = open("llhds.csv", "wt")
@@ -56,7 +57,7 @@ class StatisticsTest(unittest.TestCase):
             print("llhd from limits", llhdlim, chi2lim)
             totdir += llhddir * dx
             totlim += llhdlim * dx
-            f.write("%s,%s,%s\n" % (nsig, llhddir, llhdlim ))
+            f.write(f"{nsig},{llhddir},{llhdlim}\n")
         print("total direct", totdir)
         print("total limit", totlim)
         f.close()
@@ -66,9 +67,9 @@ class StatisticsTest(unittest.TestCase):
         nsig = 3.0
         nobs, nbg = 35, 30
         m = Data(nobs, nbg, 0.001, None, nsig )
-        ulcomp = UpperLimitComputer()
-        ulobs = ulcomp.getUpperLimitOnMu(m)
-        ulexp = ulcomp.getUpperLimitOnMu(m, expected=True)
+        ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
+        ulobs = ulcomp.getUpperLimitOnMu()
+        ulexp = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
         ret = computer.lmax ( return_nll = False)
         doPrint = False
@@ -122,11 +123,11 @@ class StatisticsTest(unittest.TestCase):
         nsig = 35.0
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
-        ulcomp = UpperLimitComputer()
-        ulexpmu = ulcomp.getUpperLimitOnMu(m, expected=True)
+        ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
+        ulexpmu = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
         self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
-        ulobsmu = ulcomp.getUpperLimitOnMu(m)
+        ulobsmu = ulcomp.getUpperLimitOnMu()
         # ulobsmu should roughly equal sqrt(100*2 / 35. + ( 110 -100 ) / 35. = 85
         self.assertAlmostEqual ( ulobsmu, 0.834560746, 3 )
         llhdcomp = LikelihoodComputer(m)
@@ -158,8 +159,8 @@ class StatisticsTest(unittest.TestCase):
 
     def testUpperLimit(self):
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
-        comp = UpperLimitComputer()
-        re = comp.getUpperLimitOnMu(m)
+        comp = UpperLimitComputer( LikelihoodComputer(m) )
+        re = comp.getUpperLimitOnMu()
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
     def testExperimentalFeatureOff(self):
@@ -218,6 +219,11 @@ class StatisticsTest(unittest.TestCase):
         pred_signal_strength = prediction.xsection
         prediction.computeStatistics()
         ill = math.log(prediction.likelihood())
+        nll = prediction.nll()
+        self.assertAlmostEqual(-ill,nll,6)
+        illE = -math.log(prediction.likelihood( evaluationType=aposteriori ))
+        nllE = prediction.nll(evaluationType = aposteriori )
+        self.assertAlmostEqual(illE,nllE,6)
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
@@ -251,7 +257,7 @@ class StatisticsTest(unittest.TestCase):
     def testLikelihood(self):
         """
         Compare the computed chi2 from a given observed
-        and expected upper limit and a theory prediction
+        and evaluationType upper limit and a theory prediction
         with the previously known result for the value of
         the chi2.
 

@@ -15,6 +15,7 @@ from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
@@ -43,7 +44,7 @@ class DataSet(object):
         self.txnameList = []
 
         if path and createInfo:
-            logger.debug('Creating object based on data folder : %s' % self.path)
+            logger.debug(f'Creating object based on data folder : {self.path}')
 
             # Get data folder info:
             if not os.path.isfile(os.path.join(path, "dataInfo.txt")):
@@ -64,7 +65,7 @@ class DataSet(object):
                         continue
                     self.txnameList.append(txname)
                 except TypeError as e:
-                    logger.warning('Error creating txname from file %s:\n %s' % (txtfile, e))
+                    logger.warning(f'Error creating txname from file {txtfile}:\n {e}')
                     continue
 
             self.txnameList.sort()
@@ -157,7 +158,7 @@ class DataSet(object):
         idOther = other.globalInfo.id
         for t in tokens:
             if ":" in t:
-                logger.error("combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination %s." % t)
+                logger.error(f"combinableWith field in globalInfo is at the analysis level. You specified a dataset-level combination {t}.")
                 raise SModelSError()
         if idOther in tokens:
             return True
@@ -175,7 +176,7 @@ class DataSet(object):
         tokens = self.dataInfo.combinableWith.split(",")
         for t in tokens:
             if ":" not in t:
-                logger.error("combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination %s." % t)
+                logger.error(f"combinableWith field in dataInfo is at the dataset level. You specified an analysis-level combination {t}.")
                 raise SModelSError()
         idOther = other.globalInfo.id
         didOther = other.dataInfo.dataId
@@ -223,9 +224,9 @@ class DataSet(object):
 
     def __str__(self):
         if self.dataInfo.dataId:
-            ret = "Dataset %s: %s" % (self.dataInfo.dataId, ", ".join(map(str, self.txnameList)))
+            ret = f"Dataset {self.dataInfo.dataId}: {', '.join(map(str, self.txnameList))}"
         else:
-            ret = "Dataset: %s" % (", ".join(map(str, self.txnameList)))
+            ret = f"Dataset: {', '.join(map(str, self.txnameList))}"
         return ret
 
     def __repr__(self):
@@ -254,7 +255,7 @@ class DataSet(object):
         dsStr = str(self)
         expID = self.globalInfo.id
         dsType = self.getType()
-        lStr = '%s : %s (%s)' %(expID,dsStr,dsType)
+        lStr = f'{expID} : {dsStr} ({dsType})'
 
         return lStr
 
@@ -339,7 +340,7 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, expected=False, txnames=None,
+    def getUpperLimitFor(self, sms=None, evaluationType=False, txnames=None,
                          compute=False, alpha=0.05, deltas_rel=0.2,
                          mass=None):
         """
@@ -350,7 +351,7 @@ class DataSet(object):
         will be rescaled according to the lifetimes of the SMS intermediate particles.
         If SMS is not defined, but mass is given, compute the UL using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
 
         :param txname: TxName object or txname string (only for UL-type results)
@@ -359,17 +360,17 @@ class DataSet(object):
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
+        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events.
+                        from evaluationType and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
         :return: upper limit (Unum object)
         """
 
         if self.getType() == 'efficiencyMap':
-            upperLimit = self.getSRUpperLimit(expected=expected)
+            upperLimit = self.getSRUpperLimit(evaluationType=evaluationType)
             if upperLimit is None:
                 return None
             if (upperLimit/fb).normalize()._unit:
@@ -404,7 +405,7 @@ class DataSet(object):
 
             for tx in self.txnameList:
                 if tx == txname or tx.txName == txname:
-                    upperLimit = tx.getULFor(sms, expected, mass=mass)
+                    upperLimit = tx.getULFor(sms, evaluationType, mass=mass)
 
             return upperLimit
 
@@ -413,12 +414,12 @@ class DataSet(object):
                            self.getType())
             return None
 
-    def getSRUpperLimit(self,expected=False):
+    def getSRUpperLimit(self,evaluationType : NllEvalType = observed ):
         """
         Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
-        :param expected: If True, return the expected limit ( i.e. Nobserved = NexpectedBG )
+        :param expected: If True, return the evaluationType limit ( i.e. Nobserved = NexpectedBG )
 
         :return: upper limit value
         """
@@ -427,7 +428,7 @@ class DataSet(object):
             logger.error("getSRUpperLimit can only be used for efficiency map results!")
             raise SModelSError()
 
-        if expected:
+        if evaluationType != observed:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
                 logger.info("expectedUpperLimit field not found. Returning None instead.")
                 return None
@@ -513,7 +514,7 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "covariance"):
             datasets = self.origdatasets[:]
             if not hasattr(self.globalInfo, "datasetOrder"):
-                raise SModelSError("datasetOrder not given in globalInfo.txt for %s" % self.globalInfo.id)
+                raise SModelSError(f"datasetOrder not given in globalInfo.txt for {self.globalInfo.id}")
             datasetOrder = self.globalInfo.datasetOrder
             if isinstance(datasetOrder, str):
                 datasetOrder = [datasetOrder]
@@ -525,7 +526,7 @@ class CombinedDataSet(object):
             for dataset in datasets:
                 idx = self.getIndex(dataset.getID(), datasetOrder)
                 if idx == -1:
-                    raise SModelSError("Dataset ID %s not found in datasetOrder" % dataset.getID())
+                    raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
                 self._datasets[idx] = dataset
                 # dsIndex = datasetOrder.index(dataset.getID())
                 # self._datasets[dsIndex] = dataset

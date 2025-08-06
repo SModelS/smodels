@@ -66,7 +66,7 @@ expectedBGs = [1.5,0.06,0.007,0.0017,240.,17.,2.2,0.48]
 bgErrors = [0.3,0.01,0.002,0.0009,20.,2.,0.2,0.07]
 #SR Upper limits from arxiv:1902.01636 (Table 5).
 obsUpperLimits = ['0.09*fb','0.08*fb','0.08*fb','0.08*fb','1.26*fb','0.24*fb','0.10*fb','0.08*fb']
-#Assume expected UL = observed UL (otherwise they will be overwritten)
+#Assume evaluationType UL = observed UL (otherwise they will be overwritten)
 expUpperLimits = ['0.09*fb','0.08*fb','0.08*fb','0.08*fb','1.26*fb','0.24*fb','0.10*fb','0.08*fb']
 
 
@@ -103,8 +103,8 @@ for idataset,name in enumerate(datasetNames):
 #+++++++ dataset block ++++++++++++++
     dataset = DataSetInput(name)
     dataset.setInfo(dataType = 'efficiencyMap', dataId = name,
-            observedN=observedNs[idataset], expectedBG=expectedBGs[idataset], bgError=bgErrors[idataset],
-            upperLimit = obsUpperLimits[idataset], expectedUpperLimit = expUpperLimits[idataset])
+            observedN=observedNs[idataset], evaluationTypeBG=evaluationTypeBGs[idataset], bgError=bgErrors[idataset],
+            upperLimit = obsUpperLimits[idataset], evaluationTypeUpperLimit = expUpperLimits[idataset])
 
     #+++++++ txnames ++++++++++++++++++++
     for tx in txnames:
@@ -124,11 +124,11 @@ for idataset,name in enumerate(datasetNames):
         #+++++++ next mass plane block ++++++++++++++
         plane = Txname.addMassPlane(txnames[tx]['massPlane'])
         if not (tx in ['THSCPM1b','THSCPM2b','THSCPM3','THSCPM4','THSCPM8','THSCPM9','THSCPM10','THSCPM11']):
-            dataFile = 'orig/%s_eff_mutrig_%s_noWidth.dat' %(tx,name) #Use maps without width info
+            dataFile = f'orig/{tx}_eff_mutrig_{name}_noWidth.dat' #Use maps without width info
         elif tx in ['THSCPM10','THSCPM11']:
-            dataFile = 'orig/%s_eff_mutrig_reduced_th_%s.dat' %(tx,name)
+            dataFile = f'orig/{tx}_eff_mutrig_reduced_th_{name}.dat'
         else:
-            dataFile = 'orig/%s_eff_mutrig_%s_trimmedwidth.dat' %(tx,name)
+            dataFile = f'orig/{tx}_eff_mutrig_{name}_trimmedwidth.dat'
         plane.addSource(dataLabel = 'efficiencyMap',
                     dataFile = dataFile,
                     coordinateMap = txnames[tx]['coordinates'],

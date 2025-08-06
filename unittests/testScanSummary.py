@@ -26,7 +26,7 @@ class ScanSummaryTest(unittest.TestCase):
     def removeOutputs(self,f):
         extList = ['py','pyc','smodels','smodelsslha','xml']
         for ext in extList:
-            fname= f+'.'+ext
+            fname= f"{f}.{ext}"
             if os.path.exists(fname):
                 os.remove(fname)
 

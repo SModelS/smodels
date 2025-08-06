@@ -150,7 +150,7 @@
     <OutputStatus>
         <checkinput>True</checkinput>
         <computestatistics>False</computestatistics>
-        <database_version>unittest300</database_version>
+        <database_version>unittest310</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -161,7 +161,7 @@
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>3.0.0</smodels_version>
+        <smodels_version>3.1.0</smodels_version>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>

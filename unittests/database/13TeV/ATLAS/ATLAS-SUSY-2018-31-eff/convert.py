@@ -61,7 +61,7 @@ info.publication     = ''
 SRA_incl = DataSetInput('SRA_incl')
 SRA_incl.setInfo( dataType = 'efficiencyMap', dataId = "SRA_incl",
                   observedN = 17, expectedBG=17.1, bgError = 2.8,
-#                 upperLimit = '2.637E-01*fb', expectedUpperLimit = '2.639E-01*fb', ## FIXME this line is nonsense
+#                 upperLimit = '2.637E-01*fb', evaluationTypeUpperLimit = '2.639E-01*fb', ## FIXME this line is nonsense
                   jsonfile = "orig/BkgOnlyA.json" )
 
 # +++++++ next txName block ++++++++++++++
@@ -95,8 +95,8 @@ T6bbHHDM130.addSource ( "efficiencyMap", ( "orig/Efficiency_SRA_incl_dm130.csv",
 # +++++++ dataset block ++++++++++++++
 SRB = DataSetInput('SRB')
 SRB.setInfo( dataType = 'efficiencyMap', dataId = "SRB", 
-             observedN = 3, expectedBG=3.3, bgError = 0.9,
-            # upperLimit = '2.637E-01*fb', expectedUpperLimit = '2.639E-01*fb', # FIXME this line is nonsense
+             observedN = 3, evaluationTypeBG=3.3, bgError = 0.9,
+            # upperLimit = '2.637E-01*fb', evaluationTypeUpperLimit = '2.639E-01*fb', # FIXME this line is nonsense
              jsonfile = "orig/BkgOnlyB.json" )
 
 # +++++++ next txName block ++++++++++++++
@@ -132,8 +132,8 @@ T6bbHHDM130.addSource ( "efficiencyMap", ( "orig/Efficiency_SRB.csv", "orig/Acce
 # +++++++ dataset block ++++++++++++++
 SRC_incl = DataSetInput('SRC_incl')
 SRC_incl.setInfo( dataType = 'efficiencyMap', dataId = "SRC_incl", 
-                  observedN = 47, expectedBG=37.9, bgError = 6.2,
-                 # upperLimit = '2.637E-01*fb', expectedUpperLimit = '2.639E-01*fb', # FIXME this line is nonsense
+                  observedN = 47, evaluationTypeBG=37.9, bgError = 6.2,
+                 # upperLimit = '2.637E-01*fb', evaluationTypeUpperLimit = '2.639E-01*fb', # FIXME this line is nonsense
                   jsonfile = "orig/BkgOnlyC.json" )
 
 # +++++++ next txName block ++++++++++++++

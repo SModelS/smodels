@@ -13,7 +13,7 @@ import sys
 
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.tools.caching import _memoize
+from smodels.tools.caching import roundCache
 from scipy.linalg import svd, LinAlgError
 import numpy as np
 import math
@@ -50,9 +50,9 @@ class TxNameData(object):
         if self._keep_values:
             self.origdata = x
 
-    def __str__(self):
-        """ a simple unique string identifier, mostly for _memoize """
-        return str(self._id)
+    def __hash__(self):
+        """ a simple unique identifier, mostly for caching """
+        return id(self)
 
     def round_to_n(self, x, n):
         if x == 0.0:
@@ -101,7 +101,7 @@ class TxNameData(object):
         """
 
         if len(point) != self.full_dimensionality and len(point) != self.dimensionality:
-            msgError = "Wrong point dimensions (%i)," % (len(point))
+            msgError = f"Wrong point dimensions ({len(point)}),"
             msgError += " it should be % i(reduced dimensions)" % self.dimensionality
             msgError += " or %i(full dimensionts)" % self.full_dimensionality
             logger.error(msgError)
@@ -123,7 +123,7 @@ class TxNameData(object):
 
         return point
 
-    @_memoize
+    @roundCache(argname="point",argpos=1,digits=2)
     def getValueFor(self, point):
         """
         Returns the UL or efficiency for the point.
@@ -194,7 +194,7 @@ class TxNameData(object):
     def _estimateExtrapolationError(self, point):
         """
         When projecting a point from full_dimensionality to self.dimensionality, we
-        estimate the expected extrapolation error with the following
+        estimate the evaluationType extrapolation error with the following
         strategy: we compute the gradient at point P, and let alpha be the
         distance between p and P. We then walk one step of length alpha in
         the direction of the greatest ascent, and the opposite direction.
@@ -306,8 +306,7 @@ class TxNameData(object):
         if negative_values:
             for x in self.y_values:
                 if x < -eps:
-                    logger.error("negative error in result: %f, %s" %
-                                 (x, self._id))
+                    logger.error(f"negative error in result: {x:f}, {self._id}")
                     sys.exit()
         if sum(self.y_values) > 0.:
             return False
@@ -345,7 +344,7 @@ class TxNameData(object):
             n = int(math.ceil(len(M)/2000.))
             Vt = svd(M[::n])[2]
         except LinAlgError as e:
-            raise SModelSError("exception caught when performing singular value decomposition: %s, %s" % (type(e), e))
+            raise SModelSError(f"exception caught when performing singular value decomposition: {type(e)}, {e}")
 
         V = Vt.T
         self._V = V  # self.round ( V )

@@ -14,6 +14,7 @@ from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 import numpy as np
 from itertools import groupby
 import time
@@ -64,7 +65,7 @@ class TxTPrinter(BasicPrinter):
         # hidden feature, printtimespent, turn on in ini file, e.g.
         # [summary-printer] printtimespent = True
         if self.printtimespent:
-            output += "Time spent: %.2fs\n" % (time.time() - self.time)
+            output += f"Time spent: {time.time() - self.time:.2f}s\n"
         output += "Decomposition output status: " + str(obj.status) + " "
         st = "unknown status"
         if obj.status in obj.statusStrings:
@@ -136,13 +137,13 @@ class TxTPrinter(BasicPrinter):
             topoName = topoNames[canonName]
 
             output += "===================================================== \n"
-            output += "Topology: %s \n" %topoName
+            output += f"Topology: {topoName} \n"
             totxsec = smsList[0].weightList
             for sms in smsList[1:]:
                 totxsec += sms.weightList
 
             output += "Total Global topology weight :\n" + totxsec.niceStr() + '\n'
-            output += "Total Number of %s: " %baseLabel + \
+            output += f"Total Number of {baseLabel}: " + \
                 str(len(smsList)) + '\n'
             if not hasattr(self, 'addsmsinfo') or not self.addsmsinfo:
                 continue
@@ -201,7 +202,7 @@ class TxTPrinter(BasicPrinter):
 
         else:
             output += "\t\t SMS ID: %i\n" %obj.smsID
-            output += "\t\t SMS: %s\n" %str(obj)
+            output += f"\t\t SMS: {str(obj)}\n"
             output += "\t\t Masses: %s\n" %str([(node,mass) for node,mass in zip(obj.nodes,obj.mass)
                                                 if not node.isSM and not node is obj.root])
             output += "\t\t Cross-Sections:\n \t\t "+obj.weightList.niceStr().replace("\n", "\n \t\t ")
@@ -258,10 +259,10 @@ class TxTPrinter(BasicPrinter):
         output += "========================================================\n"
         output += "Experimental Result ID: " + obj.globalInfo.id + '\n'
         output += "Tx Labels: " + str(txnames) + '\n'
-        output += "Sqrts: %2.2E\n" % obj.globalInfo.sqrts.asNumber(TeV)
+        output += f"Sqrts: {obj.globalInfo.sqrts.asNumber(TeV):2.2E}\n"
         if hasattr(self, "addanainfo") and self.addanainfo:
             output += "\t -----------------------------\n"
-            output += "\t %s tested by analysis:\n" %baseLabel
+            output += f"\t {baseLabel} tested by analysis:\n"
             listOfSMS = []
             for dataset in obj.datasets:
                 for txname in dataset.txnameList:
@@ -274,7 +275,7 @@ class TxTPrinter(BasicPrinter):
                         if smsStr not in listOfSMS:
                             listOfSMS.append(smsStr)
             for sms in listOfSMS:
-                output += "\t    %s \n" %sms
+                output += f"\t    {sms} \n"
 
         return output
 
@@ -331,21 +332,21 @@ class TxTPrinter(BasicPrinter):
             output += "  " + str(theoryPrediction.conditions) + "\n"
 
             # Get upper limit for the respective prediction:
-            upperLimit = theoryPrediction.getUpperLimit(expected=False)
+            upperLimit = theoryPrediction.getUpperLimit(evaluationType=observed)
             upperLimitExp = theoryPrediction.getUpperLimit(
-                expected=self.getTypeOfExpected())
+                evaluationType=self.getTypeOfExpected())
 
             output += "Observed experimental limit: " + str(upperLimit) + "\n"
             if upperLimitExp is not None:
                 output += "Expected experimental limit: " + \
                     str(upperLimitExp) + "\n"
             srv = self._formatNumber(
-                theoryPrediction.getRValue(expected=False), 4)
-            output += "Observed r-value: %s\n" % srv
+                theoryPrediction.getRValue(evaluationType=observed), 4)
+            output += f"Observed r-value: {srv}\n"
             if upperLimitExp is not None:
                 serv = self._formatNumber(theoryPrediction.getRValue(
-                    expected=self.getTypeOfExpected()), 4)
-                output += "Expected r-value: %s\n" % serv
+                    evaluationType=self.getTypeOfExpected()), 4)
+                output += f"Expected r-value: {serv}\n"
             nll = theoryPrediction.likelihood( return_nll = True )
             if nll is not None:
                 chi2, chi2sm = None, None
@@ -376,7 +377,7 @@ class TxTPrinter(BasicPrinter):
                 IDList = list(
                     set([sms.smsID for sms in theoryPrediction.smsList]))
                 if IDList:
-                    output += "Contributing %s: " %baseLabel + str(IDList) + "\n"
+                    output += f"Contributing {baseLabel}: " + str(IDList) + "\n"
 
                 if self.outputFormat == 'version2':
                     smsPIDs = []
@@ -431,12 +432,12 @@ class TxTPrinter(BasicPrinter):
             description = group.description
             sqrts = group.sqrts.asNumber(TeV)
             if not group.finalStateSMS:
-                output += "No %s found\n" % description
+                output += f"No {description} found\n"
                 output += "================================================================================\n"
                 continue
             output += "%s with the highest cross sections (up to %i):\n" % (
                 description, nprint)
-            output += "Sqrts (TeV)   Weight (fb)                  %s description\n" %baseLabel
+            output += f"Sqrts (TeV)   Weight (fb)                  {baseLabel} description\n"
             for fsSMS in group.finalStateSMS[:nprint]:
                 if self.outputFormat == 'version2':
                     smsStr = fsSMS.oldStr()
@@ -449,7 +450,7 @@ class TxTPrinter(BasicPrinter):
                     contributing = []
                     for sms in fsSMS._contributingSMS:
                         contributing.append(sms.smsID)
-                    output += "Contributing %s %s\n" %(baseLabel,str(contributing))
+                    output += f"Contributing {baseLabel} {str(contributing)}\n"
             output += "================================================================================\n"
         return output
 
@@ -469,7 +470,7 @@ class TxTPrinter(BasicPrinter):
         expIDs = obj.analysisId()
         # Get r-value:
         r = self._formatNumber(obj.getRValue(),4)
-        r_expected = self._formatNumber(obj.getRValue(expected=self.getTypeOfExpected()),4)
+        r_expected = self._formatNumber(obj.getRValue(evaluationType=self.getTypeOfExpected()),4)
         # Get likelihoods:
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )

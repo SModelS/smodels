@@ -4,6 +4,7 @@ from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
 from smodels.tools.caching import Cache
 import socket, atexit, time, os, sys, copy
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 import unum
 
 unum.Unum.VALUE_FORMAT = "%0.16E"
@@ -13,7 +14,7 @@ servers = [ [] ]
 def shutdownAll ():
     if len(servers[0])==0:
         return
-    print ( "[databaseServer] shutting down %d servers" % len(servers[0]) )
+    print ( f"[databaseServer] shutting down {len(servers[0])} servers" )
     for i in servers[0]:
         i.shutdown( fromwhere = "atexit" )
     servers[0] = []
@@ -31,7 +32,7 @@ class DatabaseServer:
             if k in verbose:
                 self.verbose = v
         self.setStatus ( "ramping" )
-        self.pprint ( "starting a server at %s" % time.asctime() )
+        self.pprint ( f"starting a server at {time.asctime()}" )
         if port == None:
             port = 31770
             while self.is_port_in_use ( port ):
@@ -39,7 +40,7 @@ class DatabaseServer:
             self.pprint ( "using first free port %d" % port )
         if servername == None:
             servername = socket.gethostname()
-            self.pprint ( "determined servername as '%s'" % servername )
+            self.pprint ( f"determined servername as '{servername}'" )
         self.servername = servername
         self.dbpath = dbpath
         self.t0 = time.time()
@@ -48,7 +49,7 @@ class DatabaseServer:
         self.nlookups = 0
         servers[0].append ( self )
         if "SLURM_JOB_ID" in os.environ:
-            self.pprint ( "slurm job id is %s" % os.environ["SLURM_JOB_ID"] )
+            self.pprint ( f"slurm job id is {os.environ['SLURM_JOB_ID']}" )
         self.setStatus ( "ramped" )
 
     def setStatus ( self, status ):
@@ -97,22 +98,22 @@ class DatabaseServer:
             try:  ## remove from list of servers
                 servers[0].remove ( self )
             except:
-                print ( "[databaseServer] couldnt remove %s" % str(self ) )
+                print ( f"[databaseServer] couldnt remove {str(self)}" )
         sys.exit()
 
     def parseData ( self, data ):
         """ parse the data packet """
         data=data[2:-1]
-        self.log ( 'received "%s"' % data )
+        self.log ( f'received "{data}"' )
         if data.startswith ( "shutdown" ):
             self.shutdown( fromwhere = "client" )
             return
         if not data.startswith ( "query " ):
-            self.pprint ( "I dont understand the data packet %s" % data )
+            self.pprint ( f"I dont understand the data packet {data}" )
             return
         data=data[6:] ## remove the query statement
         ret = self.lookUpResult ( data )
-        self.log ( 'sending result of "%s" back to the client' % ret )
+        self.log ( f'sending result of "{ret}" back to the client' )
         ret = (str(ret)+" "*32)[:32]
         self.connection.sendall ( bytes(ret,"utf-8") )
 
@@ -130,11 +131,10 @@ class DatabaseServer:
         for ibr,br in enumerate(massv):
             for iel,el in enumerate(br):
                     massvunits[ibr][iel]=el*GeV
-        expected = False 
+        evaluationType = observed
         if tokens[0] == "exp":
-            expected = True
-        self.log ( 'looking up for %s,%s,%s,%s' % \
-                      ( anaId, dType, txname, massv ) )
+            evaluationType = apriori
+        self.log ( f'looking up for {anaId},{dType},{txname},{massv}' )
         for exp in self.expResults:
             if not exp.globalInfo.id == anaId:
                 continue
@@ -151,7 +151,7 @@ class DatabaseServer:
                     coords = txn.txnameData.dataToCoordinates ( massv, txn.txnameData._V,
                              txn.txnameData.delta_x ) 
                     res = None
-                    if expected:
+                    if evaluationType != observed:
                         if txn.txnameDataExp != None:
                             res = txn.txnameDataExp.getValueForPoint ( coords )
                     else:

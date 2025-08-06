@@ -8,6 +8,7 @@
 import sys
 import os
 from smodels.base.smodelsLogging import logger
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 import numpy as np
 import time
 
@@ -19,7 +20,7 @@ class BasicPrinter(object):
 
     def __init__(self, output, filename, outputFormat = 'current'):
         """
-        :ivar str typeofexpectedvalues: what type of expected values to print,
+        :ivar str typeofexpectedvalues: what type of evaluationType values to print,
               apriori or posteriori
         """
 
@@ -30,21 +31,21 @@ class BasicPrinter(object):
         self.filename = filename
         self.output = output
         self.printingOrder = []
-        self.typeofexpectedvalues = "apriori"
+        self.typeofexpectedvalues = apriori
         self.toPrint = []
         self.outputFormat = outputFormat
 
         if filename and os.path.isfile(filename):
-            logger.warning("Removing file %s" % filename)
+            logger.warning( f"Removing file {filename}" )
             os.remove(filename)
 
     def getTypeOfExpected(self):
-        """ tiny convenience function for what expected values to print,
+        """ tiny convenience function for what evaluationType values to print,
             apriori (True) or posteriori """
-        expected = True
-        if self.typeofexpectedvalues == "posteriori":
-            expected = "posteriori"
-        return expected
+        evaluationType = apriori
+        if self.typeofexpectedvalues in [ "aposteriori", "posteriori", aposteriori ]:
+            evaluationType = aposteriori
+        return evaluationType
 
     @property
     def filename(self):
@@ -96,7 +97,7 @@ class BasicPrinter(object):
         d = os.path.dirname(filename)
         if not os.path.exists(d):
             os.makedirs(d)
-            logger.info("creating directory %s" % d)
+            logger.info(f"creating directory {d}")
         return open(filename, mode)
 
     def flush(self):
@@ -143,7 +144,7 @@ class BasicPrinter(object):
             # print ( " `-", len(ret))
             return ret
         except AttributeError as e:
-            logger.warning('Error formating object %s: \n %s' % (typeStr, e))
+            logger.warning(f'Error formating object {typeStr}: \n {e}')
             return False
 
     def _round(self, number, n=6):

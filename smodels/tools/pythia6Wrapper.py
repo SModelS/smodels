@@ -67,7 +67,7 @@ class Pythia6Wrapper(WrapperBase):
         """
         nFile = self.absPath(inputFile)
         if not os.path.exists(nFile):
-            raise IOError("file %s does not exist" % nFile)
+            raise IOError(f"file {nFile} does not exist")
         return nFile
 
 
@@ -77,9 +77,9 @@ class Pythia6Wrapper(WrapperBase):
         Describe the current status
 
         """
-        ret = "tool: %s\n" % (self.name)
-        ret += "executable: %s\n" % (self.executablePath)
-        ret += "temp dir: %s\n" % self.tempdir
+        ret = f"tool: {self.name}\n"
+        ret += f"executable: {self.executablePath}\n"
+        ret += f"temp dir: {self.tempdir}\n"
         ret += "nevents: %d\n" % self.nevents
         return ret
 
@@ -149,7 +149,7 @@ class Pythia6Wrapper(WrapperBase):
         for line in lines:  # # copy all but lines with "param"
             if not param in line:
                 f.write(line)
-        f.write("%s=%s\n" % (param, str(value)))
+        f.write(f"{param}={str(value)}\n")
         f.close()
 
     def run( self, slhafile, lhefile=None, unlink=True ):
@@ -188,7 +188,7 @@ class Pythia6Wrapper(WrapperBase):
         self.setParameter("MSTP(163)", "6")
 
         if unlink==False:
-            logger.info ( "keeping temporary directory at %s" % self.tempDirectory() )
+            logger.info ( f"keeping temporary directory at {self.tempDirectory()}" )
         r = self.checkInstallation()
         if r == False:
             logger.info ( "Installation check failed." )
@@ -251,8 +251,7 @@ class Pythia6Wrapper(WrapperBase):
         logger.debug("running with " + str(cfg))
         import shutil
         shutil.copy(slha, self.tempDirectory() + "/fort.61")
-        cmd = "cd %s ; %s < %s" % \
-             (self.tempDirectory(), self.executablePath, cfg)
+        cmd = f"cd {self.tempDirectory()} ; {self.executablePath} < {cfg}"
         logger.debug("Now running " + str(cmd))
         out = executor.getoutput(cmd)
         if unlink:

@@ -27,11 +27,14 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
 from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "fatal" )
 
+from unitTestHelpers import checkPythonRequirements
+checkPythonRequirements()
+
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()
     keywords = [ "cpp", "nllfast", "pythia", "xsec", "interactiveplot",
-                 "server", "loadlatest", "notebook", "recipes" ]
+                 "server", "loadlatest", "notebook", "recipes", "resummino", "toolbox" ]
     for keyword in keywords:
         if keyword in t:
             return False
@@ -50,7 +53,7 @@ def run(filter=None, testNotebooks=False, reduced=False ):
 
     ret = unittest.TextTestRunner().run(tests)
     if not ret.wasSuccessful():
-        raise AssertionError("%i tests failed" %len(ret.failures))
+        raise AssertionError(f"{len(ret.failures)} tests failed")
 
 
 def verbose_run( filter=None, testNotebooks=False, reduced=False ):
@@ -77,16 +80,15 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
                 if filter and (not filter in str(t)):
                     continue
                 n_tests += 1
-                print ( "[#%3d] %s ... " % ( n_tests, t.id() ), end="" )
+                print ( f"[#{int(n_tests):3}] {t.id()} ... ", end="" )
                 sys.stdout.flush()
                 try:
                     a=t.debug()
                 except Exception as e:
                     n_failed += 1
-                    print ( "%s FAILED: %s,%s%s" % \
-                            ( colors.error, type(e), str(e), colors.reset ) )
+                    print ( f"{colors.error} FAILED: {type(e)},{str(e)}{colors.reset}" )
                     continue
-                print ( "%sok%s" % ( colors.info, colors.reset ) )
+                print ( f"{colors.info}ok{colors.reset}" )
 
                 #a=t.run() ## python3
                 # print ( "a=",a )
@@ -125,7 +127,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
     runner = unittest.TextTestRunner()
     ret = runner.run(concurrent_suite)
     if not ret.wasSuccessful():
-        raise AssertionError("%i tests failed" %len(ret.failures))
+        raise AssertionError(f"{len(ret.failures)} tests failed")
 
 
 def cleanDatabase ():
@@ -159,9 +161,9 @@ if __name__ == "__main__":
         cleanDatabase()
     else:
         if not args.notebooks:
-            print('Notebooks WILL NOT be tested.')
+            print('[runCompleteTestSuite] Notebooks WILL NOT be tested.')
         if args.reduced:
-            print('Reduced set of unit tests')
+            print('[runCompleteTestSuite] Reduced set of unit tests')
 
         if args.parallel:
             parallel_run(args.verbose, args.notebooks, args.reduced)

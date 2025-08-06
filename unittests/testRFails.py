@@ -30,7 +30,7 @@ class RFailsTest(unittest.TestCase):
         f = os.path.splitext(f)[0]
         extList = ['py','pyc','smodels','smodelsslha','xml']
         for ext in extList:
-            fname= f+'.'+ext
+            fname= f"{f}.{ext}"
             if os.path.exists(fname):
                 os.remove(fname)
 
@@ -75,7 +75,7 @@ class RFailsTest(unittest.TestCase):
         sortXML(xmlDefault)
         sortXML(xmlNew)
         equals = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05,
-                            ignore=['input_file', 'smodels_version', 'ncpus'])
+                            ignore=['input_file', 'smodels_version', 'database_version', 'ncpus'])
         if not equals:
             logger.error ( f"{outputfile}!={defaultfile}" )
 
@@ -101,7 +101,7 @@ class RFailsTest(unittest.TestCase):
         from smodels.statistics import pyhfInterface
 
         # Reduce the number of attempts 
-        pyhfInterface.nattempts_max = 5
+        pyhfInterface.nattempts_max = 10
         database = Database('official')
         runMain(dirname,inifile='testParameters_rfails.ini',
                              overridedatabase = database,suppressStdout=True )

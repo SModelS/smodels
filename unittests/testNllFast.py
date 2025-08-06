@@ -17,17 +17,17 @@ path = "./testFiles/slha/"
 class NllFastTest(unittest.TestCase):
     def testGluino7 (self):
         tool = toolBox.ToolBox().get("nllfast7")
-        o = tool.getKfactorsFor ( (1000021, 1000021 ), "%ssimplyGluino.slha" % path )
+        o = tool.getKfactorsFor ( (1000021, 1000021 ), f"{path}simplyGluino.slha" )
         self.assertAlmostEqual ( o[0], 2.1 )
         self.assertAlmostEqual ( o[1], 1.08 )
     def testSquark8 (self):
         tool = toolBox.ToolBox().get("nllfast8")
-        o = tool.getKfactorsFor ( (1000001, 1000001 ), "%sgluino_squarks.slha"%path )
+        o = tool.getKfactorsFor ( (1000001, 1000001 ), f"{path}gluino_squarks.slha" )
         self.assertAlmostEqual ( o[0], 1.22 )
         self.assertAlmostEqual ( o[1], 1.02 )
     def testSquark13 (self):
         tool = toolBox.ToolBox().get("nllfast13")
-        o = tool.getKfactorsFor ( (1000001, 1000001 ), "%sgluino_squarks.slha" % path)
+        o = tool.getKfactorsFor ( (1000001, 1000001 ), f"{path}gluino_squarks.slha")
         self.assertAlmostEqual ( o[0], 1.24 )
         self.assertAlmostEqual ( o[1], 1.01 )
     def testWeakino8 (self):

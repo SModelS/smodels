@@ -50,16 +50,16 @@ class Plotter(object):
         self.min_BR = None
 
         if not os.path.isfile(parameterFile):
-            raise SModelSError('Parameters file %s not found' %parameterFile)
+            raise SModelSError(f'Parameters file {parameterFile} not found')
 
         if modelFile != None:
             if not os.path.isfile(self.modelFile):
-                raise SModelSError('model.py file %s not found' % modelFile )
+                raise SModelSError(f'model.py file {modelFile} not found' )
 
         if not os.path.exists(smodelsFolder):
-            raise SModelSError("%s not found" %smodelsFolder)
+            raise SModelSError(f"{smodelsFolder} not found")
         if not os.path.exists(slhaFolder):
-            raise SModelSError("%s not found" %slhaFolder)
+            raise SModelSError(f"{slhaFolder} not found")
 
         self.loadParameters()
         self.loadModelFile()
@@ -70,7 +70,7 @@ class Plotter(object):
         Reads the parameters from the plotting parameter file.
         """
 
-        logger.info("Reading parameters from %s ..." %(self.parameterFile))
+        logger.info(f"Reading parameters from {self.parameterFile} ...")
 
         parFile = self.parameterFile
 
@@ -81,49 +81,49 @@ class Plotter(object):
             spec.loader.exec_module(parameters)
         # except Exception as e:
         except (IOError,ValueError,ImportError,SyntaxError) as e:
-            logger.error("Error loading parameters file %s: %s" % (self.parameterFile,e) )
+            logger.error(f"Error loading parameters file {self.parameterFile}: {e}" )
             raise SModelSError()
 
         if not hasattr(parameters, 'slha_hover_information'):
-            logger.debug("slha_hover_information dictionary was not found in %s. SLHA data will not be included in info box." %parFile)
+            logger.debug(f"slha_hover_information dictionary was not found in {parFile}. SLHA data will not be included in info box.")
             self.slha_hover_information = {}
         else:
             self.slha_hover_information = parameters.slha_hover_information
 
         if not hasattr(parameters, 'ctau_hover_information'):
-            logger.debug("ctau_hover_information dictionary was not found in %s. Lifetime data will not be included in info box." %parFile)
+            logger.debug(f"ctau_hover_information dictionary was not found in {parFile}. Lifetime data will not be included in info box.")
             self.ctau_hover_information = {}
         else:
             self.ctau_hover_information = parameters.ctau_hover_information
 
         if not hasattr(parameters, 'BR_hover_information'):
-            logger.debug("BR_hover_information dictionary was not found in %s. Branching ratio data will not be included in info box." %parFile)
+            logger.debug(f"BR_hover_information dictionary was not found in {parFile}. Branching ratio data will not be included in info box.")
             self.BR_hover_information = {}
         else:
             self.BR_hover_information = parameters.BR_hover_information
 
         if not hasattr(parameters, 'SModelS_hover_information'):
-            logger.debug("SModelS_hover_information dictionary was not found in %s. SModelS data will not be included in info box." %parFile)
+            logger.debug(f"SModelS_hover_information dictionary was not found in {parFile}. SModelS data will not be included in info box.")
             self.SModelS_hover_information = {}
         else:
             self.SModelS_hover_information = list(set(parameters.SModelS_hover_information))
 
         if not hasattr(parameters, 'plot_data'):
-            logger.debug("plot_data list was not found in %s. All points will be plotted" %parFile)
+            logger.debug(f"plot_data list was not found in {parFile}. All points will be plotted")
             self.plot_data = ['all']
         else:
             self.plot_data = list(set(parameters.plot_data))
 
         if not hasattr(parameters, 'variable_x'):
-            raise SModelSError("variable_x was not found in %s. Please define the variable to be plotted in the x-axis." %parFile)
+            raise SModelSError(f"variable_x was not found in {parFile}. Please define the variable to be plotted in the x-axis.")
         else:
             self.variable_x = parameters.variable_x
         if not hasattr(parameters, 'variable_y'):
-            raise SModelSError("variable_y was not found in %s. Please define the variable to be plotted in the y-axis." %parFile)
+            raise SModelSError(f"variable_y was not found in {parFile}. Please define the variable to be plotted in the y-axis.")
         else:
             self.variable_y = parameters.variable_y
         if not hasattr(parameters, 'plot_list'):
-            raise SModelSError("plot_list was not found in %s. Please define the list of plots to be plotted." %parFile)
+            raise SModelSError(f"plot_list was not found in {parFile}. Please define the list of plots to be plotted.")
         else:
             self.plot_list = list(set(parameters.plot_list))
 
@@ -134,7 +134,7 @@ class Plotter(object):
             self.min_BR = parameters.min_BR
 
         if not hasattr(parameters,'plot_title'):
-            logger.warning("plot_title not defined in %s. Using default title" %parFile)
+            logger.warning(f"plot_title not defined in {parFile}. Using default title")
             self.plot_title = 'interactive-plots'
         else:
             self.plot_title = parameters.plot_title
@@ -144,7 +144,7 @@ class Plotter(object):
         Reads the parameters from the plotting parameter file.
         """
 
-        logger.info("Reading model.py file from %s ..." %(self.modelFile))
+        logger.info(f"Reading model.py file from {self.modelFile} ...")
 
         if self.modelFile==None:
             self.particle_names=None
@@ -454,7 +454,7 @@ class Plotter(object):
 
         self.plotter=helpers.PlotlyBackend(self, outFolder )
         self.plotter.makePlots( indexfile )
-        logger.info('Generation of interactive plots finished. Go to: \n %s/%s \n to see the plots.' % ( outFolder, indexfile ) )
+        logger.info(f'Generation of interactive plots finished. Go to: \n {outFolder}/{indexfile} \n to see the plots.' )
     
     def cleanUp ( self ):
         if hasattr ( self, "plotter" ):

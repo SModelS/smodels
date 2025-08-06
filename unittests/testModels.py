@@ -35,7 +35,7 @@ class ModelsTest(unittest.TestCase):
         if self.definingRun:
             logger.error ( "This is a definition run! Know what youre doing!" )
             default = "idm_example_defaultB.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             a = subprocess.getoutput ( cmd )
         smodelsOutput = importModule ( outputfile )
         from idm_example_defaultB import smodelsOutputDefault
@@ -62,7 +62,7 @@ class ModelsTest(unittest.TestCase):
         if self.definingRun:
             logger.error ( "This is a definition run! Know what youre doing!" )
             default = "idm_example_default.py"
-            cmd = "cat %s | sed -e 's/smodelsOutput/smodelsOutputDefault/' > %s" % ( outputfile, default )
+            cmd = f"cat {outputfile} | sed -e 's/smodelsOutput/smodelsOutputDefault/' > {default}"
             a = subprocess.getoutput ( cmd )
         smodelsOutput = importModule ( outputfile )
         from idm_example_default import smodelsOutputDefault

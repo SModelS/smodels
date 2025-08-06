@@ -38,7 +38,7 @@ class ExpResult(object):
             self.path = "<transient>"
             return
         if not os.path.isdir(path):
-            raise SModelSExperimentError("%s is not a path" % path)
+            raise SModelSExperimentError(f"{path} is not a path")
 
         self.path = path
         if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
@@ -55,6 +55,24 @@ class ExpResult(object):
             folders.append((root, files))
         folders.sort()
         self.datasets = []
+        hasJsons = hasattr(self.globalInfo, "jsonFiles" )
+        if hasJsons:
+            dsOrder = []
+            for SRs in self.globalInfo.jsonFiles.values():
+                if not isinstance(SRs,list):
+                    raise SModelSExperimentError(f"The entries in jsonFiles keys should be a list and not {type(SRs)}")
+                for SR in SRs:
+                    if not isinstance(SR,dict):
+                        raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
+                    # In case the smodels label is not defined, ignore SR
+                    if not "smodels" in SR:
+                        continue
+                    smodelsLabel = SR["smodels"]
+                    if smodelsLabel is None or smodelsLabel in dsOrder:
+                        continue
+                    # Store the dataset following the order defined in globalInfo.jsonFiles
+                    dsOrder.append ( smodelsLabel )
+            self.globalInfo.datasetOrder = dsOrder
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
@@ -67,7 +85,7 @@ class ExpResult(object):
                     else:
                         self.datasets.append(dataset)
                 except TypeError as e:
-                    logger.warning("Error creating dataset from dir %s:\n %s" % (root, e))
+                    logger.warning(f"Error creating dataset from dir {root}:\n {e}")
                     continue
         if not hasOrder:
             return
@@ -77,15 +95,23 @@ class ExpResult(object):
             dsOrder = [dsOrder]
         for dsname in dsOrder:
             self.datasets.append(datasets[dsname])
+        if type(self.globalInfo.datasetOrder)==tuple:
+            self.globalInfo.datasetOrder = list ( self.globalInfo.datasetOrder )
+        # now append the rest -- but only for json file case
+        if hasJsons:
+            for dsName,ds in datasets.items():
+                if dsName not in dsOrder:
+                    self.datasets.append ( ds )
+                    self.globalInfo.datasetOrder.append ( dsName )
         if len(self.datasets) != len(dsOrder):
-            raise SModelSExperimentError("lengths of datasets and datasetOrder mismatch")
+            raise SModelSExperimentError( f"lengths of datasets and datasetOrder mismatch in {self.globalInfo.id}")
 
     def writePickle(self, dbVersion):
         """ write the pickle file """
 
         meta = metaObj.Meta(self.path, databaseVersion=dbVersion)
-        pclfile = "%s/.%s" % (self.path, meta.getPickleFileName())
-        logger.debug("writing expRes pickle file %s, mtime=%s" % (pclfile, meta.cTime()))
+        pclfile = f"{self.path}/.{meta.getPickleFileName()}"
+        logger.debug(f"writing expRes pickle file {pclfile}, mtime={meta.cTime()}")
         f = open(pclfile, "wb")
         ptcl = min(4, serializer.HIGHEST_PROTOCOL)
         serializer.dump(meta, f, protocol=ptcl)
@@ -128,7 +154,7 @@ class ExpResult(object):
         if isinstance(txnames, list):
             for txname in txnames:
                 label += txname + ','
-            label = "%s(%d)," % (label[:-1], len(txnames))
+            label = f"{label[:-1]}({len(txnames)}),"
         else:
             label += txnames + ','
         return label[:-1]
@@ -159,7 +185,7 @@ class ExpResult(object):
         matches the Txname.
         If SMS is not defined, but mass is given, give the efficiency using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param txname: TxName object or txname string (only for UL-type results)
@@ -215,7 +241,7 @@ class ExpResult(object):
         # nothing found? default is: False
         return False
 
-    def getUpperLimitFor(self, dataID=None, alpha=0.05, expected=False,
+    def getUpperLimitFor(self, dataID=None, alpha=0.05, evaluationType=False,
                          txname=None, sms=None, compute=False, mass=None):
         """
         Computes the 95% upper limit (UL) on the signal cross section according
@@ -226,18 +252,18 @@ class ExpResult(object):
         Txname.
         If SMS is not defined, but mass is given, compute the UL using only the mass array
         (no width reweighting is applied) and the mass format is assumed
-        to follow the expected by the data.
+        to follow the evaluationType by the data.
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
                       (= 95% C.L.) (only for  efficiency-map results)
-        :param expected: Compute expected limit, i.e. Nobserved = NexpectedBG
+        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param sms: SMS object
         :param mass: Mass array
         :param compute: If True, the upper limit will be computed
-                        from expected and observed number of events.
+                        from evaluationType and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
         :return: upper limit (Unum object)
@@ -245,13 +271,13 @@ class ExpResult(object):
 
         dataset = self.getDataset(dataID)
         if dataset:
-            upperLimit = dataset.getUpperLimitFor(sms=sms, expected=expected,
+            upperLimit = dataset.getUpperLimitFor(sms=sms, evaluationType=evaluationType,
                                                   txnames=txname,
                                                   compute=compute, alpha=alpha,
                                                   mass=mass)
             return upperLimit
         else:
-            logger.error("Dataset ID %s not found in experimental result %s" % (dataID, self))
+            logger.error(f"Dataset ID {dataID} not found in experimental result {self}")
             return None
 
     def getValuesFor(self, attribute):

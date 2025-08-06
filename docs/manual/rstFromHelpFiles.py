@@ -46,8 +46,8 @@ def write ( c, f ):
             isIn = "argument"
 
 def run ( tool, rstfile ):
-    with open("source/%s.rst" % rstfile, "w" ) as f:
-        c = subprocess.getoutput ( "../../smodelsTools.py %s -h" % tool )
+    with open(f"source/{rstfile}.rst", "w" ) as f:
+        c = subprocess.getoutput ( f"../../smodelsTools.py {tool} -h" )
         write ( c, f )
 
 def runSModelS ():

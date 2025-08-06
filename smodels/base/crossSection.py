@@ -101,7 +101,7 @@ class XSectionInfo(object):
         self.sqrts = self.normalizeSqrts(self.sqrts)
         if not self.order:
             return str(self.sqrts)
-        return "%s (%s)" % (self.sqrts, self.order)
+        return f"{self.sqrts} ({self.order})"
 
     def __repr__(self):
         return str(self)
@@ -241,7 +241,7 @@ class XSection(object):
             valB = other
             valA = valA.asNumber()
         else:
-            raise SModelSError("Can not compare %s and %s" % (self, other))
+            raise SModelSError(f"Can not compare {self} and {other}")
 
         if valA == valB:
             return 0
@@ -413,7 +413,7 @@ class XSectionList(object):
             valB = other
             valA = valA.asNumber()
         else:
-            raise SModelSError("Can not compare %s and %s" % (self, other))
+            raise SModelSError(f"Can not compare {self} and {other}")
 
         if valA == valB:
             return 0
@@ -747,15 +747,13 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
         try:
             f = pyslha.readSLHAFile(slhafile)
         except Exception as e:
-            logger.error(f"Error reading file {f}: {e}")
-            raise SModelSError()
+            raise SModelSError(f"Error reading file {slhafile}: {e}")
     else: # Assume slhafile is a string containing the SLHA file content:
         try:
             f = pyslha.readSLHA(slhafile)
         except Exception as e:
-            logger.error(f"Error reading SLHA string {f}: {e}")
-            raise SModelSError()
-        
+            raise SModelSError(f"Error reading SLHA string {slhafile}: {e}")
+
     for production in f.xsections:
         process = f.xsections.get(production)
         for pxsec in process.xsecs:

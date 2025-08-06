@@ -182,7 +182,7 @@ def reweightFactorFor(sms=None, resType='prompt',
 
     rType = resType.lower()
     if rType not in ['prompt', 'displaced']:
-        logger.error('resultType should be prompt or displaced and not %s' % str(resType))
+        logger.error(f'resultType should be prompt or displaced and not {str(resType)}')
         raise SModelSError()
 
     FpromptTotal = 1.  # Keep track of the probability of all decays being prompt

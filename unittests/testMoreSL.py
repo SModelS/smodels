@@ -17,6 +17,7 @@ from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 from smodels.decomposition import decomposer
 from smodels.matching.theoryPrediction import theoryPredictionsFor
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 import numpy as np
@@ -49,7 +50,7 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=True ) }
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( evaluationType=apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
@@ -82,7 +83,7 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( expected=True ) }
+                r = { "obs": p.getRValue(), "exp": p.getRValue ( evaluationType=apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )

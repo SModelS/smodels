@@ -6,7 +6,7 @@
             <nll>9.264033</nll>
             <nll_SM>9.691611</nll_SM>
             <nll_min>8.924963</nll_min>
-            <r>0.1333632</r>
+            <r>0.1200000</r>
             <r_expected>0.2100586</r_expected>
         </CombinedRes>
     </CombinedRes_List>
@@ -357,7 +357,7 @@
         <checkinput>True</checkinput>
         <combineanas>CMS-SUS-13-012,ATLAS-SUSY-2018-31,ATLAS-CONF-2013-037</combineanas>
         <computestatistics>False</computestatistics>
-        <database_version>unittest300</database_version>
+        <database_version>unittest310</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -365,6 +365,7 @@
         <input_file>./testFiles/slha/gluino_squarks.slha</input_file>
         <maxcond>0.2</maxcond>
         <minmassgap>5.0</minmassgap>
+        <minmassgapisr>5.0</minmassgapisr>
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>

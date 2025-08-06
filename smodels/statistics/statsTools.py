@@ -18,6 +18,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
@@ -135,13 +136,13 @@ class StatsComputer:
             return None
 
         eul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=True
+            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=apriori
         )
         if eul is None:
             return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, expected=False
+            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=observed
         ) / theorypred.xsection
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
@@ -185,9 +186,9 @@ class StatsComputer:
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
                      nsignal = self.nsig )
-        self.data = data
+        # self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( )
+        self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 
     def getComputerMultiBinSL(self):
         """
@@ -218,7 +219,7 @@ class StatsComputer:
                      deltas_rel = self.deltas_sys, lumi=dataset.getLumi() )
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( )
+        self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 
     def getComputerPyhf(self ):
         """
@@ -260,8 +261,8 @@ class StatsComputer:
         for ds in datasets:
             if not ds in jsonRegions:
                 logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
-        logger.debug("list of datasets: {}".format(datasets))
-        logger.debug("jsonFiles after filtering: {}".format(jsonFiles))
+        logger.debug(f"list of datasets: {datasets}")
+        logger.debug(f"jsonFiles after filtering: {jsonFiles}")
 
         # Constructing the list of signals with subsignals matching each json
         nsignals = {}
@@ -305,7 +306,7 @@ class StatsComputer:
                                                             deltas_rel=self.deltas_sys)
         self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
 
-    def get_five_values ( self, expected : Union [ bool, Text ],
+    def get_five_values ( self, evaluationType : NllEvalType,
                       return_nll : bool = False,
                       check_for_maxima : bool = False )-> Dict:
         """
@@ -314,14 +315,14 @@ class StatsComputer:
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
                                  correct, if necessary
         """
-        ret = self.maximize_likelihood ( expected = expected, return_nll = return_nll  )
+        ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll  )
         if ret is None:
             return {}
         lmax = ret['lmax']
 
-        lbsm = self.likelihood ( poi_test = 1., expected=expected, return_nll = return_nll )
+        lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, return_nll = return_nll )
         ret["lbsm"] = lbsm
-        lsm = self.likelihood ( poi_test = 0., expected=expected, return_nll = return_nll )
+        lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, return_nll = return_nll )
         ret["lsm"] = lsm
         if check_for_maxima:
             if return_nll:
@@ -349,39 +350,44 @@ class StatsComputer:
 
         return ret
 
-    def likelihood ( self, poi_test : float, expected : Union[bool,Text],
-                            return_nll : bool ) -> float:
+    def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
+                  return_nll : bool, asimov : Union[None,float] = None ) -> float:
         """ simple frontend to individual computers """
-        self.transform ( expected )
-        kwargs = {}
+        self.transform ( evaluationType )
+        kwargs = { "evaluationType": evaluationType, "asimov": asimov }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-            return self.likelihoodComputer.likelihood (
-                    poi_test, return_nll = return_nll,
-                    expected = expected, **kwargs )
-        elif self.dataType == "truncGaussian":
-            kwargs["expected"]=expected
-        elif self.dataType == "analysesComb":
-            kwargs["expected"]=expected
-        return self.likelihoodComputer.likelihood ( poi_test,
-                                                return_nll = return_nll, **kwargs)
+            ret = self.likelihoodComputer.likelihood (
+                    poi_test, return_nll = return_nll, **kwargs )
+            return ret
+        ret = self.likelihoodComputer.likelihood ( poi_test,
+                                            return_nll = return_nll, **kwargs)
+        return ret
 
-    def CLs ( self, poi_test : float = 1., expected : Union[bool,Text] = False ) -> Union[float,None]:
+    def CLs ( self, poi_test : float = 1., evaluationType : NllEvalType=observed ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
-        # self.transform ( expected )
-        if hasattr ( self.likelihoodComputer, "CLs" ):
-            return self.likelihoodComputer.CLs ( poi_test, expected )
+        # self.transform ( evaluationType )
+        if hasattr ( self.upperLimitComputer, "CLs" ):
+            return self.upperLimitComputer.CLs ( poi_test, evaluationType )
         return None
 
-    def transform ( self, expected ):
-        """ SL only. transform the data to expected or observed """
+    def transform ( self, evaluationType ):
+        """ SL only. transform the data to evaluationType or observed """
         if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
             return
-        self.likelihoodComputer.transform ( expected )
+        self.likelihoodComputer.transform ( evaluationType )
 
-    def maximize_likelihood ( self, expected : Union[bool,Text],
+    def restore ( self, evaluationType ):
+        """ SL only. transform the data to evaluationType or observed """
+        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+            return
+        if evaluationType != observed:
+            return
+        self.likelihoodComputer.model = self.likelihoodComputer.origModel
+
+    def maximize_likelihood ( self, evaluationType : NllEvalType,
            return_nll : bool = False ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
@@ -389,25 +395,25 @@ class StatsComputer:
                   muhat, sigma_mu (sigma of mu_hat), \
                   optionally also theta_hat
         """
-        self.transform ( expected )
+        self.transform ( evaluationType )
         kwargs = { }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
                 index = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-                if expected != False:
-                    kwargs["expected"] = expected
+                if evaluationType != observed:
+                    kwargs["evaluationType"] = evaluationType
         elif self.dataType == "truncGaussian":
-            kwargs["expected"]=expected
+            kwargs["evaluationType"]=evaluationType
         elif self.dataType == "analysesComb":
-            kwargs["expected"]=expected
+            kwargs["evaluationType"]=evaluationType
 
         ret = self.likelihoodComputer.lmax ( return_nll = return_nll,
                                    allowNegativeSignals = self.allowNegativeSignals,
                                    **kwargs )
         return ret
 
-    def poi_upper_limit ( self, expected : Union [ bool, Text ],
+    def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False ) -> float:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
@@ -422,23 +428,24 @@ class StatsComputer:
             index = self.likelihoodComputer.getBestCombinationIndex()
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       expected = expected, workspace_index = index )
+                       evaluationType = evaluationType, workspace_index = index )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       expected = expected, workspace_index = index )
+                       evaluationType = evaluationType, workspace_index = index )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
+            self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(self.data,
-                       expected = expected )
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                       evaluationType = evaluationType )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(self.data,
-                       expected = expected )
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                       evaluationType = evaluationType )
         elif self.dataType in ["analysesComb"]:
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(expected = expected,
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(evaluationType = evaluationType,
                                                                            allowNegativeSignals=self.allowNegativeSignals )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(expected = expected,
+                ret = self.upperLimitComputer.getUpperLimitOnMu(evaluationType = evaluationType,
                                                                 allowNegativeSignals=self.allowNegativeSignals )
 
         return ret
@@ -447,7 +454,7 @@ class SimpleStatsDataSet:
     """ a very simple data class that can replace a smodels.dataset,
     for 1d SL data only. used for testing and in dataPreparation """
     class SimpleInfo:
-        def __init__ ( self, observedN : float, expectedBG : float,
+        def __init__ ( self, observedN : float, evaluationTypeBG : float,
                        bgError : float ):
             self.observedN = observedN
             self.expectedBG = expectedBG
@@ -458,10 +465,10 @@ class SimpleStatsDataSet:
             self.id = "SimpleStatsDataSet"
             self.lumi = lumi
 
-    def __init__ ( self, observedN : float, expectedBG : float,
+    def __init__ ( self, observedN : float, evaluationTypeBG : float,
                    bgError : float, lumi : fb ):
         """ initialise the dataset with all relevant stats """
-        self.dataInfo = self.SimpleInfo ( observedN, expectedBG, bgError )
+        self.dataInfo = self.SimpleInfo ( observedN, evaluationTypeBG, bgError )
         self.globalInfo = self.GlobalInfo( lumi )
 
     def getLumi ( self ):
@@ -477,7 +484,7 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleStatsDataSet ( nobs, bg, bgerr, lumi )
     computer = StatsComputer ( dataset, 1. )
-    ul = computer.poi_upper_limit ( expected = False, limit_on_xsec = True )
+    ul = computer.poi_upper_limit ( evaluationType = observed, limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( expected = True, limit_on_xsec = True )
+    ule = computer.poi_upper_limit ( evaluationType = apriori, limit_on_xsec = True )
     print ( "ule", ule )

@@ -53,7 +53,7 @@ info.prettyName = '0 leptons + >= 3 (1b-)jets + Etmiss'
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET3_HT3_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT3_nb3", observedN = 6, expectedBG = 5.9 , bgError = 1.9, upperLimit = '3.9702E-01*fb', expectedUpperLimit = '3.5007E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT3_nb3", observedN = 6, evaluationTypeBG = 5.9 , bgError = 1.9, upperLimit = '3.9702E-01*fb', expectedUpperLimit = '3.5007E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -96,7 +96,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET4_HT3_nb2")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT3_nb2", observedN = 19, expectedBG = 20.7 , bgError = 3.2, upperLimit = '5.7300E-01*fb', expectedUpperLimit = '6.1033E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT3_nb2", observedN = 19, evaluationTypeBG = 20.7 , bgError = 3.2, upperLimit = '5.7300E-01*fb', expectedUpperLimit = '6.1033E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -139,7 +139,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET2_HT2_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT2_nb3", observedN = 182, expectedBG = 179 , bgError = 13, upperLimit = '2.0613E+00*fb', expectedUpperLimit = '1.9515E+00*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT2_nb3", observedN = 182, evaluationTypeBG = 179 , bgError = 13, upperLimit = '2.0613E+00*fb', expectedUpperLimit = '1.9515E+00*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -182,7 +182,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET2_HT1_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT1_nb3", observedN = 161, expectedBG = 157 , bgError = 13, upperLimit = '2.0431E+00*fb', expectedUpperLimit = '1.8875E+00*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT1_nb3", observedN = 161, evaluationTypeBG = 157 , bgError = 13, upperLimit = '2.0431E+00*fb', expectedUpperLimit = '1.8875E+00*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -225,7 +225,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET4_HT2_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT2_nb3", observedN = 8, expectedBG = 8.4 , bgError = 2.1, upperLimit = '4.2514E-01*fb', expectedUpperLimit = '4.2430E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT2_nb3", observedN = 8, evaluationTypeBG = 8.4 , bgError = 2.1, upperLimit = '4.2514E-01*fb', expectedUpperLimit = '4.2430E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -268,7 +268,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET4_HT4_nb2")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT4_nb2", observedN = 19, expectedBG = 19.0 , bgError = 3.2, upperLimit = '6.2027E-01*fb', expectedUpperLimit = '6.2027E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT4_nb2", observedN = 19, evaluationTypeBG = 19.0 , bgError = 3.2, upperLimit = '6.2027E-01*fb', expectedUpperLimit = '6.2027E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -311,7 +311,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET4_HT4_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT4_nb3", observedN = 4, expectedBG = 2.1 , bgError = 1.1, upperLimit = '3.8500E-01*fb', expectedUpperLimit = '2.6167E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT4_nb3", observedN = 4, evaluationTypeBG = 2.1 , bgError = 1.1, upperLimit = '3.8500E-01*fb', expectedUpperLimit = '2.6167E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -354,7 +354,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET3_HT4_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT4_nb3", observedN = 4, expectedBG = 2.9 , bgError = 1.3, upperLimit = '3.6165E-01*fb', expectedUpperLimit = '2.5204E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT4_nb3", observedN = 4, evaluationTypeBG = 2.9 , bgError = 1.3, upperLimit = '3.6165E-01*fb', expectedUpperLimit = '2.5204E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -397,7 +397,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET2_HT3_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT3_nb3", observedN = 18, expectedBG = 23.2 , bgError = 3.8, upperLimit = '5.0635E-01*fb', expectedUpperLimit = '6.8517E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT3_nb3", observedN = 18, evaluationTypeBG = 23.2 , bgError = 3.8, upperLimit = '5.0635E-01*fb', expectedUpperLimit = '6.8517E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -440,7 +440,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET4_HT2_nb2")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT2_nb2", observedN = 66, expectedBG = 70.5 , bgError = 6.3, upperLimit = '9.7444E-01*fb', expectedUpperLimit = '1.1161E+00*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT2_nb2", observedN = 66, evaluationTypeBG = 70.5 , bgError = 6.3, upperLimit = '9.7444E-01*fb', expectedUpperLimit = '1.1161E+00*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -483,7 +483,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET3_HT1_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT1_nb3", observedN = 15, expectedBG = 15.5 , bgError = 3.0, upperLimit = '5.5542E-01*fb', expectedUpperLimit = '5.5753E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT1_nb3", observedN = 15, evaluationTypeBG = 15.5 , bgError = 3.0, upperLimit = '5.5542E-01*fb', expectedUpperLimit = '5.5753E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -526,7 +526,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET3_HT2_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT2_nb3", observedN = 36, expectedBG = 32.1 , bgError = 4.3, upperLimit = '9.6536E-01*fb', expectedUpperLimit = '7.8674E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET3_HT2_nb3", observedN = 36, evaluationTypeBG = 32.1 , bgError = 4.3, upperLimit = '9.6536E-01*fb', expectedUpperLimit = '7.8674E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -569,7 +569,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET2_HT4_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT4_nb3", observedN = 14, expectedBG = 12.3 , bgError = 2.7, upperLimit = '6.0499E-01*fb', expectedUpperLimit = '5.1236E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET2_HT4_nb3", observedN = 14, evaluationTypeBG = 12.3 , bgError = 2.7, upperLimit = '6.0499E-01*fb', expectedUpperLimit = '5.1236E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"
@@ -612,7 +612,7 @@ T1ttttoff.addMassPlane(T1tttt)
 
 #+++++++ dataset block ++++++++++++++
 dataset = DataSetInput("MET4_HT3_nb3")
-dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT3_nb3", observedN = 2, expectedBG = 2.0 , bgError = 1.0, upperLimit = '2.6247E-01*fb', expectedUpperLimit = '2.6247E-01*fb')
+dataset.setInfo(dataType = 'efficiencyMap', dataId = "MET4_HT3_nb3", observedN = 2, evaluationTypeBG = 2.0 , bgError = 1.0, upperLimit = '2.6247E-01*fb', expectedUpperLimit = '2.6247E-01*fb')
 #+++++++ next txName block ++++++++++++++
 T1bbbb = dataset.addTxName('T1bbbb')
 T1bbbb.checked ="AL"

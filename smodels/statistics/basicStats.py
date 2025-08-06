@@ -12,12 +12,49 @@ from scipy import stats
 from smodels.base.smodelsLogging import logger
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from typing import Text
+from typing import Text, Union
+from collections.abc import Callable
 
-__all__ = [ "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
+__all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
+
+from enum import Enum
+
+class NllEvalType(Enum):
+    """ an enum to account for the different types of likelihood values: observed,
+    a priori evaluationType, a posteriori evaluationType """
+    observed = 0
+    aposteriori = 1
+    apriori = 2
+
+    @classmethod
+    def init ( cls, evaluationType : Union[str,bool] ):
+        """ get evaluationtype either from a string (e.g. 'posteriori') or a bool
+            (true is priori, false is observed)
+        """
+        evaluationType = str(evaluationType).lower().replace("_","")
+        if evaluationType in [ "posteriori", "aposteriori", "posterior" ]:
+            return cls.aposteriori
+        if evaluationType in [ "apriori", "prior", "priori", "true" ]:
+            return cls.apriori
+        if evaluationType in [ "false", "observed", "obs" ]:
+            return cls.observed
+        raise SModelSError ( f"NllEvalType {evaluationType} unknown" )
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def __eq__ ( self, other ):
+        if type ( other ) == NllEvalType:
+            return super().__eq__ ( other  )
+        if type ( other ) in [ bool, str ]:
+            return super().__eq__ ( NllEvalType.init ( other ) )
+        raise SModelSError ( f"comparing a NllEvalType with {other}({type(other)})" )
+
+## convenience
+observed, aposteriori, apriori = NllEvalType.observed, NllEvalType.aposteriori, NllEvalType.apriori
 
 def CLsfromNLL(
-    nllA: float, nll0A: float, nll: float, nll0: float,
+        nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,
     return_type: Text = "CLs-alpha" ) -> float:
     """
     compute the CLs - alpha from the NLLs
@@ -27,14 +64,16 @@ def CLsfromNLL(
     :param nll0A: negative log likelihood at muhat for Asimov data
     :param nll: negative log likelihood
     :param nll0: negative log likelihood at muhat
+    :param big_muhat: true if muhat>mu
     :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
+                        alpha-CLs: returns CLs - 0.05 \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
     :return: Cls-type value, see above
     """
-    assert return_type in ["CLs-alpha", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
-    qmu = 0.0 if 2 * (nll - nll0) < 0.0 else 2 * (nll - nll0)
+    assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+    qmu = 0.0 if ( nll < nll0 or big_muhat ) else 2 * (nll - nll0)
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
     if qA < 0.0:
@@ -53,8 +92,32 @@ def CLsfromNLL(
         return 1.0 - CLs
     elif return_type == "CLs":
         return CLs
+    elif return_type == "CLs-alpha":
+        return CLs - 0.05
+    # return_type == "alpha-CLs"
+    return 0.05 - CLs
 
-    return CLs - 0.05
+def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args : tuple = (),
+               rtol : float = 8.881784197001252e-16, xtol : float = 2e-12 ) -> float:
+    """ find the root of the function "func", within [lower_bound,upper_bound].
+    We first try the faster toms748. If that doesnt converge, we fall back to brentq.
+    :param func: the callable function to find the root for
+    :param lower_bound: lower end of bracket
+    :param upper_bound: upper end of bracket
+    :param rtol: rtol for both toms748 and brentq
+    :param xtol: xtol for both toms748 and brentq
+    :returns: place where function evaluates to zero
+    """
+    logger.debug("Starting root finding")
+    from scipy import optimize
+    root = optimize.toms748( func, lower_bound, upper_bound, args=args, rtol=rtol,
+                             xtol=xtol, full_output=True )
+    if root[1].converged:
+        root = root[0]
+    else:
+        root = optimize.brentq( func, lower_bound, upper_bound, args=args,
+                                rtol=rtol, xtol=xtol )
+    return root
 
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
          allowNegative = True ):
@@ -111,9 +174,9 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
             continue
         closestr, closest = float("inf"), None
         if i > ntrials or ( b < 0 and not allowNegative ):
-            bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 10000.0, 100000.0, 1000000.0 ]
+            bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10., 1e2, -1e2, 1e3, 1e-2, -1e-2, 1e-3, -1e-3, 1e4, 1e5, 1e6, 1e8 ]
             if not allowNegative:
-                bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001, 10000.0, 100000.0, 1000000.0 ]
+                bvalues = [1.0, 0.0, 3.0, 10.0, 1e-1, 1e2, 1e3, 1e-2, 1e-3, 1e4, 1e5, 1e6, 1e8 ]
             for b in bvalues:
                 rb = rootfinder(b)
                 if rb is None: # if cls computation failed, try with next b value
@@ -129,6 +192,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                 logger.error(f"closest to zero rootfinder({closest})={closestr}")
                 logger.error(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
                 raise SModelSError()
+    if a > b: a,b=b,a
     return a, b
 
 def deltaChi2FromLlhd(likelihood):

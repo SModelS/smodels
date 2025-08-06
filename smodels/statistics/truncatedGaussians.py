@@ -3,7 +3,7 @@
 """
 .. module:: truncatedGaussian
    :synopsis: a module that contains the code that computes an approximate
-              Gaussian likelihood from an expected an observer upper limit. See
+              Gaussian likelihood from an evaluationType an observer upper limit. See
               https://arxiv.org/abs/1202.3415.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -18,6 +18,7 @@ from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from typing import Text, Optional, Union, Dict
 from smodels.statistics.basicStats import deltaChi2FromLlhd
 
@@ -35,7 +36,7 @@ class TruncatedGaussians:
                     corr : Optional[float] = 0.6, cl=.95 ):
         """
         :param upperLimitOnMu: observed upper limit on signal strength mu
-        :param expectedUpperLimitOnMu: expected upper limit on signal strength mu
+        :param expectedUpperLimitOnMu: evaluationType upper limit on signal strength mu
         :param corr: correction factor:
            ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
            When comparing with likelihoods constructed from efficiency maps,
@@ -50,14 +51,14 @@ class TruncatedGaussians:
         self.upperLimitOnMu = upperLimitOnMu
         self.expectedUpperLimitOnMu = expectedUpperLimitOnMu
         self.corr = corr
-        self.sigma_mu = self._getSigmaMu()  # the expected scale, eq 3.24 in arXiv:1202.3415
+        self.sigma_mu = self._getSigmaMu()  # the evaluationType scale, eq 3.24 in arXiv:1202.3415
         self.denominator = np.sqrt(2.0) * self.sigma_mu
         self.cl = cl
 
     def likelihood ( self, mu : Union[float,None], return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
-            expected : Union[Text,bool] = False ) -> Union[None,float]:
+            evaluationType : NllEvalType = observed ) -> Union[None,float]:
         """ return the likelihood, as a function of mu
 
         :param mu: number of signal events, if None then mu = muhat
@@ -75,14 +76,14 @@ class TruncatedGaussians:
         muhat, sigma_mu = float("inf"), float("inf")
         dsig = self._likelihoodOfMu ( mu, return_nll=return_nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr,
-                expected = expected )
+                evaluationType = evaluationType )
         ret = dsig[sllhd]
         return ret
 
     def lmax ( self, return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
-            expected : Union[bool,Text] = False ) -> Dict:
+            evaluationType : NllEvalType = observed ) -> Dict:
         """
         Return the likelihood, as a function of mu
 
@@ -104,7 +105,7 @@ class TruncatedGaussians:
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
         muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
         # llhd evaluated at mu_hat 
-        if expected:
+        if evaluationType != observed:
             muhat = 0.
         lmax = self.likelihood ( muhat, return_nll=return_nll )
 
@@ -115,7 +116,7 @@ class TruncatedGaussians:
             return_nll : Optional[bool] = False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6, 
-            expected : Union[bool,Text] = False ) -> float:
+            evaluationType : NllEvalType = observed ) -> float:
         """ return the likelihood, as a function of nsig
 
         :param mu: signal strength
@@ -140,7 +141,7 @@ class TruncatedGaussians:
                 xa = -self.expectedUpperLimitOnMu
                 xb = 1
                 muhat = 0.
-                if expected == False:
+                if evaluationType == observed:
                     muhat = self._findMuhat( xa, xb )
                 ret = self._computeLlhd(mu, muhat, return_nll = return_nll )
                 return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
@@ -149,7 +150,7 @@ class TruncatedGaussians:
                 return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
         muhat = 0.
-        if expected == False:
+        if evaluationType == observed:
             xa = -self.expectedUpperLimitOnMu
             xb = self.expectedUpperLimitOnMu
             muhat = self._findMuhat(xa,xb)
@@ -162,7 +163,7 @@ class TruncatedGaussians:
         """ get the standard deviation sigma on the signal strength mu, given
         an upper limit and a central value. assumes a truncated Gaussian likelihood
         """
-        # the expected scale, eq 3.24 in arXiv:1202.3415
+        # the evaluationType scale, eq 3.24 in arXiv:1202.3415
         sigma_mu = self.expectedUpperLimitOnMu / 1.96
         #if self.newCorrectionType: # we could correct here
         #    sigma_mu = sigma_mu / ( 1. - self.corr/2.)
@@ -210,8 +211,13 @@ class TruncatedGaussians:
         except ValueError as e:
             logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
             logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
-            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02)
-            logger.error ( f"retry with tol=1e-2 seemed to have worked" )
+            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02, full_output = True )
+            if muhat[1].converged:
+                muhat = muhat[0]
+                logger.error ( f"retry with tol=1e-2 seemed to have worked" )
+            else:
+                muhat = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
+                logger.error ( f"retry with brentq seemed to have worked" )
         return muhat
 
     def _computeLlhd( self, mu, muhat, return_nll):

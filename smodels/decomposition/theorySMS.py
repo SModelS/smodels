@@ -76,7 +76,7 @@ class TheorySMS(GenericSMS):
         """
 
         if not isinstance(other,TheorySMS):
-            raise SModelSError("Can not compare TheorySMS and %s" %str(type(other)))
+            raise SModelSError(f"Can not compare TheorySMS and {str(type(other))}")
         elif self.canonName != other.canonName:
             raise SModelSError("Can not add elements with distinct topologies")
 
@@ -124,7 +124,7 @@ class TheorySMS(GenericSMS):
         """
 
         if not isinstance(other,TheorySMS):
-            raise SModelSError("Can not compare TheorySMS and %s" %str(type(other)))
+            raise SModelSError(f"Can not compare TheorySMS and {str(type(other))}")
 
         # Make sure the SMS are sorted
         # (if it has already been sorted, it does nothing)
@@ -327,7 +327,7 @@ class TheorySMS(GenericSMS):
         for ancestor in self.getAncestors():
             ancestor.coveredBy.add(resultType)
 
-    def compress(self, doCompress, doInvisible, minmassgap):
+    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR):
         """
         Keep compressing the original SMS and the derived ones till they
         can be compressed no more.
@@ -337,6 +337,9 @@ class TheorySMS(GenericSMS):
         :parameter minmassgap: value (in GeV) of the maximum
                                mass difference for compression
                                (if mass difference < minmassgap, perform mass compression)
+        :parameter minmassgapISR: value (in GeV) for mass compression leading to pure
+                                  ISR signature, i.e. PV > MET + MET + ... MET,
+                                  (if all mass differences < minmassgapISR allow a pure ISR SMS)
         :returns: list with the compressed SMS (TheorySMS objects)
         """
 
@@ -352,7 +355,7 @@ class TheorySMS(GenericSMS):
             # Check for mass compressed topologies
             if doCompress:
                 for sms in newList:
-                    newSMS = sms.massCompress(minmassgap)
+                    newSMS = sms.massCompress(minmassgap,minmassgapISR)
                     # Avoids double counting
                     # (elements sharing the same parent are removed during clustering)
                     if (newSMS is not None) and (newSMS not in newList):
@@ -374,7 +377,7 @@ class TheorySMS(GenericSMS):
 
         return newList
 
-    def massCompress(self, minmassgap):
+    def massCompress(self, minmassgap, minmassgapISR):
         """
         Perform mass compression.
         It is only done if there is one decay of type BSM_i -> BSM_j + (any number of SM),
@@ -383,6 +386,9 @@ class TheorySMS(GenericSMS):
         :parameter minmassgap: value (in GeV) of the maximum
                                mass difference for compression
                                (if mass difference < minmassgap -> perform mass compression)
+        :parameter minmassgapISR: value (in GeV) for mass compression leading to pure
+                                  ISR signature, i.e. PV > MET + MET + ... MET,
+                                  (if all mass differences < minmassgapISR allow a pure ISR SMS)
         :returns: compressed copy of self, if two masses in the
                   SMS can be considered degenerate; None, if compression is not possible;
         """
@@ -391,6 +397,7 @@ class TheorySMS(GenericSMS):
         newSMSList = [self]  # Dummy list to store newSMS
 
         # Loop over nodes from root to leaves:
+        maxCompMassDiff = None # Keep track of the maximum compressed mass diffirence
         for momIndex, daughterIndices in self.genIndexIterator():
             newSMS = newSMSList[0]
             if momIndex is newSMS.rootIndex:  # Skip primary vertex
@@ -434,6 +441,9 @@ class TheorySMS(GenericSMS):
             # Remove mother and all SM daughters:
             removeIndices = smDaughters + [momIndex]
             newSMS.remove_nodes_from(removeIndices)
+            # Store the compressed massDiff
+            if (maxCompMassDiff is None) or (massDiff > maxCompMassDiff):
+                maxCompMassDiff = massDiff
 
             # Attach BSM daughter to grandmother:
             newSMS.add_edge(gMomIndex, bsmDaughter)
@@ -449,6 +459,21 @@ class TheorySMS(GenericSMS):
         # Recompute the global properties (except for the weightList)
         # and sort the new SMS
         newSMS.setGlobalProperties(weight=False)
+
+        # Check if any of the compressions violates minmassgapISR
+        # and if the compressed SMS corresponds to pure MET, i.e. PV > MET + MET +... + MET
+        if maxCompMassDiff >= minmassgapISR:
+            primaryMoms = newSMS.daughterIndices(newSMS.rootIndex)
+            # Check if all primary mothers are final states and are MET
+            if all(newSMS.out_degree(mom) == 0 for mom in primaryMoms):
+                if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):                      
+        # Redo the compression, but with minmassgap set to maxCompMassDiff
+        # This way at least one of the steps in the compression will not be performed and the
+        # compressed SMS will not be pure MET. 
+        # Also, it guarantees that the largest mass difference is the one left uncompressed
+        # (we set minmassgap slightly below maxCompMassDiff for numerical estability)
+                    return self.massCompress(minmassgap=(0.999*maxCompMassDiff),
+                                     minmassgapISR=minmassgapISR)
 
         return newSMS
 

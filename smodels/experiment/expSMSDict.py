@@ -44,7 +44,7 @@ class ExpSMSDict(dict):
         of unique SMS and txname objects.
         """
 
-        strD = "Dict with %i unique SMS for %i txname objects" %(len(self._smsDict),len(self._txDict))
+        strD = f"Dict with {len(self._smsDict)} unique SMS for {len(self._txDict)} txname objects"
         
         return strD
     
@@ -69,7 +69,7 @@ class ExpSMSDict(dict):
         elif isinstance(key,TxName):
             useDict = self._txDict
         else:
-            logger.error("Can not assing a %s object to a ExpSMSDict" %str(type(key)))
+            logger.error(f"Can not assing a {str(type(key))} object to a ExpSMSDict")
             raise SModelSError()
 
         return useDict[key]
@@ -85,7 +85,7 @@ class ExpSMSDict(dict):
         elif isinstance(key,TxName):
             useDict = self._txDict
         else:
-            logger.error("Can not assing a %s object to a ExpSMSDict" %str(type(key)))
+            logger.error(f"Can not assing a {str(type(key))} object to a ExpSMSDict")
             raise SModelSError()
 
         useDict[key] =  value
@@ -97,7 +97,7 @@ class ExpSMSDict(dict):
         elif isinstance(key,TxName):
             useDict = self._txDict
         else:
-            logger.error("Can not assing a %s object to a ExpSMSDict" %str(type(key)))
+            logger.error(f"Can not assing a {str(type(key))} object to a ExpSMSDict")
             raise SModelSError()
 
         dict.__delitem__(useDict,key)
@@ -229,7 +229,7 @@ class ExpSMSDict(dict):
             for tx in exp.getTxNames():
                 # Loop over ExpSMS in the txname:
                 if tx in self.getTx():
-                    logger.error("TxName %s for %s already present in the map (should never happen)!" %(tx,exp))
+                    logger.error(f"TxName {tx} for {exp} already present in the map (should never happen)!")
                     raise SModelSError()
                 self[tx] = {}
                 self._nodesDict[tx] = {}

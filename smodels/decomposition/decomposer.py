@@ -21,15 +21,18 @@ from itertools import product
 
 
 def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
-              minmassgap=0 * GeV):
+              minmassgap = 0*GeV, minmassgapISR = 0*GeV):
     """
     Perform decomposition using the information stored in model.
 
     :param sigmacut: minimum sigma*BR to be generated, by default sigcut = 0.1 fb
     :param massCompress: turn mass compression on/off
     :param invisibleCompress: turn invisible compression on/off
-    :param minmassgap: maximum value (in GeV) for considering two R-odd particles
+    :param minmassgap: maximum value (in GeV) for considering two BSM particles
                        degenerate (only revelant for massCompress=True )
+    :param minmassgapISR: maximum value (in GeV) for mass compression leading to pure
+                       ISR signature, i.e. PV > MET + MET + ... MET,
+                       (only revelant for massCompress=True )
     :returns: list of topologies (TopologyList object)
 
     """
@@ -86,14 +89,15 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
         smsTopDict.addSMS(sms)
 
     if massCompress or invisibleCompress:
-        smsTopDict.compress(massCompress, invisibleCompress, minmassgap)
+        smsTopDict.compress(massCompress, invisibleCompress, 
+                            minmassgap, minmassgapISR)
     # Sort the topology dictionary according to the canonical names
     smsTopDict.sort()
     # Set the SMS IDs
     smsTopDict.setSMSIds()
 
 
-    logger.debug("decomposer done in %.2f s." % (time.time() - t1))
+    logger.debug(f"decomposer done in {time.time() - t1:.2f} s.")
 
     return smsTopDict
 

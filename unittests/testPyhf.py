@@ -368,7 +368,8 @@ class PyhfTest(unittest.TestCase):
 
     def testPatchUncertaintyAndCRs(self):
         """
-        Test if signal uncertainty and signal in the CRs are pathed, with ATLAS-SUSY-2018-16 as a test case
+        Test if signal uncertainty and signal in the CRs are patched, with ATLAS-SUSY-2018-16 as a test case
+
         """
         from smodels.base.physicsUnits import GeV
         from smodels.experiment.databaseObj import Database

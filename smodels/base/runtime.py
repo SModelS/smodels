@@ -10,7 +10,8 @@
 
 """
 
-from typing import Union
+from typing import Union, Text, Dict
+import os
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
@@ -20,7 +21,78 @@ _experimental = { "truncatedgaussians": False,
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
-def filetype ( filename ):
+def checkForIncompatibleModuleVersions():
+    """ for 3.1.0, at release time, we have the problem that scipy 1.16
+    does not work with pyhf 0.7.6. we warn about such situations.
+    """
+    from importlib.metadata import version
+    if version("scipy")[:4] in [ "1.16", "1.17" ]:
+        print ( f"SModelS warning: scipy v{version('scipy')} is installed, but it seems " \
+                 "this version does not work with pyhf 0.7.6. We recommend scipy 1.15.x " \
+                 "and pyhf 0.7.6. You have been warned." )
+        
+checkForIncompatibleModuleVersions()
+
+def returnGitCommitId():
+    """ if we are in a git-managed repository, return the git commit id """
+    try:
+        import subprocess
+        # Check if we're inside a Git repository
+        subprocess.run(
+            ['git', 'rev-parse', '--is-inside-work-tree'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
+
+        # Get the current commit hash
+        commit = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'],
+            stderr=subprocess.DEVNULL
+        ).decode('utf-8').strip()
+
+        return commit
+
+    except subprocess.CalledProcessError:
+        # Not a Git repo, or git command failed—do nothing
+        return None
+
+def printEnvironmentInfo( args : Dict ):
+    """ very simple method that prints out info relevant to debugging
+        machine-dependent problems
+    :param args: a dictionary with options, currently only a "colors" option
+    is available
+    :returns: true if all depenendencies are met
+    """
+    from smodels.base.smodelsLogging import colors
+    colors.on = True if "colors" in args and args["colors"] == True else False
+    import importlib, platform
+
+    modules = [ "scipy", "sympy", "numpy",
+        "pyslha", "unum", "pyhf" ]
+
+    print("Environment Information:")
+    print(f"Operating System: {colors.green}{platform.system()} {platform.release()}{colors.reset}")
+    print(f"Python Version: {colors.green}{platform.python_version()}{colors.reset}")
+    print(f"Machine Architecture: {colors.green}{platform.machine()}{colors.reset}")
+    print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
+    print("\nModule Versions:")
+
+    depsMet = True
+    for module_name in modules:
+        try:
+            module = importlib.import_module(module_name)
+            version = getattr(module, '__version__', 'Unknown version attribute')
+            print(f"{module_name:<12}: {colors.green}{version}{colors.reset}")
+        except ImportError:
+            print(f"{module_name:<12}: Not installed")
+            depsMet = False
+    gitId = returnGitCommitId()
+    if gitId != None:
+        print ( f"\ngit commit: {gitId}" )
+    return depsMet
+
+def filetype ( filename : os.PathLike ) -> Union[Text,None]:
     """ obtain information about the filetype of an input file,
         currently only used to discriminate between slha and lhe
         files.
@@ -53,12 +125,11 @@ def filetype ( filename ):
         return None
     return None
 
-
 def experimentalFeature( feature : str ) -> Union[None,bool]:
     """ method to check if a certain experimental feature is enabled.
     can be turned on and off via options:experimental in parameters.ini.
     :param feature: ask for feature
-    
+
     :returns: None if feature does not exist, else boolean
     """
     if not feature in _experimental:
@@ -99,4 +170,5 @@ def nCPUs():
     return None
 
 if __name__ == "__main__":
-    print ( "This machine has %d CPUs" % nCPUs() )
+    printEnvironmentInfo()
+    # print ( f"This machine has {nCPUs()} CPUs" )

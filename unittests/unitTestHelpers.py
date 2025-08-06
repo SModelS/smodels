@@ -24,6 +24,47 @@ from smodels.base.physicsUnits import fb
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 
+import sys
+
+def checkPythonRequirements(requirements_path: 
+			os.PathLike = "../smodels/share/requirements.txt"):
+    """ Simple function to check if the Python requirements 
+	  are met using importlib and packaging."""
+    from pathlib import Path
+    from importlib.metadata import version, PackageNotFoundError
+    from packaging.requirements import Requirement
+    from packaging.version import Version
+    req_path = Path(requirements_path)
+    if not req_path.exists():
+        print(f"❌ Requirements file not found: {requirements_path}")
+        sys.exit(1)
+
+    with req_path.open() as f:
+        requirements = f.read().splitlines()
+
+    # Filter out comments and empty lines
+    requirements = [line.strip() for line in requirements if line.strip() \
+				   and not line.strip().startswith("#")]
+
+    print(f"[unitTestHelpers] Checking {len(requirements)} python dependencies ... ", end="")
+
+    for req_line in requirements:
+        try:
+            req = Requirement(req_line)
+            dist_name = req.name
+            installed_version = version(dist_name)
+            if Version(installed_version) not in req.specifier:
+                print(f"\n❌ Version conflict: {req_line} -> installed: {installed_version}")
+                sys.exit(1)
+        except PackageNotFoundError:
+            print(f"\n❌ Missing package: {req_line}")
+            sys.exit(1)
+        except Exception as e:
+            print(f"\n❌ Error checking {req_line}: {e}")
+            sys.exit(1)
+
+    print("all requirements are met.")
+
 def canonNameToVertNumb(topoDict,cName):
     """
     Convert canonical name to old vertnumb notation (in string format)
@@ -115,7 +156,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         if (where == 'Mass (GeV)' or where == 'Width (GeV)'):
             if obj1 is None or obj2 is None:
                 return True
-        logger.warning("Data types differ: (%s,%s) <-> (%s,%s) in ''%s'':%s" % (obj1, type(obj1), obj2, type(obj2), where, fname ))
+        logger.warning(f"Data types differ: ({obj1},{type(obj1)}) <-> ({obj2},{type(obj2)}) in ''{where}'':{fname}")
         return False
 
     if isinstance(obj1, unum.Unum):
@@ -135,13 +176,13 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         rel_diff = 2.*abs_diff/abs(obj1+obj2)
         ret = (rel_diff < allowedRelDiff)
         if not ret:
-            logger.error("values %s and %s differ by %s in ''%s'': %s != %s" % (obj1, obj2, rel_diff, where, fname, fname2))
+            logger.error(f"values {obj1} and {obj2} differ by {rel_diff} in ''{where}'': {fname} != {fname2}")
         return ret
     elif isinstance(obj1, str):
         obj1 = obj1.replace(" ","")  # Remove blanks
         obj2 = obj2.replace(" ","")  # Remove blanks
         if obj1 != obj2:
-            logger.error("strings ``%s'' and ``%s'' differ in %s:%s" % (obj1, obj2, where, fname))
+            logger.error(f"strings ``{obj1}'' and ``{obj2}'' differ in {where}:{fname}")
         return obj1 == obj2
     elif isinstance(obj1, dict):
         for key in obj1:
@@ -155,11 +196,11 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 deffile = f" (default file {fname2})"
                 if fname2 == "unspecified":
                     deffile = ""
-                logger.warning("Key ``%s'' missing in %s:%s%s" % (key, where, fname, deffile ))
+                logger.warning(f"Key ``{key}'' missing in {where}:{fname}{deffile}")
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
                              where=key, fname=fname, fname2=fname2):
-                logger.warning("Objects differ for %s" % (key))
+                logger.warning(f"Objects differ for {key}")
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
@@ -179,7 +220,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     if checkBothOrders:
         if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
                          fname2, fname, checkBothOrders=False):
-            logger.error("Objects %s and %s differ in %s: %s != %s" % (obj1, obj2, where, fname, fname2))
+            logger.error(f"Objects {obj1} and {obj2} differ in {where}: {fname} != {fname2}")
             return False
     return True
 
@@ -193,12 +234,12 @@ def sortXML(xmltree):
 def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
 
     if len(xmldefault) != len(xmlnew):
-        logger.warning("lengths of document %d != %d" % (len(xmldefault), len(xmlnew)))
+        logger.warning( f"lengths of document {len(xmldefault)} != {len(xmlnew)}" )
         return False
     for i, el in enumerate(xmldefault):
         newel = xmlnew[i]
         if len(el) != len(newel):
-            logger.warning("lengths of elements %s and %s differ (%d != %d)" % (el.tag,newel.tag,len(el), len(newel)))
+            logger.warning( f"lengths of elements {el.tag} and {newel.tag} differ ({len(el)} != {len(newel)})" )
             return False
         if len(el) == 0:
             if el.tag in ignore:
@@ -221,10 +262,10 @@ def compareXML(xmldefault, xmlnew, allowedRelDiff, ignore=[]):
             if isinstance(el.text, float) and isinstance(newel.text, float):
                 diff = 2.*abs(el.text-newel.text)/abs(el.text+newel.text)
                 if diff > allowedRelDiff:
-                    logger.warning("values %s and %s differ" % (el.text, newel.text))
+                    logger.warning( f"values {el.text} and {newel.text} differ" )
                     return False
             elif newel.text != el.text:
-                logger.warning("texts %s and %s differ" % (el.text, newel.text))
+                logger.warning( f"texts {el.text} and {newel.text} differ" )
                 return False
         else:
             if not compareXML(el, newel, allowedRelDiff, ignore):
@@ -245,7 +286,7 @@ def compareSLHA(slhadefault, slhanew, allowedRelDiff):
 
     for b in defaultData.blocks:
         if len(defaultData.blocks[b].entries) != len(newData.blocks[b].entries):
-            logger.error('Numbers of entries in block %s differ' % (defaultData.blocks[b].name))
+            logger.error( f'Numbers of entries in block {defaultData.blocks[b].name} differ' )
             return False
         keys = defaultData.blocks[b].keys()
         bkeys = newData.blocks[b].keys()
@@ -320,11 +361,11 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
     with redirector.stdout_redirected(to=to):
         out = join(iDir(), "unittests/unitTestOutput")
         setLogLevel(level)
-        run(filename, parameterFile=join(iDir(), "unittests/%s" % inifile),
+        run(filename, parameterFile=join(iDir(), f"unittests/{inifile}" ),
             outputDir=out, db=database, timeout=timeout,
             development=development)
         setLogLevel(oldlevel)
-        sfile = join(iDir(), "unittests/unitTestOutput/%s.py" % basename(filename))
+        sfile = join(iDir(), f"unittests/unitTestOutput/{basename(filename)}.py" )
         return sfile
 
 
@@ -337,7 +378,7 @@ def compareScanSummary(outA, outB, allowedRelDiff):
         headerB = f.readlines()[:5]
     for il,lA in enumerate(headerA):
         if lA != headerB[il]:
-            logger.error("Headers differ:\n %s\n and\n %s\n" % (lA, headerB[il]))
+            logger.error(f"Headers differ:\n {lA}\n and\n {headerB[il]}\n")
             return False
 
     fA = np.genfromtxt(outA, dtype=None, encoding='utf-8',
@@ -348,7 +389,7 @@ def compareScanSummary(outA, outB, allowedRelDiff):
 
 
     if sorted(fA['filename']) != sorted(fB['filename']):
-        logger.error("Filenames differ:\n %s\n and\n %s" % (sorted(fA['filename']), sorted(fB['filename'])))
+        logger.error(f"Filenames differ:\n {sorted(fA['filename'])}\n and\n {sorted(fB['filename'])}")
         return False
 
     for fname in fA['filename']:
@@ -360,10 +401,10 @@ def compareScanSummary(outA, outB, allowedRelDiff):
             elif isinstance(ptA[col], (float, int)):
                 diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
                 if diff > allowedRelDiff:
-                    logger.error("values for %s differ by %s in %s" % (col, diff, fname))
+                    logger.error( f"values for {col} differ by {diff} ({ptA[col]} vs {ptB[col]}) in {fname}" )
                     return False
             else:
-                logger.error("values for %s differ in %s" % (col, fname))
+                logger.error(f"values for {col} differ in {fname}" )
                 return False
     return True
 
@@ -374,14 +415,14 @@ def compareObjs(obj1, obj2, allowedRelDiff=0.05):
     obj2_keys = sorted([k for k in dir(obj2) if not k[0] == '_'])
 
     if obj1_keys != obj2_keys:
-        logger.warning('Object attributes differ:\n %s \n and \n %s' % (obj1_keys, obj2_keys))
+        logger.warning(f'Object attributes differ:\n {obj1_keys} \n and \n {obj2_keys}')
         return False
 
     for key in obj1_keys:
         attr1 = getattr(obj1, key)
         attr2 = getattr(obj2, key)
         if type(attr1) != type(attr2):
-            logger.warning('Type of attribute differ:\n %s \n and \n %s' % (type(attr1), type(attr2)))
+            logger.warning(f'Type of attribute differ:\n {type(attr1)} \n and \n {type(attr2)}')
             return False
         elif attr1 != attr2:
             if isinstance(attr1, (float, int)):
@@ -391,7 +432,7 @@ def compareObjs(obj1, obj2, allowedRelDiff=0.05):
                                    % (key, allowedRelDiff, attr1, attr2))
                     return False
             else:
-                logger.warning('Attribute %s value differ:\n %s \n and \n %s' % (key, attr1, attr2))
+                logger.warning(f'Attribute {key} value differ:\n {attr1} \n and \n {attr2}')
                 return False
     return True
 
@@ -428,8 +469,8 @@ class Summary():
         fn = self._filename.replace("//", "/")
         final = fn.replace(os.getcwd(), ".")
         if len(final) > 50:
-            final = "..."+final[-47:]
-        return "Summary(%s)" % final
+            final = f"...{final[-47:]}"
+        return f"Summary({final})"
 
     def __eq__(self, other):
         return compareObjs(self, other, self._allowedRelDiff)
@@ -567,7 +608,7 @@ class Summary():
                 lkeys = lkeys.split(',')
                 lvals = [eval(val) for val in lvals.split(',')]
                 for i, label in enumerate(lkeys):
-                    setattr(self, 'comb'+label.strip(), lvals[i])
+                    setattr(self, f"comb{label.strip()}", lvals[i])
             elif 'combined r-value (expected)' in line:
                 rexp = eval(line.split(':')[1])
                 self.rexpComb = rexp

@@ -17,6 +17,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 from collections import OrderedDict
 import unum
 import time
@@ -119,14 +120,14 @@ class PyPrinter(BasicPrinter):
                     branch = obj.indexToNode(bIndex)
                     if branch.isSM:
                         continue
-                    mass = float('%1.3e' %branch.mass.asNumber(GeV))
+                    mass = float(f'{branch.mass.asNumber(GeV):1.3e}')
                     bMasses = [mass]
                     pids = [branch.pdg]
                     for n in obj.dfsIndexIterator(bIndex):
                         node = obj.indexToNode(n)
                         if node.isSM:
                             continue
-                        mass = float('%1.3e' %node.mass.asNumber(GeV))
+                        mass = float(f'{node.mass.asNumber(GeV):1.3e}')
                         bMasses.append(mass)
                         pids.append(node.pdg)
                     masses.append(bMasses)
@@ -144,7 +145,7 @@ class PyPrinter(BasicPrinter):
         if self.outputFormat == 'current':
             smsDict["ID"] = obj.smsID
             smsDict["SMS"] = str(obj)
-            smsDict["Masses (GeV)"] = [(str(node),float('%1.3e' %node.mass.asNumber(GeV)))
+            smsDict["Masses (GeV)"] = [(str(node),float(f'{node.mass.asNumber(GeV):1.3e}'))
                                       for node in obj.nodes if not node.isSM]
             smsDict["PIDs"] = [(str(node),node.pdg)
                               for node in obj.nodes if not node.isSM]
@@ -160,7 +161,7 @@ class PyPrinter(BasicPrinter):
             if len(xsecs) != 1:
                 logger.warning("Cross section lists contain multiple values for %s .\
                 Only the first cross section will be printed" % str(sqrts))
-            xsecs = float('%1.2e' %xsecs[0])
+            xsecs = float(f'{xsecs[0]:1.2e}')
             sqrtsStr = 'xsec '+str(sqrts.asNumber(TeV))+' TeV'
             smsDict["Weights (fb)"][sqrtsStr] = xsecs
 
@@ -188,7 +189,7 @@ class PyPrinter(BasicPrinter):
         # hidden feature, printtimespent, turn on in ini file, e.g.
         # [summary-printer] printtimespent = True
         if self.printtimespent:
-            infoDict['time spent'] = "%.2fs" % (time.time() - self.time)
+            infoDict['time spent'] = f"{time.time() - self.time:.2f}s"
         return {'OutputStatus': infoDict}
 
     def _formatTheoryPredictionList(self, obj):
@@ -206,7 +207,7 @@ class PyPrinter(BasicPrinter):
             dataType = theoryPrediction.dataType()
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(
-                expected=self.getTypeOfExpected())
+                evaluationType=self.getTypeOfExpected())
             if isinstance(ul, unum.Unum):
                 ul = ul.asNumber(fb)
             if isinstance(ulExpected, unum.Unum):
@@ -271,9 +272,9 @@ class PyPrinter(BasicPrinter):
 
             sqrts = expResult.globalInfo.sqrts
 
-            r = self._round(theoryPrediction.getRValue(expected=False))
+            r = self._round(theoryPrediction.getRValue(evaluationType=False))
             r_expected = self._round(theoryPrediction.getRValue(
-                expected=self.getTypeOfExpected()))
+                evaluationType=self.getTypeOfExpected()))
 
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
@@ -360,9 +361,9 @@ class PyPrinter(BasicPrinter):
         # Add summary of groups:
         for group in groups:
             sqrts = group.sqrts.asNumber(TeV)
-            uncoveredDict["Total xsec for %s (fb)" % group.description] = \
+            uncoveredDict[f"Total xsec for {group.description} (fb)"] = \
                 self._round(group.getTotalXSec())
-            uncoveredDict["%s" % group.description] = []
+            uncoveredDict[f"{group.description}"] = []
             for fsSMS in group.finalStateSMS[:nprint]:
                 fsSMSDict = {'sqrts (TeV)': sqrts, 'weight (fb)': self._round(fsSMS.missingX)}
 
@@ -381,7 +382,7 @@ class PyPrinter(BasicPrinter):
                     else:
                         fsSMSDict["SMS IDs"] = [sms.smsID
                                                 for sms in fsSMS._contributingSMS]
-                uncoveredDict["%s" % group.description].append(fsSMSDict)
+                uncoveredDict[f"{group.description}"].append(fsSMSDict)
 
         return uncoveredDict
 
@@ -400,14 +401,14 @@ class PyPrinter(BasicPrinter):
         # Get list of analyses used in combination:
         expIDs = obj.analysisId()
         ul = obj.getUpperLimit()
-        ulExpected = obj.getUpperLimit(expected=True)
+        ulExpected = obj.getUpperLimit(evaluationType=self.getTypeOfExpected())
         if isinstance(ul, unum.Unum):
             ul = ul.asNumber(fb)
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
-        r = self._round(obj.getRValue(expected=False))
-        r_expected = self._round(obj.getRValue(expected=True))
+        r = self._round(obj.getRValue(evaluationType=False))
+        r_expected = self._round(obj.getRValue(evaluationType=self.getTypeOfExpected()))
 
         nll = self._round(obj.likelihood( return_nll = True ))
         nllmin = self._round(obj.lmax( return_nll = True ))

@@ -2,6 +2,7 @@ smodelsOutputDefault={
     'OutputStatus': {
         'sigmacut': 0.03,
         'minmassgap': 5.0,
+        'minmassgapisr' : 5.0,
         'maxcond': 0.2,
         'ncpus': -6,
         'model': 'share.models.mssm',
@@ -300,7 +301,7 @@ smodelsOutputDefault={
     'CombinedRes': [
         {
             "AnalysisID": "ATLAS-CONF-2013-037,CMS-SUS-13-012",
-            "r": 0.1332296,
+            "r": 0.1199965,
             "r_expected": 0.207,
             "nll": 9.26403233033306,
             "nll_min": 8.92496220146949,

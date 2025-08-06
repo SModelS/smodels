@@ -79,7 +79,7 @@ class TopologyDict(OrderedDict):
             allsmsList.extend(self[cName])
         return allsmsList
 
-    def compress(self, doCompress, doInvisible, minmassgap):
+    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR):
         """
         Compress all SMS in the dictionary and include the compressed
         SMS in the topology list.
@@ -89,11 +89,14 @@ class TopologyDict(OrderedDict):
         :parameter minmassgap: value (in GeV) of the maximum
                                mass difference for compression
                                (if mass difference < minmassgap, perform mass compression)
-
+        :parameter minmassgapISR: value (in GeV) for mass compression leading to pure
+                                  ISR signature, i.e. PV > MET + MET + ... MET,
+                                  (if all mass differences < minmassgapISR allow a pure ISR SMS)
         """
 
         for sms in self.getSMSList():
-            newSMSList = sms.compress(doCompress, doInvisible, minmassgap)
+            newSMSList = sms.compress(doCompress, doInvisible, 
+                                      minmassgap, minmassgapISR)
             if not newSMSList:
                 continue
             for sms in newSMSList:

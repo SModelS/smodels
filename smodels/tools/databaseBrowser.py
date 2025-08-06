@@ -137,7 +137,7 @@ class Browser(object):
 
         return expres.getEfficiencyFor(txname=txname, mass=massarray, dataset=dataset)
 
-    def getULFor(self,expid,txname,massarray, expected=False ):
+    def getULFor(self,expid,txname,massarray, evaluationType=False ):
         """
         Get an upper limit for the given experimental id, the txname,
         and the massarray.
@@ -148,7 +148,7 @@ class Browser(object):
         :param txname: txname (string). ONLY required for upper limit results
         :param massarray: list of masses with units, e.g.
                           [[ 400.*GeV, 100.*GeV],[400.*GeV, 100.*GeV]]
-        :param expected: If true, return expected upper limit, otherwise
+        :param expected: If true, return evaluationType upper limit, otherwise
                          return observed upper limit.
         :return: upper limit [fb]
         """
@@ -172,9 +172,9 @@ class Browser(object):
         for tx in txnames:
             if not tx.txName == txname:
                 continue
-            return tx.getULFor(sms=None,mass=massarray,expected=expected)
+            return tx.getULFor(sms=None,mass=massarray,evaluationType=evaluationType)
 
-        logger.warning( "Could not find TxName %s ." % (txname))
+        logger.warning( f"Could not find TxName {txname} .")
         return None
 
     def getULForSR(self,expid,datasetID):
@@ -206,7 +206,7 @@ class Browser(object):
                 continue
             return dataset.getSRUpperLimit()
 
-        logger.warning ( "Could not find dataset %s ." % (datasetID))
+        logger.warning ( f"Could not find dataset {datasetID} .")
         return None
 
 
@@ -228,7 +228,7 @@ class Browser(object):
         allfields = self.getAttributes()
         for tag,value in restrDict.items():
             if tag in allfields: rDict[tag] = value
-            else: logger.warning("Field/attribute %s not found (will be ignored)." % tag)
+            else: logger.warning(f"Field/attribute {tag} not found (will be ignored).")
 
         results = self.database.expResultList[:]
         for expRes in results[:]:
@@ -286,7 +286,7 @@ def main(args):
 
         header += "\n"
         header += "fb, pb, GeV, TeV defined.\n"
-        header +=  "\nBrowser loaded for %s \n" %( args.path_to_database )
+        header +=  f"\nBrowser loaded for {args.path_to_database} \n"
         header += "Try 'print(browser)' for the list of available results.\n"
         header += "More examples on how to access the database can be found in the SModelS manual.\n"
         header += "\nType 'exit' to exit this session."

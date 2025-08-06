@@ -92,7 +92,7 @@ class SMSTest(unittest.TestCase):
         n1.mass = 390.*GeV
         n1.totalwidth = 0.*GeV
 
-        smsComp = sms1.massCompress(minmassgap = 5.*GeV)
+        smsComp = sms1.massCompress(minmassgap = 5.*GeV, minmassgapISR= 5*GeV)
 
         stringEl = "(PV > st_1(1),st_1(2)), (st_1(2) >b,t+,N1), (st_1(1) > b,t+,N1)"
         sms2 = fromString(stringEl, model=model)
@@ -104,7 +104,7 @@ class SMSTest(unittest.TestCase):
         gluino.mass = 400.*GeV
         st1.mass = 393.*GeV
         n1.mass = 390.*GeV
-        smsComp = sms1.massCompress(minmassgap = 5.*GeV)
+        smsComp = sms1.massCompress(minmassgap = 5.*GeV, minmassgapISR= 5*GeV)
 
         stringEl = "(PV > gluino(1),N1), (gluino(1) > t+,N1)"
         sms2 = fromString(stringEl, model=model)
@@ -113,7 +113,7 @@ class SMSTest(unittest.TestCase):
 
 
         #Compress everything
-        smsComp = sms1.massCompress(minmassgap = 10.*GeV) #Fully compress
+        smsComp = sms1.massCompress(minmassgap = 10.*GeV, minmassgapISR=10*GeV) #Fully compress
         stringEl = "(PV > N1,N1)"
         sms2 = fromString(stringEl, model=model)
 

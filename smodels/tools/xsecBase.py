@@ -139,13 +139,10 @@ class XSecBase:
         if comment:
             header += " # " + str(comment)  # Comment
         entry = "  0  " + str(xsec.info.order) + "  0  0  0  0  " + \
-                str( "%16.8E" % (xsec.value / xsecUnit) ) + " SModelSv" + \
+                str( f"{float(xsec.value / xsecUnit):16.8E}" ) + " SModelSv" + \
                     installation.version()
 
         return "\n" + header + "\n" + entry
-
-
-
 
 class ArgsStandardizer:
     """ simple class to collect all argument manipulators """
@@ -165,7 +162,7 @@ class ArgsStandardizer:
         """ geth the names of the slha files to run over """
         inputPath  = args.filename.strip()
         if not os.path.exists( inputPath ):
-            logger.error( "Path %s does not exist." % inputPath )
+            logger.error( f"Path {inputPath} does not exist." )
             sys.exit(1)
         inputFiles = []
         if os.path.isfile ( inputPath ):

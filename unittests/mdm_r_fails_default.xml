@@ -58,7 +58,7 @@
         <combineanas>ATLAS-SUSY-2018-22-multibin, CMS-EXO-20-004</combineanas>
         <combinesrs>True</combinesrs>
         <computestatistics>True</computestatistics>
-        <database_version>3.0.0</database_version>
+        <database_version>3.1.0</database_version>
         <decomposition_status>1</decomposition_status>
         <docompress>True</docompress>
         <doinvisible>True</doinvisible>
@@ -71,7 +71,7 @@
         <promptwidth>1e-11</promptwidth>
         <reportallsrs>False</reportallsrs>
         <sigmacut>0.0</sigmacut>
-        <smodels_version>3.0.0</smodels_version>
+        <smodels_version>3.1.0</smodels_version>
         <stablewidth>1e-25</stablewidth>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>

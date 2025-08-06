@@ -197,8 +197,8 @@ class SmsEvent(object):
             nr = " " + str(self.eventnr)
         metainfo = ""
         for(key, value) in self.metainfo.items():
-            metainfo += " %s:%s" % (key, value)
-        ret = "\nEvent%s:%s\n" % (nr, metainfo)
+            metainfo += f" {key}:{value}"
+        ret = f"\nEvent{nr}:{metainfo}\n"
         for p in self.particles:
             ret += p.__str__() + "\n"
         return ret

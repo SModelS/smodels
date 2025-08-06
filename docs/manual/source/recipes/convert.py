@@ -13,9 +13,9 @@ def runNotebook ( nb : str, cmd : str ) -> None:
     execute=""
     if "interactivePlots" in nb:
         execute = " --execute"
-    cmd1="%s%s --to html %s" % ( cmd, execute, nb )
-    cmd2="%s --to python %s" % ( cmd, nb )
-    print ( "convert: %s" % cmd1 )
+    cmd1=f"{cmd}{execute} --to html {nb}"
+    cmd2=f"{cmd} --to python {nb}"
+    print ( f"convert: {cmd1}" )
     subprocess.getoutput ( cmd1 )
     subprocess.getoutput ( cmd2 )
 
@@ -31,7 +31,7 @@ def convert( forceConvert : bool = False ) -> None:
         if cmd != "":
             cmd =cmd + " nbconvert"
 
-    print ( "command for conversion: %s" % cmd )
+    print ( f"command for conversion: {cmd}" )
 
     notebooks=glob.glob("*.ipynb")
     htmls=glob.glob("*.html")
@@ -46,7 +46,7 @@ def convert( forceConvert : bool = False ) -> None:
         if m_html < m_nb or forceConvert: ## notebook changed since?
             runNotebook ( notebook, cmd )
         else:
-            print ( "%s has not changed." % notebook )
+            print ( f"{notebook} has not changed." )
 
 if __name__ == "__main__":
     import argparse

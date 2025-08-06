@@ -1,7 +1,7 @@
 #!/bin/bash
 
 install_dir=$PWD
-LHAPDF_VERSION="6.5.4"
+LHAPDF_VERSION="6.5.5"
 RESUMMINO_VERSION="3.1.2"
 
 mkdir -p $install_dir
@@ -74,37 +74,34 @@ download_file() {
     fi
 }
 
-if [ ! -d "$install_dir/lhapdf" ]; then
-    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    tar xf "LHAPDF-$LHAPDF_VERSION.tar.gz"
+download_and_install_lhapdf() {
+    cd $install_dir
+    download_file "$1" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    tar xzf "LHAPDF-$LHAPDF_VERSION.tar.gz"
+    if [ ! -d "LHAPDF-$LHAPDF_VERSION" ]; then
+        echo "LHAPDF-$LHAPDF_VERSION directory missing, something went wrong. exiting."
+        exit -1
+    fi
     cd "LHAPDF-$LHAPDF_VERSION"
     ./configure --prefix=$install_dir/lhapdf --disable-python
     make -j"$num_cores_to_use"
     make install
-    cd ..
-    download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" "PDF4LHC21_40.tar.gz"
-	  tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
     cd $install_dir
-fi
-
-download_and_install_lhapdf() {
-    download_file "$1" "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    tar xf "LHAPDF-$LHAPDF_VERSION.tar.gz"
-    cd "LHAPDF-$LHAPDF_VERSION" || { echo "Error: Unable to change directory to LHAPDF-$LHAPDF_VERSION"; return 1; }
-    ./configure --prefix=$install_dir/lhapdf --disable-python
-    make -j"$num_cores_to_use"
-    make install
-    cd ..
     download_file "http://lhapdfsets.web.cern.ch/lhapdfsets/current/PDF4LHC21_40.tar.gz" "PDF4LHC21_40.tar.gz"
-	  tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
+    tar xz -C $install_dir/lhapdf/share/LHAPDF -f PDF4LHC21_40.tar.gz
     cd $install_dir
 }
 
 if [ ! -d "$install_dir/lhapdf" ]; then
-    if ! download_and_install_lhapdf "https://smodels.github.io/resummino/LHAPDF-$LHAPDF_VERSION.tar.gz"; then
-        echo "Failed to download from smodels.github.io, trying hepforge.org..."
-        download_and_install_lhapdf "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz"
-    fi
+    download_and_install_lhapdf "https://smodels.github.io/resummino/LHAPDF-$LHAPDF_VERSION.tar.gz"
+#    download_file "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz" "LHAPDF-$LHAPDF_VERSION.tar.gz"
+fi
+
+if [ ! -d "$install_dir/lhapdf" ]; then
+    echo "Failed to download from smodels.github.io, trying lhapdf.hepforge.org ..."
+    download_and_install_lhapdf "https://lhapdf.hepforge.org/downloads/?f=LHAPDF-$LHAPDF_VERSION.tar.gz"
+    # we could also try to download from gitlab, but then we need to use the autotools, and we dont want that:
+    # download_and_install_lhapdf "https://gitlab.com/hepcedar/lhapdf/-/archive/lhapdf-$LHAPDF_VERSION/lhapdf-lhapdf-$LHAPDF_VERSION.tar.gz"
 fi
 
 # Checking for the existence of RESUMMINO
@@ -118,6 +115,7 @@ download_and_install_resummino() {
         make -j"$num_cores_to_use"
         make install
         cd ..
+		    cp $install_dir/resummino-$RESUMMINO_VERSION/bin/resummino $install_dir/resummino_install/bin/
         return 0
     else
         return 1

@@ -59,7 +59,7 @@ class ExpSMS(GenericSMS):
         elif '>' in stringSMS and 'PV' in stringSMS:
             procString = stringSMS
         else:
-            raise SModelSError("Could not recognize string format for SMS (%s)" % stringSMS)
+            raise SModelSError(f"Could not recognize string format for SMS ({stringSMS})")
 
 
         decays = procString.replace(" ", "").split("),(")
@@ -92,7 +92,7 @@ class ExpSMS(GenericSMS):
 
         # Make sure particles have unique nodes:
         if len(set(list(nodesDict.values()))) != len(list(nodesDict.values())):
-            raise SModelSError("Input string has non unique nodes: %s" % nodesDict)
+            raise SModelSError(f"Input string has non unique nodes: {nodesDict}")
 
         # Add the particles with undefined nodes to nodesDict
         # and create successors dict
@@ -183,7 +183,7 @@ class ExpSMS(GenericSMS):
 
 
         if not isinstance(other,GenericSMS):
-            raise SModelSError("Can not compare ExpSMS and %s" %str(type(other)))
+            raise SModelSError(f"Can not compare ExpSMS and {str(type(other))}")
 
         mapDict = self.computeMatchingDict(other,self.rootIndex,
                                            other.rootIndex)

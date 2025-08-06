@@ -21,6 +21,7 @@ from smodels.share.models.mssm import st1,gluino,n1
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 from smodels.experiment.defaultFinalStates import finalStates
+from smodels.statistics.basicStats import observed, apriori, aposteriori
 
 class TopoCombTest(unittest.TestCase):
     def createSLHAFile(self,case="T1tttt"):
@@ -33,7 +34,7 @@ class TopoCombTest(unittest.TestCase):
         if case == "mixed":
             ratios = { "T1": .5, "T5": .5 }
 
-        fname = "%s.slha" % case
+        fname = f"{case}.slha"
         f=open( fname,"w")
         f.write ( """BLOCK MASS  # Mass Spectrum
    1000006     120.           # ~t_1
@@ -66,7 +67,7 @@ XSECTION  1.30E+04  2212 2212 2 1000021 1000021 # 10000 events, [pb], pythia8 fo
             tp = theoryPredictionsFor(database, deco, useBestDataset=True, combinedResults=True)
             for t in tp:
                 predXSecs[case]=t.xsection
-                rvalues[case]=t.getRValue(expected=True)
+                rvalues[case]=t.getRValue(evaluationType=apriori)
             if True:
                 os.unlink ( filename )
         ## first test: the theory prediction of the mixed scenario should be 25% of the sum

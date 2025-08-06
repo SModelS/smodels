@@ -29,11 +29,11 @@ class Info(object):
 
         self.path = path
         if path:
-            logger.debug('Creating object based on  %s' % self.path)
+            logger.debug(f'Creating object based on  {self.path}')
 
             # Open the info file and get the information:
             if not os.path.isfile(path):
-                logger.error("Info file %s not found" % path)
+                logger.error(f"Info file {path} not found")
                 raise SModelSError()
             from smodels.experiment.expAuxiliaryFuncs import concatenateLines
             infoFile = open(self.path)
@@ -60,6 +60,8 @@ class Info(object):
                                 region["type"]="SR"
                             if not "smodels" in region:
                                 region["smodels"]=None
+                            if not "pyhf" in region:
+                                region["pyhf"]=region["smodels"]
                             newregions.append ( region )
                         jsonFiles[jsonFileName] = newregions
                     value = str(jsonFiles)

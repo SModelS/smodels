@@ -117,8 +117,8 @@ class InclusiveNodeTest(unittest.TestCase):
             node = matchedEl.indexToNode(nodeIndex)
             if node.isSM:
                 continue
-            m = float('%1.2e' %(node.mass.asNumber(GeV)))
-            m_default = float('%1.2e' %(mass[nodeIndex].asNumber(GeV)))
+            m = float(f'{node.mass.asNumber(GeV):1.2e}')
+            m_default = float(f'{mass[nodeIndex].asNumber(GeV):1.2e}')
             self.assertEqual(m,m_default)
 
 

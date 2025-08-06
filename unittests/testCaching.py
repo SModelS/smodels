@@ -12,15 +12,12 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.tools.caching import Cache
 from smodels.base.physicsUnits import GeV, fb
 from databaseLoader import database
 import numpy as np
 
 class CachingTest(unittest.TestCase):
     def testCache(self):
-        Cache.n_stored = 10
-        Cache.reset()
         database.selectExpResults(analysisIDs=["ATLAS-SUSY-2013-05"], 
                     datasetIDs=[None], txnames=["T2bb" ] )
         expRes = database.expResultList
@@ -31,11 +28,14 @@ class CachingTest(unittest.TestCase):
         for masses in massesvec:
             txname.txnameData.getValueFor( np.array([masses,masses]).flatten())
 
-        self.assertEqual ( Cache.size(), 7 )
+        # self.assertEqual ( txname.txnameData.getValueFor.cache_parameters(), {'maxsize': 128, 'typed': False} )
         m = [ 270.0, 100.0, 270.0, 100.0 ]
-        result=txname.txnameData.getValueFor(m)
+        for i in range(3):
+            result=txname.txnameData.getValueFor(m)
         result = result*txname.y_unit
         self.assertAlmostEqual(result.asNumber(fb) , 459.658) 
+
+        self.assertEqual ( txname.txnameData.getValueFor.__wrapped__.cache_info().hits, 3 )
 
 if __name__ == "__main__":
     unittest.main()

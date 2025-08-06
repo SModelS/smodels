@@ -10,12 +10,17 @@ from smodels.base.physicsUnits import TeV, fb
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
+from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
+from smodels.tools.caching import roundCache,lru_cache
 from typing import Union, Text, Dict
 import numpy as np
 
+mu_digits = 8 # number of digits for rounding the mu argument when computing likelihoods
+
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
+
 
 class TheoryPrediction(object):
     """
@@ -39,12 +44,10 @@ class TheoryPrediction(object):
             from smodels.base.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
         self._statsComputer = None
 
     def __str__(self):
-        ret = "%s:%s" % (self.analysisId(), self.totalXsection())
+        ret = f"{self.analysisId()}:{self.totalXsection()}"
         return ret
 
     def dataId(self):
@@ -152,7 +155,7 @@ class TheoryPrediction(object):
                 computer = 'N/A'
             else:
                 computer = StatsComputer.forTruncatedGaussian(self)
-                if computer is None: # No expected UL available
+                if computer is None: # No evaluationType UL available
                     computer = 'N/A'
 
         elif self.dataType() == "efficiencyMap":
@@ -186,7 +189,8 @@ class TheoryPrediction(object):
 
         self._statsComputer = computer
 
-    def getUpperLimit(self, expected=False):
+    @lru_cache
+    def getUpperLimit(self, evaluationType : NllEvalType = observed ):
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -194,38 +198,37 @@ class TheoryPrediction(object):
         For combined results, returns the upper limit on the
         total sigma*eff (for all signal regions/datasets).
 
-        :param expected: return expected Upper Limit, instead of observed.
+        :param expected: return evaluationType Upper Limit, instead of observed.
         :return: upper limit (Unum object)
         """
+        if self.dataType() == "efficiencyMap":
+            ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType)
+        if self.dataType() == "upperLimit":
+            ul = self.dataset.getUpperLimitFor(
+                sms=self.avgSMS, txnames=self.txnames, evaluationType=evaluationType
+            )
+        if self.dataType() == "combined":
+            ul = self.statsComputer.poi_upper_limit(evaluationType = evaluationType,
+                                                    limit_on_xsec = True)
+        return ul
 
-        # First check if the upper-limit and expected upper-limit have already been computed.
-        # If not, compute it and store them.
-        if "UL" not in self.cachedObjs[expected]:
-            ul = None
-            if self.dataType() == "efficiencyMap":
-                ul = self.dataset.getSRUpperLimit(expected=expected)
-            if self.dataType() == "upperLimit":
-                ul = self.dataset.getUpperLimitFor(
-                    sms=self.avgSMS, txnames=self.txnames, expected=expected
-                )
-            if self.dataType() == "combined":
-                ul = self.statsComputer.poi_upper_limit(expected = expected,
-                                                        limit_on_xsec = True)
-            self.cachedObjs[expected]["UL"] = ul
-
-        return self.cachedObjs[expected]["UL"]
-
-    def getUpperLimitOnMu(self, expected=False):
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed, **kwargs ):
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
         (i.e. mu_UL = upper limit/theory xsec)
 
-        :param expected: if True, compute expected upper limit, else observed
+        :param evaluationType: one of: observed, apriori, aposteriori
         :returns: upper limit on signal strength multiplier mu
         """
+        if "expected" in kwargs:
+            import warnings
+            warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
+            evaluationType = kwargs["expected"]
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
 
-        upperLimit = self.getUpperLimit(expected=expected)
+        upperLimit = self.getUpperLimit(evaluationType=evaluationType)
         xsec = self.totalXsection()
         if xsec is None or upperLimit is None:
             return None
@@ -234,21 +237,26 @@ class TheoryPrediction(object):
 
         return muUL
 
-    def getRValue(self, expected=False):
+    @lru_cache
+    def getRValue(self, evaluationType : NllEvalType = observed, **kwargs ):
         """
         Get the r value = theory prediction / experimental upper limit
+
+        :param evaluationType: one of: observed, apriori, aposteriori
         """
-        if "r" not in self.cachedObjs[expected]:
-            upperLimit = self.getUpperLimit(expected)
-            if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
-                r = None
-                self.cachedObjs[expected]["r"] = r
-                return r
-            else:
-                r = (self.totalXsection()/upperLimit).asNumber()
-                self.cachedObjs[expected]["r"] = r
-                return r
-        return self.cachedObjs[expected]["r"]
+        if "expected" in kwargs:
+            import warnings
+            warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
+            evaluationType = kwargs["expected"]
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
+        upperLimit = self.getUpperLimit(evaluationType)
+        if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
+            r = None
+            return r
+        else:
+            r = (self.totalXsection()/upperLimit).asNumber()
+            return r
 
     def whenDefined(function):
         """
@@ -266,85 +274,71 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm(self, expected=False, return_nll : bool = False ):
+    def lsm(self, evaluationType : NllEvalType = observed, return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        if "nll_sm" not in self.cachedObjs[expected]:
-            self.computeStatistics(expected)
-        if "nll_sm" not in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lsm"] = None
-        return self.nllToLikelihood ( self.cachedObjs[expected]["nll_sm"],
-               return_nll )
+        llhDict = self.computeStatistics(evaluationType)
+        return self.nllToLikelihood (llhDict["lsm"],return_nll )
 
     @whenDefined
-    def lmax(self, expected=False, return_nll : bool = False ):
+    def lmax(self, evaluationType : NllEvalType = observed, return_nll : bool = False ):
         """likelihood at mu_hat"""
-
-        if not "nllmax" in self.cachedObjs[expected]:
-            self.computeStatistics(expected)
-        return self.nllToLikelihood ( self.cachedObjs[expected]["nllmax"],
-                return_nll )
+        llhDict = self.computeStatistics(evaluationType)
+        return self.nllToLikelihood (llhDict["lmax"],return_nll )
 
     @whenDefined
-    def CLs(self, mu : float = 1., expected : Union[Text,bool] = False ) -> \
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
+    def CLs(self, mu : float = 1., evaluationType : NllEvalType = observed ) -> \
                     Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        if not "CLs" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["CLs"] = {}
-        if mu in self.cachedObjs[expected]["CLs"]:
-            return self.cachedObjs[expected]["CLs"][mu]
-        cls = self.statsComputer.CLs ( poi_test = mu, expected = expected )
-        self.cachedObjs[expected]["CLs"][mu] = cls
+        cls = self.statsComputer.CLs ( poi_test = mu, evaluationType = evaluationType )
         return cls
 
     @whenDefined
-    def sigma_mu(self, expected=False):
+    def sigma_mu(self, evaluationType : NllEvalType = observed ):
         """sigma_mu of mu_hat"""
-
-        if not "sigma_mu" in self.cachedObjs[expected]:
-            self.computeStatistics(expected)
-
-        return self.cachedObjs[expected]["sigma_mu"]
+        llhDict = self.computeStatistics(evaluationType)
+        return llhDict["sigma_mu"]
 
     @whenDefined
-    def muhat(self, expected=False):
+    def muhat(self, evaluationType : NllEvalType = observed ):
         """position of maximum likelihood"""
-
-        if not "muhat" in self.cachedObjs[expected]:
-            self.computeStatistics(expected)
-
-        return self.cachedObjs[expected]["muhat"]
+        llhDict = self.computeStatistics(evaluationType)
+        return llhDict["muhat"]
 
     @whenDefined
-    def likelihood(self, mu=1.0, expected=False, return_nll=False, useCached=True):
+    def nll(self, mu=1.0, evaluationType : NllEvalType = observed,
+            asimov : Union[None,float] = None, **kwargs ) -> float:
+        """
+        get the negative log likelihood for a signal strength modifier mu.
+        this is a method to prepare for a transition to dealing with nlls only
+
+        :param evaluationType: one of: observed, apriori, aposteriori
+        """
+        return self.likelihood ( mu=mu, evaluationType=evaluationType, asimov=asimov,
+                                 return_nll=True )
+
+    @whenDefined
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
+    def likelihood(self, mu=1.0, evaluationType : NllEvalType = observed, return_nll=False,
+            asimov : Union[None,float] = None, **kwargs ) -> float:
         """
         get the likelihood for a signal strength modifier mu
-        :param expected: compute expected, not observed likelihood. if "posteriori",
-                         compute expected posteriori.
-        :param return_nll: if True, return negative log likelihood, else likelihood
-        :param useCached: if True, will return the cached value, if available
-        """
-        if useCached and mu in self.cachedNlls[expected]:
-            nll = self.cachedNlls[expected][mu]
-            return self.nllToLikelihood ( nll, return_nll )
 
-        if useCached:
-            if "nll" in self.cachedObjs[expected] and abs(mu - 1.0) < 1e-5:
-                nll = self.cachedObjs[expected]["nll"]
-                return self.nllToLikelihood ( nll, return_nll )
-            if "nll_sm" in self.cachedObjs[expected] and abs(mu) < 1e-5:
-                nllsm = self.cachedObjs[expected]["nll_sm"]
-                return self.nllToLikelihood ( nllsm, return_nll )
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param return_nll: if True, return negative log likelihood, else likelihood
+        """
+        assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
+        if "expected" in kwargs:
+            import warnings
+            warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
+            evaluationType = kwargs["expected"]
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
-                                             expected = expected,
-                                             return_nll = True )
-        self.cachedNlls[expected][mu] = nll
-
-        if abs(mu) < 1e-5:
-            self.cachedObjs[expected]["nll_sm"] = nll
-
-        return self.nllToLikelihood ( nll, return_nll )
+                       evaluationType = evaluationType, return_nll = return_nll, asimov = asimov )
+        return nll
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
         """ if not return_nll, then compute likelihood from nll """
@@ -353,29 +347,18 @@ class TheoryPrediction(object):
         return np.exp ( - nll ) if nll is not None else None
 
     @whenDefined
-    def computeStatistics(self, expected=False):
+    @lru_cache
+    def computeStatistics(self, evaluationType : NllEvalType = observed ):
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
         attributes.
-        :param expected: computed expected quantities, not observed
+        :param expected: computed evaluationType quantities, not observed
         """
-
-        if not "lmax" in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lmax"] = {}
-            self.cachedObjs[expected]["muhat"] = {}
-            self.cachedObjs[expected]["sigma_mu"] = {}
-
         # Compute likelihoods and related parameters:
-        llhdDict = self.statsComputer.get_five_values(expected = expected,
+        llhdDict = self.statsComputer.get_five_values(evaluationType = evaluationType,
                      return_nll = True )
-        if llhdDict not in [ None, {} ]:
-            self.cachedObjs[expected]["nll"] = llhdDict["lbsm"]
-            self.cachedObjs[expected]["nll_sm"] = llhdDict["lsm"]
-            self.cachedObjs[expected]["nllmax"] = llhdDict["lmax"]
-            self.cachedObjs[expected]["muhat"] = llhdDict["muhat"]
-            if "sigma_mu" in llhdDict:
-                self.cachedObjs[expected]["sigma_mu"] = llhdDict["sigma_mu"]
+        return llhdDict
 
 
 class TheoryPredictionsCombiner(TheoryPrediction):
@@ -417,8 +400,6 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
-        self.cachedObjs = {False: {}, True: {}, "posteriori": {}}
-        self.cachedNlls = {False: {}, True: {}, "posteriori": {}}
         self._statsComputer = None
 
     @classmethod
@@ -427,7 +408,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         Select the results from theoryPrediction list which match one
         of the IDs in anaIDs. If there are multiple predictions for the
         same ID for which a likelihood is available, it gives priority
-        to the ones with largest expected r-values.
+        to the ones with largest evaluationType r-values.
 
         :param theoryPredictions: list of TheoryPrediction objects
         :param anaIDs: list with the analyses IDs (in string format) to be combined
@@ -453,11 +434,11 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         # Define a hierarchy for the results:
         priority = {"combined": 2, "efficiencyMap": 1, "upperLimit": 0}
-        # Now sort by highest priority and then by highest expected r-value:
+        # Now sort by highest priority and then by highest evaluationType r-value:
         selectedTPs = sorted(
             selectedTPs, key=lambda tp: (priority[tp.dataType()],
-                                         tp.getRValue(expected=True) is not None,
-                                         tp.getRValue(expected=True))
+                                         tp.getRValue(evaluationType=apriori) is not None,
+                                         tp.getRValue(evaluationType=apriori))
         )
         # Now get a single TP for each result
         # (the highest ranking analyses with r != None come last and are kept in the dict)
@@ -530,7 +511,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         self._statsComputer = computer
 
-    def getLlhds(self,muvals,expected=False,normalize=True):
+    def getLlhds(self,muvals,evaluationType=False,normalize=True):
         """
         Facility to access the likelihoods for the individual analyses and the combined
         likelihood.
@@ -539,11 +520,11 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         :param muvals: List with values for the signal strenth for which the likelihoods must
                        be evaluated.
-        :param expected: If True returns the expected likelihood values.
+        :param expected: If True returns the evaluationType likelihood values.
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
 
-        return self.statsComputer.likelihoodComputer.getLlhds(muvals,expected,normalize)
+        return self.statsComputer.likelihoodComputer.getLlhds(muvals,evaluationType,normalize)
 
     def describe(self):
         """returns a string containing a list of all analysisId and dataIds"""
@@ -590,7 +571,7 @@ class TheoryPredictionList(object):
     def __str__(self):
         if len(self._theoryPredictions) == 0:
             return "no predictions."
-        ret = "%d predictions: " % len(self._theoryPredictions)
+        ret = f"{len(self._theoryPredictions)} predictions: "
         ret += ", ".join([str(s) for s in self._theoryPredictions])
         return ret
 
@@ -669,7 +650,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
     if not isinstance(database,Database):
         errorMsg = "The argument for theoryPredictionsFor should be a"
-        errorMsg += " database with the selected experimental results and not %s" %type(database)
+        errorMsg += f" database with the selected experimental results and not {type(database)}"
         logger.error(errorMsg)
         raise SModelSError(errorMsg)
 
@@ -724,9 +705,10 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 else:
                     tpe = "SR"
 
-                if tpe is None:
-                    logger.error(f"Could not find type of region {theoPred.dataType()} from {theoPred.analysisId()}")
-                    raise SModelSError()
+                #if tpe is None:
+                #    this probably just means that the signal region is not mentioned in the jsonFiles. thats allowed.
+                #    logger.debug(f"Could not find type of region {theoPred.dataset.dataInfo.dataId} from {theoPred.analysisId()}")
+                    # raise SModelSError()
 
                 if tpe == "SR":
                     theoPred.upperLimit = theoPred.getUpperLimit()
@@ -744,6 +726,26 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
     return tpList
 
+def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
+    """ is a given dataset mentioned in the combination?
+    we are allowing datasets in an expResult that is not mentioned
+    in the combination of that result.
+    :returns: true if its in, false if it is not in, None if there is no combination
+    """
+    assert hasattr ( dataset, "dataInfo" ), "why does the dataset here not have a dataInfo?"
+    dataId = dataset.dataInfo.dataId
+    if hasattr ( expResult.globalInfo, "jsonFiles" ):
+        for regionSet in expResult.globalInfo.jsonFiles.values():
+            for region in regionSet:
+                if dataId == region["smodels"]:
+                    return True
+        return False
+    if hasattr ( expResult.globalInfo, "datasetOrder" ):
+        for ds in expResult.globalInfo.datasetOrder:
+            if dataId == ds:
+                return True
+        return False
+    return None
 
 def _getCombinedResultFor(dataSetResults, expResult):
     """
@@ -792,6 +794,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
         txnameList += pred.txnames
         smsList += pred.smsList
         avgSMSlist.append(pred.avgSMS)
+        if not _isDatasetInCombination ( pred.dataset, expResult ):
+            continue
         if totalXsec is None:
             totalXsec = pred.xsection
         else:
@@ -824,7 +828,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
 def _getBestResult(dataSetResults):
     """
-    Returns the best result according to the expected upper limit.
+    Returns the best result according to the evaluationType upper limit.
     If a combined result is included in the list, always return it.
 
     :param datasetPredictions: list of TheoryPredictionList objects
@@ -844,7 +848,7 @@ def _getBestResult(dataSetResults):
 
 
     # For efficiency-map analyses with multipler signal regions,
-    # select the best one according to the expected upper limit:
+    # select the best one according to the evaluationType upper limit:
     bestExpectedR = 0.0
     bestXsec = 0.0*fb
     bestPred = None
@@ -878,7 +882,7 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec/dataset.getSRUpperLimit(expected=True)).asNumber()
+        expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=True)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred
@@ -919,7 +923,7 @@ def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
     #  Check dataset sqrts format:
     if (dataset.globalInfo.sqrts/TeV).normalize()._unit:
         ID = dataset.globalInfo.id
-        logger.error("Sqrt(s) defined with wrong units for %s" % (ID))
+        logger.error(f"Sqrt(s) defined with wrong units for {ID}")
         return False
 
     # Compute relevant SMS weights
@@ -1019,7 +1023,6 @@ def _combineSMS(smsList, dataset, maxDist):
             txnameSMS = [sms for sms in smsList if sms.txname is txname]
             clusters += clusterTools.clusterSMS(txnameSMS, maxDist, dataset)
     else:
-        logger.warning("Unkown data type: %s. Data will be ignored."
-                       % dataset.getType())
+        logger.warning(f"Unkown data type: {dataset.getType()}. Data will be ignored.")
 
     return clusters

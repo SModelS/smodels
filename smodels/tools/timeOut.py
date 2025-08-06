@@ -18,7 +18,7 @@ class NoTime(Exception):
         Exception.__init__(self, value)
         
     def __str__(self):
-        return '%.2es time out exceeded' %float(self.value)
+        return f'{float(self.value):.2e}s time out exceeded'
 
 
 class Timeout():

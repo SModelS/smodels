@@ -62,7 +62,7 @@ void SModelS::loadDatabase ( const string & parameterfile )
   PyRun_SimpleString( "parser = modelTester.getParameters( parameterFile )" );
   PyRun_SimpleString( "database = modelTester.loadDatabase(parser, None )" );
   PyRun_SimpleString( "modelTester.loadDatabaseResults(parser, database)" );
-  PyRun_SimpleString( "print ( '[smodels.cpp] %d experimental results found.' % len(listOfExpRes) ) " );
+  PyRun_SimpleString( "print ( '[smodels.cpp] %d experimental results found.' % len(database.getExpResults() ) ) " );
 }
 
 int SModelS::run ( const string & inFile )
