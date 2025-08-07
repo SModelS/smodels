@@ -21,15 +21,19 @@ _experimental = { "truncatedgaussians": False,
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
-def checkForIncompatibleModuleVersions():
+def checkForIncompatibleModuleVersions() -> bool:
     """ for 3.1.0, at release time, we have the problem that scipy 1.16
     does not work with pyhf 0.7.6. we warn about such situations.
+
+    :returns: false if incompatible version found, else true
     """
     from importlib.metadata import version
     if version("scipy")[:4] in [ "1.16", "1.17" ]:
         print ( f"SModelS warning: scipy v{version('scipy')} is installed, but it seems " \
                  "this version does not work with pyhf 0.7.6. We recommend scipy 1.15.x " \
                  "and pyhf 0.7.6. You have been warned." )
+        return False
+    return True
         
 checkForIncompatibleModuleVersions()
 
