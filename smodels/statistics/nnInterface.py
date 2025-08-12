@@ -351,8 +351,10 @@ class NNUpperLimitComputer:
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
         # FIXME maximize this one function
+        if modelToUse == None:
+            modelToUse = self.determineMostSensitiveModel()
         if not modelToUse in self.data.globalInfo.onnxMeta:
-            print ( f"[nnInterface] no {modelToUse} in {self.data.globalInfo.onnxMeta.keys()}" )
+            print ( f"[nnInterface] no {modelToUse} in {', '.join(self.data.globalInfo.onnxMeta.keys())}" )
             sys.exit()
         muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_max"]
         if asimov:
@@ -472,9 +474,12 @@ class NNUpperLimitComputer:
                               modelToUse = modelToUse)
         # print ( f"@@NN76 clsRoot expected {expected} modelToUse {modelToUse}" )
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse }
-        a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
-                allowNegative = allowNegativeSignals, args=clsRootArgs,
-                    verbose = False )
+        try:
+            a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
+                    allowNegative = allowNegativeSignals, args=clsRootArgs,
+                        verbose = True )
+        except Exception as e:
+            return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b, args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06)
         if False: # False and expected == "posteriori":
             print ( f"@@NN473 getUpperLimitOnMu r={1./mu_lim:.3f} expected {expected}" )
@@ -547,7 +552,7 @@ class NNUpperLimitComputer:
             nll = nllA
             if expected != "posteriori":
                 nll = self.likelihood(mu, return_nll=True, expected=expected, modelToUse = modelToUse, asimov = False )
-            ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if nll is not None else None
+            ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), return_type=return_type) if (nll is not None and nllA is not None) else None
             if False: #  and expected == "posteriori" and abs(mu-.765)<.1:
                 print ( f"@@NN653 {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {modelToUse} {RESET}" )
             return ret
