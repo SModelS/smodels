@@ -73,7 +73,10 @@ class BasicPrinter(object):
         """
 
         for opt, value in options:
-            setattr(self, opt, eval(value))
+            if "posterior" in value or "prior" in value:
+                setattr(self, opt, value)
+            else:
+                setattr(self, opt, eval(value))
 
     def addObj(self, obj):
         """
