@@ -169,6 +169,8 @@ class NNUpperLimitComputer:
 
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
+        if modelToUse == None:
+            return None
 
         syields = []
         if False and not modelToUse in self.data.globalInfo.onnxMeta:
@@ -306,6 +308,8 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         """
         ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
+        if ret == None:
+            return None
         if expected:
             if asimov:
                 nll = ret['nllA_exp_1']
@@ -353,9 +357,15 @@ class NNUpperLimitComputer:
         # FIXME maximize this one function
         if modelToUse == None:
             modelToUse = self.determineMostSensitiveModel()
+        if modelToUse is None:
+            print ( f"[nnInterface] no most sensitive model found" )
+            for model in self.data.globalInfo.onnxMeta.keys():
+                ulmu = self.getUpperLimitOnMu ( expected=True, modelToUse = model )
+                print ( f"[nnInterface] ulmu({model})={ulmu}" )
+            return None
         if not modelToUse in self.data.globalInfo.onnxMeta:
             print ( f"[nnInterface] no {modelToUse} in {', '.join(self.data.globalInfo.onnxMeta.keys())}" )
-            sys.exit()
+            return None
         muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_max"]
         if asimov:
             muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_obs_max"]
@@ -472,6 +482,8 @@ class NNUpperLimitComputer:
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(expected=expected,
                               allowNegativeSignals=allowNegativeSignals,
                               modelToUse = modelToUse)
+        if mu_hat is None:
+            return float("inf")
         # print ( f"@@NN76 clsRoot expected {expected} modelToUse {modelToUse}" )
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse }
         try:
@@ -504,6 +516,8 @@ class NNUpperLimitComputer:
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax(expected="posteriori", allowNegativeSignals=allowNegativeSignals,
                              return_nll=True, modelToUse = modelToUse )
+        if fmh == None:
+            return None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
 
         nll0 = nll0A
