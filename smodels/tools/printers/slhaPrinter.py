@@ -70,8 +70,8 @@ class SLHAPrinter(TxTPrinter):
             keysDict[8] = f"{obj.parameters['promptwidth']:25} #prompt width [GeV] \n"
         if 'stablewidth' in obj.parameters:
             keysDict[9] = f"{obj.parameters['stablewidth']:25} #stable width [GeV] \n"
-        if 'minmassgapISR' in obj.parameters:
-            keysDict[10] = f"{obj.parameters['minmassgapISR']:25} #minimum mass gap for ISR mass compression [GeV]\n"
+        if 'minmassgapisr' in obj.parameters:
+            keysDict[10] = f"{obj.parameters['minmassgapisr']:24} #minimum mass gap for ISR mass compression [GeV]\n"
 
         output = "BLOCK SModelS_Settings\n"
         for key in sorted(list(keysDict.keys())):
@@ -148,7 +148,7 @@ class SLHAPrinter(TxTPrinter):
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.float64)):
-                        lv = f"{lv:-30.2E}"
+                        lv = f"{lv:-30.4E}"
                     else:
                         lv = str(lv)
                     lvals[i] = lv
@@ -214,7 +214,7 @@ class SLHAPrinter(TxTPrinter):
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.float64)):
-                    lv = f"{lv:-30.2E}"
+                    lv = f"{lv:-30.4E}"
                 else:
                     lv = str(lv)
                 lvals[i] = lv
