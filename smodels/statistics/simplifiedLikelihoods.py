@@ -17,6 +17,7 @@ from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from typing import Text, Optional, Union, Tuple
 from smodels.statistics.basicStats import findRoot
+from smodels.tools.caching import roundCache, lru_cache
 
 import numpy as np
 import math
@@ -100,6 +101,7 @@ class Data:
         self.name = name
         self.deltas_rel = deltas_rel
         self._computeABC()
+        self.weight = np.linalg.inv(self.V )
 
     def generateAsimovData ( self, theta_hat : list, mu : float = 0. ):
         """ generate a model with Asimov data out of the current model
@@ -743,7 +745,7 @@ class LikelihoodComputer:
         # if not model.isLinear():
         # self.cov_tot = model.V + model.var_s(nsig)
         # self.cov_tot = model.totalCovariance (nsig)
-        self.weight = np.linalg.inv(self.cov_tot)
+        self.weight = model.weight # np.linalg.inv(self.cov_tot)
         # self.coeff = 1.
 
         ## to catch slogdet warnings on Mac, numpy 2.3.2
