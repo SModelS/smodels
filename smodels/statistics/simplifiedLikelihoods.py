@@ -21,6 +21,7 @@ from smodels.statistics.basicStats import findRoot
 import numpy as np
 import math
 import copy
+import warnings
 
 try:
     from smodels.base.smodelsLogging import logger
@@ -744,7 +745,27 @@ class LikelihoodComputer:
         # self.cov_tot = model.totalCovariance (nsig)
         self.weight = np.linalg.inv(self.cov_tot)
         # self.coeff = 1.
-        logdet = np.linalg.slogdet(self.cov_tot)
+
+        ## to catch slogdet warnings on Mac, numpy 2.3.2
+        ## added by WW&SK, 14/08/2025 
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="divide by zero",   # pattern 1
+                category=RuntimeWarning
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message="invalid value encountered",   # pattern 2
+                category=RuntimeWarning
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message="overflow encountered",   # pattern 3
+                category=RuntimeWarning
+            )
+            logdet = np.linalg.slogdet(self.cov_tot)
+            
         self.logcoeff = -model.n / 2 * np.log(2 * np.pi) - 0.5 * logdet[1]
         # self.coeff = (2*np.pi)**(-model.n/2) * np.exp(-.5* logdet[1] )
         # print ( "coeff", self.coeff, "n", model.n, "det", np.linalg.slogdet ( self.cov_tot ) )
