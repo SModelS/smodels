@@ -110,10 +110,13 @@ class PyhfData:
     :ivar inputJsons: list of json instances
     :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
+    :ivar globalInfo: None, or link to globalInfo (for debugging)
     """
 
     def __init__( self, nsignals : Dict[str, Dict], inputJsons, jsonFiles=None,
-                  includeCRs=False, signalUncertainty=None):
+                  includeCRs=False, signalUncertainty=None,
+                  globalInfo = None ):
+        self.globalInfo = globalInfo
         self.nsignals = nsignals
         self.getTotalYield()
         self.inputJsons = inputJsons
