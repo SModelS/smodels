@@ -1188,9 +1188,9 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = self._CLs(lo_mu, evaluationType, "alpha-CLs", workspace_index )
+                rt1 = self.CLs(lo_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
                 # rt5 = CLs(med_mu)
-                rt10 = self._CLs(hi_mu, evaluationType, "alpha-CLs", workspace_index )
+                rt10 = self.CLs(hi_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1198,7 +1198,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = self._CLs(med_mu, evaluationType, "alpha-CLs", workspace_index )
+                    rt5 = self.CLs(med_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1210,7 +1210,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = self._CLs(med_mu, evaluationType, "alpha-CLs", workspace_index )
+                    rt5 = self.CLs(med_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1240,10 +1240,12 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            ul = findRoot ( self._CLs, lo_mu, hi_mu, args=(evaluationType, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
+            # ul = findRoot ( self._CLs, lo_mu, hi_mu, args=(evaluationType, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
+            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale, args=(evaluationType, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
+
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
-            ul = ul * self.scale
+            # ul = ul * self.scale
             return ul  # self.scale has been updated within self.rescale() method
 
 if __name__ == "__main__":
