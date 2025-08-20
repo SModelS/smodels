@@ -248,6 +248,7 @@ class NNUpperLimitComputer:
             print ( f"@@NN5 obsDelta {obsDelta} expDelta {expDelta}" )
             print ( f"@@NN5 nll0obs {nll0obs} nll0exp {nll0exp}" )
             print ( f"@@NN5 nllA0obs {nllA0obs} nllA0exp {nllA0exp}" )
+            print ( f"@@NN5 arr {arr}" )
             print ( f"@@NN5 poi_test {poi_test}" )
             print ( f"@@NN5 nll1obs {float(nll1obs)} nll1exp {float(nll1exp)}" )
             print ( f"@@NN5 nllA1obs {float(nllA1obs)} nll1Aexp {float(nllA1exp)}" )
