@@ -6,7 +6,7 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-from smodels.base.physicsUnits import TeV, fb
+from smodels.base.physicsUnits import TeV, fb, GeV
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
@@ -16,6 +16,20 @@ from typing import Union, Text, Dict
 import numpy as np
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
+
+def writeOutYields ( theoryPred ):
+    with open ("yields", "at" ) as f:
+        # print ( f"@@XX llhd {theoryPred.dataType()}" )
+        # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+        masses = []
+        for node in theoryPred.smsList[0].nodes:
+            if node.particle.isSM:
+                continue
+            masses.append ( float(node.particle.mass.asNumber(GeV)) )
+        nsig = theoryPred.statsComputer.nsig
+        print ( "FIXME here we need to translate signals into yields!!" )
+        f.write ( f"{{ 'masses': {masses}, 'nsignals': {nsig} }}\n" )
+        f.close()
 
 class TheoryPrediction(object):
     """
@@ -328,6 +342,8 @@ class TheoryPrediction(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param useCached: if True, will return the cached value, if available
         """
+        if self.dataType() == "combined":
+            writeOutYields ( self )
         if useCached and mu in self.cachedNlls[expected]:
             nll = self.cachedNlls[expected][mu]
             return self.nllToLikelihood ( nll, return_nll )
