@@ -87,7 +87,7 @@ class NNUpperLimitComputer:
         logger.debug("Signals : {}".format(self.nsignals))
         # self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.cl = cl
-        
+
         self.alreadyBeenThere = (
             False  # boolean to detect wether self.signals has returned to an older value
         )
@@ -149,7 +149,184 @@ class NNUpperLimitComputer:
                 return isCR ( dct )
         return False
 
-    def negative_log_likelihood(self, poi_test,
+    def totalYieldsFromSignals ( self, modelToUse : str, poi_test : float ) -> list :
+        """ given the signal yields self.nsignals, return the total
+        yields, signal + background
+
+        :param poi_test: signal strength multiplier to test
+        :returns: list of total yields
+        """
+
+        yields = []
+        for srname,smyield in self.data.globalInfo.onnxMeta[modelToUse]["smYields"].items():
+            p1 = srname.rfind("-")
+            realname = srname[:p1]
+            if not realname in self.nsignals:
+                realname = f"{realname}[{srname[p1+1:]}]"
+                assert realname in self.nsignals, \
+                  f"nnInterface: cannot find sr name {realname} in {' '.join(self.nsignals.keys())}"
+            # smodelsname = self.data.globalInfo
+            signal = float ( self.nsignals[realname]*poi_test )
+            if self.isControlRegion ( srname, modelToUse ):
+                if hasattr ( self.data.globalInfo, "includeCRs" ) and self.data.globalInfo.includeCRs == False:
+                    continue
+                obsyield = self.data.globalInfo.onnxMeta[modelToUse]["obsYields"][srname]
+                ## seems like a CR! replaced bkgexpected with observed (postfit)
+                smyield = obsyield
+            tot = smyield + signal
+            yields.append ( tot )
+        return yields
+
+    def scaleYields ( self, yields : list, modelToUse : Union[None,str] ) -> np.array:
+        """ scale the (total) yields
+
+        :param modelToUse: scale the yields that model.
+        :returns: the scaled total yields
+        """
+        scaled_yields = np.array( [yields], dtype=np.float32 )
+
+        #if poi_test == 0.:
+        #    print ( f"inputMeans {self.data.globalInfo.inputMeans[modelToUse]}" )
+        #    print ( f"inputErrors {self.data.globalInfo.inputErrors[modelToUse]}" )
+        for i,x in enumerate(scaled_yields[0]):
+            t = 0. # x
+            err = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i]
+            if err > 1e-20:
+                t = (x - self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i])/err
+            #else:
+            #    t = # - self.data.globalInfo.inputMeans[i]
+            scaled_yields[0][i]=t
+        return scaled_yields
+
+    def predict ( self, scaled_yields : np.array, modelToUse : Union[None,str] ):
+        """ get the prediction from the NN
+
+        :param scaled_yields: the input of the neural network
+        :returns: arr, the unscaled unshifted output of the neural network
+        """
+        #if poi_test == 0.:
+        #    print ( f"@@NNX we evaluate at {scaled_signal_yields}" )
+        if len(scaled_yields[0])!=self.regressors[modelToUse]["dim"]:
+            dim_nn = self.regressors[modelToUse]["dim"]
+            dim_input = len(scaled_signal_yields[0])
+            line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
+            logger.error ( f"[nnInterface] {line}" )
+            print ( f"[nnInterface] {line}" )
+            sys.exit()
+        arr = self.regressors[modelToUse]["session"].run(None,
+                {"input_1":scaled_yields})
+        # print ( f"@@NNA arr {arr}" )
+        arr = arr[0][0]
+        return arr
+
+    def nllsFromPrediction( self, arr, modelToUse : Union[None,str],
+           poi_test : float ) -> dict:
+        """ given the networks predictions, compute the NLLs
+
+        :param arr: the neural network output
+        :returns: { "nll_exp_0": ..., "nll_exp_1": ...,
+                "nll_obs_0": ..., "nll_obs_1": ...,
+                "nllA_exp_0": ..., "nllA_exp_1": ...,
+                "nllA_obs_0": ..., "nllA_obs_1": ... }
+        """
+        nll0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_mu0"]
+        nll0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_mu0"]
+        nllA0obs =  self.data.globalInfo.onnxMeta[modelToUse]["nLLA_obs_mu0"]
+        nllA0exp =  self.data.globalInfo.onnxMeta[modelToUse]["nLLA_exp_mu0"]
+        i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
+        expDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_exp]
+        obsDelta = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_obs]
+        expDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_expA]
+        obsDeltaA = self.data.globalInfo.onnxMeta[modelToUse]["inputMeans"][i_obsA]
+        expErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_exp]
+        obsErr = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_obs]
+        expErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_expA]
+        obsErrA = self.data.globalInfo.onnxMeta[modelToUse]["inputErrors"][i_obsA]
+        nll1exp = nll0exp + arr[i_exp]*expErr + expDelta
+        nll1obs = nll0obs + arr[i_obs]*obsErr + obsDelta
+        #print ( f"@@NN5 onnxMeta", self.data.globalInfo.onnxMeta )
+        nllA1exp = nllA0exp + arr[i_expA]*expErrA + expDeltaA
+        nllA1obs = nllA0obs + arr[i_obsA]*obsErrA + obsDeltaA
+
+        if False and poi_test == 3.:
+            print ( f"@@NN5 obsDelta {obsDelta} expDelta {expDelta}" )
+            print ( f"@@NN5 nll0obs {nll0obs} nll0exp {nll0exp}" )
+            print ( f"@@NN5 nllA0obs {nllA0obs} nllA0exp {nllA0exp}" )
+            print ( f"@@NN5 arr {arr}" )
+            print ( f"@@NN5 poi_test {poi_test}" )
+            print ( f"@@NN5 nll1obs {float(nll1obs)} nll1exp {float(nll1exp)}" )
+            print ( f"@@NN5 nllA1obs {float(nllA1obs)} nll1Aexp {float(nllA1exp)}" )
+
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
+                "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
+        return ret
+
+    def negative_log_likelihood(self, poi_test : float,
+        modelToUse : Union[None,str] = None,
+        outputType : str = "extended" ):
+        """ the method that really wraps around the llhd computation.
+        :param modelToUse: if given, compute the nll for that model.
+        If None compute for most sensitive analysis.
+        :param outputType: if 'extended' return dictionary with all
+        values, if 'observed' return nll_obs_1, if 'expected' return
+        nll_exp_1, if 'asimov' return nllA_obs_1, if 'asimov_exp'
+        return nllA_exp_1
+
+        :returns: dictionary with nlls, obs and exp, mu=0 and 1
+        """
+        try:
+            poi_test = poi_test[0]
+        except (TypeError,IndexError) as e:
+            pass
+
+        if modelToUse == None:
+            modelToUse = self.mostSensitiveModel
+        if modelToUse == None:
+            return None
+
+        # from signal yields compute total yields
+        yields = self.totalYieldsFromSignals( modelToUse, poi_test )
+        # we scale these yields
+        scaled_yields = self.scaleYields ( yields, modelToUse )
+        # we send this through the network
+        arr = self.predict ( scaled_yields, modelToUse )
+        # from the output we compute the NLLs
+        ret = self.nllsFromPrediction ( arr, modelToUse, poi_test )
+
+        """
+        if abs(poi_test)<1e-10:
+            if abs(nll0obs-nll1obs)>1e-1:
+                #logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
+                # ret["nll_obs_1"]=nll0obs
+                pass
+            if abs(nll0exp-nll1exp)>1e-1:
+                pass
+                # logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
+                # ret["nll_exp_1"]=nll0exp
+            if False:
+                ret["nll_exp_1"]=ret["nll_exp_0"]
+                ret["nll_obs_1"]=ret["nll_obs_0"]
+                ret["nllA_obs_1"]=ret["nllA_obs_0"]
+                ret["nllA_exp_1"]=ret["nllA_exp_0"]
+        """
+        # we return what has been asked
+        if outputType == "observed":
+            return ret["nll_obs_1"]
+        if outputType == "expected":
+            return ret["nll_exp_1"]
+        if outputType == "asimov":
+            return ret["nllA_obs_1"]
+        if outputType == "asimov_exp":
+            return ret["nllA_exp_1"]
+        if outputType != "extended":
+            logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
+            sys.exit(-1)
+        # print ( f"@@NN22 ret {ret} oldret {self.negative_log_likelihood_old(poi_test,modelToUse,outputType)}" )
+        return ret
+
+    def negative_log_likelihood_old(self, poi_test,
         modelToUse : Union[None,str] = None,
         outputType : str = "extended" ):
         """ the method that really wraps around the llhd computation.
@@ -257,31 +434,6 @@ class NNUpperLimitComputer:
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
-        if abs(poi_test)<1e-10:
-            if abs(nll0obs-nll1obs)>1e-1:
-                #logger.error ( f"mu={poi_test:.2f} but nll0obs {nll0obs:.4f}!= nll1obs {nll1obs:.4f}. obsDelta {obsDelta} obsErr {obsErr} arr {arr}" )
-                # ret["nll_obs_1"]=nll0obs
-                pass
-            if abs(nll0exp-nll1exp)>1e-1:
-                pass
-                # logger.error ( f"mu={poi_test:.2f} but nll0exp {nll0exp:.4f}!= nll1exp {nll1exp:.4f}." )
-                # ret["nll_exp_1"]=nll0exp
-            if False:
-                ret["nll_exp_1"]=ret["nll_exp_0"]
-                ret["nll_obs_1"]=ret["nll_obs_0"]
-                ret["nllA_obs_1"]=ret["nllA_obs_0"]
-                ret["nllA_exp_1"]=ret["nllA_exp_0"]
-        if outputType == "observed":
-            return ret["nll_obs_1"]
-        if outputType == "expected":
-            return ret["nll_exp_1"]
-        if outputType == "asimov":
-            return ret["nllA_obs_1"]
-        if outputType == "asimov_exp":
-            return ret["nllA_exp_1"]
-        if outputType != "extended":
-            logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
-            sys.exit(-1)
         return ret
 
     def welcome(self):
