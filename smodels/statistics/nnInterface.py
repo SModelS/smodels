@@ -24,9 +24,15 @@ nninfo = {
     "repeat": 0
 }
 
-def writeOutYields ( theoryPred, filename : os.PathLike = "yields.json" ):
+def writeOutYields ( theoryPred, 
+        filename : Union[os.PathLike,None] = "yields.json" ):
     """ a function for debugging only: writes the actual NN input
-    into a file called filename """
+    into a file called filename 
+    
+    :param filename: output file name, if None, then it is
+    yields_<massparams>,json
+    
+    """
 
     from smodels.base.physicsUnits import GeV
     masses = []

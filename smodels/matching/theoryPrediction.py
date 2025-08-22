@@ -330,7 +330,7 @@ class TheoryPrediction(object):
         """
         if self.dataType() == "combined":
             from smodels.statistics.nnInterface import writeOutYields
-            writeOutYields ( self, "yields" )
+            writeOutYields ( self, "yields.json" )
         if useCached and mu in self.cachedNlls[expected]:
             nll = self.cachedNlls[expected][mu]
             return self.nllToLikelihood ( nll, return_nll )
