@@ -9,7 +9,7 @@
 """
 
 from typing import Union, Text, Tuple, Callable, Dict
-import copy
+import copy, os
 import numpy as np
 import sys
 import onnxruntime
@@ -23,6 +23,44 @@ nninfo = {
     "hasgreeted": False,
     "repeat": 0
 }
+
+def writeOutYields ( theoryPred, filename : os.PathLike = "yields.json" ):
+    """ a function for debugging only: writes the actual NN input
+    into a file called filename """
+
+    from smodels.base.physicsUnits import GeV
+    masses = []
+    for node in theoryPred.smsList[0].nodes:
+        if node.particle.isSM:
+            continue
+        masses.append ( float(node.particle.mass.asNumber(GeV)) )
+    if filename == None:
+        filename = f"yields_{'_'.join(map(str(masses)))}.json"
+    nsig = theoryPred.statsComputer.nsig
+    computer = theoryPred.statsComputer.upperLimitComputer
+    models = computer.data.globalInfo.onnxMeta.keys()
+    modelToUse = computer.mostSensitiveModel
+    gI = theoryPred.dataset.globalInfo
+    Dict = { "anaId": gI.id, "masses": masses, "nsignals": nsig,
+             "model": modelToUse,
+             "txnames":list( set(map(str,theoryPred.txnames))) }
+    dicts = []
+    if True: # modelToUse == None:
+        for m in models:
+            yields = computer.totalYieldsFromSignals( m, 1. )
+            scaled_yields = computer.scaleYields ( yields, m )
+            nn_input = scaled_yields.tolist()
+            Dict["model"]=m
+            Dict["nn_input"]=nn_input
+            dicts.append ( Dict )
+
+    with open ( filename, "wt" ) as f:
+        import json
+        d = json.dumps ( dicts, indent=4 )
+        f.write ( d )
+        f.close()
+    # import sys, IPython; IPython.embed( colors = "neutral" ) # ; sys.exit()
+
 
 class NNData:
     """
