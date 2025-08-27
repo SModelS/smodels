@@ -171,6 +171,10 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
+            if hasattr(self.dataset.globalInfo, "mlModels"):
+                # Get computer
+                computer = StatsComputer.forNNs(dataset=self.dataset,
+                        nsig=srNsigDict, deltas_rel = self.deltas_rel)
 
             # Get ordered list of datasets:
             if hasattr(self.dataset.globalInfo, "covariance"):
@@ -778,7 +782,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
+    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile() \
+            and not expResult.hasMLModel():
         return None
 
     txnameList = []

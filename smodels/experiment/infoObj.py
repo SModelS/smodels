@@ -22,6 +22,40 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
+    def canonizeRegions ( self, regions : list, forNN : bool = False ) -> list:
+        """ given a list of regions in globalInfo.txt in any of the
+        jsonFiles, jsonFiles_FullLikelihood, or mlModels fields,
+        return a canonical version of that list: strings in
+        that list get transformed into dictionaries, if region type is
+        missing, "SR" is assumed. if the "smodels" counterpart is not
+        given for a region, we assume that there is None.
+
+        :param regions: list of regions in globalInfo.txt
+        :param forNN: if true, then also possibly translate "pyhf" fields into
+        "onnx" field
+        :returns: canonical list of regions
+        """
+        newregions = []
+        for region in regions:
+            if type(region)==str:
+                region={"smodels": region}
+            if not "type" in region:
+                region["type"]="SR"
+            if not "smodels" in region:
+                region["smodels"]=None
+            if forNN:
+                if not "onnx" in region:
+                    if "pyhf" in region:
+                        region["onnx"]=region["pyhf"]
+                        region.pop("pyhf")
+                    else:
+                        region["onnx"]=region["smodels"]
+            else:
+                if not "pyhf" in region:
+                    region["pyhf"]=region["smodels"]
+            newregions.append ( region )
+        return newregions
+
     def __init__(self, path=None):
         """
         :param path: path to the .txt file
@@ -42,6 +76,7 @@ class Info(object):
 
             # Get tags in info file:
             tags = [line.split(':', 1)[0].strip() for line in content]
+            modelsLine = None # the mlModels line needs to be parsed
             for i, tag in enumerate(tags):
                 if not tag:
                     continue
@@ -49,6 +84,9 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
+                if tag == "mlModels":
+                    modelsLine = value
+                    continue
                 if tag in [ "jsonFiles", "jsonFiles_FullLikelihood" ]:
                     jsonFiles = eval(value)
                     for jsonFileName,regions in jsonFiles.items():
@@ -68,16 +106,142 @@ class Info(object):
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
                 else:
-                    logger.info("Ignoring unknown field %s found in file %s"
-                                % (tag, self.path))
+                    logger.info(f"Ignoring unknown field {tag} found in file {self.path}" )
                     continue
 
+            ## only now add the mlModels field
+            if modelsLine != None:
+                if not "'" in modelsLine and not '"' in modelsLine:
+                    # did you write without qoutes?
+                    modelsLine = f'"{modelsLine}"'
+                mlModels = eval(modelsLine)
+                if type(mlModels)==str:
+                    if len(jsonFiles.values())>1:
+                        logger.error ( f"mlModels {mlModels} is a single model, but we have several json files." )
+                        sys.exit()
+                    mlModels = { mlModels: list(jsonFiles.values())[0] }
+                if type(mlModels)==dict:
+                    for onnxFile,pointer in mlModels.items():
+                        if type(pointer) == str:
+                            pointer = jsonFiles[pointer]
+                        newregions = self.canonizeRegions ( pointer, forNN=True )
+                        mlModels[onnxFile]=newregions
+                value = str(mlModels)
+                self.addInfo("mlModels", value )
+
             self.cacheJsons()
+            self.cacheOnnxes()
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False
         return True
+
+    def cacheOnnxes(self):
+        """ if we have the "mlModels" attribute defined,
+            we cache the corresponding onnx files. Needed when pickling """
+        if not hasattr(self, "mlModels"):
+            return
+        if hasattr(self, "onnxes"):  # seems like we already have them
+            return
+        dirp = os.path.dirname(self.path)
+        if type( self.mlModels ) in [ str ]:
+            jsonFileNames = list ( self.jsonFiles.keys() )
+            if len ( jsonFileNames ) == 1:
+                jsonFileName = jsonFileNames[0]
+                onnxFile = jsonFileName.replace(".json",".onnx")
+                fullPath = os.path.join(dirp, onnxFile )
+                if not os.path.exists ( fullPath ):
+                    onnxFile = "model.onnx" ## fall back to standard name
+                # allow shorthand notation for entries with only one json file
+                self.mlModels = { onnxFile: jsonFileName }
+            else:
+                logger.error ( f"mlModels field in {dirp} is a string, but {len(jsonFileNames)} json files are mentioned!" )
+                import sys; sys.exit(-1)
+        self.onnxes = {}
+        self.onnxMeta = {}
+
+
+        def removeSignalRegions ( channels : list, dictionary : dict ) -> dict:
+            """ remove a list of signal regions called "channels" from the dictionary of values.
+            :returns: pruned dictionary
+            """
+            newDict = {}
+            for SRname,value in dictionary.items():
+                if SRname in channels:
+                    continue
+                p1 = SRname.rfind("-")
+                if p1 > 0 and SRname[:p1] in channels:
+                    continue
+                newDict[SRname]=value
+            return newDict
+
+        def fillValues ( container, value ):
+            """ given <value> fill in <container>, if value is sensible
+            :param container: the container to fill
+            :param value: the container, value to copy from
+            """
+            tmp = json.loads(value)
+            if type(tmp) in [ list, tuple ] and len(tmp)==2:
+                if math.isfinite(tmp[1]):
+                    container = tmp
+                if container[0]==None:
+                    container[0]=tmp[0]
+
+        for onnxFile, jsonfilename in self.mlModels.items():
+            fullPath = os.path.join(dirp, onnxFile )
+            with open ( fullPath, "rb" ) as f:
+                self.onnxes[onnxFile] = f.read()
+                f.close()
+            import onnx
+            m = onnx.load ( fullPath )
+            data = { "smYields": {}, "obsYields": {}, "inputMeans": [],
+                     "inputErrors": [], "nLL_exp_mu0": [ None ]*2,
+                     "nLL_obs_mu0": [ None ]*2, "nLLA_exp_mu0": [ None ]*2,
+                     "nLLA_obs_mu0": [ None ]*2, "nLL_exp_max": [ None ]*2,
+                     "nLL_obs_max": [ None ]*2, "nLLA_exp_max": [ None ]*2,
+                     "nLLA_obs_max": [ None ]*2 }
+            remove_channels=[]
+            import json, math
+            for em in m.metadata_props:
+                if em.key == "remove_channels":
+                    # remove these channels at the end, so that order does not matter
+                    remove_channels = eval(em.value)
+                    # data["remove_channels"] = remove_channels
+                if em.key == "obs_yields":
+                    st = eval(em.value)
+                    for l in st: ## the sm yields are tuple of (name,value)
+                        data["obsYields"][ l[0] ]= int ( l[1] )
+                if em.key == "bkg_yields":
+                    st = eval(em.value)
+                    for l in st: ## the sm yields are tuple of (name,value)
+                        data["smYields"][ l[0] ] = l[1]
+                if em.key == "standardization_mean":
+                    data["inputMeans"] = eval(em.value)
+                elif em.key == "standardization_std":
+                    data["inputErrors"] = eval(em.value)
+                elif em.key  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
+                                  'nLLA_obs_mu0' ]:
+                    data[em.key] = json.loads(em.value)
+                elif em.key in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
+                                 'nLLA_obs_max', 'nLL_exp_mu0', ]:
+                    fillValues ( em.key, em.value )
+                elif em.key == 'y_min':
+                    values = json.loads(em.value)
+                    if len(values)<7:
+                        logger.error ( f"'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
+                        import sys; sys.exit(-1)
+                    indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3,
+                                "nLL_obs_max" : -5, "nLL_exp_max": -7 }
+                    for name,index in indices.items():
+                        if data[name] != None:
+                            data[name] = [None,values[index]]
+            if len(remove_channels)>0:
+                data["smYields"]=removeSignalRegions ( remove_channels, data["smYields"] )
+                data["obsYields"]=removeSignalRegions ( remove_channels, data["obsYields"] )
+            self.onnxMeta[onnxFile]={}
+            for key,value in data.items():
+                self.onnxMeta[onnxFile][key]=value
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,

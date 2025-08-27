@@ -18,6 +18,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
+from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
@@ -100,6 +101,24 @@ class StatsComputer:
                                  nsig=nsig, deltas_rel=deltas_rel)
 
         computer.getComputerMultiBinSL( )
+
+        return computer
+
+    @classmethod
+    def forNNs(cls, dataset, nsig, deltas_rel):
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        computer = StatsComputer(dataObject=dataset,
+                                 dataType="nn",
+                                 nsig=nsig, deltas_rel=deltas_rel)
+
+        computer.getComputerNN( )
 
         return computer
 
@@ -220,6 +239,51 @@ class StatsComputer:
         self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
+
+    def addRegionsForNN ( self, regions : dict, translator : dict,
+                          nsignals : dict ):
+        """ for neural networks, add the regions information contained
+        in dict to translator, and to nsignals
+        """
+        for region in regions:
+            nsignals[ region["onnx"] ] = 0.
+            if region["smodels"] != None:
+                # jsonDictNames[jsName].append ( region["smodels"] )
+                translator[ region["smodels"] ] = region["onnx"]
+
+    def getComputerNN(self ):
+        """
+        Create computer for a machine learned model
+        """
+        globalInfo = self.dataObject.globalInfo
+        mlModels = globalInfo.mlModels
+        nsignals = {}
+        translator = {}
+        import sys
+        for mlModel, pointer in mlModels.items():
+            # mlModel is e.g. model.onnx, pointer is either SRcombined.json
+            # or directly the list of SRs, like in jsonFiles
+            if type(pointer) in [ str ]:
+                # points to a json file, so we copy the SRs from there!
+                jsonFiles = globalInfo.jsonFiles
+                if pointer not in globalInfo.jsonFiles.keys():
+                    logger.error ( f"no '{pointer}' defined in 'jsonFiles'!" )
+                    sys.exit(-1)
+                ## pointer is e.g. SRcombined.json
+                self.addRegionsForNN ( jsonFiles[pointer], translator, nsignals )
+            elif type(pointer) in [ list ]:
+                self.addRegionsForNN ( pointer, translator, nsignals )
+            else:
+                logger.error ( f"type of {pointer} is {type(pointer)}: dont know what to do." )
+                sys.exit(-1)
+        ## translate the signal from smodels names to pyhf names
+        for smname,pyhfname in translator.items():
+            nsignals[pyhfname] = self.nsig[smname]
+        # ic ( nsignals )
+        data = NNData( nsignals, self.dataObject )
+        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        self.likelihoodComputer = self.upperLimitComputer
+
 
     def getComputerPyhf(self ):
         """
