@@ -1106,7 +1106,7 @@ class PyhfUpperLimitComputer:
             logger.debug(f"result for {mu_rel} {result}")
             if evaluationType == aposteriori:
                 logger.debug("computing a-posteriori evaluationType limit")
-                logger.debug(f"expected = {expected}, mu_rel = {mu_rel}, result = {result}")
+                logger.debug(f"evaluationType = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
                 try:
                     CLs = float(result[1].tolist())
                 except TypeError:
