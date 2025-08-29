@@ -363,7 +363,7 @@ class DataSet(object):
         :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
                          (only for efficiency-map results)
         :param compute: If True, the upper limit will be computed
-                        from evaluationType and observed number of events.
+                        from expected and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
         :return: upper limit (Unum object)
