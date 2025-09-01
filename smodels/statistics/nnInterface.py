@@ -18,6 +18,8 @@ from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, obs
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from scipy import optimize, differentiate
 from smodels_utils.helper.terminalcolors import *
+from smodels.matching.theoryPrediction import mu_digits
+from smodels.tools.caching import roundCache, lru_cache
 
 nninfo = {
     "hasgreeted": False,
@@ -144,13 +146,9 @@ class NNUpperLimitComputer:
         """
         jsonfiles = list(self.data.globalInfo.onnxMeta.keys())
         # print ( f"@@NN66 determineMostSensitiveModel jsonfiles {jsonfiles}" )
-        self.cachedULs= { None: {} }
         if len(jsonfiles)==1:
             self.mostSensitiveModel = jsonfiles[0]
             ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = self.mostSensitiveModel )
-            self.cachedULs[self.mostSensitiveModel] = {}
-            self.cachedULs[self.mostSensitiveModel][True]=ulmu
-            self.cachedULs[None][True]=ulmu
             return
         mumin,mostSensitiveModel=float("inf"),None
         # print ( f"@@NN66 more than one!" )
@@ -159,16 +157,12 @@ class NNUpperLimitComputer:
             try:
                 # print ( f"@@NN99 get ulmu for {model}" )
                 ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = model )
-                self.cachedULs[model] = { True: ulmu }
                 # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
             except SModelSError as e:
-                self.cachedULs[model] = { True: ulmu }
-                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
                 continue
             if ulmu < mumin:
                 mumin = ulmu
                 mostSensitiveModel = model
-        self.cachedULs[None][apriori]=mumin # the smallest expected UL
         ## the most sensitive model and its upper limit we store separately
         self.mostSensitiveModel = mostSensitiveModel
         self.mumin = mumin # the smallest expected UL
@@ -308,6 +302,7 @@ class NNUpperLimitComputer:
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         return ret
 
+    @roundCache(argname='poi_test',argpos=1,digits=mu_digits)
     def negative_log_likelihood(self, poi_test : float,
         modelToUse : Union[None,str] = None,
         outputType : str = "extended" ):
@@ -533,6 +528,7 @@ class NNUpperLimitComputer:
             return np.exp(-nll )
         return nll
 
+    @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
@@ -652,6 +648,7 @@ class NNUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
+    @lru_cache
     def getUpperLimitOnMu(self, evaluationType=observed, allowNegativeSignals = False,
             modelToUse : Union[None,str] = None ) -> float:
         """
@@ -667,11 +664,6 @@ class NNUpperLimitComputer:
         #if nninfo["repeat"]>10:
         #    sys.exit()
         # print ( f"@@NN13 getUpperLimitOnMu modelToUse {modelToUse}" )
-        if modelToUse in self.cachedULs:
-            if evaluationType in self.cachedULs[modelToUse]:
-                return self.cachedULs[modelToUse][evaluationType]
-        else:
-            self.cachedULs[modelToUse]={}
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
@@ -690,9 +682,6 @@ class NNUpperLimitComputer:
         mu_lim = optimize.brentq(clsRoot, a, b, args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06)
         if False: # False and evaluatioNType == aposteriori:
             print ( f"@@NN473 getUpperLimitOnMu r={1./mu_lim:.3f} evaluationType {evaluationType}" )
-        if not modelToUse in self.cachedULs:
-            self.cachedULs[modelToUse]={}
-        self.cachedULs[modelToUse][evaluationType]=mu_lim # store
         return mu_lim
 
     def getCLsRootFunc(self, evaluationType: bool = observed,
