@@ -65,6 +65,7 @@ def writeOutYields ( theoryPred,
         d = json.dumps ( dicts, indent=4 )
         f.write ( d )
         f.close()
+    print ( f"[nnInterface] wrote yields to {filename}" )
     # import sys, IPython; IPython.embed( colors = "neutral" ) # ; sys.exit()
 
 

@@ -90,17 +90,7 @@ class Info(object):
                 if tag in [ "jsonFiles", "jsonFiles_FullLikelihood" ]:
                     jsonFiles = eval(value)
                     for jsonFileName,regions in jsonFiles.items():
-                        newregions = []
-                        for region in regions:
-                            if type(region)==str:
-                                region={"smodels": region}
-                            if not "type" in region:
-                                region["type"]="SR"
-                            if not "smodels" in region:
-                                region["smodels"]=None
-                            if not "pyhf" in region:
-                                region["pyhf"]=region["smodels"]
-                            newregions.append ( region )
+                        newregions = self.canonizeRegions ( regions, forNN=False )
                         jsonFiles[jsonFileName] = newregions
                     value = str(jsonFiles)
                 if tags.count(tag) == 1:
