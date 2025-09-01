@@ -177,7 +177,7 @@ class TheoryPrediction(object):
                         nsig=srNsigDict, deltas_rel = self.deltas_rel)
 
             # Get ordered list of datasets:
-            if hasattr(self.dataset.globalInfo, "covariance"):
+            elif hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] for dataID in datasetList]

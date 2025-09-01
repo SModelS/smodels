@@ -439,7 +439,7 @@ class StatsComputer:
 
     def transform ( self, evaluationType ):
         """ SL only. transform the data to evaluationType or observed """
-        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             return
         self.likelihoodComputer.transform ( evaluationType )
 
@@ -496,6 +496,16 @@ class StatsComputer:
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                        evaluationType = evaluationType, workspace_index = index )
+        elif self.dataType == "nn":
+            if all([s == 0 for s in self.nsig]):
+                logger.warning("All signals are empty")
+                return None
+            if limit_on_xsec:
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                       evaluationType = evaluationType )
+            else:
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                       evaluationType = evaluationType )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:
