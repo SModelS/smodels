@@ -331,6 +331,12 @@ class TheoryPrediction(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
+        if self.dataType() == "combined":
+            from smodels.base.runtime import experimentalFeature
+            if experimentalFeature ( "writeOutYields" ):
+                from smodels.statistics.nnInterface import writeOutYields
+                writeOutYields ( self, filename = "auto" )
+
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
         if "expected" in kwargs:
             import warnings

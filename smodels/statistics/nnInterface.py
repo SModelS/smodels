@@ -29,8 +29,8 @@ def writeOutYields ( theoryPred,
     """ a function for debugging only: writes the actual NN input
     into a file called filename 
     
-    :param filename: output file name, if None, then it is
-    yields_<massparams>,json
+    :param filename: output file name, if None or 'auto', then it is
+    yields_<massparams>.json
     
     """
 
@@ -40,7 +40,7 @@ def writeOutYields ( theoryPred,
         if node.particle.isSM:
             continue
         masses.append ( float(node.particle.mass.asNumber(GeV)) )
-    if filename == None:
+    if filename in [ None, "auto" ]:
         filename = f"yields_{'_'.join(map(str(masses)))}.json"
     nsig = theoryPred.statsComputer.nsig
     computer = theoryPred.statsComputer.upperLimitComputer

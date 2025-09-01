@@ -53,9 +53,9 @@ class StatsComputer:
         :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
         """
 
-        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb"]:
+        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             logger.error ( f"I do not recognize the data type {dataType}" )
-            raise SModelSError()
+            raise SModelSError( f"I do not recognize the data type {dataType}" )
 
         self.dataObject = dataObject
         self.dataType = dataType
