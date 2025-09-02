@@ -120,7 +120,7 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args :
     return root
 
 def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
-         allowNegative = True ):
+         allowNegative = True, args : dict = {}, verbose :  bool = True ):
     """find a, b for brent bracketing
 
     :param mu_hat: mu that maximizes likelihood
@@ -129,11 +129,12 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
     :param allowNegative: if False, then do not allow a or b to become negative
     :returns: the interval a,b
     """
+    msg = logger.error if verbose else logger.debug
     sigma_mu = max(sigma_mu, 0.5)  # there is a minimum on sigma_mu
     sigma_mu = min(sigma_mu, 100.) # there is a maximum on sigma_mu
     # the root should be roughly at mu_hat + 2*sigma_mu
     a = mu_hat + 1.5 * sigma_mu
-    ra = rootfinder(a)
+    ra = rootfinder(a,**args)
     ntrials = 20
     i = 0
     foundExtra = False
@@ -141,35 +142,35 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
         # if this is negative, we move it to the left
         i += 1
         a -= (i**2.0) * sigma_mu
-        ra = rootfinder(a)
+        ra = rootfinder(a,**args)
         if i > ntrials or a < -10000.0 or ra is None or ( a < 0 and not allowNegative ):
             avalues = [0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1, 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
             if not allowNegative:
                 avalues = [0.0, 1.0, 3.0, 10.0, 0.1, 0.01, .001, 100., .0001 ]
             for a in avalues:
-                ra = rootfinder(a)
+                ra = rootfinder(a,**args)
                 if ra is None: # if cls computation failed, try with next a value
                     continue
                 if ra > 0.0:
                     foundExtra = True
                     break
             if not foundExtra:
-                logger.error(
+                msg(
                     f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
-                logger.error(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
+                msg(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
                 raise SModelSError(
                     f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
     i = 0
     foundExtra = False
     b = mu_hat + 2.5 * sigma_mu
-    rb = rootfinder(b)
+    rb = rootfinder(b,**args)
     while rb > 0.0:
         # if this is positive, we move it to the right
         i += 1
         b += (i**2.0) * sigma_mu
-        rb = rootfinder(b)
+        rb = rootfinder(b,**args)
         if rb is None: # if cls computation failed, try with a bigger b value
             continue
         closestr, closest = float("inf"), None
@@ -178,7 +179,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
             if not allowNegative:
                 bvalues = [1.0, 0.0, 3.0, 10.0, 1e-1, 1e2, 1e3, 1e-2, 1e-3, 1e4, 1e5, 1e6, 1e8 ]
             for b in bvalues:
-                rb = rootfinder(b)
+                rb = rootfinder(b,**args )
                 if rb is None: # if cls computation failed, try with next b value
                     continue
                 if rb < 0.0:
