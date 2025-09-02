@@ -192,7 +192,7 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
                 logger.error(f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")
                 logger.error(f"closest to zero rootfinder({closest})={closestr}")
                 logger.error(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
-                raise SModelSError()
+                raise SModelSError( f"cannot find a b that is right of the root (i.e. rootfinder(b) < 0)." )
     if a > b: a,b=b,a
     return a, b
 
