@@ -44,7 +44,7 @@ def writeOutYields ( theoryPred,
             continue
         masses.append ( float(node.particle.mass.asNumber(GeV)) )
     if filename in [ None, "auto" ]:
-        filename = f"yields_{'_'.join(map(str(masses)))}.json"
+        filename = f"yields_{'_'.join(map(str,masses))}.json"
     nsig = theoryPred.statsComputer.nsig
     computer = theoryPred.statsComputer.upperLimitComputer
     models = computer.data.globalInfo.onnxMeta.keys()

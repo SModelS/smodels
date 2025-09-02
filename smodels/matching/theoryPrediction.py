@@ -333,7 +333,7 @@ class TheoryPrediction(object):
         """
         if self.dataType() == "combined":
             from smodels.base.runtime import experimentalFeature
-            if experimentalFeature ( "writeOutYields" ):
+            if experimentalFeature ( "writeoutyields" ):
                 from smodels.statistics.nnInterface import writeOutYields
                 writeOutYields ( self, filename = "auto" )
 
