@@ -20,6 +20,7 @@ from scipy import optimize, differentiate
 from smodels_utils.helper.terminalcolors import *
 from smodels.matching.theoryPrediction import mu_digits
 from smodels.tools.caching import roundCache, lru_cache
+from smodels.statistics.basicStats import findRoot
 
 nninfo = {
     "hasgreeted": False,
@@ -149,6 +150,8 @@ class NNUpperLimitComputer:
         if len(jsonfiles)==1:
             self.mostSensitiveModel = jsonfiles[0]
             ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = self.mostSensitiveModel )
+            self.mumin = ulmu
+            # print ( f"@@NN83 ulmu {ulmu}" )
             return
         mumin,mostSensitiveModel=float("inf"),None
         # print ( f"@@NN66 more than one!" )
@@ -156,8 +159,9 @@ class NNUpperLimitComputer:
             ulmu = float("inf")
             try:
                 # print ( f"@@NN99 get ulmu for {model}" )
+                # print ( f"@@NN52 determineMostSensitiveModel for {model} .. " )
                 ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = model )
-                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
+                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={ulmu}" )
             except SModelSError as e:
                 continue
             if ulmu < mumin:
@@ -392,7 +396,7 @@ class NNUpperLimitComputer:
         syields = []
         if False and not modelToUse in self.data.globalInfo.onnxMeta:
             print ( f"@@NN77 we dont have {modelToUse} in meta:" )
-            print ( f"meta {self.data.globalInfo.onnxMeta}" )
+            print ( f"@@NN78 meta {self.data.globalInfo.onnxMeta}" )
         for srname,smyield in self.data.globalInfo.onnxMeta[modelToUse]["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -611,7 +615,7 @@ class NNUpperLimitComputer:
                 if hessian > 0.:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
-                ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
+                ret = { "lmax": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
                 # print ( f"@@NN45 muhat {muhat} nllmin {nllmin} hessian {hessian} allowNegativeSignals {allowNegativeSignals}" )
                 # print ( f"@@NN47 negative_log_likelihood {self.negative_log_likelihood(muhat)}" )
                 return ret
@@ -663,12 +667,14 @@ class NNUpperLimitComputer:
         #nninfo["repeat"]=nninfo["repeat"]+1
         #if nninfo["repeat"]>10:
         #    sys.exit()
-        # print ( f"@@NN13 getUpperLimitOnMu modelToUse {modelToUse}" )
+        #print ( f"@@NN13 getUpperLimitOnMu modelToUse {modelToUse}" )
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
+        #print ( f"@@NN14 getUpperLimitOnMu modelToUse {modelToUse}" )
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
                               allowNegativeSignals=allowNegativeSignals,
                               modelToUse = modelToUse)
+        #print ( f"@@NN16 getUpperLimitOnMu mu_hat {mu_hat}" )
         if mu_hat is None:
             return float("inf")
         # print ( f"@@NN76 clsRoot evaluationType {evaluationType} modelToUse {modelToUse}" )
@@ -676,11 +682,13 @@ class NNUpperLimitComputer:
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
-                        verbose = True )
+                    verbose = True )
         except Exception as e:
+            # print ( f"@@NN12 exception e {e}" )
             return float("inf")
-        mu_lim = optimize.brentq(clsRoot, a, b, args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06)
-        if False: # False and evaluatioNType == aposteriori:
+        # mu_lim = optimize.brentq(clsRoot, a, b, args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06)
+        mu_lim = findRoot(clsRoot, a, b, args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06)
+        if False and evaluatioNType == aposteriori:
             print ( f"@@NN473 getUpperLimitOnMu r={1./mu_lim:.3f} evaluationType {evaluationType}" )
         return mu_lim
 
@@ -702,18 +710,18 @@ class NNUpperLimitComputer:
                              return_nll=True, modelToUse = modelToUse )
         if fmh == None:
             return None, None, None
-        mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+        mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
 
         nll0 = nll0A
 
         if True: # evaluationType != aposteriori:
             fmh = self.lmax( evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals, 
                              modelToUse = modelToUse )
-            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
             mu_hat = mu_hat if mu_hat is not None else 0.0
         if False: # evaluationType == aposteriori:
             fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
-            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
             mu_hat = mu_hat if mu_hat is not None else 0.0
             #nll02 = self.likelihood(.298, evaluationType=observed, return_nll=True,
             #        modelToUse = modelToUse )
