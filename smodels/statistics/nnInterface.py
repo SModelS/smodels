@@ -36,7 +36,6 @@ def writeOutYields ( theoryPred,
     yields_<massparams>.json
     
     """
-
     from smodels.base.physicsUnits import GeV
     masses = []
     for node in theoryPred.smsList[0].nodes:
@@ -45,6 +44,8 @@ def writeOutYields ( theoryPred,
         masses.append ( float(node.particle.mass.asNumber(GeV)) )
     if filename in [ None, "auto" ]:
         filename = f"yields_{'_'.join(map(str,masses))}.json"
+    if os.path.exists ( filename ):
+        return
     nsig = theoryPred.statsComputer.nsig
     computer = theoryPred.statsComputer.upperLimitComputer
     models = computer.data.globalInfo.onnxMeta.keys()
@@ -53,15 +54,22 @@ def writeOutYields ( theoryPred,
     Dict = { "anaId": gI.id, "masses": masses, "nsignals": nsig,
              "model": modelToUse,
              "txnames":list( set(map(str,theoryPred.txnames))) }
+    Dict["nllSM"]=theoryPred.lsm ( observed, return_nll = True )
+    Dict["nll"]=theoryPred.nll ( 1.0, observed, return_nll = True )
+    Dict["nll_min"]=theoryPred.lmax ( observed, return_nll = True )
     dicts = []
+    dicts.append ( Dict )
     if True: # modelToUse == None:
         for m in models:
+            ndict = {}
             yields = computer.totalYieldsFromSignals( m, 1. )
             scaled_yields = computer.scaleYields ( yields, m )
             nn_input = scaled_yields.tolist()
-            Dict["model"]=m
-            Dict["nn_input"]=nn_input
-            dicts.append ( Dict )
+            ndict["model"]=m
+            ndict["yields"]=yields
+            ndict["nn_input"]=nn_input
+            # Dict["ul"]=theoryPred.getUpperLimitOnMu ( observed )
+            dicts.append ( ndict )
 
     with open ( filename, "wt" ) as f:
         import json

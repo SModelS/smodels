@@ -205,6 +205,7 @@ class TheoryPrediction(object):
         :param expected: return evaluationType Upper Limit, instead of observed.
         :return: upper limit (Unum object)
         """
+        self.writeOutYields()
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType)
         if self.dataType() == "upperLimit":
@@ -321,6 +322,20 @@ class TheoryPrediction(object):
         return self.likelihood ( mu=mu, evaluationType=evaluationType, asimov=asimov,
                                  return_nll=True )
 
+    def writeOutYields ( self ):
+        """ if being asked to, we write out the yields """
+        if self.dataType() != "combined":
+            return
+        from smodels.base.runtime import experimentalFeature
+        if experimentalFeature ( "writeoutyields" ) != True:
+            return
+        if hasattr ( self, "yieldsWritten") and self.yieldsWritten == True:
+            return
+        from smodels.statistics.nnInterface import writeOutYields
+        writeOutYields ( self, filename = "auto" )
+        self.yieldsWritten = True
+
+
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(self, mu=1.0, evaluationType : NllEvalType = observed, return_nll=False,
@@ -331,11 +346,6 @@ class TheoryPrediction(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
-        if self.dataType() == "combined":
-            from smodels.base.runtime import experimentalFeature
-            if experimentalFeature ( "writeoutyields" ):
-                from smodels.statistics.nnInterface import writeOutYields
-                writeOutYields ( self, filename = "auto" )
 
         assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
         if "expected" in kwargs:
