@@ -52,11 +52,12 @@ def writeOutYields ( theoryPred,
     modelToUse = computer.mostSensitiveModel
     gI = theoryPred.dataset.globalInfo
     Dict = { "anaId": gI.id, "masses": masses, "nsignals": nsig,
-             "model": modelToUse,
+    #         "model": modelToUse,
              "txnames":list( set(map(str,theoryPred.txnames))) }
     Dict["nllSM"]=theoryPred.lsm ( observed, return_nll = True )
     Dict["nll"]=theoryPred.nll ( 1.0, observed, return_nll = True )
     Dict["nll_min"]=theoryPred.lmax ( observed, return_nll = True )
+    Dict["bestModel"]=modelToUse
     dicts = []
     dicts.append ( Dict )
     if True: # modelToUse == None:
