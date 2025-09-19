@@ -9,7 +9,11 @@
 """
 
 import unum
-SModelSUnit = unum.Unum # for type hinting
+# these are just for type hinting
+UnitLength = unum.Unum
+UnitXSec = unum.Unum 
+UnitEnergy = unum.Unum
+UnitTime = unum.Unum
 
 # description see
 # http://home.scarlet.be/be052320/Unum.html
