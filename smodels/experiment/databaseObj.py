@@ -28,6 +28,7 @@ from smodels.base.physicsUnits import TeV
 from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
+from typing import Union
 import logging
 os.environ["OMP_NUM_THREADS"] = "2"
 
@@ -78,9 +79,10 @@ class Database(object):
     Delegates all calls to SubDatabases.
     """
 
-    def __init__(self, base=None, force_load=None,
-                 progressbar=False, subpickle=True,
-                 combinationsmatrix=None):
+    def __init__(self, base : Union[str,None] = None,
+                 force_load : Union[str,None] = None,
+                 progressbar : bool = False, subpickle : bool = True,
+                 combinationsmatrix : Union[dict,None] = None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
@@ -128,8 +130,8 @@ class Database(object):
             lists = [x.expResultList for x in self.subs]
             return self.mergeLists(lists)
 
-    def mergeLists(self, lists):
-        """ small function, merges lists of ERs """
+    def mergeLists( self, lists : list ) -> list:
+        """ small function, merges lists of expResults """
         D = {}
         for tmp in lists:
             for t in tmp:
@@ -144,7 +146,10 @@ class Database(object):
         return list(D.values())
 
     def mergeERs(self, o1, r2):
-        """ merge the content of exp res r1 and r2 """
+        """ merge the content of exp res o1 and r2
+        :param o1: other1, an experimentalResult
+        :param r2: experimental Result 2
+        """
         r1 = copy.deepcopy(o1)
         r1.globalInfo = r2.globalInfo
         dids = [x.getID() for x in o1.datasets]
@@ -164,7 +169,7 @@ class Database(object):
                         r1.datasets[idx].txnameList.append(txn)
         return r1
 
-    def createBinaryFile(self, filename=None):
+    def createBinaryFile(self, filename : Union[None,os.PathLike] = None ):
         """ create a pcl file from all the subs """
         ## make sure we have a model to pickle with the database!
         logger.debug(f" * create {filename}")
@@ -344,8 +349,11 @@ class SubDatabase(object):
     SubDatabase object. Holds a list of ExpResult objects.
     """
 
-    def __init__(self, base=None, force_load=None,
-                 progressbar=False, subpickle=True, combinationsmatrix=None):
+    def __init__(self, base : Union[str,None] = None,
+                 force_load : Union[str,None] = None,
+                 progressbar : bool= False,
+                 subpickle : bool= True,
+                 combinationsmatrix : Union[dict,None] = None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
