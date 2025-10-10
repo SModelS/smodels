@@ -54,14 +54,14 @@ except ImportError as e:
     import pickle as serializer
 
 
-def _getSHA1(filename):
+def _getSHA1( filename : os.PathLike ) -> str:
     return hashlib.sha1(pathlib.Path(filename).read_bytes()).hexdigest()
 
 # some mechanism to remove lock files if the download got interrupted
 import atexit
 lockfiles = set()
 
-def removeLockFiles( lockfiles ):
+def removeLockFiles( lockfiles : list ):
     """ remove cruft lockfiles """
     for l in lockfiles:
         if os.path.exists ( l ):
@@ -145,7 +145,7 @@ class Database(object):
                     D[anaid] = self.mergeERs(D[anaid], t)
         return list(D.values())
 
-    def mergeERs(self, o1, r2):
+    def mergeERs(self, o1 : ExpResult, r2 : ExpResult ) -> ExpResult:
         """ merge the content of exp res o1 and r2
         :param o1: other1, an experimentalResult
         :param r2: experimental Result 2
@@ -229,9 +229,10 @@ class Database(object):
                 return False
         return True
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def getExpResults(self, analysisIDs : list = ['all'],
+            datasetIDs : list = ['all'], txnames : list = ['all'],
+            dataTypes : list = ['all'], useNonValidated : bool = False,
+            onlyWithExpected : bool = False ):
         """
         Select (filter) the results within the database satisfying the restrictions set by the arguments and returns the corresponding results.
         """
@@ -243,9 +244,10 @@ class Database(object):
 
         return self.expResultList[:]
 
-    def selectExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def selectExpResults(self, analysisIDs : list = ['all'],
+            datasetIDs : list = ['all'], txnames : list =['all'],
+            dataTypes : list = ['all'], useNonValidated : bool = False,
+            onlyWithExpected : bool = False ):
         """
         Selects (filter) the results within the database satisfying the restrictions set by the arguments and updates the centralized SMS dictionary.
 
@@ -442,7 +444,7 @@ class SubDatabase(object):
         return True
 
     @property
-    def expResultList(self):
+    def expResultList(self) -> list:
         """
         The list of active results.
         """
@@ -450,7 +452,7 @@ class SubDatabase(object):
         return self._activeResults[:]
 
     @expResultList.setter
-    def expResultList(self,value):
+    def expResultList(self,value : list ):
         """
         If a results list is defined for the database,
         store it in _allExpResults and reset the active list.
@@ -528,7 +530,7 @@ class SubDatabase(object):
             if hasattr(er.globalInfo, "_databaseParticles"):
                 del er.globalInfo._databaseParticles
 
-    def loadBinaryFile(self, lastm_only=False):
+    def loadBinaryFile(self, lastm_only : bool = False):
         """
         Load a binary database, returning last modified, file count, database.
 
@@ -600,7 +602,7 @@ class SubDatabase(object):
             logger.info("Binary db file does not need an update.")
         return nu
 
-    def needsUpdate(self):
+    def needsUpdate(self) -> bool:
         """ does the binary db file need an update? """
         try:
             self.loadBinaryFile(lastm_only=True)
@@ -610,7 +612,7 @@ class SubDatabase(object):
             # if we encounter a problem, we rebuild the database.
             return True
 
-    def createBinaryFile(self, filename=None):
+    def createBinaryFile(self, filename : Union[None,os.PathLike] = None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         ## make sure we have a model to pickle with the database!
@@ -648,7 +650,7 @@ class SubDatabase(object):
         return self.txt_meta.databaseVersion
 
     @databaseVersion.setter
-    def databaseVersion(self, x):
+    def databaseVersion(self, x : str ):
         self.txt_meta.databaseVersion = x
         self.pcl_meta.databaseVersion = x
 
@@ -674,7 +676,7 @@ class SubDatabase(object):
         """
         return self.txt_meta.pathname
 
-    def lockFile ( self, filename : os.PathLike ):
+    def lockFile ( self, filename : os.PathLike ) -> bool:
         """ lock the file <filename>
         """
         lockfile = os.path.join ( os.path.dirname ( filename ),
