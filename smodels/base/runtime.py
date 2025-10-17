@@ -28,13 +28,14 @@ def checkForIncompatibleModuleVersions() -> bool:
     :returns: false if incompatible version found, else true
     """
     from importlib.metadata import version
-    if version("scipy")[:4] in [ "1.16", "1.17" ]:
-        print ( f"SModelS warning: scipy v{version('scipy')} is installed, but it seems " \
-                 "this version does not work with pyhf 0.7.6. We recommend scipy 1.15.x " \
-                 "and pyhf 0.7.6. You have been warned." )
+    if version("scipy")[:6] in ["1.16.0", "1.16.1", "1.16.2"]:
+        print ( f"SModelS warning: scipy v{version('scipy')} is installed, but there is " \
+                 "a known optimizer issue in this scipy version that causes errors " \
+                 "for some pyhf models. " \
+                 "c.f. https://github.com/scikit-hep/pyhf/issues/2593. You have been warned." )
         return False
     return True
-        
+
 checkForIncompatibleModuleVersions()
 
 def returnGitCommitId():
