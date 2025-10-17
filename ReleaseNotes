@@ -2,7 +2,7 @@ Release v3.1.1
 =======================================================
 
   * added filter for slogdet warnings (relevant on MacOS)
-  * Minor fixes slha printer
+  * Minor fixes in slha printer
   * Bumped up pythia8 from 8315 to 8316
 
 
