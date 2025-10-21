@@ -6,21 +6,23 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-from smodels.base.physicsUnits import TeV, fb
+from smodels.base.physicsUnits import TeV, fb, UnitXSec
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, aposteriori, \
+         NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
-from typing import Union, Text, Dict
+from typing import Union, Text, Dict, Callable
 import numpy as np
 
-mu_digits = 8 # number of digits for rounding the mu argument when computing likelihoods
+# number of digits for rounding the mu argument when computing likelihoods
+mu_digits = 8
 
-__all__ = [ "TheoryPrediction", "theoryPredictionsFor", "TheoryPredictionsCombiner" ]
-
+__all__ = [ "TheoryPrediction", "theoryPredictionsFor",
+            "TheoryPredictionsCombiner" ]
 
 class TheoryPrediction(object):
     """
@@ -28,9 +30,10 @@ class TheoryPrediction(object):
     for an analysis.
     """
 
-    def __init__(self, deltas_rel=None):
+    def __init__(self, deltas_rel : Union[None,float] = None):
         """
-        Initialize the theory prediction object. deltas_rel is meant to be a constant.
+        Initialize the theory prediction object. deltas_rel is meant to be a
+        constant.
 
         :param deltas_rel: relative uncertainty in signal (float).
                            Default value is 20%.
@@ -64,7 +67,7 @@ class TheoryPrediction(object):
 
         return self.dataset.globalInfo.id
 
-    def dataType(self, short=False):
+    def dataType(self, short : bool = False ):
         """
         Return the type of dataset
         :param: short, if True, return abbreviation (ul,em,comb)
@@ -190,7 +193,7 @@ class TheoryPrediction(object):
         self._statsComputer = computer
 
     @lru_cache
-    def getUpperLimit(self, evaluationType : NllEvalType = observed ):
+    def getUpperLimit(self, evaluationType : NllEvalType = observed ) -> UnitXSec:
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -212,7 +215,8 @@ class TheoryPrediction(object):
                                                     limit_on_xsec = True)
         return ul
 
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed, **kwargs ):
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
+            **kwargs ) -> float:
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
@@ -238,7 +242,8 @@ class TheoryPrediction(object):
         return muUL
 
     @lru_cache
-    def getRValue(self, evaluationType : NllEvalType = observed, **kwargs ):
+    def getRValue( self, evaluationType : NllEvalType = observed,
+                   **kwargs ) -> float:
         """
         Get the r value = theory prediction / experimental upper limit
 
@@ -258,7 +263,7 @@ class TheoryPrediction(object):
             r = (self.totalXsection()/upperLimit).asNumber()
             return r
 
-    def whenDefined(function):
+    def whenDefined( function : Callable ) -> Callable:
         """
         Returns the function whenever the statistical
         calculation is possible (i.e. when it is possible to define
@@ -319,8 +324,9 @@ class TheoryPrediction(object):
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood(self, mu=1.0, evaluationType : NllEvalType = observed, return_nll=False,
-            asimov : Union[None,float] = None, **kwargs ) -> float:
+    def likelihood(self, mu : float = 1.0, evaluationType : NllEvalType = observed,
+            return_nll : bool =False, asimov : Union[None,float] = None,
+            **kwargs ) -> float:
         """
         get the likelihood for a signal strength modifier mu
 
@@ -337,7 +343,8 @@ class TheoryPrediction(object):
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
-                       evaluationType = evaluationType, return_nll = return_nll, asimov = asimov )
+                       evaluationType = evaluationType, return_nll = return_nll,
+                       asimov = asimov )
         return nll
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
@@ -356,8 +363,8 @@ class TheoryPrediction(object):
         :param expected: computed evaluationType quantities, not observed
         """
         # Compute likelihoods and related parameters:
-        llhdDict = self.statsComputer.get_five_values(evaluationType = evaluationType,
-                     return_nll = True )
+        llhdDict = self.statsComputer.get_five_values(
+                evaluationType = evaluationType, return_nll = True )
         return llhdDict
 
 
@@ -368,7 +375,9 @@ class TheoryPredictionsCombiner(TheoryPrediction):
     object.
     """
 
-    def __new__(cls,theoryPredictions: list, slhafile=None, deltas_rel=None):
+    def __new__(cls,theoryPredictions: list,
+                slhafile : Union[None,str] = None,
+                deltas_rel : Union[float,None] = None ):
         """
         If called with a list containing a single TheoryPrediction, return the TheoryPrediction object.
         Otherwise, create a TheoryPredictionsCombiner object.
@@ -380,7 +389,9 @@ class TheoryPredictionsCombiner(TheoryPrediction):
             tpCombiner = super(TheoryPredictionsCombiner, cls).__new__(cls)
             return tpCombiner
 
-    def __init__(self, theoryPredictions: list, slhafile=None, deltas_rel=None):
+    def __init__( self, theoryPredictions: list,
+                  slhafile : Union[None,str]=None,
+                  deltas_rel : Union[float,None]=None ):
         """
         Constructor.
 
@@ -403,7 +414,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         self._statsComputer = None
 
     @classmethod
-    def selectResultsFrom(cls, theoryPredictions, anaIDs):
+    def selectResultsFrom(cls, theoryPredictions : list, anaIDs : list ):
         """
         Select the results from theoryPrediction list which match one
         of the IDs in anaIDs. If there are multiple predictions for the
@@ -425,9 +436,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # Warn the user concerning results with no likelihoods:
         for anaID in filteredIDs.difference(selectedIDs):
             logger.info(
-                "No likelihood available for %s. This analysis will not be used in analysis combination."
-                % anaID
-            )
+                f"No likelihood available for {anaID}. This analysis will not be used in analysis combination." )
         # If no results are available, return None
         if len(selectedTPs) == 0:
             return None
@@ -437,11 +446,12 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # Now sort by highest priority and then by highest evaluationType r-value:
         selectedTPs = sorted(
             selectedTPs, key=lambda tp: (priority[tp.dataType()],
-                                         tp.getRValue(evaluationType=apriori) is not None,
-                                         tp.getRValue(evaluationType=apriori))
+                                 tp.getRValue(evaluationType=apriori) is not None,
+                                 tp.getRValue(evaluationType=apriori))
         )
         # Now get a single TP for each result
-        # (the highest ranking analyses with r != None come last and are kept in the dict)
+        # (the highest ranking analyses with r != None come last
+        # and are kept in the dict)
         uniqueTPs = {tp.analysisId(): tp for tp in selectedTPs}
         uniqueTPs = list(uniqueTPs.values())
 
@@ -459,7 +469,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
     def analysisId(self):
         """
-        Return a string with the IDs of all the experimental results used in the combination.
+        Return a string with the IDs of all the experimental results
+        used in the combination.
         """
 
         ret = ",".join(sorted([tp.analysisId() for tp in self.theoryPredictions]))
@@ -507,21 +518,24 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         else:
             from smodels.statistics.statsTools import getStatsComputerModule
             StatsComputer = getStatsComputerModule()
-            computer = StatsComputer.forAnalysesComb(self.theoryPredictions, self.deltas_rel)
+            computer = StatsComputer.forAnalysesComb(self.theoryPredictions,
+                    self.deltas_rel)
 
         self._statsComputer = computer
 
-    def getLlhds(self,muvals,evaluationType=False,normalize=True):
+    def getLlhds(self,muvals,evaluationType : bool = False,
+                  normalize : bool = True ) -> dict:
         """
-        Facility to access the likelihoods for the individual analyses and the combined
-        likelihood.
-        Returns a dictionary with the analysis IDs as keys and the likelihood values as values.
-        Mostly used for plotting the likelihoods.
+        Facility to access the likelihoods for the individual analyses and
+        the combined likelihood.
+        Returns a dictionary with the analysis IDs as keys and the likelihood
+        values as values.  Mostly used for plotting the likelihoods.
 
-        :param muvals: List with values for the signal strenth for which the likelihoods must
-                       be evaluated.
+        :param muvals: List with values for the signal strenth for which
+        the likelihoods must be evaluated.
         :param expected: If True returns the evaluationType likelihood values.
-        :param normalize: If True normalizes the likelihood by its integral over muvals.
+        :param normalize: If True normalizes the likelihood by its integral
+        over muvals.
         """
 
         return self.statsComputer.likelihoodComputer.getLlhds(muvals,evaluationType,normalize)
@@ -623,7 +637,8 @@ class TheoryPredictionList(object):
 
 def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         maxMassDist : float = 0.2, useBestDataset : bool = True,
-        combinedResults : bool = True, deltas_rel : Union[None,float] = None):
+        combinedResults : bool = True,
+        deltas_rel : Union[None,float] = None) -> list:
     """
     Compute theory predictions for the given experimental result, using the list of
     SMS in smsTopDict.
