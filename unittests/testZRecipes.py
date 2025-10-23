@@ -63,7 +63,8 @@ class RecipeTest(unittest.TestCase):
         _, error = p.communicate()
         logger.debug( f"{notebookFile} run in {time.time()-t0:1.2f}s" )
         if p.returncode != 0:
-            logger.debug( f"Notebook {notebookFile} failed with error:\n {error}" )
+            logger.error( f"When executing {cmd}:" )
+            logger.error( f"Notebook {notebookFile} failed with error:\n {error}" )
         self.assertEqual(p.returncode,0)
 
 
