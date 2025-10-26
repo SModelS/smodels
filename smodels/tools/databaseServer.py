@@ -2,7 +2,6 @@
 
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
-from smodels.tools.caching import Cache
 import socket, atexit, time, os, sys, copy
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 import unum
@@ -37,7 +36,7 @@ class DatabaseServer:
             port = 31770
             while self.is_port_in_use ( port ):
                 port += 1
-            self.pprint ( "using first free port %d" % port )
+            self.pprint ( f"using first free port {port}" )
         if servername == None:
             servername = socket.gethostname()
             self.pprint ( f"determined servername as '{servername}'" )
@@ -120,7 +119,7 @@ class DatabaseServer:
     def lookUpResult ( self, data ):
         self.nlookups += 1
         if self.nlookups % 20000 == 0:
-            self.pprint ( "looked up %dth result" % self.nlookups )
+            self.pprint ( f"looked up {self.nlookups}th result" )
         tokens = data.split(":")
         anaId = tokens[1]
         dType = ":". join ( tokens[2:-2] )
@@ -199,19 +198,16 @@ class DatabaseServer:
 
     def initialize( self ):
         self.setStatus ( "initialized" )
-        Cache.n_stored = 20000 ## crank up the caching
         self.db = Database ( self.dbpath )
         self.expResults = self.db.expResultList
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_address = ( self.servername, self.port )
         self.pprint ( 'starting up on %s port %s' % self.server_address )
-        self.pprint ( 'I will be serving database %s at %s' % \
-                      (self.db.databaseVersion, self.dbpath ) )
+        self.pprint ( f'I will be serving database {self.db.databaseVersion} at {self.dbpath}' )
         try:
             self.sock.bind( self.server_address )
         except OSError as e:
-            self.pprint ( "exception %s. is host ''%s'' reachable?" % \
-                          ( e, self.server_address ) )
+            self.pprint ( f"exception {e}. is host ''{self.server_address}'' reachable?" )
             sys.exit(-1)
         # Listen for incoming connections
         self.sock.listen(1)
