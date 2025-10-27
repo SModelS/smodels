@@ -206,7 +206,7 @@ class DatabaseServer:
         try:
             self.sock.bind( self.server_address )
         except OSError as e:
-            self.pprint ( f"exception {e}. is host ''{self.server_address}'' reachable?" )
+            self.pprint ( f"exception {e}: is host '{self.servername}:{self.port}' reachable?" )
             sys.exit(-1)
         # Listen for incoming connections
         self.sock.listen(1)
