@@ -80,7 +80,7 @@ class DatabaseServer:
         """ log our stats upon exit """
         self.pprint ( "server stats" )
         self.pprint ( "============" )
-        self.pprint ( "total number of lookups: %d" % self.nlookups )
+        self.pprint ( f"total number of lookups: {self.nlookups}" )
         
     def shutdown ( self, fromwhere = "unknown" ):
         self.pprint ( f"Received shutdown request from {fromwhere}" )
@@ -173,8 +173,7 @@ class DatabaseServer:
                 if data:
                     self.parseData ( str(data) )
                 else:
-                    self.log ( 'no more data from %s:%s' % \
-                               ( self.client_address[0], self.client_address[1] ) )
+                    self.log ( f'no more data from {self.client_address[0]}:{self.client_address[1]}' )
                     break
         finally:
             # Clean up the connection
@@ -184,16 +183,16 @@ class DatabaseServer:
         if self.verbose > 35:
             print ( "[databaseServer]", " ".join(map(str,args)) )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseServer-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                asctime = time.strftime("%H:%M:%S")
+                f.write(f"[databaseServer-{asctime}] {' '.join(map(str,args))}\n")
                 f.close()
 
     def pprint ( self, *args ):
         if self.verbose > 25:
             print ( "[databaseServer]", " ".join(map(str,args)) )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseServer-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                asctime = time.strftime("%H:%M:%S")
+                f.write(f"[databaseServer-{asctime}] {' '.join(map(str,args))}\n")
                 f.close()
 
     def initialize( self ):
