@@ -5,6 +5,7 @@ from smodels.base.physicsUnits import GeV
 import socket, atexit, time, os, sys, copy
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 import unum
+from typing import Union
 
 unum.Unum.VALUE_FORMAT = "%0.16E"
 
@@ -19,8 +20,9 @@ def shutdownAll ():
     servers[0] = []
 
 class DatabaseServer:
-    def __init__ ( self, dbpath, servername = None, port = None, verbose = "info",
-                   rundir = "./", logfile = "@@rundir@@/dbserver.log" ):
+    def __init__ ( self, dbpath : str, servername : Union[str,None] = None,
+            port : Union[int,None] = None, verbose : str = "info",
+            rundir : str = "./", logfile : str = "@@rundir@@/dbserver.log" ):
         self.rundir = rundir
         logfile = logfile.replace("@@rundir@@",rundir)
         verbose = verbose.lower()
@@ -51,7 +53,7 @@ class DatabaseServer:
             self.pprint ( f"slurm job id is {os.environ['SLURM_JOB_ID']}" )
         self.setStatus ( "ramped" )
 
-    def setStatus ( self, status ):
+    def setStatus ( self, status : str ):
         """ servers have a status file that tells us if they are running """
         statusfile = self.rundir + "/serverstatus.log"
         if status == "down" and os.path.exists ( statusfile ):
@@ -61,15 +63,15 @@ class DatabaseServer:
             f.write ( status + "\n" )
             f.close()
 
-    def is_port_in_use(self, port):
+    def is_port_in_use(self, port : int ) -> bool:
         """ check if port is in use """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex(('localhost', port)) == 0
 
-    def run ( self, nonblocking = False ):
+    def run ( self, nonblocking : bool = False ):
         """ run server
         :param nonblock: run in nonblocking mode (not yet implemented)
-        """ 
+        """
         if nonblocking:
             pid = os.fork()
             if pid == 0:
@@ -81,8 +83,8 @@ class DatabaseServer:
         self.pprint ( "server stats" )
         self.pprint ( "============" )
         self.pprint ( f"total number of lookups: {self.nlookups}" )
-        
-    def shutdown ( self, fromwhere = "unknown" ):
+
+    def shutdown ( self, fromwhere : str = "unknown" ):
         self.pprint ( f"Received shutdown request from {fromwhere}" )
         self.logServerStats ()
         self.setStatus ( "down" )
@@ -100,7 +102,7 @@ class DatabaseServer:
                 print ( f"[databaseServer] couldnt remove {str(self)}" )
         sys.exit()
 
-    def parseData ( self, data ):
+    def parseData ( self, data : str ):
         """ parse the data packet """
         data=data[2:-1]
         self.log ( f'received "{data}"' )
@@ -116,7 +118,7 @@ class DatabaseServer:
         ret = (str(ret)+" "*32)[:32]
         self.connection.sendall ( bytes(ret,"utf-8") )
 
-    def lookUpResult ( self, data ):
+    def lookUpResult ( self, data : str ) -> str:
         self.nlookups += 1
         if self.nlookups % 20000 == 0:
             self.pprint ( f"looked up {self.nlookups}th result" )
@@ -127,9 +129,8 @@ class DatabaseServer:
         txname = tokens[-2]
         massv = eval(tokens[-1])
         massvunits = copy.deepcopy ( massv )
-        for ibr,br in enumerate(massv):
-            for iel,el in enumerate(br):
-                    massvunits[ibr][iel]=el*GeV
+        for ien,mass in enumerate(massvunits):
+            massvunits[ien]=mass*GeV
         evaluationType = observed
         if tokens[0] == "exp":
             evaluationType = apriori
@@ -147,14 +148,12 @@ class DatabaseServer:
                 for txn in ds.txnameList:
                     if txn.txName != txname:
                         continue
-                    coords = txn.txnameData.dataToCoordinates ( massv, txn.txnameData._V,
-                             txn.txnameData.delta_x ) 
                     res = None
                     if evaluationType != observed:
                         if txn.txnameDataExp != None:
-                            res = txn.txnameDataExp.getValueForPoint ( coords )
+                            res = txn.txnameDataExp.getValueFor ( massv )
                     else:
-                        res = txn.txnameData.getValueForPoint ( coords )
+                        res = txn.txnameData.getValueFor ( massv )
                     # print ( "now query", massv, anaId, ds.getType(), txname, ":", res )
                     return str(res)
         return "None"
@@ -163,9 +162,13 @@ class DatabaseServer:
         if hasattr ( self, "connection" ):
             self.connection.close()
 
+    def pprintClientAddr ( self ):
+        """ super simple convenience function """
+        return f"{self.client_address[0]}:{self.client_address[1]}"
+
     def listen ( self ):
         try:
-            self.log ( 'connection from', self.client_address )
+            self.log ( f'connection from {self.pprintClientAddr()}' )
 
             # Receive the data in small chunks and retransmit it
             while True:
@@ -173,7 +176,7 @@ class DatabaseServer:
                 if data:
                     self.parseData ( str(data) )
                 else:
-                    self.log ( f'no more data from {self.client_address[0]}:{self.client_address[1]}' )
+                    self.log ( f'no more data from {self.pprintClientAddr()}' )
                     break
         finally:
             # Clean up the connection

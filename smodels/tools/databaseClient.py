@@ -5,7 +5,7 @@ from smodels.base.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
-    def __init__ ( self, servername = None, port = None, verbose = "info", 
+    def __init__ ( self, servername = None, port = None, verbose = "info",
                    rundir = "./", logfile = "@@rundir@@/dbclient.log",
                    clientid = -1 ):
         verbose = verbose.lower()
@@ -95,7 +95,7 @@ class DatabaseClient:
         :param amount_expected: how many return bytes do you expect
         """
         try:
-            message = bytes ( message, "UTF-8" ) 
+            message = bytes ( message, "UTF-8" )
             # Send data
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
             self.log ( f'sending "{message}"' )
@@ -106,11 +106,11 @@ class DatabaseClient:
 
                     # Look for the response
                     amount_received = 0
-                    
+
                     self.log ( 'sent message' )
                     if amount_expected <= 0:
                         return
-                    
+
                     while amount_received < amount_expected:
                         data = self.sock.recv( self.packetlength )
                         amount_received += len(data)
@@ -128,7 +128,7 @@ class DatabaseClient:
                     time.sleep ( dt )
             self.pprint ( f"could not connect in send, after trying {self.ntries} times. aborting" )
             raise SModelSError ( f"Could not connect to database in send, tried {self.ntries} times" )
-            
+
         finally:
             self.log ( 'closing socket' )
             self.sock.close()
@@ -215,9 +215,9 @@ def stresstest( args ):
     for i in range(1000):
         if random.uniform(0,1)>.9:
             mmother = random.uniform ( 200, 900 )
-            mlsp = random.uniform ( 0, mmother )
-        msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[%.2f,%.2f],[%.2f,%.2f]]" % \
-               ( mmother, mlsp, mmother, mlsp )
+            mlsp = random.uniform ( 0, mmother/2. )
+        #msg = f"obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[{mmother:.2f},{mlsp:.2f}],[{mmother:.2f},{mlsp:.2f}]]"
+        msg = f"obs:ATLAS-SUSY-2019-08:SR_HM_Med_MCT:TChiWH:[{mmother:.2f},{mlsp:.2f},{mmother:.2f},{mlsp:.2f}]"
         client.query ( msg )
     print ( f"[stresstest] finished {nr}" )
 
@@ -255,10 +255,10 @@ if __name__ == "__main__":
             margs.append ((args.servername, args.port, i ) )
         p = multiprocessing.Pool( nproc )
         p.map ( stresstest, margs )
-        dt = time.time() - t0 
+        dt = time.time() - t0
         print ( f"[databaseClient] stress test took {dt:.2f} seconds" )
         sys.exit()
-    client = DatabaseClient ( args.servername, args.port, args.verbosity, 
+    client = DatabaseClient ( args.servername, args.port, args.verbosity,
                               rundir=args.rundir, clientid = 0 )
     client.initialize()
     if args.shutdown:
