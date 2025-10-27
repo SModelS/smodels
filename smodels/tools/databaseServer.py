@@ -202,7 +202,7 @@ class DatabaseServer:
         self.expResults = self.db.expResultList
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_address = ( self.servername, self.port )
-        self.pprint ( 'starting up on %s port %s' % self.server_address )
+        self.pprint ( f'starting up on {self.servername} port {self.port}' )
         self.pprint ( f'I will be serving database {self.db.databaseVersion} at {self.dbpath}' )
         try:
             self.sock.bind( self.server_address )

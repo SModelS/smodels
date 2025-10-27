@@ -25,7 +25,7 @@ class DatabaseClient:
         self.packetlength = 256
         if port == None:
             port = 31770
-            self.pprint ( "using default port %d" % port )
+            self.pprint ( f"using default port {port}" )
         self.port = port
         if servername == None:
             servername = socket.gethostname()
@@ -33,8 +33,7 @@ class DatabaseClient:
         self.servername = servername
         self.maxtries = 25 ## max numbers of trying to connect
         sstatus = self.findServerStatus()
-        self.pprint ( "connecting to %s port %s, rundir is %s. server status is '%s'" % \
-                      ( self.servername, self.port, self.rundir, sstatus ) )
+        self.pprint ( f"connecting to {self.servername} port {self.port}, rundir is {self.rundir}. server status is '{sstatus}'" )
         if "SLURM_JOB_ID" in os.environ:
             self.pprint ( f"slurm job id is {os.environ['SLURM_JOB_ID']}" )
 
@@ -50,8 +49,8 @@ class DatabaseClient:
         maxhits=[]
         for i in self.cache.values():
             maxhits.append ( i[1] )
-        self.pprint ( "highest number of hits: %d" % max(maxhits))
-        self.pprint ( "lowest number of hits: %d" % min(maxhits))
+        self.pprint ( f"highest number of hits: {max(maxhits)}" )
+        self.pprint ( f"lowest number of hits: {min(maxhits)}" )
 
     def getWaitingTime ( self ):
         """ compute a waiting time between attempts, from self.ntries """
@@ -168,7 +167,7 @@ class DatabaseClient:
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
             self.setDefaults()
-            print ( "[databaseClient%d] %s" % ( self.clientid, " ".join(map(str,args)) ) )
+            print ( f"[databaseClient{self.clientid}] {' '.join(map(str,args))}" )
             with open ( self.logfile, "at" ) as f:
                 f.write ( "[databaseClient%d-%s] %s\n" % \
                       ( self.clientid, time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
