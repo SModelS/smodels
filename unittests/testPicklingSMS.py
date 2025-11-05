@@ -21,7 +21,7 @@ import os
 setLogLevel('error')
 
 
-class PickilingTest(unittest.TestCase):
+class PicklingTest(unittest.TestCase):
 
     def testPickling(self):
         
