@@ -742,8 +742,7 @@ class SubDatabase(object):
             logger.error("Consider supplying a different database path in the ini file (possibly a local one)")
             raise SModelSError()
         if r.status_code != 200:
-            line = "Error %d: could not fetch '%s' from server: '%s'" % \
-                           (r.status_code, path, r.reason)
+            line = f"Error {r.status_code}: could not fetch '{path}' from server: '{r.reason}'"
             logger.error(line)
             raise SModelSError(line)
         ## its new so store the description
