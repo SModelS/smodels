@@ -2,3 +2,5 @@ gfortran
 gcc
 cmake
 libboost-dev
+libgsl-dev
+# graphviz ## needed to plot the SMS
