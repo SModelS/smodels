@@ -258,9 +258,9 @@ class ExpResult(object):
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
-                      (= 95% C.L.) (only for  efficiency-map results)
-        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
-                         (only for efficiency-map results)
+        (= 95% C.L.) (only for efficiency-map results)
+        :param evaluationType: Compute <evaluationType> limit, e.g. Nobserved = NexpectedBG
+        for a priori (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param sms: SMS object
         :param mass: Mass array

@@ -555,7 +555,7 @@ class LikelihoodComputer:
             self.mu. notice, by default it returns nll
 
         :param theta: nuisance parameters
-        :params nll: if True, compute negative log likelihood
+        :param nll: if True, compute negative log likelihood
         """
         model = self.model
         # theta = array ( thetaA )
@@ -995,8 +995,8 @@ class UpperLimitComputer:
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: one of: observed, apriori, aposteriori
-        :params trylasttime: if True, then dont try extra
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
         model = self.likelihoodComputer.model
@@ -1021,8 +1021,7 @@ class UpperLimitComputer:
         plus mu_hat and sigma_mu
 
         :param model: statistical model
-        :param expected: false: compute observed, true: compute a priori evaluationType, \
-            "posteriori": compute a posteriori expected
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
@@ -1086,8 +1085,8 @@ class UpperLimitComputer:
         for each signal regio/dataset), by using
         the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: one of: observed, apriori, aposteriori
-        :params trylasttime: if True, then dont try extra
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param trylasttime: if True, then dont try extra
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
@@ -1114,9 +1113,7 @@ class UpperLimitComputer:
         Compute the exclusion confidence level of the model (1-CLs).
 
         :param model: statistical model
-        :param expected: if false, compute observed,
-                         true: compute a priori evaluationType, "posteriori":
-                         compute a posteriori expected
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
                             CLs-alpha: returns CLs - 0.05 (alpha)

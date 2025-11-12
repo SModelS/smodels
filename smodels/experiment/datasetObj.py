@@ -358,10 +358,10 @@ class DataSet(object):
         :param sms: SMS object (only for UL-type results)
         :param mass: Mass array  (only for UL-type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
-                      (= 95% C.L.) (only for  efficiency-map results)
+        (= 95% C.L.) (only for  efficiency-map results)
         :param deltas_rel: relative uncertainty in signal (float). Default value is 20%.
-        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
-                         (only for efficiency-map results)
+        :param evaluationType: one of: observed, apriori, aposteriori
+        (only for efficiency-map results)
         :param compute: If True, the upper limit will be computed
                         from expected and observed number of events.
                         If False, the value listed in the database will be used
@@ -419,9 +419,9 @@ class DataSet(object):
         Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
-        :param expected: If True, return the evaluationType limit ( i.e. Nobserved = NexpectedBG )
+        :param evaluationType: one of: observed, apriori, aposteriori
 
-        :return: upper limit value
+        :returns: upper limit value
         """
 
         if not self.getType() == 'efficiencyMap':

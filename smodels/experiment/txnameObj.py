@@ -820,7 +820,7 @@ class TxName(object):
 
 
         :param sms: SMS object or mass array (with units)
-        :param expected: look in self.txnameDataExp, not self.txnameData
+        :param evaluationType: if apriori, look in self.txnameDataExp, not self.txnameData
         """
 
         if not self.dataType == 'upperLimit':

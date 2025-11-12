@@ -378,7 +378,7 @@ class PyhfUpperLimitComputer:
         :ivar nWS: number of workspaces = number of json files
         :ivar patches: list of patches to be applied to the inputJsons as python dictionary instances
         :ivar workspaces: list of workspaces resulting from the patched inputJsons
-        :ivar workspaces_expected: list of patched workspaces with observation yields replaced by the evaluationType ones
+        :ivar workspaces_expected: list of patched workspaces with observation yields replaced by the expected eones
         :ivar cl: created from cl
         :ivar scale: scale that is applied to the signal predictions, dynamically changes throughout the upper limit calculation
         :ivar alreadyBeenThere: boolean flag that identifies when nsignals accidentally passes twice at two identical values
@@ -685,7 +685,7 @@ class PyhfUpperLimitComputer:
         :param workspace_index: supply index of workspace to use. If None, \
                                 choose index of best combo
         :param return_nll: if true, return nll, not llhd
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         """
         logger.debug("Calling likelihood")
         if type(workspace_index) == float:
@@ -856,7 +856,7 @@ class PyhfUpperLimitComputer:
         :param return_nll: if true, return nll, not llhd
         :param workspace_index: supply index of workspace to use. If None, \
             choose index of best combo
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
@@ -957,7 +957,7 @@ class PyhfUpperLimitComputer:
         Small method used to return the appropriate workspace
 
         :param workspace_index: the index of the workspace to retrieve from the corresponding list
-        :param expected: if False, retuns the unmodified (but patched) workspace. Used for computing observed or aposteriori evaluationType limits.
+        :param evaluationType: if False, retuns the unmodified (but patched) workspace. Used for computing observed or aposteriori evaluationType limits.
                         if True, retuns the modified (and patched) workspace, where obs = sum(bkg). Used for computing apriori evaluationType limit.
         """
         if self.nWS == 1:
@@ -980,7 +980,7 @@ class PyhfUpperLimitComputer:
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to apriori: uses evaluationType SM backgrounds as signals
+        :param evaluationType:  - if set to apriori: uses evaluationType SM backgrounds as signals
                           - else: uses 'self.nsignals'
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit
@@ -1033,7 +1033,7 @@ class PyhfUpperLimitComputer:
         _absolute_ mu
 
         :param mu: compute for the parameter of interest mu
-        :param expected: if observed, compute observed, apriori: compute a priori expected
+        :param evaluationType: if observed, compute observed, apriori: compute a priori expected
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
         CLs-alpha: returns CLs - 0.05
@@ -1050,7 +1050,7 @@ class PyhfUpperLimitComputer:
         This is our internal method to compute CLs.
 
         :param mu_rel: compute for the parameter of interest mu_rel
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
         CLs-alpha: returns CLs - 0.05
@@ -1136,7 +1136,7 @@ class PyhfUpperLimitComputer:
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param expected:  - if set to apriori: uses evaluationType SM backgrounds as signals
+        :param evaluationType:  - if set to apriori: uses evaluationType SM backgrounds as signals
                           - else: uses 'self.nsignals'
         :param workspace_index: - if different from 'None': index of the workspace to use
                                   for upper limit

@@ -201,7 +201,7 @@ class TheoryPrediction(object):
         For combined results, returns the upper limit on the
         total sigma*eff (for all signal regions/datasets).
 
-        :param expected: return evaluationType Upper Limit, instead of observed.
+        :param evaluationType: one of: observed, apriori, aposteriori
         :return: upper limit (Unum object)
         """
         if self.dataType() == "efficiencyMap":
@@ -360,7 +360,7 @@ class TheoryPrediction(object):
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
         attributes.
-        :param expected: computed evaluationType quantities, not observed
+        :param evaluationType: one of: observed, apriori, aposteriori
         """
         # Compute likelihoods and related parameters:
         llhdDict = self.statsComputer.get_five_values(
@@ -533,7 +533,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         :param muvals: List with values for the signal strenth for which
         the likelihoods must be evaluated.
-        :param expected: If True returns the evaluationType likelihood values.
+        :param evaluationType: returns the observed/priori expected/posteriori expected likelihood values.
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
@@ -897,7 +897,7 @@ def _getBestResult(dataSetResults):
             raise SModelSError(txt)
         pred = predList[0]
         xsec = pred.xsection
-        expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=True)).asNumber()
+        expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
             bestExpectedR = expectedR
             bestPred = pred

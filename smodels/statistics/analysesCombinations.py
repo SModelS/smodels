@@ -52,7 +52,7 @@ class AnaCombLikelihoodComputer(object):
         just a proxy method to ease transition of codes that depend on SModelS.
 
         :param mu: signal strength
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
         return self.likelihood ( mu, evaluationType, return_nll=True, asimov=asimov )
@@ -69,7 +69,7 @@ class AnaCombLikelihoodComputer(object):
         Compute the likelihood at a given mu
 
         :param mu: signal strength
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
@@ -107,7 +107,7 @@ class AnaCombLikelihoodComputer(object):
         """find muhat and lmax.
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if true, return negative log max likelihood instead of lmax
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
                   output is requested, it returns a dictionary with mu_hat, \
@@ -229,7 +229,7 @@ class AnaCombLikelihoodComputer(object):
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :returns: upper limit on signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
@@ -247,7 +247,7 @@ class AnaCombLikelihoodComputer(object):
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :returns: upper limit on fiducial cross section
         """
         ul = self.getUpperLimitOnMu(evaluationType=evaluationType,
@@ -266,7 +266,7 @@ class AnaCombLikelihoodComputer(object):
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         """
         fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals)
         mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
@@ -301,7 +301,7 @@ class AnaCombLikelihoodComputer(object):
         Compute the exclusion confidence level of the model
 
         :param mu: compute for the parameter of interest mu
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         alpha-CLs: returns 0.05 - CLs \
@@ -322,7 +322,7 @@ class AnaCombLikelihoodComputer(object):
 
         :param muvals: List with values for the signal strenth for which the likelihoods must
                        be evaluated.
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param normalize: If True normalizes the likelihood by its integral over muvals.
         """
 
