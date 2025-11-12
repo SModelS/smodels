@@ -1,2 +1,4 @@
 gfortran
 gcc
+cmake
+libboost-dev
