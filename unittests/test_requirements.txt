@@ -9,4 +9,5 @@ parameterized
 matplotlib
 redirector
 line_profiler
+graphviz
 spey
