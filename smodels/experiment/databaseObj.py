@@ -28,7 +28,7 @@ from smodels.base.physicsUnits import TeV
 from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
-from typing import Union
+from typing import List, Tuple, Union
 import logging
 os.environ["OMP_NUM_THREADS"] = "2"
 
@@ -118,7 +118,7 @@ class Database(object):
         self.selectExpResults()
 
     @property
-    def expResultList(self):
+    def expResultList(self) -> List[ExpResult]:
         """
         The combined list of results, compiled from the
         the active results in each subdatabase.
@@ -221,7 +221,7 @@ class Database(object):
         idList += "%d datasets, %d txnames.\n" % (datasets, txnames)
         return idList
 
-    def __eq__(self, other):
+    def __eq__(self, other: "Database" ):
         if type(other) != type(self):
             return False
         for x, y in zip(self.subs, other.subs):
@@ -291,7 +291,7 @@ class Database(object):
         return r[0]  # FIXME do sth smarter?
 
     @property
-    def databaseVersion(self):
+    def databaseVersion(self) -> str:
         """
         The version of the database, concatenation of the individual versions
 
@@ -530,7 +530,7 @@ class SubDatabase(object):
             if hasattr(er.globalInfo, "_databaseParticles"):
                 del er.globalInfo._databaseParticles
 
-    def loadBinaryFile(self, lastm_only : bool = False):
+    def loadBinaryFile(self, lastm_only : bool = False) -> "SubDatabase":
         """
         Load a binary database, returning last modified, file count, database.
 
@@ -797,7 +797,7 @@ class SubDatabase(object):
         self.force_load = "pcl"
         return ("./", f"{filename}")
 
-    def fetchFromServer(self, path):
+    def fetchFromServer(self, path: str) -> Tuple[str, str]:
         import requests
         import time
         import json
@@ -857,7 +857,7 @@ class SubDatabase(object):
         self.force_load = "pcl"
         return ("./", filename)
 
-    def checkPathName(self, path):
+    def checkPathName(self, path: str) -> Tuple[str, str]:
         """
         checks the path name,
         returns the base directory and the pickle file name.
@@ -1060,9 +1060,10 @@ class SubDatabase(object):
                 self.txt_meta.hasFastLim = True
         return expres
 
-    def setActiveExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def setActiveExpResults(self, analysisIDs: Union[str, List[str]]=['all'],
+            datasetIDs: List[str]=['all'], txnames: Union[str, List[str]]=['all'],
+            dataTypes: List[str]=['all'], useNonValidated: bool=False,
+            onlyWithExpected: bool=False):
         """
         Filter the experimental results and store them in activeResults.
 
@@ -1090,9 +1091,10 @@ class SubDatabase(object):
                                                 dataTypes, useNonValidated,
                                                 onlyWithExpected)
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def getExpResults(self, analysisIDs: Union[str, List[str]]=['all'],
+            datasetIDs: List[str]=['all'], txnames: Union[str, List[str]]=['all'],
+            dataTypes: List[str]=['all'], useNonValidated: bool=False,
+            onlyWithExpected: bool=False) -> List[ExpResult]:
         """
         Returns a list of ExpResult objects.
 
