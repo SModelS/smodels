@@ -13,11 +13,12 @@ from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.base.physicsUnits import fb, pb, TeV, mb
-from smodels.base.crossSection import getXsecFromLHEFile
+from smodels.base.crossSection import XSectionList, getXsecFromLHEFile
 from smodels import installation
 from smodels.tools.pythia8particles import particles
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import os, sys, io, shutil
+from typing import Union
 
 try:
     import commands as executor  # python2
@@ -30,9 +31,9 @@ class Pythia8Wrapper(WrapperBase):
     """
 
     def __init__(self,
-                 configFile="<install>/smodels/etc/pythia8.cfg",
-                 executablePath="<install>/smodels/lib/pythia8/pythia8.exe",
-                 srcPath="<install>/smodels/lib/pythia8/"):
+                 configFile: str="<install>/smodels/etc/pythia8.cfg",
+                 executablePath: str="<install>/smodels/lib/pythia8/pythia8.exe",
+                 srcPath: str="<install>/smodels/lib/pythia8/"):
         """
         :param configFile: Location of the config file, full path; copy this
                            file and provide tools to change its content and to provide a template
@@ -59,7 +60,7 @@ class Pythia8Wrapper(WrapperBase):
 
         self.unlink()
 
-    def getPythiaVersion( self ):
+    def getPythiaVersion( self ) -> str:
         """obtain the pythia version we wish to use, stored in file 'pythiaversion'"""
         versionfile = f"{self.srcPath}/pythiaversion"
         if not os.path.exists( versionfile ):
@@ -71,7 +72,7 @@ class Pythia8Wrapper(WrapperBase):
             f.close()
         return ver
 
-    def checkFileExists(self, inputFile):
+    def checkFileExists(self, inputFile: str) -> str:
         """
         Check if file exists, raise an IOError if it does not.
 
@@ -94,7 +95,7 @@ class Pythia8Wrapper(WrapperBase):
         ret += f"nevents: {self.nevents}\n"
         return ret
 
-    def unlink(self, unlinkdir=True):
+    def unlink(self, unlinkdir: bool=True):
         """
         Remove temporary files.
 
@@ -147,7 +148,7 @@ class Pythia8Wrapper(WrapperBase):
         exists = os.path.exists ( self.includeFile )
         return exists
 
-    def getXmldoc ( self ):
+    def getXmldoc ( self ) -> str:
         """ get the content of xml.doc """
         xmldoc = self.executablePath.replace( "pythia8.exe", "xml.doc" )
         logger.debug( f"exe path={self.executablePath}" )
@@ -162,7 +163,8 @@ class Pythia8Wrapper(WrapperBase):
         #    return None
         return toadd
 
-    def run(self, slhaFile, lhefile=None, unlink=True):
+    def run( self, slhaFile: str, lhefile: Union[str,None]=None,
+             unlink: bool=True ) -> XSectionList:
         """
         Run pythia8.
 
@@ -175,12 +177,12 @@ class Pythia8Wrapper(WrapperBase):
 
         """
         if True:
-            ## this has been introduced to fix a very sick error on lxplus 
+            ## this has been introduced to fix a very sick error on lxplus
             ## machines where fortran code cannot deal with slha file paths
             ## that reside in /afs/cern.ch/work. God knows why.
             ## there is already anyhow a temp directory, so it's no biggie,
             ## but we could have this bit triggered only when a certain
-            ## condition is met, e.g. len(slhaFile)>min_length or 
+            ## condition is met, e.g. len(slhaFile)>min_length or
             ## "cern.ch/work" in slhaFile or ...
             import tempfile
             tempf = tempfile.mktemp( dir=self.tempDirectory(),
