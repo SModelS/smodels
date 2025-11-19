@@ -174,6 +174,12 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
 
         """
+        if True:
+            import tempfile
+            tempf = tempfile.mktemp( dir=self.tempDirectory(),
+                                     suffix=".slha",prefix="p8w_" )
+            shutil.copyfile ( slhaFile, tempf )
+            slhaFile = tempf
         if self.maycompile:
             self.checkInstallation( compile = True )
         # Change pythia configuration file, if defined:
