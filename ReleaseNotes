@@ -1,7 +1,8 @@
 Release v3.1.1
 =======================================================
 
-  * fixed issues with xsecComputer on lxplus (thanks Jonas Wuerzinger)
+  * fixed issues with fortran compilation of nllfast on lxplus (thanks Jonas 
+  Wuerzinger for reporting this)
   * added filter for slogdet warnings (relevant on MacOS)
   * Minor fixes in slha printer
   * Bumped up pythia8 from 8315 to 8316

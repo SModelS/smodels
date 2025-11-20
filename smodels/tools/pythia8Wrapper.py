@@ -176,19 +176,6 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
 
         """
-        if True:
-            ## this has been introduced to fix a very sick error on lxplus
-            ## machines where fortran code cannot deal with slha file paths
-            ## that reside in /afs/cern.ch/work. God knows why.
-            ## there is already anyhow a temp directory, so it's no biggie,
-            ## but we could have this bit triggered only when a certain
-            ## condition is met, e.g. len(slhaFile)>min_length or
-            ## "cern.ch/work" in slhaFile or ...
-            import tempfile
-            tempf = tempfile.mktemp( dir=self.tempDirectory(),
-                                     suffix=".slha",prefix="p8w_" )
-            shutil.copyfile ( slhaFile, tempf )
-            slhaFile = tempf
         if self.maycompile:
             self.checkInstallation( compile = True )
         # Change pythia configuration file, if defined:
