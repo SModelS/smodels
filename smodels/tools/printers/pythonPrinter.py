@@ -28,7 +28,7 @@ class PyPrinter(BasicPrinter):
     Printer class to handle the printing of one single pythonic output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "py"
         self.printtimespent = False
@@ -139,17 +139,16 @@ class PyPrinter(BasicPrinter):
                 smsDict["Masses (GeV)"] = masses
                 smsDict["PIDs"] = pidlist
             except:
-                logger.info("Could not format SMS using version2, switching to current format.")
-                self.outputFormat = 'current'
+                logger.info("Could not format SMS using version2, switching to version3 format.")
+                self.outputFormat = 'version3'
 
-        if self.outputFormat == 'current':
+        if self.outputFormat == 'version3':
             smsDict["ID"] = obj.smsID
             smsDict["SMS"] = str(obj)
             smsDict["Masses (GeV)"] = [(str(node),float(f'{node.mass.asNumber(GeV):1.3e}'))
                                       for node in obj.nodes if not node.isSM]
             smsDict["PIDs"] = [(str(node),node.pdg)
                               for node in obj.nodes if not node.isSM]
-
 
         smsDict["Weights (fb)"] = {}
         sqrts = [info.sqrts.asNumber(TeV) for info in obj.weightList.getInfo()]

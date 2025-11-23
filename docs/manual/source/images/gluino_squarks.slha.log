@@ -7,19 +7,20 @@ Decomposition output status: 1 #decomposition was successful
 # computestatistics = True
 # docompress = True
 # doinvisible = True
-# eraseprompt = spin,eCharge,colordim
-# experimentalfeatures = False
+# ignorepromptqnumbers = spin,eCharge,colordim
 # maxcond = 0.2
 # minmassgap = 5.
+# minmassgapisr = 1.
 # model = share.models.mssm
 # ncpus = 1
 # promptwidth = 1e-11
+# pyhfbackend = pytorch
 # reportallsrs = False
 # sigmacut = 10.0
 # stablewidth = 1e-25
 # testcoverage = True
-# SModelS version: 3.0.0-beta
-# Database version: 3.0.0-beta
+# SModelS version: 3.1.1
+# Database version: 3.1.0
 ================================================================================
   ========================================================  
 ||                                                        ||
@@ -27,19 +28,38 @@ Decomposition output status: 1 #decomposition was successful
 ||                                                        ||
   ========================================================  
 ========================================================
+Experimental Result ID: ATLAS-EXOT-2018-06
+Tx Labels: ['TRV1']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > Zprime(1)), (Zprime(1) > MET,MET) 
+========================================================
+Experimental Result ID: ATLAS-EXOT-2018-06
+Tx Labels: ['TChiISR', 'TChiWISRll', 'TChiWWISRqq', 'TChiZISRll', 'TChiZISRqq', 'TRV1']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > MET,MET) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,l,nu) 
+	    (PV > anyBSM(1),anyBSM(3)), (anyBSM(1) > MET,q,q), (anyBSM(3) > MET,q,q) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,l+,l-) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,q,q) 
+	    (PV > Zprime(1)), (Zprime(1) > MET,MET) 
+========================================================
 Experimental Result ID: ATLAS-EXOT-2018-48
 Tx Labels: ['TRV1tt']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > Zprime(1)), (Zprime(1) > jet,jet) 
+	    (PV > Zprime(1)), (Zprime(1) > t,t) 
 ========================================================
 Experimental Result ID: ATLAS-EXOT-2019-03
-Tx Labels: ['TRV1bb', 'TRV1qq']
+Tx Labels: ['TRV1jj']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > Zprime(1)), (Zprime(1) > jet,jet) 
+	    (PV > Zprime(1)), (Zprime(1) > jetb,jetb) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2015-01
 Tx Labels: ['T2bb']
@@ -401,6 +421,14 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
 ========================================================
+Experimental Result ID: ATLAS-SUSY-2018-09
+Tx Labels: ['T6ttWW', 'TRPV5tjb']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),anyBSM(4)), (anyBSM(1) > anyBSM(2),t), (anyBSM(4) > anyBSM(5),t), (anyBSM(2) > MET,W), (anyBSM(5) > MET,W) 
+	    (PV > anyBSM(1),anyBSM(3)), (anyBSM(1) > anyBSM(2),t), (anyBSM(3) > anyBSM(4),t), (anyBSM(2) > jet,b), (anyBSM(4) > jet,b) 
+========================================================
 Experimental Result ID: ATLAS-SUSY-2018-10
 Tx Labels: ['T5WW', 'T5WWoff', 'T6WW', 'T6WWoff']
 Sqrts: 1.30E+01
@@ -438,6 +466,14 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,jet,jet), (anyBSM(2) > MET,b,jet,jet) 
+========================================================
+Experimental Result ID: ATLAS-SUSY-2018-13
+Tx Labels: ['TRPV1jjj', 'TRPVChijjj']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet,jet), (anyBSM(2) > anyBSM(4),jet,jet), (anyBSM(3) > jet,jet,jet), (anyBSM(4) > jet,jet,jet) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > jet,jet,jet), (anyBSM(2) > jet,jet,jet) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2018-14
 Tx Labels: ['TSelSelDisp', 'TSmuSmuDisp', 'TStauStauDisp']
@@ -447,6 +483,38 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+), (anyBSM(2) > MET,e-) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,ta+), (anyBSM(2) > MET,ta-) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+), (anyBSM(2) > MET,mu-) 
+========================================================
+Experimental Result ID: ATLAS-SUSY-2018-16
+Tx Labels: ['TChiWZoff', 'TSlepSlep']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,jet,jet) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,jet,jet) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+), (anyBSM(2) > MET,mu-) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+), (anyBSM(2) > MET,e-) 
+========================================================
+Experimental Result ID: ATLAS-SUSY-2018-16
+Tx Labels: ['TChiWZoff', 'TSlepSlep']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,jet,jet) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,jet,jet) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+), (anyBSM(2) > MET,e-) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+), (anyBSM(2) > MET,mu-) 
+========================================================
+Experimental Result ID: ATLAS-SUSY-2018-16-hino
+Tx Labels: ['TChiWWoff', 'TChiWZoff', 'TChiZoff']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,jet,jet) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,jet,jet) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,e+,e-) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,mu+,mu-) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,nu), (anyBSM(2) > MET,e-,nu) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,nu), (anyBSM(2) > MET,mu-,nu) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2018-22
 Tx Labels: ['T1', 'T2', 'T5WW', 'T5WWoff', 'T6WW', 'T6WWoff']
@@ -461,13 +529,23 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet), (anyBSM(2) > anyBSM(8),jet), (anyBSM(3) > MET,l,nu), (anyBSM(8) > MET,jet,jet) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2018-22
-Tx Labels: ['T1', 'T2', 'T5WW']
+Tx Labels: ['T1', 'T2', 'T5WW', 'TChiQ', 'TRV1']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
+	    (PV > Zprime(1)), (Zprime(1) > MET,MET) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet,jet), (anyBSM(2) > anyBSM(8),jet,jet), (anyBSM(3) > MET,W), (anyBSM(8) > MET,W) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,jet) 
+========================================================
+Experimental Result ID: ATLAS-SUSY-2018-22-multibin
+Tx Labels: ['TChiQ', 'TRV1']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,jet) 
+	    (PV > Zprime(1)), (Zprime(1) > MET,MET) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2018-23
 Tx Labels: ['TChiHH', 'TChiWH']
@@ -521,6 +599,13 @@ Sqrts: 1.30E+01
 	 SMS tested by analysis:
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,W) 
 ========================================================
+Experimental Result ID: ATLAS-SUSY-2018-33
+Tx Labels: ['TRPV1jmu']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > jet,mu+), (anyBSM(2) > jet,mu-) 
+========================================================
 Experimental Result ID: ATLAS-SUSY-2018-40
 Tx Labels: ['T6bbHH']
 Sqrts: 1.30E+01
@@ -567,11 +652,15 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,ta+), (anyBSM(2) > MET,ta-) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2018-42
-Tx Labels: ['T1Disp', 'TRHadGM1']
+Tx Labels: ['T1Disp', 'TDTM1F', 'TDTM2F', 'THSCPM1', 'THSCPM2', 'TRHadGM1']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,q,q), (anyBSM(2) > MET,q,q) 
+	    (PV > gluino(1),gluino(2)), (gluino(1) > MET,q,q), (gluino(2) > MET,q,q) 
+	    (PV > C1+(1),C1-(3)), (C1+(1) > MET,*anySM), (C1-(3) > MET,*anySM) 
+	    (PV > C1(1),MET), (C1(1) > MET,*anySM) 
+	    (PV > HSCP,HSCP) 
+	    (PV > HSCP,MET) 
 	    (PV > RHadronG,RHadronG) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2019-02
@@ -598,18 +687,14 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,higgs) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2019-08
-Tx Labels: ['TChiWH']
+Tx Labels: ['TChiWH', 'TChiWH4q', 'TChiWHqq', 'TChiWqqH']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,higgs) 
-========================================================
-Experimental Result ID: ATLAS-SUSY-2019-08-grp
-Tx Labels: ['TChiWH']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,higgs) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),W), (anyBSM(2) > anyBSM(8),higgs), (anyBSM(3) > MET,q,q), (anyBSM(8) > MET,q,q) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > anyBSM(5),higgs), (anyBSM(5) > MET,q,q) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),W), (anyBSM(2) > MET,higgs), (anyBSM(3) > MET,q,q) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2019-09
 Tx Labels: ['TChiWH', 'TChiWZ', 'TChiWZoff']
@@ -622,13 +707,14 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,l,nu) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2019-09
-Tx Labels: ['TChiWZ', 'TChiWZoff']
+Tx Labels: ['TChiWH', 'TChiWZ', 'TChiWZoff']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,Z) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,l,nu) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,l,nu) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,higgs) 
 ========================================================
 Experimental Result ID: CMS-EXO-19-001
 Tx Labels: ['T2Disp']
@@ -646,19 +732,31 @@ Sqrts: 1.30E+01
 	    (PV > C1(1),MET), (C1(1) > MET,*anySM) 
 ========================================================
 Experimental Result ID: CMS-EXO-19-012
-Tx Labels: ['TRV1qq']
+Tx Labels: ['TRV1jj']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > Zprime(1)), (Zprime(1) > jet,jet) 
+	    (PV > Zprime(1)), (Zprime(1) > jetb,jetb) 
 ========================================================
 Experimental Result ID: CMS-EXO-20-004
-Tx Labels: ['TRS1', 'TRV1']
+Tx Labels: ['TChiISR', 'TChiWISRll', 'TChiWWISRqq', 'TChiZISRll', 'TChiZISRqq', 'TRS1', 'TRV1']
 Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
+	    (PV > MET,MET) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,l,nu) 
+	    (PV > anyBSM(1),anyBSM(3)), (anyBSM(1) > MET,q,q), (anyBSM(3) > MET,q,q) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,l+,l-) 
+	    (PV > anyBSM(1),MET), (anyBSM(1) > MET,q,q) 
 	    (PV > H0(1)), (H0(1) > MET,MET) 
 	    (PV > Zprime(1)), (Zprime(1) > MET,MET) 
+========================================================
+Experimental Result ID: CMS-EXO-20-008
+Tx Labels: ['TRV1bb']
+Sqrts: 1.30E+01
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > Zprime(1)), (Zprime(1) > b,b) 
 ========================================================
 Experimental Result ID: CMS-PAS-EXO-16-036
 Tx Labels: ['THSCPM1b', 'TRHadGM1', 'TRHadQM1']
@@ -668,77 +766,6 @@ Sqrts: 1.30E+01
 	    (PV > HSCP,HSCP) 
 	    (PV > RHadronG,RHadronG) 
 	    (PV > RHadronQ,RHadronQ) 
-========================================================
-Experimental Result ID: CMS-PAS-EXO-20-008
-Tx Labels: ['TRV1bb']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > Zprime(1)), (Zprime(1) > jet,jet) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-15-002
-Tx Labels: ['T1', 'T1bbbb']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-16-014
-Tx Labels: ['T1', 'T1bbbb', 'T1tttt', 'T1ttttoff', 'T2', 'T2bb', 'T2tt', 'T2ttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-16-015
-Tx Labels: ['T1', 'T1bbbb', 'T1tttt', 'T1ttttoff', 'T2', 'T2bb', 'T2tt', 'T2ttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-16-016
-Tx Labels: ['T1bbbb', 'T1tttt', 'T1ttttoff', 'T2bb', 'T2tt', 'T2ttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-16-019
-Tx Labels: ['T1tttt', 'T1ttttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-16-022
-Tx Labels: ['T1tttt', 'T1ttttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
 ========================================================
 Experimental Result ID: CMS-PAS-SUS-16-052
 Tx Labels: ['T2bbWWoff', 'T6bbWWoff']
@@ -756,42 +783,6 @@ Sqrts: 1.30E+01
 	 SMS tested by analysis:
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,l,nu), (anyBSM(2) > MET,b,jet,jet) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,l,nu), (anyBSM(8) > MET,jet,jet) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-16-052
-Tx Labels: ['T2bbWWoff', 'T6bbWWoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,l,nu), (anyBSM(2) > MET,b,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,l,nu), (anyBSM(8) > MET,jet,jet) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-17-004
-Tx Labels: ['TChiWH', 'TChiWZ', 'TChiWZoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,higgs) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,Z) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,l,nu) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,l,nu) 
-========================================================
-Experimental Result ID: CMS-SUS-15-002
-Tx Labels: ['T1', 'T1bbbb', 'T1tttt', 'T1ttttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-========================================================
-Experimental Result ID: CMS-SUS-15-008
-Tx Labels: ['T1tttt', 'T1ttttoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
 ========================================================
 Experimental Result ID: CMS-SUS-16-009
 Tx Labels: ['T1tttt', 'T1ttttoff', 'T2tt', 'T2ttoff', 'T5tctc']
@@ -928,15 +919,6 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,l,nu) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,l,nu) 
 ========================================================
-Experimental Result ID: CMS-SUS-16-039
-Tx Labels: ['TChiWZ', 'TChiWZoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,Z) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,l,nu) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,l,nu) 
-========================================================
 Experimental Result ID: CMS-SUS-16-041
 Tx Labels: ['T1tttt', 'T1ttttoff', 'T6HHtt', 'T6ZZofftt', 'T6ZZtt', 'T6ttWW', 'T6ttWWoff', 'T6ttoffWW']
 Sqrts: 1.30E+01
@@ -1002,18 +984,6 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+,mu-), (anyBSM(2) > MET,jet,jet) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+,e-), (anyBSM(2) > MET,jet,jet) 
 ========================================================
-Experimental Result ID: CMS-SUS-16-049
-Tx Labels: ['T2cc', 'T2tt', 'T2ttC', 'T2ttoff', 'T6bbWW', 'T6bbWWoff']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,jet,jet), (anyBSM(2) > MET,b,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W), (anyBSM(7) > MET,W) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,jet,jet), (anyBSM(8) > MET,jet,jet) 
-========================================================
 Experimental Result ID: CMS-SUS-16-050
 Tx Labels: ['T1tttt', 'T1ttttoff', 'T2tt', 'T2ttoff', 'T5tctc', 'T5tttt']
 Sqrts: 1.30E+01
@@ -1036,26 +1006,7 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,jet), (anyBSM(7) > MET,jet) 
 ========================================================
-Experimental Result ID: CMS-SUS-16-050
-Tx Labels: ['T1tttt', 'T1ttttoff', 'T2tt', 'T5tctc']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,jet), (anyBSM(7) > MET,jet) 
-========================================================
 Experimental Result ID: CMS-SUS-16-051
-Tx Labels: ['T2tt', 'T2ttoff', 'T6bbWW']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W), (anyBSM(7) > MET,W) 
-========================================================
-Experimental Result ID: CMS-SUS-17-001
 Tx Labels: ['T2tt', 'T2ttoff', 'T6bbWW']
 Sqrts: 1.30E+01
 	 -----------------------------
@@ -1195,24 +1146,6 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W+), (anyBSM(7) > MET,W-) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet,jet) 
 ========================================================
-Experimental Result ID: CMS-SUS-19-006
-Tx Labels: ['T1', 'T1bbbb', 'T1tttt', 'T1ttttoff', 'T2', 'T2bb', 'T2tt', 'T2ttoff', 'T3GQ', 'T5GQ', 'T6bbWW', 'TGQ']
-Sqrts: 1.30E+01
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > anyBSM(5),jet), (anyBSM(5) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet), (anyBSM(2) > MET,jet,jet), (anyBSM(3) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W+), (anyBSM(7) > MET,W-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-========================================================
 Experimental Result ID: CMS-SUS-19-008
 Tx Labels: ['T1tttt', 'T1ttttoff', 'T5WW', 'T5WZ', 'T5tctc', 'T5tttt']
 Sqrts: 1.30E+01
@@ -1322,374 +1255,20 @@ Sqrts: 1.30E+01
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W+), (anyBSM(2) > MET,W-) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,Z) 
 ========================================================
-Experimental Result ID: ATLAS-CONF-2012-105
-Tx Labels: ['T1tttt']
-Sqrts: 8.00E+00
+Experimental Result ID: CMS-SUS-21-007
+Tx Labels: ['T1tttt', 'T5WW']
+Sqrts: 1.30E+01
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2012-166
-Tx Labels: ['T2tt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-001
-Tx Labels: ['T6bbWWoff']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,L,nu), (anyBSM(8) > MET,L,nu) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,L,nu), (anyBSM(8) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,jet,jet), (anyBSM(8) > MET,jet,jet) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-007
-Tx Labels: ['T1btbt', 'T1tttt', 'T5tttt', 'T6ttWW', 'T6ttWWoff']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t+), (anyBSM(2) > MET,b,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t-), (anyBSM(2) > MET,b,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,W-), (anyBSM(7) > MET,W+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(8),t-), (anyBSM(3) > MET,l-,nu), (anyBSM(8) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(8),t+), (anyBSM(3) > MET,l+,nu), (anyBSM(8) > MET,jet,jet) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-024
-Tx Labels: ['T2tt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-024
-Tx Labels: ['T1bbbb', 'T1bbbt', 'T1bbqq', 'T1bbtt', 'T1btbt', 'T1btqq', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2bb', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQbbq', 'TGQbtq', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-025
-Tx Labels: ['T6ZZtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),Z), (anyBSM(2) > anyBSM(7),Z), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-035
-Tx Labels: ['TChiChipmSlepL', 'TChiWZ', 'TChiWZoff']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,Z) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,L,nu), (anyBSM(2) > MET,e+,e-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,L,nu), (anyBSM(2) > MET,mu+,mu-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,L,nu), (anyBSM(2) > MET,ta+,ta-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-037
-Tx Labels: ['T2tt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-037
-Tx Labels: ['T1bbbb', 'T1bbbt', 'T1bbtt', 'T1btbt', 'T1btqq', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQbtq', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-047
-Tx Labels: ['T1', 'T5WW', 'T5WWoff', 'T5tctc']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet,jet), (anyBSM(2) > anyBSM(8),jet,jet), (anyBSM(3) > MET,W), (anyBSM(8) > MET,W) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet,jet), (anyBSM(2) > anyBSM(9),jet,jet), (anyBSM(3) > MET,jet,jet), (anyBSM(9) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,jet), (anyBSM(7) > MET,jet) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-047
-Tx Labels: ['T1', 'T1bbbb', 'T1bbbt', 'T1bbqq', 'T1bbtt', 'T1btbt', 'T1btqq', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2', 'T2bb', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQ', 'TGQbbq', 'TGQbtq', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-048
-Tx Labels: ['T2bbWW', 'T6bbWW', 'T6bbWWoff']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W+,b), (anyBSM(2) > MET,W-,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W+), (anyBSM(7) > MET,W-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,L-,nu), (anyBSM(8) > MET,L+,nu) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-048
-Tx Labels: ['T1bbtt', 'T1btbt', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2tt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+), (anyBSM(2) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-049
-Tx Labels: ['TSlepSlep']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+), (anyBSM(2) > MET,e-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+), (anyBSM(2) > MET,mu-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-053
-Tx Labels: ['T2bb']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-053
-Tx Labels: ['T1bbbb', 'T1bbbt', 'T1bbqq', 'T1bbtt', 'T1btqq', 'T2bb', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQbbq', 'TGQbtq', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-054
-Tx Labels: ['T1', 'T1bbbb', 'T1bbbt', 'T1bbqq', 'T1bbtt', 'T1btbt', 'T1btqq', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2', 'T2bb', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQ', 'TGQbbq', 'TGQbtq', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-061
-Tx Labels: ['T1bbbb', 'T1btbt', 'T1tttt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
+	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),q,q), (anyBSM(2) > anyBSM(8),q,q), (anyBSM(3) > MET,W), (anyBSM(8) > MET,W) 
 ========================================================
-Experimental Result ID: ATLAS-CONF-2013-061
-Tx Labels: ['T1bbbb', 'T1bbbt', 'T1bbqq', 'T1bbtt', 'T1btbt', 'T1btqq', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2bb', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQbbq', 'TGQbtq', 'TGQqtt']
+Experimental Result ID: ATLAS-EXOT-2013-11
+Tx Labels: ['TRV1qq']
 Sqrts: 8.00E+00
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-062
-Tx Labels: ['T1', 'T1bbbb', 'T1bbbt', 'T1bbqq', 'T1bbtt', 'T1btbt', 'T1btqq', 'T1bttt', 'T1qqtt', 'T1tttt', 'T2bt', 'T2tt', 'T5bbbb', 'T5bbbt', 'T5btbt', 'T5tbtb', 'T5tbtt', 'T5tttt', 'TGQbbq', 'TGQbtq', 'TGQqtt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+,t-), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t+), (anyBSM(2) > anyBSM(7),t+), (anyBSM(3) > MET,t-), (anyBSM(7) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t-), (anyBSM(2) > anyBSM(7),t-), (anyBSM(3) > MET,t+), (anyBSM(7) > MET,t+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,t), (anyBSM(2) > MET,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet), (anyBSM(2) > MET,t+,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,jet,jet), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet,jet) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,jet) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-065
-Tx Labels: ['T2tt', 'T6bbWW']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t+), (anyBSM(2) > MET,t-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W+), (anyBSM(7) > MET,W-) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-089
-Tx Labels: ['T6WW']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),jet), (anyBSM(2) > anyBSM(7),jet), (anyBSM(3) > MET,W), (anyBSM(7) > MET,W) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-093
-Tx Labels: ['TChiWH']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,higgs), (anyBSM(2) > MET,W) 
-========================================================
-Experimental Result ID: ATLAS-CONF-2013-093
-Tx Labels: ['T1bbbt', 'T2bt', 'T2tt', 'T5bbbt', 'T5btbt', 'T5tbtb']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,b), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,t), (anyBSM(7) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),t), (anyBSM(2) > anyBSM(7),t), (anyBSM(3) > MET,b), (anyBSM(7) > MET,b) 
+	    (PV > Zprime(1)), (Zprime(1) > jet,jet) 
 ========================================================
 Experimental Result ID: ATLAS-SUSY-2013-02
 Tx Labels: ['T1', 'T2', 'T5WW', 'T5WWoff', 'T5tctc', 'T6WW']
@@ -1940,6 +1519,13 @@ Sqrts: 8.00E+00
 	    (PV > RHadronG,RHadronG) 
 	    (PV > RHadronU,RHadronU) 
 ========================================================
+Experimental Result ID: CMS-EXO-12-059
+Tx Labels: ['TRV1qq']
+Sqrts: 8.00E+00
+	 -----------------------------
+	 SMS tested by analysis:
+	    (PV > Zprime(1)), (Zprime(1) > jet,jet) 
+========================================================
 Experimental Result ID: CMS-EXO-13-006
 Tx Labels: ['THSCPM1b', 'THSCPM2b', 'THSCPM3', 'THSCPM4', 'THSCPM5', 'THSCPM6', 'THSCPM7', 'THSCPM8', 'THSCPM9']
 Sqrts: 8.00E+00
@@ -1955,29 +1541,12 @@ Sqrts: 8.00E+00
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > HSCP,anySM,anySM), (anyBSM(2) > HSCP,anySM,anySM) 
 	    (PV > Inclusive(1),anyBSM(2)), (Inclusive(1) > MET,*anySM), (anyBSM(2) > HSCP,anySM,anySM) 
 ========================================================
-Experimental Result ID: CMS-PAS-SUS-12-022
-Tx Labels: ['TChiChipmSlepL', 'TChiChipmSlepStau', 'TChiChipmStauStau', 'TChiWZ', 'TChipChimSlepSnu', 'TSlepSlep']
+Experimental Result ID: CMS-EXO-16-057
+Tx Labels: ['TRV1bb']
 Sqrts: 8.00E+00
 	 -----------------------------
 	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),L), (anyBSM(3) > MET,L), (anyBSM(7) > MET,nu) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,L) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L), (anyBSM(7) > MET,ta) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),ta), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,ta), (anyBSM(7) > MET,ta) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W), (anyBSM(2) > MET,Z) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L-), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,nu), (anyBSM(7) > MET,L+) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L+), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,nu), (anyBSM(7) > MET,L-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),L+), (anyBSM(2) > anyBSM(7),L-), (anyBSM(3) > MET,nu), (anyBSM(7) > MET,nu) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),nu), (anyBSM(2) > anyBSM(7),nu), (anyBSM(3) > MET,L+), (anyBSM(7) > MET,L-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,e+), (anyBSM(2) > MET,e-) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,mu+), (anyBSM(2) > MET,mu-) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-12-026
-Tx Labels: ['T1tttt']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
+	    (PV > Zprime(1)), (Zprime(1) > b,b) 
 ========================================================
 Experimental Result ID: CMS-PAS-SUS-13-015
 Tx Labels: ['T2tt', 'T2ttoff']
@@ -2019,17 +1588,6 @@ Sqrts: 8.00E+00
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(7),b), (anyBSM(3) > MET,W), (anyBSM(7) > MET,W) 
 	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > anyBSM(3),b), (anyBSM(2) > anyBSM(8),b), (anyBSM(3) > MET,jet,jet), (anyBSM(8) > MET,jet,jet) 
-========================================================
-Experimental Result ID: CMS-PAS-SUS-14-011
-Tx Labels: ['T1bbbb', 'T1tttt', 'T1ttttoff', 'T2tt', 'T2ttoff']
-Sqrts: 8.00E+00
-	 -----------------------------
-	 SMS tested by analysis:
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,b,b), (anyBSM(2) > MET,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t,t), (anyBSM(2) > MET,t,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,W,b,b), (anyBSM(2) > MET,W,W,b,b) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,t), (anyBSM(2) > MET,t) 
-	    (PV > anyBSM(1),anyBSM(2)), (anyBSM(1) > MET,W,b), (anyBSM(2) > MET,W,b) 
 ========================================================
 Experimental Result ID: CMS-SUS-12-024
 Tx Labels: ['T1tttt', 'T1ttttoff']
@@ -2230,8 +1788,8 @@ Sqrts: 8.00E+00
 ===================================================== 
 Topology: 11101001101000 
 Total Global topology weight :
-Sqrts: 1.30E+01 [TeV], Weight:3.92E-01 [pb]
-Sqrts: 8.00E+00 [TeV], Weight:1.74E-01 [pb]
+Sqrts: 1.30E+01 [TeV], Weight:7.12E-01 [pb]
+Sqrts: 8.00E+00 [TeV], Weight:3.20E-01 [pb]
 
 Total Number of SMS: 5
 		 .........................................................................
@@ -2239,8 +1797,8 @@ Total Number of SMS: 5
 		 SMS: (PV > N2(1),C1-(2)), (N2(1) > N1,higgs), (C1-(2) > N1~,W-)
 		 Masses: [(N2, 2.69E+02 [GeV]), (C1-, 2.69E+02 [GeV]), (N1, 1.29E+02 [GeV]), (N1~, 1.29E+02 [GeV])]
 		 Cross-Sections:
- 		 Sqrts: 1.30E+01 [TeV], Weight:3.92E-01 [pb]
- 		 Sqrts: 8.00E+00 [TeV], Weight:1.74E-01 [pb]
+ 		 Sqrts: 1.30E+01 [TeV], Weight:7.12E-01 [pb]
+ 		 Sqrts: 8.00E+00 [TeV], Weight:3.20E-01 [pb]
  		 
 		 .........................................................................
 		 SMS ID: 2
@@ -2277,8 +1835,8 @@ Total Number of SMS: 5
 ===================================================== 
 Topology: 111010011011010000 
 Total Global topology weight :
-Sqrts: 1.30E+01 [TeV], Weight:2.33E-02 [pb]
-Sqrts: 8.00E+00 [TeV], Weight:3.18E-03 [pb]
+Sqrts: 1.30E+01 [TeV], Weight:3.51E-02 [pb]
+Sqrts: 8.00E+00 [TeV], Weight:4.69E-03 [pb]
 
 Total Number of SMS: 2
 		 .........................................................................
@@ -2286,8 +1844,8 @@ Total Number of SMS: 2
 		 SMS: (PV > C1+(1),sd_L(2)), (C1+(1) > N1,W+), (sd_L(2) > q,C1-(6)), (C1-(6) > N1~,W-)
 		 Masses: [(C1+, 2.69E+02 [GeV]), (sd_L, 9.94E+02 [GeV]), (N1, 1.29E+02 [GeV]), (C1-, 2.69E+02 [GeV]), (N1~, 1.29E+02 [GeV])]
 		 Cross-Sections:
- 		 Sqrts: 1.30E+01 [TeV], Weight:2.33E-02 [pb]
- 		 Sqrts: 8.00E+00 [TeV], Weight:3.18E-03 [pb]
+ 		 Sqrts: 1.30E+01 [TeV], Weight:3.51E-02 [pb]
+ 		 Sqrts: 8.00E+00 [TeV], Weight:4.69E-03 [pb]
  		 
 		 .........................................................................
 		 SMS ID: 7
@@ -2300,8 +1858,8 @@ Total Number of SMS: 2
 ===================================================== 
 Topology: 11101001101011010000 
 Total Global topology weight :
-Sqrts: 1.30E+01 [TeV], Weight:1.06E-01 [pb]
-Sqrts: 8.00E+00 [TeV], Weight:1.18E-02 [pb]
+Sqrts: 1.30E+01 [TeV], Weight:1.94E-01 [pb]
+Sqrts: 8.00E+00 [TeV], Weight:2.16E-02 [pb]
 
 Total Number of SMS: 6
 		 .........................................................................
@@ -2309,8 +1867,8 @@ Total Number of SMS: 6
 		 SMS: (PV > su_R(1),gluino(2)), (su_R(1) > N1,q), (gluino(2) > q,q,C1-(7)), (C1-(7) > N1~,W-)
 		 Masses: [(su_R, 9.91E+02 [GeV]), (gluino, 8.65E+02 [GeV]), (N1, 1.29E+02 [GeV]), (C1-, 2.69E+02 [GeV]), (N1~, 1.29E+02 [GeV])]
 		 Cross-Sections:
- 		 Sqrts: 1.30E+01 [TeV], Weight:1.06E-01 [pb]
- 		 Sqrts: 8.00E+00 [TeV], Weight:1.18E-02 [pb]
+ 		 Sqrts: 1.30E+01 [TeV], Weight:1.94E-01 [pb]
+ 		 Sqrts: 8.00E+00 [TeV], Weight:2.16E-02 [pb]
  		 
 		 .........................................................................
 		 SMS ID: 9
@@ -2355,8 +1913,8 @@ Total Number of SMS: 6
 ===================================================== 
 Topology: 11101010011011010000 
 Total Global topology weight :
-Sqrts: 1.30E+01 [TeV], Weight:2.01E-02 [pb]
-Sqrts: 8.00E+00 [TeV], Weight:2.46E-03 [pb]
+Sqrts: 1.30E+01 [TeV], Weight:3.01E-02 [pb]
+Sqrts: 8.00E+00 [TeV], Weight:3.69E-03 [pb]
 
 Total Number of SMS: 2
 		 .........................................................................
@@ -2364,8 +1922,8 @@ Total Number of SMS: 2
 		 SMS: (PV > gluino(1),su_L(2)), (gluino(1) > N1,q,q), (su_L(2) > q,C1+(7)), (C1+(7) > N1,W+)
 		 Masses: [(gluino, 8.65E+02 [GeV]), (su_L, 9.92E+02 [GeV]), (N1, 1.29E+02 [GeV]), (C1+, 2.69E+02 [GeV]), (N1, 1.29E+02 [GeV])]
 		 Cross-Sections:
- 		 Sqrts: 1.30E+01 [TeV], Weight:2.01E-02 [pb]
- 		 Sqrts: 8.00E+00 [TeV], Weight:2.46E-03 [pb]
+ 		 Sqrts: 1.30E+01 [TeV], Weight:3.01E-02 [pb]
+ 		 Sqrts: 8.00E+00 [TeV], Weight:3.69E-03 [pb]
  		 
 		 .........................................................................
 		 SMS ID: 15
@@ -2378,8 +1936,8 @@ Total Number of SMS: 2
 ===================================================== 
 Topology: 1110110100011011010000 
 Total Global topology weight :
-Sqrts: 1.30E+01 [TeV], Weight:3.58E-02 [pb]
-Sqrts: 8.00E+00 [TeV], Weight:5.50E-03 [pb]
+Sqrts: 1.30E+01 [TeV], Weight:5.63E-02 [pb]
+Sqrts: 8.00E+00 [TeV], Weight:7.90E-03 [pb]
 
 Total Number of SMS: 2
 		 .........................................................................
@@ -2387,8 +1945,8 @@ Total Number of SMS: 2
 		 SMS: (PV > su_L(1),su_L(2)), (su_L(1) > q,C1+(4)), (su_L(2) > q,C1+(6)), (C1+(4) > N1,W+), (C1+(6) > N1,W+)
 		 Masses: [(su_L, 9.92E+02 [GeV]), (su_L, 9.92E+02 [GeV]), (C1+, 2.69E+02 [GeV]), (C1+, 2.69E+02 [GeV]), (N1, 1.29E+02 [GeV]), (N1, 1.29E+02 [GeV])]
 		 Cross-Sections:
- 		 Sqrts: 1.30E+01 [TeV], Weight:3.58E-02 [pb]
- 		 Sqrts: 8.00E+00 [TeV], Weight:5.50E-03 [pb]
+ 		 Sqrts: 1.30E+01 [TeV], Weight:5.63E-02 [pb]
+ 		 Sqrts: 8.00E+00 [TeV], Weight:7.90E-03 [pb]
  		 
 		 .........................................................................
 		 SMS ID: 17
@@ -2401,8 +1959,8 @@ Total Number of SMS: 2
 ===================================================== 
 Topology: 111011010001101011010000 
 Total Global topology weight :
-Sqrts: 1.30E+01 [TeV], Weight:2.40E-01 [pb]
-Sqrts: 8.00E+00 [TeV], Weight:2.94E-02 [pb]
+Sqrts: 1.30E+01 [TeV], Weight:4.69E-01 [pb]
+Sqrts: 8.00E+00 [TeV], Weight:5.76E-02 [pb]
 
 Total Number of SMS: 15
 		 .........................................................................
@@ -2410,8 +1968,8 @@ Total Number of SMS: 15
 		 SMS: (PV > su_L(1),gluino(2)), (su_L(1) > q,N2(4)), (gluino(2) > q,q,C1-(7)), (N2(4) > N1,higgs), (C1-(7) > N1~,W-)
 		 Masses: [(su_L, 9.92E+02 [GeV]), (gluino, 8.65E+02 [GeV]), (N2, 2.69E+02 [GeV]), (C1-, 2.69E+02 [GeV]), (N1, 1.29E+02 [GeV]), (N1~, 1.29E+02 [GeV])]
 		 Cross-Sections:
- 		 Sqrts: 1.30E+01 [TeV], Weight:2.40E-01 [pb]
- 		 Sqrts: 8.00E+00 [TeV], Weight:2.94E-02 [pb]
+ 		 Sqrts: 1.30E+01 [TeV], Weight:4.69E-01 [pb]
+ 		 Sqrts: 8.00E+00 [TeV], Weight:5.76E-02 [pb]
  		 
 		 .........................................................................
 		 SMS ID: 19
@@ -2535,6 +2093,7 @@ Total Number of SMS: 15
 ---------------Analysis Label = ATLAS-SUSY-2018-10
 -------------------Dataset Label = 4j0blowx_3
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.80E-04 [pb]
 Theory conditions:  None
@@ -2542,7 +2101,7 @@ Observed experimental limit: 5.82E-02 [fb]
 Expected experimental limit: 5.82E-02 [fb]
 Observed r-value: 3.089
 Expected r-value: 3.089
-nll: 15.492
+nll: 15.49
 nll_min: 3.184   -2log(L/L_max): 24.62
 nll_SM: 3.184   -2log(L/L_SM): 24.62
 Contributing SMS: [16, 17]
@@ -2550,6 +2109,7 @@ Contributing SMS: [16, 17]
 ---------------Analysis Label = ATLAS-SUSY-2016-07
 -------------------Dataset Label = 5j_Meff_1600
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.18E-03 [pb]
 Theory conditions:  None
@@ -2558,13 +2118,14 @@ Expected experimental limit: 1.07E+00 [fb]
 Observed r-value: 1.72
 Expected r-value: 2.042
 nll: 14.26
-nll_min: 6.93    -2log(L/L_max): 14.66
+nll_min: 6.93   -2log(L/L_max): 14.66
 nll_SM: 7.005   -2log(L/L_SM): 14.51
 Contributing SMS: [16, 17]
 
 ---------------Analysis Label = ATLAS-SUSY-2016-07
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.58E-02 [pb]
 Theory conditions:  None
@@ -2575,6 +2136,7 @@ Contributing SMS: [16, 17]
 ---------------Analysis Label = ATLAS-SUSY-2013-20
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.50E-03 [pb]
 Theory conditions:  None
@@ -2585,6 +2147,7 @@ Contributing SMS: [16, 17]
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.50E-03 [pb]
 Theory conditions:  None
@@ -2595,6 +2158,7 @@ Contributing SMS: [16, 17]
 ---------------Analysis Label = ATLAS-SUSY-2018-32
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWW']
+-------------------Final States = (PV > N1~,W-,N1,W+)
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.45E-01 [pb]
 Theory conditions:  None
@@ -2605,6 +2169,7 @@ Contributing SMS: [5]
 ---------------Analysis Label = ATLAS-SUSY-2018-32
 -------------------Dataset Label = SRDF_0d_cuts
 -------------------Txname Labels = ['TChiWW']
+-------------------Final States = (PV > N1~,W-,N1,W+)
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.46E-05 [pb]
 Theory conditions:  None
@@ -2612,14 +2177,15 @@ Observed experimental limit: 5.89E-02 [fb]
 Expected experimental limit: 9.25E-02 [fb]
 Observed r-value: 0.2483
 Expected r-value: 0.1581
-Likelihood: 0.00462
-L_max: 0.007315   -2log(L/L_max): 0.9188
-L_SM: 0.007315   -2log(L/L_SM): 0.9188
+nll: 5.377
+nll_min: 4.918   -2log(L/L_max): 0.9188
+nll_SM: 4.918   -2log(L/L_SM): 0.9188
 Contributing SMS: [5]
 
 ---------------Analysis Label = ATLAS-SUSY-2018-23
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
@@ -2632,6 +2198,7 @@ Contributing SMS: [1, 2]
 ---------------Analysis Label = ATLAS-SUSY-2019-09
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
@@ -2644,81 +2211,66 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = ATLAS-SUSY-2019-09
 -------------------Dataset Label = SRWZ_5
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.35E-05 [pb]
 Theory conditions:  None
-Observed experimental limit: 7.13E-02 [fb]
-Expected experimental limit: 1.46E-01 [fb]
-Observed r-value: 0.1899
-Expected r-value: 0.09276
-Likelihood: 0.0005795
-L_max: 0.0008696   -2log(L/L_max): 0.8119
-L_SM: 0.0008696   -2log(L/L_SM): 0.8119
+Observed experimental limit: 6.72E-02 [fb]
+Expected experimental limit: 1.07E-01 [fb]
+Observed r-value: 0.2015
+Expected r-value: 0.1263
+nll: 7.453
+nll_min: 7.047   -2log(L/L_max): 0.8119
+nll_SM: 7.047   -2log(L/L_SM): 0.8119
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 3NJet6_1500HTinf_300MHTinf
 -------------------Txname Labels = ['T6WW', 'TChiWW', 'TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 2.64E-04 [pb]
 Theory conditions:  None
 Observed experimental limit: 1.43E+00 [fb]
 Expected experimental limit: 9.34E-01 [fb]
-Observed r-value: 0.1847
+Observed r-value: 0.1846
 Expected r-value: 0.2827
-Likelihood: 0.003885
-L_max: 0.004385   -2log(L/L_max): 0.242
-L_SM: 0.002352   -2log(L/L_SM): -1.003
+nll: 5.551
+nll_min: 5.43   -2log(L/L_max): 0.2422
+nll_SM: 6.052   -2log(L/L_SM): -1.003
 Contributing SMS: [3, 4, 5, 16, 17]
-
----------------Analysis Label = ATLAS-SUSY-2019-08
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWH']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 2.07E-01 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.15E+03 [fb]
-Observed r-value: 0.1804
-Contributing SMS: [1, 2]
-
----------------Analysis Label = ATLAS-SUSY-2019-08-grp
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWH']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 2.07E-01 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.15E+03 [fb]
-Observed r-value: 0.1804
-Contributing SMS: [1, 2]
 
 ---------------Analysis Label = ATLAS-SUSY-2019-08
 -------------------Dataset Label = SR_LM_High_MCT
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 9.06E-06 [pb]
 Theory conditions:  None
-Observed experimental limit: 5.31E-02 [fb]
-Expected experimental limit: 5.31E-02 [fb]
-Observed r-value: 0.1707
-Expected r-value: 0.1707
-Likelihood: 0.03511
-L_max: 0.03944   -2log(L/L_max): 0.2326
-L_SM: 0.03944   -2log(L/L_SM): 0.2326
+Observed experimental limit: 4.95E-02 [fb]
+Expected experimental limit: 5.11E-02 [fb]
+Observed r-value: 0.1832
+Expected r-value: 0.1774
+nll: 3.349
+nll_min: 3.233   -2log(L/L_max): 0.2326
+nll_SM: 3.233   -2log(L/L_SM): 0.2326
 Contributing SMS: [1, 2]
 
----------------Analysis Label = CMS-PAS-SUS-17-004
+---------------Analysis Label = ATLAS-SUSY-2019-08
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
-Observed experimental limit: 1.57E+03 [fb]
-Observed r-value: 0.1317
+Observed experimental limit: 1.15E+03 [fb]
+Observed r-value: 0.1804
 Contributing SMS: [1, 2]
 
 ---------------Analysis Label = CMS-SUS-17-004
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
@@ -2729,26 +2281,18 @@ Contributing SMS: [1, 2]
 ---------------Analysis Label = CMS-SUS-18-007
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
 Observed experimental limit: 1.63E+03 [fb]
-Observed r-value: 0.1274
+Observed r-value: 0.1273
 Contributing SMS: [1, 2]
-
----------------Analysis Label = CMS-PAS-SUS-17-004
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 3.99E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 3.68E+02 [fb]
-Observed r-value: 0.1085
-Contributing SMS: [3, 4]
 
 ---------------Analysis Label = CMS-SUS-17-004
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
@@ -2759,6 +2303,7 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = CMS-SUS-16-039
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
@@ -2769,6 +2314,7 @@ Contributing SMS: [1, 2]
 ---------------Analysis Label = CMS-SUS-21-002
 -------------------Dataset Label = b_veto_SR0
 -------------------Txname Labels = ['TChiWH', 'TChiWW', 'TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.50E-05 [pb]
 Theory conditions:  None
@@ -2776,29 +2322,15 @@ Observed experimental limit: 1.57E-01 [fb]
 Expected experimental limit: 1.93E-01 [fb]
 Observed r-value: 0.09515
 Expected r-value: 0.07734
-Likelihood: 0.001561
-L_max: 0.001701   -2log(L/L_max): 0.1718
-L_SM: 0.001701   -2log(L/L_SM): 0.1718
+nll: 6.463
+nll_min: 6.377   -2log(L/L_max): 0.1718
+nll_SM: 6.377   -2log(L/L_SM): 0.1718
 Contributing SMS: [1, 2, 3, 4, 5]
-
----------------Analysis Label = ATLAS-SUSY-2018-06
--------------------Dataset Label = SR_low
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 1.45E-05 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.59E-01 [fb]
-Expected experimental limit: 1.43E-01 [fb]
-Observed r-value: 0.09109
-Expected r-value: 0.1012
-Likelihood: 0.004192
-L_max: 0.00445   -2log(L/L_max): 0.1195
-L_SM: 0.003757   -2log(L/L_SM): -0.2193
-Contributing SMS: [3, 4]
 
 ---------------Analysis Label = CMS-SUS-16-039
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
@@ -2809,16 +2341,18 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = CMS-SUS-16-045
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
 Observed experimental limit: 2.44E+03 [fb]
-Observed r-value: 0.08486
+Observed r-value: 0.08498
 Contributing SMS: [1, 2]
 
 ---------------Analysis Label = CMS-SUS-13-006
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 9.59E-02 [pb]
 Theory conditions:  None
@@ -2826,9 +2360,26 @@ Observed experimental limit: 1.14E+03 [fb]
 Observed r-value: 0.0844
 Contributing SMS: [1, 2]
 
+---------------Analysis Label = ATLAS-SUSY-2013-11
+-------------------Dataset Label = WWc-DF
+-------------------Txname Labels = ['TChiWW']
+-------------------Final States = (PV > N1,W+,N1~,W-)
+Analysis sqrts: 8.00E+00 [TeV]
+Theory prediction: 4.48E-05 [pb]
+Theory conditions:  None
+Observed experimental limit: 5.31E-01 [fb]
+Expected experimental limit: 4.38E-01 [fb]
+Observed r-value: 0.08431
+Expected r-value: 0.1022
+nll: 3.872
+nll_min: 3.833   -2log(L/L_max): 0.07761
+nll_SM: 3.967   -2log(L/L_SM): -0.1902
+Contributing SMS: [5]
+
 ---------------Analysis Label = CMS-SUS-21-002
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
@@ -2838,24 +2389,26 @@ Observed r-value: 0.08326
 Expected r-value: 0.06136
 Contributing SMS: [1, 2]
 
----------------Analysis Label = ATLAS-SUSY-2013-11
--------------------Dataset Label = WWc-DF
--------------------Txname Labels = ['TChiWW']
-Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 4.39E-05 [pb]
+---------------Analysis Label = ATLAS-SUSY-2018-06
+-------------------Dataset Label = SR_low
+-------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
+Analysis sqrts: 1.30E+01 [TeV]
+Theory prediction: 1.26E-05 [pb]
 Theory conditions:  None
-Observed experimental limit: 5.31E-01 [fb]
-Expected experimental limit: 4.38E-01 [fb]
-Observed r-value: 0.08267
-Expected r-value: 0.1002
-Likelihood: 0.0208
-L_max: 0.02165   -2log(L/L_max): 0.0802
-L_SM: 0.01893   -2log(L/L_SM): -0.1876
-Contributing SMS: [5]
+Observed experimental limit: 1.59E-01 [fb]
+Expected experimental limit: 1.43E-01 [fb]
+Observed r-value: 0.07902
+Expected r-value: 0.08775
+nll: 5.486
+nll_min: 5.415   -2log(L/L_max): 0.142
+nll_SM: 5.584   -2log(L/L_SM): -0.1968
+Contributing SMS: [3, 4]
 
 ---------------Analysis Label = ATLAS-SUSY-2018-10
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q)
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.52E-02 [pb]
 Theory conditions:  None
@@ -2866,6 +2419,7 @@ Contributing SMS: [16]
 ---------------Analysis Label = ATLAS-SUSY-2016-24
 -------------------Dataset Label = WZ-0Jb
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 7.64E-06 [pb]
 Theory conditions:  None
@@ -2873,14 +2427,31 @@ Observed experimental limit: 1.00E-01 [fb]
 Expected experimental limit: 1.24E-01 [fb]
 Observed r-value: 0.07639
 Expected r-value: 0.0616
-Likelihood: 0.1278
-L_max: 0.1519   -2log(L/L_max): 0.3457
-L_SM: 0.1519   -2log(L/L_SM): 0.3457
+nll: 2.058
+nll_min: 1.885   -2log(L/L_max): 0.3457
+nll_SM: 1.885   -2log(L/L_SM): 0.3457
+Contributing SMS: [3, 4]
+
+---------------Analysis Label = ATLAS-SUSY-2017-03
+-------------------Dataset Label = SR2l_Int
+-------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
+Analysis sqrts: 1.30E+01 [TeV]
+Theory prediction: 6.66E-06 [pb]
+Theory conditions:  None
+Observed experimental limit: 9.00E-02 [fb]
+Expected experimental limit: 1.25E-01 [fb]
+Observed r-value: 0.07396
+Expected r-value: 0.05325
+nll: 2.345
+nll_min: 2.219   -2log(L/L_max): 0.2512
+nll_SM: 2.219   -2log(L/L_SM): 0.2512
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = ATLAS-SUSY-2016-24
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
@@ -2891,6 +2462,7 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = ATLAS-SUSY-2013-12
 -------------------Dataset Label = SR0tau_a_Bin16
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 1.72E-05 [pb]
 Theory conditions:  None
@@ -2898,24 +2470,28 @@ Observed experimental limit: 2.56E-01 [fb]
 Expected experimental limit: 2.91E-01 [fb]
 Observed r-value: 0.06709
 Expected r-value: 0.05902
-Likelihood: 0.03946
-L_max: 0.04315   -2log(L/L_max): 0.1786
-L_SM: 0.04315   -2log(L/L_SM): 0.1786
+nll: 3.232
+nll_min: 3.143   -2log(L/L_max): 0.1786
+nll_SM: 3.143   -2log(L/L_SM): 0.1786
 Contributing SMS: [3, 4]
 
----------------Analysis Label = CMS-PAS-SUS-12-022
+---------------Analysis Label = ATLAS-SUSY-2018-06
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 1.85E-02 [pb]
+-------------------Final States = (PV > N1,W+,N1,Z),...
+Analysis sqrts: 1.30E+01 [TeV]
+Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
-Observed experimental limit: 2.82E+02 [fb]
-Observed r-value: 0.06555
+Observed experimental limit: 6.02E+02 [fb]
+Expected experimental limit: 3.91E+02 [fb]
+Observed r-value: 0.06631
+Expected r-value: 0.102
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = ATLAS-SUSY-2018-05-ewk
 -------------------Dataset Label = SRInt_1_cuts
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 6.74E-06 [pb]
 Theory conditions:  None
@@ -2923,14 +2499,15 @@ Observed experimental limit: 1.07E-01 [fb]
 Expected experimental limit: 9.23E-02 [fb]
 Observed r-value: 0.06303
 Expected r-value: 0.07307
-Likelihood: 0.009241
-L_max: 0.00925   -2log(L/L_max): 0.001907
-L_SM: 0.009065   -2log(L/L_SM): -0.0384
+nll: 4.684
+nll_min: 4.683   -2log(L/L_max): 0.001907
+nll_SM: 4.703   -2log(L/L_SM): -0.0384
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = ATLAS-SUSY-2013-12
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 1.85E-02 [pb]
 Theory conditions:  None
@@ -2941,6 +2518,7 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = CMS-SUS-16-039-agg
 -------------------Dataset Label = AR1
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 5.09E-05 [pb]
 Theory conditions:  None
@@ -2948,48 +2526,28 @@ Observed experimental limit: 9.55E-01 [fb]
 Expected experimental limit: 9.32E-01 [fb]
 Observed r-value: 0.05332
 Expected r-value: 0.05463
-Likelihood: 0.0005299
-L_max: 0.0005302   -2log(L/L_max): 0.001022
-L_SM: 0.0005298   -2log(L/L_SM): -0.0004705
-Contributing SMS: [3, 4]
-
----------------Analysis Label = ATLAS-CONF-2013-035
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 1.85E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 3.55E+02 [fb]
-Observed r-value: 0.0521
-Contributing SMS: [3, 4]
-
----------------Analysis Label = ATLAS-SUSY-2018-06
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 3.99E-02 [pb]
-Theory conditions:  None
-Observed experimental limit: 8.25E+02 [fb]
-Expected experimental limit: 5.20E+02 [fb]
-Observed r-value: 0.04834
-Expected r-value: 0.07675
+nll: 7.543
+nll_min: 7.542   -2log(L/L_max): 0.001022
+nll_SM: 7.543   -2log(L/L_SM): -0.0004705
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = CMS-SUS-21-002
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWW']
+-------------------Final States = (PV > N1,W+,N1~,W-)
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.45E-01 [pb]
 Theory conditions:  None
 Observed experimental limit: 3.15E+03 [fb]
-Expected experimental limit: 2.93E+03 [fb]
+Expected experimental limit: 2.95E+03 [fb]
 Observed r-value: 0.04586
-Expected r-value: 0.04926
+Expected r-value: 0.04908
 Contributing SMS: [5]
 
 ---------------Analysis Label = ATLAS-SUSY-2018-05
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
@@ -3000,43 +2558,31 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = CMS-SUS-13-006
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 1.85E-02 [pb]
 Theory conditions:  None
-Observed experimental limit: 4.64E+02 [fb]
-Observed r-value: 0.03977
+Observed experimental limit: 4.66E+02 [fb]
+Observed r-value: 0.03967
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = CMS-SUS-20-001
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
 Observed experimental limit: 1.14E+03 [fb]
-Expected experimental limit: 8.66E+02 [fb]
-Observed r-value: 0.03496
-Expected r-value: 0.04606
-Contributing SMS: [3, 4]
-
----------------Analysis Label = CMS-SUS-16-039
--------------------Dataset Label = SR1
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 5.03E-05 [pb]
-Theory conditions:  None
-Observed experimental limit: 1.56E+00 [fb]
-Expected experimental limit: 1.53E+00 [fb]
-Observed r-value: 0.03224
-Expected r-value: 0.03288
-Likelihood: 0.00053
-L_max: 0.0005302   -2log(L/L_max): 0.0009689
-L_SM: 0.0005298   -2log(L/L_SM): -0.0005241
+Expected experimental limit: 8.67E+02 [fb]
+Observed r-value: 0.03494
+Expected r-value: 0.04601
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = ATLAS-SUSY-2018-22
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T6WW']
+-------------------Final States = (PV > N1,W+,q,N1,W+,q)
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 1.52E-02 [pb]
 Theory conditions:  None
@@ -3047,6 +2593,7 @@ Contributing SMS: [16]
 ---------------Analysis Label = CMS-SUS-16-034
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
@@ -3054,24 +2601,10 @@ Observed experimental limit: 1.57E+03 [fb]
 Observed r-value: 0.02539
 Contributing SMS: [3, 4]
 
----------------Analysis Label = ATLAS-SUSY-2017-03
--------------------Dataset Label = SR3l_Low
--------------------Txname Labels = ['TChiWZ']
-Analysis sqrts: 1.30E+01 [TeV]
-Theory prediction: 1.30E-05 [pb]
-Theory conditions:  None
-Observed experimental limit: 5.30E-01 [fb]
-Expected experimental limit: 2.60E-01 [fb]
-Observed r-value: 0.02449
-Expected r-value: 0.04993
-Likelihood: 0.0016
-L_max: 0.01772   -2log(L/L_max): 4.809
-L_SM: 0.001214   -2log(L/L_SM): -0.5518
-Contributing SMS: [3, 4]
-
 ---------------Analysis Label = ATLAS-SUSY-2013-11
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 1.85E-02 [pb]
 Theory conditions:  None
@@ -3082,6 +2615,7 @@ Contributing SMS: [3, 4]
 ---------------Analysis Label = CMS-SUS-16-043
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWH']
+-------------------Final States = (PV > N1,W+,N1,higgs),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 2.07E-01 [pb]
 Theory conditions:  None
@@ -3092,39 +2626,31 @@ Contributing SMS: [1, 2]
 ---------------Analysis Label = CMS-SUS-21-002
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
 Observed experimental limit: 2.71E+03 [fb]
-Expected experimental limit: 2.51E+03 [fb]
+Expected experimental limit: 2.53E+03 [fb]
 Observed r-value: 0.0147
-Expected r-value: 0.01589
+Expected r-value: 0.01579
 Contributing SMS: [3, 4]
 
 ---------------Analysis Label = ATLAS-SUSY-2017-03
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['TChiWZ']
+-------------------Final States = (PV > N1,W+,N1,Z),...
 Analysis sqrts: 1.30E+01 [TeV]
 Theory prediction: 3.99E-02 [pb]
 Theory conditions:  None
 Observed experimental limit: 4.18E+03 [fb]
 Observed r-value: 0.009551
 Contributing SMS: [3, 4]
-
----------------Analysis Label = ATLAS-CONF-2013-089
--------------------Dataset Label = (UL)
--------------------Txname Labels = ['T6WW']
-Analysis sqrts: 8.00E+00 [TeV]
-Theory prediction: 5.50E-03 [pb]
-Theory conditions:  None
-Observed experimental limit: 4.05E+04 [fb]
-Observed r-value: 0.0001359
-Contributing SMS: [16, 17]
 ===================================================== 
 Combined Analyses: ATLAS-SUSY-2018-10,CMS-SUS-13-012
 Likelihoods: nll, nll_min, nll_SM = 21.043, 9.236, 9.236
-combined r-value:  3.130E+00
-combined r-value (expected):  3.169E+00
+combined r-value: 3.11
+combined r-value (expected): 3.169
 ===================================================== 
 
 
@@ -3137,50 +2663,50 @@ Total cross-section for topologies outside the grid (fb):  0.000E+00
 ================================================================================
 missing topologies with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)                  SMS description
- 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET) 
+ 13.0          9.648E+01    #                         PV > (MET,jet), (MET,jet,jet) 
 Contributing SMS [25, 26, 27, 28]
- 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET) 
+ 13.0          7.018E+01    #                         PV > (jet,MET), (MET,jet,jet) 
 Contributing SMS [8, 9, 10, 11]
- 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET) 
+ 13.0          4.897E+01    #                             PV > (MET,jet), (MET,b,t) 
 Contributing SMS [30, 32]
- 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET) 
+ 13.0          4.020E+01    #                         PV > (MET,jet), (MET,jet,jet) 
 Contributing SMS [18, 19, 20, 21]
- 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET) 
+ 13.0          3.562E+01    #                             PV > (jet,MET), (MET,b,t) 
 Contributing SMS [12, 13]
- 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET) 
+ 13.0          2.058E+01    #                         PV > (MET,jet), (MET,jet,jet) 
 Contributing SMS [24, 29]
- 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET) 
+ 13.0          2.040E+01    #                             PV > (MET,jet), (MET,b,t) 
 Contributing SMS [22, 23]
- 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET) 
+ 13.0          2.005E+01    #                         PV > (jet,jet,MET), (MET,jet) 
 Contributing SMS [14, 15]
- 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET) 
+ 13.0          1.304E+01    #                             PV > (MET,jet), (MET,b,b) 
 Contributing SMS [31]
- 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET) 
+ 13.0          1.182E+01    #                             PV > (jet,MET), (MET,jet) 
 Contributing SMS [7]
 ================================================================================
 No missing topologies with displaced decays found
 ================================================================================
 missing topologies with prompt decays with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)                  SMS description
- 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET) 
+ 13.0          9.648E+01    #                         PV > (MET,jet), (MET,jet,jet) 
 Contributing SMS [25, 26, 27, 28]
- 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET) 
+ 13.0          7.018E+01    #                         PV > (jet,MET), (MET,jet,jet) 
 Contributing SMS [8, 9, 10, 11]
- 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET) 
+ 13.0          4.897E+01    #                             PV > (MET,jet), (MET,b,t) 
 Contributing SMS [30, 32]
- 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET) 
+ 13.0          4.020E+01    #                         PV > (MET,jet), (MET,jet,jet) 
 Contributing SMS [18, 19, 20, 21]
- 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET) 
+ 13.0          3.562E+01    #                             PV > (jet,MET), (MET,b,t) 
 Contributing SMS [12, 13]
- 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET) 
+ 13.0          2.058E+01    #                         PV > (MET,jet), (MET,jet,jet) 
 Contributing SMS [24, 29]
- 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET) 
+ 13.0          2.040E+01    #                             PV > (MET,jet), (MET,b,t) 
 Contributing SMS [22, 23]
- 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET) 
+ 13.0          2.005E+01    #                         PV > (jet,jet,MET), (MET,jet) 
 Contributing SMS [14, 15]
- 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET) 
+ 13.0          1.304E+01    #                             PV > (MET,jet), (MET,b,b) 
 Contributing SMS [31]
- 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET) 
+ 13.0          1.182E+01    #                             PV > (jet,MET), (MET,jet) 
 Contributing SMS [7]
 ================================================================================
 No topologies outside the grid found

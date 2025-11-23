@@ -24,7 +24,7 @@ class TxTPrinter(BasicPrinter):
     Printer class to handle the printing of one single text output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "log"
         self.printtimespent = False
@@ -126,8 +126,8 @@ class TxTPrinter(BasicPrinter):
                     topoName = vertnumb
                     topoNames_v2[canonName] = topoName
                 except:
-                    logger.info("Could not format SMS using version2, switching to current format.")
-                    self.outputFormat = 'current'
+                    logger.info("Could not format SMS using version2, switching to version3 format.")
+                    self.outputFormat = 'version3'
         
         if self.outputFormat == 'version2':
             topoNames = topoNames_v2

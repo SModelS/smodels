@@ -24,7 +24,7 @@ class SummaryPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
         TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "summary"
         self.printingOrder = [
