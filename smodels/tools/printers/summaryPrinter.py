@@ -117,8 +117,8 @@ class SummaryPrinter(TxTPrinter):
                 "'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
 
-            fStates = sorted([str(sms.compressToFinalStates(compressPrimary=True)) 
-                              for sms in theoPred.smsList])
+            fStates = sorted(list(set([str(sms.compressToFinalStates(compressPrimary=True)) 
+                              for sms in theoPred.smsList])))
             fStates = ', '.join(fStates)
             max_length = 30
             if len(fStates) > max_length:

@@ -229,9 +229,14 @@ class RunPrinterTest(unittest.TestCase):
                                           key=lambda res: res['r'], reverse=True)
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields)
+        
+        if equals:
+            self.removeOutputs(outputfile)
+        else:
+            logger.error(f"{outputfile} differs from simplyGluino_default_nodesMap.py")
 
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        
 
 
 if __name__ == "__main__":

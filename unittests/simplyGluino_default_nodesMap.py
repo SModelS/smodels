@@ -21,8 +21,8 @@ smodelsOutputDefault = {
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
     'input file' : './testFiles/slha/simplyGluino.slha',
-    'database version' : 'unittest300-beta',
-    'smodels version' : '3.0.0-beta'
+    'database version' : 'unittest310',
+    'smodels version' : '3.1.1'
 },
 'SMS Decomposition' : [
     {
@@ -50,6 +50,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 167.641,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T1'],
+        'Final States' : ['(PV > N1,q,q,N1,q,q)'],
         'Mass (GeV)' : [('gluino', 675.0), ('N1', 200.0)],
         'AnalysisID' : 'CMS-PAS-SUS-15-002',
         'DataSetID' : None,
@@ -78,6 +79,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 38.1378,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T1'],
+        'Final States' : ['(PV > N1,q,q,N1,q,q)'],
         'Mass (GeV)' : [('gluino', 675.0), ('N1', 200.0)],
         'AnalysisID' : 'ATLAS-SUSY-2013-02',
         'DataSetID' : None,
@@ -106,6 +108,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 0.3857116,
         'expected upper limit (fb)' : 0.2637784,
         'TxNames' : ['T1'],
+        'Final States' : ['(PV > N1,q,q,N1,q,q)'],
         'Mass (GeV)' : [('gluino', 675.0), ('N1', 200.0)],
         'AnalysisID' : 'CMS-SUS-13-012',
         'DataSetID' : '6NJet8_1000HT1250_450MHTinf',

@@ -318,8 +318,8 @@ class TxTPrinter(BasicPrinter):
             txnames = [str(txname) for txname in theoryPrediction.txnames]
             txnames = sorted(list(set(txnames)))
 
-            fStates = sorted([str(sms.compressToFinalStates(compressPrimary=True)) 
-                              for sms in theoryPrediction.smsList])
+            fStates = sorted(list(set([str(sms.compressToFinalStates(compressPrimary=True)) 
+                              for sms in theoryPrediction.smsList])))
             fStates = ', '.join(fStates)
             max_length = 30
             if len(fStates) > max_length:
