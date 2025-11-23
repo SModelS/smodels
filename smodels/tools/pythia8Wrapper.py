@@ -148,19 +148,17 @@ class Pythia8Wrapper(WrapperBase):
         exists = os.path.exists ( self.includeFile )
         return exists
 
-    def getXmldoc ( self ) -> str:
+    def getXmldoc ( self ) -> Union[None,str]:
         """ get the content of xml.doc """
         xmldoc = self.executablePath.replace( "pythia8.exe", "xml.doc" )
         logger.debug( f"exe path={self.executablePath}" )
-        if not os.path.exists ( xmldoc ):
-            return None
+        toadd = None
         if os.path.exists(xmldoc):
             logger.debug(f"xml.doc found at {xmldoc}.")
             with open(xmldoc) as f:
                 xmlDir = f.read()
                 toadd = os.path.join(os.path.dirname(xmldoc), xmlDir.strip())
-        #if not os.path.exists ( toadd ):
-        #    return None
+
         return toadd
 
     def run( self, slhaFile: str, lhefile: Union[str,None]=None,
