@@ -319,7 +319,7 @@ class GenericSMS(object):
 
         smsComp = self.copy()
         if not compressPrimary:
-            mothers = [self.daughterIndices(self.rootIndex)]
+            mothers = self.daughterIndices(self.rootIndex)
         else:
             mothers = [self.rootIndex]
         for m in mothers:

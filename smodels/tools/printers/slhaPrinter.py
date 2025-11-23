@@ -134,7 +134,7 @@ class SLHAPrinter(TxTPrinter):
 
 
 
-            output += f" {cter} 0 {txnameStr:<30} #txname \n"
+            output += f" {cter} 0 {txnameStr:<30} #txname (final states = {fStates})\n"
             if r is not None:
                 output += f" {cter} 1 {r:<30.3E} #r value\n"
             else:
@@ -164,8 +164,6 @@ class SLHAPrinter(TxTPrinter):
             output += f" {cter} 6 {nll:<30} #nll\n"
             output += f" {cter} 7 {nllmin:<30} #nll_min\n"
             output += f" {cter} 8 {nllsm:<30} #nll_SM\n"
-    
-            output += f" {cter} 9 {fStates:<30} #final states \n"
             output += "\n"
 
         return output

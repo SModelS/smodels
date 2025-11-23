@@ -1843,61 +1843,61 @@ smodelsOutput = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 96.48054,
-        'SMS' : 'PV > (MET,jet), (MET,jet,jet)',
+        'SMS' : 'PV > (W,jet,MET), (W,jet,jet,MET)',
         'SMS IDs' : [25, 26, 27, 28]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 70.17688,
-        'SMS' : 'PV > (jet,MET), (MET,jet,jet)',
+        'SMS' : 'PV > (jet,MET), (W,jet,jet,MET)',
         'SMS IDs' : [8, 9, 10, 11]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 48.96736,
-        'SMS' : 'PV > (MET,jet), (MET,b,t)',
+        'SMS' : 'PV > (W,jet,MET), (W,b,t,MET)',
         'SMS IDs' : [30, 32]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 40.20174,
-        'SMS' : 'PV > (MET,jet), (MET,jet,jet)',
+        'SMS' : 'PV > (higgs,jet,MET), (W,jet,jet,MET)',
         'SMS IDs' : [18, 19, 20, 21]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 35.6173,
-        'SMS' : 'PV > (jet,MET), (MET,b,t)',
+        'SMS' : 'PV > (jet,MET), (W,b,t,MET)',
         'SMS IDs' : [12, 13]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.57984,
-        'SMS' : 'PV > (MET,jet), (MET,jet,jet)',
+        'SMS' : 'PV > (W,jet,MET), (higgs,jet,jet,MET)',
         'SMS IDs' : [24, 29]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.40384,
-        'SMS' : 'PV > (MET,jet), (MET,b,t)',
+        'SMS' : 'PV > (higgs,jet,MET), (W,b,t,MET)',
         'SMS IDs' : [22, 23]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.05211,
-        'SMS' : 'PV > (jet,jet,MET), (MET,jet)',
+        'SMS' : 'PV > (jet,jet,MET), (W,jet,MET)',
         'SMS IDs' : [14, 15]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 13.04106,
-        'SMS' : 'PV > (MET,jet), (MET,b,b)',
+        'SMS' : 'PV > (W,jet,MET), (b,b,higgs,MET)',
         'SMS IDs' : [31]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 11.82386,
-        'SMS' : 'PV > (jet,MET), (MET,jet)',
+        'SMS' : 'PV > (jet,MET), (W,jet,MET)',
         'SMS IDs' : [7]
     }
 ],
@@ -1908,61 +1908,61 @@ smodelsOutput = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 96.48054,
-        'SMS' : 'PV > (MET,jet), (MET,jet,jet)',
+        'SMS' : 'PV > (W,jet,MET), (W,jet,jet,MET)',
         'SMS IDs' : [25, 26, 27, 28]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 70.17688,
-        'SMS' : 'PV > (jet,MET), (MET,jet,jet)',
+        'SMS' : 'PV > (jet,MET), (W,jet,jet,MET)',
         'SMS IDs' : [8, 9, 10, 11]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 48.96736,
-        'SMS' : 'PV > (MET,jet), (MET,b,t)',
+        'SMS' : 'PV > (W,jet,MET), (W,b,t,MET)',
         'SMS IDs' : [30, 32]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 40.20174,
-        'SMS' : 'PV > (MET,jet), (MET,jet,jet)',
+        'SMS' : 'PV > (higgs,jet,MET), (W,jet,jet,MET)',
         'SMS IDs' : [18, 19, 20, 21]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 35.6173,
-        'SMS' : 'PV > (jet,MET), (MET,b,t)',
+        'SMS' : 'PV > (jet,MET), (W,b,t,MET)',
         'SMS IDs' : [12, 13]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.57984,
-        'SMS' : 'PV > (MET,jet), (MET,jet,jet)',
+        'SMS' : 'PV > (W,jet,MET), (higgs,jet,jet,MET)',
         'SMS IDs' : [24, 29]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.40384,
-        'SMS' : 'PV > (MET,jet), (MET,b,t)',
+        'SMS' : 'PV > (higgs,jet,MET), (W,b,t,MET)',
         'SMS IDs' : [22, 23]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.05211,
-        'SMS' : 'PV > (jet,jet,MET), (MET,jet)',
+        'SMS' : 'PV > (jet,jet,MET), (W,jet,MET)',
         'SMS IDs' : [14, 15]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 13.04106,
-        'SMS' : 'PV > (MET,jet), (MET,b,b)',
+        'SMS' : 'PV > (W,jet,MET), (b,b,higgs,MET)',
         'SMS IDs' : [31]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 11.82386,
-        'SMS' : 'PV > (jet,MET), (MET,jet)',
+        'SMS' : 'PV > (jet,MET), (W,jet,MET)',
         'SMS IDs' : [7]
     }
 ],

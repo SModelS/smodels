@@ -331,8 +331,8 @@ class TxTPrinter(BasicPrinter):
                 str(dataId).replace("None", "(UL)") + "\n"
             output += "-------------------Txname Labels = " + \
                 str(txnames) + "\n"
-            output += "-------------------Final States = " + \
-                str(fStates) + "\n"
+            if self.outputFormat != 'version2':
+                output += f"-------------------Final States = {fStates}\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                 "\n"
 

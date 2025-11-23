@@ -330,24 +330,23 @@ Below we give a description of each block together with a sample output.
   if the model is excluded, all results with :math:`r`-value greater than one are shown and if the point is not excluded,
   only the result with the highest :math:`r`-value is displayed.
   For each experimental result, the |txname| (for a list of all |txnames| and their meaning, see  `SMS Dictionary <https://smodels.github.io/docs/SmsDictionary>`_), the :math:`r`-value, the expected :math:`r`-value (when available),
-  the :ref:`condition violation <ULconditions>`, the experimental result *label*, the signal region (|dataset|) and a limited list of |final states| are shown.
+  the :ref:`condition violation <ULconditions>`, the experimental result *label* and the signal region (|dataset|) are shown.
   If **computeStatistics** = True, the negative log likelihood values
   for |EMrs| are also printed:
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 16-25
+   :lines: 16-24
 
 * information about the combination of results, if **combineAnas** is defined (available from v2.2 onward):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
- :lines: 489-495
+ :lines: 446-452
 
 
 * the label of each :ref:`coverage group <coverageGroups>` (first entry) and the total cross section in each group (second entry) (if **testCoverage** = True):
 
 .. literalinclude:: /images/gluino_squarks.slha.smodelsslha
-   :lines: 498-506
-
+   :lines: 455-463
 
 .. _scanSummary:
 

@@ -282,16 +282,17 @@ class PyPrinter(BasicPrinter):
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
                        'expected upper limit (fb)': self._round(ulExpected),
-                       'TxNames': sorted(txnamesDict.keys()),
-                       'Final States': sorted(fStates),
-                       'Mass (GeV)': mass,
+                       'TxNames': sorted(txnamesDict.keys())}
+            if self.outputFormat != 'version2':
+                       resDict['Final States'] = sorted(fStates)
+            resDict.update({'Mass (GeV)': mass,
                        'AnalysisID': expID,
                        'DataSetID': datasetID,
                        'AnalysisSqrts (TeV)': sqrts.asNumber(TeV),
                        'lumi (fb-1)': (expResult.globalInfo.lumi*fb).asNumber(),
                        'dataType': dataType,
                        'r': r, 'r_expected': r_expected,
-                       'Width (GeV)' : widths}
+                       'Width (GeV)' : widths})
 
             if hasattr(self, "addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] = txnamesDict

@@ -15,6 +15,9 @@
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>SRbC3</DataSetID>
+            <Final_States_List>
+                <Final_States>(PV &gt; N1,b,b,N1,t+,t-)</Final_States>
+            </Final_States_List>
             <Mass_GeV_List>
                 <Mass_GeV>('gluino', 577.0)</Mass_GeV>
                 <Mass_GeV>('N1', 68.1)</Mass_GeV>
@@ -45,6 +48,15 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
+            <Final_States_List>
+                <Final_States>(PV &gt; N1,c,c,N1/N1~,q,c)</Final_States>
+                <Final_States>(PV &gt; N1,c,c,N1/N1~,q,q)</Final_States>
+                <Final_States>(PV &gt; N1,q,q,N1/N1~,q,c)</Final_States>
+                <Final_States>(PV &gt; N1,q,q,N1/N1~,q,q)</Final_States>
+                <Final_States>(PV &gt; N1/N1~,q,q,N1/N1~,q,c)</Final_States>
+                <Final_States>(PV &gt; N1~,q,c,N1,q,c)</Final_States>
+                <Final_States>(PV &gt; N1~,q,q,N1,q,q)</Final_States>
+            </Final_States_List>
             <Mass_GeV_List>
                 <Mass_GeV>('C1+/C1-/N2', 134.99)</Mass_GeV>
                 <Mass_GeV>('C1+/C1-', 134.4)</Mass_GeV>
@@ -91,7 +103,7 @@
         <promptwidth>1e-11</promptwidth>
         <reportallsrs>False</reportallsrs>
         <sigmacut>10.0</sigmacut>
-        <smodels_version>3.1.0</smodels_version>
+        <smodels_version>3.1.1</smodels_version>
         <stablewidth>1e-25</stablewidth>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>

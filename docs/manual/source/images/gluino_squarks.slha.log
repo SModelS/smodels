@@ -2663,50 +2663,50 @@ Total cross-section for topologies outside the grid (fb):  0.000E+00
 ================================================================================
 missing topologies with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)                  SMS description
- 13.0          9.648E+01    #                         PV > (MET,jet), (MET,jet,jet) 
+ 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET) 
 Contributing SMS [25, 26, 27, 28]
- 13.0          7.018E+01    #                         PV > (jet,MET), (MET,jet,jet) 
+ 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET) 
 Contributing SMS [8, 9, 10, 11]
- 13.0          4.897E+01    #                             PV > (MET,jet), (MET,b,t) 
+ 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET) 
 Contributing SMS [30, 32]
- 13.0          4.020E+01    #                         PV > (MET,jet), (MET,jet,jet) 
+ 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET) 
 Contributing SMS [18, 19, 20, 21]
- 13.0          3.562E+01    #                             PV > (jet,MET), (MET,b,t) 
+ 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET) 
 Contributing SMS [12, 13]
- 13.0          2.058E+01    #                         PV > (MET,jet), (MET,jet,jet) 
+ 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET) 
 Contributing SMS [24, 29]
- 13.0          2.040E+01    #                             PV > (MET,jet), (MET,b,t) 
+ 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET) 
 Contributing SMS [22, 23]
- 13.0          2.005E+01    #                         PV > (jet,jet,MET), (MET,jet) 
+ 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET) 
 Contributing SMS [14, 15]
- 13.0          1.304E+01    #                             PV > (MET,jet), (MET,b,b) 
+ 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET) 
 Contributing SMS [31]
- 13.0          1.182E+01    #                             PV > (jet,MET), (MET,jet) 
+ 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET) 
 Contributing SMS [7]
 ================================================================================
 No missing topologies with displaced decays found
 ================================================================================
 missing topologies with prompt decays with the highest cross sections (up to 10):
 Sqrts (TeV)   Weight (fb)                  SMS description
- 13.0          9.648E+01    #                         PV > (MET,jet), (MET,jet,jet) 
+ 13.0          9.648E+01    #                     PV > (W,jet,MET), (W,jet,jet,MET) 
 Contributing SMS [25, 26, 27, 28]
- 13.0          7.018E+01    #                         PV > (jet,MET), (MET,jet,jet) 
+ 13.0          7.018E+01    #                       PV > (jet,MET), (W,jet,jet,MET) 
 Contributing SMS [8, 9, 10, 11]
- 13.0          4.897E+01    #                             PV > (MET,jet), (MET,b,t) 
+ 13.0          4.897E+01    #                         PV > (W,jet,MET), (W,b,t,MET) 
 Contributing SMS [30, 32]
- 13.0          4.020E+01    #                         PV > (MET,jet), (MET,jet,jet) 
+ 13.0          4.020E+01    #                 PV > (higgs,jet,MET), (W,jet,jet,MET) 
 Contributing SMS [18, 19, 20, 21]
- 13.0          3.562E+01    #                             PV > (jet,MET), (MET,b,t) 
+ 13.0          3.562E+01    #                           PV > (jet,MET), (W,b,t,MET) 
 Contributing SMS [12, 13]
- 13.0          2.058E+01    #                         PV > (MET,jet), (MET,jet,jet) 
+ 13.0          2.058E+01    #                 PV > (W,jet,MET), (higgs,jet,jet,MET) 
 Contributing SMS [24, 29]
- 13.0          2.040E+01    #                             PV > (MET,jet), (MET,b,t) 
+ 13.0          2.040E+01    #                     PV > (higgs,jet,MET), (W,b,t,MET) 
 Contributing SMS [22, 23]
- 13.0          2.005E+01    #                         PV > (jet,jet,MET), (MET,jet) 
+ 13.0          2.005E+01    #                       PV > (jet,jet,MET), (W,jet,MET) 
 Contributing SMS [14, 15]
- 13.0          1.304E+01    #                             PV > (MET,jet), (MET,b,b) 
+ 13.0          1.304E+01    #                     PV > (W,jet,MET), (b,b,higgs,MET) 
 Contributing SMS [31]
- 13.0          1.182E+01    #                             PV > (jet,MET), (MET,jet) 
+ 13.0          1.182E+01    #                           PV > (jet,MET), (W,jet,MET) 
 Contributing SMS [7]
 ================================================================================
 No topologies outside the grid found

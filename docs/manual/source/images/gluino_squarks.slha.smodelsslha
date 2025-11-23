@@ -13,7 +13,7 @@ BLOCK SModelS_Settings
 
 BLOCK SModelS_Exclusion
  0 0 1                              #output status (-1 not tested, 0 not excluded, 1 excluded)
- 1 0 T6WW                           #txname 
+ 1 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q),...)
  1 1 3.089E+00                      #r value
  1 2 3.089E+00                      #expected r value
  1 3 0.00                           #condition violation
@@ -22,9 +22,8 @@ BLOCK SModelS_Exclusion
  1 6 1.5492E+01                     #nll
  1 7 3.1837E+00                     #nll_min
  1 8 3.1837E+00                     #nll_SM
- 1 9 (PV > N1,W+,q,N1,W+,q),...     #final states 
 
- 2 0 T6WW                           #txname 
+ 2 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q),...)
  2 1 1.720E+00                      #r value
  2 2 2.042E+00                      #expected r value
  2 3 0.00                           #condition violation
@@ -33,9 +32,8 @@ BLOCK SModelS_Exclusion
  2 6 1.4260E+01                     #nll
  2 7 6.9302E+00                     #nll_min
  2 8 7.0046E+00                     #nll_SM
- 2 9 (PV > N1,W+,q,N1,W+,q),...     #final states 
 
- 3 0 T6WW                           #txname 
+ 3 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q),...)
  3 1 6.658E-01                      #r value
  3 2 N/A                            #expected r value
  3 3 0.00                           #condition violation
@@ -44,9 +42,8 @@ BLOCK SModelS_Exclusion
  3 6 N/A                            #nll
  3 7 N/A                            #nll_min
  3 8 N/A                            #nll_SM
- 3 9 (PV > N1,W+,q,N1,W+,q),...     #final states 
 
- 4 0 T6WW                           #txname 
+ 4 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q),...)
  4 1 4.754E-01                      #r value
  4 2 N/A                            #expected r value
  4 3 0.00                           #condition violation
@@ -55,9 +52,8 @@ BLOCK SModelS_Exclusion
  4 6 N/A                            #nll
  4 7 N/A                            #nll_min
  4 8 N/A                            #nll_SM
- 4 9 (PV > N1,W+,q,N1,W+,q),...     #final states 
 
- 5 0 T6WW                           #txname 
+ 5 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q),...)
  5 1 3.200E-01                      #r value
  5 2 N/A                            #expected r value
  5 3 0.00                           #condition violation
@@ -66,9 +62,8 @@ BLOCK SModelS_Exclusion
  5 6 N/A                            #nll
  5 7 N/A                            #nll_min
  5 8 N/A                            #nll_SM
- 5 9 (PV > N1,W+,q,N1,W+,q),...     #final states 
 
- 6 0 TChiWW                         #txname 
+ 6 0 TChiWW                         #txname (final states = (PV > N1~,W-,N1,W+))
  6 1 2.605E-01                      #r value
  6 2 N/A                            #expected r value
  6 3 0.00                           #condition violation
@@ -77,9 +72,8 @@ BLOCK SModelS_Exclusion
  6 6 N/A                            #nll
  6 7 N/A                            #nll_min
  6 8 N/A                            #nll_SM
- 6 9 (PV > N1~,W-,N1,W+)            #final states 
 
- 7 0 TChiWW                         #txname 
+ 7 0 TChiWW                         #txname (final states = (PV > N1~,W-,N1,W+))
  7 1 2.483E-01                      #r value
  7 2 1.581E-01                      #expected r value
  7 3 0.00                           #condition violation
@@ -88,9 +82,8 @@ BLOCK SModelS_Exclusion
  7 6 5.3773E+00                     #nll
  7 7 4.9178E+00                     #nll_min
  7 8 4.9178E+00                     #nll_SM
- 7 9 (PV > N1~,W-,N1,W+)            #final states 
 
- 8 0 TChiWH                         #txname 
+ 8 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  8 1 2.112E-01                      #r value
  8 2 2.551E-01                      #expected r value
  8 3 0.00                           #condition violation
@@ -99,9 +92,8 @@ BLOCK SModelS_Exclusion
  8 6 N/A                            #nll
  8 7 N/A                            #nll_min
  8 8 N/A                            #nll_SM
- 8 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 9 0 TChiWZ                         #txname 
+ 9 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  9 1 2.050E-01                      #r value
  9 2 1.642E-01                      #expected r value
  9 3 0.00                           #condition violation
@@ -110,9 +102,8 @@ BLOCK SModelS_Exclusion
  9 6 N/A                            #nll
  9 7 N/A                            #nll_min
  9 8 N/A                            #nll_SM
- 9 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 10 0 TChiWZ                         #txname 
+ 10 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  10 1 2.015E-01                      #r value
  10 2 1.263E-01                      #expected r value
  10 3 0.00                           #condition violation
@@ -121,9 +112,8 @@ BLOCK SModelS_Exclusion
  10 6 7.4534E+00                     #nll
  10 7 7.0475E+00                     #nll_min
  10 8 7.0475E+00                     #nll_SM
- 10 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 11 0 T6WW, TChiWW, TChiWZ           #txname 
+ 11 0 T6WW, TChiWW, TChiWZ           #txname (final states = (PV > N1,W+,N1,Z),...)
  11 1 1.846E-01                      #r value
  11 2 2.827E-01                      #expected r value
  11 3 0.00                           #condition violation
@@ -132,9 +122,8 @@ BLOCK SModelS_Exclusion
  11 6 5.5507E+00                     #nll
  11 7 5.4297E+00                     #nll_min
  11 8 6.0524E+00                     #nll_SM
- 11 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 12 0 TChiWH                         #txname 
+ 12 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  12 1 1.832E-01                      #r value
  12 2 1.774E-01                      #expected r value
  12 3 0.00                           #condition violation
@@ -143,9 +132,8 @@ BLOCK SModelS_Exclusion
  12 6 3.3493E+00                     #nll
  12 7 3.2330E+00                     #nll_min
  12 8 3.2330E+00                     #nll_SM
- 12 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 13 0 TChiWH                         #txname 
+ 13 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  13 1 1.804E-01                      #r value
  13 2 N/A                            #expected r value
  13 3 0.00                           #condition violation
@@ -154,9 +142,8 @@ BLOCK SModelS_Exclusion
  13 6 N/A                            #nll
  13 7 N/A                            #nll_min
  13 8 N/A                            #nll_SM
- 13 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 14 0 TChiWH                         #txname 
+ 14 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  14 1 1.317E-01                      #r value
  14 2 N/A                            #expected r value
  14 3 0.00                           #condition violation
@@ -165,9 +152,8 @@ BLOCK SModelS_Exclusion
  14 6 N/A                            #nll
  14 7 N/A                            #nll_min
  14 8 N/A                            #nll_SM
- 14 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 15 0 TChiWH                         #txname 
+ 15 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  15 1 1.273E-01                      #r value
  15 2 N/A                            #expected r value
  15 3 0.00                           #condition violation
@@ -176,9 +162,8 @@ BLOCK SModelS_Exclusion
  15 6 N/A                            #nll
  15 7 N/A                            #nll_min
  15 8 N/A                            #nll_SM
- 15 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 16 0 TChiWZ                         #txname 
+ 16 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  16 1 1.085E-01                      #r value
  16 2 N/A                            #expected r value
  16 3 0.00                           #condition violation
@@ -187,9 +172,8 @@ BLOCK SModelS_Exclusion
  16 6 N/A                            #nll
  16 7 N/A                            #nll_min
  16 8 N/A                            #nll_SM
- 16 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 17 0 TChiWH                         #txname 
+ 17 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  17 1 9.793E-02                      #r value
  17 2 N/A                            #expected r value
  17 3 0.00                           #condition violation
@@ -198,9 +182,8 @@ BLOCK SModelS_Exclusion
  17 6 N/A                            #nll
  17 7 N/A                            #nll_min
  17 8 N/A                            #nll_SM
- 17 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 18 0 TChiWH, TChiWW, TChiWZ         #txname 
+ 18 0 TChiWH, TChiWW, TChiWZ         #txname (final states = (PV > N1,W+,N1,Z),...)
  18 1 9.515E-02                      #r value
  18 2 7.734E-02                      #expected r value
  18 3 0.00                           #condition violation
@@ -209,9 +192,8 @@ BLOCK SModelS_Exclusion
  18 6 6.4625E+00                     #nll
  18 7 6.3766E+00                     #nll_min
  18 8 6.3766E+00                     #nll_SM
- 18 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 19 0 TChiWZ                         #txname 
+ 19 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  19 1 8.526E-02                      #r value
  19 2 N/A                            #expected r value
  19 3 0.00                           #condition violation
@@ -220,9 +202,8 @@ BLOCK SModelS_Exclusion
  19 6 N/A                            #nll
  19 7 N/A                            #nll_min
  19 8 N/A                            #nll_SM
- 19 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 20 0 TChiWH                         #txname 
+ 20 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  20 1 8.498E-02                      #r value
  20 2 N/A                            #expected r value
  20 3 0.00                           #condition violation
@@ -231,9 +212,8 @@ BLOCK SModelS_Exclusion
  20 6 N/A                            #nll
  20 7 N/A                            #nll_min
  20 8 N/A                            #nll_SM
- 20 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 21 0 TChiWH                         #txname 
+ 21 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  21 1 8.440E-02                      #r value
  21 2 N/A                            #expected r value
  21 3 0.00                           #condition violation
@@ -242,9 +222,8 @@ BLOCK SModelS_Exclusion
  21 6 N/A                            #nll
  21 7 N/A                            #nll_min
  21 8 N/A                            #nll_SM
- 21 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 22 0 TChiWW                         #txname 
+ 22 0 TChiWW                         #txname (final states = (PV > N1,W+,N1~,W-))
  22 1 8.431E-02                      #r value
  22 2 1.022E-01                      #expected r value
  22 3 0.00                           #condition violation
@@ -253,9 +232,8 @@ BLOCK SModelS_Exclusion
  22 6 3.8717E+00                     #nll
  22 7 3.8329E+00                     #nll_min
  22 8 3.9668E+00                     #nll_SM
- 22 9 (PV > N1,W+,N1~,W-)            #final states 
 
- 23 0 TChiWH                         #txname 
+ 23 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  23 1 8.326E-02                      #r value
  23 2 6.136E-02                      #expected r value
  23 3 0.00                           #condition violation
@@ -264,9 +242,8 @@ BLOCK SModelS_Exclusion
  23 6 N/A                            #nll
  23 7 N/A                            #nll_min
  23 8 N/A                            #nll_SM
- 23 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 24 0 TChiWZ                         #txname 
+ 24 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  24 1 7.902E-02                      #r value
  24 2 8.775E-02                      #expected r value
  24 3 0.00                           #condition violation
@@ -275,9 +252,8 @@ BLOCK SModelS_Exclusion
  24 6 5.4859E+00                     #nll
  24 7 5.4149E+00                     #nll_min
  24 8 5.5843E+00                     #nll_SM
- 24 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 25 0 T6WW                           #txname 
+ 25 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q))
  25 1 7.714E-02                      #r value
  25 2 N/A                            #expected r value
  25 3 0.00                           #condition violation
@@ -286,9 +262,8 @@ BLOCK SModelS_Exclusion
  25 6 N/A                            #nll
  25 7 N/A                            #nll_min
  25 8 N/A                            #nll_SM
- 25 9 (PV > N1,W+,q,N1,W+,q)         #final states 
 
- 26 0 TChiWZ                         #txname 
+ 26 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  26 1 7.639E-02                      #r value
  26 2 6.160E-02                      #expected r value
  26 3 0.00                           #condition violation
@@ -297,9 +272,8 @@ BLOCK SModelS_Exclusion
  26 6 2.0575E+00                     #nll
  26 7 1.8847E+00                     #nll_min
  26 8 1.8847E+00                     #nll_SM
- 26 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 27 0 TChiWZ                         #txname 
+ 27 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  27 1 7.396E-02                      #r value
  27 2 5.325E-02                      #expected r value
  27 3 0.00                           #condition violation
@@ -308,9 +282,8 @@ BLOCK SModelS_Exclusion
  27 6 2.3448E+00                     #nll
  27 7 2.2192E+00                     #nll_min
  27 8 2.2192E+00                     #nll_SM
- 27 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 28 0 TChiWZ                         #txname 
+ 28 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  28 1 6.823E-02                      #r value
  28 2 N/A                            #expected r value
  28 3 0.00                           #condition violation
@@ -319,9 +292,8 @@ BLOCK SModelS_Exclusion
  28 6 N/A                            #nll
  28 7 N/A                            #nll_min
  28 8 N/A                            #nll_SM
- 28 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 29 0 TChiWZ                         #txname 
+ 29 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  29 1 6.709E-02                      #r value
  29 2 5.902E-02                      #expected r value
  29 3 0.00                           #condition violation
@@ -330,9 +302,8 @@ BLOCK SModelS_Exclusion
  29 6 3.2323E+00                     #nll
  29 7 3.1431E+00                     #nll_min
  29 8 3.1431E+00                     #nll_SM
- 29 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 30 0 TChiWZ                         #txname 
+ 30 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  30 1 6.631E-02                      #r value
  30 2 1.020E-01                      #expected r value
  30 3 0.00                           #condition violation
@@ -341,9 +312,8 @@ BLOCK SModelS_Exclusion
  30 6 N/A                            #nll
  30 7 N/A                            #nll_min
  30 8 N/A                            #nll_SM
- 30 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 31 0 TChiWZ                         #txname 
+ 31 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  31 1 6.303E-02                      #r value
  31 2 7.307E-02                      #expected r value
  31 3 0.00                           #condition violation
@@ -352,9 +322,8 @@ BLOCK SModelS_Exclusion
  31 6 4.6841E+00                     #nll
  31 7 4.6831E+00                     #nll_min
  31 8 4.7033E+00                     #nll_SM
- 31 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 32 0 TChiWZ                         #txname 
+ 32 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  32 1 5.586E-02                      #r value
  32 2 N/A                            #expected r value
  32 3 0.00                           #condition violation
@@ -363,9 +332,8 @@ BLOCK SModelS_Exclusion
  32 6 N/A                            #nll
  32 7 N/A                            #nll_min
  32 8 N/A                            #nll_SM
- 32 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 33 0 TChiWZ                         #txname 
+ 33 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  33 1 5.332E-02                      #r value
  33 2 5.463E-02                      #expected r value
  33 3 0.00                           #condition violation
@@ -374,9 +342,8 @@ BLOCK SModelS_Exclusion
  33 6 7.5428E+00                     #nll
  33 7 7.5422E+00                     #nll_min
  33 8 7.5430E+00                     #nll_SM
- 33 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 34 0 TChiWW                         #txname 
+ 34 0 TChiWW                         #txname (final states = (PV > N1,W+,N1~,W-))
  34 1 4.586E-02                      #r value
  34 2 4.908E-02                      #expected r value
  34 3 0.00                           #condition violation
@@ -385,9 +352,8 @@ BLOCK SModelS_Exclusion
  34 6 N/A                            #nll
  34 7 N/A                            #nll_min
  34 8 N/A                            #nll_SM
- 34 9 (PV > N1,W+,N1~,W-)            #final states 
 
- 35 0 TChiWZ                         #txname 
+ 35 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  35 1 4.525E-02                      #r value
  35 2 N/A                            #expected r value
  35 3 0.00                           #condition violation
@@ -396,9 +362,8 @@ BLOCK SModelS_Exclusion
  35 6 N/A                            #nll
  35 7 N/A                            #nll_min
  35 8 N/A                            #nll_SM
- 35 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 36 0 TChiWZ                         #txname 
+ 36 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  36 1 3.967E-02                      #r value
  36 2 N/A                            #expected r value
  36 3 0.00                           #condition violation
@@ -407,9 +372,8 @@ BLOCK SModelS_Exclusion
  36 6 N/A                            #nll
  36 7 N/A                            #nll_min
  36 8 N/A                            #nll_SM
- 36 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 37 0 TChiWZ                         #txname 
+ 37 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  37 1 3.494E-02                      #r value
  37 2 4.601E-02                      #expected r value
  37 3 0.00                           #condition violation
@@ -418,9 +382,8 @@ BLOCK SModelS_Exclusion
  37 6 N/A                            #nll
  37 7 N/A                            #nll_min
  37 8 N/A                            #nll_SM
- 37 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 38 0 T6WW                           #txname 
+ 38 0 T6WW                           #txname (final states = (PV > N1,W+,q,N1,W+,q))
  38 1 2.930E-02                      #r value
  38 2 N/A                            #expected r value
  38 3 0.00                           #condition violation
@@ -429,9 +392,8 @@ BLOCK SModelS_Exclusion
  38 6 N/A                            #nll
  38 7 N/A                            #nll_min
  38 8 N/A                            #nll_SM
- 38 9 (PV > N1,W+,q,N1,W+,q)         #final states 
 
- 39 0 TChiWZ                         #txname 
+ 39 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  39 1 2.539E-02                      #r value
  39 2 N/A                            #expected r value
  39 3 0.00                           #condition violation
@@ -440,9 +402,8 @@ BLOCK SModelS_Exclusion
  39 6 N/A                            #nll
  39 7 N/A                            #nll_min
  39 8 N/A                            #nll_SM
- 39 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 40 0 TChiWZ                         #txname 
+ 40 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  40 1 1.997E-02                      #r value
  40 2 N/A                            #expected r value
  40 3 0.00                           #condition violation
@@ -451,9 +412,8 @@ BLOCK SModelS_Exclusion
  40 6 N/A                            #nll
  40 7 N/A                            #nll_min
  40 8 N/A                            #nll_SM
- 40 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 41 0 TChiWH                         #txname 
+ 41 0 TChiWH                         #txname (final states = (PV > N1,W+,N1,higgs),...)
  41 1 1.629E-02                      #r value
  41 2 N/A                            #expected r value
  41 3 0.00                           #condition violation
@@ -462,9 +422,8 @@ BLOCK SModelS_Exclusion
  41 6 N/A                            #nll
  41 7 N/A                            #nll_min
  41 8 N/A                            #nll_SM
- 41 9 (PV > N1,W+,N1,higgs),...      #final states 
 
- 42 0 TChiWZ                         #txname 
+ 42 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  42 1 1.470E-02                      #r value
  42 2 1.579E-02                      #expected r value
  42 3 0.00                           #condition violation
@@ -473,9 +432,8 @@ BLOCK SModelS_Exclusion
  42 6 N/A                            #nll
  42 7 N/A                            #nll_min
  42 8 N/A                            #nll_SM
- 42 9 (PV > N1,W+,N1,Z),...          #final states 
 
- 43 0 TChiWZ                         #txname 
+ 43 0 TChiWZ                         #txname (final states = (PV > N1,W+,N1,Z),...)
  43 1 9.551E-03                      #r value
  43 2 N/A                            #expected r value
  43 3 0.00                           #condition violation
@@ -484,7 +442,6 @@ BLOCK SModelS_Exclusion
  43 6 N/A                            #nll
  43 7 N/A                            #nll_min
  43 8 N/A                            #nll_SM
- 43 9 (PV > N1,W+,N1,Z),...          #final states 
 
 BLOCK SModelS_CombinedAnas
  1 1 3.110E+00                      #r value
