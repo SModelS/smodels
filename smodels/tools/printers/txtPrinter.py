@@ -317,12 +317,22 @@ class TxTPrinter(BasicPrinter):
             dataId = theoryPrediction.dataId()
             txnames = [str(txname) for txname in theoryPrediction.txnames]
             txnames = sorted(list(set(txnames)))
+
+            fStates = sorted([str(sms.compressToFinalStates(compressPrimary=True)) 
+                              for sms in theoryPrediction.smsList])
+            fStates = ', '.join(fStates)
+            max_length = 30
+            if len(fStates) > max_length:
+                fStates = fStates[:fStates.find(')')+1]+',...'
+
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
             output += "-------------------Dataset Label = " + \
                 str(dataId).replace("None", "(UL)") + "\n"
             output += "-------------------Txname Labels = " + \
                 str(txnames) + "\n"
+            output += "-------------------Final States = " + \
+                str(fStates) + "\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                 "\n"
 

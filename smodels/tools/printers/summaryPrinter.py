@@ -116,6 +116,15 @@ class SummaryPrinter(TxTPrinter):
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
+
+            fStates = sorted([str(sms.compressToFinalStates(compressPrimary=True)) 
+                              for sms in theoPred.smsList])
+            fStates = ', '.join(fStates)
+            max_length = 30
+            if len(fStates) > max_length:
+                fStates = fStates[:fStates.find(')')+1]+',...'
+            output += " Final States: " + fStates + "\n"
+
             nll = theoPred.likelihood( return_nll = True )
             if nll is not None:
                 nllmin = theoPred.lmax( return_nll = True )

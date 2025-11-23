@@ -11,10 +11,10 @@ import os
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed
 import numpy as np
 import unum
 
@@ -124,6 +124,11 @@ class SLHAPrinter(TxTPrinter):
             txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
+            
+            fStates = sorted([str(sms.compressToFinalStates(compressPrimary=True)) 
+                               for sms in theoPred.smsList])
+            fStatesStr = ', '.join(fStates)
+            
 
             output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
             if r is not None:
@@ -163,6 +168,7 @@ class SLHAPrinter(TxTPrinter):
                     cter)
                 output += " %d 8 N/A                            #nll_SM\n" % (
                     cter)
+            output += " %d 9 %-30s #final states \n" % (cter, fStatesStr)
             output += "\n"
 
         return output

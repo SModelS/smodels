@@ -275,11 +275,16 @@ class PyPrinter(BasicPrinter):
             r = self._round(theoryPrediction.getRValue(evaluationType=False))
             r_expected = self._round(theoryPrediction.getRValue(
                 evaluationType=self.getTypeOfExpected()))
+            
+            fStates = sorted([str(sms.compressToFinalStates(compressPrimary=True)) 
+                              for sms in theoryPrediction.smsList])
+            
 
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
                        'expected upper limit (fb)': self._round(ulExpected),
                        'TxNames': sorted(txnamesDict.keys()),
+                       'Final States': sorted(fStates),
                        'Mass (GeV)': mass,
                        'AnalysisID': expID,
                        'DataSetID': datasetID,
