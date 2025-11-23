@@ -20,6 +20,7 @@ Total Number of SMS: 1
 ---------------Analysis Label = ATLAS-SUSY-2013-02
 -------------------Dataset Label = (UL)
 -------------------Txname Labels = ['T1']
+-------------------Final States = (PV > N1,q,q,N1,q,q)
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 5.72E-01 [pb]
 Theory conditions:  None
@@ -28,6 +29,7 @@ Observed r-value: 15
 ---------------Analysis Label = CMS-SUS-13-012
 -------------------Dataset Label = 6NJet8_1000HT1250_450MHTinf
 -------------------Txname Labels = ['T1']
+-------------------Final States = (PV > N1,q,q,N1,q,q)
 Analysis sqrts: 8.00E+00 [TeV]
 Theory prediction: 1.72E-03 [pb]
 Theory conditions:  None
