@@ -1,3 +1,19 @@
+# --- Check for python3-config --------------------------------------------------
+
+define PYCONFIG_ERROR
+python3-config not found. Please install the Python development package:
+  • Debian/Ubuntu: sudo apt install python3-dev
+  • Fedora/RHEL:  sudo dnf install python3-devel
+  • Arch Linux:   sudo pacman -S python
+  • macOS:        install Python from python.org or brew install python
+endef
+
+PYTHON3_CONFIG := $(shell command -v python3-config 2>/dev/null)
+
+ifeq ($(PYTHON3_CONFIG),)
+$(error $(PYCONFIG_ERROR))
+endif
+
 python_version_full := $(wordlist 2,4,$(subst ., ,$(shell python3 --version 2>&1)))
 python_version_major := $(word 1,${python_version_full})
 python_version_minor := $(word 2,${python_version_full})
