@@ -39,7 +39,7 @@ def fetch():
     path = os.path.join ( url, tarball )
     # URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
     #TARBALL="pythia${VER}_fixed.tgz"
-    r = requests.get ( path, stream=True )
+    r = requests.get ( path, stream=True, verify=False )
     if r.status_code != 200:
         print ( f"[installer.py] could not fetch tarball: {r.reason}." )
         rmTarball()
