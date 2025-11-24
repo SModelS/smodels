@@ -176,8 +176,7 @@ class Pythia8Wrapper(WrapperBase):
         """
         if "force" in slhaFile:
             ## there is a bug in pythia8 <= 8316
-            import re
-            num = int(''.join(re.findall(r'\d+', self.version)))
+            num = int(''.join(ch for ch in self.version if ch.isdigit()))
             if num <= 8316:
                 logger.error ( f"the word 'force' appears in your slha file path {slhaFile}, and you are using pythia8 <= 8316. This triggers a pythia bug, consider upgrading pythia8 or avoid paths with 'force' in its name" )
                 sys.exit()
