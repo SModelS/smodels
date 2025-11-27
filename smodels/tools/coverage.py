@@ -382,22 +382,10 @@ class FinalStateSMS(TheorySMS):
 
     def __str__(self):
         """
-        Defines a slightly simplified version of the SMS string
+        Returns the final state string
         """
 
-        fsStrs = []
-        for d in self.daughterIndices(self.rootIndex):
-            if self.out_degree(d) == 0:
-                daughter = self.indexToNode(d)
-                finalStates = f'({str(daughter)})'
-            else:
-                finalStates = str(tuple(self.daughters(d)[::-1]))
-            fsStrs.append(finalStates.replace(' ',''))
-        smsStr = 'PV > '
-        smsStr += ', '.join(fsStrs)
-
-        return smsStr
-
+        return self.getFinalStateStr()
 
     def oldStr(self):
         """

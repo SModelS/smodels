@@ -50,6 +50,39 @@ class GenericSMS(object):
 
         return self.treeToString()
 
+    def getFinalStateStr(self):
+        """
+        Returns a simplified string representation of the SMS 
+        displaying only  the final states.
+        The final states are grouped according to their primary mother
+        produced in the PV.
+        Example: (PV > X1,X2),(X2 > X3,q,q),(X3 > e+,e-),(X1 > X0,W+)
+        is written as PV > (q,q,e+,e-),(X0,W+).
+        """
+
+        # Since it can be expensive to compute the string, we cache it
+        if hasattr(self,'_finalStateStr') and self._finalStateStr:
+            return self._finalStateStr
+        
+        smsComp = self.compressToFinalStates()
+        smsComp.sort(force=True)
+
+        fsStrs = []
+        for d in smsComp.daughterIndices(smsComp.rootIndex):
+            if smsComp.out_degree(d) == 0:
+                daughter = smsComp.indexToNode(d)
+                finalStates = f'({str(daughter)})'
+            else:
+                finalStates = str(tuple(smsComp.daughters(d)[::-1]))
+            fsStrs.append(finalStates.replace(' ',''))
+        fsStr = 'PV > '
+        fsStr += ','.join(fsStrs)
+        
+        self._finalStateStr = fsStr
+
+        return fsStr
+
+
     def __getattr__(self, attr):
         """
         If the attribute has not been defined for self

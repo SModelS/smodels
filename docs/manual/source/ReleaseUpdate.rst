@@ -49,6 +49,7 @@ New in Version 3.1.0:
   * Small fixes in |database|: ATLAS-SUSY-2018-14 (UL), ATLAS-SUSY-2018-31 (EM), CMS-SUS-20-004 (UL)
     -- results for these analyses may vary with respect to the previous version!
   * Fixed bug preventing the extended output to be printed
+  * Added final states information to output
 
 New in Version 3.0.3.post1:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -115,26 +115,32 @@ class SLHAPrinter(TxTPrinter):
         for iTP, theoPred in enumerate(rList):
             cter = iTP + 1
             expResult = theoPred.expResult
-            txnames = theoPred.txnames
+            txWeightsDict = theoPred.getTxNamesWeights(sort=True)
             signalRegion = theoPred.dataId()
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
             r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
-            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
+            txnameStr = ', '.join([tx.txName for tx in txWeightsDict])
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
             
-            fStates = sorted(list(set([str(sms.compressToFinalStates(compressPrimary=True)) 
-                              for sms in theoPred.smsList])))
-            fStates = ', '.join(fStates)
-            max_length = 30
+            # Get TxNames final states:
+            fStates = []
+            for txname in txWeightsDict:
+                for sms in txname.smsMap:
+                    fs = sms.getFinalStateStr()
+                    if fs not in fStates:
+                        fStates.append(fs)
+
+            max_length = 3
+            fStates_str = ', '.join(fStates[:max_length])
             if len(fStates) > max_length:
-                fStates = fStates[:fStates.find(')')+1]+',...'
+                fStates_str += f',...{len(fStates)-max_length:d} more'
 
 
 
-            output += f" {cter} 0 {txnameStr:<30} #txname (final states = {fStates})\n"
+            output += f" {cter} 0 {txnameStr:<30} #txname (final states = {fStates_str})\n"
             if r is not None:
                 output += f" {cter} 1 {r:<30.3E} #r value\n"
             else:
@@ -212,12 +218,18 @@ class SLHAPrinter(TxTPrinter):
             nllsm = cRes.lsm(return_nll=True)
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
-                if isinstance(lv, (float, np.float64)):
+                if isinstance(lv, (float, np.floating)):
                     lv = f"{lv:1.4E}"
                 else:
                     lv = str(lv)
                 lvals[i] = lv
             nll, nllmin, nllsm = lvals[:]
+
+            # Get sorted txnames
+            txnames = []
+            for tx in obj.getTxNamesWeights(sort=True):
+                if tx.txName not in txnames:
+                    txnames.append(tx.txName)
 
             if r is not None:
                 output += f" {cter} 1 {r:<30.3E} #r value\n"
@@ -231,6 +243,7 @@ class SLHAPrinter(TxTPrinter):
             output += f" {cter} 4 {nllmin:<30} #nll_min\n"
             output += f" {cter} 5 {nllsm:<30} #nll_SM\n"
             output += f" {cter} 6 {expIDs} #IDs of combined analyses\n"
+            output += f" {cter} 7 {', '.join(txnames)} #txnames\n"
             output += "\n"
 
         return output

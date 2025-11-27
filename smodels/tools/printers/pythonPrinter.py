@@ -213,12 +213,16 @@ class PyPrinter(BasicPrinter):
                 ulExpected = ulExpected.asNumber(fb)
 
             value = theoryPrediction.xsection.asNumber(fb)
-            txnamesDict = {}
-            for sms in theoryPrediction.smsList:
-                if sms.txname.txName not in txnamesDict:
-                    txnamesDict[sms.txname.txName] = sms.weight.asNumber(fb)
-                else:
-                    txnamesDict[sms.txname.txName] += sms.weight.asNumber(fb)
+            
+            txWeightsDict = theoryPrediction.getTxNamesWeights(sort=True)
+            # Get TxNames final states:
+            fStates = []
+            for txname in txWeightsDict:
+                for sms in txname.smsMap:
+                    fs = sms.getFinalStateStr()
+                    if fs not in fStates:
+                        fStates.append(fs)
+
             maxconds = theoryPrediction.getmaxCondition()
 
             def _convWidth(x):
@@ -275,16 +279,15 @@ class PyPrinter(BasicPrinter):
             r_expected = self._round(theoryPrediction.getRValue(
                 evaluationType=self.getTypeOfExpected()))
             
-            fStates = sorted(list(set([str(sms.compressToFinalStates(compressPrimary=True)) 
-                              for sms in theoryPrediction.smsList])))
+
             
 
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
                        'expected upper limit (fb)': self._round(ulExpected),
-                       'TxNames': sorted(txnamesDict.keys())}
+                       'TxNames': [tx.txName for tx in txWeightsDict.keys()]}
             if self.outputFormat != 'version2':
-                       resDict['Final States'] = sorted(fStates)
+                       resDict['FinalStates'] = fStates
             resDict.update({'Mass (GeV)': mass,
                        'AnalysisID': expID,
                        'DataSetID': datasetID,
@@ -295,7 +298,8 @@ class PyPrinter(BasicPrinter):
                        'Width (GeV)' : widths})
 
             if hasattr(self, "addtxweights") and self.addtxweights:
-                resDict['TxNames weights (fb)'] = txnamesDict
+                resDict['TxNames weights (fb)'] = {tx.txName : w 
+                                                   for tx,w in txWeightsDict.items()}
             if hasattr(self, "addnodesmap") and self.addnodesmap:
                 resDict['Nodes Map'] = nodesDict
 
@@ -419,11 +423,18 @@ class PyPrinter(BasicPrinter):
         nllmin = self._round(obj.lmax( return_nll = True ))
         nllsm = self._round(obj.lsm( return_nll = True ))
 
+        # Get sorted txnames
+        txnames = []
+        for tx in obj.getTxNamesWeights(sort=True):
+            if tx.txName not in txnames:
+                txnames.append(tx.txName)
+
         resDict = {'AnalysisID': expIDs,
                    'r': r, 'r_expected': r_expected,
                    'nll': nll,
                    'nll_min': nllmin,
-                   'nll_SM': nllsm}
+                   'nll_SM': nllsm,
+                   'Txnames' : txnames}
 
         combRes.append(resDict)
 
