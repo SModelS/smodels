@@ -116,11 +116,7 @@ smodelsOutputDefault={
             'theory prediction (fb)': 0.1561866,
             'upper limit (fb)': 1.205,
             'expected upper limit (fb)': 0.7514,
-            'TxNames': [
-                'T1',
-                'T1tttt',
-                'T2'
-            ],
+        'TxNames' : ['T2', 'T1', 'T1tttt'],
             'Mass (GeV)': None,
             'AnalysisID': 'CMS-SUS-13-012',
             'DataSetID': '3NJet6_1000HT1250_600MHTinf',
@@ -306,6 +302,7 @@ smodelsOutputDefault={
             "nll": 9.26403233033306,
             "nll_min": 8.92496220146949,
             "nll_SM": 9.691610753377516,
+            "Txnames" : ['T2', 'T1', 'T1qqtt', 'T1tttt']
         }
     ],
     'Total xsec for missing topologies (fb)': 3065.78,

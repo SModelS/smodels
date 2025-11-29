@@ -27,8 +27,8 @@ smodelsOutputDefault={
             'upper limit (fb)': 0.7450577,
             'expected upper limit (fb)': 1.17765,
             'TxNames': [
-                'T1tttt',
-                'T2tt'
+                'T2tt',
+                'T1tttt'
             ],
             'Mass (GeV)': None,
             'AnalysisID': 'CMS-SUS-16-050-agg',

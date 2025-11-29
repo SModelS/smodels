@@ -3,6 +3,9 @@
     <CombinedRes_List>
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
+            <Txnames_List>
+                <Txnames>T1bbtt</Txnames>
+            </Txnames_List>
             <nll>3.963032</nll>
             <nll_SM>3.87898</nll_SM>
             <nll_min>3.87898</nll_min>
@@ -15,9 +18,9 @@
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>SRbC3</DataSetID>
-            <Final_States_List>
-                <Final_States>(PV &gt; N1,b,b,N1,t+,t-)</Final_States>
-            </Final_States_List>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (t+,t-,MET),(b,b,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('gluino', 577.0)</Mass_GeV>
                 <Mass_GeV>('N1', 68.1)</Mass_GeV>
@@ -48,15 +51,9 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
-            <Final_States_List>
-                <Final_States>(PV &gt; N1,c,c,N1/N1~,q,c)</Final_States>
-                <Final_States>(PV &gt; N1,c,c,N1/N1~,q,q)</Final_States>
-                <Final_States>(PV &gt; N1,q,q,N1/N1~,q,c)</Final_States>
-                <Final_States>(PV &gt; N1,q,q,N1/N1~,q,q)</Final_States>
-                <Final_States>(PV &gt; N1/N1~,q,q,N1/N1~,q,c)</Final_States>
-                <Final_States>(PV &gt; N1~,q,c,N1,q,c)</Final_States>
-                <Final_States>(PV &gt; N1~,q,q,N1,q,q)</Final_States>
-            </Final_States_List>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (jet,jet,MET),(jet,jet,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('C1+/C1-/N2', 134.99)</Mass_GeV>
                 <Mass_GeV>('C1+/C1-', 134.4)</Mass_GeV>

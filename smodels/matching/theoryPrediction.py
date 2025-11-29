@@ -145,14 +145,14 @@ class TheoryPrediction(object):
 
         txnamesWeightsDict = {}
         for sms in self.smsList:
-            if sms.txname.txName not in txnamesWeightsDict:
+            if sms.txname not in txnamesWeightsDict:
                 txnamesWeightsDict[sms.txname] = sms.weight.asNumber(fb)
             else:
                 txnamesWeightsDict[sms.txname] += sms.weight.asNumber(fb)
         
         if sort:
             txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(), 
-                                        key=lambda x: (x[1],x[0]), reverse=True))
+                                        key=lambda x: (x[1],str(x[0])), reverse=True))
             
         return txnamesWeightsDict
 

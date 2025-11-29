@@ -1966,7 +1966,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 0.4,
         'expected upper limit (fb)' : 0.433,
         'TxNames' : ['T1bbtt'],
-        'Final States' : ['(PV > N1,b,b,N1,t+,t-)'],
+        'FinalStates' : ['PV > (t+,t-,MET),(b,b,MET)'],
         'Mass (GeV)' : [('gluino', 577.0), ('N1', 68.1)],
         'AnalysisID' : 'ATLAS-CONF-2013-037',
         'DataSetID' : 'SRbC3',
@@ -1987,15 +1987,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 23325100.0,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T1'],
-        'Final States' : [
-            '(PV > N1,c,c,N1/N1~,q,c)',
-            '(PV > N1,c,c,N1/N1~,q,q)',
-            '(PV > N1,q,q,N1/N1~,q,c)',
-            '(PV > N1,q,q,N1/N1~,q,q)',
-            '(PV > N1/N1~,q,q,N1/N1~,q,c)',
-            '(PV > N1~,q,c,N1,q,c)',
-            '(PV > N1~,q,q,N1,q,q)'
-        ],
+        'FinalStates' : ['PV > (jet,jet,MET),(jet,jet,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-/N2', 134.99),
             ('C1+/C1-', 134.4),
@@ -2023,7 +2015,8 @@ smodelsOutputDefault = {
         'r_expected' : 0.1009563,
         'nll' : 3.963032,
         'nll_min' : 3.87898,
-        'nll_SM' : 3.87898
+        'nll_SM' : 3.87898,
+        'Txnames' : ['T1bbtt']
     }
 ],
 'Total xsec for missing topologies (fb)' : 5056.816,

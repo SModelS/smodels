@@ -242,8 +242,8 @@ class SLHAPrinter(TxTPrinter):
             output += f" {cter} 3 {nll:<30} #nll\n"
             output += f" {cter} 4 {nllmin:<30} #nll_min\n"
             output += f" {cter} 5 {nllsm:<30} #nll_SM\n"
-            output += f" {cter} 6 {expIDs} #IDs of combined analyses\n"
-            output += f" {cter} 7 {', '.join(txnames)} #txnames\n"
+            output += f" {cter} 6 {expIDs:<30} #IDs of combined analyses\n"
+            output += f" {cter} 7 {','.join(txnames):<30} #txnames\n"
             output += "\n"
 
         return output

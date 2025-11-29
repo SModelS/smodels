@@ -280,12 +280,13 @@ class PyPrinter(BasicPrinter):
                 evaluationType=self.getTypeOfExpected()))
             
 
-            
-
+            # Get unique txnames
+            txnames =  list(dict.fromkeys([tx.txName 
+                                           for tx in txWeightsDict.keys()]))
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
                        'expected upper limit (fb)': self._round(ulExpected),
-                       'TxNames': [tx.txName for tx in txWeightsDict.keys()]}
+                       'TxNames': txnames}
             if self.outputFormat != 'version2':
                        resDict['FinalStates'] = fStates
             resDict.update({'Mass (GeV)': mass,
