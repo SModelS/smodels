@@ -666,10 +666,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.0582,
         'expected upper limit (fb)' : 0.0582,
         'TxNames' : ['T6WW'],
-        'Final States' : [
-            '(PV > N1,W+,q,N1,W+,q)',
-            '(PV > N1~,W-,q,N1,W+,q)'
-        ],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 993.11),
             ('su_L', 991.5),
@@ -704,10 +701,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1.27,
         'expected upper limit (fb)' : 1.07,
         'TxNames' : ['T6WW'],
-        'Final States' : [
-            '(PV > N1,W+,q,N1,W+,q)',
-            '(PV > N1~,W-,q,N1,W+,q)'
-        ],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 993.11),
             ('su_L', 991.5),
@@ -742,10 +736,7 @@ smodelsOutput = {
         'upper limit (fb)' : 53.7511,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
-        'Final States' : [
-            '(PV > N1,W+,q,N1,W+,q)',
-            '(PV > N1~,W-,q,N1,W+,q)'
-        ],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 993.11),
             ('su_L', 991.5),
@@ -777,10 +768,7 @@ smodelsOutput = {
         'upper limit (fb)' : 11.5698,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
-        'Final States' : [
-            '(PV > N1,W+,q,N1,W+,q)',
-            '(PV > N1~,W-,q,N1,W+,q)'
-        ],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 992.72),
             ('su_L', 991.5),
@@ -812,10 +800,7 @@ smodelsOutput = {
         'upper limit (fb)' : 17.1895,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
-        'Final States' : [
-            '(PV > N1,W+,q,N1,W+,q)',
-            '(PV > N1~,W-,q,N1,W+,q)'
-        ],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 992.72),
             ('su_L', 991.5),
@@ -847,7 +832,7 @@ smodelsOutput = {
         'upper limit (fb)' : 554.995,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWW'],
-        'Final States' : ['(PV > N1~,W-,N1,W+)'],
+        'FinalStates' : ['PV > (W,MET),(W,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -875,7 +860,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.0589,
         'expected upper limit (fb)' : 0.0925,
         'TxNames' : ['TChiWW'],
-        'Final States' : ['(PV > N1~,W-,N1,W+)'],
+        'FinalStates' : ['PV > (W,MET),(W,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -906,10 +891,7 @@ smodelsOutput = {
         'upper limit (fb)' : 980.798,
         'expected upper limit (fb)' : 811.908,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-23',
         'DataSetID' : None,
@@ -931,7 +913,7 @@ smodelsOutput = {
         'upper limit (fb)' : 194.632,
         'expected upper limit (fb)' : 243.047,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2019-09',
         'DataSetID' : None,
@@ -953,7 +935,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.0672,
         'expected upper limit (fb)' : 0.1072,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -984,12 +966,10 @@ smodelsOutput = {
         'upper limit (fb)' : 1.43,
         'expected upper limit (fb)' : 0.934,
         'TxNames' : ['T6WW', 'TChiWW', 'TChiWZ'],
-        'Final States' : [
-            '(PV > N1,W+,N1,Z)',
-            '(PV > N1,W+,q,N1,W+,q)',
-            '(PV > N1~,W-,N1,W+)',
-            '(PV > N1~,W-,N1,Z)',
-            '(PV > N1~,W-,q,N1,W+,q)'
+        'FinalStates' : [
+            'PV > (W,jet,MET),(W,jet,MET)',
+            'PV > (W,MET),(W,MET)',
+            'PV > (W,MET),(Z,MET)'
         ],
         'Mass (GeV)' : None,
         'AnalysisID' : 'CMS-SUS-13-012',
@@ -1015,10 +995,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.04949,
         'expected upper limit (fb)' : 0.05109,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [
             ('N2', 268.9),
             ('C1+/C1-', 269.0),
@@ -1049,10 +1026,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1148.34,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2019-08',
         'DataSetID' : None,
@@ -1074,10 +1048,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1572.24,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-17-004',
         'DataSetID' : None,
@@ -1099,10 +1070,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1626.51,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-18-007',
         'DataSetID' : None,
@@ -1124,7 +1092,7 @@ smodelsOutput = {
         'upper limit (fb)' : 367.751,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-17-004',
         'DataSetID' : None,
@@ -1146,10 +1114,7 @@ smodelsOutput = {
         'upper limit (fb)' : 2115.13,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-039',
         'DataSetID' : None,
@@ -1170,13 +1135,11 @@ smodelsOutput = {
         'theory prediction (fb)' : 0.01495825,
         'upper limit (fb)' : 0.1572,
         'expected upper limit (fb)' : 0.1934,
-        'TxNames' : ['TChiWH', 'TChiWW', 'TChiWZ'],
-        'Final States' : [
-            '(PV > N1,W+,N1,Z)',
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1,W+,N1~,W-)',
-            '(PV > N1~,W-,N1,Z)',
-            '(PV > N1~,W-,N1,higgs)'
+        'TxNames' : ['TChiWW', 'TChiWZ', 'TChiWH'],
+        'FinalStates' : [
+            'PV > (W-,MET),(W+,MET)',
+            'PV > (W,MET),(Z,MET)',
+            'PV > (higgs,MET),(W,MET)'
         ],
         'Mass (GeV)' : None,
         'AnalysisID' : 'CMS-SUS-21-002',
@@ -1202,7 +1165,7 @@ smodelsOutput = {
         'upper limit (fb)' : 467.97,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-039',
         'DataSetID' : None,
@@ -1224,10 +1187,7 @@ smodelsOutput = {
         'upper limit (fb)' : 2437.37,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-045',
         'DataSetID' : None,
@@ -1249,10 +1209,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1136.02,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-13-006',
         'DataSetID' : None,
@@ -1274,7 +1231,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.531,
         'expected upper limit (fb)' : 0.438,
         'TxNames' : ['TChiWW'],
-        'Final States' : ['(PV > N1,W+,N1~,W-)'],
+        'FinalStates' : ['PV > (W-,MET),(W+,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -1305,10 +1262,7 @@ smodelsOutput = {
         'upper limit (fb)' : 2487.7,
         'expected upper limit (fb)' : 3375.71,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-21-002',
         'DataSetID' : None,
@@ -1330,7 +1284,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.15899,
         'expected upper limit (fb)' : 0.14317,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1361,7 +1315,7 @@ smodelsOutput = {
         'upper limit (fb)' : 197.645,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
-        'Final States' : ['(PV > N1,W+,q,N1,W+,q)'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [('su_L', 991.5), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-10',
         'DataSetID' : None,
@@ -1383,7 +1337,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.1,
         'expected upper limit (fb)' : 0.124,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1414,7 +1368,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.09,
         'expected upper limit (fb)' : 0.125,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1445,7 +1399,7 @@ smodelsOutput = {
         'upper limit (fb)' : 584.765,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2016-24',
         'DataSetID' : None,
@@ -1467,7 +1421,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.256,
         'expected upper limit (fb)' : 0.291,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1498,7 +1452,7 @@ smodelsOutput = {
         'upper limit (fb)' : 601.75,
         'expected upper limit (fb)' : 391.04,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-06',
         'DataSetID' : None,
@@ -1520,7 +1474,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.107,
         'expected upper limit (fb)' : 0.0923,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1551,7 +1505,7 @@ smodelsOutput = {
         'upper limit (fb)' : 330.645,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2013-12',
         'DataSetID' : None,
@@ -1573,7 +1527,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.954862,
         'expected upper limit (fb)' : 0.931994,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1604,7 +1558,7 @@ smodelsOutput = {
         'upper limit (fb)' : 3152.54,
         'expected upper limit (fb)' : 2945.62,
         'TxNames' : ['TChiWW'],
-        'Final States' : ['(PV > N1,W+,N1~,W-)'],
+        'FinalStates' : ['PV > (W-,MET),(W+,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -1632,7 +1586,7 @@ smodelsOutput = {
         'upper limit (fb)' : 881.725,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-05',
         'DataSetID' : None,
@@ -1654,7 +1608,7 @@ smodelsOutput = {
         'upper limit (fb)' : 465.626,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-13-006',
         'DataSetID' : None,
@@ -1676,7 +1630,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1141.88,
         'expected upper limit (fb)' : 867.141,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-20-001',
         'DataSetID' : None,
@@ -1698,7 +1652,7 @@ smodelsOutput = {
         'upper limit (fb)' : 520.288,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
-        'Final States' : ['(PV > N1,W+,q,N1,W+,q)'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [('su_L', 991.5), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-22',
         'DataSetID' : None,
@@ -1720,7 +1674,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1571.83,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-034',
         'DataSetID' : None,
@@ -1742,7 +1696,7 @@ smodelsOutput = {
         'upper limit (fb)' : 924.951,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2013-11',
         'DataSetID' : None,
@@ -1764,10 +1718,7 @@ smodelsOutput = {
         'upper limit (fb)' : 12712.3,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Final States' : [
-            '(PV > N1,W+,N1,higgs)',
-            '(PV > N1~,W-,N1,higgs)'
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-043',
         'DataSetID' : None,
@@ -1789,7 +1740,7 @@ smodelsOutput = {
         'upper limit (fb)' : 2713.7,
         'expected upper limit (fb)' : 2526.8,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-21-002',
         'DataSetID' : None,
@@ -1811,7 +1762,7 @@ smodelsOutput = {
         'upper limit (fb)' : 4177.63,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Final States' : ['(PV > N1,W+,N1,Z)', '(PV > N1~,W-,N1,Z)'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2017-03',
         'DataSetID' : None,
@@ -1835,7 +1786,8 @@ smodelsOutput = {
         'r_expected' : 3.169283,
         'nll' : 21.04258,
         'nll_min' : 9.236051,
-        'nll_SM' : 9.23609
+        'nll_SM' : 9.23609,
+        'Txnames' : ['T6WW', 'TChiWW', 'TChiWZ']
     }
 ],
 'Total xsec for missing topologies (fb)' : 388.8044,
@@ -1843,61 +1795,61 @@ smodelsOutput = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 96.48054,
-        'SMS' : 'PV > (W,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [25, 26, 27, 28]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 70.17688,
-        'SMS' : 'PV > (jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [8, 9, 10, 11]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 48.96736,
-        'SMS' : 'PV > (W,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [30, 32]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 40.20174,
-        'SMS' : 'PV > (higgs,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [18, 19, 20, 21]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 35.6173,
-        'SMS' : 'PV > (jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (jet,MET),(W,b,t,MET)',
         'SMS IDs' : [12, 13]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.57984,
-        'SMS' : 'PV > (W,jet,MET), (higgs,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(higgs,jet,jet,MET)',
         'SMS IDs' : [24, 29]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.40384,
-        'SMS' : 'PV > (higgs,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [22, 23]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.05211,
-        'SMS' : 'PV > (jet,jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,jet,MET),(W,jet,MET)',
         'SMS IDs' : [14, 15]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 13.04106,
-        'SMS' : 'PV > (W,jet,MET), (b,b,higgs,MET)',
+        'SMS' : 'PV > (W,jet,MET),(b,b,higgs,MET)',
         'SMS IDs' : [31]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 11.82386,
-        'SMS' : 'PV > (jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,MET)',
         'SMS IDs' : [7]
     }
 ],
@@ -1908,61 +1860,61 @@ smodelsOutput = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 96.48054,
-        'SMS' : 'PV > (W,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [25, 26, 27, 28]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 70.17688,
-        'SMS' : 'PV > (jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [8, 9, 10, 11]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 48.96736,
-        'SMS' : 'PV > (W,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [30, 32]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 40.20174,
-        'SMS' : 'PV > (higgs,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [18, 19, 20, 21]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 35.6173,
-        'SMS' : 'PV > (jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (jet,MET),(W,b,t,MET)',
         'SMS IDs' : [12, 13]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.57984,
-        'SMS' : 'PV > (W,jet,MET), (higgs,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(higgs,jet,jet,MET)',
         'SMS IDs' : [24, 29]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.40384,
-        'SMS' : 'PV > (higgs,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [22, 23]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.05211,
-        'SMS' : 'PV > (jet,jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,jet,MET),(W,jet,MET)',
         'SMS IDs' : [14, 15]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 13.04106,
-        'SMS' : 'PV > (W,jet,MET), (b,b,higgs,MET)',
+        'SMS' : 'PV > (W,jet,MET),(b,b,higgs,MET)',
         'SMS IDs' : [31]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 11.82386,
-        'SMS' : 'PV > (jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,MET)',
         'SMS IDs' : [7]
     }
 ],

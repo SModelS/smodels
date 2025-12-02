@@ -5,9 +5,9 @@
             <AnalysisID>ATLAS-SUSY-2018-22</AnalysisID>
             <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
             <DataSetID>SR2j_2200</DataSetID>
-            <Final_States_List>
-                <Final_States>(PV &gt; chi,chi)</Final_States>
-            </Final_States_List>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (MET,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('zp', 2566.0)</Mass_GeV>
                 <Mass_GeV>('chi', 1244.2)</Mass_GeV>
@@ -35,9 +35,9 @@
             <AnalysisID>ATLAS-SUSY-2018-22-multibin</AnalysisID>
             <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
             <DataSetID>(combined)</DataSetID>
-            <Final_States_List>
-                <Final_States>(PV &gt; chi,chi)</Final_States>
-            </Final_States_List>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (MET,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('zp', 2566.0)</Mass_GeV>
                 <Mass_GeV>('chi', 1244.2)</Mass_GeV>

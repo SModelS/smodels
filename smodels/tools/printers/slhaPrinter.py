@@ -115,15 +115,21 @@ class SLHAPrinter(TxTPrinter):
         for iTP, theoPred in enumerate(rList):
             cter = iTP + 1
             expResult = theoPred.expResult
+            # Get sorted txnames
             txWeightsDict = theoPred.getTxNamesWeights(sort=True)
+            txnames = []
+            for tx in txWeightsDict:
+                if tx.txName not in txnames:
+                    txnames.append(tx.txName)
+            txnameStr = ', '.join(txnames)
+            txnameStr = txnameStr.replace("'", "").replace("[", "").replace("]", "")
+
             signalRegion = theoPred.dataId()
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
             r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
-            txnameStr = ', '.join([tx.txName for tx in txWeightsDict])
-            txnameStr = txnameStr.replace(
-                "'", "").replace("[", "").replace("]", "")
+            
             
             # Get TxNames final states:
             fStates = []
