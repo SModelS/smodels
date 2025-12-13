@@ -27,6 +27,8 @@ class RunSModelSTest(unittest.TestCase):
     #  use with super great care!!
 
     def testMultipleFiles(self):
+        ## count the number of crash files before we run this
+        crashfiles_before = set ( glob.glob ( "*.crash" ) )
         out = "./unitTestOutput"
         for i in os.listdir(out):
             if i[-8:] == ".smodels":
@@ -35,10 +37,15 @@ class RunSModelSTest(unittest.TestCase):
         runMain(dirname)
         nout = len([i for i in glob.iglob("unitTestOutput/*smodels") if not "~" in i])
         nin = len([i for i in glob.iglob(f"{dirname}/*slha") if not "~" in i])
-        if nout != nin:
-            logger.error("Number of output files (%d) differ from number of input files (%d)" %
-                         (nout, nin))
-        self.assertEqual(nout, nin)
+        if nout not in [ nin, nin - 1 ]:
+            logger.error( f"Number of output files ({nout}) differ from number of input files ({nin})" )
+        self.assertIn(nout, [ nin, nin - 1 ] )
+        if nout == nin - 1:
+            crashfiles = set ( glob.glob ( "*.crash" ) )
+            ## we should have one crash file more now
+            self.assertTrue ( len(crashfiles) == len(crashfiles_before) + 1 )
+            new_crashfile = ( crashfiles - crashfiles_before ).pop()
+            os.unlink ( new_crashfile )
 
     def testTimeout(self):
         try:
