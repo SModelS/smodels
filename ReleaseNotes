@@ -8,6 +8,7 @@ Release v3.1.1
   * Bumped up pythia8 from 8315 to 8316
   * Fixed bug preventing the extended output to be printed
   * Added final states information to output
+  * Fix for pyslha 3.3.1
 
 
 Release v3.1.0, Thu 07 Aug 2025
