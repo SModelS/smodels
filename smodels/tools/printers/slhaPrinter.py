@@ -11,10 +11,10 @@ import os
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed
 import numpy as np
 import unum
 
@@ -25,7 +25,7 @@ class SLHAPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='file', filename=None, outputFormat='current'):
+    def __init__(self, output='file', filename=None, outputFormat='version3'):
         TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "slha"
         self.docompress = 0
@@ -57,31 +57,31 @@ class SLHAPrinter(TxTPrinter):
         if not smodelsversion.startswith("v"):
             smodelsversion = "v" + smodelsversion
 
-        keysDict = {0: f"{smodelsversion:25} #SModelS version\n",
-                    1: f"{obj.databaseVersion.replace(' ', ''):25} #database version\n",
-                    2: f"{obj.parameters['maxcond']:25} #maximum condition violation\n",
-                    3: f"{self.docompress:25} #compression (0 off, 1 on)\n",
-                    4: f"{obj.parameters['minmassgap']:25} #minimum mass gap for mass compression [GeV]\n",
-                    5: f"{obj.parameters['sigmacut']:25} #sigmacut [fb]\n",
-                    6: f"{self.combinesr:25} #signal region combination (0 off, 1 on)\n",
-                    7: f"{self.combineanas:25} #analyses combination (0 off, 1 on)\n"}
+        keysDict = {0: f"{smodelsversion:<25} #SModelS version\n",
+                    1: f"{obj.databaseVersion.replace(' ', ''):<25} #database version\n",
+                    2: f"{obj.parameters['maxcond']:<25} #maximum condition violation\n",
+                    3: f"{self.docompress:<25} #compression (0 off, 1 on)\n",
+                    4: f"{obj.parameters['minmassgap']:<25} #minimum mass gap for mass compression [GeV]\n",
+                    5: f"{obj.parameters['sigmacut']:<25} #sigmacut [fb]\n",
+                    6: f"{self.combinesr:<25} #signal region combination (0 off, 1 on)\n",
+                    7: f"{self.combineanas:<25} #analyses combination (0 off, 1 on)\n"}
 
         if 'promptwidth' in obj.parameters:
-            keysDict[8] = f"{obj.parameters['promptwidth']:25} #prompt width [GeV] \n"
+            keysDict[8] = f"{obj.parameters['promptwidth']:<25} #prompt width [GeV] \n"
         if 'stablewidth' in obj.parameters:
-            keysDict[9] = f"{obj.parameters['stablewidth']:25} #stable width [GeV] \n"
+            keysDict[9] = f"{obj.parameters['stablewidth']:<25} #stable width [GeV] \n"
         if 'minmassgapisr' in obj.parameters:
-            keysDict[10] = f"{obj.parameters['minmassgapisr']:24} #minimum mass gap for ISR mass compression [GeV]\n"
+            keysDict[10] = f"{obj.parameters['minmassgapisr']:<25} #minimum mass gap for ISR mass compression [GeV]\n"
 
         output = "BLOCK SModelS_Settings\n"
         for key in sorted(list(keysDict.keys())):
-            output += " %i %s" % (key, keysDict[key])
+            output += f" {key:<2d} {keysDict[key]}"
         output += '\n'
 
         # for SLHA output we always want to have SModelS_Exclusion block, if no results we write it here
         if obj.status <= 0:
             output += "BLOCK SModelS_Exclusion\n"
-            output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n\n" % (-1)
+            output += f" 0 0 {-1:<30d} #output status (-1 not tested, 0 not excluded, 1 excluded)\n\n"
 
         return output
 
@@ -94,6 +94,7 @@ class SLHAPrinter(TxTPrinter):
         output = "BLOCK SModelS_Exclusion\n"
         if not obj._theoryPredictions[0]:
             excluded = -1
+            firstResult = None
         else:
             obj.sortTheoryPredictions()
             firstResult = obj._theoryPredictions[0]
@@ -101,8 +102,7 @@ class SLHAPrinter(TxTPrinter):
             excluded = 0
             if r is not None and r > 1:
                 excluded = 1
-        output += " 0 0 %-30s #output status (-1 not tested, 0 not excluded, 1 excluded)\n" % (
-            excluded)
+        output += f" 0 0 {excluded:<30d} #output status (-1 not tested, 0 not excluded, 1 excluded)\n"
         if excluded == -1:
             rList = []
         elif not printAll:
@@ -115,54 +115,67 @@ class SLHAPrinter(TxTPrinter):
         for iTP, theoPred in enumerate(rList):
             cter = iTP + 1
             expResult = theoPred.expResult
-            txnames = theoPred.txnames
+            # Get sorted txnames
+            txWeightsDict = theoPred.getTxNamesWeights(sort=True)
+            txnames = []
+            for tx in txWeightsDict:
+                if tx.txName not in txnames:
+                    txnames.append(tx.txName)
+            txnameStr = ', '.join(txnames)
+            txnameStr = txnameStr.replace("'", "").replace("[", "").replace("]", "")
+
             signalRegion = theoPred.dataId()
             if signalRegion is None:
                 signalRegion = '(UL)'
             r = theoPred.getRValue()
             r_expected = theoPred.getRValue(evaluationType=self.getTypeOfExpected())
-            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
-            txnameStr = txnameStr.replace(
-                "'", "").replace("[", "").replace("]", "")
+            
+            
+            # Get TxNames final states:
+            fStates = []
+            for txname in txWeightsDict:
+                for sms in txname.smsMap:
+                    fs = sms.getFinalStateStr()
+                    if fs not in fStates:
+                        fStates.append(fs)
 
-            output += " %d 0 %-30s #txname \n" % (cter, txnameStr)
+            max_length = 3
+            fStates_str = ', '.join(fStates[:max_length])
+            if len(fStates) > max_length:
+                fStates_str += f',...{len(fStates)-max_length:d} more'
+
+
+
+            output += f" {cter} 0 {txnameStr:<30} #txname (final states = {fStates_str})\n"
             if r is not None:
-                output += " %d 1 %-30.3E #r value\n" % (cter, r)
+                output += f" {cter} 1 {r:<30.3E} #r value\n"
             else:
-                output += " %d 1 NaN                            #r value (failed to compute r-value)\n" % (cter)
+                output += f" {cter} 1 {"NaN":<30} #r value (failed to compute r-value)\n"
             if not r_expected:
-                output += " %d 2 N/A                            #expected r value\n" % (cter) # r_expected could fail or simply not be available
+                output += f" {cter} 2 {"N/A":<30} #expected r value\n"  # r_expected could fail or simply not be available
             else:
-                output += " %d 2 %-30.3E #expected r value\n" % (
-                    cter, r_expected)
-            output += " %d 3 %-30.2f #condition violation\n" % (
-                cter, theoPred.getmaxCondition())
-            output += " %d 4 %-30s #analysis\n" % (cter,
-                                                   expResult.globalInfo.id)
-            output += " %d 5 %-30s #signal region \n" % (
-                cter, signalRegion.replace(" ", "_"))
+                output += f" {cter} 2 {r_expected:<30.3E} #expected r value\n"
+            output += f" {cter} 3 {theoPred.getmaxCondition():<30.2f} #condition violation\n"
+            output += f" {cter} 4 {expResult.globalInfo.id:<30} #analysis\n"
+            output += f" {cter} 5 {signalRegion.replace(" ", "_"):<30} #signal region \n"
             nll = theoPred.likelihood( return_nll  = True )
             if nll is not None:
                 nllmin = theoPred.lmax(return_nll=True)
                 nllsm = theoPred.lsm( return_nll=True )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
-                    if isinstance(lv, (float, np.float64)):
-                        lv = f"{lv:-30.4E}"
+                    if isinstance(lv, (float, np.floating)):
+                        lv = f"{lv:1.4E}"
                     else:
                         lv = str(lv)
                     lvals[i] = lv
                 nll, nllmin, nllsm = lvals[:]
-                output += " %d 6 %s #nll\n" % (cter, nll)
-                output += " %d 7 %s #nll_min\n" % (cter, nllmin)
-                output += " %d 8 %s #nll_SM\n" % (cter, nllsm)
             else:
-                output += " %d 6 N/A                            #nll\n" % (
-                    cter)
-                output += " %d 7 N/A                            #nll_min\n" % (
-                    cter)
-                output += " %d 8 N/A                            #nll_SM\n" % (
-                    cter)
+                nll, nllmin, nllsm = "N/A","N/A","N/A"
+    
+            output += f" {cter} 6 {nll:<30} #nll\n"
+            output += f" {cter} 7 {nllmin:<30} #nll_min\n"
+            output += f" {cter} 8 {nllsm:<30} #nll_SM\n"
             output += "\n"
 
         return output
@@ -174,10 +187,8 @@ class SLHAPrinter(TxTPrinter):
         # Get summary of groups:
         output = "\nBLOCK SModelS_Coverage"
         for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
-            output += "\n %d 0 %-30s      # %s" % (
-                i, group.label, group.description)
-            output += "\n %d 1 %-30.3E      # %s" % (
-                i, group.getTotalXSec(), "Total cross-section (fb)")
+            output += f"\n {i} 0 {group.label:<30}      # {group.description}"
+            output += f"\n {i} 1 {group.getTotalXSec():<30.3E}      # {"Total cross-section (fb)"}"
         output += "\n"
         return output
 
@@ -213,25 +224,32 @@ class SLHAPrinter(TxTPrinter):
             nllsm = cRes.lsm(return_nll=True)
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
-                if isinstance(lv, (float, np.float64)):
-                    lv = f"{lv:-30.4E}"
+                if isinstance(lv, (float, np.floating)):
+                    lv = f"{lv:1.4E}"
                 else:
                     lv = str(lv)
                 lvals[i] = lv
             nll, nllmin, nllsm = lvals[:]
 
+            # Get sorted txnames
+            txnames = []
+            for tx in obj.getTxNamesWeights(sort=True):
+                if tx.txName not in txnames:
+                    txnames.append(tx.txName)
+
             if r is not None:
-                output += " %d 1 %-30.3E #r value\n" % (cter, r)
+                output += f" {cter} 1 {r:<30.3E} #r value\n"
             else:
-                output += " %d 1 NaN                            #r value (failed to compute r-value)\n" % (cter)
+                output += f" {cter} 1 {"NaN":<30} #r value (failed to compute r-value)\n"
             if r_expected is not None:
-                output += " %d 2 %-30.3E #expected r value\n" % (cter, r_expected)
+                output += f" {cter} 2 {r_expected:<30.3E} #expected r value\n"
             else:
-                output += " %d 2 NaN                            #expected r value (failed to compute evaluationType r-value)\n" % (cter)
-            output += " %d 3 %s #nll\n" % (cter, nll)
-            output += " %d 4 %s #nll_min\n" % (cter, nllmin)
-            output += " %d 5 %s #nll_SM\n" % (cter, nllsm)
-            output += " %d 6 %s #IDs of combined analyses\n" % (cter, expIDs)
+                output += f" {cter} 2 {"NaN":<30} #expected r value (failed to compute evaluationType r-value)\n"
+            output += f" {cter} 3 {nll:<30} #nll\n"
+            output += f" {cter} 4 {nllmin:<30} #nll_min\n"
+            output += f" {cter} 5 {nllsm:<30} #nll_SM\n"
+            output += f" {cter} 6 {expIDs:<30} #IDs of combined analyses\n"
+            output += f" {cter} 7 {','.join(txnames):<30} #txnames\n"
             output += "\n"
 
         return output

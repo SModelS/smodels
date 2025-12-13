@@ -24,7 +24,7 @@ class MPrinter(object):
 
         self.name = "master"
         self.Printers = {}
-        self.outputFormat = "current"
+        self.outputFormat = "version3"
 
     def setPrinterOptions(self, parser):
         """

@@ -24,7 +24,7 @@ class SummaryPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
         TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "summary"
         self.printingOrder = [
@@ -81,7 +81,6 @@ class SummaryPrinter(TxTPrinter):
         output += "\n\n"
         for theoPred in theoPredictions:
             expResult = theoPred.expResult
-            txnames = theoPred.txnames
             ul = theoPred.getUpperLimit(evaluationType=False)
             uls = str(ul)
             if isinstance(ul, unum.Unum):
@@ -112,17 +111,36 @@ class SummaryPrinter(TxTPrinter):
             
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
-            txnameStr = str(sorted(list(set([str(tx) for tx in txnames]))))
+            txWeightsDict = theoPred.getTxNamesWeights(sort=True)
+            txnameStr = ', '.join([tx.txName for tx in txWeightsDict])
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
+            
+            # Get TxNames final states:
+            fStates = []
+            for txname in txWeightsDict:
+                for sms in txname.smsMap:
+                    fs = sms.getFinalStateStr()
+                    if fs not in fStates:
+                        fStates.append(fs)
+            
+
+            max_length = 3
+            fStates_str = ', '.join(fStates[:max_length])
+            if len(fStates) > max_length:
+                fStates_str += f',...({len(fStates)-max_length:d} more)'
+
+            if self.outputFormat != 'version2':
+                output += " Final States: " + fStates_str + "\n"
+
             nll = theoPred.likelihood( return_nll = True )
             if nll is not None:
                 nllmin = theoPred.lmax( return_nll = True )
                 nllsm = theoPred.lsm( return_nll = True )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
-                    if isinstance(lv, (float, np.float64)):
+                    if isinstance(lv, (float, np.floating)):
                         lv = f"{lv:10.3E}"
                     else:
                         lv = str(lv)
@@ -173,7 +191,14 @@ class SummaryPrinter(TxTPrinter):
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )
         nllmin = obj.lmax( return_nll = True )
+        # Get sorted txnames
+        txnames = []
+        for tx in obj.getTxNamesWeights(sort=True):
+            if tx.txName not in txnames:
+                txnames.append(tx.txName)
+
         output += f"Combined Analyses: {expIDs}\n"
+        output += f"Txnames: {', '.join(txnames)}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n"
         if r is not None:
             output += f"combined r-value: {r:10.3E}\n"

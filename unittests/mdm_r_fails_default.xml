@@ -5,6 +5,9 @@
             <AnalysisID>ATLAS-SUSY-2018-22</AnalysisID>
             <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
             <DataSetID>SR2j_2200</DataSetID>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (MET,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('zp', 2566.0)</Mass_GeV>
                 <Mass_GeV>('chi', 1244.2)</Mass_GeV>
@@ -32,6 +35,9 @@
             <AnalysisID>ATLAS-SUSY-2018-22-multibin</AnalysisID>
             <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
             <DataSetID>(combined)</DataSetID>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (MET,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('zp', 2566.0)</Mass_GeV>
                 <Mass_GeV>('chi', 1244.2)</Mass_GeV>
@@ -71,7 +77,7 @@
         <promptwidth>1e-11</promptwidth>
         <reportallsrs>False</reportallsrs>
         <sigmacut>0.0</sigmacut>
-        <smodels_version>3.1.0</smodels_version>
+        <smodels_version>3.1.1</smodels_version>
         <stablewidth>1e-25</stablewidth>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>

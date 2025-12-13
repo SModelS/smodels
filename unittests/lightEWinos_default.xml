@@ -3,6 +3,9 @@
     <CombinedRes_List>
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
+            <Txnames_List>
+                <Txnames>T1bbtt</Txnames>
+            </Txnames_List>
             <nll>3.963032</nll>
             <nll_SM>3.87898</nll_SM>
             <nll_min>3.87898</nll_min>
@@ -15,6 +18,9 @@
             <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>SRbC3</DataSetID>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (t+,t-,MET),(b,b,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('gluino', 577.0)</Mass_GeV>
                 <Mass_GeV>('N1', 68.1)</Mass_GeV>
@@ -45,6 +51,9 @@
             <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
             <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
             <DataSetID>None</DataSetID>
+            <FinalStates_List>
+                <FinalStates>PV &gt; (jet,jet,MET),(jet,jet,MET)</FinalStates>
+            </FinalStates_List>
             <Mass_GeV_List>
                 <Mass_GeV>('C1+/C1-/N2', 134.99)</Mass_GeV>
                 <Mass_GeV>('C1+/C1-', 134.4)</Mass_GeV>
@@ -91,7 +100,7 @@
         <promptwidth>1e-11</promptwidth>
         <reportallsrs>False</reportallsrs>
         <sigmacut>10.0</sigmacut>
-        <smodels_version>3.1.0</smodels_version>
+        <smodels_version>3.1.1</smodels_version>
         <stablewidth>1e-25</stablewidth>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>

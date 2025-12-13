@@ -6,6 +6,8 @@ Release v3.1.1
   * added filter for slogdet warnings (relevant on MacOS)
   * Minor fixes in slha printer
   * Bumped up pythia8 from 8315 to 8316
+  * Fixed bug preventing the extended output to be printed
+  * Added final states information to output
 
 
 Release v3.1.0, Thu 07 Aug 2025

@@ -136,6 +136,26 @@ class TheoryPrediction(object):
             values.append(float(value))
         return max(values)
 
+    def getTxNamesWeights(self,sort=True):
+        """
+        Returns a dictionary with the txname objects as keys
+        and their total weights as values. 
+        :param sort: If True, the dictionary is sorted according to the largest weights.
+        """
+
+        txnamesWeightsDict = {}
+        for sms in self.smsList:
+            if sms.txname not in txnamesWeightsDict:
+                txnamesWeightsDict[sms.txname] = sms.weight.asNumber(fb)
+            else:
+                txnamesWeightsDict[sms.txname] += sms.weight.asNumber(fb)
+        
+        if sort:
+            txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(), 
+                                        key=lambda x: (x[1],str(x[0])), reverse=True))
+            
+        return txnamesWeightsDict
+
     @property
     def statsComputer(self):
         if self._statsComputer is None:
@@ -502,6 +522,27 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         """
         conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
         return max(conditions)
+    
+    def getTxNamesWeights(self,sort=True):
+        """
+        Returns a dictionary with the txname objects as keys
+        and their total weights as values. 
+        :param sort: If True, the dictionary is sorted according to the largest weights.
+        """
+
+        txnamesWeightsDict = {}
+        for theoPred in self.theoryPredictions:
+            txW = theoPred.getTxNamesWeights(sort=False)
+            for tx,w in txW.items():
+                if tx not in txnamesWeightsDict:
+                    txnamesWeightsDict[tx] = 0.0
+                txnamesWeightsDict[tx] += w
+        
+        if sort:
+            txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(), 
+                                        key=lambda x: (x[1],x[0]), reverse=True))
+            
+        return txnamesWeightsDict
 
     def setStatsComputer(self):
         """
