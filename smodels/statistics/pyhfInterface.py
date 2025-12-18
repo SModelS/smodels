@@ -949,7 +949,11 @@ class PyhfUpperLimitComputer:
                 lmax = float(lmax[0])
             lmax = self.exponentiateNLL(lmax, not return_nll)
 
-            ret = { "lmax": lmax, "muhat": muhat, "sigma_mu": sigma_mu }
+            ret = { "muhat": muhat, "sigma_mu": sigma_mu }
+            if return_nll:
+                ret["nll_min"] = lmax
+            else:
+                ret["lmax"] = lmax
             return ret
 
     def updateWorkspace(self, workspace_index=None, evaluationType : NllEvalType=observed ):

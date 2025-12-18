@@ -139,7 +139,7 @@ class TheoryPrediction(object):
     def getTxNamesWeights(self,sort=True):
         """
         Returns a dictionary with the txname objects as keys
-        and their total weights as values. 
+        and their total weights as values.
         :param sort: If True, the dictionary is sorted according to the largest weights.
         """
 
@@ -149,11 +149,11 @@ class TheoryPrediction(object):
                 txnamesWeightsDict[sms.txname] = sms.weight.asNumber(fb)
             else:
                 txnamesWeightsDict[sms.txname] += sms.weight.asNumber(fb)
-        
+
         if sort:
-            txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(), 
+            txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(),
                                         key=lambda x: (x[1],str(x[0])), reverse=True))
-            
+
         return txnamesWeightsDict
 
     @property
@@ -299,16 +299,18 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm(self, evaluationType : NllEvalType = observed, return_nll : bool = False ):
+    def lsm( self, evaluationType : NllEvalType = observed,
+             return_nll : bool = False ):
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
         llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["lsm"],return_nll )
+        return self.nllToLikelihood (llhDict["nllsm"],return_nll )
 
     @whenDefined
-    def lmax(self, evaluationType : NllEvalType = observed, return_nll : bool = False ):
+    def lmax( self, evaluationType : NllEvalType = observed,
+              return_nll : bool = False ):
         """likelihood at mu_hat"""
         llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["lmax"],return_nll )
+        return self.nllToLikelihood (llhDict["nll_min"],return_nll )
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -339,8 +341,8 @@ class TheoryPrediction(object):
 
         :param evaluationType: one of: observed, apriori, aposteriori
         """
-        return self.likelihood ( mu=mu, evaluationType=evaluationType, asimov=asimov,
-                                 return_nll=True )
+        return self.likelihood ( mu=mu, evaluationType=evaluationType,
+                                 asimov=asimov, return_nll=True )
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -353,7 +355,8 @@ class TheoryPrediction(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
-        assert asimov in [ None, 0. ], "currently we only need asimov data for 0., no?"
+        assert asimov in [ None, 0. ], \
+               "currently we only need asimov data for 0., no?"
         if "expected" in kwargs:
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
@@ -522,11 +525,11 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         """
         conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
         return max(conditions)
-    
+
     def getTxNamesWeights(self,sort=True):
         """
         Returns a dictionary with the txname objects as keys
-        and their total weights as values. 
+        and their total weights as values.
         :param sort: If True, the dictionary is sorted according to the largest weights.
         """
 
@@ -537,11 +540,11 @@ class TheoryPredictionsCombiner(TheoryPrediction):
                 if tx not in txnamesWeightsDict:
                     txnamesWeightsDict[tx] = 0.0
                 txnamesWeightsDict[tx] += w
-        
+
         if sort:
-            txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(), 
+            txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(),
                                         key=lambda x: (x[1],x[0]), reverse=True))
-            
+
         return txnamesWeightsDict
 
     def setStatsComputer(self):
