@@ -151,7 +151,10 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
     output = '{\n'
     for ik,(key,val) in enumerate(outputDict.items()):
         if isinstance(val,dict):
-            valStr = formatNestedDict(val,ident=ident+4,maxLength=maxLength)
+            if ident > 50:
+                valStr = val
+            else:
+                valStr = formatNestedDict(val,ident=ident+4,maxLength=maxLength)
         elif isinstance(val,list):
             valStr = formatNestedList(val,ident=ident+4,maxLength=maxLength)
         elif isinstance(val,str):
