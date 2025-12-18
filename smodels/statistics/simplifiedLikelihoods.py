@@ -356,7 +356,7 @@ class LikelihoodComputer:
 
     def extendedOutput(self, extended_output, default=None):
         if extended_output:
-            ret = {"muhat": default, "sigma_mu": default, "lmax": default}
+            ret = {"muhat": default, "sigma_mu": default, "nll_min": default}
             return ret
         return default
 
@@ -497,7 +497,11 @@ class LikelihoodComputer:
             sigma_mu = self.getSigmaMu(mu_hat, theta_hat)
             llhd = self.likelihood( mu_hat, nll=nll)
             # print ( f"returning {allowNegativeSignals}: mu_hat {mu_hat}+-{sigma_mu} llhd {llhd}" )
-            ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd}
+            ret = {"muhat": mu_hat, "sigma_mu": sigma_mu }
+            if nll:
+                ret["nll_min"] = llhd
+            else:
+                ret["lmax"] = llhd
             return ret
         return mu_hat
 
@@ -793,13 +797,22 @@ class LikelihoodComputer:
             sigma_mu = self.getSigmaMu ( muhat, theta_hat[0] )
             ret= self.likelihood( return_nll=return_nll, mu = muhat )
             # print ( "sigma_mu", sigma_mu, "old", sigma_mu2 )
-            return { "lmax": ret, "muhat": muhat, "sigma_mu": sigma_mu }
+            ret = { "muhat": muhat, "sigma_mu": sigma_mu }
+            if return_nll:
+                ret["nll_min"] = ret
+            else:
+                ret["lmax"] = ret
+            return ret
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, return_nll=return_nll
         )
         muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
         lmax = self.likelihood ( return_nll=return_nll, mu=muhat_ )
-        ret = { "lmax": lmax, "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
+        ret = { "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
+        if return_nll:
+            ret["nll_min"] = lmax
+        else:
+            ret["lmax"] = lmax
         return ret
 
     def findMuHat(
