@@ -805,7 +805,6 @@ class PyhfUpperLimitComputer:
         '''
 
         n = len(x)
-
         if n<=5:
 
             hessian = np.zeros((n,n))
@@ -821,6 +820,8 @@ class PyhfUpperLimitComputer:
                     par_22 = pyhf.infer.mle.twice_nll(x - eps_i - eps_j, data, model)
 
                     partial_xi_xj = (par_11 - par_12 - par_21 +par_22)/(4*epsilon**2)
+                    if type(partial_xi_xj) in [ np.ndarray, list, np.array ]:
+                        partial_xi_xj = partial_xi_xj[0]
                     hessian[i,j] = partial_xi_xj
                     if i!=j: hessian[j,i] = partial_xi_xj
 
@@ -844,6 +845,8 @@ class PyhfUpperLimitComputer:
         par_22 = pyhf.infer.mle.twice_nll(x - 2*eps_i, data, model)
         hessian = (par_11 - 2*par_12 + par_22)/(4*epsilon**2)
 
+        if type(hessian) in [ np.ndarray, list, np.array ]:
+            hessian = hessian[0]
         #return the inverse hessian at the poi
         return 1.0/hessian
 
