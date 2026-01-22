@@ -150,9 +150,9 @@ class SLHAPrinter(TxTPrinter):
             if r is not None:
                 output += f" {cter} 1 {r:<30.3E} #r value\n"
             else:
-                output += f" {cter} 1 {"NaN":<30} #r value (failed to compute r-value)\n"
+                output += f" {cter} 1 {'NaN':<30} #r value (failed to compute r-value)\n"
             if not r_expected:
-                output += f" {cter} 2 {"N/A":<30} #expected r value\n"  # r_expected could fail or simply not be available
+                output += f" {cter} 2 {'N/A':<30} #expected r value\n"  # r_expected could fail or simply not be available
             else:
                 output += f" {cter} 2 {r_expected:<30.3E} #expected r value\n"
             output += f" {cter} 3 {theoPred.getmaxCondition():<30.2f} #condition violation\n"
