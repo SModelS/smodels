@@ -240,11 +240,11 @@ class SLHAPrinter(TxTPrinter):
             if r is not None:
                 output += f" {cter} 1 {r:<30.3E} #r value\n"
             else:
-                output += f" {cter} 1 {"NaN":<30} #r value (failed to compute r-value)\n"
+                output += f" {cter} 1 {'NaN':<30} #r value (failed to compute r-value)\n"
             if r_expected is not None:
                 output += f" {cter} 2 {r_expected:<30.3E} #expected r value\n"
             else:
-                output += f" {cter} 2 {"NaN":<30} #expected r value (failed to compute evaluationType r-value)\n"
+                output += f" {cter} 2 {'NaN':<30} #expected r value (failed to compute evaluationType r-value)\n"
             output += f" {cter} 3 {nll:<30} #nll\n"
             output += f" {cter} 4 {nllmin:<30} #nll_min\n"
             output += f" {cter} 5 {nllsm:<30} #nll_SM\n"
