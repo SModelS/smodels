@@ -157,7 +157,7 @@ class SLHAPrinter(TxTPrinter):
                 output += f" {cter} 2 {r_expected:<30.3E} #expected r value\n"
             output += f" {cter} 3 {theoPred.getmaxCondition():<30.2f} #condition violation\n"
             output += f" {cter} 4 {expResult.globalInfo.id:<30} #analysis\n"
-            output += f" {cter} 5 {signalRegion.replace(" ", "_"):<30} #signal region \n"
+            output += f" {cter} 5 {signalRegion.replace(' ', '_'):<30} #signal region \n"
             nll = theoPred.likelihood( return_nll  = True )
             if nll is not None:
                 nllmin = theoPred.lmax(return_nll=True)
