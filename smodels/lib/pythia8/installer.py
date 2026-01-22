@@ -34,7 +34,7 @@ def fetch():
         else:
             rmTarball()
     import requests
-    url=f"http://pythia.org/download/pythia{ver[:2]}/"
+    url=f"https://pythia.org/download/pythia{ver[:2]}/"
     print ( f"[installer.py] fetching {tarball} from {url}" )
     path = os.path.join ( url, tarball )
     # URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
@@ -43,7 +43,7 @@ def fetch():
     if r.status_code != 200:
         print ( f"[installer.py] could not fetch tarball: {r.reason}." )
         rmTarball()
-        url=f"http://smodels.github.io/downloads/tarballs/"
+        url=f"https://smodels.github.io/downloads/tarballs/"
         print ( f"[installer.py] trying to fetch {tarball} from {url}" )
         path = os.path.join ( url, tarball )
         r = requests.get ( path, stream=True )
