@@ -188,7 +188,7 @@ class SLHAPrinter(TxTPrinter):
         output = "\nBLOCK SModelS_Coverage"
         for i, group in enumerate(sorted(groups, key=lambda g: g.label)):
             output += f"\n {i} 0 {group.label:<30}      # {group.description}"
-            output += f"\n {i} 1 {group.getTotalXSec():<30.3E}      # {"Total cross-section (fb)"}"
+            output += f"\n {i} 1 {group.getTotalXSec():<30.3E}      # Total cross-section (fb)"
         output += "\n"
         return output
 
