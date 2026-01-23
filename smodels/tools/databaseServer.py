@@ -2,10 +2,10 @@
 
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
-from smodels.tools.caching import Cache
 import socket, atexit, time, os, sys, copy
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 import unum
+from typing import Union
 
 unum.Unum.VALUE_FORMAT = "%0.16E"
 
@@ -20,8 +20,9 @@ def shutdownAll ():
     servers[0] = []
 
 class DatabaseServer:
-    def __init__ ( self, dbpath, servername = None, port = None, verbose = "info",
-                   rundir = "./", logfile = "@@rundir@@/dbserver.log" ):
+    def __init__ ( self, dbpath : str, servername : Union[str,None] = None,
+            port : Union[int,None] = None, verbose : str = "info",
+            rundir : str = "./", logfile : str = "@@rundir@@/dbserver.log" ):
         self.rundir = rundir
         logfile = logfile.replace("@@rundir@@",rundir)
         verbose = verbose.lower()
@@ -37,7 +38,7 @@ class DatabaseServer:
             port = 31770
             while self.is_port_in_use ( port ):
                 port += 1
-            self.pprint ( "using first free port %d" % port )
+            self.pprint ( f"using first free port {port}" )
         if servername == None:
             servername = socket.gethostname()
             self.pprint ( f"determined servername as '{servername}'" )
@@ -52,7 +53,7 @@ class DatabaseServer:
             self.pprint ( f"slurm job id is {os.environ['SLURM_JOB_ID']}" )
         self.setStatus ( "ramped" )
 
-    def setStatus ( self, status ):
+    def setStatus ( self, status : str ):
         """ servers have a status file that tells us if they are running """
         statusfile = self.rundir + "/serverstatus.log"
         if status == "down" and os.path.exists ( statusfile ):
@@ -62,15 +63,15 @@ class DatabaseServer:
             f.write ( status + "\n" )
             f.close()
 
-    def is_port_in_use(self, port):
+    def is_port_in_use(self, port : int ) -> bool:
         """ check if port is in use """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex(('localhost', port)) == 0
 
-    def run ( self, nonblocking = False ):
+    def run ( self, nonblocking : bool = False ):
         """ run server
         :param nonblock: run in nonblocking mode (not yet implemented)
-        """ 
+        """
         if nonblocking:
             pid = os.fork()
             if pid == 0:
@@ -81,9 +82,9 @@ class DatabaseServer:
         """ log our stats upon exit """
         self.pprint ( "server stats" )
         self.pprint ( "============" )
-        self.pprint ( "total number of lookups: %d" % self.nlookups )
-        
-    def shutdown ( self, fromwhere = "unknown" ):
+        self.pprint ( f"total number of lookups: {self.nlookups}" )
+
+    def shutdown ( self, fromwhere : str = "unknown" ):
         self.pprint ( f"Received shutdown request from {fromwhere}" )
         self.logServerStats ()
         self.setStatus ( "down" )
@@ -101,7 +102,7 @@ class DatabaseServer:
                 print ( f"[databaseServer] couldnt remove {str(self)}" )
         sys.exit()
 
-    def parseData ( self, data ):
+    def parseData ( self, data : str ):
         """ parse the data packet """
         data=data[2:-1]
         self.log ( f'received "{data}"' )
@@ -117,10 +118,10 @@ class DatabaseServer:
         ret = (str(ret)+" "*32)[:32]
         self.connection.sendall ( bytes(ret,"utf-8") )
 
-    def lookUpResult ( self, data ):
+    def lookUpResult ( self, data : str ) -> str:
         self.nlookups += 1
         if self.nlookups % 20000 == 0:
-            self.pprint ( "looked up %dth result" % self.nlookups )
+            self.pprint ( f"looked up {self.nlookups}th result" )
         tokens = data.split(":")
         anaId = tokens[1]
         dType = ":". join ( tokens[2:-2] )
@@ -128,9 +129,8 @@ class DatabaseServer:
         txname = tokens[-2]
         massv = eval(tokens[-1])
         massvunits = copy.deepcopy ( massv )
-        for ibr,br in enumerate(massv):
-            for iel,el in enumerate(br):
-                    massvunits[ibr][iel]=el*GeV
+        for ien,mass in enumerate(massvunits):
+            massvunits[ien]=mass*GeV
         evaluationType = observed
         if tokens[0] == "exp":
             evaluationType = apriori
@@ -148,14 +148,12 @@ class DatabaseServer:
                 for txn in ds.txnameList:
                     if txn.txName != txname:
                         continue
-                    coords = txn.txnameData.dataToCoordinates ( massv, txn.txnameData._V,
-                             txn.txnameData.delta_x ) 
                     res = None
                     if evaluationType != observed:
                         if txn.txnameDataExp != None:
-                            res = txn.txnameDataExp.getValueForPoint ( coords )
+                            res = txn.txnameDataExp.getValueFor ( massv )
                     else:
-                        res = txn.txnameData.getValueForPoint ( coords )
+                        res = txn.txnameData.getValueFor ( massv )
                     # print ( "now query", massv, anaId, ds.getType(), txname, ":", res )
                     return str(res)
         return "None"
@@ -164,9 +162,13 @@ class DatabaseServer:
         if hasattr ( self, "connection" ):
             self.connection.close()
 
+    def pprintClientAddr ( self ):
+        """ super simple convenience function """
+        return f"{self.client_address[0]}:{self.client_address[1]}"
+
     def listen ( self ):
         try:
-            self.log ( 'connection from', self.client_address )
+            self.log ( f'connection from {self.pprintClientAddr()}' )
 
             # Receive the data in small chunks and retransmit it
             while True:
@@ -174,8 +176,7 @@ class DatabaseServer:
                 if data:
                     self.parseData ( str(data) )
                 else:
-                    self.log ( 'no more data from %s:%s' % \
-                               ( self.client_address[0], self.client_address[1] ) )
+                    self.log ( f'no more data from {self.pprintClientAddr()}' )
                     break
         finally:
             # Clean up the connection
@@ -185,33 +186,30 @@ class DatabaseServer:
         if self.verbose > 35:
             print ( "[databaseServer]", " ".join(map(str,args)) )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseServer-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                asctime = time.strftime("%H:%M:%S")
+                f.write(f"[databaseServer-{asctime}] {' '.join(map(str,args))}\n")
                 f.close()
 
     def pprint ( self, *args ):
         if self.verbose > 25:
             print ( "[databaseServer]", " ".join(map(str,args)) )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseServer-%s] %s\n" % \
-                          ( time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                asctime = time.strftime("%H:%M:%S")
+                f.write(f"[databaseServer-{asctime}] {' '.join(map(str,args))}\n")
                 f.close()
 
     def initialize( self ):
         self.setStatus ( "initialized" )
-        Cache.n_stored = 20000 ## crank up the caching
         self.db = Database ( self.dbpath )
         self.expResults = self.db.expResultList
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_address = ( self.servername, self.port )
-        self.pprint ( 'starting up on %s port %s' % self.server_address )
-        self.pprint ( 'I will be serving database %s at %s' % \
-                      (self.db.databaseVersion, self.dbpath ) )
+        self.pprint ( f'starting up on {self.servername} port {self.port}' )
+        self.pprint ( f'I will be serving database {self.db.databaseVersion} at {self.dbpath}' )
         try:
             self.sock.bind( self.server_address )
         except OSError as e:
-            self.pprint ( "exception %s. is host ''%s'' reachable?" % \
-                          ( e, self.server_address ) )
+            self.pprint ( f"exception {e}: is host '{self.servername}:{self.port}' reachable?" )
             sys.exit(-1)
         # Listen for incoming connections
         self.sock.listen(1)

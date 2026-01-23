@@ -9,7 +9,6 @@
 from __future__ import print_function
 import sys
 import os
-import copy
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
@@ -17,12 +16,9 @@ from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.pythonPrinter import PyPrinter
-import numpy as np
 from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
-import unum
-import time
 
 
 class XmlPrinter(PyPrinter):
@@ -30,7 +26,7 @@ class XmlPrinter(PyPrinter):
     Printer class to handle the printing of one single XML output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
         PyPrinter.__init__(self, output, filename, outputFormat)
         self.name = "xml"
         self.printingOrder = [OutputStatus, TopologyDict,

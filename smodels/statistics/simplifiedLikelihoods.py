@@ -17,10 +17,12 @@ from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from typing import Text, Optional, Union, Tuple
 from smodels.statistics.basicStats import findRoot
+from smodels.tools.caching import roundCache, lru_cache
 
 import numpy as np
 import math
 import copy
+import warnings
 
 try:
     from smodels.base.smodelsLogging import logger
@@ -99,6 +101,7 @@ class Data:
         self.name = name
         self.deltas_rel = deltas_rel
         self._computeABC()
+        self.weight = np.linalg.inv(self.V )
 
     def generateAsimovData ( self, theta_hat : list, mu : float = 0. ):
         """ generate a model with Asimov data out of the current model
@@ -374,9 +377,14 @@ class LikelihoodComputer:
             ret = sum(ret)
         return ret
 
-    def extendedOutput(self, extended_output, default=None):
+    def extendedOutput(self, extended_output : bool,
+            default : Union[None,float] = None, return_nll : bool = False ):
         if extended_output:
-            ret = {"muhat": default, "sigma_mu": default, "lmax": default}
+            ret = { "muhat": default, "sigma_mu": default }
+            if return_nll:
+                ret["nll_min"] = default
+            else:
+                ret["lmax"] = default
             return ret
         return default
 
@@ -434,7 +442,7 @@ class LikelihoodComputer:
 
     #def findMuHat(
     def findMuHatViaBracketing( self, allowNegativeSignals=False,
-        extended_output=False, nll=False ):
+        extended_output=False, return_nll=False ):
         """
         Find the most likely signal strength mu via a brent bracketing technique
         given the relative signal strengths in each dataset (signal region).
@@ -442,7 +450,8 @@ class LikelihoodComputer:
         :param allowNegativeSignals: if true, then also allow for negative values
         :param extended_output: if true, return also sigma_mu, the estimate \
         of the error of mu_hat, and lmax, the likelihood at mu_hat
-        :param nll: if true, return nll instead of lmax in the extended output
+        :param return_nll: if true, return nll instead of lmax in the
+        extended output
 
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if \
         extended output is requested, it returns a dictionary with mu_hat, \
@@ -451,7 +460,7 @@ class LikelihoodComputer:
         """
         model = self.model
         if (model.backgrounds == model.observed).all():
-            return self.extendedOutput(extended_output, 0.0)
+            return self.extendedOutput(extended_output, 0.0, return_nll)
         nsig = model.nsignal
 
         if type(nsig) in [list, ndarray]:
@@ -497,7 +506,7 @@ class LikelihoodComputer:
                 logger.debug(
                     f"did not find a lower value with rootfinder(lower) < 0. Closest: f({closestl})={closestr}"
                 )
-                return self.extendedOutput(extended_output, 0.0)
+                return self.extendedOutput(extended_output, 0.0, return_nll )
             ustarters = [ avgr + 0.2 * abs(avgr), maxr, 0.0, 1.0, 10.0, -1.0 - 0.1,\
                 0.1, 100.0, -100.0, 1000.0, -1000.0, 0.01, -0.01, ]
             closestl, closestr = None, float("inf")
@@ -509,7 +518,7 @@ class LikelihoodComputer:
                     closestl, closestr = upper, upper_v
             if upper_v < 0.0:
                 logger.debug("did not find an upper value with rootfinder(upper) > 0.")
-                return self.extendedOutput(extended_output, 0.0)
+                return self.extendedOutput(extended_output, 0.0, return_nll )
             mu_hat = findRoot(self.dNLLdMu, lower, upper, args=(theta_hat, ), rtol=1e-9 )
             if not allowNegativeSignals and mu_hat < 0.0:
                 mu_hat = 0.0
@@ -518,9 +527,13 @@ class LikelihoodComputer:
 
         if extended_output:
             sigma_mu = self.getSigmaMu(mu_hat, theta_hat)
-            llhd = self.likelihood( mu_hat, nll=nll)
+            llhd = self.likelihood( mu_hat, return_nll=return_nll)
             # print ( f"returning {allowNegativeSignals}: mu_hat {mu_hat}+-{sigma_mu} llhd {llhd}" )
-            ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd}
+            ret = {"muhat": mu_hat, "sigma_mu": sigma_mu }
+            if nll:
+                ret["nll_min"] = llhd
+            else:
+                ret["lmax"] = llhd
             return ret
         return mu_hat
 
@@ -552,7 +565,7 @@ class LikelihoodComputer:
             self.mu. notice, by default it returns nll
 
         :param theta: nuisance parameters
-        :params nll: if True, compute negative log likelihood
+        :param nll: if True, compute negative log likelihood
         """
         model = self.model
         # theta = array ( thetaA )
@@ -742,9 +755,29 @@ class LikelihoodComputer:
         # if not model.isLinear():
         # self.cov_tot = model.V + model.var_s(nsig)
         # self.cov_tot = model.totalCovariance (nsig)
-        self.weight = np.linalg.inv(self.cov_tot)
+        self.weight = model.weight # np.linalg.inv(self.cov_tot)
         # self.coeff = 1.
-        logdet = np.linalg.slogdet(self.cov_tot)
+
+        ## to catch slogdet warnings on Mac, numpy 2.3.2
+        ## added by WW&SK, 14/08/2025
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="divide by zero",   # pattern 1
+                category=RuntimeWarning
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message="invalid value encountered",   # pattern 2
+                category=RuntimeWarning
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message="overflow encountered",   # pattern 3
+                category=RuntimeWarning
+            )
+            logdet = np.linalg.slogdet(self.cov_tot)
+
         self.logcoeff = -model.n / 2 * np.log(2 * np.pi) - 0.5 * logdet[1]
         # self.coeff = (2*np.pi)**(-model.n/2) * np.exp(-.5* logdet[1] )
         # print ( "coeff", self.coeff, "n", model.n, "det", np.linalg.slogdet ( self.cov_tot ) )
@@ -785,7 +818,8 @@ class LikelihoodComputer:
         return ini, -1
 
     def likelihood(self, mu : float, return_nll : bool = False,
-           evaluationType : NllEvalType=observed, asimov : Union[None,float] = None  ):
+           evaluationType : NllEvalType=observed,
+           asimov : Union[None,float] = None  ):
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
@@ -824,15 +858,23 @@ class LikelihoodComputer:
             #sigma_mu2 = np.sqrt(model.observed[0] / model.nsignal[0] + model.covariance[0][0] )
             theta_hat = self.findThetaHat( muhat )
             sigma_mu = self.getSigmaMu ( muhat, theta_hat[0] )
-            ret= self.likelihood( return_nll=return_nll, mu = muhat )
+            lmax = self.likelihood( return_nll=return_nll, mu = muhat )
             # print ( "sigma_mu", sigma_mu, "old", sigma_mu2 )
-            return { "lmax": ret, "muhat": muhat, "sigma_mu": sigma_mu }
+            ret = { "muhat": muhat, "sigma_mu": sigma_mu }
+            if return_nll:
+                ret["nll_min"] = lmax
+            else:
+                ret["lmax"] = lmax
+            return ret
+
+        s_max = "nll_min" if return_nll else "lmax"
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, return_nll=return_nll
         )
-        muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh[s_max]
         lmax = self.likelihood ( return_nll=return_nll, mu=muhat_ )
-        ret = { "lmax": lmax, "muhat": float ( muhat_ ), "sigma_mu": sigma_mu }
+        ret = { "muhat": float ( muhat_ ), "sigma_mu": sigma_mu,
+                s_max : fmh [ s_max ] }
         return ret
 
     def findMuHat(
@@ -898,7 +940,11 @@ class LikelihoodComputer:
             sigma_mu = self.getSigmaMu ( mu_hat, theta_hat )
             llhd = self.likelihood( mu_hat, return_nll=return_nll)
             # sigma_mu = float(np.sqrt(hess[0][0]))
-            ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": llhd }
+            ret = {"muhat": mu_hat, "sigma_mu": sigma_mu }
+            if return_nll:
+                ret["nll_min"] = llhd
+            else:
+                ret["lmax"] = llhd
             return ret
         return mu_hat
 
@@ -972,8 +1018,8 @@ class UpperLimitComputer:
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: one of: observed, apriori, aposteriori
-        :params trylasttime: if True, then dont try extra
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param trylasttime: if True, then dont try extra
         :returns: upper limit on fiducial cross section
         """
         model = self.likelihoodComputer.model
@@ -998,8 +1044,7 @@ class UpperLimitComputer:
         plus mu_hat and sigma_mu
 
         :param model: statistical model
-        :param expected: false: compute observed, true: compute a priori evaluationType, \
-            "posteriori": compute a posteriori expected
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
         :return: mu_hat, sigma_mu, CLs-alpha
         """
@@ -1063,8 +1108,8 @@ class UpperLimitComputer:
         for each signal regio/dataset), by using
         the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :params expected: one of: observed, apriori, aposteriori
-        :params trylasttime: if True, then dont try extra
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param trylasttime: if True, then dont try extra
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
@@ -1091,9 +1136,7 @@ class UpperLimitComputer:
         Compute the exclusion confidence level of the model (1-CLs).
 
         :param model: statistical model
-        :param expected: if false, compute observed,
-                         true: compute a priori evaluationType, "posteriori":
-                         compute a posteriori expected
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
                             CLs-alpha: returns CLs - 0.05 (alpha)

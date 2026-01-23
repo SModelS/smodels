@@ -40,7 +40,7 @@ class FinalStateCompTest(unittest.TestCase):
         # Compress SMS:
         fsSMS = FinalStateSMS(sms,smFinalStates=[lList,tList],bsmFinalStates=[MET],
                               missingX=10*fb)
-        compStr = 'PV > (b,t,q,q,MET), (b,b,b,b,MET)'
+        compStr = 'PV > (b,t,q,q,MET),(b,b,b,b,MET)'
         self.assertEqual(str(fsSMS),compStr)
         self.assertEqual(fsSMS.missingX,10*fb)
 
@@ -51,7 +51,7 @@ class FinalStateCompTest(unittest.TestCase):
         # Compress SMS:
         fsSMS = FinalStateSMS(sms,smFinalStates=[lList,tList],bsmFinalStates=[MET],
                               missingX=1.5*fb)
-        compStr = 'PV > (b,t,l,l,MET), (b,b,b,nu,l,MET)'
+        compStr = 'PV > (b,t,l,l,MET),(b,b,b,nu,l,MET)'
         self.assertEqual(str(fsSMS),compStr)
         self.assertEqual(fsSMS.missingX,1.5*fb)
 

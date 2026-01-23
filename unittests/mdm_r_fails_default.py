@@ -18,9 +18,9 @@ smodelsOutputDefault = {
     'file status' : 1,
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
-    'input file' : './testFiles/slha/2mdm_r_fails.slha',
-    'database version' : '3.0.0',
-    'smodels version' : '3.0.0'
+    'input file' : './testFiles/rfails/mdm_r_fails.slha',
+    'database version' : '3.1.0',
+    'smodels version' : '3.1.1'
 },
 'ExptRes' : [
     {
@@ -29,6 +29,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 0.7769,
         'expected upper limit (fb)' : 0.7927,
         'TxNames' : ['TRV1'],
+        'FinalStates' : ['PV > (MET,MET)'],
         'Mass (GeV)' : [('zp', 2566.0), ('chi', 1244.2)],
         'AnalysisID' : 'ATLAS-SUSY-2018-22',
         'DataSetID' : 'SR2j_2200',
@@ -48,6 +49,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : None,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TRV1'],
+        'FinalStates' : ['PV > (MET,MET)'],
         'Mass (GeV)' : [('zp', 2566.0), ('chi', 1244.2)],
         'AnalysisID' : 'ATLAS-SUSY-2018-22-multibin',
         'DataSetID' : '(combined)',

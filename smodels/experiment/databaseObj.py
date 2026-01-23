@@ -28,6 +28,7 @@ from smodels.base.physicsUnits import TeV
 from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
+from typing import List, Tuple, Union
 import logging
 os.environ["OMP_NUM_THREADS"] = "2"
 
@@ -53,14 +54,14 @@ except ImportError as e:
     import pickle as serializer
 
 
-def _getSHA1(filename):
+def _getSHA1( filename : os.PathLike ) -> str:
     return hashlib.sha1(pathlib.Path(filename).read_bytes()).hexdigest()
 
 # some mechanism to remove lock files if the download got interrupted
 import atexit
 lockfiles = set()
 
-def removeLockFiles( lockfiles ):
+def removeLockFiles( lockfiles : list ):
     """ remove cruft lockfiles """
     for l in lockfiles:
         if os.path.exists ( l ):
@@ -78,9 +79,10 @@ class Database(object):
     Delegates all calls to SubDatabases.
     """
 
-    def __init__(self, base=None, force_load=None,
-                 progressbar=False, subpickle=True,
-                 combinationsmatrix=None):
+    def __init__(self, base : Union[str,None] = None,
+                 force_load : Union[str,None] = None,
+                 progressbar : bool = False, subpickle : bool = True,
+                 combinationsmatrix : Union[dict,None] = None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
@@ -116,7 +118,7 @@ class Database(object):
         self.selectExpResults()
 
     @property
-    def expResultList(self):
+    def expResultList(self) -> List[ExpResult]:
         """
         The combined list of results, compiled from the
         the active results in each subdatabase.
@@ -128,8 +130,8 @@ class Database(object):
             lists = [x.expResultList for x in self.subs]
             return self.mergeLists(lists)
 
-    def mergeLists(self, lists):
-        """ small function, merges lists of ERs """
+    def mergeLists( self, lists : list ) -> list:
+        """ small function, merges lists of expResults """
         D = {}
         for tmp in lists:
             for t in tmp:
@@ -143,8 +145,11 @@ class Database(object):
                     D[anaid] = self.mergeERs(D[anaid], t)
         return list(D.values())
 
-    def mergeERs(self, o1, r2):
-        """ merge the content of exp res r1 and r2 """
+    def mergeERs(self, o1 : ExpResult, r2 : ExpResult ) -> ExpResult:
+        """ merge the content of exp res o1 and r2
+        :param o1: other1, an experimentalResult
+        :param r2: experimental Result 2
+        """
         r1 = copy.deepcopy(o1)
         r1.globalInfo = r2.globalInfo
         dids = [x.getID() for x in o1.datasets]
@@ -164,7 +169,7 @@ class Database(object):
                         r1.datasets[idx].txnameList.append(txn)
         return r1
 
-    def createBinaryFile(self, filename=None):
+    def createBinaryFile(self, filename : Union[None,os.PathLike] = None ):
         """ create a pcl file from all the subs """
         ## make sure we have a model to pickle with the database!
         logger.debug(f" * create {filename}")
@@ -216,7 +221,7 @@ class Database(object):
         idList += "%d datasets, %d txnames.\n" % (datasets, txnames)
         return idList
 
-    def __eq__(self, other):
+    def __eq__(self, other: "Database" ):
         if type(other) != type(self):
             return False
         for x, y in zip(self.subs, other.subs):
@@ -224,9 +229,10 @@ class Database(object):
                 return False
         return True
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def getExpResults(self, analysisIDs : list = ['all'],
+            datasetIDs : list = ['all'], txnames : list = ['all'],
+            dataTypes : list = ['all'], useNonValidated : bool = False,
+            onlyWithExpected : bool = False ):
         """
         Select (filter) the results within the database satisfying the restrictions set by the arguments and returns the corresponding results.
         """
@@ -238,9 +244,10 @@ class Database(object):
 
         return self.expResultList[:]
 
-    def selectExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def selectExpResults(self, analysisIDs : list = ['all'],
+            datasetIDs : list = ['all'], txnames : list =['all'],
+            dataTypes : list = ['all'], useNonValidated : bool = False,
+            onlyWithExpected : bool = False ):
         """
         Selects (filter) the results within the database satisfying the restrictions set by the arguments and updates the centralized SMS dictionary.
 
@@ -284,7 +291,7 @@ class Database(object):
         return r[0]  # FIXME do sth smarter?
 
     @property
-    def databaseVersion(self):
+    def databaseVersion(self) -> str:
         """
         The version of the database, concatenation of the individual versions
 
@@ -344,8 +351,11 @@ class SubDatabase(object):
     SubDatabase object. Holds a list of ExpResult objects.
     """
 
-    def __init__(self, base=None, force_load=None,
-                 progressbar=False, subpickle=True, combinationsmatrix=None):
+    def __init__(self, base : Union[str,None] = None,
+                 force_load : Union[str,None] = None,
+                 progressbar : bool= False,
+                 subpickle : bool= True,
+                 combinationsmatrix : Union[dict,None] = None ):
         """
         :param base: path to the database, or pickle file (string), or http
                      address. If None, "official", or "official_fastlim",
@@ -434,7 +444,7 @@ class SubDatabase(object):
         return True
 
     @property
-    def expResultList(self):
+    def expResultList(self) -> list:
         """
         The list of active results.
         """
@@ -442,7 +452,7 @@ class SubDatabase(object):
         return self._activeResults[:]
 
     @expResultList.setter
-    def expResultList(self,value):
+    def expResultList(self,value : list ):
         """
         If a results list is defined for the database,
         store it in _allExpResults and reset the active list.
@@ -520,7 +530,7 @@ class SubDatabase(object):
             if hasattr(er.globalInfo, "_databaseParticles"):
                 del er.globalInfo._databaseParticles
 
-    def loadBinaryFile(self, lastm_only=False):
+    def loadBinaryFile(self, lastm_only : bool = False) -> "SubDatabase":
         """
         Load a binary database, returning last modified, file count, database.
 
@@ -592,7 +602,7 @@ class SubDatabase(object):
             logger.info("Binary db file does not need an update.")
         return nu
 
-    def needsUpdate(self):
+    def needsUpdate(self) -> bool:
         """ does the binary db file need an update? """
         try:
             self.loadBinaryFile(lastm_only=True)
@@ -602,7 +612,7 @@ class SubDatabase(object):
             # if we encounter a problem, we rebuild the database.
             return True
 
-    def createBinaryFile(self, filename=None):
+    def createBinaryFile(self, filename : Union[None,os.PathLike] = None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         ## make sure we have a model to pickle with the database!
@@ -640,7 +650,7 @@ class SubDatabase(object):
         return self.txt_meta.databaseVersion
 
     @databaseVersion.setter
-    def databaseVersion(self, x):
+    def databaseVersion(self, x : str ):
         self.txt_meta.databaseVersion = x
         self.pcl_meta.databaseVersion = x
 
@@ -666,7 +676,7 @@ class SubDatabase(object):
         """
         return self.txt_meta.pathname
 
-    def lockFile ( self, filename : os.PathLike ):
+    def lockFile ( self, filename : os.PathLike ) -> bool:
         """ lock the file <filename>
         """
         lockfile = os.path.join ( os.path.dirname ( filename ),
@@ -732,8 +742,7 @@ class SubDatabase(object):
             logger.error("Consider supplying a different database path in the ini file (possibly a local one)")
             raise SModelSError()
         if r.status_code != 200:
-            line = "Error %d: could not fetch '%s' from server: '%s'" % \
-                           (r.status_code, path, r.reason)
+            line = f"Error {r.status_code}: could not fetch '{path}' from server: '{r.reason}'"
             logger.error(line)
             raise SModelSError(line)
         ## its new so store the description
@@ -788,7 +797,7 @@ class SubDatabase(object):
         self.force_load = "pcl"
         return ("./", f"{filename}")
 
-    def fetchFromServer(self, path):
+    def fetchFromServer(self, path: str) -> Tuple[str, str]:
         import requests
         import time
         import json
@@ -848,7 +857,7 @@ class SubDatabase(object):
         self.force_load = "pcl"
         return ("./", filename)
 
-    def checkPathName(self, path):
+    def checkPathName(self, path: str) -> Tuple[str, str]:
         """
         checks the path name,
         returns the base directory and the pickle file name.
@@ -1051,9 +1060,10 @@ class SubDatabase(object):
                 self.txt_meta.hasFastLim = True
         return expres
 
-    def setActiveExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def setActiveExpResults(self, analysisIDs: Union[str, List[str]]=['all'],
+            datasetIDs: List[str]=['all'], txnames: Union[str, List[str]]=['all'],
+            dataTypes: List[str]=['all'], useNonValidated: bool=False,
+            onlyWithExpected: bool=False):
         """
         Filter the experimental results and store them in activeResults.
 
@@ -1081,9 +1091,10 @@ class SubDatabase(object):
                                                 dataTypes, useNonValidated,
                                                 onlyWithExpected)
 
-    def getExpResults(self, analysisIDs=['all'], datasetIDs=['all'], txnames=['all'],
-                    dataTypes=['all'], useNonValidated=False,
-                    onlyWithExpected=False):
+    def getExpResults(self, analysisIDs: Union[str, List[str]]=['all'],
+            datasetIDs: List[str]=['all'], txnames: Union[str, List[str]]=['all'],
+            dataTypes: List[str]=['all'], useNonValidated: bool=False,
+            onlyWithExpected: bool=False) -> List[ExpResult]:
         """
         Returns a list of ExpResult objects.
 

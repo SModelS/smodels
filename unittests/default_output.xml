@@ -3,6 +3,12 @@
     <CombinedRes_List>
         <CombinedRes>
             <AnalysisID>ATLAS-CONF-2013-037,CMS-SUS-13-012</AnalysisID>
+            <Txnames_List>
+                <Txnames>T2</Txnames>
+                <Txnames>T1</Txnames>
+                <Txnames>T1qqtt</Txnames>
+                <Txnames>T1tttt</Txnames>
+            </Txnames_List>
             <nll>9.264033</nll>
             <nll_SM>9.691611</nll_SM>
             <nll_min>8.924963</nll_min>
@@ -133,9 +139,9 @@
             <DataSetID>3NJet6_1000HT1250_600MHTinf</DataSetID>
             <Mass_GeV>None</Mass_GeV>
             <TxNames_List>
+                <TxNames>T2</TxNames>
                 <TxNames>T1</TxNames>
                 <TxNames>T1tttt</TxNames>
-                <TxNames>T2</TxNames>
             </TxNames_List>
             <Width_GeV>None</Width_GeV>
             <dataType>efficiencyMap</dataType>
@@ -369,7 +375,7 @@
         <model>share.models.mssm</model>
         <ncpus>-6</ncpus>
         <sigmacut>0.03</sigmacut>
-        <smodels_version>3.0.0</smodels_version>
+        <smodels_version>3.1.1</smodels_version>
         <testcoverage>True</testcoverage>
         <warnings>Input file ok</warnings>
     </OutputStatus>

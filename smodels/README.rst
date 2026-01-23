@@ -21,7 +21,7 @@
 .. |Colab| image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/SModelS/tutorials/blob/main/index.ipynb
 
-|GitHub Project| |PyPI version| |Anaconda version| |CodeFactor| |Colab| |Docs|
+|GitHub Project| |PyPI version| |Anaconda version| |CodeFactor| |Docs|
 
 ==============
 SModelS v3

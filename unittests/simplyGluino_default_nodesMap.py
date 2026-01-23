@@ -21,8 +21,8 @@ smodelsOutputDefault = {
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
     'input file' : './testFiles/slha/simplyGluino.slha',
-    'database version' : 'unittest300-beta',
-    'smodels version' : '3.0.0-beta'
+    'database version' : 'unittest310',
+    'smodels version' : '3.1.1'
 },
 'SMS Decomposition' : [
     {
@@ -50,6 +50,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 167.641,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T1'],
+        'FinalStates' : ['PV > (jet,jet,MET),(jet,jet,MET)'],
         'Mass (GeV)' : [('gluino', 675.0), ('N1', 200.0)],
         'AnalysisID' : 'CMS-PAS-SUS-15-002',
         'DataSetID' : None,
@@ -78,6 +79,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 38.1378,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T1'],
+        'FinalStates' : ['PV > (jet,jet,MET),(jet,jet,MET)'],
         'Mass (GeV)' : [('gluino', 675.0), ('N1', 200.0)],
         'AnalysisID' : 'ATLAS-SUSY-2013-02',
         'DataSetID' : None,
@@ -106,6 +108,7 @@ smodelsOutputDefault = {
         'upper limit (fb)' : 0.3857116,
         'expected upper limit (fb)' : 0.2637784,
         'TxNames' : ['T1'],
+        'FinalStates' : ['PV > (jet,jet,MET),(jet,jet,MET)'],
         'Mass (GeV)' : [('gluino', 675.0), ('N1', 200.0)],
         'AnalysisID' : 'CMS-SUS-13-012',
         'DataSetID' : '6NJet8_1000HT1250_450MHTinf',
@@ -137,9 +140,10 @@ smodelsOutputDefault = {
         'AnalysisID' : 'CMS-SUS-13-012',
         'r' : 4.450234,
         'r_expected' : 6.507382,
-        'nll' : 25.091652322862235,
-        'nll_min' : 2.6471251067851,
-        'nll_SM' : 3.0208989134775686
+        'nll' : 25.09165,
+        'nll_min' : 2.647125,
+        'nll_SM' : 3.020899,
+        'Txnames' : ['T1']
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.0,

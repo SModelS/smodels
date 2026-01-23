@@ -3,8 +3,8 @@
 """
 .. module:: analysesCombinations
    :synopsis: a module with the methods required for computing the likelihood and
-              upper limits for a combination of theory predictions (analyses combination).
-              Mostly used by the TheoryPredictionsCombiner class.
+   upper limits for a combination of theory predictions (analyses combination).
+   Mostly used by the TheoryPredictionsCombiner class.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 .. moduleauthor:: Jamie Yellen <j.yellen.1@research.gla.ac.uk>
@@ -20,7 +20,8 @@ import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
 from smodels.tools.caching import roundCache, lru_cache
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, aposteriori, \
+     NllEvalType
 from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
@@ -52,7 +53,7 @@ class AnaCombLikelihoodComputer(object):
         just a proxy method to ease transition of codes that depend on SModelS.
 
         :param mu: signal strength
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
         return self.likelihood ( mu, evaluationType, return_nll=True, asimov=asimov )
@@ -69,7 +70,7 @@ class AnaCombLikelihoodComputer(object):
         Compute the likelihood at a given mu
 
         :param mu: signal strength
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
@@ -107,7 +108,7 @@ class AnaCombLikelihoodComputer(object):
         """find muhat and lmax.
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if true, return negative log max likelihood instead of lmax
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
                   output is requested, it returns a dictionary with mu_hat, \
@@ -135,12 +136,20 @@ class AnaCombLikelihoodComputer(object):
             if muhat < 0. and not allowNegativeSignals:
                 muhat = 0.
             retllh = self.theoryPredictions[0].likelihood ( muhat, return_nll = return_nll, evaluationType = evaluationType, asimov=asimov )
-            ret = {"muhat": muhat, "sigma_mu": sigma_mu, "lmax": retllh}
+            ret = {"muhat": float(muhat), "sigma_mu": float(sigma_mu) }
+            if return_nll:
+                ret["nll_min"] = retllh
+            else:
+                ret["lmax"] = retllh
             return ret
 
         if len(muhats) == 0:
             logger.error(f"asked to compute muhat for combination, but no individual values")
-            ret = {"muhat": None, "sigma_mu": None, "lmax": None}
+            ret = {"muhat": None, "sigma_mu": None }
+            if return_nll:
+                ret["nll_min"]=None
+            else:
+                ret["lmax"] = None
             return  ret
 
 
@@ -221,7 +230,11 @@ class AnaCombLikelihoodComputer(object):
         retllh = lmax
         if return_nll:
             retllh = nll_
-        ret = {"muhat": mu_hat, "sigma_mu": sigma_mu, "lmax": retllh}       #return nll_ too in the dictionary?
+        ret = {"muhat": float(mu_hat), "sigma_mu": float(sigma_mu) }
+        if return_nll:
+            ret["nll_min"] = retllh
+        else:
+            ret["lmax"]=retllh
         return ret
 
     @lru_cache
@@ -229,7 +242,7 @@ class AnaCombLikelihoodComputer(object):
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :returns: upper limit on signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
@@ -247,7 +260,7 @@ class AnaCombLikelihoodComputer(object):
             for each signal region/dataset), by using
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :returns: upper limit on fiducial cross section
         """
         ul = self.getUpperLimitOnMu(evaluationType=evaluationType,
@@ -266,17 +279,19 @@ class AnaCombLikelihoodComputer(object):
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         """
         fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals)
-        mu_hat, sigma_mu, _ = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        mu_hat, sigma_mu = fmh["muhat"], fmh["sigma_mu"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
-        nll0 = self.likelihood(mu_hat, evaluationType=evaluationType, return_nll=True,asimov=None )
+        nll0 = self.likelihood(mu_hat, evaluationType=evaluationType,
+                               return_nll=True,asimov=None )
         # a posteriori evaluationType is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True, asimov = 0. )
-        _, _, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["lmax"]
+        fmh = self.lmax(evaluationType=evaluationType,
+                        allowNegativeSignals=allowNegativeSignals,
+                        return_nll=True, asimov = 0. )
+        nll0A = fmh["nll_min"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )
         # return 1.
@@ -286,8 +301,10 @@ class AnaCombLikelihoodComputer(object):
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True, evaluationType=evaluationType, asimov = None)
-            nllA = self.likelihood(mu, evaluationType=evaluationType, return_nll=True, asimov = 0. )
+            nll = self.likelihood(mu, return_nll=True,
+                    evaluationType=evaluationType, asimov = None)
+            nllA = self.likelihood(mu, evaluationType=evaluationType,
+                    return_nll=True, asimov = 0. )
 
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
                      return_type=return_type) if nll and nllA is not None else None
@@ -301,14 +318,15 @@ class AnaCombLikelihoodComputer(object):
         Compute the exclusion confidence level of the model
 
         :param mu: compute for the parameter of interest mu
-        :param expected: one of: observed, apriori, aposteriori
+        :param evaluationType: one of: observed, apriori, aposteriori
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
                         CLs-alpha: returns CLs - 0.05 \
                         alpha-CLs: returns 0.05 - CLs \
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
         """
-        assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+        assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
+            f"Unknown return type: {return_type}."
         _, _, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType)
 
         return float(clsRoot(mu, return_type=return_type))
@@ -318,21 +336,25 @@ class AnaCombLikelihoodComputer(object):
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
-        Returns a dictionary with the analysis IDs as keys and the likelihood values as values.
+        Returns a dictionary with the analysis IDs as keys and the
+        likelihood values as values.
 
-        :param muvals: List with values for the signal strenth for which the likelihoods must
-                       be evaluated.
-        :param expected: one of: observed, apriori, aposteriori
-        :param normalize: If True normalizes the likelihood by its integral over muvals.
+        :param muvals: List with values for the signal strenth for which the
+        likelihoods must be evaluated.
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param normalize: If True normalizes the likelihood by its integral
+        over muvals.
         """
 
         llhds = {}
-        llhds['combined'] = np.array([self.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
+        llhds['combined'] = np.array(\
+            [self.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
         tpreds = self.theoryPredictions
         for t in tpreds:
             Id = t.analysisId()
             t.computeStatistics( evaluationType = evaluationType )
-            l = np.array([t.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
+            l = np.array(\
+                [t.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
             llhds[Id]=l
 
         if normalize:

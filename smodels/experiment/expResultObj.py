@@ -14,6 +14,7 @@ from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, cleanWalk
+from typing import Union
 
 try:
     import cPickle as serializer
@@ -27,7 +28,8 @@ class ExpResult(object):
     experimental result (experimental conference note or publication).
     """
 
-    def __init__(self, path=None, databaseParticles=None):
+    def __init__( self, path : Union[None,os.PathLike]=None, 
+                  databaseParticles=None):
         """
         :param path: Path to the experimental result folder, None means
                      transient experimental result
@@ -106,7 +108,7 @@ class ExpResult(object):
         if len(self.datasets) != len(dsOrder):
             raise SModelSExperimentError( f"lengths of datasets and datasetOrder mismatch in {self.globalInfo.id}")
 
-    def writePickle(self, dbVersion):
+    def writePickle(self, dbVersion : str ):
         """ write the pickle file """
 
         meta = metaObj.Meta(self.path, databaseVersion=dbVersion)
@@ -159,7 +161,7 @@ class ExpResult(object):
             label += txnames + ','
         return label[:-1]
 
-    def getDataset(self, dataId):
+    def getDataset(self, dataId : str ) -> datasetObj.DataSet:
         """
         retrieve dataset by dataId
         """
@@ -168,7 +170,7 @@ class ExpResult(object):
                 return dataset
         return None
 
-    def getTxNames(self):
+    def getTxNames(self) -> list:
         """
         Returns a list of all TxName objects appearing in all datasets.
         """
@@ -202,13 +204,13 @@ class ExpResult(object):
         else:
             return None
 
-    def hasCovarianceMatrix(self):
+    def hasCovarianceMatrix(self) -> bool:
         return hasattr(self.globalInfo, "covariance")
 
-    def hasJsonFile(self):
+    def hasJsonFile(self) -> bool:
         return hasattr(self.globalInfo, "jsonFiles")
 
-    def isCombinableWith ( self, other ):
+    def isCombinableWith ( self, other ) -> bool:
         """ can this expResult be safely assumed to be approximately uncorrelated
         with "other"? "Other" is another expResult. Later, "other" should also be
         allowed to be a dataset """
@@ -256,9 +258,9 @@ class ExpResult(object):
 
         :param dataID: dataset ID (string) (only for efficiency-map type results)
         :param alpha: Can be used to change the C.L. value. The default value is 0.05
-                      (= 95% C.L.) (only for  efficiency-map results)
-        :param expected: Compute evaluationType limit, i.e. Nobserved = NexpectedBG
-                         (only for efficiency-map results)
+        (= 95% C.L.) (only for efficiency-map results)
+        :param evaluationType: Compute <evaluationType> limit, e.g. Nobserved = NexpectedBG
+        for a priori (only for efficiency-map results)
         :param txname: TxName object or txname string (only for UL-type results)
         :param sms: SMS object
         :param mass: Mass array
@@ -280,7 +282,7 @@ class ExpResult(object):
             logger.error(f"Dataset ID {dataID} not found in experimental result {self}")
             return None
 
-    def getValuesFor(self, attribute):
+    def getValuesFor(self, attribute : str ):
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
@@ -310,7 +312,7 @@ class ExpResult(object):
 
         return attributes
 
-    def getTxnameWith(self, restrDict={}):
+    def getTxnameWith(self, restrDict : dict = {} ):
         """
         Returns a list of TxName objects satisfying the restrictions.
         The restrictions specified as a dictionary.

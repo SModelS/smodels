@@ -97,3 +97,5 @@ smodels/lib/resummino/resummino-*.zip
 smodels/lib/resummino/lhapdf/
 smodels/lib/resummino/LHAPDF-*/
 smodels/lib/resummino/resummino_install/
+smodels/lib/resummino/LHAPDF-6.5.5.tar.gz
+smodels/lib/resummino/PDF4LHC21_40.tar.gz

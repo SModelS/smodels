@@ -9,6 +9,11 @@
 """
 
 import unum
+# these are just for type hinting
+UnitLength = unum.Unum
+UnitXSec = unum.Unum 
+UnitEnergy = unum.Unum
+UnitTime = unum.Unum
 
 # description see
 # http://home.scarlet.be/be052320/Unum.html
@@ -54,7 +59,11 @@ if __name__ == "__main__":
     Called as script, will print some base.physicsUnits.
 
     """
+    def getXSec() -> SModelSUnit:
+        return 3.0*fb
+
     three = 3.0 * fb
     print(three, "=", three.asUnit(pb))
     seven = 7.0 * TeV
     print(seven, "=", seven.asUnit(GeV))
+    print ( getXSec() )

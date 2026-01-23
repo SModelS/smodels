@@ -3,8 +3,8 @@
 """
 .. module:: ioObjects
    :synopsis: Definitions of input/output parameters which are read from parameter.in.
-    
-.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>    
+
+.. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
@@ -26,17 +26,17 @@ SMpdgs = SMparticleList.pdg
 
 class OutputStatus(object):
     """
-    Object that holds all status information and has a predefined printout.    
+    Object that holds all status information and has a predefined printout.
     """
-    
+
     def __init__( self, status, inputFile, parameters, databaseVersion):
         """
         Initialize output. If one of the checks failed, exit.
-        
+
         :parameter status: status of input file
         :parameter inputFile: input file name
         :parameter parameters: input parameters
-        :parameter databaseVersion: database version (string)        
+        :parameter databaseVersion: database version (string)
         """
 
         try:
@@ -70,18 +70,18 @@ class OutputStatus(object):
     def updateStatus(self, status):
         """
         Update status.
-        
+
         :parameter status: new status flag
-        
+
         """
         self.status = status
 
     def updateSLHAStatus(self, status):
         """
         Update SLHA status.
-        
+
         :parameter status: new SLHA status flag
-        
+
         """
         self.slhastatus = status
         return
@@ -89,9 +89,9 @@ class OutputStatus(object):
     def addWarning(self, warning):
         """
         Append warning to warnings.
-        
+
         :parameter warning: warning to be appended
-        
+
         """
         self.warnings += warning
         return
@@ -113,10 +113,10 @@ class FileStatus(object):
     def checkFile(self, inputFile):
         """
         Run checks on the input file.
-        
-        :parameter inputFile: path to input file   
+
+        :parameter inputFile: path to input file
         """
-        
+
         inputType = runtime.filetype( inputFile )
 
         if inputType == 'lhe':
@@ -127,15 +127,15 @@ class FileStatus(object):
             self.status = self.filestatus.status
         else:
             self.filestatus = None
-            self.status = -5, f'Unknown input type: {inputType}' 
+            self.status = -5, f'Unknown input type: {inputType}'
 
 
 class LheStatus(object):
     """
     Object to check if input lhe file contains errors.
-    
+
     :ivar filename: path to input LHE file
-    
+
     """
 
     def __init__(self, filename):
@@ -171,27 +171,27 @@ class SlhaStatus(object):
     = 1: the check is ok
     = -1: case of a physical problem, e.g. charged LSP,
     = -2: case of formal problems, e.g. no cross sections
-        
+
     """
     def __init__(self, filename,
                  findMissingDecayBlocks=True,
                  findIllegalDecays=False, checkXsec=True):
-        
+
         """
         :parameter filename: path to input SLHA file
         :parameter findMissingDecayBlocks: if True add a warning for missing decay blocks
         :parameter findIllegalDecays: if True check if all decays are kinematically allowed
         :parameter checkXsec: if True check if SLHA file contains cross sections
-        :parameter findLonglived: if True find stable charged particles and displaced vertices        
+        :parameter findLonglived: if True find stable charged particles and displaced vertices
         """
-        
+
         self.filename = filename
         self.slha = self.read()
-        
+
         from smodels.tools.particlesLoader import load
 
         BSMList = load()
-        
+
         if not self.slha:
             self.status = -3, "Could not read input SLHA file"
             return
@@ -214,10 +214,10 @@ class SlhaStatus(object):
     def read(self):
         """
         Get pyslha output object.
-        
+
         """
         try: ret = pyslha.readSLHAFile(self.filename)
-        except (pyslha.ParseError,IOError): 
+        except (pyslha.ParseError,pyslha.AccessError,IOError):
             return None
         if not ret.blocks["MASS"]: return None
         return ret
@@ -262,10 +262,10 @@ class SlhaStatus(object):
     def emptyDecay(self, pid):
         """
         Check if any decay is missing for the particle with pid
-        
+
         :parameter pid: PID number of particle to be checked
         :returns: True if the decay block is missing or if it is empty, None otherwise
-        
+
         """
         if not abs(pid) in self.slha.decays: return True  # consider missing decay block as empty
         if not self.slha.decays[abs(pid)].decays: return True
@@ -275,9 +275,9 @@ class SlhaStatus(object):
     def findMissingDecayBlocks(self, findMissingBlocks):
         """
         For all non-SMpdgs particles listed in mass block, check if decay block is written
-        
+
         :returns: status flag and message
-        
+
         """
         if not findMissingBlocks:
             return 0, "Did not check for missing decay blocks"
@@ -299,10 +299,10 @@ class SlhaStatus(object):
     def findIllegalDecay(self, findIllegal):
         """
         Find decays for which the sum of daughter masses excels the mother mass
-        
+
         :parameter findIllegal: True if check should be run
         :returns: status flag and message
-        
+
         """
         if not findIllegal:
             return 0, "Did not check for illegal decays"
@@ -325,7 +325,7 @@ class SlhaStatus(object):
                         else:
                             smParticle = smParticle[0]
                         mDau += smParticle.mass/GeV
-                    elif ptc in self.slha.blocks["MASS"].keys(): 
+                    elif ptc in self.slha.blocks["MASS"].keys():
                         mDau += abs(self.slha.blocks["MASS"][ptc])
                     else:
                         return -2, f"Unknown PID {str(ptc)} in decay of {str(particle) + '. Add ' + str(ptc) + ' to smodels/particle.py'}"
@@ -334,17 +334,17 @@ class SlhaStatus(object):
                     if not str(particle) in badDecay: badDecay += str(particle) + " "
         if st == 1:
             badDecay = "No illegal decay blocks"
-            
+
         return st, badDecay
 
 
     def hasXsec(self, checkXsec):
         """
         Check if XSECTION table is present in the slha file.
-        
+
         :parameter checkXsec: set True to run the check
         :returns: status flag, message
-        
+
         """
         if not checkXsec:
             return 0, "Did not check for missing XSECTION table"

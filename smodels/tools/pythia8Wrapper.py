@@ -13,11 +13,12 @@ from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.base.physicsUnits import fb, pb, TeV, mb
-from smodels.base.crossSection import getXsecFromLHEFile
+from smodels.base.crossSection import XSectionList, getXsecFromLHEFile
 from smodels import installation
 from smodels.tools.pythia8particles import particles
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import os, sys, io, shutil
+from typing import Union
 
 try:
     import commands as executor  # python2
@@ -30,9 +31,9 @@ class Pythia8Wrapper(WrapperBase):
     """
 
     def __init__(self,
-                 configFile="<install>/smodels/etc/pythia8.cfg",
-                 executablePath="<install>/smodels/lib/pythia8/pythia8.exe",
-                 srcPath="<install>/smodels/lib/pythia8/"):
+                 configFile: str="<install>/smodels/etc/pythia8.cfg",
+                 executablePath: str="<install>/smodels/lib/pythia8/pythia8.exe",
+                 srcPath: str="<install>/smodels/lib/pythia8/"):
         """
         :param configFile: Location of the config file, full path; copy this
                            file and provide tools to change its content and to provide a template
@@ -59,7 +60,7 @@ class Pythia8Wrapper(WrapperBase):
 
         self.unlink()
 
-    def getPythiaVersion( self ):
+    def getPythiaVersion( self ) -> str:
         """obtain the pythia version we wish to use, stored in file 'pythiaversion'"""
         versionfile = f"{self.srcPath}/pythiaversion"
         if not os.path.exists( versionfile ):
@@ -71,7 +72,7 @@ class Pythia8Wrapper(WrapperBase):
             f.close()
         return ver
 
-    def checkFileExists(self, inputFile):
+    def checkFileExists(self, inputFile: str) -> str:
         """
         Check if file exists, raise an IOError if it does not.
 
@@ -94,7 +95,7 @@ class Pythia8Wrapper(WrapperBase):
         ret += f"nevents: {self.nevents}\n"
         return ret
 
-    def unlink(self, unlinkdir=True):
+    def unlink(self, unlinkdir: bool=True):
         """
         Remove temporary files.
 
@@ -147,22 +148,21 @@ class Pythia8Wrapper(WrapperBase):
         exists = os.path.exists ( self.includeFile )
         return exists
 
-    def getXmldoc ( self ):
+    def getXmldoc ( self ) -> Union[None,str]:
         """ get the content of xml.doc """
         xmldoc = self.executablePath.replace( "pythia8.exe", "xml.doc" )
         logger.debug( f"exe path={self.executablePath}" )
-        if not os.path.exists ( xmldoc ):
-            return None
+        toadd = None
         if os.path.exists(xmldoc):
             logger.debug(f"xml.doc found at {xmldoc}.")
             with open(xmldoc) as f:
                 xmlDir = f.read()
                 toadd = os.path.join(os.path.dirname(xmldoc), xmlDir.strip())
-        #if not os.path.exists ( toadd ):
-        #    return None
+
         return toadd
 
-    def run(self, slhaFile, lhefile=None, unlink=True):
+    def run( self, slhaFile: str, lhefile: Union[str,None]=None,
+             unlink: bool=True ) -> XSectionList:
         """
         Run pythia8.
 
@@ -174,6 +174,12 @@ class Pythia8Wrapper(WrapperBase):
         :returns: List of cross sections
 
         """
+        if "force" in slhaFile:
+            ## there is a bug in pythia8 <= 8316
+            num = int(''.join(ch for ch in self.version if ch.isdigit()))
+            if num <= 8316:
+                logger.error ( f"the word 'force' appears in your slha file path {slhaFile}, and you are using pythia8 <= 8316. This triggers a pythia bug, consider upgrading pythia8 or avoid paths with 'force' in its name" )
+                sys.exit()
         if self.maycompile:
             self.checkInstallation( compile = True )
         # Change pythia configuration file, if defined:

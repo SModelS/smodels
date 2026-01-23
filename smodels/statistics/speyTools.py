@@ -471,14 +471,23 @@ class SpeyComputer:
         speyret = self.speyModels[self.model_index].maximize_likelihood ( evaluationType = evaluationType,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
-        ret = { "muhat": float(speyret[0]), "lmax": float(speyret[1]) }
+        ret = { "muhat": float(speyret[0]) }
+        if return_nll:
+            ret["nll_min"] = float(speyret[1])
+        else:
+            ret["lmax"] = float(speyret[1])
         ## not clear if bounds will be hard bounds
         if not allow_negative_signal and speyret[0]< 0.:
-            llhd0 = self.likelihood ( 0., evaluationType = evaluationType, return_nll = return_nll )
-            ret = { "muhat": 0., "lmax": float(llhd0) }
+            llhd0 = float ( self.likelihood ( 0., evaluationType = evaluationType,
+                                              return_nll = return_nll ) )
+            ret = { "muhat": 0. }
+            if return_nll:
+                ret["nll_min"] = llhd0
+            else:
+                ret["lmax"] = llhd0
         return ret
 
-    def sigma_mu ( self, poi_test : float, evaluationType : NllEvalType, 
+    def sigma_mu ( self, poi_test : float, evaluationType : NllEvalType,
                    allow_negative_signal : bool = False ) -> float:
         """ determine sigma at poi_test.
         :param: FIXME allow_negative_signal should not be needed!
@@ -599,11 +608,20 @@ class SpeyAnalysesCombosComputer:
         speyret = self.speyModel.maximize_likelihood ( evaluationType = evaluationType,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
-        ret = { "muhat": float(speyret[0]), "lmax": float(speyret[1]) }
+        ret = { "muhat": float(speyret[0]) }
+        if return_nll:
+            ret["nll_min"] = float(speyret[1])
+        else:
+            ret["lmax"] = float(speyret[1])
         ## not clear if bounds will be hard bounds
         if not allow_negative_signal and speyret[0]< 0.:
-            l0 = self.likelihood ( 0., evaluationType = evaluationType, return_nll = return_nll )
-            ret = { "muhat": 0., "lmax": float(l0) }
+            l0 = float ( self.likelihood ( 0., evaluationType = evaluationType,
+                                           return_nll = return_nll ) )
+            ret = { "muhat": 0. }
+            if return_nll:
+                ret["nll_min"] = l0
+            else:
+                ret["lmax"] = l0
         return ret
 
     def get_five_values ( self, evaluationType : NllEvalType,
@@ -615,41 +633,45 @@ class SpeyAnalysesCombosComputer:
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
             correct, if necessary
         """
-        ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll  )
-        lmax = ret['lmax']
+        ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll )
+        max_s = "nll_min" if return_nll else "lmax"
+        lmax = ret[ max_s ]
 
         lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, return_nll = return_nll )
-        ret["lbsm"] = lbsm
         lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, return_nll = return_nll )
-        ret["lsm"] = lsm
+        if return_nll:
+            ret["nllbsm"] = lbsm
+            ret["nllsm"] = lsm
+        else:
+            ret["lbsm"] = lbsm
+            ret["lsm"] = lsm
         if check_for_maxima:
             if return_nll:
                 if lsm < lmax: ## if return_nll is off, its the other way
                     muhat = ret["muhat"]
                     logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
+                    ret[ max_s ] = lsm
                     ret["muhat"] = 0.0
                 if lbsm < lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
+                    ret[ max_s ] = lbsm
                     ret["muhat"] = 1.0
             else:
                 if lsm > lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
+                    ret[ max_s ] = lsm
                     ret["muhat"] = 0.0
                 if lbsm > lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
+                    ret[ max_s ] = lbsm
                     ret["muhat"] = 1.0
 
-# print ( "five values", ret, [ type(v) for k,v in ret.items() ] )
         return ret
 
-    def sigma_mu ( self, poi_test : float, evaluationType : NllEvalType, 
+    def sigma_mu ( self, poi_test : float, evaluationType : NllEvalType,
                    allow_negative_signal : bool = False ) -> float:
         """ determine sigma at poi_test.
         :param: FIXME allow_negative_signal should not be needed!

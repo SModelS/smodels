@@ -24,7 +24,7 @@ class TxTPrinter(BasicPrinter):
     Printer class to handle the printing of one single text output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='current'):
+    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "log"
         self.printtimespent = False
@@ -126,8 +126,8 @@ class TxTPrinter(BasicPrinter):
                     topoName = vertnumb
                     topoNames_v2[canonName] = topoName
                 except:
-                    logger.info("Could not format SMS using version2, switching to current format.")
-                    self.outputFormat = 'current'
+                    logger.info("Could not format SMS using version2, switching to version3 format.")
+                    self.outputFormat = 'version3'
         
         if self.outputFormat == 'version2':
             topoNames = topoNames_v2
@@ -315,14 +315,29 @@ class TxTPrinter(BasicPrinter):
         for theoryPrediction in obj._theoryPredictions:
             expRes = theoryPrediction.expResult
             dataId = theoryPrediction.dataId()
-            txnames = [str(txname) for txname in theoryPrediction.txnames]
-            txnames = sorted(list(set(txnames)))
+            txWeightsDict = theoryPrediction.getTxNamesWeights(sort=True)
+             # Get TxNames final states:
+            fStates = []
+            for txname in txWeightsDict:
+                for sms in txname.smsMap:
+                    fs = sms.getFinalStateStr()
+                    if fs not in fStates:
+                        fStates.append(fs)
+
+            max_length = 3
+            fStates_str = ', '.join(fStates[:max_length])
+            if len(fStates) > max_length:
+                fStates_str += f',...({len(fStates)-max_length:d} more)'
+
+
             output += "\n"
             output += "---------------Analysis Label = " + expRes.globalInfo.id + "\n"
             output += "-------------------Dataset Label = " + \
                 str(dataId).replace("None", "(UL)") + "\n"
             output += "-------------------Txname Labels = " + \
-                str(txnames) + "\n"
+                ', '.join([tx.txName for tx in txWeightsDict]) + "\n"
+            if self.outputFormat != 'version2':
+                output += f"-------------------Final States = {fStates_str}\n"
             output += "Analysis sqrts: " + str(expRes.globalInfo.sqrts) + \
                 "\n"
 
@@ -475,7 +490,14 @@ class TxTPrinter(BasicPrinter):
         nllsm = obj.lsm( return_nll = True )
         nll = obj.likelihood( return_nll = True )
         nllmin = obj.lmax( return_nll = True )
+        # Get sorted txnames
+        txnames = []
+        for tx in obj.getTxNamesWeights(sort=True):
+            if tx.txName not in txnames:
+                txnames.append(tx.txName)
+
         output += f"Combined Analyses: {expIDs}\n"
+        output += f"Txnames: {', '.join(txnames)}\n"
         output += f"Likelihoods: nll, nll_min, nll_SM = {nll:.3f}, {nllmin:.3f}, {nllsm:.3f}\n" 
         output += f"combined r-value: {r:s}\n"
         output += f"combined r-value (expected): {r_expected:s}"

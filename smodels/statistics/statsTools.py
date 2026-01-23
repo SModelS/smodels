@@ -234,12 +234,12 @@ class StatsComputer:
         # Filtering the json files by looking at the available datasets
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
-            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ): 
+            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ):
                 if not isinstance(region,dict):
                     raise SModelSError("The jsonFiles field should contain lists \
                                        of strings or dictionaries \
                                        (%s is not allowed)" %type(region))
-                
+
                 globalInfo.jsonFiles[jsName][ir] = region
                 if region['type'] == 'SR':
                     jsonSRs.append(region['smodels'])
@@ -281,7 +281,7 @@ class StatsComputer:
             signalUncertainty = globalInfo.signalUncertainty
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty)
+        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty, globalInfo )
         if data.errorFlag:
             return None
         self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
@@ -318,34 +318,41 @@ class StatsComputer:
         ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll  )
         if ret is None:
             return {}
-        lmax = ret['lmax']
+        s_max = "nll_min" if return_nll else "lmax"
+        lmax = ret[ s_max ]
 
-        lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, return_nll = return_nll )
-        ret["lbsm"] = lbsm
-        lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, return_nll = return_nll )
-        ret["lsm"] = lsm
+        lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType,
+                                 return_nll = return_nll )
+        lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType,
+                                return_nll = return_nll )
+        if return_nll:
+            ret["nllbsm"] = lbsm
+            ret["nllsm"] = lsm
+        else:
+            ret["lbsm"] = lbsm
+            ret["lsm"] = lsm
         if check_for_maxima:
             if return_nll:
                 if lsm < lmax: ## if return_nll is off, its the other way
                     muhat = ret["muhat"]
                     logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
+                    ret[ s_max ] = lsm
                     ret["muhat"] = 0.0
                 if lbsm < lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
+                    ret[ s_max ] = lbsm
                     ret["muhat"] = 1.0
             else:
                 if lsm > lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
+                    ret[ s_max ] = lsm
                     ret["muhat"] = 0.0
                 if lbsm > lmax:
                     muhat = ret["muhat"]
                     logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
+                    ret[ s_max ] = lbsm
                     ret["muhat"] = 1.0
 
         return ret

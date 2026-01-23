@@ -9,10 +9,11 @@ BLOCK SModelS_Settings
  7 1                         #analyses combination (0 off, 1 on)
  8 1e-11                     #prompt width [GeV] 
  9 1e-25                     #stable width [GeV] 
+ 10 5.                        #minimum mass gap for ISR mass compression [GeV]
 
 BLOCK SModelS_Exclusion
  0 0 0                              #output status (-1 not tested, 0 not excluded, 1 excluded)
- 1 0 T1bbtt                         #txname 
+ 1 0 T1bbtt                         #txname (final states = PV > (t+,t-,MET),(b,b,MET))
  1 1 1.093E-01                      #r value
  1 2 1.010E-01                      #expected r value
  1 3 0.00                           #condition violation
@@ -22,7 +23,7 @@ BLOCK SModelS_Exclusion
  1 7 3.88E+00                       #nll_min
  1 8 3.88E+00                       #nll_SM
 
- 2 0 T1                             #txname 
+ 2 0 T1                             #txname (final states = PV > (jet,jet,MET),(jet,jet,MET))
  2 1 6.560E-05                      #r value
  2 2 N/A                            #expected r value
  2 3 0.00                           #condition violation
@@ -39,6 +40,7 @@ BLOCK SModelS_CombinedAnas
  1 4 3.88E+00                       #nll_min
  1 5 3.88E+00                       #nll_SM
  1 6 ATLAS-CONF-2013-037 #IDs of combined analyses
+ 1 7 T1bbtt #txnames
 
 
 BLOCK SModelS_Coverage

@@ -5,7 +5,7 @@ from smodels.base.physicsUnits import fb, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
-    def __init__ ( self, servername = None, port = None, verbose = "info", 
+    def __init__ ( self, servername = None, port = None, verbose = "info",
                    rundir = "./", logfile = "@@rundir@@/dbclient.log",
                    clientid = -1 ):
         verbose = verbose.lower()
@@ -25,7 +25,7 @@ class DatabaseClient:
         self.packetlength = 256
         if port == None:
             port = 31770
-            self.pprint ( "using default port %d" % port )
+            self.pprint ( f"using default port {port}" )
         self.port = port
         if servername == None:
             servername = socket.gethostname()
@@ -33,8 +33,7 @@ class DatabaseClient:
         self.servername = servername
         self.maxtries = 25 ## max numbers of trying to connect
         sstatus = self.findServerStatus()
-        self.pprint ( "connecting to %s port %s, rundir is %s. server status is '%s'" % \
-                      ( self.servername, self.port, self.rundir, sstatus ) )
+        self.pprint ( f"connecting to {self.servername} port {self.port}, rundir is {self.rundir}. server status is '{sstatus}'" )
         if "SLURM_JOB_ID" in os.environ:
             self.pprint ( f"slurm job id is {os.environ['SLURM_JOB_ID']}" )
 
@@ -44,14 +43,14 @@ class DatabaseClient:
         self.send ( "shutdown", amount_expected = 0 )
 
     def saveStats ( self ):
-        self.pprint ( "client stats after %d queries" % self.nqueries )
+        self.pprint ( f"client stats after {self.nqueries} queries" )
         self.pprint ( "=================================" )
         self.pprint ( f"number of results in cache: {len(self.cache)}" )
         maxhits=[]
         for i in self.cache.values():
             maxhits.append ( i[1] )
-        self.pprint ( "highest number of hits: %d" % max(maxhits))
-        self.pprint ( "lowest number of hits: %d" % min(maxhits))
+        self.pprint ( f"highest number of hits: {max(maxhits)}" )
+        self.pprint ( f"lowest number of hits: {min(maxhits)}" )
 
     def getWaitingTime ( self ):
         """ compute a waiting time between attempts, from self.ntries """
@@ -96,7 +95,7 @@ class DatabaseClient:
         :param amount_expected: how many return bytes do you expect
         """
         try:
-            message = bytes ( message, "UTF-8" ) 
+            message = bytes ( message, "UTF-8" )
             # Send data
             # msg = b'query obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[500,100],[500,100]]'
             self.log ( f'sending "{message}"' )
@@ -107,11 +106,11 @@ class DatabaseClient:
 
                     # Look for the response
                     amount_received = 0
-                    
+
                     self.log ( 'sent message' )
                     if amount_expected <= 0:
                         return
-                    
+
                     while amount_received < amount_expected:
                         data = self.sock.recv( self.packetlength )
                         amount_received += len(data)
@@ -125,12 +124,11 @@ class DatabaseClient:
                 except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                     dt = self.getWaitingTime()
                     self.ntries += 1
-                    self.log ( 'could not connect to %s. trying again in %d seconds' % \
-                               ( self.nameAndPort(), dt ) )
+                    self.log ( f'could not connect to {self.nameAndPort()}. trying again in {dt} seconds' )
                     time.sleep ( dt )
             self.pprint ( f"could not connect in send, after trying {self.ntries} times. aborting" )
             raise SModelSError ( f"Could not connect to database in send, tried {self.ntries} times" )
-            
+
         finally:
             self.log ( 'closing socket' )
             self.sock.close()
@@ -159,23 +157,26 @@ class DatabaseClient:
     def log ( self, *args ):
         if type(self.verbose)==str or self.verbose > 35:
             self.setDefaults()
-            print ( "[databaseClient%d] %s" % ( self.clientid, " ".join(map(str,args)) ) )
+            s_args = ' '.join(map(str,args))
+            print ( f"[databaseClient{self.clientid}] {s_args}" )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseClient%d-%s] %s\n" % \
-                     ( self.clientid, time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                asctime = time.strftime("%H:%M:%S")
+                f.write ( f"[databaseClient{self.clientid}-{asctime}] {s_args}\n" )
                 f.close()
 
     def pprint ( self, *args ):
         if type(self.verbose)==str or self.verbose > 25:
             self.setDefaults()
-            print ( "[databaseClient%d] %s" % ( self.clientid, " ".join(map(str,args)) ) )
+            s_args = ' '.join(map(str,args))
+            print ( f"[databaseClient{self.clientid}] {s_args}" )
+            print ( f"[databaseClient{self.clientid}] {s_args}" )
             with open ( self.logfile, "at" ) as f:
-                f.write ( "[databaseClient%d-%s] %s\n" % \
-                      ( self.clientid, time.strftime("%H:%M:%S"), " ".join(map(str,args)) ) )
+                asctime = time.strftime("%H:%M:%S")
+                f.write ( f"[databaseClient{self.clientid}-{asctime}] {s_args}\n" )
                 f.close()
 
     def nameAndPort ( self ):
-        return "%s:%d" % ( self.servername, self.port )
+        return f"{self.servername}:{self.port}"
 
     def initialize( self ):
         if hasattr ( self, "sock" ):
@@ -196,11 +197,10 @@ class DatabaseClient:
             except (socket.timeout,OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
                 dt = self.getWaitingTime()
                 self.ntries += 1
-                self.log ( 'could not connect to %s after %d times. trying again in %d seconds' % \
-                           ( self.nameAndPort(), self.ntries, dt ) )
+                self.log ( f'could not connect to {self.nameAndPort()} after {self.ntries} times. trying again in {dt} seconds' )
                 time.sleep ( dt )
         self.pprint ( f'could not connect to database in initialize, after trying {self.ntries} times. aborting' )
-        raise SModelSError ( "Could not connect to database in initialize, tried %d times" % self.ntries )
+        raise SModelSError ( f"Could not connect to database in initialize, tried {self.ntries} times" )
 
 
 def stresstest( args ):
@@ -208,19 +208,18 @@ def stresstest( args ):
     verbosity, servername, port = "error", args[0], args[1]
     nr = args[2]
     client = DatabaseClient ( servername, port, verbose = verbosity,
-                              logfile="@@rundir@@/dbclient%d.log" % nr,
+                              logfile=f"@@rundir@@/dbclient{nr}.log",
                               clientid = nr )
     mmother = random.uniform ( 200, 900 )
     mlsp = random.uniform ( 0, mmother )
     for i in range(1000):
         if random.uniform(0,1)>.9:
             mmother = random.uniform ( 200, 900 )
-            mlsp = random.uniform ( 0, mmother )
-        msg = "obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[%.2f,%.2f],[%.2f,%.2f]]" % \
-               ( mmother, mlsp, mmother, mlsp )
-        # print ( "client #%d" % pid )
+            mlsp = random.uniform ( 0, mmother/2. )
+        #msg = f"obs:ATLAS-SUSY-2017-01:SRHad-Low:TChiWH:[[{mmother:.2f},{mlsp:.2f}],[{mmother:.2f},{mlsp:.2f}]]"
+        msg = f"obs:ATLAS-SUSY-2019-08:SR_HM_Med_MCT:TChiWH:[{mmother:.2f},{mlsp:.2f},{mmother:.2f},{mlsp:.2f}]"
         client.query ( msg )
-    print ( "finished %d" % nr )
+    print ( f"[stresstest] finished {nr}" )
 
 if __name__ == "__main__":
     import argparse
@@ -256,10 +255,10 @@ if __name__ == "__main__":
             margs.append ((args.servername, args.port, i ) )
         p = multiprocessing.Pool( nproc )
         p.map ( stresstest, margs )
-        dt = time.time() - t0 
+        dt = time.time() - t0
         print ( f"[databaseClient] stress test took {dt:.2f} seconds" )
         sys.exit()
-    client = DatabaseClient ( args.servername, args.port, args.verbosity, 
+    client = DatabaseClient ( args.servername, args.port, args.verbosity,
                               rundir=args.rundir, clientid = 0 )
     client.initialize()
     if args.shutdown:

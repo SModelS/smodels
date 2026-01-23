@@ -2,27 +2,28 @@ smodelsOutput = {
 'OutputStatus' : {
     'sigmacut' : 10.0,
     'minmassgap' : 5.0,
+    'minmassgapisr' : 1.0,
     'maxcond' : 0.2,
     'ncpus' : 1,
     'model' : 'share.models.mssm',
     'promptwidth' : 1e-11,
     'stablewidth' : 1e-25,
-    'eraseprompt' : 'spin,eCharge,colordim',
+    'ignorepromptqnumbers' : 'spin,eCharge,colordim',
     'checkinput' : True,
     'doinvisible' : True,
     'docompress' : True,
-    'computestatistics' : True,
     'testcoverage' : True,
+    'computestatistics' : True,
     'combinesrs' : False,
     'combineanas' : 'ATLAS-SUSY-2018-10,CMS-SUS-13-012',
+    'pyhfbackend' : 'pytorch',
     'reportallsrs' : False,
-    'experimentalfeatures' : False,
     'file status' : 1,
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
     'input file' : 'inputFiles/slha/gluino_squarks.slha',
-    'database version' : '3.0.0-beta',
-    'smodels version' : '3.0.0-beta'
+    'database version' : '3.1.0',
+    'smodels version' : '3.1.1'
 },
 'SMS Decomposition' : [
     {
@@ -40,7 +41,7 @@ smodelsOutput = {
             ('N1', 1000022),
             ('N1~', -1000022)
         ],
-        'Weights (fb)' : {'xsec 8.0 TeV': 174.0, 'xsec 13.0 TeV': 392.0}
+        'Weights (fb)' : {'xsec 8.0 TeV': 320.0, 'xsec 13.0 TeV': 712.0}
     },
     {
         'ID' : 2,
@@ -127,7 +128,7 @@ smodelsOutput = {
             ('C1-', -1000024),
             ('N1~', -1000022)
         ],
-        'Weights (fb)' : {'xsec 8.0 TeV': 3.18, 'xsec 13.0 TeV': 23.3}
+        'Weights (fb)' : {'xsec 8.0 TeV': 4.69, 'xsec 13.0 TeV': 35.1}
     },
     {
         'ID' : 7,
@@ -165,7 +166,7 @@ smodelsOutput = {
             ('C1-', -1000024),
             ('N1~', -1000022)
         ],
-        'Weights (fb)' : {'xsec 8.0 TeV': 11.8, 'xsec 13.0 TeV': 106.0}
+        'Weights (fb)' : {'xsec 8.0 TeV': 21.6, 'xsec 13.0 TeV': 194.0}
     },
     {
         'ID' : 9,
@@ -279,7 +280,7 @@ smodelsOutput = {
             ('C1+', 1000024),
             ('N1', 1000022)
         ],
-        'Weights (fb)' : {'xsec 8.0 TeV': 2.46, 'xsec 13.0 TeV': 20.1}
+        'Weights (fb)' : {'xsec 8.0 TeV': 3.69, 'xsec 13.0 TeV': 30.1}
     },
     {
         'ID' : 15,
@@ -319,7 +320,7 @@ smodelsOutput = {
             ('N1', 1000022),
             ('N1', 1000022)
         ],
-        'Weights (fb)' : {'xsec 8.0 TeV': 5.5, 'xsec 13.0 TeV': 35.8}
+        'Weights (fb)' : {'xsec 8.0 TeV': 7.9, 'xsec 13.0 TeV': 56.3}
     },
     {
         'ID' : 17,
@@ -361,7 +362,7 @@ smodelsOutput = {
             ('N1', 1000022),
             ('N1~', -1000022)
         ],
-        'Weights (fb)' : {'xsec 8.0 TeV': 29.4, 'xsec 13.0 TeV': 240.0}
+        'Weights (fb)' : {'xsec 8.0 TeV': 57.6, 'xsec 13.0 TeV': 469.0}
     },
     {
         'ID' : 19,
@@ -665,6 +666,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.0582,
         'expected upper limit (fb)' : 0.0582,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 993.11),
             ('su_L', 991.5),
@@ -681,15 +683,15 @@ smodelsOutput = {
         'r' : 3.088661,
         'r_expected' : 3.088661,
         'Width (GeV)' : [
-            ('sd_L/su_L', 'prompt'),
-            ('su_L', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('sd_L/su_L', 14.817),
+            ('su_L', 14.771),
+            ('C1+/C1-', 0.0013847),
+            ('C1+', 0.0013847),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 0.17976008654165604},
-        'nll' : 15.491848,
+        'nll' : 15.49185,
         'nll_min' : 3.183696,
         'nll_SM' : 3.183696
     },
@@ -699,6 +701,7 @@ smodelsOutput = {
         'upper limit (fb)' : 1.27,
         'expected upper limit (fb)' : 1.07,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 993.11),
             ('su_L', 991.5),
@@ -715,17 +718,17 @@ smodelsOutput = {
         'r' : 1.720142,
         'r_expected' : 2.041664,
         'Width (GeV)' : [
-            ('sd_L/su_L', 'prompt'),
-            ('su_L', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('sd_L/su_L', 14.817),
+            ('su_L', 14.771),
+            ('C1+/C1-', 0.0013847),
+            ('C1+', 0.0013847),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 2.184580974615298},
-        'likelihood' : 6.411921e-07,
-        'l_max' : 0.000977816,
-        'l_SM' : 0.0009076683
+        'nll' : 14.25994,
+        'nll_min' : 6.930189,
+        'nll_SM' : 7.004632
     },
     {
         'maxcond' : 0.0,
@@ -733,6 +736,7 @@ smodelsOutput = {
         'upper limit (fb)' : 53.7511,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 993.11),
             ('su_L', 991.5),
@@ -749,10 +753,10 @@ smodelsOutput = {
         'r' : 0.6658436,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', 'prompt'),
-            ('su_L', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('sd_L/su_L', 14.817),
+            ('su_L', 14.771),
+            ('C1+/C1-', 0.0013847),
+            ('C1+', 0.0013847),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
@@ -764,6 +768,7 @@ smodelsOutput = {
         'upper limit (fb)' : 11.5698,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 992.72),
             ('su_L', 991.5),
@@ -780,10 +785,10 @@ smodelsOutput = {
         'r' : 0.4753812,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', 'prompt'),
-            ('su_L', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('sd_L/su_L', 14.806),
+            ('su_L', 14.771),
+            ('C1+/C1-', 0.0013847),
+            ('C1+', 0.0013847),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
@@ -795,6 +800,7 @@ smodelsOutput = {
         'upper limit (fb)' : 17.1895,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [
             ('sd_L/su_L', 992.72),
             ('su_L', 991.5),
@@ -811,10 +817,10 @@ smodelsOutput = {
         'r' : 0.3199666,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('sd_L/su_L', 'prompt'),
-            ('su_L', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('sd_L/su_L', 14.806),
+            ('su_L', 14.771),
+            ('C1+/C1-', 0.0013847),
+            ('C1+', 0.0013847),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
@@ -826,6 +832,7 @@ smodelsOutput = {
         'upper limit (fb)' : 554.995,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWW'],
+        'FinalStates' : ['PV > (W,MET),(W,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -840,8 +847,8 @@ smodelsOutput = {
         'r' : 0.2605149,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('C1-', 0.00138466665),
+            ('C1+', 0.00138466665),
             ('N1~', 'stable'),
             ('N1', 'stable')
         ],
@@ -853,6 +860,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.0589,
         'expected upper limit (fb)' : 0.0925,
         'TxNames' : ['TChiWW'],
+        'FinalStates' : ['PV > (W,MET),(W,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -867,15 +875,15 @@ smodelsOutput = {
         'r' : 0.2482631,
         'r_expected' : 0.1580832,
         'Width (GeV)' : [
-            ('C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('C1-', 0.00138466665),
+            ('C1+', 0.00138466665),
             ('N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWW': 0.0146226954636},
-        'likelihood' : 0.004620449,
-        'l_max' : 0.0073149,
-        'l_SM' : 0.0073149
+        'nll' : 5.377263,
+        'nll_min' : 4.917842,
+        'nll_SM' : 4.917842
     },
     {
         'maxcond' : 0.0,
@@ -883,12 +891,8 @@ smodelsOutput = {
         'upper limit (fb)' : 980.798,
         'expected upper limit (fb)' : 811.908,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-23',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -897,10 +901,9 @@ smodelsOutput = {
         'r' : 0.2111855,
         'r_expected' : 0.2551154,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -910,12 +913,8 @@ smodelsOutput = {
         'upper limit (fb)' : 194.632,
         'expected upper limit (fb)' : 243.047,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2019-09',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -924,9 +923,8 @@ smodelsOutput = {
         'r' : 0.2050081,
         'r_expected' : 0.1641704,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
@@ -934,9 +932,10 @@ smodelsOutput = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.01354272,
-        'upper limit (fb)' : 0.0713,
-        'expected upper limit (fb)' : 0.146,
+        'upper limit (fb)' : 0.0672,
+        'expected upper limit (fb)' : 0.1072,
         'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -948,103 +947,55 @@ smodelsOutput = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
         'dataType' : 'efficiencyMap',
-        'r' : 0.18994,
-        'r_expected' : 0.09275837,
+        'r' : 0.2015286,
+        'r_expected' : 0.1263314,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.013542722171439512},
-        'likelihood' : 0.0005794582,
-        'l_max' : 0.0008695981,
-        'l_SM' : 0.0008695981
+        'nll' : 7.453417,
+        'nll_min' : 7.047479,
+        'nll_SM' : 7.047479
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.2640824,
+        'theory prediction (fb)' : 0.2640166,
         'upper limit (fb)' : 1.43,
         'expected upper limit (fb)' : 0.934,
         'TxNames' : ['T6WW', 'TChiWW', 'TChiWZ'],
+        'FinalStates' : [
+            'PV > (W,jet,MET),(W,jet,MET)',
+            'PV > (W,MET),(W,MET)',
+            'PV > (W,MET),(Z,MET)'
+        ],
         'Mass (GeV)' : None,
         'AnalysisID' : 'CMS-SUS-13-012',
         'DataSetID' : '3NJet6_1500HTinf_300MHTinf',
         'AnalysisSqrts (TeV)' : 8.0,
         'lumi (fb-1)' : 19.5,
         'dataType' : 'efficiencyMap',
-        'r' : 0.184673,
-        'r_expected' : 0.2827435,
+        'r' : 0.184627,
+        'r_expected' : 0.282673,
         'Width (GeV)' : None,
         'TxNames weights (fb)' : {
             'T6WW' : 0.2624601049703651,
             'TChiWW' : 0.001204890709847,
-            'TChiWZ' : 0.0004174098342360046
+            'TChiWZ' : 0.0003515868180097819
         },
-        'likelihood' : 0.003884919,
-        'l_max' : 0.004384619,
-        'l_SM' : 0.002352225
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 207.1303,
-        'upper limit (fb)' : 1148.34,
-        'expected upper limit (fb)' : None,
-        'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-SUSY-2019-08',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'upperLimit',
-        'r' : 0.1803736,
-        'r_expected' : None,
-        'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 207.1303,
-        'upper limit (fb)' : 1148.34,
-        'expected upper limit (fb)' : None,
-        'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-SUSY-2019-08-grp',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'upperLimit',
-        'r' : 0.1803736,
-        'r_expected' : None,
-        'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
+        'nll' : 5.550729,
+        'nll_min' : 5.429653,
+        'nll_SM' : 6.052394
     },
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.009064725,
-        'upper limit (fb)' : 0.0531,
-        'expected upper limit (fb)' : 0.0531,
+        'upper limit (fb)' : 0.04949,
+        'expected upper limit (fb)' : 0.05109,
         'TxNames' : ['TChiWH'],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
         'Mass (GeV)' : [
             ('N2', 268.9),
             ('C1+/C1-', 269.0),
@@ -1056,43 +1007,38 @@ smodelsOutput = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
         'dataType' : 'efficiencyMap',
-        'r' : 0.1707104,
-        'r_expected' : 0.1707104,
+        'r' : 0.1831628,
+        'r_expected' : 0.1774266,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
+            ('N2', 0.0011236),
+            ('C1+/C1-', 0.0013847),
             ('N1', 'stable'),
             ('N1/N1~', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 0.009064724873000252},
-        'likelihood' : 0.03511049,
-        'l_max' : 0.03943978,
-        'l_SM' : 0.03943978
+        'nll' : 3.349255,
+        'nll_min' : 3.23298,
+        'nll_SM' : 3.23298
     },
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 207.1303,
-        'upper limit (fb)' : 1572.24,
+        'upper limit (fb)' : 1148.34,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
-        'AnalysisID' : 'CMS-PAS-SUS-17-004',
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
+        'AnalysisID' : 'ATLAS-SUSY-2019-08',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 35.9,
+        'lumi (fb-1)' : 139.0,
         'dataType' : 'upperLimit',
-        'r' : 0.1317421,
+        'r' : 0.1803736,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1102,12 +1048,8 @@ smodelsOutput = {
         'upper limit (fb)' : 1572.24,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-17-004',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1116,37 +1058,31 @@ smodelsOutput = {
         'r' : 0.1317421,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 207.1303,
-        'upper limit (fb)' : 1626.39,
+        'upper limit (fb)' : 1626.51,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-18-007',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 77.5,
         'dataType' : 'upperLimit',
-        'r' : 0.1273558,
+        'r' : 0.1273464,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1156,39 +1092,8 @@ smodelsOutput = {
         'upper limit (fb)' : 367.751,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'CMS-PAS-SUS-17-004',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 35.9,
-        'dataType' : 'upperLimit',
-        'r' : 0.1085004,
-        'r_expected' : None,
-        'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 39.90113,
-        'upper limit (fb)' : 367.751,
-        'expected upper limit (fb)' : None,
-        'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-17-004',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1197,9 +1102,8 @@ smodelsOutput = {
         'r' : 0.1085004,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
@@ -1210,12 +1114,8 @@ smodelsOutput = {
         'upper limit (fb)' : 2115.13,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-039',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1224,10 +1124,9 @@ smodelsOutput = {
         'r' : 0.09792791,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1236,7 +1135,12 @@ smodelsOutput = {
         'theory prediction (fb)' : 0.01495825,
         'upper limit (fb)' : 0.1572,
         'expected upper limit (fb)' : 0.1934,
-        'TxNames' : ['TChiWH', 'TChiWW', 'TChiWZ'],
+        'TxNames' : ['TChiWW', 'TChiWZ', 'TChiWH'],
+        'FinalStates' : [
+            'PV > (W-,MET),(W+,MET)',
+            'PV > (W,MET),(Z,MET)',
+            'PV > (higgs,MET),(W,MET)'
+        ],
         'Mass (GeV)' : None,
         'AnalysisID' : 'CMS-SUS-21-002',
         'DataSetID' : 'b_veto_SR0',
@@ -1251,63 +1155,28 @@ smodelsOutput = {
             'TChiWZ' : 0.0021157892362806815,
             'TChiWH' : 0.002043601101045336
         },
-        'likelihood' : 0.001560876,
-        'l_max' : 0.001700873,
-        'l_SM' : 0.001700873
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.01448299,
-        'upper limit (fb)' : 0.15899,
-        'expected upper limit (fb)' : 0.14317,
-        'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-SUSY-2018-06',
-        'DataSetID' : 'SR_low',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'efficiencyMap',
-        'r' : 0.09109373,
-        'r_expected' : 0.1011594,
-        'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWZ': 0.014482992254171961},
-        'likelihood' : 0.004191917,
-        'l_max' : 0.004449953,
-        'l_SM' : 0.003756542
+        'nll' : 6.462508,
+        'nll_min' : 6.376614,
+        'nll_SM' : 6.376614
     },
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 39.90113,
-        'upper limit (fb)' : 467.967,
+        'upper limit (fb)' : 467.97,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-039',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 35.9,
         'dataType' : 'upperLimit',
-        'r' : 0.08526483,
+        'r' : 0.08526429,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
@@ -1315,27 +1184,22 @@ smodelsOutput = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 207.1303,
-        'upper limit (fb)' : 2440.76,
+        'upper limit (fb)' : 2437.37,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-045',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 35.9,
         'dataType' : 'upperLimit',
-        'r' : 0.08486302,
+        'r' : 0.08498105,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1345,12 +1209,8 @@ smodelsOutput = {
         'upper limit (fb)' : 1136.02,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-13-006',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 8.0,
@@ -1359,46 +1219,19 @@ smodelsOutput = {
         'r' : 0.08440365,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 95.88423927189842}
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 207.1303,
-        'upper limit (fb)' : 2487.7,
-        'expected upper limit (fb)' : 3375.71,
-        'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
-        'AnalysisID' : 'CMS-SUS-21-002',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 137.0,
-        'dataType' : 'upperLimit',
-        'r' : 0.08326176,
-        'r_expected' : 0.06135902,
-        'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.04389609,
+        'theory prediction (fb)' : 0.04476938,
         'upper limit (fb)' : 0.531,
         'expected upper limit (fb)' : 0.438,
         'TxNames' : ['TChiWW'],
+        'FinalStates' : ['PV > (W-,MET),(W+,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -1410,18 +1243,71 @@ smodelsOutput = {
         'AnalysisSqrts (TeV)' : 8.0,
         'lumi (fb-1)' : 20.3,
         'dataType' : 'efficiencyMap',
-        'r' : 0.08266684,
-        'r_expected' : 0.1002194,
+        'r' : 0.08431146,
+        'r_expected' : 0.1022132,
         'Width (GeV)' : [
-            ('C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('C1-', 0.00138466665),
+            ('C1+', 0.00138466665),
             ('N1~', 'stable'),
             ('N1', 'stable')
         ],
-        'TxNames weights (fb)' : {'TChiWW': 0.043896094537829604},
-        'likelihood' : 0.02079683,
-        'l_max' : 0.02164771,
-        'l_SM' : 0.01893459
+        'TxNames weights (fb)' : {'TChiWW': 0.044769383356433996},
+        'nll' : 3.871663,
+        'nll_min' : 3.832856,
+        'nll_SM' : 3.966765
+    },
+    {
+        'maxcond' : 0.0,
+        'theory prediction (fb)' : 207.1303,
+        'upper limit (fb)' : 2487.7,
+        'expected upper limit (fb)' : 3375.71,
+        'TxNames' : ['TChiWH'],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
+        'AnalysisID' : 'CMS-SUS-21-002',
+        'DataSetID' : None,
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 137.0,
+        'dataType' : 'upperLimit',
+        'r' : 0.08326176,
+        'r_expected' : 0.06135902,
+        'Width (GeV)' : [
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
+        ],
+        'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
+    },
+    {
+        'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.01256271,
+        'upper limit (fb)' : 0.15899,
+        'expected upper limit (fb)' : 0.14317,
+        'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [
+            ('C1+/C1-', 269.0),
+            ('N2', 268.9),
+            ('N1/N1~', 129.0),
+            ('N1', 129.0)
+        ],
+        'AnalysisID' : 'ATLAS-SUSY-2018-06',
+        'DataSetID' : 'SR_low',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 139.0,
+        'dataType' : 'efficiencyMap',
+        'r' : 0.07901573,
+        'r_expected' : 0.08774681,
+        'Width (GeV)' : [
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
+        ],
+        'TxNames weights (fb)' : {'TChiWZ': 0.012562710565159365},
+        'nll' : 5.485862,
+        'nll_min' : 5.414862,
+        'nll_SM' : 5.584257
     },
     {
         'maxcond' : 0.0,
@@ -1429,6 +1315,7 @@ smodelsOutput = {
         'upper limit (fb)' : 197.645,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [('su_L', 991.5), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-10',
         'DataSetID' : None,
@@ -1438,8 +1325,8 @@ smodelsOutput = {
         'r' : 0.07713592,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('su_L', 'prompt'),
-            ('C1+', 'prompt'),
+            ('su_L', 14.7712529),
+            ('C1+', 0.00138466665),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 15.245528607859374}
@@ -1450,6 +1337,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.1,
         'expected upper limit (fb)' : 0.124,
         'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1464,15 +1352,46 @@ smodelsOutput = {
         'r' : 0.07638752,
         'r_expected' : 0.06160284,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.007638751758050727},
-        'likelihood' : 0.127771,
-        'l_max' : 0.151876,
-        'l_SM' : 0.151876
+        'nll' : 2.057516,
+        'nll_min' : 1.884691,
+        'nll_SM' : 1.884691
+    },
+    {
+        'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.006656745,
+        'upper limit (fb)' : 0.09,
+        'expected upper limit (fb)' : 0.125,
+        'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [
+            ('C1+/C1-', 269.0),
+            ('N2', 268.9),
+            ('N1/N1~', 129.0),
+            ('N1', 129.0)
+        ],
+        'AnalysisID' : 'ATLAS-SUSY-2017-03',
+        'DataSetID' : 'SR2l_Int',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 36.1,
+        'dataType' : 'efficiencyMap',
+        'r' : 0.07396383,
+        'r_expected' : 0.05325396,
+        'Width (GeV)' : [
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
+            ('N1/N1~', 'stable'),
+            ('N1', 'stable')
+        ],
+        'TxNames weights (fb)' : {'TChiWZ': 0.006656745095367584},
+        'nll' : 2.344793,
+        'nll_min' : 2.219183,
+        'nll_SM' : 2.219183
     },
     {
         'maxcond' : 0.0,
@@ -1480,12 +1399,8 @@ smodelsOutput = {
         'upper limit (fb)' : 584.765,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2016-24',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1494,9 +1409,8 @@ smodelsOutput = {
         'r' : 0.06823447,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
@@ -1507,6 +1421,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.256,
         'expected upper limit (fb)' : 0.291,
         'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1521,42 +1436,37 @@ smodelsOutput = {
         'r' : 0.06708621,
         'r_expected' : 0.05901742,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.01717407016330772},
-        'likelihood' : 0.03946467,
-        'l_max' : 0.04315095,
-        'l_SM' : 0.04315095
+        'nll' : 3.232349,
+        'nll_min' : 3.143051,
+        'nll_SM' : 3.143051
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 18.47093,
-        'upper limit (fb)' : 281.789,
-        'expected upper limit (fb)' : None,
+        'theory prediction (fb)' : 39.90113,
+        'upper limit (fb)' : 601.75,
+        'expected upper limit (fb)' : 391.04,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'CMS-PAS-SUS-12-022',
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
+        'AnalysisID' : 'ATLAS-SUSY-2018-06',
         'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 8.0,
-        'lumi (fb-1)' : 9.2,
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 139.0,
         'dataType' : 'upperLimit',
-        'r' : 0.06554881,
-        'r_expected' : None,
+        'r' : 0.06630848,
+        'r_expected' : 0.1020385,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
-        'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
+        'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
     },
     {
         'maxcond' : 0.0,
@@ -1564,6 +1474,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.107,
         'expected upper limit (fb)' : 0.0923,
         'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1578,15 +1489,15 @@ smodelsOutput = {
         'r' : 0.06303483,
         'r_expected' : 0.07307397,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.006744727082739748},
-        'likelihood' : 0.009241119,
-        'l_max' : 0.009249933,
-        'l_SM' : 0.009065371
+        'nll' : 4.684092,
+        'nll_min' : 4.683139,
+        'nll_SM' : 4.703294
     },
     {
         'maxcond' : 0.0,
@@ -1594,12 +1505,8 @@ smodelsOutput = {
         'upper limit (fb)' : 330.645,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2013-12',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 8.0,
@@ -1608,9 +1515,8 @@ smodelsOutput = {
         'r' : 0.05586334,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
@@ -1621,6 +1527,7 @@ smodelsOutput = {
         'upper limit (fb)' : 0.954862,
         'expected upper limit (fb)' : 0.931994,
         'TxNames' : ['TChiWZ'],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
         'Mass (GeV)' : [
             ('C1+/C1-', 269.0),
             ('N2', 268.9),
@@ -1635,76 +1542,23 @@ smodelsOutput = {
         'r' : 0.05331895,
         'r_expected' : 0.05462722,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
+            ('C1+/C1-', 0.0013847),
+            ('N2', 0.0011236),
             ('N1/N1~', 'stable'),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 0.050912243359359},
-        'likelihood' : 0.0005299372,
-        'l_max' : 0.0005302082,
-        'l_SM' : 0.0005298125
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 18.47093,
-        'upper limit (fb)' : 354.511,
-        'expected upper limit (fb)' : None,
-        'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-CONF-2013-035',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 8.0,
-        'lumi (fb-1)' : 20.7,
-        'dataType' : 'upperLimit',
-        'r' : 0.05210257,
-        'r_expected' : None,
-        'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 39.90113,
-        'upper limit (fb)' : 825.36,
-        'expected upper limit (fb)' : 519.9,
-        'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-SUSY-2018-06',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'upperLimit',
-        'r' : 0.04834391,
-        'r_expected' : 0.0767477,
-        'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
+        'nll' : 7.542752,
+        'nll_min' : 7.542241,
+        'nll_SM' : 7.542987
     },
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 144.5845,
         'upper limit (fb)' : 3152.54,
-        'expected upper limit (fb)' : 2934.9,
+        'expected upper limit (fb)' : 2945.62,
         'TxNames' : ['TChiWW'],
+        'FinalStates' : ['PV > (W-,MET),(W+,MET)'],
         'Mass (GeV)' : [
             ('C1-', 269.0),
             ('C1+', 269.0),
@@ -1717,10 +1571,10 @@ smodelsOutput = {
         'lumi (fb-1)' : 137.0,
         'dataType' : 'upperLimit',
         'r' : 0.04586285,
-        'r_expected' : 0.04926385,
+        'r_expected' : 0.04908456,
         'Width (GeV)' : [
-            ('C1-', 'prompt'),
-            ('C1+', 'prompt'),
+            ('C1-', 0.00138466665),
+            ('C1+', 0.00138466665),
             ('N1~', 'stable'),
             ('N1', 'stable')
         ],
@@ -1732,12 +1586,8 @@ smodelsOutput = {
         'upper limit (fb)' : 881.725,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-05',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1746,9 +1596,8 @@ smodelsOutput = {
         'r' : 0.04525348,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
@@ -1756,26 +1605,21 @@ smodelsOutput = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 18.47093,
-        'upper limit (fb)' : 464.427,
+        'upper limit (fb)' : 465.626,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-13-006',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 8.0,
         'lumi (fb-1)' : 19.5,
         'dataType' : 'upperLimit',
-        'r' : 0.03977144,
+        'r' : 0.03966903,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
@@ -1783,59 +1627,24 @@ smodelsOutput = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 39.90113,
-        'upper limit (fb)' : 1141.22,
-        'expected upper limit (fb)' : 866.225,
+        'upper limit (fb)' : 1141.88,
+        'expected upper limit (fb)' : 867.141,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-20-001',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 137.0,
         'dataType' : 'upperLimit',
-        'r' : 0.03496357,
-        'r_expected' : 0.04606324,
+        'r' : 0.03494336,
+        'r_expected' : 0.04601458,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.05030016,
-        'upper limit (fb)' : 1.56,
-        'expected upper limit (fb)' : 1.53,
-        'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'CMS-SUS-16-039',
-        'DataSetID' : 'SR1',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 35.9,
-        'dataType' : 'efficiencyMap',
-        'r' : 0.03224369,
-        'r_expected' : 0.03287592,
-        'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWZ': 0.05030016005491955},
-        'likelihood' : 0.0005299514,
-        'l_max' : 0.0005302082,
-        'l_SM' : 0.0005298125
     },
     {
         'maxcond' : 0.0,
@@ -1843,6 +1652,7 @@ smodelsOutput = {
         'upper limit (fb)' : 520.288,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T6WW'],
+        'FinalStates' : ['PV > (W,jet,MET),(W,jet,MET)'],
         'Mass (GeV)' : [('su_L', 991.5), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2018-22',
         'DataSetID' : None,
@@ -1852,8 +1662,8 @@ smodelsOutput = {
         'r' : 0.0293021,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('su_L', 'prompt'),
-            ('C1+', 'prompt'),
+            ('su_L', 14.7712529),
+            ('C1+', 0.00138466665),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'T6WW': 15.245528607859374}
@@ -1864,12 +1674,8 @@ smodelsOutput = {
         'upper limit (fb)' : 1571.83,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-034',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1878,42 +1684,11 @@ smodelsOutput = {
         'r' : 0.02538514,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.01298155,
-        'upper limit (fb)' : 0.53,
-        'expected upper limit (fb)' : 0.26,
-        'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-SUSY-2017-03',
-        'DataSetID' : 'SR3l_Low',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 36.1,
-        'dataType' : 'efficiencyMap',
-        'r' : 0.0244935,
-        'r_expected' : 0.04992905,
-        'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'TChiWZ': 0.01298155270640454},
-        'likelihood' : 0.00160016,
-        'l_max' : 0.01772008,
-        'l_SM' : 0.001214341
     },
     {
         'maxcond' : 0.0,
@@ -1921,12 +1696,8 @@ smodelsOutput = {
         'upper limit (fb)' : 924.951,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2013-11',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 8.0,
@@ -1935,9 +1706,8 @@ smodelsOutput = {
         'r' : 0.01996963,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 18.47093282810156}
@@ -1948,12 +1718,8 @@ smodelsOutput = {
         'upper limit (fb)' : 12712.3,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWH'],
-        'Mass (GeV)' : [
-            ('N2', 268.9),
-            ('C1+/C1-', 269.0),
-            ('N1', 129.0),
-            ('N1/N1~', 129.0)
-        ],
+        'FinalStates' : ['PV > (higgs,MET),(W,MET)'],
+        'Mass (GeV)' : [('N2', 268.9), ('C1+', 269.0), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-16-043',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -1962,10 +1728,9 @@ smodelsOutput = {
         'r' : 0.01629369,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('N2', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('N1', 'stable'),
-            ('N1/N1~', 'stable')
+            ('N2', 0.00112364506),
+            ('C1+', 0.00138466665),
+            ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWH': 207.13027034006157}
     },
@@ -1973,25 +1738,20 @@ smodelsOutput = {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 39.90113,
         'upper limit (fb)' : 2713.7,
-        'expected upper limit (fb)' : 2511.59,
+        'expected upper limit (fb)' : 2526.8,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'CMS-SUS-21-002',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 137.0,
         'dataType' : 'upperLimit',
         'r' : 0.01470359,
-        'r_expected' : 0.0158868,
+        'r_expected' : 0.01579117,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
@@ -2002,12 +1762,8 @@ smodelsOutput = {
         'upper limit (fb)' : 4177.63,
         'expected upper limit (fb)' : None,
         'TxNames' : ['TChiWZ'],
-        'Mass (GeV)' : [
-            ('C1+/C1-', 269.0),
-            ('N2', 268.9),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
+        'FinalStates' : ['PV > (W,MET),(Z,MET)'],
+        'Mass (GeV)' : [('C1+', 269.0), ('N2', 268.9), ('N1', 129.0)],
         'AnalysisID' : 'ATLAS-SUSY-2017-03',
         'DataSetID' : None,
         'AnalysisSqrts (TeV)' : 13.0,
@@ -2016,53 +1772,22 @@ smodelsOutput = {
         'r' : 0.00955114,
         'r_expected' : None,
         'Width (GeV)' : [
-            ('C1+/C1-', 'prompt'),
-            ('N2', 'prompt'),
-            ('N1/N1~', 'stable'),
+            ('C1+', 0.00138466665),
+            ('N2', 0.00112364506),
             ('N1', 'stable')
         ],
         'TxNames weights (fb)' : {'TChiWZ': 39.9011280599384}
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 5.500066,
-        'upper limit (fb)' : 40471.1,
-        'expected upper limit (fb)' : None,
-        'TxNames' : ['T6WW'],
-        'Mass (GeV)' : [
-            ('sd_L/su_L', 992.72),
-            ('su_L', 991.5),
-            ('C1+/C1-', 269.0),
-            ('C1+', 269.0),
-            ('N1/N1~', 129.0),
-            ('N1', 129.0)
-        ],
-        'AnalysisID' : 'ATLAS-CONF-2013-089',
-        'DataSetID' : None,
-        'AnalysisSqrts (TeV)' : 8.0,
-        'lumi (fb-1)' : 20.3,
-        'dataType' : 'upperLimit',
-        'r' : 0.0001359011,
-        'r_expected' : None,
-        'Width (GeV)' : [
-            ('sd_L/su_L', 'prompt'),
-            ('su_L', 'prompt'),
-            ('C1+/C1-', 'prompt'),
-            ('C1+', 'prompt'),
-            ('N1/N1~', 'stable'),
-            ('N1', 'stable')
-        ],
-        'TxNames weights (fb)' : {'T6WW': 5.500065906194978}
     }
 ],
 'CombinedRes' : [
     {
         'AnalysisID' : 'ATLAS-SUSY-2018-10,CMS-SUS-13-012',
-        'r' : 3.129969,
-        'r_expected' : 3.169335,
-        'nll' : 21.042502,
-        'nll_min' : 9.236050,
-        'nll_SM' : 9.236090
+        'r' : 3.110038,
+        'r_expected' : 3.169283,
+        'nll' : 21.04258,
+        'nll_min' : 9.236051,
+        'nll_SM' : 9.23609,
+        'Txnames' : ['T6WW', 'TChiWW', 'TChiWZ']
     }
 ],
 'Total xsec for missing topologies (fb)' : 388.8044,
@@ -2070,61 +1795,61 @@ smodelsOutput = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 96.48054,
-        'SMS' : 'PV > (W,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [25, 26, 27, 28]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 70.17688,
-        'SMS' : 'PV > (jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [8, 9, 10, 11]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 48.96736,
-        'SMS' : 'PV > (W,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [30, 32]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 40.20174,
-        'SMS' : 'PV > (higgs,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [18, 19, 20, 21]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 35.6173,
-        'SMS' : 'PV > (jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (jet,MET),(W,b,t,MET)',
         'SMS IDs' : [12, 13]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.57984,
-        'SMS' : 'PV > (W,jet,MET), (higgs,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(higgs,jet,jet,MET)',
         'SMS IDs' : [24, 29]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.40384,
-        'SMS' : 'PV > (higgs,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [22, 23]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.05211,
-        'SMS' : 'PV > (jet,jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,jet,MET),(W,jet,MET)',
         'SMS IDs' : [14, 15]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 13.04106,
-        'SMS' : 'PV > (W,jet,MET), (b,b,higgs,MET)',
+        'SMS' : 'PV > (W,jet,MET),(b,b,higgs,MET)',
         'SMS IDs' : [31]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 11.82386,
-        'SMS' : 'PV > (jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,MET)',
         'SMS IDs' : [7]
     }
 ],
@@ -2135,61 +1860,61 @@ smodelsOutput = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 96.48054,
-        'SMS' : 'PV > (W,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [25, 26, 27, 28]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 70.17688,
-        'SMS' : 'PV > (jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [8, 9, 10, 11]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 48.96736,
-        'SMS' : 'PV > (W,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (W,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [30, 32]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 40.20174,
-        'SMS' : 'PV > (higgs,jet,MET), (W,jet,jet,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,jet,jet,MET)',
         'SMS IDs' : [18, 19, 20, 21]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 35.6173,
-        'SMS' : 'PV > (jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (jet,MET),(W,b,t,MET)',
         'SMS IDs' : [12, 13]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.57984,
-        'SMS' : 'PV > (W,jet,MET), (higgs,jet,jet,MET)',
+        'SMS' : 'PV > (W,jet,MET),(higgs,jet,jet,MET)',
         'SMS IDs' : [24, 29]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.40384,
-        'SMS' : 'PV > (higgs,jet,MET), (W,b,t,MET)',
+        'SMS' : 'PV > (higgs,jet,MET),(W,b,t,MET)',
         'SMS IDs' : [22, 23]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 20.05211,
-        'SMS' : 'PV > (jet,jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,jet,MET),(W,jet,MET)',
         'SMS IDs' : [14, 15]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 13.04106,
-        'SMS' : 'PV > (W,jet,MET), (b,b,higgs,MET)',
+        'SMS' : 'PV > (W,jet,MET),(b,b,higgs,MET)',
         'SMS IDs' : [31]
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 11.82386,
-        'SMS' : 'PV > (jet,MET), (W,jet,MET)',
+        'SMS' : 'PV > (jet,MET),(W,jet,MET)',
         'SMS IDs' : [7]
     }
 ],

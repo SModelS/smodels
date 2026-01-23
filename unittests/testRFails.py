@@ -43,7 +43,8 @@ class RFailsTest(unittest.TestCase):
         pyhfInterface.nattempts_max = 5
         database = Database('official')
         out = runMain(filename,inifile='testParameters_rfails.ini',
-                             overridedatabase = database)
+                             overridedatabase = database, 
+                             suppressStdout=True)
 
         # Check Summary output
         outputfile = out.replace('.py', '.smodels')
