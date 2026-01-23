@@ -33,6 +33,18 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 3.1.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Fixed issues with fortran compilation of nllfast on lxplus (thanks Jonas Wuerzinger for reporting this)
+  * Added filter for slogdet warnings (relevant on MacOS)
+  * Minor fixes in `slha printer <tools.printers.html#module-tools.printers.slhaPrinter>`_
+  * Bumped up pythia8 from 8315 to 8317 (fixes "force" bug)
+  * Fixed bug preventing the extended output to be printed
+  * Added final states information to output
+  * Fix for pyslha 3.3.1
+  * Small fixes in `slha printer <tools.printers.html#module-tools.printers.slhaPrinter>`_, `pyhf interface <statistics.html#module-statistics.pyhfInterface>`_
+  * |database| extension: ATLAS-SUSY-2019-04 (UL), ATLAS-SUSY-2018-19 (EM), TRV1nunu added to CMS-EXO-20-004, ATLAS-SUSY-2018-22-multibin, ATLAS-SUSY-2018-22, ATLAS-EXOT-2018-06
 
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
