@@ -1,0 +1,8 @@
+dataId: ar19
+dataType: efficiencyMap
+observedN: 6
+expectedBG: 4.5
+bgError: 2.3638950907347813
+upperLimit: 0.238993*fb
+expectedUpperLimit: 0.175743*fb
+aggregated: t1b>=3MT2300__1000MET450__550

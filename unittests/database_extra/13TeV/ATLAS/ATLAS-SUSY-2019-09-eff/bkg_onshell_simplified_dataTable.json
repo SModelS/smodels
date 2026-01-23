@@ -1,0 +1,749 @@
+{
+    "channels": [
+        {
+            "name": "WZ_CR_0jets_cuts",
+            "samples": [
+                {
+                    "data": [
+                        2866.533889311919
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    2918.906144521235
+                                ],
+                                "lo_data": [
+                                    2814.1616341026033
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "WZ_CR_LowHT_cuts",
+            "samples": [
+                {
+                    "data": [
+                        3485.1153713508525
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    3543.7133442634236
+                                ],
+                                "lo_data": [
+                                    3426.5173984382814
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "WZ_CR_HighHT_cuts",
+            "samples": [
+                {
+                    "data": [
+                        687.0489304664306
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    712.9976077808717
+                                ],
+                                "lo_data": [
+                                    661.1002531519896
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR1_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        314.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    347.0
+                                ],
+                                "lo_data": [
+                                    281.0
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR2_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        35.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    41.0
+                                ],
+                                "lo_data": [
+                                    29.0
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR3_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        4.1
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    3.1
+                                ],
+                                "lo_data": [
+                                    5.1
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR4_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        1.2
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    1.7
+                                ],
+                                "lo_data": [
+                                    0.7
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR5_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        58.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    63.0
+                                ],
+                                "lo_data": [
+                                    53.0
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR6_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        8.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    8.9
+                                ],
+                                "lo_data": [
+                                    7.1
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR7_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        5.8
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    6.8
+                                ],
+                                "lo_data": [
+                                    4.8
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR8_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        0.8
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    1.2
+                                ],
+                                "lo_data": [
+                                    0.4
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR9_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        90.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    110.0
+                                ],
+                                "lo_data": [
+                                    70.0
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR10_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        13.4
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    15.8
+                                ],
+                                "lo_data": [
+                                    11.0
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR11_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        0.5
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    0.9
+                                ],
+                                "lo_data": [
+                                    0.1
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR12_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        0.49
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    0.73
+                                ],
+                                "lo_data": [
+                                    0.25
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR13_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        89.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    100.0
+                                ],
+                                "lo_data": [
+                                    78.0
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR14_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        16.0
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    17.4
+                                ],
+                                "lo_data": [
+                                    14.6
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR15_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        2.8
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    3.4
+                                ],
+                                "lo_data": [
+                                    2.2
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR16_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        1.30
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    1.57
+                                ],
+                                "lo_data": [
+                                    1.03
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR17_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        13.7
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    16.3
+                                ],
+                                "lo_data": [
+                                    11.1
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR18_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        9.2
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    10.5
+                                ],
+                                "lo_data": [
+                                    7.9
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR19_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        2.3
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    2.7
+                                ],
+                                "lo_data": [
+                                    1.9
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR20_WZ_cuts",
+            "samples": [
+                {
+                    "data": [
+                        1.09
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    1.22
+                                ],
+                                "lo_data": [
+                                    0.96
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "fixed": true,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                2868.0
+            ],
+            "name": "WZ_CR_0jets_cuts"
+        },
+        {
+            "data": [
+                3479.0
+            ],
+            "name": "WZ_CR_LowHT_cuts"
+        },
+        {
+            "data": [
+                687.0
+            ],
+            "name": "WZ_CR_HighHT_cuts"
+        },
+        {
+            "data": [
+                332.0
+            ],
+            "name": "SR1_WZ_cuts"
+        },
+        {
+            "data": [
+                31.0
+            ],
+            "name": "SR2_WZ_cuts"
+        },
+        {
+            "data": [
+                3.0
+            ],
+            "name": "SR3_WZ_cuts"
+        },
+        {
+            "data": [
+                2.0
+            ],
+            "name": "SR4_WZ_cuts"
+        },
+        {
+            "data": [
+                42.0
+            ],
+            "name": "SR5_WZ_cuts"
+        },
+        {
+            "data": [
+                7.0
+            ],
+            "name": "SR6_WZ_cuts"
+        },
+        {
+            "data": [
+                3.0
+            ],
+            "name": "SR7_WZ_cuts"
+        },
+        {
+            "data": [
+                1.0
+            ],
+            "name": "SR8_WZ_cuts"
+        },
+        {
+            "data": [
+                78.0
+            ],
+            "name": "SR9_WZ_cuts"
+        },
+        {
+            "data": [
+                11.0
+            ],
+            "name": "SR10_WZ_cuts"
+        },
+        {
+            "data": [
+                0.0
+            ],
+            "name": "SR11_WZ_cuts"
+        },
+        {
+            "data": [
+                0.0
+            ],
+            "name": "SR12_WZ_cuts"
+        },
+        {
+            "data": [
+                111.0
+            ],
+            "name": "SR13_WZ_cuts"
+        },
+        {
+            "data": [
+                19.0
+            ],
+            "name": "SR14_WZ_cuts"
+        },
+        {
+            "data": [
+                5.0
+            ],
+            "name": "SR15_WZ_cuts"
+        },
+        {
+            "data": [
+                1.0
+            ],
+            "name": "SR16_WZ_cuts"
+        },
+        {
+            "data": [
+                13.0
+            ],
+            "name": "SR17_WZ_cuts"
+        },
+        {
+            "data": [
+                9.0
+            ],
+            "name": "SR18_WZ_cuts"
+        },
+        {
+            "data": [
+                3.0
+            ],
+            "name": "SR19_WZ_cuts"
+        },
+        {
+            "data": [
+                1.0
+            ],
+            "name": "SR20_WZ_cuts"
+        }
+    ],
+    "version": "1.0.0"
+}

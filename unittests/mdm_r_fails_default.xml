@@ -1,0 +1,159 @@
+<?xml version="1.0" ?>
+<smodelsOutput>
+    <ExptRes_List>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2018-22</AnalysisID>
+            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
+            <DataSetID>SR2j_2200</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV>('zp', 2566.0)</Mass_GeV>
+                <Mass_GeV>('chi', 1244.2)</Mass_GeV>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>TRV1</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV>('zp', 12.4299)</Width_GeV>
+                <Width_GeV>('chi', 'stable')</Width_GeV>
+            </Width_GeV_List>
+            <dataType>efficiencyMap</dataType>
+            <expected_upper_limit_fb>0.7927</expected_upper_limit_fb>
+            <lumi_fb-1>139.0</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <nll>9.201058</nll>
+            <nll_SM>9.200812</nll_SM>
+            <nll_min>9.200812</nll_min>
+            <r>0.0008762126</r>
+            <r_expected>0.0008587481</r_expected>
+            <theory_prediction_fb>0.0006807296</theory_prediction_fb>
+            <upper_limit_fb>0.7769</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2018-22-multibin</AnalysisID>
+            <AnalysisSqrts_TeV>13.0</AnalysisSqrts_TeV>
+            <DataSetID>(combined)</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV>('zp', 2566.0)</Mass_GeV>
+                <Mass_GeV>('chi', 1244.2)</Mass_GeV>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>TRV1</TxNames>
+            </TxNames_List>
+            <Width_GeV_List>
+                <Width_GeV>('zp', 12.4299)</Width_GeV>
+                <Width_GeV>('chi', 'stable')</Width_GeV>
+            </Width_GeV_List>
+            <dataType>combined</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
+            <lumi_fb-1>139.0</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>None</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>0.003375296</theory_prediction_fb>
+            <upper_limit_fb>None</upper_limit_fb>
+        </ExptRes>
+    </ExptRes_List>
+    <OutputStatus>
+        <checkinput>True</checkinput>
+        <combineanas>ATLAS-SUSY-2018-22-multibin, CMS-EXO-20-004</combineanas>
+        <combinesrs>True</combinesrs>
+        <computestatistics>True</computestatistics>
+        <database_version>3.1.0</database_version>
+        <decomposition_status>1</decomposition_status>
+        <docompress>True</docompress>
+        <doinvisible>True</doinvisible>
+        <eraseprompt>eCharge,colordim</eraseprompt>
+        <file_status>1</file_status>
+        <input_file>./testFiles/slha/mdm_r_fails.slha</input_file>
+        <maxcond>0.2</maxcond>
+        <minmassgap>5.0</minmassgap>
+        <ncpus>30</ncpus>
+        <promptwidth>1e-11</promptwidth>
+        <reportallsrs>False</reportallsrs>
+        <sigmacut>0.0</sigmacut>
+        <smodels_version>3.1.0</smodels_version>
+        <stablewidth>1e-25</stablewidth>
+        <testcoverage>True</testcoverage>
+        <warnings>Input file ok</warnings>
+    </OutputStatus>
+    <Total_xsec_for_missing_topologies_fb>26.40994</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>26.40994</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>0.0</Total_xsec_for_topologies_outside_the_grid_fb>
+    <missing_topologies_List>
+        <missing_topologies>
+            <SMS>PV &gt; (jet,jet)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>16.91617</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (t,t)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>4.277667</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (b,b)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>4.229042</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (W,W)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>0.497966</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (Z,Z)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>0.2472259</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (higgs,higgs)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>0.2418662</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (ta,ta)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>1.955352e-06</weight_fb>
+        </missing_topologies>
+    </missing_topologies_List>
+    <missing_topologies_with_displaced_decays_List/>
+    <missing_topologies_with_prompt_decays_List>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (jet,jet)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>16.91617</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (t,t)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>4.277667</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (b,b)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>4.229042</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (W,W)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>0.497966</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (Z,Z)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>0.2472259</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (higgs,higgs)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>0.2418662</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (ta,ta)</SMS>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>1.955352e-06</weight_fb>
+        </missing_topologies_with_prompt_decays>
+    </missing_topologies_with_prompt_decays_List>
+    <topologies_outside_the_grid_List/>
+</smodelsOutput>

@@ -1,0 +1,2648 @@
+<?xml version="1.0" ?>
+<smodelsOutput>
+    <CombinedRes_List>
+        <CombinedRes>
+            <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
+            <nll>3.963032</nll>
+            <nll_SM>3.87898</nll_SM>
+            <nll_min>3.87898</nll_min>
+            <r>0.1092852</r>
+            <r_expected>0.1009563</r_expected>
+        </CombinedRes>
+    </CombinedRes_List>
+    <ExptRes_List>
+        <ExptRes>
+            <AnalysisID>ATLAS-CONF-2013-037</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>SRbC3</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV>('gluino', 577.0)</Mass_GeV>
+                <Mass_GeV>('N1', 68.1)</Mass_GeV>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1bbtt</TxNames>
+            </TxNames_List>
+            <TxNames_weights_fb>
+                <T1bbtt>0.04371409082770728</T1bbtt>
+            </TxNames_weights_fb>
+            <Width_GeV_List>
+                <Width_GeV>('gluino', 3.48980131e-05)</Width_GeV>
+                <Width_GeV>('N1', 'stable')</Width_GeV>
+            </Width_GeV_List>
+            <dataType>efficiencyMap</dataType>
+            <expected_upper_limit_fb>0.433</expected_upper_limit_fb>
+            <lumi_fb-1>20.7</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <nll>3.963032</nll>
+            <nll_SM>3.87898</nll_SM>
+            <nll_min>3.87898</nll_min>
+            <r>0.1092852</r>
+            <r_expected>0.1009563</r_expected>
+            <theory_prediction_fb>0.04371409</theory_prediction_fb>
+            <upper_limit_fb>0.4</upper_limit_fb>
+        </ExptRes>
+        <ExptRes>
+            <AnalysisID>ATLAS-SUSY-2013-02</AnalysisID>
+            <AnalysisSqrts_TeV>8.0</AnalysisSqrts_TeV>
+            <DataSetID>None</DataSetID>
+            <Mass_GeV_List>
+                <Mass_GeV>('C1+/C1-/N2', 134.99)</Mass_GeV>
+                <Mass_GeV>('C1+/C1-', 134.4)</Mass_GeV>
+                <Mass_GeV>('N1/N1~', 68.1)</Mass_GeV>
+            </Mass_GeV_List>
+            <TxNames_List>
+                <TxNames>T1</TxNames>
+            </TxNames_List>
+            <TxNames_weights_fb>
+                <T1>1530.0117493459818</T1>
+            </TxNames_weights_fb>
+            <Width_GeV_List>
+                <Width_GeV>('C1+/C1-/N2', 3.5461e-05)</Width_GeV>
+                <Width_GeV>('C1+/C1-', 8.4306e-05)</Width_GeV>
+                <Width_GeV>('N1/N1~', 'stable')</Width_GeV>
+            </Width_GeV_List>
+            <dataType>upperLimit</dataType>
+            <expected_upper_limit_fb>None</expected_upper_limit_fb>
+            <lumi_fb-1>20.3</lumi_fb-1>
+            <maxcond>0.0</maxcond>
+            <r>6.559508e-05</r>
+            <r_expected>None</r_expected>
+            <theory_prediction_fb>1530.012</theory_prediction_fb>
+            <upper_limit_fb>23325100.0</upper_limit_fb>
+        </ExptRes>
+    </ExptRes_List>
+    <OutputStatus>
+        <checkinput>True</checkinput>
+        <combineanas>ATLAS-CONF-2013-037,CMS-SUS-13-012</combineanas>
+        <combinesrs>False</combinesrs>
+        <computestatistics>True</computestatistics>
+        <database_version>unittest310</database_version>
+        <decomposition_status>1</decomposition_status>
+        <docompress>True</docompress>
+        <doinvisible>True</doinvisible>
+        <file_status>1</file_status>
+        <ignorepromptqnumbers>spin,eCharge,colordim</ignorepromptqnumbers>
+        <input_file>./testFiles/slha/lightEWinos.slha</input_file>
+        <maxcond>0.2</maxcond>
+        <minmassgap>5.0</minmassgap>
+        <minmassgapisr>5.0</minmassgapisr>
+        <model>share.models.mssm</model>
+        <ncpus>1</ncpus>
+        <promptwidth>1e-11</promptwidth>
+        <reportallsrs>False</reportallsrs>
+        <sigmacut>10.0</sigmacut>
+        <smodels_version>3.1.0</smodels_version>
+        <stablewidth>1e-25</stablewidth>
+        <testcoverage>True</testcoverage>
+        <warnings>Input file ok</warnings>
+    </OutputStatus>
+    <SMS_Decomposition_List>
+        <SMS_Decomposition>
+            <ID>1</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; N1,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>53.8</xsec_13.0_TeV>
+                <xsec_8.0_TeV>38.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>2</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; N1,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>53.8</xsec_13.0_TeV>
+                <xsec_8.0_TeV>38.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>3</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('inv', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('inv', 1000023)</PIDs>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; inv,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>121.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>64.7</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>4</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('inv', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('inv', 1000023)</PIDs>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; inv,C1+/C1-(2)), (C1+/C1-(2) &gt; N1/N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>121.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>64.7</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>5</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,e-,nu), (C1+(2) &gt; N1,nu,e+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>6</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,e-,nu), (C1+(2) &gt; N1,nu,mu+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>7</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,e-,nu), (C1+(2) &gt; N1,nu,ta+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>8</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,e-,nu), (C1+(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>9</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,e-,nu), (C1+(2) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>10</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,e-,nu), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>82.8</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>11</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,e-,nu), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>23.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>11.7</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>12</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,e-,nu), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>28.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>13</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,mu-,nu), (C1+(2) &gt; N1,nu,e+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>14</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,mu-,nu), (C1+(2) &gt; N1,nu,mu+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>15</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,mu-,nu), (C1+(2) &gt; N1,nu,ta+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>16</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,mu-,nu), (C1+(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>17</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,mu-,nu), (C1+(2) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>18</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,mu-,nu), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>82.8</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>19</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,mu-,nu), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>23.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>11.7</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>20</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,mu-,nu), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>28.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>21</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,ta-,nu), (C1+(2) &gt; N1,nu,e+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>22</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,ta-,nu), (C1+(2) &gt; N1,nu,mu+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>23</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,ta-,nu), (C1+(2) &gt; N1,nu,ta+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>12.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>24</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,ta-,nu), (C1+(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.3</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>25</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,ta-,nu), (C1+(2) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.3</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>26</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,ta-,nu), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>82.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>27</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,ta-,nu), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>23.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>11.6</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>28</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),N2(2)), (C1-(1) &gt; N1~,ta-,nu), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>28.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>29</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,nu,e+), (C1-(2) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>30</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,nu,e+), (C1-(2) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>31</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,e+), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>146.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>80.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>32</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,e+), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>40.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>22.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>33</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,e+), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>50.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>27.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>34</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,nu,mu+), (C1-(2) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>35</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,nu,mu+), (C1-(2) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>36</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,mu+), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>146.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>80.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>37</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,mu+), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>40.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>22.4</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>38</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,mu+), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>50.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>27.9</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>39</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,nu,ta+), (C1-(2) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.3</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>40</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,nu,ta+), (C1-(2) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>77.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>41.3</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>41</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,ta+), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>146.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>80.2</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>42</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,ta+), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>40.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>22.3</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>43</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+(1),N2(2)), (C1+(1) &gt; N1,nu,ta+), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>50.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>27.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>44</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,q,q), (C1+(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>247.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>132.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>45</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [-1000024, 1000024])</PIDs>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N1/N1~', [-1000022, 1000022])</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),C1+/C1-(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (C1+/C1-(2) &gt; N1/N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>494.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>265.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>46</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,e-,e+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>29.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>15.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>47</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,mu-,mu+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>29.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>15.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>48</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,ta-,ta+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>30.9</xsec_13.0_TeV>
+                <xsec_8.0_TeV>16.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>49</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,nu,nu)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>121.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>64.7</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>50</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>733.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>391.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>51</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>204.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>109.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>52</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,q), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>254.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>136.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>53</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,q,c), (C1+(2) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>247.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>132.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>54</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,e-,e+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>29.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>15.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>55</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,mu-,mu+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>29.6</xsec_13.0_TeV>
+                <xsec_8.0_TeV>15.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>56</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,ta-,ta+)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>30.9</xsec_13.0_TeV>
+                <xsec_8.0_TeV>16.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>57</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,nu,nu)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>121.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>64.7</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>58</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>733.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>391.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>59</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>204.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>109.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>60</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('C1+/C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1/N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('C1+/C1-', [1000024, -1000024])</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1/N1~', [1000022, -1000022])</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; C1+/C1-(1),N2(2)), (C1+/C1-(1) &gt; N1/N1~,q,c), (N2(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>254.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>136.0</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>61</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,t-,t+), (gluino(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>29.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>4.37</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>62</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>47.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>7.11</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>63</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; N1,Z)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>31.9</xsec_13.0_TeV>
+                <xsec_8.0_TeV>4.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>64</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; t-,b,C1+(8)), (C1+(8) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>65</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; t-,b,C1+(8)), (C1+(8) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>66</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(8)), (N2(8) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>154.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>23.2</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>67</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(8)), (N2(8) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>42.9</xsec_13.0_TeV>
+                <xsec_8.0_TeV>6.47</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>68</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,b,N2(8)), (N2(8) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>53.4</xsec_13.0_TeV>
+                <xsec_8.0_TeV>8.05</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>69</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,t+,C1-(8)), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>70</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; b,t+,C1-(8)), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>60.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>9.05</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>71</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W-,C1+(9)), (C1+(9) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>72</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W-,C1+(9)), (C1+(9) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>73</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W+,C1-(9)), (C1-(9) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>74</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; N1,b,b), (gluino(2) &gt; g,N3(7)), (N3(7) &gt; W+,C1-(9)), (C1-(9) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>21.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.22</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>75</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; t-,b,C1+(7)), (N3(4) &gt; N1,Z), (C1+(7) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>76</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; t-,b,C1+(7)), (N3(4) &gt; N1,Z), (C1+(7) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>77</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; b,t+,C1-(7)), (N3(4) &gt; N1,Z), (C1-(7) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>78</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N3', 266.5)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N3', 1000025)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; g,N3(4)), (gluino(2) &gt; b,t+,C1-(7)), (N3(4) &gt; N1,Z), (C1-(7) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>20.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.06</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>79</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; t-,b,C1+(8)), (C1+(5) &gt; N1,q,q), (C1+(8) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>80</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; t-,b,C1+(8)), (C1+(5) &gt; N1,q,q), (C1+(8) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>81</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,q), (N2(8) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>82</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,q), (N2(8) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>83</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,q), (N2(8) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>84</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>85</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>86</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; t-,b,C1+(8)), (C1+(5) &gt; N1,q,c), (C1+(8) &gt; N1,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>87</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,c), (N2(8) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>88</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,c), (N2(8) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>89</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,b,N2(8)), (C1+(5) &gt; N1,q,c), (N2(8) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>90</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,c), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>91</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1+', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1+', 1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; t-,b,C1+(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1+(5) &gt; N1,q,c), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>92</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,q,q), (N2(8) &gt; N1,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>116.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>17.5</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>93</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,q,q), (N2(8) &gt; N1,c,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>50.7</xsec_13.0_TeV>
+                <xsec_8.0_TeV>7.63</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>94</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,q,q), (N2(8) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>87.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>13.2</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>95</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>96</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,q,q), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>98.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>14.8</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>97</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,c,c), (N2(8) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>24.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>3.66</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>98</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,c,c), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>99</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,c,c), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>27.3</xsec_13.0_TeV>
+                <xsec_8.0_TeV>4.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>100</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,b,N2(8)), (N2(5) &gt; N1,b,b), (N2(8) &gt; N1,b,b)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>15.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>2.28</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>101</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,b,b), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>102</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('N2', 135.3)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('N2', 1000023)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,b,N2(5)), (gluino(2) &gt; b,t+,C1-(8)), (N2(5) &gt; N1,b,b), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>34.0</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.12</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>103</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1-(5) &gt; N1~,q,q), (C1-(8) &gt; N1~,q,q)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>104</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1-(5) &gt; N1~,q,q), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>38.2</xsec_13.0_TeV>
+                <xsec_8.0_TeV>5.76</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+        <SMS_Decomposition>
+            <ID>105</ID>
+            <Masses_GeV_List>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('gluino', 577.0)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+            </Masses_GeV_List>
+            <PIDs_List>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('gluino', 1000021)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
+            </PIDs_List>
+            <SMS>(PV &gt; gluino(1),gluino(2)), (gluino(1) &gt; b,t+,C1-(5)), (gluino(2) &gt; b,t+,C1-(8)), (C1-(5) &gt; N1~,q,c), (C1-(8) &gt; N1~,q,c)</SMS>
+            <Weights_fb>
+                <xsec_13.0_TeV>19.1</xsec_13.0_TeV>
+                <xsec_8.0_TeV>2.88</xsec_8.0_TeV>
+            </Weights_fb>
+        </SMS_Decomposition>
+    </SMS_Decomposition_List>
+    <Total_xsec_for_missing_topologies_fb>5056.816</Total_xsec_for_missing_topologies_fb>
+    <Total_xsec_for_missing_topologies_with_displaced_decays_fb>0.0</Total_xsec_for_missing_topologies_with_displaced_decays_fb>
+    <Total_xsec_for_missing_topologies_with_prompt_decays_fb>5056.816</Total_xsec_for_missing_topologies_with_prompt_decays_fb>
+    <Total_xsec_for_topologies_outside_the_grid_fb>213.7975</Total_xsec_for_topologies_outside_the_grid_fb>
+    <missing_topologies_List>
+        <missing_topologies>
+            <SMS>PV &gt; (jet,jet,MET), (nu,l,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>31</SMS_IDs>
+                <SMS_IDs>36</SMS_IDs>
+                <SMS_IDs>10</SMS_IDs>
+                <SMS_IDs>18</SMS_IDs>
+                <SMS_IDs>8</SMS_IDs>
+                <SMS_IDs>9</SMS_IDs>
+                <SMS_IDs>16</SMS_IDs>
+                <SMS_IDs>17</SMS_IDs>
+                <SMS_IDs>29</SMS_IDs>
+                <SMS_IDs>30</SMS_IDs>
+                <SMS_IDs>34</SMS_IDs>
+                <SMS_IDs>35</SMS_IDs>
+                <SMS_IDs>32</SMS_IDs>
+                <SMS_IDs>37</SMS_IDs>
+                <SMS_IDs>11</SMS_IDs>
+                <SMS_IDs>19</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>1203.688</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (jet,jet,MET), (nu,ta,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>41</SMS_IDs>
+                <SMS_IDs>26</SMS_IDs>
+                <SMS_IDs>24</SMS_IDs>
+                <SMS_IDs>25</SMS_IDs>
+                <SMS_IDs>39</SMS_IDs>
+                <SMS_IDs>40</SMS_IDs>
+                <SMS_IDs>42</SMS_IDs>
+                <SMS_IDs>27</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>600.2543</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (jet,jet,MET), (b,b,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>52</SMS_IDs>
+                <SMS_IDs>60</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>507.5377</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (b,t,jet,jet,MET), (b,b,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>81</SMS_IDs>
+                <SMS_IDs>87</SMS_IDs>
+                <SMS_IDs>95</SMS_IDs>
+                <SMS_IDs>96</SMS_IDs>
+                <SMS_IDs>82</SMS_IDs>
+                <SMS_IDs>88</SMS_IDs>
+                <SMS_IDs>98</SMS_IDs>
+                <SMS_IDs>99</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>502.143</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (MET), (jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>3</SMS_IDs>
+                <SMS_IDs>4</SMS_IDs>
+                <SMS_IDs>1</SMS_IDs>
+                <SMS_IDs>2</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>349.9908</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (b,t,jet,jet,MET), (b,t,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>80</SMS_IDs>
+                <SMS_IDs>84</SMS_IDs>
+                <SMS_IDs>85</SMS_IDs>
+                <SMS_IDs>90</SMS_IDs>
+                <SMS_IDs>91</SMS_IDs>
+                <SMS_IDs>104</SMS_IDs>
+                <SMS_IDs>79</SMS_IDs>
+                <SMS_IDs>86</SMS_IDs>
+                <SMS_IDs>103</SMS_IDs>
+                <SMS_IDs>105</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>305.8877</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (b,b,MET), (b,t,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>64</SMS_IDs>
+                <SMS_IDs>65</SMS_IDs>
+                <SMS_IDs>69</SMS_IDs>
+                <SMS_IDs>70</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>240.2881</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (b,b,MET), (b,b,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>66</SMS_IDs>
+                <SMS_IDs>67</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>197.2275</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (b,b,jet,jet,MET), (b,b,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>92</SMS_IDs>
+                <SMS_IDs>93</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>166.9985</weight_fb>
+        </missing_topologies>
+        <missing_topologies>
+            <SMS>PV &gt; (nu,l,MET), (b,b,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>33</SMS_IDs>
+                <SMS_IDs>38</SMS_IDs>
+                <SMS_IDs>12</SMS_IDs>
+                <SMS_IDs>20</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>158.7077</weight_fb>
+        </missing_topologies>
+    </missing_topologies_List>
+    <missing_topologies_with_displaced_decays_List/>
+    <missing_topologies_with_prompt_decays_List>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (jet,jet,MET), (nu,l,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>31</SMS_IDs>
+                <SMS_IDs>36</SMS_IDs>
+                <SMS_IDs>10</SMS_IDs>
+                <SMS_IDs>18</SMS_IDs>
+                <SMS_IDs>8</SMS_IDs>
+                <SMS_IDs>9</SMS_IDs>
+                <SMS_IDs>16</SMS_IDs>
+                <SMS_IDs>17</SMS_IDs>
+                <SMS_IDs>29</SMS_IDs>
+                <SMS_IDs>30</SMS_IDs>
+                <SMS_IDs>34</SMS_IDs>
+                <SMS_IDs>35</SMS_IDs>
+                <SMS_IDs>32</SMS_IDs>
+                <SMS_IDs>37</SMS_IDs>
+                <SMS_IDs>11</SMS_IDs>
+                <SMS_IDs>19</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>1203.688</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (jet,jet,MET), (nu,ta,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>41</SMS_IDs>
+                <SMS_IDs>26</SMS_IDs>
+                <SMS_IDs>24</SMS_IDs>
+                <SMS_IDs>25</SMS_IDs>
+                <SMS_IDs>39</SMS_IDs>
+                <SMS_IDs>40</SMS_IDs>
+                <SMS_IDs>42</SMS_IDs>
+                <SMS_IDs>27</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>600.2543</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (jet,jet,MET), (b,b,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>52</SMS_IDs>
+                <SMS_IDs>60</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>507.5377</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (b,t,jet,jet,MET), (b,b,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>81</SMS_IDs>
+                <SMS_IDs>87</SMS_IDs>
+                <SMS_IDs>95</SMS_IDs>
+                <SMS_IDs>96</SMS_IDs>
+                <SMS_IDs>82</SMS_IDs>
+                <SMS_IDs>88</SMS_IDs>
+                <SMS_IDs>98</SMS_IDs>
+                <SMS_IDs>99</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>502.143</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (MET), (jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>3</SMS_IDs>
+                <SMS_IDs>4</SMS_IDs>
+                <SMS_IDs>1</SMS_IDs>
+                <SMS_IDs>2</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>349.9908</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (b,t,jet,jet,MET), (b,t,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>80</SMS_IDs>
+                <SMS_IDs>84</SMS_IDs>
+                <SMS_IDs>85</SMS_IDs>
+                <SMS_IDs>90</SMS_IDs>
+                <SMS_IDs>91</SMS_IDs>
+                <SMS_IDs>104</SMS_IDs>
+                <SMS_IDs>79</SMS_IDs>
+                <SMS_IDs>86</SMS_IDs>
+                <SMS_IDs>103</SMS_IDs>
+                <SMS_IDs>105</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>305.8877</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (b,b,MET), (b,t,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>64</SMS_IDs>
+                <SMS_IDs>65</SMS_IDs>
+                <SMS_IDs>69</SMS_IDs>
+                <SMS_IDs>70</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>240.2881</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (b,b,MET), (b,b,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>66</SMS_IDs>
+                <SMS_IDs>67</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>197.2275</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (b,b,jet,jet,MET), (b,b,jet,jet,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>92</SMS_IDs>
+                <SMS_IDs>93</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>166.9985</weight_fb>
+        </missing_topologies_with_prompt_decays>
+        <missing_topologies_with_prompt_decays>
+            <SMS>PV &gt; (nu,l,MET), (b,b,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>33</SMS_IDs>
+                <SMS_IDs>38</SMS_IDs>
+                <SMS_IDs>12</SMS_IDs>
+                <SMS_IDs>20</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>158.7077</weight_fb>
+        </missing_topologies_with_prompt_decays>
+    </missing_topologies_with_prompt_decays_List>
+    <topologies_outside_the_grid_List>
+        <topologies_outside_the_grid>
+            <SMS>PV &gt; (jet,jet,MET), (l,l,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>46</SMS_IDs>
+                <SMS_IDs>47</SMS_IDs>
+                <SMS_IDs>54</SMS_IDs>
+                <SMS_IDs>55</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>118.3128</weight_fb>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
+            <SMS>PV &gt; (nu,l,MET), (nu,l,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>5</SMS_IDs>
+                <SMS_IDs>14</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>48.29554</weight_fb>
+        </topologies_outside_the_grid>
+        <topologies_outside_the_grid>
+            <SMS>PV &gt; (b,b,MET), (b,b,MET)</SMS>
+            <SMS_IDs_List>
+                <SMS_IDs>62</SMS_IDs>
+            </SMS_IDs_List>
+            <sqrts_TeV>13.0</sqrts_TeV>
+            <weight_fb>47.18918</weight_fb>
+        </topologies_outside_the_grid>
+    </topologies_outside_the_grid_List>
+</smodelsOutput>
