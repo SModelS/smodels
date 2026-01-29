@@ -841,6 +841,7 @@ class PyhfUpperLimitComputer:
                     par_22 = pyhf.infer.mle.twice_nll(x - eps_i - eps_j, data, model)
 
                     partial_xi_xj = (par_11 - par_12 - par_21 +par_22)/(4*epsilon**2)
+                    partial_xi_xj = np.asarray(partial_xi_xj).item()
                     hessian[i,j] = partial_xi_xj
                     if i!=j: hessian[j,i] = partial_xi_xj
 
