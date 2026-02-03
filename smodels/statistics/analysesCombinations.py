@@ -93,7 +93,6 @@ class AnaCombLikelihoodComputer(object):
         if not return_nll:
             llhd = np.exp(-nll)
             return llhd
-# print ( f"@@AC mu={mu} evaluationType {expected} asimov {asimov} nll {nll}" )
 
         return nll
 
