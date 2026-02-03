@@ -94,7 +94,7 @@ def CLsfromNLL(
         return CLs
     elif return_type == "CLs-alpha":
         return CLs - 0.05
-    # return_type == "alpha-CLs"
+
     return 0.05 - CLs
 
 def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args : tuple = (),
