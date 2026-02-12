@@ -11,7 +11,7 @@
 
 """
 
-import os, onnx, json, math
+import os, onnx, json, math, onnxruntime
 import numpy as np
 from typing import Union
 
@@ -33,7 +33,13 @@ class NNAdapter:
         self.mlModel = onnx.load ( onnxfile )
         self.parseMetaData ()
         self.getSROrder()
+        self.instantiateRegressor()
 
+    def instantiateRegressor ( self ):
+        """ create the actual inference session object """
+        sess = onnxruntime.InferenceSession ( self.onnxfile )
+        self.regressor={ "session": sess,
+                         "dim": sess.get_inputs()[0].shape[1] }
 
     def fillValues ( self, container, value ):
         """ given <value> fill in <container>, if value is sensible
@@ -146,7 +152,7 @@ class NNAdapter:
         arr = arr[0][0]
         return arr
 
-    def nllsFromPrediction( self, arr, poi_test : float ) -> dict:
+    def nllsFromPrediction( self, arr ) -> dict:
         """ given the networks predictions, compute the NLLs
 
         :param arr: the neural network output
