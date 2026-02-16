@@ -45,7 +45,7 @@ def writeOutYields ( theoryPred,
         filename = f"yields_{'_'.join(map(str(masses)))}.json"
     nsig = theoryPred.statsComputer.nsig
     computer = theoryPred.statsComputer.upperLimitComputer
-    models = computer.data.globalInfo.onnxMeta.keys()
+    models = computer.adaptors.keys()
     modelToUse = computer.mostSensitiveModel
     gI = theoryPred.dataset.globalInfo
     Dict = { "anaId": gI.id, "masses": masses, "nsignals": nsig,
@@ -133,7 +133,7 @@ class NNUpperLimitComputer:
         """ determines the most sensitive model, stores all the ULs
         that were needed to compute that.
         """
-        jsonfiles = list(self.data.globalInfo.onnxMeta.keys())
+        jsonfiles = list(self.adaptors.keys())
         # print ( f"@@NN66 determineMostSensitiveModel jsonfiles {jsonfiles}" )
         self.cachedULs= { None: {} }
         if len(jsonfiles)==1:
@@ -194,7 +194,7 @@ class NNUpperLimitComputer:
         """
 
         yields = []
-        for srname,smyield in self.data.globalInfo.onnxMeta[modelToUse]["smYields"].items():
+        for srname,smyield in self.adaptors[modelToUse].onnxMeta["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
             if not realname in self.nsignals:
@@ -206,7 +206,7 @@ class NNUpperLimitComputer:
             if self.isControlRegion ( srname, modelToUse ):
                 if hasattr ( self.data.globalInfo, "includeCRs" ) and self.data.globalInfo.includeCRs == False:
                     continue
-                obsyield = self.data.globalInfo.onnxMeta[modelToUse]["obsYields"][srname]
+                obsyield = self.adaptors[modelToUse].onnxMeta["obsYields"][srname]
                 ## seems like a CR! replaced bkgexpected with observed (postfit)
                 smyield = obsyield
             tot = smyield + signal
@@ -340,20 +340,21 @@ class NNUpperLimitComputer:
             modelToUse = self.determineMostSensitiveModel()
         if modelToUse is None:
             print ( f"[nnInterface] no most sensitive model found" )
-            for model in self.data.globalInfo.onnxMeta.keys():
+            for model in self.adaptors.keys():
+            # for model in self.data.globalInfo.onnxMeta.keys():
                 ulmu = self.getUpperLimitOnMu ( expected=True, modelToUse = model )
                 print ( f"[nnInterface] ulmu({model})={ulmu}" )
             return None
-        if not modelToUse in self.data.globalInfo.onnxMeta:
-            print ( f"[nnInterface] no {modelToUse} in {', '.join(self.data.globalInfo.onnxMeta.keys())}" )
+        if not modelToUse in self.adaptors.keys():
+            print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
             return None
-        muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_obs_max"]
+        muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_obs_max"]
         if asimov:
-            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_obs_max"]
+            muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_obs_max"]
             if expected:
-                muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLLA_exp_max"]
+                muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_exp_max"]
         elif expected:
-            muhat,nllmin = self.data.globalInfo.onnxMeta[modelToUse]["nLL_exp_max"]
+            muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_exp_max"]
 
         outputType = "observed"
         if expected == True:
