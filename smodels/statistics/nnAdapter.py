@@ -126,7 +126,7 @@ class NNAdapter:
             elif em.key == 'y_min':
                 values = json.loads(em.value)
                 if len(values)<7:
-                    logger.error ( f"'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
+                    print ( f"[nnAdapter] 'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
                     import sys; sys.exit(-1)
                 indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3,
                             "nLL_obs_max" : -5, "nLL_exp_max": -7 }
@@ -170,8 +170,7 @@ class NNAdapter:
             dim_nn = self.regressor["dim"]
             dim_input = len(scaled_yields[0])
             line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
-            logger.error ( f"[nnInterface] {line}" )
-            print ( f"[nnInterface] {line}" )
+            print ( f"[nnAdapter] {line}" )
             sys.exit()
         arr = self.regressor["session"].run(None,
                 {"input_1":scaled_yields})
