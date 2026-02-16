@@ -4,12 +4,13 @@
 .. module:: nnAdapter
    :synopsis: An Adapter class that wraps around the neural networks (e.g. onnx
    files), handle all the pre and post processing. This adapter is
-   meant to be published with the ML paper, and the SModels database, not with
-   SModelS per se.
+   meant to be published with the ML paper, not with e.g. SModelS.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
+
+__all__ = [ "NNAdapter" ]
 
 import os, onnx, json, math, onnxruntime
 import numpy as np
@@ -19,49 +20,55 @@ class NNAdapter:
     """
     Adapter that wraps around a neural network
     """
+    __slots__ = [ "onnxFile", "allowsSyntheticData", "mlModel",
+                  "onnxMeta", "srOrder", "regressor" ]
 
-    def __init__( self, onnxfile : os.PathLike,
+    def __init__( self, onnxFile : os.PathLike,
                   allowsSyntheticData : bool = False ):
         """
-        :param onnxfile: path to onnx file
+        :param onnxFile: path to onnx file
         to the ML model's SRs
         :param allowsSyntheticData: if true, then also synthetic
-        data can be supplied
+        data can be supplied, not used yet
         """
-        self.onnxfile = onnxfile
+        self.onnxFile = onnxFile
         self.allowsSyntheticData = allowsSyntheticData
-        self.mlModel = onnx.load ( onnxfile )
-        self.parseMetaData ()
-        self.getSROrder()
-        self.instantiateRegressor()
+        self.mlModel = onnx.load ( onnxFile )
+        self._parseMetaData ()
+        self._getSROrder()
+        self._instantiateRegressor()
 
-    def instantiateRegressor ( self ):
+    def _instantiateRegressor ( self ):
         """ create the actual inference session object """
-        sess = onnxruntime.InferenceSession ( self.onnxfile )
+        sess = onnxruntime.InferenceSession ( self.onnxFile )
         self.regressor={ "session": sess,
                          "dim": sess.get_inputs()[0].shape[1] }
 
-    def fillValues ( self, container, value ):
-        """ given <value> fill in <container>, if value is sensible
-        :param container: the container to fill
-        :param value: the container, value to copy from
+    def _fillValues ( self, container : str, values : str ) -> list:
+        """ given <values> fill in <container>, if values are sensible
+        :param container: the container to fill, e.g. nLL_obs_max
+        :param values: the container values to copy from, e.g. [2,0]
+        :returns: the values, but cast to proper type
         """
-        tmp = json.loads(value)
+        tmp = json.loads(values)
         if type(tmp) in [ list, tuple ] and len(tmp)==2:
             if math.isfinite(tmp[1]):
                 container = tmp
             if container[0]==None:
                 container[0]=tmp[0]
 
+        return container
 
-    def getSROrder ( self ):
+    def _getSROrder ( self ):
         """ get the order of the signal regions as specified in the
-        onnx meta information """
+        onnx meta information. We rely on smYields in the meta information
+        to define the canonical order.
+        """
         self.srOrder = []
         for srname in self.onnxMeta["smYields"]:
             self.srOrder.append ( srname )
 
-    def parseMetaData ( self ):
+    def _parseMetaData ( self ):
         """ parse the model's meta data """
         data = { "inputMeans": [], "inputErrors": [],
             "nLL_exp_mu0": [ None ]*2, "nLL_obs_mu0": [ None ]*2,
@@ -96,7 +103,7 @@ class NNAdapter:
                 data[em.key] = json.loads(em.value)
             elif em.key in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
                              'nLLA_obs_max', 'nLL_exp_mu0', ]:
-                self.fillValues ( em.key, em.value )
+                data[em.key] = self._fillValues ( em.key, em.value )
             elif em.key == 'y_min':
                 values = json.loads(em.value)
                 if len(values)<7:
@@ -108,14 +115,15 @@ class NNAdapter:
                     if data[name] != None:
                         data[name] = [None,values[index]]
         if len(remove_channels)>0:
-            data["smYields"]=removeSignalRegions ( remove_channels, data["smYields"] )
-            data["obsYields"]=removeSignalRegions ( remove_channels, data["obsYields"] )
-        # ['smYields', 'obsYields', 'inputMeans', 'inputErrors' ]
+            data["smYields"]=removeSignalRegions ( remove_channels, 
+                                                   data["smYields"] )
+            data["obsYields"]=removeSignalRegions ( remove_channels, 
+                                                    data["obsYields"] )
         self.onnxMeta={}
         for key,value in data.items():
             self.onnxMeta[key]=value
 
-    def scaleYields ( self, yields : list ) -> np.array:
+    def _scaleYields ( self, yields : list ) -> np.array:
         """ scale the (total) yields
 
         :returns: the scaled total yields
@@ -131,7 +139,7 @@ class NNAdapter:
             scaled_yields[0][i]=t
         return scaled_yields
 
-    def predictFromScaledYields ( self, scaled_yields : np.array ):
+    def _predictFromScaledYields ( self, scaled_yields : np.array ) -> np.array:
         """ get the prediction from the NN
 
         :param scaled_yields: the input of the neural network
@@ -152,7 +160,7 @@ class NNAdapter:
         arr = arr[0][0]
         return arr
 
-    def nllsFromPrediction( self, arr ) -> dict:
+    def _nllsFromPrediction( self, arr ) -> dict:
         """ given the networks predictions, compute the NLLs
 
         :param arr: the neural network output
@@ -185,80 +193,72 @@ class NNAdapter:
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         return ret
 
-    def predict ( self, yields : dict ) -> dict:
-        """ predict for yields
-        :param yields: e.g. { "SR1": 3, "SR2": 5 }
+    def predict ( self, yields : Union[dict,list] ) -> dict:
+        """ predict for yields, the main method
+        :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
+        (in which case the order must match the one in the json)
 
-        :returns: xxx
+        :returns: { 'nll_exp_0': ..., 'nll_exp_1': ..., 'nll_obs_0': ..., 
+                    'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ..., 
+                    'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
-        inp_list = self.inputDictToList ( yields )
-        scaled_yields = self.scaleYields ( inp_list )
-        out = self.predictFromScaledYields ( scaled_yields )
-        return self.nllsFromPrediction ( out )
+        inp_list = yields
+        if type(inp_list)==dict:
+            inp_list = self._inputDictToList ( yields )
+        scaled_yields = self._scaleYields ( inp_list )
+        out = self._predictFromScaledYields ( scaled_yields )
+        return self._nllsFromPrediction ( out )
 
-    def inputDictToList ( self, in_dict : dict ) -> list:
+    def _inputDictToList ( self, in_dict : dict ) -> list:
         """ translate a dictionary of input yields to a list
         of said yields in the canonical order specified in the onnx
         :raises: exception if input SR is missing or one too many
         :returns: list of yields
         """
         ret = []
-        #if len(in_dict) != len ( self.srOrder ):
-        #    raise Exception ( f"length of dict ({len(in_dict)} does not match srOrder ({len(self.srOrder)})" )
+        if len(in_dict) != len ( self.srOrder ):
+            raise Exception ( f"length of dict ({len(in_dict)} does not match srOrder ({len(self.srOrder)})" )
         for sr in self.srOrder:
-            if not sr in in_dict:
-                ret.append ( 0. )
-                # raise Exception( f"signal region {sr} not in input_dict" )
-            else:
+            dsr = sr
+            if dsr.endswith ( "-0" ):
+                dsr = sr[:-2]
+            if sr in in_dict:
                 ret.append ( in_dict[sr] )
+                continue
+            if dsr in in_dict:
+                ret.append ( in_dict[dsr] )
+                continue
+            print( f"signal region {sr} not in input_dict" )
+            ret.append ( 0. )
         return ret
 
     def interact ( self ):
+        """ for debugging, should probably disappear in the final version """
         import IPython; IPython.embed( colors = "neutral" )
 
-def getRegionsForExample():
-    # the regions dictionary of the example
-    ret = [
-        {'smodels': 'SRhigh_0Jb', 'pyhf': 'SRhigh_0Jb_cuts'},
-        {'smodels': 'SRhigh_0Jc', 'pyhf': 'SRhigh_0Jc_cuts'},
-        {'smodels': 'SRhigh_0Jd', 'pyhf': 'SRhigh_0Jd_cuts'},
-        {'smodels': 'SRhigh_0Je', 'pyhf': 'SRhigh_0Je_cuts'},
-        {'smodels': 'SRhigh_0Jf1', 'pyhf': 'SRhigh_0Jf1_cuts'},
-        {'smodels': 'SRhigh_0Jf2', 'pyhf': 'SRhigh_0Jf2_cuts'},
-        {'smodels': 'SRhigh_0Jg1', 'pyhf': 'SRhigh_0Jg1_cuts'},
-        {'smodels': 'SRhigh_0Jg2', 'pyhf': 'SRhigh_0Jg2_cuts'},
-        {'smodels': 'SRhigh_nJa', 'pyhf': 'SRhigh_nJa_cuts'},
-        {'smodels': 'SRhigh_nJb', 'pyhf': 'SRhigh_nJb_cuts'},
-        {'smodels': 'SRhigh_nJc', 'pyhf': 'SRhigh_nJc_cuts'},
-        {'smodels': 'SRhigh_nJd', 'pyhf': 'SRhigh_nJd_cuts'},
-        {'smodels': 'SRhigh_nJe', 'pyhf': 'SRhigh_nJe_cuts'},
-        {'smodels': 'SRhigh_nJf', 'pyhf': 'SRhigh_nJf_cuts'},
-        {'smodels': 'SRhigh_nJg', 'pyhf': 'SRhigh_nJg_cuts'},
-        {'smodels': 'SRlow_0Jb', 'pyhf': 'SRlow_0Jb_cuts'},
-        {'smodels': 'SRlow_0Jc', 'pyhf': 'SRlow_0Jc_cuts'},
-        {'smodels': 'SRlow_0Jd', 'pyhf': 'SRlow_0Jd_cuts'},
-        {'smodels': 'SRlow_0Je', 'pyhf': 'SRlow_0Je_cuts'},
-        {'smodels': 'SRlow_0Jf1', 'pyhf': 'SRlow_0Jf1_cuts'},
-        {'smodels': 'SRlow_0Jf2', 'pyhf': 'SRlow_0Jf2_cuts'},
-        {'smodels': 'SRlow_0Jg1', 'pyhf': 'SRlow_0Jg1_cuts'},
-        {'smodels': 'SRlow_0Jg2', 'pyhf': 'SRlow_0Jg2_cuts'},
-        {'smodels': 'SRlow_nJb', 'pyhf': 'SRlow_nJb_cuts'},
-        {'smodels': 'SRlow_nJc', 'pyhf': 'SRlow_nJc_cuts'},
-        {'smodels': 'SRlow_nJd', 'pyhf': 'SRlow_nJd_cuts'},
-        {'smodels': 'SRlow_nJe', 'pyhf': 'SRlow_nJe_cuts'},
-        {'smodels': 'SRlow_nJf1', 'pyhf': 'SRlow_nJf1_cuts'},
-        {'smodels': 'SRlow_nJf2', 'pyhf': 'SRlow_nJf2_cuts'},
-        {'smodels': 'SRlow_nJg1', 'pyhf': 'SRlow_nJg1_cuts'},
-        {'smodels': 'SRlow_nJg2', 'pyhf': 'SRlow_nJg2_cuts'}]
-    return ret
-
 if __name__ == "__main__":
-    onnxfile = "../../unittests/testFiles/test.onnx"
+    onnxFile = "../../unittests/testFiles/test.onnx"
+
+    def getRegionsForExample():
+        # the regions dictionary of the example
+        ret = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts', 
+                'SRhigh_0Je_cuts', 'SRhigh_0Jf1_cuts', 'SRhigh_0Jf2_cuts',
+                'SRhigh_0Jg1_cuts', 'SRhigh_0Jg2_cuts', 'SRhigh_nJa_cuts',
+                'SRhigh_nJb_cuts', 'SRhigh_nJc_cuts', 'SRhigh_nJd_cuts',
+                'SRhigh_nJe_cuts', 'SRhigh_nJf_cuts', 'SRhigh_nJg_cuts',
+                'SRlow_0Jb_cuts', 'SRlow_0Jc_cuts', 'SRlow_0Jd_cuts',
+                'SRlow_0Je_cuts', 'SRlow_0Jf1_cuts', 'SRlow_0Jf2_cuts',
+                'SRlow_0Jg1_cuts', 'SRlow_0Jg2_cuts', 'SRlow_nJb_cuts',
+                'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
+                'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
+                'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
+        return ret
+
     regions = getRegionsForExample()
-    adapter = NNAdapter ( onnxfile, False )
+    adapter = NNAdapter ( onnxFile, False )
     yields = {}
     for region in regions:
-        yields[ region["pyhf"] ] = 0.
+        yields[ region ] = 0.
     ret = adapter.predict ( yields )
     print ( ret )
     adapter.interact()
