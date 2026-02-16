@@ -23,7 +23,7 @@ class NNAdapter:
     __slots__ = [ "allowsSyntheticData", "mlModel",
                   "onnxMeta", "srOrder", "regressor" ]
 
-    def __init__( self, mlModel : onnx.ModelProto,
+    def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto],
                   allowsSyntheticData : bool = False ):
         """
         :param model: the model, as a ProtoMod
@@ -31,6 +31,8 @@ class NNAdapter:
         data can be supplied, not used yet
         """
         self.mlModel = mlModel
+        if type(mlModel) in [ bytes, str ]:
+            self.mlModel = onnx.load_model_from_string ( mlModel )
         self.allowsSyntheticData = allowsSyntheticData
         self._parseMetaData ()
         self._getSROrder()
