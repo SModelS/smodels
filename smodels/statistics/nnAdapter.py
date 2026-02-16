@@ -23,24 +23,22 @@ class NNAdapter:
     __slots__ = [ "onnxFile", "allowsSyntheticData", "mlModel",
                   "onnxMeta", "srOrder", "regressor" ]
 
-    def __init__( self, onnxFile : os.PathLike,
+    def __init__( self, mlModel : onnx.ModelProto,
                   allowsSyntheticData : bool = False ):
         """
-        :param onnxFile: path to onnx file
-        to the ML model's SRs
+        :param model: the model, as a ProtoMod
         :param allowsSyntheticData: if true, then also synthetic
         data can be supplied, not used yet
         """
-        self.onnxFile = onnxFile
+        self.mlModel = mlModel
         self.allowsSyntheticData = allowsSyntheticData
-        self.mlModel = onnx.load ( onnxFile )
         self._parseMetaData ()
         self._getSROrder()
         self._instantiateRegressor()
 
     def _instantiateRegressor ( self ):
         """ create the actual inference session object """
-        sess = onnxruntime.InferenceSession ( self.onnxFile )
+        sess = onnxruntime.InferenceSession ( self.mlModel.SerializeToString() )
         self.regressor={ "session": sess,
                          "dim": sess.get_inputs()[0].shape[1] }
 
@@ -232,33 +230,25 @@ class NNAdapter:
             ret.append ( 0. )
         return ret
 
-    def interact ( self ):
-        """ for debugging, should probably disappear in the final version """
-        import IPython; IPython.embed( colors = "neutral" )
-
 if __name__ == "__main__":
+    regions = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts', 
+        'SRhigh_0Je_cuts', 'SRhigh_0Jf1_cuts', 'SRhigh_0Jf2_cuts',
+        'SRhigh_0Jg1_cuts', 'SRhigh_0Jg2_cuts', 'SRhigh_nJa_cuts',
+        'SRhigh_nJb_cuts', 'SRhigh_nJc_cuts', 'SRhigh_nJd_cuts',
+        'SRhigh_nJe_cuts', 'SRhigh_nJf_cuts', 'SRhigh_nJg_cuts',
+        'SRlow_0Jb_cuts', 'SRlow_0Jc_cuts', 'SRlow_0Jd_cuts',
+        'SRlow_0Je_cuts', 'SRlow_0Jf1_cuts', 'SRlow_0Jf2_cuts',
+        'SRlow_0Jg1_cuts', 'SRlow_0Jg2_cuts', 'SRlow_nJb_cuts',
+        'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
+        'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
+        'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
     onnxFile = "../../unittests/testFiles/test.onnx"
+    model = onnx.load ( onnxFile )
 
-    def getRegionsForExample():
-        # the regions dictionary of the example
-        ret = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts', 
-                'SRhigh_0Je_cuts', 'SRhigh_0Jf1_cuts', 'SRhigh_0Jf2_cuts',
-                'SRhigh_0Jg1_cuts', 'SRhigh_0Jg2_cuts', 'SRhigh_nJa_cuts',
-                'SRhigh_nJb_cuts', 'SRhigh_nJc_cuts', 'SRhigh_nJd_cuts',
-                'SRhigh_nJe_cuts', 'SRhigh_nJf_cuts', 'SRhigh_nJg_cuts',
-                'SRlow_0Jb_cuts', 'SRlow_0Jc_cuts', 'SRlow_0Jd_cuts',
-                'SRlow_0Je_cuts', 'SRlow_0Jf1_cuts', 'SRlow_0Jf2_cuts',
-                'SRlow_0Jg1_cuts', 'SRlow_0Jg2_cuts', 'SRlow_nJb_cuts',
-                'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
-                'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
-                'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
-        return ret
+    adapter = NNAdapter ( model, False )
 
-    regions = getRegionsForExample()
-    adapter = NNAdapter ( onnxFile, False )
     yields = {}
-    for region in regions:
+    for region in regions: # predict for no yields
         yields[ region ] = 0.
     ret = adapter.predict ( yields )
-    print ( ret )
-    adapter.interact()
+    print ("\n".join( f"{key:10s}: {value:.1f}" for key,value in ret.items()))
