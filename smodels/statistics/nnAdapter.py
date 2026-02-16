@@ -259,7 +259,8 @@ if __name__ == "__main__":
         'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
         'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
         'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
-    onnxFile = "../../unittests/testFiles/test.onnx"
+    # onnxFile = "../../unittests/testFiles/test.onnx"
+    onnxFile = "test.onnx"
     model = onnx.load ( onnxFile )
 
     adapter = NNAdapter ( model, False )
