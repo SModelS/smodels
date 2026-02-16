@@ -20,7 +20,7 @@ class NNAdapter:
     """
     Adapter that wraps around a neural network
     """
-    __slots__ = [ "onnxFile", "allowsSyntheticData", "mlModel",
+    __slots__ = [ "allowsSyntheticData", "mlModel",
                   "onnxMeta", "srOrder", "regressor" ]
 
     def __init__( self, mlModel : onnx.ModelProto,
@@ -65,6 +65,21 @@ class NNAdapter:
         self.srOrder = []
         for srname in self.onnxMeta["smYields"]:
             self.srOrder.append ( srname )
+
+    def _removeSignalRegions ( self, channels : list, dictionary : dict ) -> dict:
+        """ remove a list of signal regions called "channels" 
+        from the dictionary of values.
+        :returns: pruned dictionary
+        """
+        newDict = {}
+        for SRname,value in dictionary.items():
+            if SRname in channels:
+                continue
+            p1 = SRname.rfind("-")
+            if p1 > 0 and SRname[:p1] in channels:
+                continue
+            newDict[SRname]=value
+        return newDict
 
     def _parseMetaData ( self ):
         """ parse the model's meta data """
@@ -113,9 +128,9 @@ class NNAdapter:
                     if data[name] != None:
                         data[name] = [None,values[index]]
         if len(remove_channels)>0:
-            data["smYields"]=removeSignalRegions ( remove_channels, 
+            data["smYields"]=self._removeSignalRegions ( remove_channels,
                                                    data["smYields"] )
-            data["obsYields"]=removeSignalRegions ( remove_channels, 
+            data["obsYields"]=self._removeSignalRegions ( remove_channels,
                                                     data["obsYields"] )
         self.onnxMeta={}
         for key,value in data.items():
@@ -196,8 +211,8 @@ class NNAdapter:
         :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
         (in which case the order must match the one in the json)
 
-        :returns: { 'nll_exp_0': ..., 'nll_exp_1': ..., 'nll_obs_0': ..., 
-                    'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ..., 
+        :returns: { 'nll_exp_0': ..., 'nll_exp_1': ..., 'nll_obs_0': ...,
+                    'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
         inp_list = yields
@@ -231,7 +246,7 @@ class NNAdapter:
         return ret
 
 if __name__ == "__main__":
-    regions = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts', 
+    regions = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts',
         'SRhigh_0Je_cuts', 'SRhigh_0Jf1_cuts', 'SRhigh_0Jf2_cuts',
         'SRhigh_0Jg1_cuts', 'SRhigh_0Jg2_cuts', 'SRhigh_nJa_cuts',
         'SRhigh_nJb_cuts', 'SRhigh_nJc_cuts', 'SRhigh_nJd_cuts',
@@ -252,3 +267,4 @@ if __name__ == "__main__":
         yields[ region ] = 0.
     ret = adapter.predict ( yields )
     print ("\n".join( f"{key:10s}: {value:.1f}" for key,value in ret.items()))
+    import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
