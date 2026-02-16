@@ -23,15 +23,19 @@ class NNAdapter:
     __slots__ = [ "allowsSyntheticData", "mlModel",
                   "onnxMeta", "srOrder", "regressor" ]
 
-    def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto],
+    def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
                   allowsSyntheticData : bool = False ):
         """
-        :param model: the model, as a ProtoMod
+        :param mlModel: the model, as a ModelProto, as a bytes stream,
+        or as a path to an onnx file (needing to end with .onnx)
         :param allowsSyntheticData: if true, then also synthetic
         data can be supplied, not used yet
         """
         self.mlModel = mlModel
-        if type(mlModel) in [ bytes, str ]:
+        if type(mlModel) == str and mlModel.endswith ( "onnx") and \
+                os.path.exists ( mlModel ):
+            self.mlModel = onnx.load ( mlModel )
+        elif type(mlModel) in [ bytes, str ]:
             self.mlModel = onnx.load_model_from_string ( mlModel )
         self.allowsSyntheticData = allowsSyntheticData
         self._parseMetaData ()
@@ -261,9 +265,8 @@ if __name__ == "__main__":
         'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
     # onnxFile = "../../unittests/testFiles/test.onnx"
     onnxFile = "test.onnx"
-    model = onnx.load ( onnxFile )
 
-    adapter = NNAdapter ( model, False )
+    adapter = NNAdapter ( onnxFile, False )
 
     yields = {}
     for region in regions: # predict for no yields

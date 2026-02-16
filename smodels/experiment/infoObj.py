@@ -149,7 +149,6 @@ class Info(object):
                 logger.error ( f"mlModels field in {dirp} is a string, but {len(jsonFileNames)} json files are mentioned!" )
                 import sys; sys.exit(-1)
         self.onnxes = {}
-        self.onnxMeta = {}
 
         def removeSignalRegions ( channels : list, dictionary : dict ) -> dict:
             """ remove a list of signal regions called "channels" from the dictionary of values.
@@ -231,28 +230,6 @@ class Info(object):
                 #print ( f"@@IO2 {len(data['inputMeans'])}" )
                 data["smYields"]=removeSignalRegions ( remove_channels, data["smYields"] )
                 data["obsYields"]=removeSignalRegions ( remove_channels, data["obsYields"] )
-            #data["inputMeans"]=removeSignalRegions ( remove_channels, data["inputMeans"] )
-            #data["inputErrors"]=removeSignalRegions ( remove_channels, data["inputErrors"] )
-            """
-
-            newSMYields, newObsYields, newMeans, newErrors = {}, {}, [], []
-            for i,SRname in enumerate(data["smYields"].keys()):
-                if SRname in remove_channels:
-                    continue
-                newSMYields[SRname]=data["smYields"]
-                newObsYields[SRname]=data["obsYields"]
-                newMeans.append ( data["inputMeans"][i] )
-                newErrors.append ( data["inputErrors"][i] )
-            data["smYields"] = newSMYields
-            data["obsYields"] = newObsYields
-            data["inputMeans"] = newMeans +  data["inputMeans"][-4:]
-            data["inputErrors"] = newErrors + data ["inputErrors"][-4:]
-            """
-            # ['smYields', 'obsYields', 'inputMeans', 'inputErrors' ]
-            self.onnxMeta[onnxFile]={}
-            for key,value in data.items():
-                self.onnxMeta[onnxFile][key]=value
-
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
             we cache the corresponding jsons. Needed when pickling """

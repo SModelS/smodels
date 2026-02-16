@@ -117,6 +117,7 @@ class NNUpperLimitComputer:
         self.adaptors = {}
         for jsonfilename,onnxb in self.data.globalInfo.onnxes.items():
             self.adaptors[jsonfilename]=NNAdapter ( onnxb )
+        del self.data.globalInfo.onnxes # we wont need that, thank you
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         self.determineMostSensitiveModel()
