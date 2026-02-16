@@ -12,7 +12,7 @@
 
 __all__ = [ "NNAdapter" ]
 
-import os, onnx, json, math, onnxruntime
+import os, onnx, json, math, onnxruntime, sys
 import numpy as np
 from typing import Union
 
