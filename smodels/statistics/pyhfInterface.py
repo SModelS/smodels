@@ -924,6 +924,8 @@ class PyhfUpperLimitComputer:
                         if abs ( sigma_mu_temp - 1.0 ) < 1e-8: # Fischer information is nonsense
                             #Calculate inv_hess numerically
                             inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                            if isinstance(inv_hess,np.ndarray):
+                                inv_hess = inv_hess.item()
                             sigma_mu_temp = float ( np.sqrt ( inv_hess))
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
@@ -939,6 +941,8 @@ class PyhfUpperLimitComputer:
 
                 #Calculate inv_hess numerically
                 inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                if isinstance(inv_hess,np.ndarray):
+                    inv_hess = inv_hess.item()
                 sigma_mu = float ( np.sqrt ( inv_hess)) * self.scale
 
             muhat = float ( muhat[model.config.poi_index]*self.scale )
