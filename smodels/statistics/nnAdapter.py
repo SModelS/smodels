@@ -240,9 +240,6 @@ class NNAdapter:
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
         print ( f"@@postprocess arr {arr}" )
-        if self.joaquinsModel:
-            arr = self._undo_log_with_negatives ( arr )
-        print ( f"@@postprocess arr {arr}" )
         nll0obs =  self.onnxMeta["nLL_obs_mu0"]
         nll0exp =  self.onnxMeta["nLL_exp_mu0"]
         nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
@@ -276,14 +273,15 @@ class NNAdapter:
                 "nllA_exp_0": ..., "nllA_exp_1": ...,
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
-        print ( f"@@postprocess: we start with {arr}" )
+        print ( f"@@postprocessJoaquin: we start with {arr}" )
+        print ( f"@@postprocessJoaquin onnxMeta {self.onnxMeta.keys()}" )
         nll0obs =  self.onnxMeta["nLL_obs_mu0"]
         nll0exp =  self.onnxMeta["nLL_exp_mu0"]
         nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
         nllA0exp =  self.onnxMeta["nLLA_exp_mu0"]
         i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
-        print ( "@@postprocess nllMeans", self.onnxMeta["nllMeans"] )
-        print ( "@@postprocess nllErrors", self.onnxMeta["nllErrors"] )
+        print ( "@@postprocessJoaquin nllMeans", self.onnxMeta["nllMeans"] )
+        print ( "@@postprocessJoaquin nllErrors", self.onnxMeta["nllErrors"] )
         d_nll1obs = self.onnxMeta["nllMeans"][i_obs] + self.onnxMeta["nllErrors"][i_obs]*arr[i_obs]
         d_nll1exp = self.onnxMeta["nllMeans"][i_exp] + self.onnxMeta["nllErrors"][i_exp]*arr[i_exp]
         d_nllA1obs = self.onnxMeta["nllMeans"][i_obsA] + self.onnxMeta["nllErrors"][i_obsA]*arr[i_obsA]
@@ -297,7 +295,8 @@ class NNAdapter:
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
-        print ( f"@@postprocess we return {ret}" )
+        ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
+        print ( f"@@postprocessJoaquin we return {ret}" )
         return ret
 
     def predict ( self, yields : Union[dict,list] ) -> dict:
@@ -309,10 +308,11 @@ class NNAdapter:
                     'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
+        print ( f"@@predict for yields {yields}" )
         scaled_yields = self.preprocess ( yields )
         out = self._predictFromScaledYields ( scaled_yields )
         ret = self.postprocess ( out )
-        print ( f"@@predict ret {ret}" )
+        #print ( f"@@predict ret {ret}" )
         return ret
 
     def preprocess ( self, yields : Union[dict,list] ) -> dict:
@@ -329,6 +329,7 @@ class NNAdapter:
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
         print ( f"@@preprocessJoaquin predict {yields} inp_list {inp_list}" )
+        print ( "@@postprocessJoaquin featureMeans", self.onnxMeta["featureMeans"] )
         inp_list = self._log_with_negatives ( inp_list )
         scaled_yields = self._scaleYieldsJoaquin ( inp_list )
         return scaled_yields
