@@ -20,7 +20,7 @@ class NNAdapter:
     """
     Adapter that wraps around a neural network
     """
-    __slots__ = [ "allowsSyntheticData", "mlModel",
+    __slots__ = [ "allowsSyntheticData", "mlModel", "joaquinsModel",
                   "onnxMeta", "srOrder", "regressor" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
@@ -38,6 +38,7 @@ class NNAdapter:
         elif type(mlModel) in [ bytes, str ]:
             self.mlModel = onnx.load_model_from_string ( mlModel )
         self.allowsSyntheticData = allowsSyntheticData
+        self.joaquinsModel = True
         self._parseMetaData ()
         self._getSROrder()
         self._instantiateRegressor()
@@ -174,7 +175,7 @@ class NNAdapter:
             line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
             print ( f"[nnAdapter] {line}" )
             sys.exit()
-        if True:
+        if False:
             print ( f"@@NNX we evaluate at {scaled_yields}" )
             print ( f"@@NNX we evaluate for {self.regressor['dim']} dims" )
         arr = self.regressor["session"].run(None,
@@ -184,7 +185,19 @@ class NNAdapter:
         arr = arr[0][0]
         return arr
 
-    def _nllsFromPrediction( self, arr ) -> dict:
+    def _log_with_negatives ( self, x : np.array ) -> np.array:
+        """ a pre-processing step that joaquin is performing 
+        but rafal is not
+        """
+        return np.sign(x) * np.log1p ( np.abs(x) )
+
+    def _undo_log_with_negatives ( self, x : np.array ) -> np.array:
+        """ a post-processing step that joaquin is performing 
+        but rafal is not
+        """
+        return np.sign(x) * np.expm1 ( np.abs(x) )
+
+    def postprocess( self, arr ) -> dict:
         """ given the networks predictions, compute the NLLs
 
         :param arr: the neural network output
@@ -226,13 +239,19 @@ class NNAdapter:
                     'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
-        print ( f"@@0 predict {yields}" )
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
+        print ( f"@@0 predict {yields} inp_list {inp_list}" )
+        if self.joaquinsModel:
+            inp_list = self._log_with_negatives ( inp_list )
         scaled_yields = self._scaleYields ( inp_list )
         out = self._predictFromScaledYields ( scaled_yields )
-        return self._nllsFromPrediction ( out )
+        ret = self.postprocess ( out )
+        print ( f"@@1 ret {ret}" )
+        #if self.joaquinsModel:
+        #    ret = self._undo_log_with_negatives ( ret )
+        return ret
 
     def _inputDictToList ( self, in_dict : dict ) -> list:
         """ translate a dictionary of input yields to a list
