@@ -99,10 +99,15 @@ class NNAdapter:
         data["nLL_exp_max"]= [ None ] * 2
         data["nLLA_obs_max"]= [ None ] * 2
         data["nLLA_exp_max"]= [ None ] * 2
+        data["featureMeans"]= []
+        data["featureErrors"]= []
+        data["nllMeans"]= []
+        data["nllErrors"]= []
         remove_channels=[]
         import json, math
         for em in self.mlModel.metadata_props:
             emkey = em.key.replace ( "rafal::", "" )
+            print ( f"@@XXX emkey {emkey} value {em.value}" )
             if emkey == "remove_channels":
                 # remove these channels at the end, so that order does not matter
                 remove_channels = eval(em.value)
@@ -136,7 +141,14 @@ class NNAdapter:
                     if data[name] != None:
                         data[name] = [None,values[index]]
             elif emkey == "standardization":
-                pass
+                # joaquins values
+                values = eval(em.value)
+                data["featureMeans"] = values["features_mean"][0]*3
+                data["featureErrors"] = values["features_std"][0]*3
+                data["nllMeans"] = values["nLLs_mean"][0]
+                data["nllErrors"] = values["nLLs_std"][0]
+
+
                 #values = json.loads(em.value)
         if len(remove_channels)>0:
             data["smYields"]=self._removeSignalRegions ( remove_channels,
@@ -147,7 +159,7 @@ class NNAdapter:
         for key,value in data.items():
             self.onnxMeta[key]=value
 
-    def _scaleYields ( self, yields : list ) -> np.array:
+    def _scaleYieldsRafal ( self, yields : list ) -> np.array:
         """ scale the (total) yields
 
         :returns: the scaled total yields
@@ -158,6 +170,22 @@ class NNAdapter:
             err = self.onnxMeta["inputErrors"][i]
             if err > 1e-20:
                 t = (x - self.onnxMeta["inputMeans"][i])/err
+            #else:
+            #    t = # - self.data.globalInfo.inputMeans[i]
+            scaled_yields[0][i]=t
+        return scaled_yields
+
+    def _scaleYieldsJoaquin ( self, yields : list ) -> np.array:
+        """ scale the (total) yields Joaquin version
+
+        :returns: the scaled total yields
+        """
+        scaled_yields = np.array( [yields], dtype=np.float32 )
+        for i,x in enumerate(scaled_yields[0]):
+            t = 0. # x
+            err = self.onnxMeta["featureErrors"][i]
+            if err > 1e-20:
+                t = (x - self.onnxMeta["featureMeans"][i])/err
             #else:
             #    t = # - self.data.globalInfo.inputMeans[i]
             scaled_yields[0][i]=t
@@ -197,7 +225,12 @@ class NNAdapter:
         """
         return np.sign(x) * np.expm1 ( np.abs(x) )
 
-    def postprocess( self, arr ) -> dict:
+    def postprocess ( self, arr ) -> dict:
+        if self.joaquinsModel:
+            return self.postprocessJoaquin ( arr )
+        return self.postprocessRafal ( arr )
+
+    def postprocessRafal( self, arr ) -> dict:
         """ given the networks predictions, compute the NLLs
 
         :param arr: the neural network output
@@ -206,6 +239,10 @@ class NNAdapter:
                 "nllA_exp_0": ..., "nllA_exp_1": ...,
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
+        print ( f"@@postprocess arr {arr}" )
+        if self.joaquinsModel:
+            arr = self._undo_log_with_negatives ( arr )
+        print ( f"@@postprocess arr {arr}" )
         nll0obs =  self.onnxMeta["nLL_obs_mu0"]
         nll0exp =  self.onnxMeta["nLL_exp_mu0"]
         nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
@@ -230,6 +267,39 @@ class NNAdapter:
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
         return ret
 
+    def postprocessJoaquin( self, arr ) -> dict:
+        """ given the networks predictions, compute the NLLs
+
+        :param arr: the neural network output
+        :returns: { "nll_exp_0": ..., "nll_exp_1": ...,
+                "nll_obs_0": ..., "nll_obs_1": ...,
+                "nllA_exp_0": ..., "nllA_exp_1": ...,
+                "nllA_obs_0": ..., "nllA_obs_1": ... }
+        """
+        print ( f"@@postprocess: we start with {arr}" )
+        nll0obs =  self.onnxMeta["nLL_obs_mu0"]
+        nll0exp =  self.onnxMeta["nLL_exp_mu0"]
+        nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
+        nllA0exp =  self.onnxMeta["nLLA_exp_mu0"]
+        i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
+        print ( "@@postprocess nllMeans", self.onnxMeta["nllMeans"] )
+        print ( "@@postprocess nllErrors", self.onnxMeta["nllErrors"] )
+        d_nll1obs = self.onnxMeta["nllMeans"][i_obs] + self.onnxMeta["nllErrors"][i_obs]*arr[i_obs]
+        d_nll1exp = self.onnxMeta["nllMeans"][i_exp] + self.onnxMeta["nllErrors"][i_exp]*arr[i_exp]
+        d_nllA1obs = self.onnxMeta["nllMeans"][i_obsA] + self.onnxMeta["nllErrors"][i_obsA]*arr[i_obsA]
+        d_nllA1exp = self.onnxMeta["nllMeans"][i_expA] + self.onnxMeta["nllErrors"][i_expA]*arr[i_expA]
+        nll1obs = self._undo_log_with_negatives ( d_nll1obs ) + nll0obs
+        nll1exp = self._undo_log_with_negatives ( d_nll1exp ) + nll0exp
+        nllA1obs = self._undo_log_with_negatives ( d_nllA1obs ) + nllA0obs
+        nllA1exp = self._undo_log_with_negatives ( d_nllA1exp ) + nllA0exp
+
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
+                "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
+        print ( f"@@postprocess we return {ret}" )
+        return ret
+
     def predict ( self, yields : Union[dict,list] ) -> dict:
         """ predict for yields, the main method
         :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
@@ -239,19 +309,37 @@ class NNAdapter:
                     'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
+        scaled_yields = self.preprocess ( yields )
+        out = self._predictFromScaledYields ( scaled_yields )
+        ret = self.postprocess ( out )
+        print ( f"@@predict ret {ret}" )
+        return ret
+
+    def preprocess ( self, yields : Union[dict,list] ) -> dict:
+        """ perform all the preprocessing steps
+        :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
+        (in which case the order must match the one in the json)
+        """
+        if self.joaquinsModel:
+            return self.preprocessJoaquin ( yields )
+        return self.preprocessRafal ( yields )
+
+    def preprocessJoaquin ( self, yields : Union[dict,list] ) -> dict:
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
-        print ( f"@@0 predict {yields} inp_list {inp_list}" )
-        if self.joaquinsModel:
-            inp_list = self._log_with_negatives ( inp_list )
-        scaled_yields = self._scaleYields ( inp_list )
-        out = self._predictFromScaledYields ( scaled_yields )
-        ret = self.postprocess ( out )
-        print ( f"@@1 ret {ret}" )
-        #if self.joaquinsModel:
-        #    ret = self._undo_log_with_negatives ( ret )
-        return ret
+        print ( f"@@preprocessJoaquin predict {yields} inp_list {inp_list}" )
+        inp_list = self._log_with_negatives ( inp_list )
+        scaled_yields = self._scaleYieldsJoaquin ( inp_list )
+        return scaled_yields
+
+    def preprocessRafal ( self, yields : Union[dict,list] ) -> dict:
+        inp_list = yields
+        if type(inp_list)==dict:
+            inp_list = self._inputDictToList ( yields )
+        print ( f"@@preprocessRafal predict {yields} inp_list {inp_list}" )
+        scaled_yields = self._scaleYieldsRafal ( inp_list )
+        return scaled_yields
 
     def _inputDictToList ( self, in_dict : dict ) -> list:
         """ translate a dictionary of input yields to a list
