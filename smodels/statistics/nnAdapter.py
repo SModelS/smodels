@@ -101,29 +101,30 @@ class NNAdapter:
         remove_channels=[]
         import json, math
         for em in self.mlModel.metadata_props:
-            if em.key == "remove_channels":
+            emkey = em.key.replace ( "rafal::", "" )
+            if emkey == "remove_channels":
                 # remove these channels at the end, so that order does not matter
                 remove_channels = eval(em.value)
                 data["remove_channels"] = remove_channels
-            if em.key == "obs_yields":
+            elif emkey == "obs_yields":
                 st = eval(em.value)
                 for l in st: ## the sm yields are tuple of (name,value)
                     data["obsYields"][ l[0] ]= int ( l[1] )
-            if em.key == "bkg_yields":
+            elif emkey == "bkg_yields":
                 st = eval(em.value)
                 for l in st: ## the sm yields are tuple of (name,value)
                     data["smYields"][ l[0] ] = l[1]
-            if em.key == "standardization_mean":
+            elif emkey == "standardization_mean":
                 data["inputMeans"] = eval(em.value)
-            elif em.key == "standardization_std":
+            elif emkey == "standardization_std":
                 data["inputErrors"] = eval(em.value)
-            elif em.key  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
+            elif emkey  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
                               'nLLA_obs_mu0' ]:
-                data[em.key] = json.loads(em.value)
-            elif em.key in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
+                data[emkey] = json.loads(em.value)
+            elif emkey in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
                              'nLLA_obs_max', 'nLL_exp_mu0', ]:
-                data[em.key] = self._fillValues ( em.key, em.value )
-            elif em.key == 'y_min':
+                data[emkey] = self._fillValues ( emkey, em.value )
+            elif emkey == 'y_min':
                 values = json.loads(em.value)
                 if len(values)<7:
                     print ( f"[nnAdapter] 'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
@@ -133,6 +134,9 @@ class NNAdapter:
                 for name,index in indices.items():
                     if data[name] != None:
                         data[name] = [None,values[index]]
+            elif emkey == "standardization":
+                pass
+                #values = json.loads(em.value)
         if len(remove_channels)>0:
             data["smYields"]=self._removeSignalRegions ( remove_channels,
                                                    data["smYields"] )
@@ -164,16 +168,18 @@ class NNAdapter:
         :param scaled_yields: the input of the neural network
         :returns: arr, the unscaled unshifted output of the neural network
         """
-        #if poi_test == 0.:
-        #    print ( f"@@NNX we evaluate at {scaled_yields}" )
         if len(scaled_yields[0])!=self.regressor["dim"]:
             dim_nn = self.regressor["dim"]
             dim_input = len(scaled_yields[0])
             line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
             print ( f"[nnAdapter] {line}" )
             sys.exit()
+        if True:
+            print ( f"@@NNX we evaluate at {scaled_yields}" )
+            print ( f"@@NNX we evaluate for {self.regressor['dim']} dims" )
         arr = self.regressor["session"].run(None,
-                {"input_1":scaled_yields})
+                {"features":scaled_yields})
+        #        {"input_1":scaled_yields})
         # print ( f"@@NNA arr {arr}" )
         arr = arr[0][0]
         return arr
@@ -220,6 +226,7 @@ class NNAdapter:
                     'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
+        print ( f"@@0 predict {yields}" )
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )

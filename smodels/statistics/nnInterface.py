@@ -195,6 +195,7 @@ class NNUpperLimitComputer:
         """
 
         yields = []
+        print ( f"@@NNI smYields {self.adaptors[modelToUse].onnxMeta}" )
         for srname,smyield in self.adaptors[modelToUse].onnxMeta["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -239,8 +240,8 @@ class NNUpperLimitComputer:
 
         # from signal yields compute total yields
         yields = self.totalYieldsFromSignals( modelToUse, poi_test )
+        print ( f"@@NNI we evaluate at {yields} modelToUse {modelToUse} poi_test {poi_test}" )
         """
-        print ( f"@@NNX we evaluate at {yields[:2]}" )
         # we scale these yields
         scaled_yields = self.scaleYields ( yields, modelToUse )
         # we send this through the network

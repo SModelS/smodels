@@ -150,86 +150,12 @@ class Info(object):
                 import sys; sys.exit(-1)
         self.onnxes = {}
 
-        def removeSignalRegions ( channels : list, dictionary : dict ) -> dict:
-            """ remove a list of signal regions called "channels" from the dictionary of values.
-            :returns: pruned dictionary
-            """
-            newDict = {}
-            for SRname,value in dictionary.items():
-                if SRname in channels:
-                    continue
-                p1 = SRname.rfind("-")
-                if p1 > 0 and SRname[:p1] in channels:
-                    continue
-                newDict[SRname]=value
-            return newDict
-
-        def fillValues ( container, value ):
-            """ given <value> fill in <container>, if value is sensible
-            :param container: the container to fill
-            :param value: the container, value to copy from
-            """
-            tmp = json.loads(value)
-            if type(tmp) in [ list, tuple ] and len(tmp)==2:
-                if math.isfinite(tmp[1]):
-                    container = tmp
-                if container[0]==None:
-                    container[0]=tmp[0]
-
         for onnxFile, jsonfilename in self.mlModels.items():
             fullPath = os.path.join(dirp, onnxFile )
             with open ( fullPath, "rb" ) as f:
                 self.onnxes[onnxFile] = f.read()
                 f.close()
-            import onnx
-            m = onnx.load ( fullPath )
-            data = { "smYields": {}, "obsYields": {}, "inputMeans": [],
-                     "inputErrors": [], "nLL_exp_mu0": [ None ]*2,
-                     "nLL_obs_mu0": [ None ]*2, "nLLA_exp_mu0": [ None ]*2,
-                     "nLLA_obs_mu0": [ None ]*2, "nLL_exp_max": [ None ]*2,
-                     "nLL_obs_max": [ None ]*2, "nLLA_exp_max": [ None ]*2,
-                     "nLLA_obs_max": [ None ]*2 }
-            remove_channels=[]
-            import json, math
-            for em in m.metadata_props:
-                if em.key == "remove_channels":
-                    # remove these channels at the end, so that order does not matter
-                    remove_channels = eval(em.value)
-                    # data["remove_channels"] = remove_channels
-                if em.key == "obs_yields":
-                    st = eval(em.value)
-                    for l in st: ## the sm yields are tuple of (name,value)
-                        data["obsYields"][ l[0] ]= int ( l[1] )
-                if em.key == "bkg_yields":
-                    st = eval(em.value)
-                    for l in st: ## the sm yields are tuple of (name,value)
-                        data["smYields"][ l[0] ] = l[1]
-                if em.key == "standardization_mean":
-                    data["inputMeans"] = eval(em.value)
-                elif em.key == "standardization_std":
-                    data["inputErrors"] = eval(em.value)
-                elif em.key  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
-                                  'nLLA_obs_mu0' ]:
-                    data[em.key] = json.loads(em.value)
-                elif em.key in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
-                                 'nLLA_obs_max', 'nLL_exp_mu0', ]:
-                    fillValues ( em.key, em.value )
-                elif em.key == 'y_min':
-                    values = json.loads(em.value)
-                    if len(values)<7:
-                        logger.error ( f"'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
-                        import sys; sys.exit(-1)
-                    indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3,
-                                "nLL_obs_max" : -5, "nLL_exp_max": -7 }
-                    for name,index in indices.items():
-                        if data[name] != None:
-                            data[name] = [None,values[index]]
-            if len(remove_channels)>0:
-                #print ( f"@@IO0 now removing {len(remove_channels)}" )
-                #print ( f"@@IO1 {len(data['obsYields'])})" )
-                #print ( f"@@IO2 {len(data['inputMeans'])}" )
-                data["smYields"]=removeSignalRegions ( remove_channels, data["smYields"] )
-                data["obsYields"]=removeSignalRegions ( remove_channels, data["obsYields"] )
+
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
             we cache the corresponding jsons. Needed when pickling """
