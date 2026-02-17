@@ -20,7 +20,7 @@ class NNAdapter:
     """
     Adapter that wraps around a neural network
     """
-    __slots__ = [ "allowsSyntheticData", "mlModel", "joaquinsModel",
+    __slots__ = [ "allowsSyntheticData", "mlModel", "modelType",
                   "onnxMeta", "srOrder", "regressor" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
@@ -38,7 +38,7 @@ class NNAdapter:
         elif type(mlModel) in [ bytes, str ]:
             self.mlModel = onnx.load_model_from_string ( mlModel )
         self.allowsSyntheticData = allowsSyntheticData
-        self.joaquinsModel = True
+        self.modelType = "rafal"
         self._parseMetaData ()
         self._getSROrder()
         self._instantiateRegressor()
@@ -105,9 +105,15 @@ class NNAdapter:
         data["nllErrors"]= []
         remove_channels=[]
         import json, math
+        isJoaquins = False
+        for em in self.mlModel.metadata_props:
+            if "rafal::" in str(em.key):
+                isJoaquins = True
+        if isJoaquins:
+            self.modelType = "joaquin"
         for em in self.mlModel.metadata_props:
             emkey = em.key.replace ( "rafal::", "" )
-            print ( f"@@XXX emkey {emkey} value {em.value}" )
+            # print ( f"@@XXX emkey {emkey} value {em.value}" )
             if emkey == "remove_channels":
                 # remove these channels at the end, so that order does not matter
                 remove_channels = eval(em.value)
@@ -206,10 +212,10 @@ class NNAdapter:
         if False:
             print ( f"@@NNX we evaluate at {scaled_yields}" )
             print ( f"@@NNX we evaluate for {self.regressor['dim']} dims" )
-        arr = self.regressor["session"].run(None,
-                {"features":scaled_yields})
-        #        {"input_1":scaled_yields})
-        # print ( f"@@NNA arr {arr}" )
+        dct = { "input_1": scaled_yields }
+        if self.modelType == "joaquin":
+            dct = { "features": scaled_yields }
+        arr = self.regressor["session"].run(None, dct )
         arr = arr[0][0]
         return arr
 
@@ -226,7 +232,7 @@ class NNAdapter:
         return np.sign(x) * np.expm1 ( np.abs(x) )
 
     def postprocess ( self, arr ) -> dict:
-        if self.joaquinsModel:
+        if self.modelType == "joaquin":
             return self.postprocessJoaquin ( arr )
         return self.postprocessRafal ( arr )
 
@@ -239,7 +245,7 @@ class NNAdapter:
                 "nllA_exp_0": ..., "nllA_exp_1": ...,
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
-        print ( f"@@postprocess arr {arr}" )
+        print ( f"@@postprocessRafal beginning arr {arr}" )
         nll0obs =  self.onnxMeta["nLL_obs_mu0"]
         nll0exp =  self.onnxMeta["nLL_exp_mu0"]
         nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
@@ -262,6 +268,7 @@ class NNAdapter:
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
+        print ( f"@@postprocessRafal ret {ret}" )
         return ret
 
     def postprocessJoaquin( self, arr ) -> dict:
@@ -274,7 +281,7 @@ class NNAdapter:
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
         print ( f"@@postprocessJoaquin: we start with {arr}" )
-        print ( f"@@postprocessJoaquin onnxMeta {self.onnxMeta.keys()}" )
+        # print ( f"@@postprocessJoaquin onnxMeta {self.onnxMeta.keys()}" )
         nll0obs =  self.onnxMeta["nLL_obs_mu0"]
         nll0exp =  self.onnxMeta["nLL_exp_mu0"]
         nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
@@ -308,7 +315,7 @@ class NNAdapter:
                     'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
-        print ( f"@@predict for yields {yields}" )
+        # print ( f"@@predict for yields {yields}" )
         scaled_yields = self.preprocess ( yields )
         out = self._predictFromScaledYields ( scaled_yields )
         ret = self.postprocess ( out )
@@ -320,7 +327,7 @@ class NNAdapter:
         :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
         (in which case the order must match the one in the json)
         """
-        if self.joaquinsModel:
+        if self.modelType == "joaquin":
             return self.preprocessJoaquin ( yields )
         return self.preprocessRafal ( yields )
 
