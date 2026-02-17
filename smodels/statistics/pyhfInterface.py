@@ -945,7 +945,7 @@ class PyhfUpperLimitComputer:
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv.todense()[model.config.poi_index][model.config.poi_index] ) )
                         if abs ( sigma_mu_temp - 1.0 ) < 1e-8: # Fischer information is nonsense
                             #Calculate inv_hess numerically
-                            inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                            inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)[0]
                             sigma_mu_temp = float ( np.sqrt ( inv_hess))
                         if abs ( sigma_mu_temp - 1.0 ) > 1e-8:
                             sigma_mu = sigma_mu_temp * self.scale
@@ -960,7 +960,7 @@ class PyhfUpperLimitComputer:
                     logger.debug(f"pyhf mle.fit failed {e} with {pyhfinfo['backend']} v{pyhfinfo['backendver']}. Calculating inv_hess numerically.")
 
                 #Calculate inv_hess numerically
-                inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)
+                inv_hess = self.compute_invhess(o.x, workspace.data(model), model, model.config.poi_index)[0]
                 sigma_mu = float ( np.sqrt ( inv_hess)) * self.scale
 
             muhat = float ( muhat[model.config.poi_index]*self.scale )
