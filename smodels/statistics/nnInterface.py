@@ -452,6 +452,11 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
+        """
+        if expected == True:
+            expected = "posteriori"
+        print ( f"@@00 getUpperLimitOnMu expected {expected}" )
+        """
         #nninfo["repeat"]=nninfo["repeat"]+1
         #if nninfo["repeat"]>10:
         #    sys.exit()
