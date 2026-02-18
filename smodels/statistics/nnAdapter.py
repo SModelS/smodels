@@ -289,10 +289,10 @@ class NNAdapter:
         i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
         print ( "@@postprocessJoaquin nllMeans", self.onnxMeta["nllMeans"] )
         print ( "@@postprocessJoaquin nllErrors", self.onnxMeta["nllErrors"] )
-        d_nll1obs = self.onnxMeta["nllMeans"][i_obs] + self.onnxMeta["nllErrors"][i_obs]*arr[i_obs]
-        d_nll1exp = self.onnxMeta["nllMeans"][i_exp] + self.onnxMeta["nllErrors"][i_exp]*arr[i_exp]
-        d_nllA1obs = self.onnxMeta["nllMeans"][i_obsA] + self.onnxMeta["nllErrors"][i_obsA]*arr[i_obsA]
-        d_nllA1exp = self.onnxMeta["nllMeans"][i_expA] + self.onnxMeta["nllErrors"][i_expA]*arr[i_expA]
+        d_nll1obs = self.onnxMeta["nllMeans"][i_obs] + self.onnxMeta["nllErrors"][i_obs]*arr[i_obs-4]
+        d_nll1exp = self.onnxMeta["nllMeans"][i_exp] + self.onnxMeta["nllErrors"][i_exp]*arr[i_exp-4]
+        d_nllA1obs = self.onnxMeta["nllMeans"][i_obsA] + self.onnxMeta["nllErrors"][i_obsA]*arr[i_obsA-4]
+        d_nllA1exp = self.onnxMeta["nllMeans"][i_expA] + self.onnxMeta["nllErrors"][i_expA]*arr[i_expA-4]
         nll1obs = self._undo_log_with_negatives ( d_nll1obs ) + nll0obs
         nll1exp = self._undo_log_with_negatives ( d_nll1exp ) + nll0exp
         nllA1obs = self._undo_log_with_negatives ( d_nllA1obs ) + nllA0obs
