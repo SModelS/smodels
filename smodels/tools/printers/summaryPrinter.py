@@ -112,7 +112,8 @@ class SummaryPrinter(TxTPrinter):
             output += "\n"
             output += " Signal Region:  "+signalRegion+"\n"
             txWeightsDict = theoPred.getTxNamesWeights(sort=True)
-            txnameStr = ', '.join(list(set([tx.txName for tx in txWeightsDict])))
+            txnameStr_list = list(dict.fromkeys([tx.txName for tx in txWeightsDict]))
+            txnameStr = ', '.join(txnameStr_list)
             txnameStr = txnameStr.replace(
                 "'", "").replace("[", "").replace("]", "")
             output += " Txnames:  " + txnameStr + "\n"
