@@ -16,7 +16,7 @@ import unittest
 import glob
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from unitTestHelpers import equalObjs, runMain, importModule
+from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
 import time
 import subprocess
 from smodels.base.smodelsLogging import logger
@@ -61,16 +61,6 @@ class RunSModelSTest(unittest.TestCase):
             print(f"wrong exception {type(e)} {e}")
             self.assertTrue(False)
 
-    def removeOutputs(self, f):
-        """ remove cruft outputfiles """
-
-        f = os.path.splitext(f)[0]
-        extList = ['py','pyc','smodels','smodelsslha','xml']
-        for ext in extList:
-            fname= f"{f}.{ext}"
-            if os.path.exists(fname):
-                os.remove(fname)
-
     def testGoodFile(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         outputfile = runMain(filename)
@@ -96,7 +86,7 @@ class RunSModelSTest(unittest.TestCase):
                 fname = fname[p:]
             print(f"[testRunSModelS] {fname} != gluino_squarks_default.py")
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        removeCruftOutputs(outputfile)
 
     def testGoodFileWithModelFromSLHA(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
@@ -119,7 +109,7 @@ class RunSModelSTest(unittest.TestCase):
                 fname = fname[p:]
             print(f"[testRunSModelS] {fname} != gluino_squarks_default.py")
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        removeCruftOutputs(outputfile)
 
     def testPyhfCombination(self):
         import warnings
@@ -137,7 +127,7 @@ class RunSModelSTest(unittest.TestCase):
             e = "T6bbHH_pyhf_default.py != ./unitTestOutput/T6bbHH_pyhf.slha.py"
             logger.error(e)
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        removeCruftOutputs(outputfile)
 
     def testGoodFile13(self):
 
@@ -163,7 +153,7 @@ class RunSModelSTest(unittest.TestCase):
         self.assertTrue(equals)
 
         # test went through, so remove the output files
-        self.removeOutputs(outputfile)
+        removeCruftOutputs(outputfile)
 
     def testGoodFileHSCP(self):
         filename = "./testFiles/slha/longLived.slha"
@@ -182,7 +172,7 @@ class RunSModelSTest(unittest.TestCase):
                            ignore=ignoreFields, fname=outputfile, fname2="longLived_default.py" )
 
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        removeCruftOutputs(outputfile)
 
     def testLifeTimeDependent(self):
         filename = "./testFiles/slha/lifetime.slha"
@@ -201,13 +191,13 @@ class RunSModelSTest(unittest.TestCase):
                            ignore=ignoreFields, fname=outputfile, fname2="lifetime_default.py" )
 
         self.assertTrue(equals)
-        self.removeOutputs(outputfile)
+        removeCruftOutputs(outputfile)
 
     def testBadFile(self):
         # since 112 we skip non-existing slha files!
         filename = "./testFiles/slha/I_dont_exist.slha"
         of = "unitTestOutput/I_dont_exist.slha.py"
-        self.removeOutputs(of)
+        removeCruftOutputs(of)
         outputfile = runMain(filename)
         self.assertTrue(of in outputfile)
         self.assertTrue(not os.path.exists(outputfile))
