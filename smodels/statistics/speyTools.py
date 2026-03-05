@@ -87,7 +87,7 @@ class SpeyComputer:
                     computer = 'N/A'
 
         elif dataType == "efficiencyMap":
-            nsig = (xsection.value * dataset.getLumi()).asNumber()
+            nsig = (xsection * dataset.getLumi()).asNumber()
             computer = SpeyComputer.forSingleBin(dataset=dataset,
                                                   nsig=nsig,deltas_rel=deltas_rel)
 
@@ -257,6 +257,22 @@ class SpeyComputer:
             f.close()
         return [ speyModel ]
 
+    @classmethod
+    def forAnalysesComb(cls,theoryPredictions, deltas_rel):
+        """ get a statscomputer for combination of analyses
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param deltas_rel: relative error for the signal
+        :returns: a StatsComputer
+        """
+
+        # Only allow negative signal if all theory predictions allow for it
+        # allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
+        #                             for tp in theoryPredictions])
+
+        computer = SpeyAnalysesCombosComputer(theorypreds=theoryPredictions,
+                                 deltas_rel=deltas_rel )
+        return computer
+
     def getStatModelsPyhf(self, nsig: Union[float, np.ndarray] ):
         """
         Create statistical model from a pyhf json file
@@ -299,14 +315,17 @@ class SpeyComputer:
         :raises NotImplementedError: If requested backend has not been recognised.
         """
         dataset = self.dataset
-        stat_wrapper = get_backend("default_pdf.uncorrelated_background")
+        try:
+            stat_wrapper = get_backend("default.uncorrelated_background")
+        except spey.PluginError as e: ## older spey?
+            stat_wrapper = get_backend("default_pdf.uncorrelated_background")
         id = f"{dataset.globalInfo.id}:{dataset.dataInfo.dataId}"
 
         speyModel = stat_wrapper(
                         data = [float(dataset.dataInfo.observedN)],
                         background_yields = [float(dataset.dataInfo.expectedBG)],
                         absolute_uncertainties = [float(dataset.dataInfo.bgError)],
-                        signal_yields = nsig,
+                        signal_yields = [nsig],
                         xsection = float (nsig/dataset.getLumi().asNumber(1./fb)),
                         analysis = id,
 #                        backend = 'simplified_likelihoods'
@@ -323,7 +342,7 @@ class SpeyComputer:
                          apriori: ExpectationType.apriori,
                          aposteriori: ExpectationType.aposteriori}
         if evaluationType in expectedDict:
-            return expectedDict[expected]
+            return expectedDict[evaluationType]
         logger.error( f'{expected} is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' )
         return None
 
@@ -335,42 +354,38 @@ class SpeyComputer:
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
              correct, if necessary
         """
-        ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll  )
-        lmax = ret['lmax']
+        assert return_nll == True, "we are phasing out return_nll=False"
+        ret = self.maximize_likelihood ( evaluationType = evaluationType, 
+               return_nll = True )
+        nll_min = ret["nll_min"]
 
-        lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, return_nll = return_nll )
-        ret["lbsm"] = lbsm
-        lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, return_nll = return_nll )
-        ret["lsm"] = lsm
+        nllbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, 
+                return_nll = True, asimov = False )
+        ret["nllbsm"] = nllbsm
+        nllsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, 
+                return_nll = True, asimov = False )
+        ret["nllsm"] = nllsm
         if check_for_maxima:
-            if return_nll:
-                if lsm < lmax: ## if return_nll is off, its the other way
-                    muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
-                    ret["muhat"] = 0.0
-                if lbsm < lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
-                    ret["muhat"] = 1.0
-            else:
-                if lsm > lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lsm
-                    ret["muhat"] = 0.0
-                if lbsm > lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret["lmax"] = lbsm
-                    ret["muhat"] = 1.0
-
+            if nllsm < nll_min: ## if return_nll is off, its the other way
+                muhat = ret["muhat"]
+                logger.debug(f"nllsm={nllsm:.2g} > nll_min({muhat:.2g})={nll_min:.2g}: will correct")
+                ret["nll_min"] = nllsm
+                ret["muhat"] = 0.0
+            if nllbsm < nll_min:
+                muhat = ret["muhat"]
+                logger.debug(f"nllbsm={nllbsm:.2g} > nll_min({muhat:.2g})={nll_min:.2g}: will correct")
+                ret["nll_min"] = nllbsm
+                ret["muhat"] = 1.0
+        if return_nll == False:
+            # if we really need to, we cast to likelihoods here
+            # but not needed yet
+            pass
         return ret
 
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False, model_index : Union [int,None] = None ) -> float:
+           limit_on_xsec : bool = False, 
+           model_index : Union [int,None] = None ) -> float:
         """ simple frontend to spey::poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the
@@ -383,7 +398,7 @@ class SpeyComputer:
         exp = self.translateExpectationType ( evaluationType )
 
         try:
-            ret = self.speyModels[model_index].poi_upper_limit ( evaluationType = exp )
+            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp )
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             sys.exit(-1)
@@ -427,8 +442,9 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
         evaluationType = self.translateExpectationType ( evaluationType )
-        return self.speyModel[self.model_index].asimov_likelihood ( poi_test = poi_test,
-            evaluationType = evaluationType, return_nll = return_nll )
+        return self.speyModel[self.model_index].asimov_likelihood ( 
+            poi_test = poi_test, expected= evaluationType, 
+            return_nll = return_nll )
 
     @classmethod
     def forPyhf(cls, dataset, nsig, deltas_rel):
@@ -451,12 +467,13 @@ class SpeyComputer:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
-                            return_nll : bool ) -> float:
+                     return_nll : bool, asimov : bool = False ) -> float:
         """ simple frontend to spey functionality """
+        ## FIXME treat the asimov flat
         self.checkMinimumPoi ( poi_test )
         evaluationType = self.translateExpectationType ( evaluationType )
         ret = self.speyModels[self.model_index].likelihood ( poi_test = poi_test,
-            evaluationType = evaluationType, return_nll = return_nll )
+            expected = evaluationType, return_nll = return_nll )
         return float(ret)
 
     def maximize_likelihood ( self, evaluationType : NllEvalType,
@@ -468,7 +485,8 @@ class SpeyComputer:
         :returns: tuple of muhat,lmax
         """
         evaluationType = self.translateExpectationType ( evaluationType )
-        speyret = self.speyModels[self.model_index].maximize_likelihood ( evaluationType = evaluationType,
+        speyret = self.speyModels[self.model_index].maximize_likelihood ( 
+                expected = evaluationType, 
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": float(speyret[0]) }
@@ -494,8 +512,8 @@ class SpeyComputer:
         """
         test_statistic = "q" if allow_negative_signal else "qmutilde"
         exp = SpeyComputer.translateExpectationType ( evaluationType )
-        sigma_mu = self.speyModels[self.model_index].sigma_mu( poi_test=poi_test,evaluationType=exp,
-                                            test_statistics=test_statistic )
+        sigma_mu = self.speyModels[self.model_index].sigma_mu( poi_test=poi_test,
+                expected=exp, test_statistics=test_statistic )
         return float(sigma_mu)
 
     def maximize_asimov_likelihood ( self, evaluationType : NllEvalType,
@@ -509,8 +527,8 @@ class SpeyComputer:
         # init = self.getSpeyInitialisation ( True )
         # opt = init["optimiser"]
         # opt["test_statistics"]="qmutilde"
-        ret = self.speyModels[self.model_index].maximize_asimov_likelihood ( evaluationType = evaluationType,
-            return_nll = return_nll ) # , **opt )
+        ret = self.speyModels[self.model_index].maximize_asimov_likelihood ( 
+                expected = evaluationType, return_nll = return_nll ) # , **opt )
         assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
         for k,v in ret.items():
             ret[k]=float(v)
@@ -563,7 +581,7 @@ class SpeyAnalysesCombosComputer:
             computer = SpeyComputer.create ( pred.dataset, pred.xsection, None,
                     deltas_rel )
             models.append ( computer.speyModels[0] )
-            xsec = pred.xsection.value
+            xsec = pred.xsection
             self.xsecs.append ( xsec )
         self.speyModel = UnCorrStatisticsCombiner ( *models )
 
@@ -581,7 +599,7 @@ class SpeyAnalysesCombosComputer:
                               cross section
         """
         exp = SpeyComputer.translateExpectationType ( evaluationType )
-        ret = self.speyModel.poi_upper_limit ( evaluationType = exp )
+        ret = self.speyModel.poi_upper_limit ( expected = exp )
         ret = float(ret) # cast for the printers
         if limit_on_xsec:
             totxsec = sum(self.xsecs,0.*fb)
@@ -589,11 +607,11 @@ class SpeyAnalysesCombosComputer:
         return ret
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
-                            return_nll : bool ) -> float:
+                     return_nll : bool, asimov : bool = False ) -> float:
         """ simple frontend to spey functionality """
         evaluationType = SpeyComputer.translateExpectationType ( evaluationType )
         ret = self.speyModel.likelihood ( poi_test = poi_test,
-            evaluationType = evaluationType, return_nll = return_nll )
+            expected = evaluationType, return_nll = return_nll )
         return float(ret)
 
     def maximize_likelihood ( self, evaluationType : NllEvalType,
@@ -605,7 +623,7 @@ class SpeyAnalysesCombosComputer:
         :returns: tuple of muhat,lmax
         """
         evaluationType = SpeyComputer.translateExpectationType ( evaluationType )
-        speyret = self.speyModel.maximize_likelihood ( evaluationType = evaluationType,
+        speyret = self.speyModel.maximize_likelihood ( expected = evaluationType,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": float(speyret[0]) }
@@ -678,7 +696,7 @@ class SpeyAnalysesCombosComputer:
         """
         test_statistic = "q" if allow_negative_signal else "qmutilde"
         exp = SpeyComputer.translateExpectationType ( evaluationType )
-        sigma_mu = self.speyModel.sigma_mu( poi_test=poi_test,evaluationType=exp,
+        sigma_mu = self.speyModel.sigma_mu( poi_test=poi_test,expected=exp,
                                             test_statistics=test_statistic )
         return float(sigma_mu)
 
