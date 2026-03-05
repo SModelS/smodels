@@ -15,11 +15,11 @@ import unittest
 # from smodels.tools import statistics
 from smodels.statistics.statsTools import getStatsComputerModule, StatsComputer
 from smodels.statistics.speyTools import SpeyComputer
-from unitTestHelpers import equalObjs, runMain
+from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
 from smodels.base import runtime
 
 class SpeyTest(unittest.TestCase):
-    def restSwitch(self):
+    def testSwitch(self):
         """ see that we can turn on spey mode """
         computer = getStatsComputerModule()
         self.assertTrue( type(computer) == type(StatsComputer) )
@@ -34,10 +34,24 @@ class SpeyTest(unittest.TestCase):
         filename = "./testFiles/slha/gluino_squarks.slha"
         inifile = "testParameters_spey.ini"
         outputfile = runMain(filename, inifile = inifile, suppressStdout=False )
-        print ( f"output {outputfile}" )
-        cmd = f"cp {outputfile} bla.py"
-        import subprocess
-        subprocess.getoutput ( cmd )
+        smodelsOutput = importModule(outputfile)
+        from default_with_spey import smodelsOutputDefault
+        runtime._experimental["spey"]=False
+        ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element',
+                        'database version', 'model']
+        smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
+                                                 key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+                           allowedRelDiff=0.02,
+                           ignore=ignoreFields, fname=outputfile)
+        if not equals:
+            p = outputfile.find("unitTestOutput")
+            fname = outputfile
+            if p > 0:
+                fname = fname[p:]
+            print(f"[testRunSModelS] {fname} != gluino_squarks_default.py")
+        self.assertTrue(equals)
+        removeCruftOutputs(outputfile)
 
 if __name__ == "__main__":
     unittest.main()

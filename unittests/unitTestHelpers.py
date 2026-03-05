@@ -26,10 +26,22 @@ from smodels.experiment.expSMS import ExpSMS
 
 import sys
 
-def checkPythonRequirements(requirements_path: 
-			os.PathLike = "../smodels/share/requirements.txt"):
-    """ Simple function to check if the Python requirements 
-	  are met using importlib and packaging."""
+def removeCruftOutputs( filename : str ):
+    """ remove cruft outputfiles
+		:param filename: filename, remove it and its variants
+		"""
+    f = os.path.splitext(filename)[0]
+    extList = ['py','pyc','smodels','smodelsslha','xml']
+    for ext in extList:
+        fname= f"{f}.{ext}"
+        if os.path.exists(fname):
+            os.remove(fname)
+
+
+def checkPythonRequirements(requirements_path:
+            os.PathLike = "../smodels/share/requirements.txt"):
+    """ Simple function to check if the Python requirements
+      are met using importlib and packaging."""
     from pathlib import Path
     from importlib.metadata import version, PackageNotFoundError
     from packaging.requirements import Requirement
@@ -44,7 +56,7 @@ def checkPythonRequirements(requirements_path:
 
     # Filter out comments and empty lines
     requirements = [line.strip() for line in requirements if line.strip() \
-				   and not line.strip().startswith("#")]
+                   and not line.strip().startswith("#")]
 
     print(f"[unitTestHelpers] Checking {len(requirements)} python dependencies ... ", end="")
 
