@@ -14,12 +14,12 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.statistics.statsTools import getStatsComputerModule, StatsComputer
-from smodels.statistics.speyTools import SpeyComputer
 from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
 from smodels.base import runtime
 
 class SpeyTest(unittest.TestCase):
     def testSwitch(self):
+        from smodels.statistics.speyTools import SpeyComputer
         """ see that we can turn on spey mode """
         computer = getStatsComputerModule()
         self.assertTrue( type(computer) == type(StatsComputer) )
