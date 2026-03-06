@@ -15,8 +15,8 @@ SModelS is an automatic, public tool for interpreting simplified-model results f
 
 ## Installation
 
-For instructions on how to install SModelS, see the “Installation” section of the SModelS online manual:
-- http://smodels.readthedocs.io/en/latest/Installation.html
+For instructions on how to install SModelS, see the [Installation](https://smodels.readthedocs.io/en/latest/Installation.html) section of the 
+[SModelS online manual](https://smodels.readthedocs.io/).
 
 ## Running SModelS
 
@@ -32,16 +32,22 @@ For help instructions:
 ./runSModelS.py -h
 ```
 
-An example file on how to call the SModelS libraries from your own Python code can be found in `Example.py`.
+An example file on how to call the SModelS libraries from your own Python code
+can be found in `Example.py`.
 
-Detailed explanations on how to use SModelS, including explanations of the output, can be found in the “Using SModelS” section of the SModelS online manual:
-- http://smodels.readthedocs.io/en/latest/RunningSModelS.html
+Detailed explanations on how to use SModelS, including explanations of the
+output, can be found in the [Using
+SModelS](https://smodels.readthedocs.io/en/latest/RunningSModelS.html) section
+of the [SModelS online manual](https://smodels.readthedocs.io/).
 
-A few example input files are provided in the `inputFiles` folder and can be used to test `runSModelS.py`.
+A few example input files are provided in the `inputFiles` folder and can be
+used to test `runSModelS.py`.
 
 ## Citation
 
-If you use this software please cite the SModelS v1–v3 manuals, the original SModelS publication, as well as the programs it makes use of. For your convenience, the relevant citations are provided in bibtex format in:
+If you use this software please cite the SModelS v1–v3 manuals, the original
+SModelS publication, as well as the programs it makes use of. For your
+convenience, the relevant citations are provided in bibtex format in:
 - references.bib: https://github.com/SModelS/smodels/blob/main/references.bib
 
 For citing the experimental analyses in the database, you can use:
