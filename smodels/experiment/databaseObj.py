@@ -29,7 +29,6 @@ from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
 from typing import List, Tuple, Union
-import logging
 os.environ["OMP_NUM_THREADS"] = "2"
 
 scipyver = ""
@@ -232,9 +231,11 @@ class Database(object):
     def getExpResults(self, analysisIDs : list = ['all'],
             datasetIDs : list = ['all'], txnames : list = ['all'],
             dataTypes : list = ['all'], useNonValidated : bool = False,
-            onlyWithExpected : bool = False ):
+            onlyWithExpected : bool = False ) -> list:
         """
-        Select (filter) the results within the database satisfying the restrictions set by the arguments and returns the corresponding results.
+        Select (filter) the results within the database satisfying the
+        restrictions set by the arguments and returns the corresponding
+        results.
         """
 
         self.selectExpResults(analysisIDs=analysisIDs, datasetIDs=datasetIDs,
@@ -249,7 +250,9 @@ class Database(object):
             dataTypes : list = ['all'], useNonValidated : bool = False,
             onlyWithExpected : bool = False ):
         """
-        Selects (filter) the results within the database satisfying the restrictions set by the arguments and updates the centralized SMS dictionary.
+        Selects (filter) the results within the database satisfying the
+        restrictions set by the arguments and updates the centralized SMS
+        dictionary.
 
         :param analysisIDs: list of analysis ids ([CMS-SUS-13-006,...]). Can
                             be wildcarded with usual shell wildcards: * ? [<letters>]
@@ -950,7 +953,7 @@ class SubDatabase(object):
 
         #If still None, fallback to default:
         if self.databaseParticles is None:
-            logging.debug("databaseParticles not found. Using default state.")
+            logger.debug("databaseParticles not found. Using default state.")
             from smodels.experiment.defaultFinalStates import finalStates
             self.databaseParticles = finalStates
 
@@ -1247,6 +1250,7 @@ class SubDatabase(object):
 
 if __name__ == "__main__":
     import argparse
+    from logging import INFO, DEBUG
     from smodels.base.smodelsLogging import setLogLevel
     """ Run as a script, this checks and/or writes dbX.pcl files """
     argparser = argparse.ArgumentParser(description='simple script to check \
@@ -1266,9 +1270,9 @@ if __name__ == "__main__":
     argparser.add_argument('-D', '--database', help='directory name of database',
                            default="../../../smodels-database/")
     args = argparser.parse_args()
-    logger.setLevel(level=logging.INFO)
+    logger.setLevel(level=INFO)
     if args.debug:
-        setLogLevel(level=logging.DEBUG)
+        setLogLevel(level=DEBUG)
     if args.write:
         db = Database(args.database, force_load="txt")
         db.createBinaryFile()
