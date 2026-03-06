@@ -60,7 +60,7 @@ class SpeyComputer:
             # an onnxfile is defined, we use it!
             return self.getNNModel ( nsig )
         if self.backendType == "pyhf":
-            return self.getStatModelsPyhf ( nsig )
+            return self.getStatModelPyhf ( nsig )
         if self.dataset.getType() == "efficiencyMap":
             return self.getStatModelSingleBin ( nsig )
         return self.getStatModelMultiBin ( nsig )
@@ -273,7 +273,7 @@ class SpeyComputer:
                                  deltas_rel=deltas_rel )
         return computer
 
-    def getStatModelsPyhf(self, nsig: Union[float, np.ndarray] ):
+    def getStatModelPyhf(self, nsig: Union[float, np.ndarray] ):
         """
         Create statistical model from a pyhf json file
 
@@ -282,7 +282,7 @@ class SpeyComputer:
         """
         dataset = self.dataset
         stat_wrapper = get_backend("pyhf")
-        from smodels.tools.speyPyhf import SpeyPyhfData
+        from smodels.statistics.speyPyhf import SpeyPyhfData
         data = SpeyPyhfData.createDataObject ( dataset, self.nsig )
         models = []
         patches = data.patchMaker()
@@ -410,6 +410,8 @@ class SpeyComputer:
             totsig = self.nsig
             if type ( self.nsig ) in [ list ]:
                 totsig = sum ( self.nsig )
+            if type ( self.nsig ) in [ dict ]:
+                totsig = sum ( self.nsig.values() )
             xsec = totsig / self.dataset.globalInfo.lumi
             ret = ret * xsec
         return ret
