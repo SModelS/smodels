@@ -47,11 +47,8 @@ used to test `runSModelS.py`.
 
 If you use this software please cite the SModelS v1–v3 manuals, the original
 SModelS publication, as well as the programs it makes use of. For your
-convenience, the relevant citations are provided in bibtex format in:
-- references.bib: https://github.com/SModelS/smodels/blob/main/references.bib
+convenience, the relevant citations are provided in bibtex format in 
+[references.bib](https://github.com/SModelS/smodels/blob/main/references.bib).
 
 For citing the experimental analyses in the database, you can use:
-- database.bib: https://github.com/SModelS/smodels-database-release/blob/main/database.bib
-
-SModelS online manual:
-- http://smodels.readthedocs.io/
+[database.bib](https://github.com/SModelS/smodels-database-release/blob/main/database.bib).
