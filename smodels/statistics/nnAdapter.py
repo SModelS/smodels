@@ -268,7 +268,7 @@ class NNAdapter:
                 "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
-        print ( f"@@postprocessRafal ret {ret}" )
+        # print ( f"@@postprocessRafal ret {ret}" )
         return ret
 
     def postprocessJoaquin( self, arr ) -> dict:
@@ -345,7 +345,7 @@ class NNAdapter:
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
-        print ( f"@@preprocessRafal predict {yields} inp_list {inp_list}" )
+        # print ( f"@@preprocessRafal predict {yields} inp_list {inp_list}" )
         scaled_yields = self._scaleYieldsRafal ( inp_list )
         return scaled_yields
 

@@ -276,7 +276,7 @@ class TheoryPrediction(object):
         if "nll_sm" not in self.cachedObjs[expected]:
             self.computeStatistics(expected)
         if "nll_sm" not in self.cachedObjs[expected]:
-            self.cachedObjs[expected]["lsm"] = None
+            self.cachedObjs[expected]["nll_sm"] = None
         return self.nllToLikelihood ( self.cachedObjs[expected]["nll_sm"],
                return_nll )
 

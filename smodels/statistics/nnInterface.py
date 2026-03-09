@@ -202,7 +202,7 @@ class NNUpperLimitComputer:
             if not realname in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
                 assert realname in self.nsignals, \
-                  f"nnInterface: cannot find sr name {realname} in {' '.join(self.nsignals.keys())}"
+                  f"nnInterface: cannot find sr name {realname} in '{' '.join(self.nsignals.keys())}'"
             # smodelsname = self.data.globalInfo
             signal = float ( self.nsignals[realname]*poi_test )
             if self.isControlRegion ( srname, modelToUse ):
@@ -385,10 +385,12 @@ class NNUpperLimitComputer:
 
         method = "Nelder-Mead"
         initx0s = [ 0., .1, -.1, .3, -.3, 1., -1., 3., -3., 10., -10., 100,-100 ]
-        bounds=[(-100,100)]
-        if not allowNegativeSignals:
-            bounds=[(0,100)]
         for x0 in initx0s:
+            bounds=[(-100,100)] if allowNegativeSignals else [(0,100)]
+            if bounds[0][0] > x0:
+                bounds = [(x0,100)]
+            if bounds[0][1] < x0:
+                bounds = [(bounds[0][0],x0)]
             o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
                     args=(modelToUse,outputType), tol=1e-8, options = options,
                     method = method, bounds=bounds )
@@ -513,6 +515,9 @@ class NNUpperLimitComputer:
 
         if True: # expected != "posteriori":
             fmh = self.lmax(expected=expected, allowNegativeSignals=allowNegativeSignals, modelToUse = modelToUse )
+            if fmh == None:
+                return None, None, None
+
             mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
             mu_hat = mu_hat if mu_hat is not None else 0.0
         if False: # expected == "posteriori":
