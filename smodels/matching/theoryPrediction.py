@@ -67,10 +67,12 @@ class TheoryPrediction(object):
 
         return self.dataset.globalInfo.id
 
-    def dataType(self, short : bool = False ):
+    def dataType(self, short : bool = False ) -> str:
         """
         Return the type of dataset
         :param: short, if True, return abbreviation (ul,em,comb)
+
+        :returns: data type, as a string, e.g. "efficiencyMap"
         """
         if short:
             t = self.dataset.getType()
@@ -136,11 +138,12 @@ class TheoryPrediction(object):
             values.append(float(value))
         return max(values)
 
-    def getTxNamesWeights(self,sort=True):
+    def getTxNamesWeights(self,sort : bool = True) -> dict:
         """
         Returns a dictionary with the txname objects as keys
         and their total weights as values.
-        :param sort: If True, the dictionary is sorted according to the largest weights.
+        :param sort: If True, the dictionary is sorted according
+        to the largest weights.
         """
 
         txnamesWeightsDict = {}
@@ -526,11 +529,12 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         conditions = [tp.getmaxCondition() for tp in self.theoryPredictions]
         return max(conditions)
 
-    def getTxNamesWeights(self,sort=True):
+    def getTxNamesWeights(self, sort : bool = True ) -> dict:
         """
         Returns a dictionary with the txname objects as keys
         and their total weights as values.
-        :param sort: If True, the dictionary is sorted according to the largest weights.
+        :param sort: If True, the dictionary is sorted according to
+        the largest weights.
         """
 
         txnamesWeightsDict = {}
@@ -543,7 +547,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         if sort:
             txnamesWeightsDict = dict(sorted(txnamesWeightsDict.items(),
-                                        key=lambda x: (x[1],x[0]), reverse=True))
+                                      key=lambda x: (x[1],x[0]), reverse=True))
 
         return txnamesWeightsDict
 
