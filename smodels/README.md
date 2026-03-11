@@ -5,7 +5,6 @@
 [![Anaconda version](https://anaconda.org/conda-forge/smodels/badges/version.svg)](https://anaconda.org/conda-forge/smodels/)
 [![CodeFactor](https://www.codefactor.io/repository/github/smodels/smodels/badge/main)](https://www.codefactor.io/repository/github/smodels/smodels/overview/main)
 [![Docs](https://img.shields.io/badge/docs-main-blue.svg)](https://smodels.readthedocs.io)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1169739.svg)](https://doi.org/10.5281/zenodo.116973)
 
 # SModelS v3
 
