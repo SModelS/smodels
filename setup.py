@@ -150,7 +150,7 @@ setup(
     include_package_data = True,
     test_suite='unittests',
     long_description=read('smodels/README.md'),
-    long_description_content_type="text/x-md",
+    long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Topic :: Scientific/Engineering :: Physics",
