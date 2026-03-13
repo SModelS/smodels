@@ -449,11 +449,13 @@ class StatsComputer:
                        evaluationType = evaluationType )
         elif self.dataType in ["analysesComb"]:
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(evaluationType = evaluationType,
-                                                                           allowNegativeSignals=self.allowNegativeSignals )
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                        evaluationType = evaluationType,
+                        allowNegativeSignals=self.allowNegativeSignals )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(evaluationType = evaluationType,
-                                                                allowNegativeSignals=self.allowNegativeSignals )
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                        evaluationType = evaluationType,
+                        allowNegativeSignals=self.allowNegativeSignals )
 
         return ret
 
