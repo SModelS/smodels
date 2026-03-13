@@ -15,6 +15,8 @@ from typing import Union, Text, Tuple, Dict, List
 import sys
 from spey import ExpectationType, StatisticalModel, get_backend
 import spey
+# spey.set_optimiser( "iminuit" )
+
 try:
     from spey.system.exceptions import AsimovTestStatZero
 except ImportError: # comes only with newer versions of spey
