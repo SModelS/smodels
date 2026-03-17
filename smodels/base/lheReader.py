@@ -10,60 +10,106 @@
 from smodels.base.physicsUnits import TeV, pb
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.smodelsLogging import logger
-import pyslha
+import pyslha, os, io
+from typing import Union, Dict, Tuple
 
 class LheReader(object):
     """
     An instance of this class represents a reader for LHE files.
     """
-
-    def __init__(self, filename, nmax=None):
+    def __init__( self, filename : Union[os.PathLike,io.FileIO],
+                  nmax : Union[int,None] = None ):
         """
         Constructor.
 
         :param filename: LHE file name
         :param nmax: When using the iterator, then nmax is the maximum number
-                     of events to be reader, nmax=None means read till the end of the file.
-                     If filename is not a string, assume it is already a file object and do
-                     not open it.
+        of events to be reader, nmax=None means read till the end of the file.
+        If filename is not a string, assume it is already a file object and do
+        not open it.
         """
-        
+
         self.filename = filename
         self.nmax = nmax
         self.ctr = 0
         if type(filename) == type('str'):
             self.file = open(filename, 'r')
-        else: self.file = filename
+        else:
+            self.file = filename
+        self.getMetaInfo()
+
+    def extractInitPartsFromText( self, lhe_text: str ) -> Dict:
+        """
+        Extract a clean <init> block (only text/numeric lines, no inner tags)
+        and a list of the inner tags as XML strings.
+
+        Returns: dictionary with collision, xsecs, nested_tags
+        as keys
+        """
+        import re
+        import xml.etree.ElementTree as ET
+        # Locate the first <init>...</init>
+        m = re.search( r'<init\b[^>]*>(?P<inner>.*?)</init>', lhe_text,
+                       flags=re.DOTALL|re.IGNORECASE )
+        if not m:
+            raise ValueError("No <init>...</init> block found.")
+
+        inner = m.group('inner')
+        # Wrap the inner content to parse the mixed text+elements safely
+        wrapper_xml = f'<__wrap__>{inner}</__wrap__>'
+        # Default parser is fine; we don't need to preserve comments as "tags"
+        wrapper = ET.fromstring(wrapper_xml)
+
+        # Reconstruct the pure text (everything outside tags):
+        # wrapper.text + sum(child.tail)
+        pieces = []
+        if wrapper.text:
+            for line in wrapper.text.split("\n"):
+                line = line.strip()
+                if len(line)==0:
+                    continue
+                pieces.append( line )
+        for child in list(wrapper):
+            if child.tail:
+                for line in child.tail.split("\n"):
+                    line = line.strip()
+                    if len(line)==0:
+                        continue
+                    pieces.append(line)
+
+        # Keep original whitespace as much as possible;
+        # ensure outer tags are present
+        # Collect the embedded tags as XML strings, in order
+        nested_tags = [ ET.tostring(child, encoding='unicode') \
+                       for child in list(wrapper) ]
+
+        return { "collision": pieces[0], "xsecs": pieces[1:],
+                 "nested_tags": nested_tags }
+
+    def getMetaInfo ( self ):
+        """ obtain the LHE file's meta info, store in self.metainfo """
         self.metainfo = {"nevents" : None, "totalxsec" : None, "sqrts" : None}
 
         # Get global information from file (cross section sqrts, total
         # cross section, total number of events)
         self.file.seek(0)
-        line = self.file.readline()
-        nevts = None
-        totxsec = None
-        sqrts = None
-        # Exit if reached end of events or file
-        while not "</LesHouchesEvents>" in line and line != "":
-            if "<init>" in line:
-                line = self.file.readline()
-                if line.split()[0] == line.split()[1] == "2212":
-                    sqrts = (eval(line.split()[2]) + eval(line.split()[3])) / 1000. * TeV
-                    self.metainfo["sqrts"] = sqrts
-                else: break
-                line = self.file.readline()
-                while not "</init>" in line:
-                    if totxsec is None: totxsec = 0*pb
-                    totxsec += eval(line.split()[0])* pb
-                    line = self.file.readline()
-                self.metainfo["totalxsec"] = totxsec
-            elif "<event>" in line:
-                if nevts is None: nevts = 0
-                nevts += 1
-            line = self.file.readline()
-        self.metainfo["nevents"] = nevts
-        # Return file to initial reader position
+        txt = self.file.read()
+        info = self.extractInitPartsFromText( txt )
+        tokens = info["collision"].split()
+        assert tokens[0] == tokens[1] == "2212", "no proton proton collision?"
+        sqrts = ( float(tokens[2]) + float(tokens[3])) / 1000. * TeV
+        self.metainfo["sqrts"]=sqrts
+        totxsec = 0. * pb
+        for line in info["xsecs"]:
+            tokens = line.split()
+            xsec = float(tokens[0])
+            totxsec += xsec * pb
+        self.metainfo["totalxsec"]=totxsec
         self.file.seek(0)
+        nevents = txt.count("<event>")
+        nevents_close = txt.count("</event>")
+        assert nevents == nevents_close, f"number of opening <event> tags {nevents} does not match number of closing </event> tags {nevents_close}"
+        self.metainfo["nevents"]=nevents
 
     def close(self):
         """ close file handle """
@@ -146,21 +192,18 @@ class LheReader(object):
             line = self.file.readline()
         return ret
 
-
-
-
 class SmsEvent(object):
     """
     Event class featuring a list of particles and some convenience functions.
 
     """
-    def __init__(self, eventnr=None):
+    def __init__(self, eventnr : Union[int,None] = None ):
         self.particles = []
         self.eventnr = eventnr
         self.metainfo = {}
 
 
-    def metaInfo(self, key):
+    def metaInfo( self, key : str ):
         """
         Return the meta information of 'key', None if info does not exist.
 
@@ -169,27 +212,25 @@ class SmsEvent(object):
             return None
         return self.metainfo[key]
 
-    def add(self, particle):
+    def add(self, particle ):
         """
         Add particle to the event.
 
         """
         self.particles.append(particle)
 
-
-    def getMom(self):
+    def getMom(self) -> list:
         """
         Return the pdgs of the mothers, None if a problem occurs.
 
         """
-        
+
         momspdg = []
         for p in self.particles:
             if len(p.moms) > 1 and p.moms[0] == 1 or p.moms[1] == 1:
                 momspdg.append(p.pdg)
 
         return sorted(momspdg)
-
 
     def __str__(self):
         nr = ""
@@ -227,15 +268,15 @@ class LHEParticle(object):
                 % (self.pdg, self.px, self.py, self.pz, self.mass,
                    self.status, self.moms)
 
-
-
-def getDictionariesFrom(lheFile,nevts=None):
+def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
+        Tuple[Dict,Dict]:
     """
-    Reads all events in the LHE file and create mass and BR dictionaries for each branch in an event.
+    Reads all events in the LHE file and create mass and BR dictionaries
+    for each branch in an event.
 
     :param lheFile: LHE file
     :param nevts: (maximum) number of events used in the decomposition. If
-                  None, all events from file are processed.
+    None, all events from file are processed.
 
     :returns: BR and mass dictionaries for the particles appearing in the event
     """
@@ -288,7 +329,7 @@ def getDictionariesFrom(lheFile,nevts=None):
     for pdg in list(massDict.keys())[:]:
         if -abs(pdg) in massDict and abs(pdg) not in massDict:
             massDict[abs(pdg)] = massDict[-abs(pdg)]
-    for pdg in list(decaysDict.keys())[:]:            
+    for pdg in list(decaysDict.keys())[:]:
         if -abs(pdg) in decaysDict and abs(pdg) not in decaysDict:
             decaysDict[abs(pdg)] = decaysDict[-abs(pdg)]
 
@@ -316,15 +357,14 @@ def getDictionariesFrom(lheFile,nevts=None):
     return massDict,decaysDict
 
 
-def getDictionariesFromEvent(event):
+def getDictionariesFromEvent( event : SmsEvent ) -> Tuple[Dict,Dict]:
     """
     Create mass and BR dictionaries for each branch in an event.
 
     :param event: LHE event
+
     :returns: BR and mass dictionaries for the branches in the event
-
     """
-
     particles = event.particles
 
     # Identify and label to which branch each particle belongs
@@ -345,14 +385,16 @@ def getDictionariesFromEvent(event):
         for ipn,newparticle in enumerate(particles):
             if ipn == ip:
                 continue
-            if not ip+1 in newparticle.moms: #newparticle is not a daughter of particle
+            if not ip+1 in newparticle.moms:
+                # newparticle is not a daughter of particle
                 continue
 
             # Check if particle has a single parent
             # (as it should)
-            newparticle.moms = [mom for mom in newparticle.moms if mom != 0]
+            # newparticle.moms = [mom for mom in newparticle.moms if mom != 0]
+            newparticle.moms = set ( [ mom for mom in newparticle.moms if mom != 0] )
             if len(newparticle.moms) != 1:
-                raise SModelSError("More than one parent particle found")
+                raise SModelSError( f"More than one parent particle found: {newparticle.moms}")
 
             decay.nda += 1
             decay.br = 1.
