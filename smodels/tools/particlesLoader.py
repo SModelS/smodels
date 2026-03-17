@@ -27,8 +27,8 @@ def getParticlesFromSLHA(slhaData):
 
     :return: List with Particle objects
     """
-    
-    
+
+
     # Create a list of SM PDGs, so if a QNUMBERS block for a SM particle
     # is present, it will be ignored.
     SMpdgs = set()
@@ -39,13 +39,13 @@ def getParticlesFromSLHA(slhaData):
             for pdg in ptc.pdg:
                 SMpdgs.add(int(abs(pdg)))
     SMpdgs = list(SMpdgs)
-    
+
     if 'block qnumbers' in slhaData.lower():
         data = slhaData[:]
     else:
         filename = slhaData
         #If file does not exist, check if it is in any of the default folders:
-        checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), 
+        checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"),
                      installDirectory(),
                      os.path.join(installDirectory(), "smodels")]
         if not os.path.isfile(slhaData):
@@ -63,7 +63,7 @@ def getParticlesFromSLHA(slhaData):
         #Read file and extract blocks:
         with open(filename, 'r') as f:
             data = f.read()
-    
+
     data = data.lower()
     qnumberBlocks = []
     qBlock = False
@@ -84,8 +84,8 @@ def getParticlesFromSLHA(slhaData):
         # If a cross-section or decay block is starting set qBlock to False
         elif l.startswith('xsection') or l.startswith('decay'):
             qBlock = False
-            continue                   
-        
+            continue
+
         # If current block is not a qnumbers block, skip
         if not qBlock:
             continue
@@ -99,7 +99,7 @@ def getParticlesFromSLHA(slhaData):
     #Build list of BSM particles:
     BSMList = []
     for b in qnumberBlocks:
-        headerInfo = [x for x in b[0].replace('block','').replace('qnumbers','').split() 
+        headerInfo = [x for x in b[0].replace('block','').replace('qnumbers','').split()
                       if x != '#']
         if headerInfo[0].replace('-','').replace('+','').isdigit():
             pdg = eval(headerInfo[0])
@@ -157,8 +157,8 @@ def getParticlesFromLHE(lhefile):
 
     checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), installDirectory(),
                 os.path.join(installDirectory(), "smodels")]
-    
-        
+
+
     filename = lhefile
     #If file does not exist, check if it is in any of the default folders:
     if not os.path.isfile(lhefile):
@@ -241,16 +241,16 @@ def getParticlesFromModule(modelFile):
 def load():
 
     from smodels.base.runtime import modelFile
-   
+
     BSMList = None
     try:
         BSMList = getParticlesFromModule(modelFile)
     #If failed, assume the input is an SLHA or LHE file:
     except (ImportError, AttributeError, ValueError, SModelSError):
-        checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), 
+        checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"),
                       installDirectory(),
                       os.path.join(installDirectory(), "smodels")]
-        
+
         filename = modelFile
         #If file does not exist, check if it is in any of the default folders:
         if not os.path.isfile(modelFile):
@@ -262,7 +262,7 @@ def load():
         if not os.path.isfile(filename):
             logger.error(f"Model file {modelFile} not found.")
             raise SModelSError()
-        
+
         with open(filename,'r') as f:
             data = f.read().lower()
         if ('<slha>' in data) and ('</slha>' in data):
@@ -275,10 +275,10 @@ def load():
                 BSMList = getParticlesFromSLHA(modelFile)
             except (ImportError, AttributeError, ValueError, SModelSError):
                 pass
-        
+
     if BSMList is None:
         logger.error(f"Could not load input model from {modelFile}. The file should be either a python module with particle definitions, a SLHA file with QNUMBERS blocks or a LHE file with a <slha> block.")
         raise SModelSError()
-        
+
     return BSMList
-    
+
