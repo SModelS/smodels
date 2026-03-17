@@ -584,7 +584,7 @@ BLOCK QNUMBERS 6000005 #       bp
 </slha>
 <MGGenerationInfo>
 #  Number of Events        :       100
-#  Integrated weight (pb)  :       1.3670075e-33
+#  Integrated weight (pb)  :       1.3670075e-01
 </MGGenerationInfo>
 </header>
 <init>

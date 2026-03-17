@@ -176,7 +176,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         print('Missing topologies (up to 3):')
         for genEl in missingTopos.finalStateSMS[:3]:
             print('Element:', genEl)
-            print('\tcross-section (fb):', genEl.missingX)
+            print(f'\tcross-section (fb): {genEl.missingX:10.3E}')
     else:
         print("No missing topologies found\n")
 
@@ -186,7 +186,7 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         print('\nElements with displaced vertices (up to 2):')
         for genEl in missingDisplaced.finalStateSMS[:2]:
             print('Element:', genEl)
-            print('\tcross-section (fb):', genEl.missingX)
+            print(f'\tcross-section (fb): {genEl.missingX:10.3E}')
     else:
         print("\nNo displaced decays")
 

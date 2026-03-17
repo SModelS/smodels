@@ -19,17 +19,15 @@ from importlib import import_module
 
 
 
-def getParticlesFromSLHA(slhafile):
+def getParticlesFromSLHA(slhaData):
     """
     Defines BSM particles from the QNUMBERS blocks in the slhafile.
 
-    :param slhafile: Path to the SLHA file
+    :param slhaData: Path to the SLHA file or the a string with the SLHA data
 
     :return: List with Particle objects
     """
-
-    checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), installDirectory(),
-                os.path.join(installDirectory(), "smodels")]
+    
     
     # Create a list of SM PDGs, so if a QNUMBERS block for a SM particle
     # is present, it will be ignored.
@@ -42,23 +40,30 @@ def getParticlesFromSLHA(slhafile):
                 SMpdgs.add(int(abs(pdg)))
     SMpdgs = list(SMpdgs)
     
-    filename = slhafile
-    #If file does not exist, check if it is in any of the default folders:
-    if not os.path.isfile(slhafile):
-        for dirPath in checkDirs:
-            if os.path.isfile(os.path.join(dirPath, slhafile)):
-                filename = os.path.join(dirPath, slhafile)
-                break
+    if 'block qnumbers' in slhaData.lower():
+        data = slhaData[:]
+    else:
+        filename = slhaData
+        #If file does not exist, check if it is in any of the default folders:
+        checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), 
+                     installDirectory(),
+                     os.path.join(installDirectory(), "smodels")]
+        if not os.path.isfile(slhaData):
+            for dirPath in checkDirs:
+                if os.path.isfile(os.path.join(dirPath, slhaData)):
+                    filename = os.path.join(dirPath, slhaData)
+                    break
 
-    if not os.path.isfile(filename):
-        logger.error(f"Model file {slhafile} not found.")
-        raise SModelSError()
+        if not os.path.isfile(filename):
+            logger.error(f"Model file {slhaData} not found.")
+            raise SModelSError()
 
-    logger.debug(f"Trying to define BSM particles from SLHA input file {filename}")
+        logger.debug(f"Trying to define BSM particles from SLHA input file {filename}")
 
-    #Read file and extract blocks:
-    with open(filename, 'r') as f:
-        data = f.read()
+        #Read file and extract blocks:
+        with open(filename, 'r') as f:
+            data = f.read()
+    
     data = data.lower()
     qnumberBlocks = []
     qBlock = False
@@ -88,7 +93,7 @@ def getParticlesFromSLHA(slhafile):
         qnumberBlocks[-1].append(l)
 
     if not qnumberBlocks:
-        logger.error(f"No QNUMBERS blocks were found in {slhafile}")
+        logger.error(f"No QNUMBERS blocks were found")
         raise SModelSError()
 
     #Build list of BSM particles:
@@ -100,6 +105,7 @@ def getParticlesFromSLHA(slhafile):
             pdg = eval(headerInfo[0])
         else:
             logger.error(f"Error obtaining PDG number from QNUMBERS block:\n {b} \n")
+            raise SModelSError()
 
         if any(p.pdg == pdg for p in BSMList):
             logger.warning("Particle with pdg %i appears multiple times in QNUMBERS blocks" %pdg)
@@ -137,6 +143,57 @@ def getParticlesFromSLHA(slhafile):
             if any(p.pdg == newParticleC.pdg for p in BSMList):
                 continue
             BSMList.append(newParticleC)
+
+    return BSMList
+
+def getParticlesFromLHE(lhefile):
+    """
+    Defines BSM particles from the QNUMBERS blocks in the <slha> block contained in the lhefile.
+
+    :param lhefile: Path to the LHE file containing a <slha> block
+
+    :return: List with Particle objects
+    """
+
+    checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), installDirectory(),
+                os.path.join(installDirectory(), "smodels")]
+    
+        
+    filename = lhefile
+    #If file does not exist, check if it is in any of the default folders:
+    if not os.path.isfile(lhefile):
+        for dirPath in checkDirs:
+            if os.path.isfile(os.path.join(dirPath, lhefile)):
+                filename = os.path.join(dirPath, lhefile)
+                break
+
+    if not os.path.isfile(filename):
+        logger.error(f"Model file {lhefile} not found.")
+        raise SModelSError()
+
+    logger.debug(f"Trying to define BSM particles from LHE input file {filename}")
+
+
+    import re
+    import xml.etree.ElementTree as ET
+    with open(filename,'r') as f:
+        lhe_text = f.read()
+
+    # Locate the first <slha>...</slha> block
+    m = re.search( r'<slha\b[^>]*>(?P<inner>.*?)</slha>', lhe_text,
+                    flags=re.DOTALL|re.IGNORECASE )
+    if not m:
+        raise ValueError("No <slha>...</slha> block found.")
+    inner = m.group('inner')
+    # Wrap the inner content to parse the mixed text+elements safely
+    wrapper_xml = f'<__wrap__>{inner}</__wrap__>'
+    # Default parser is fine; we don't need to preserve comments as "tags"
+    wrapper = ET.fromstring(wrapper_xml)
+    slhaStr = wrapper.text
+    if not slhaStr or 'block qnumbers' not in slhaStr.lower():
+        raise ValueError(f"No qnumbers block found in {lhefile}.")
+
+    BSMList = getParticlesFromSLHA(slhaStr)
 
     return BSMList
 
@@ -180,17 +237,48 @@ def getParticlesFromModule(modelFile):
     return BSMList
 
 
+
 def load():
 
     from smodels.base.runtime import modelFile
-
+   
+    BSMList = None
     try:
         BSMList = getParticlesFromModule(modelFile)
-    #If failed, assume the input is an SLHA file:
-    except (ImportError, AttributeError, SModelSError):
-        try:
-            BSMList = getParticlesFromSLHA(modelFile)
-        except SModelSError:
-            logger.error(f"Could not load input model from {modelFile}. The file should be either a python module with particle definitions or a SLHA file with QNUMBERS blocks.")
+    #If failed, assume the input is an SLHA or LHE file:
+    except (ImportError, AttributeError, ValueError, SModelSError):
+        checkDirs = [os.path.join(installDirectory(), "smodels", "share", "models"), 
+                      installDirectory(),
+                      os.path.join(installDirectory(), "smodels")]
+        
+        filename = modelFile
+        #If file does not exist, check if it is in any of the default folders:
+        if not os.path.isfile(modelFile):
+            for dirPath in checkDirs:
+                if os.path.isfile(os.path.join(dirPath, modelFile)):
+                    filename = os.path.join(dirPath, modelFile)
+                    break
+
+        if not os.path.isfile(filename):
+            logger.error(f"Model file {modelFile} not found.")
             raise SModelSError()
+        
+        with open(filename,'r') as f:
+            data = f.read().lower()
+        if ('<slha>' in data) and ('</slha>' in data):
+            try:
+                BSMList = getParticlesFromLHE(modelFile)
+            except (ImportError, AttributeError, ValueError, SModelSError):
+                pass
+        elif 'block qnumbers' in data:
+            try:
+                BSMList = getParticlesFromSLHA(modelFile)
+            except (ImportError, AttributeError, ValueError, SModelSError):
+                pass
+        
+    if BSMList is None:
+        logger.error(f"Could not load input model from {modelFile}. The file should be either a python module with particle definitions, a SLHA file with QNUMBERS blocks or a LHE file with a <slha> block.")
+        raise SModelSError()
+        
     return BSMList
+    
