@@ -190,6 +190,7 @@ class LheReader(object):
 
             ret.add(particle)
             line = self.file.readline()
+
         return ret
 
 class SmsEvent(object):
