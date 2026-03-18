@@ -10,6 +10,8 @@
 
 """
 
+__all__ = [ "TxName" ]
+
 import os
 from smodels.base import physicsUnits
 from smodels.base.genericSMS import GenericSMS

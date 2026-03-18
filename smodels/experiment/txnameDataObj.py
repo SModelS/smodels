@@ -9,6 +9,8 @@
 
 """
 
+__all__ = [ "TxNameData" ]
+
 import sys
 
 from smodels.base.smodelsLogging import logger
