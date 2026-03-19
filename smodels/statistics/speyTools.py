@@ -55,6 +55,10 @@ class SpeyComputer:
         self.speyModels = self.getStatModels ( nsig )
         self.model_index = 0 # we might have several models and need to choose
 
+    @property
+    def dataType ( self ):
+        return self.dataset.getType()
+
     def getStatModels(self, nsig ) -> StatisticalModel:
         """ retrieve the statistical model """
         assert self.backendType in [ "1bin", "SL", "ML", "pyhf" ], f"unknown backend type {self.backendType}"
@@ -97,7 +101,7 @@ class SpeyComputer:
             ## FIXME this should be removable
             # Get dictionary with dataset IDs and signal yields
             srNsigDict = {pred.dataset.getID() :
-                          (pred.xsection.value*pred.dataset.getLumi()).asNumber()
+                          (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in predictions}
 
             # Get ordered list of datasets:
@@ -357,14 +361,14 @@ class SpeyComputer:
              correct, if necessary
         """
         assert return_nll == True, "we are phasing out return_nll=False"
-        ret = self.maximize_likelihood ( evaluationType = evaluationType, 
+        ret = self.maximize_likelihood ( evaluationType = evaluationType,
                return_nll = True )
         nll_min = ret["nll_min"]
 
-        nllbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, 
+        nllbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType,
                 return_nll = True, asimov = False )
         ret["nllbsm"] = nllbsm
-        nllsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, 
+        nllsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType,
                 return_nll = True, asimov = False )
         ret["nllsm"] = nllsm
         if check_for_maxima:
@@ -386,7 +390,7 @@ class SpeyComputer:
 
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False, 
+           limit_on_xsec : bool = False,
            model_index : Union [int,None] = None ) -> float:
         """ simple frontend to spey::poi_upper_limit
 
@@ -446,8 +450,8 @@ class SpeyComputer:
         """ simple frontend to spey functionality """
         self.checkMinimumPoi( poi_test )
         evaluationType = self.translateExpectationType ( evaluationType )
-        return self.speyModel[self.model_index].asimov_likelihood ( 
-            poi_test = poi_test, expected= evaluationType, 
+        return self.speyModel[self.model_index].asimov_likelihood (
+            poi_test = poi_test, expected= evaluationType,
             return_nll = return_nll )
 
     @classmethod
@@ -489,8 +493,8 @@ class SpeyComputer:
         :returns: tuple of muhat,lmax
         """
         evaluationType = self.translateExpectationType ( evaluationType )
-        speyret = self.speyModels[self.model_index].maximize_likelihood ( 
-                expected = evaluationType, 
+        speyret = self.speyModels[self.model_index].maximize_likelihood (
+                expected = evaluationType,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
         ret = { "muhat": float(speyret[0]) }
@@ -531,7 +535,7 @@ class SpeyComputer:
         # init = self.getSpeyInitialisation ( True )
         # opt = init["optimiser"]
         # opt["test_statistics"]="qmutilde"
-        ret = self.speyModels[self.model_index].maximize_asimov_likelihood ( 
+        ret = self.speyModels[self.model_index].maximize_asimov_likelihood (
                 expected = evaluationType, return_nll = return_nll ) # , **opt )
         assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
         for k,v in ret.items():
@@ -582,8 +586,8 @@ class SpeyAnalysesCombosComputer:
         models = []
         self.xsecs = []
         for pred in theorypreds:
-            computer = SpeyComputer.create ( pred.dataset, pred.xsection, None,
-                    deltas_rel )
+            computer = SpeyComputer.create ( pred.dataset, pred.xsection,
+                    theorypreds, deltas_rel )
             models.append ( computer.speyModels[0] )
             xsec = pred.xsection
             self.xsecs.append ( xsec )
