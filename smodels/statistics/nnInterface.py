@@ -260,7 +260,7 @@ class NNUpperLimitComputer:
         #    print ( f"@@NNX we evaluate at {scaled_signal_yields}" )
         if len(scaled_yields[0])!=self.regressors[modelToUse]["dim"]:
             dim_nn = self.regressors[modelToUse]["dim"]
-            dim_input = len(scaled_signal_yields[0])
+            dim_input = len(scaled_yields[0])
             line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
             logger.error ( f"[nnInterface] {line}" )
             print ( f"[nnInterface] {line}" )
