@@ -17,6 +17,7 @@ import os
 modelFile="smodels.share.models.mssm"
 
 _experimental = { "truncatedgaussians": False,
+                  "writeoutyields": False,
                   "spey": False } ## experimental features
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength

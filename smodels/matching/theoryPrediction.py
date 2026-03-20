@@ -197,9 +197,13 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
+            if hasattr(self.dataset.globalInfo, "mlModels"):
+                # Get computer
+                computer = StatsComputer.forNNs(dataset=self.dataset,
+                        nsig=srNsigDict, deltas_rel = self.deltas_rel)
 
             # Get ordered list of datasets:
-            if hasattr(self.dataset.globalInfo, "covariance"):
+            elif hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] for dataID in datasetList]
@@ -227,6 +231,7 @@ class TheoryPrediction(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :return: upper limit (Unum object)
         """
+        self.writeOutYields()
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType)
         if self.dataType() == "upperLimit":
@@ -346,6 +351,20 @@ class TheoryPrediction(object):
         """
         return self.likelihood ( mu=mu, evaluationType=evaluationType,
                                  asimov=asimov, return_nll=True )
+
+    def writeOutYields ( self ):
+        """ if being asked to, we write out the yields """
+        if self.dataType() != "combined":
+            return
+        from smodels.base.runtime import experimentalFeature
+        if experimentalFeature ( "writeoutyields" ) != True:
+            return
+        if hasattr ( self, "yieldsWritten") and self.yieldsWritten == True:
+            return
+        from smodels.statistics.nnInterface import writeOutYields
+        writeOutYields ( self, filename = "auto" )
+        self.yieldsWritten = True
+
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -841,7 +860,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
+    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile() \
+            and not expResult.hasMLModel():
         return None
 
     txnameList = []
