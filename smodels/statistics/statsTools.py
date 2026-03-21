@@ -53,7 +53,7 @@ class StatsComputer:
         :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
         """
 
-        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb"]:
+        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             logger.error ( f"I do not recognize the data type {dataType}" )
             raise SModelSError()
 
@@ -511,6 +511,16 @@ class StatsComputer:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                        evaluationType = evaluationType, workspace_index = index,
                        nSigma = nSigma )
+        elif self.dataType == "nn":
+            if all([s == 0 for s in self.nsig]):
+                logger.warning("All signals are empty")
+                return None
+            if limit_on_xsec:
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                       evaluationType = evaluationType )
+            else:
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                       evaluationType = evaluationType )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:
@@ -532,7 +542,6 @@ class StatsComputer:
                         evaluationType = evaluationType,
                         allowNegativeSignals=self.allowNegativeSignals, 
                         nSigma = nSigma )
-
         return ret
 
 class SimpleStatsDataSet:
