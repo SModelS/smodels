@@ -210,6 +210,9 @@ class ExpResult(object):
     def hasJsonFile(self) -> bool:
         return hasattr(self.globalInfo, "jsonFiles")
 
+    def hasMLModel(self):
+        return hasattr(self.globalInfo, "mlModels")
+
     def isCombinableWith ( self, other ) -> bool:
         """ can this expResult be safely assumed to be approximately uncorrelated
         with "other"? "Other" is another expResult. Later, "other" should also be

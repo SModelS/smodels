@@ -22,6 +22,40 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
+    def canonizeRegions ( self, regions : list, forNN : bool = False ) -> list:
+        """ given a list of regions in globalInfo.txt in any of the
+        jsonFiles, jsonFiles_FullLikelihood, or mlModels fields,
+        return a canonical version of that list: strings in
+        that list get transformed into dictionaries, if region type is
+        missing, "SR" is assumed. if the "smodels" counterpart is not
+        given for a region, we assume that there is None.
+
+        :param regions: list of regions in globalInfo.txt
+        :param forNN: if true, then also possibly translate "pyhf" fields into
+        "onnx" field
+        :returns: canonical list of regions
+        """
+        newregions = []
+        for region in regions:
+            if type(region)==str:
+                region={"smodels": region}
+            if not "type" in region:
+                region["type"]="SR"
+            if not "smodels" in region:
+                region["smodels"]=None
+            if forNN:
+                if not "onnx" in region:
+                    if "pyhf" in region:
+                        region["onnx"]=region["pyhf"]
+                        region.pop("pyhf")
+                    else:
+                        region["onnx"]=region["smodels"]
+            else:
+                if not "pyhf" in region:
+                    region["pyhf"]=region["smodels"]
+            newregions.append ( region )
+        return newregions
+
     def __init__(self, path=None):
         """
         :param path: path to the .txt file
@@ -29,7 +63,7 @@ class Info(object):
 
         self.path = path
         if path:
-            logger.debug(f'Creating object based on  {self.path}')
+            logger.debug(f'Creating object based on {self.path}')
 
             # Open the info file and get the information:
             if not os.path.isfile(path):
@@ -42,6 +76,7 @@ class Info(object):
 
             # Get tags in info file:
             tags = [line.split(':', 1)[0].strip() for line in content]
+            modelsLine = None # the mlModels line needs to be parsed
             for i, tag in enumerate(tags):
                 if not tag:
                     continue
@@ -49,35 +84,78 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
+                if tag == "mlModels":
+                    modelsLine = value
+                    continue
                 if tag in [ "jsonFiles", "jsonFiles_FullLikelihood" ]:
                     jsonFiles = eval(value)
                     for jsonFileName,regions in jsonFiles.items():
-                        newregions = []
-                        for region in regions:
-                            if type(region)==str:
-                                region={"smodels": region}
-                            if not "type" in region:
-                                region["type"]="SR"
-                            if not "smodels" in region:
-                                region["smodels"]=None
-                            if not "pyhf" in region:
-                                region["pyhf"]=region["smodels"]
-                            newregions.append ( region )
+                        newregions = self.canonizeRegions ( regions, forNN=False )
                         jsonFiles[jsonFileName] = newregions
                     value = str(jsonFiles)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
                 else:
-                    logger.info("Ignoring unknown field %s found in file %s"
-                                % (tag, self.path))
+                    logger.info(f"Ignoring unknown field {tag} found in file {self.path}" )
                     continue
 
+            ## only now add the mlModels field
+            if modelsLine != None:
+                if not "'" in modelsLine and not '"' in modelsLine:
+                    # did you write without qoutes?
+                    modelsLine = f'"{modelsLine}"'
+                mlModels = eval(modelsLine)
+                if type(mlModels)==str:
+                    if len(jsonFiles.values())>1:
+                        logger.error ( f"mlModels {mlModels} is a single model, but we have several json files." )
+                        sys.exit()
+                    mlModels = { mlModels: list(jsonFiles.values())[0] }
+                if type(mlModels)==dict:
+                    for onnxFile,pointer in mlModels.items():
+                        if type(pointer) == str:
+                            pointer = jsonFiles[pointer]
+                        newregions = self.canonizeRegions ( pointer, forNN=True )
+                        mlModels[onnxFile]=newregions
+                value = str(mlModels)
+                self.addInfo("mlModels", value )
+
             self.cacheJsons()
+            self.cacheOnnxes()
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False
         return True
+
+    def cacheOnnxes(self):
+        """ if we have the "mlModels" attribute defined,
+            we cache the corresponding onnx files. Needed when pickling """
+        if not hasattr(self, "mlModels"):
+            return
+        if hasattr(self, "onnxes"):  # seems like we already have them
+            return
+        dirp = os.path.dirname(self.path)
+        if type( self.mlModels ) in [ str ]:
+            jsonFileNames = list ( self.jsonFiles.keys() )
+            if len ( jsonFileNames ) == 1:
+                jsonFileName = jsonFileNames[0]
+                onnxFile = jsonFileName.replace(".json",".onnx")
+                fullPath = os.path.join(dirp, onnxFile )
+                if not os.path.exists ( fullPath ):
+                    onnxFile = "model.onnx" ## fall back to standard name
+                # allow shorthand notation for entries with only one json file
+                self.mlModels = { onnxFile: jsonFileName }
+            else:
+                logger.error ( f"mlModels field in {dirp} is a string, but {len(jsonFileNames)} json files are mentioned!" )
+                import sys; sys.exit(-1)
+        self.onnxes = {}
+
+        for onnxFile, jsonfilename in self.mlModels.items():
+            fullPath = os.path.join(dirp, onnxFile )
+            with open ( fullPath, "rb" ) as f:
+                self.onnxes[onnxFile] = f.read()
+                f.close()
+
 
     def cacheJsons(self):
         """ if we have the "jsonFiles" attribute defined,
