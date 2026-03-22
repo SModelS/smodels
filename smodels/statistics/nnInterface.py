@@ -143,7 +143,7 @@ class NNUpperLimitComputer:
             ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = self.mostSensitiveModel )
             self.cachedULs[self.mostSensitiveModel] = {}
             self.cachedULs[self.mostSensitiveModel][apriori]=ulmu
-            self.cachedULs[None][True]=ulmu
+            self.cachedULs[None][apriori]=ulmu
             return
         mumin,mostSensitiveModel=float("inf"),None
         # print ( f"@@NN66 more than one!" )
@@ -152,16 +152,16 @@ class NNUpperLimitComputer:
             try:
                 # print ( f"@@NN99 get ulmu for {model}" )
                 ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = model )
-                self.cachedULs[model] = { apriori: ulmu }
+                # self.cachedULs[model] = { apriori: ulmu }
                 # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
             except SModelSError as e:
-                self.cachedULs[model] = { apriori: ulmu }
-                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
+                # self.cachedULs[model] = { apriori: ulmu }
+                print ( f"@@NN54 {e}: determineMostSensitiveModel for {model} we have ulmu={mu}" )
                 continue
             if ulmu < mumin:
                 mumin = ulmu
                 mostSensitiveModel = model
-        self.cachedULs[None][True]=mumin # the smallest expected UL
+        self.cachedULs[None][apriori]=mumin # the smallest expected UL
         ## the most sensitive model and its upper limit we store separately
         self.mostSensitiveModel = mostSensitiveModel
         self.mumin = mumin # the smallest expected UL

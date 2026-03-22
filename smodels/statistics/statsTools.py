@@ -446,7 +446,7 @@ class StatsComputer:
 
     def transform ( self, evaluationType ):
         """ SL only. transform the data to evaluationType or observed """
-        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             return
         self.likelihoodComputer.transform ( evaluationType )
 
