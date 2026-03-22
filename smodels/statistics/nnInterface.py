@@ -292,7 +292,7 @@ class NNUpperLimitComputer:
         ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
         if ret == None:
             return None
-        if expected:
+        if evaluationType != observed:
             if asimov:
                 nll = ret['nllA_exp_1']
             else:
@@ -524,7 +524,7 @@ class NNUpperLimitComputer:
             # print ( f"@@NN732 clsRootAsimov modelToUse {modelToUse}" )
             nllA = self.likelihood(mu, return_nll=True, modelToUse = modelToUse, asimov = True )
             nll = nllA
-            if expected != "posteriori":
+            if evaluationType != aposteriori:
                 nll = self.likelihood(mu, return_nll=True, evaluationType=evaluationType, 
                         modelToUse = modelToUse, asimov = False )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
