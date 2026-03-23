@@ -421,12 +421,16 @@ class StatsComputer:
         return ret
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False ) -> float:
+           limit_on_xsec : bool = False,
+           nSigma : int = 0 ) -> float:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the
-                              cross section
+        cross section
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
         """
         if self.dataType == "pyhf":
             if all([s == 0 for s in self.nsig]):
@@ -435,27 +439,33 @@ class StatsComputer:
             index = self.likelihoodComputer.getBestCombinationIndex()
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType, workspace_index = index )
+                       evaluationType = evaluationType, workspace_index = index,
+                       nSigma = nSigma )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       evaluationType = evaluationType, workspace_index = index )
+                       evaluationType = evaluationType, workspace_index = index,
+                       nSigma = nSigma )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType )
+                       evaluationType = evaluationType,
+                       nSigma = nSigma )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       evaluationType = evaluationType )
+                       evaluationType = evaluationType,
+                       nSigma = nSigma )
         elif self.dataType in ["analysesComb"]:
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
                         evaluationType = evaluationType,
-                        allowNegativeSignals=self.allowNegativeSignals )
+                        allowNegativeSignals=self.allowNegativeSignals,
+                        nSigma = nSigma )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                         evaluationType = evaluationType,
-                        allowNegativeSignals=self.allowNegativeSignals )
+                        allowNegativeSignals=self.allowNegativeSignals, 
+                        nSigma = nSigma )
 
         return ret
 

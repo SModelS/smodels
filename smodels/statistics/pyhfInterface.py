@@ -984,24 +984,30 @@ class PyhfUpperLimitComputer:
             else:
                 return self.workspaces[workspace_index]
 
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, workspace_index=None):
+    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, 
+            workspace_index : Union[None,int] = None, nSigma : int = 0 ):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
             - by default, the combination of the workspaces contained into self.workspaces
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param evaluationType:  - if set to apriori: uses evaluationType SM backgrounds as signals
-                          - else: uses 'self.nsignals'
-        :param workspace_index: - if different from 'None': index of the workspace to use
-                                  for upper limit
-                                - else: choose best combo
-        :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
+        :param evaluationType: if set to apriori: uses evaluationType SM 
+        backgrounds as signals, else uses 'self.nsignals'
+        :param workspace_index: if different from 'None': index of the 
+        workspace to use for upper limit, else: choose best combo
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
+
+        :return: the upper limit on sigma times eff at 'self.cl' level 
+        (0.95 by default)
         """
         if self.data.totalYield == 0.:
             return None
         else:
-            ul = self.getUpperLimitOnMu( evaluationType=evaluationType, workspace_index=workspace_index)
+            ul = self.getUpperLimitOnMu( evaluationType=evaluationType, 
+                                         workspace_index=workspace_index)
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -1025,14 +1031,16 @@ class PyhfUpperLimitComputer:
             workspace_index = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
-        workspace = self.updateWorkspace(workspace_index, evaluationType=evaluationType)
+        workspace = self.updateWorkspace(workspace_index, 
+            evaluationType=evaluationType)
         #with warnings.catch_warnings():
         #    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
         model = workspace.model(modifier_settings=msettings)
         data = workspace.data(model)
         if mu == None:
             return (model,data,workspace)
-        ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model, None, None, None)
+        ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model, 
+                    None, None, None)
         return (model,ad,workspace)
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -1077,14 +1085,16 @@ class PyhfUpperLimitComputer:
             workspace_index = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
-        workspace = self.updateWorkspace(workspace_index, evaluationType=evaluationType)
+        workspace = self.updateWorkspace(workspace_index, 
+                evaluationType=evaluationType)
         # Same modifiers_settings as those use when running the 'pyhf cls' command line
         msettings = {
             "normsys": {"interpcode": "code4"},
             "histosys": {"interpcode": "code4p"},
         }
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+            warnings.simplefilter("ignore", \
+                    category=(DeprecationWarning,UserWarning) )
             model = workspace.model(modifier_settings=msettings)
             bounds = model.config.suggested_bounds()
             bounds[model.config.poi_index] = (0, 10)
@@ -1092,7 +1102,6 @@ class PyhfUpperLimitComputer:
             args = {}
             args["return_expected"] = evaluationType == aposteriori
             args["par_bounds"] = bounds
-            # args["maxiter"]=100000
             pver = float(pyhf.__version__[:3])
             stat = "qtilde"
             if pver < 0.6:
@@ -1102,9 +1111,6 @@ class PyhfUpperLimitComputer:
             with np.testing.suppress_warnings() as sup:
                 if pyhfinfo["backend"] == "numpy":
                     sup.filter(RuntimeWarning, r"invalid value encountered in log")
-                # print ("expected", evaluationType, "return_expected", args["return_expected"], "mu", mu, "\nworkspace.data(model) :", workspace.data(model, include_auxdata = False), "\nworkspace.observations :", workspace.observations, "\nobs[data] :", workspace['observations'])
-                # ic ( workspace["channels"][0]["samples"][0]["data"] )
-                # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                 try:
                     result = pyhf.infer.hypotest(mu_rel, workspace.data(model), model, **args)
                 except Exception as e:
