@@ -391,13 +391,18 @@ class SpeyComputer:
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
-           model_index : Union [int,None] = None ) -> float:
+           model_index : Union [int,None] = None,
+           nSigma : int = 0 ) -> float:
         """ simple frontend to spey::poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the
             cross section
         :param model_index: if None, then get upper limit for most sensitive model,
             if integer, get UL for that model
+        :param nSigma: the upper limit for central value (0),
+        + 1 sigma, - 1 sigma, etc.  For error bands.
+
+        :returns: upper limit on parameter of interest (signal strength mu)
         """
         if model_index == None:
             model_index = self.model_index
@@ -600,11 +605,15 @@ class SpeyAnalysesCombosComputer:
             print ( f"    {tp.analysisId()}:{tp.dataId()}" )
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False ) -> float:
+           limit_on_xsec : bool = False, nSigma : int = 0 ) -> float:
         """ simple frontend, to spey::poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the
                               cross section
+        :param nSigma: the upper limit for central value (0),
+        + 1 sigma, - 1 sigma, etc.  For error bands.
+
+        :returns: upper limit on parameter of interest (signal strength mu)
         """
         exp = SpeyComputer.translateExpectationType ( evaluationType )
         ret = self.speyModel.poi_upper_limit ( expected = exp )

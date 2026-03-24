@@ -1022,8 +1022,7 @@ class UpperLimitComputer:
         :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
         :param nSigma: the upper limit for central value (0), 
-        + 1 sigma, - 1 sigma, etc.
-        For error bands.
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on fiducial cross section
         """
         model = self.likelihoodComputer.model
