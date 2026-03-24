@@ -16,7 +16,7 @@ import jsonschema
 import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import findRoot
+from smodels.statistics.basicStats import findRoot, clsType
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -1142,24 +1142,27 @@ class PyhfUpperLimitComputer:
                 idx = -2
             if nSigma == -1:
                 idx = 1
+            if evaluationType == observed: # no 1 sigma band for observed
+                idx = 0
+
+            def retrieve ( r : np.ndarray, idx : int ) -> float:
+                """ a bit of a silly convenience function """
+                if r.shape == ():
+                    return float(r)
+                return float(r[idx])
+
             if evaluationType == aposteriori:
                 logger.debug("computing a-posteriori evaluationType limit")
                 logger.debug(f"evaluationType = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
-                r = result[1]
-                CLs = float(r[idx])
+                CLs = retrieve ( result, idx )
             elif evaluationType == apriori and nSigma != 0:
                 r = result[1]
                 CLs = float(r[idx])
             else:
                 logger.debug(f"expected = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
-                CLs = float(result)
-            if return_type == "1-CLs":
-                return 1.0 - CLs
-            elif return_type == "CLs":
-                return CLs
-            elif return_type == "CLs-alpha":
-                return CLs - 1 + self.cl
-            return 1 - self.cl - CLs
+                logger.error( f"@@YY result {result} {type(result)} {result.shape}" )
+                CLs = retrieve ( result, 0 )
+            return clsType ( CLs, return_type, self.cl )
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of

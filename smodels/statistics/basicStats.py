@@ -52,7 +52,18 @@ class NllEvalType(Enum):
 
 ## convenience
 observed, aposteriori, apriori = NllEvalType.observed, NllEvalType.aposteriori, \
-		                             NllEvalType.apriori
+                                     NllEvalType.apriori
+
+def clsType ( CLs : float, return_type : str, cl : float = 0.95 ) -> float:
+    assert return_type in [ "1-CLs", "CLs", "CLs-alpha", "alpha-CLs" ], \
+        f"return_type {return_type} unknown"
+    if return_type == "1-CLs":
+        return 1.0 - CLs
+    if return_type == "CLs":
+        return CLs
+    if return_type == "CLs-alpha":
+        return CLs - 1 + cl
+    return 1 - cl - CLs
 
 def CLsfromNLL(
         nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,
@@ -92,17 +103,7 @@ def CLsfromNLL(
         CLb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA) + nSigma )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
-
-    if return_type == "1-CLs":
-        return 1.0 - CLs
-    elif return_type == "CLs":
-        return CLs
-    elif return_type == "CLs-alpha":
-        return CLs - 0.05
-    elif return_type == "alpha-CLs":
-        return 0.05 - CLs
-
-    return 0.05 - CLs
+    return clsType ( CLs, return_type, 0.95 )
 
 def findRoot ( func : Callable, lower_bound : float, upper_bound : float,
         args : tuple = (), rtol : float = 8.881784197001252e-16,
