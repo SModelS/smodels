@@ -625,6 +625,8 @@ class SpeyAnalysesCombosComputer:
         """
         exp = SpeyComputer.translateExpectationType ( evaluationType )
         expected_pvalue = "nominal"
+        if evaluationType == observed:
+            nSigma = 0 # no errors for observed
         if nSigma != 0:
             expected_pvalue = "1sigma"
         ret = self.speyModel.poi_upper_limit ( expected = exp,

@@ -194,20 +194,21 @@ class PyPrinter(BasicPrinter):
 
     def addErrorsForRValues(self, obj, resDict : dict ):
         """ for obj add the errors on the r values to resDict """
-        ul_p1 = obj.getRValue ( evaluationType = observed, nSigma = 1 )
-        ul_m1 = obj.getRValue ( evaluationType = observed, nSigma = -1 )
-        if ul_p1 != None:
-            resDict['r_p1'] = self._round ( ul_p1 )
-        if ul_m1 != None:
-            resDict['r_m1'] = self._round ( ul_m1 )
-        ul_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(), 
+        ul_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
                 nSigma = 1 )
-        ul_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(), 
-                nSigma = -1 )
         if ul_e_p1 != None:
             resDict['r_expected_p1'] = self._round ( ul_e_p1 )
+        ul_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
+                nSigma = -1 )
         if ul_e_m1 != None:
             resDict['r_expected_m1'] = self._round ( ul_e_m1 )
+        # add only for expected
+        # ul_p1 = obj.getRValue ( evaluationType = observed, nSigma = 1 )
+        # ul_m1 = obj.getRValue ( evaluationType = observed, nSigma = -1 )
+        # if ul_p1 != None:
+        #     resDict['r_p1'] = self._round ( ul_p1 )
+        # if ul_m1 != None:
+        #     resDict['r_m1'] = self._round ( ul_m1 )
 
     def _formatTheoryPredictionList(self, obj):
         """
@@ -231,7 +232,7 @@ class PyPrinter(BasicPrinter):
                 ulExpected = ulExpected.asNumber(fb)
 
             value = theoryPrediction.xsection.asNumber(fb)
-            
+
             txWeightsDict = theoryPrediction.getTxNamesWeights(sort=True)
             # Get TxNames final states:
             fStates = []
@@ -296,10 +297,10 @@ class PyPrinter(BasicPrinter):
             r = self._round(theoryPrediction.getRValue(evaluationType=False))
             r_expected = self._round(theoryPrediction.getRValue(
                 evaluationType=self.getTypeOfExpected()))
-            
+
 
             # Get unique txnames
-            txnames =  list(dict.fromkeys([tx.txName 
+            txnames =  list(dict.fromkeys([tx.txName
                                            for tx in txWeightsDict.keys()]))
             resDict = {'maxcond': maxconds, 'theory prediction (fb)': self._round(value),
                        'upper limit (fb)': self._round(ul),
@@ -320,7 +321,7 @@ class PyPrinter(BasicPrinter):
                 self.addErrorsForRValues ( theoryPrediction, resDict )
 
             if hasattr(self, "addtxweights") and self.addtxweights:
-                resDict['TxNames weights (fb)'] = {tx.txName : w 
+                resDict['TxNames weights (fb)'] = {tx.txName : w
                     for tx,w in txWeightsDict.items()}
             if hasattr(self, "addnodesmap") and self.addnodesmap:
                 resDict['Nodes Map'] = nodesDict
@@ -419,7 +420,7 @@ class PyPrinter(BasicPrinter):
 
     def _formatTheoryPrediction(self,obj):
         return self._formatTheoryPredictionsCombiner(obj)
-    
+
     def _formatTheoryPredictionsCombiner(self, obj):
         """
         Format data of the TheoryPredictionsCombiner object.

@@ -3,7 +3,7 @@
  * scipy>=1.0.0,!=1.16.0,!=1.16.1,!=1.16.2
  * sympy>=1.0.0
  * unum>=4.0.0
- * requests>=2.0.0
+ * requests[use_chardet_on_py3]>=2.0.0
  * pyslha>=3.1.0
  * pyhf>=0.6.1
  * jsonpatch>=1.25

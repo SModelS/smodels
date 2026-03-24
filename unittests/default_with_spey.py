@@ -297,7 +297,9 @@ smodelsOutputDefault = {
         'nll' : 4.830138,
         'nll_min' : 4.507136,
         'nll_SM' : 5.249701,
-        'Txnames' : ['T2', 'T1', 'T1tttt']
+        'Txnames' : ['T2', 'T1', 'T1tttt'],
+        'r_expected_p1' : 0.1485891,
+        'r_expected_m1' : 0.2982496
     }
 ],
 'Total xsec for missing topologies (fb)' : 3067.167,

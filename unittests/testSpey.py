@@ -49,7 +49,7 @@ class SpeyTest(unittest.TestCase):
             fname = outputfile
             if p > 0:
                 fname = fname[p:]
-            print(f"[testRunSModelS] {fname} != gluino_squarks_default.py")
+            print(f"[testRunSModelS] {fname} != default_with_spey.py")
         self.assertTrue(equals)
         removeCruftOutputs(outputfile)
 
