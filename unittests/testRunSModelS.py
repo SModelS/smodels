@@ -116,13 +116,14 @@ class RunSModelSTest(unittest.TestCase):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         filename = "./testFiles/slha/T6bbHH_pyhf.slha"
         inifile = "./testParameters_pyhf.ini"
-        outputfile = runMain(filename, inifile=inifile, suppressStdout=True)
+        outputfile = runMain(filename, inifile=inifile, suppressStdout=False)
         smodelsOutput = importModule(outputfile)
         from T6bbHH_pyhf_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile,
-                           fname2="T6bbHH_pyhf_default.py")
+        ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
+                         'database version' ]
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+                allowedRelDiff=0.02, ignore=ignoreFields, 
+                fname=outputfile, fname2="T6bbHH_pyhf_default.py" )
         if not equals:
             e = "T6bbHH_pyhf_default.py != ./unitTestOutput/T6bbHH_pyhf.slha.py"
             logger.error(e)

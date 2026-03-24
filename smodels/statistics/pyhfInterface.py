@@ -773,7 +773,8 @@ class PyhfUpperLimitComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.getUpperLimitOnMu(evaluationType=apriori, workspace_index=i_ws)
+                ul = self.getUpperLimitOnMu(evaluationType=apriori,
+                        workspace_index=i_ws,nSigma=0)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -1006,7 +1007,7 @@ class PyhfUpperLimitComputer:
             return None
         else:
             ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                                         workspace_index=workspace_index)
+                workspace_index=workspace_index, nSigma = nSigma)
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -1114,6 +1115,9 @@ class PyhfUpperLimitComputer:
             args["par_bounds"] = bounds
             pver = float(pyhf.__version__[:3])
             stat = "qtilde"
+            if evaluationType == observed:
+                # error band only for expected
+                nSigma = 0
             return_expected_set = (nSigma != 0)
             args["return_expected_set"] = return_expected_set
             if pver < 0.6:
@@ -1133,13 +1137,19 @@ class PyhfUpperLimitComputer:
             end = time.time()
             logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
             logger.debug(f"result for {mu_rel} {result}")
+            idx = 0
+            if nSigma == 1:
+                idx = -2
+            if nSigma == -1:
+                idx = 1
             if evaluationType == aposteriori:
                 logger.debug("computing a-posteriori evaluationType limit")
                 logger.debug(f"evaluationType = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
-                try:
-                    CLs = float(result[1].tolist())
-                except TypeError:
-                    CLs = float(result[1][0])
+                r = result[1]
+                CLs = float(r[idx])
+            elif evaluationType == apriori and nSigma != 0:
+                r = result[1]
+                CLs = float(r[idx])
             else:
                 logger.debug(f"expected = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
                 CLs = float(result)
@@ -1217,9 +1227,11 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = self.CLs(lo_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
+                rt1 = self.CLs( lo_mu * self.scale, evaluationType, "alpha-CLs",
+                                workspace_index, nSigma = nSigma )
                 # rt5 = CLs(med_mu)
-                rt10 = self.CLs(hi_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
+                rt10 = self.CLs( hi_mu * self.scale, evaluationType, "alpha-CLs",
+                                 workspace_index, nSigma = nSigma )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1227,7 +1239,8 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = self.CLs(med_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
+                    rt5 = self.CLs( med_mu * self.scale, evaluationType,
+                                    "alpha-CLs", workspace_index, nSigma = nSigma )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1239,7 +1252,8 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = self.CLs(med_mu * self.scale, evaluationType, "alpha-CLs", workspace_index )
+                    rt5 = self.CLs(med_mu * self.scale, evaluationType,
+                            "alpha-CLs", workspace_index, nSigma = nSigma )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1269,8 +1283,9 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            # ul = findRoot ( self._CLs, lo_mu, hi_mu, args=(evaluationType, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
-            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale, args=(evaluationType, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
+            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale,
+                    args=(evaluationType, "alpha-CLs", workspace_index, nSigma),
+                    rtol=1e-3, xtol=1e-3 )
 
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
