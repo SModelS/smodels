@@ -116,7 +116,7 @@ class RunSModelSTest(unittest.TestCase):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         filename = "./testFiles/slha/T6bbHH_pyhf.slha"
         inifile = "./testParameters_pyhf.ini"
-        outputfile = runMain(filename, inifile=inifile, suppressStdout=False)
+        outputfile = runMain(filename, inifile=inifile, suppressStdout=True )
         smodelsOutput = importModule(outputfile)
         from T6bbHH_pyhf_default import smodelsOutputDefault
         ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
