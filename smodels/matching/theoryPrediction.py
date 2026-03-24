@@ -216,36 +216,46 @@ class TheoryPrediction(object):
         self._statsComputer = computer
 
     @lru_cache
-    def getUpperLimit(self, evaluationType : NllEvalType = observed ) -> UnitXSec:
+    def getUpperLimit( self, evaluationType : NllEvalType = observed,
+                       nSigma : int = 0 ) -> UnitXSec:
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
         the corresponding dataset (signal region) upper limit.
         For combined results, returns the upper limit on the
         total sigma*eff (for all signal regions/datasets).
-
         :param evaluationType: one of: observed, apriori, aposteriori
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
         :return: upper limit (Unum object)
         """
         if self.dataType() == "efficiencyMap":
-            ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType)
+            ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType,
+                    nSigma = nSigma )
         if self.dataType() == "upperLimit":
             ul = self.dataset.getUpperLimitFor(
-                sms=self.avgSMS, txnames=self.txnames, evaluationType=evaluationType
+                sms=self.avgSMS, txnames=self.txnames, 
+                evaluationType=evaluationType, 
+                nSigma = nSigma
             )
         if self.dataType() == "combined":
-            ul = self.statsComputer.poi_upper_limit(evaluationType = evaluationType,
-                                                    limit_on_xsec = True)
+            ul = self.statsComputer.poi_upper_limit(
+                evaluationType = evaluationType,
+                nSigma = nSigma,
+                limit_on_xsec = True )
         return ul
 
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
-            **kwargs ) -> float:
+            nSigma : int = 0, **kwargs ) -> float:
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
         (i.e. mu_UL = upper limit/theory xsec)
-
         :param evaluationType: one of: observed, apriori, aposteriori
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
         :returns: upper limit on signal strength multiplier mu
         """
         if "expected" in kwargs:
@@ -255,7 +265,8 @@ class TheoryPrediction(object):
         if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
             logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
 
-        upperLimit = self.getUpperLimit(evaluationType=evaluationType)
+        upperLimit = self.getUpperLimit( evaluationType=evaluationType,
+                                         nSigma=nSigma )
         xsec = self.totalXsection()
         if xsec is None or upperLimit is None:
             return None
@@ -266,7 +277,7 @@ class TheoryPrediction(object):
 
     @lru_cache
     def getRValue( self, evaluationType : NllEvalType = observed,
-                   **kwargs ) -> float:
+                   nSigma : int = 0, **kwargs ) -> float:
         """
         Get the r value = theory prediction / experimental upper limit
 
@@ -278,7 +289,7 @@ class TheoryPrediction(object):
             evaluationType = kwargs["expected"]
         if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
             logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
-        upperLimit = self.getUpperLimit(evaluationType)
+        upperLimit = self.getUpperLimit(evaluationType,nSigma = nSigma )
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None
             return r

@@ -41,6 +41,9 @@ class MPrinter(object):
         for prt in printerTypes:
             if prt == 'python':
                 newPrinter = PyPrinter(output='file', outputFormat=self.outputFormat)
+                if parser.has_option ( "options", "errorsOnULs" ) and \
+                        parser.getboolean("options", "errorsOnULs"):
+                    newPrinter.errorsOnULs = True
             elif prt == 'summary':
                 newPrinter = SummaryPrinter(output='file', outputFormat=self.outputFormat)
             elif prt == 'stdout':

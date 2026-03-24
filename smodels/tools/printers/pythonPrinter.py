@@ -35,6 +35,7 @@ class PyPrinter(BasicPrinter):
         self.printingOrder = [OutputStatus, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               TheoryPrediction, Uncovered]
+        self.errorsonuls = False
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -191,6 +192,23 @@ class PyPrinter(BasicPrinter):
             infoDict['time spent'] = f"{time.time() - self.time:.2f}s"
         return {'OutputStatus': infoDict}
 
+    def addErrorsForRValues(self, obj, resDict : dict ):
+        """ for obj add the errors on the r values to resDict """
+        ul_p1 = obj.getRValue ( evaluationType = observed, nSigma = 1 )
+        ul_m1 = obj.getRValue ( evaluationType = observed, nSigma = -1 )
+        if ul_p1 != None:
+            resDict['r_p1'] = self._round ( ul_p1 )
+        if ul_m1 != None:
+            resDict['r_m1'] = self._round ( ul_m1 )
+        ul_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(), 
+                nSigma = 1 )
+        ul_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(), 
+                nSigma = -1 )
+        if ul_e_p1 != None:
+            resDict['r_expected_p1'] = self._round ( ul_e_p1 )
+        if ul_e_m1 != None:
+            resDict['r_expected_m1'] = self._round ( ul_e_m1 )
+
     def _formatTheoryPredictionList(self, obj):
         """
         Format data of the TheoryPredictionList object.
@@ -297,10 +315,12 @@ class PyPrinter(BasicPrinter):
                        'dataType': dataType,
                        'r': r, 'r_expected': r_expected,
                        'Width (GeV)' : widths})
+            if self.errorsonuls:
+                self.addErrorsForRValues ( theoryPrediction, resDict )
 
             if hasattr(self, "addtxweights") and self.addtxweights:
                 resDict['TxNames weights (fb)'] = {tx.txName : w 
-                                                   for tx,w in txWeightsDict.items()}
+                    for tx,w in txWeightsDict.items()}
             if hasattr(self, "addnodesmap") and self.addnodesmap:
                 resDict['Nodes Map'] = nodesDict
 
@@ -417,7 +437,7 @@ class PyPrinter(BasicPrinter):
         if isinstance(ulExpected, unum.Unum):
             ulExpected = ulExpected.asNumber(fb)
 
-        r = self._round(obj.getRValue(evaluationType=False))
+        r = self._round(obj.getRValue(evaluationType=observed ))
         r_expected = self._round(obj.getRValue(evaluationType=self.getTypeOfExpected()))
 
         nll = self._round(obj.likelihood( return_nll = True ))
@@ -436,6 +456,9 @@ class PyPrinter(BasicPrinter):
                    'nll_min': nllmin,
                    'nll_SM': nllsm,
                    'Txnames' : txnames}
+
+        if self.errorsonuls:
+            self.addErrorsForRValues ( obj, resDict )
 
         combRes.append(resDict)
 
