@@ -35,7 +35,7 @@ class PyPrinter(BasicPrinter):
         self.printingOrder = [OutputStatus, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               TheoryPrediction, Uncovered]
-        self.errorsonuls = False
+        self.errorsforr = False
         self.toPrint = [None]*len(self.printingOrder)
 
     def setOutPutFile(self, filename, overwrite=True, silent=False):
@@ -315,7 +315,8 @@ class PyPrinter(BasicPrinter):
                        'dataType': dataType,
                        'r': r, 'r_expected': r_expected,
                        'Width (GeV)' : widths})
-            if self.errorsonuls:
+            if self.errorsforr and theoryPrediction.dataType() == "combined":
+                # the errors on R values feature is used only for SR-combinations
                 self.addErrorsForRValues ( theoryPrediction, resDict )
 
             if hasattr(self, "addtxweights") and self.addtxweights:
@@ -457,7 +458,7 @@ class PyPrinter(BasicPrinter):
                    'nll_SM': nllsm,
                    'Txnames' : txnames}
 
-        if self.errorsonuls:
+        if self.errorsforr:
             self.addErrorsForRValues ( obj, resDict )
 
         combRes.append(resDict)

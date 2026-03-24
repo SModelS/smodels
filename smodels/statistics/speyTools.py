@@ -408,8 +408,16 @@ class SpeyComputer:
             model_index = self.model_index
         exp = self.translateExpectationType ( evaluationType )
 
+        expected_pvalue = "nominal"
+        if nSigma != 0:
+            expected_pvalue = "1sigma"
         try:
-            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp )
+            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp,
+                   expected_pvalue = expected_pvalue )
+            if nSigma == 1:
+                return ret[-1]
+            if nSigma == -1:
+                return ret[0]
         except ValueError as e:
             logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
             sys.exit(-1)
@@ -616,7 +624,15 @@ class SpeyAnalysesCombosComputer:
         :returns: upper limit on parameter of interest (signal strength mu)
         """
         exp = SpeyComputer.translateExpectationType ( evaluationType )
-        ret = self.speyModel.poi_upper_limit ( expected = exp )
+        expected_pvalue = "nominal"
+        if nSigma != 0:
+            expected_pvalue = "1sigma"
+        ret = self.speyModel.poi_upper_limit ( expected = exp,
+               expected_pvalue = expected_pvalue )
+        if nSigma == -1:
+            ret = ret[0]
+        if nSigma == 1:
+            ret = ret[-1]
         ret = float(ret) # cast for the printers
         if limit_on_xsec:
             totxsec = sum(self.xsecs,0.*fb)
@@ -725,7 +741,9 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
     computer = SpeyComputer ( dataset, "1bin", 1. )
-    ul = computer.poi_upper_limit ( evaluationType = observed, limit_on_xsec = True )
+    ul = computer.poi_upper_limit ( evaluationType = observed,
+                                    limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( evaluationType = apriori, limit_on_xsec = True )
+    ule = computer.poi_upper_limit ( evaluationType = apriori,
+                                     limit_on_xsec = True )
     print ( "ule", ule )
