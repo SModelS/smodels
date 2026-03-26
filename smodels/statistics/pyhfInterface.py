@@ -1160,7 +1160,6 @@ class PyhfUpperLimitComputer:
                 CLs = float(r[idx])
             else:
                 logger.debug(f"expected = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
-                logger.error( f"@@YY result {result} {type(result)} {result.shape}" )
                 CLs = retrieve ( result, 0 )
             return clsType ( CLs, return_type, self.cl )
 
