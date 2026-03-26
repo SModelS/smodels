@@ -755,7 +755,6 @@ class PyhfUpperLimitComputer:
             ret = self.exponentiateNLL(ret, not return_nll)
             # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
-            # print ( f"@@PI likelihood {mu} {workspace_index} {expected} {asimov} {ret}" )
             return ret
 
     @lru_cache
@@ -773,8 +772,7 @@ class PyhfUpperLimitComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.getUpperLimitOnMu(evaluationType=apriori,
-                        workspace_index=i_ws,nSigma=0)
+                ul = self.getUpperLimitOnMu(evaluationType=apriori, workspace_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
@@ -985,29 +983,26 @@ class PyhfUpperLimitComputer:
             else:
                 return self.workspaces[workspace_index]
 
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed,
-            workspace_index : Union[None,int] = None, nSigma : int = 0 ):
+    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, 
+            workspace_index=None, nSigma : int = 0 ):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
             - by default, the combination of the workspaces contained into self.workspaces
             - if workspace_index is specified, self.workspace[workspace_index]
               (useful for computation of the best upper limit)
 
-        :param evaluationType: if set to apriori: uses evaluationType SM
-        backgrounds as signals, else uses 'self.nsignals'
-        :param workspace_index: if different from 'None': index of the
-        workspace to use for upper limit, else: choose best combo
-        :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
-
-        :return: the upper limit on sigma times eff at 'self.cl' level
-        (0.95 by default)
+        :param evaluationType:  - if set to apriori: uses evaluationType SM backgrounds as signals
+                          - else: uses 'self.nsignals'
+        :param workspace_index: - if different from 'None': index of the workspace to use
+                                  for upper limit
+                                - else: choose best combo
+        :return: the upper limit on sigma times eff at 'self.cl' level (0.95 by default)
         """
         if self.data.totalYield == 0.:
             return None
         else:
-            ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                workspace_index=workspace_index, nSigma = nSigma)
+            ul = self.getUpperLimitOnMu( evaluationType=evaluationType, 
+                    workspace_index=workspace_index, nSigma = nSigma )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -1031,16 +1026,14 @@ class PyhfUpperLimitComputer:
             workspace_index = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
-        workspace = self.updateWorkspace(workspace_index,
-            evaluationType=evaluationType)
+        workspace = self.updateWorkspace(workspace_index, evaluationType=evaluationType)
         #with warnings.catch_warnings():
         #    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
         model = workspace.model(modifier_settings=msettings)
         data = workspace.data(model)
         if mu == None:
             return (model,data,workspace)
-        ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model,
-                    None, None, None)
+        ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model, None, None, None)
         return (model,ad,workspace)
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -1053,21 +1046,15 @@ class PyhfUpperLimitComputer:
         _absolute_ mu
 
         :param mu: compute for the parameter of interest mu
-        :param evaluationType: if observed, compute observed,
-        apriori: compute a priori expected
+        :param evaluationType: if observed, compute observed, apriori: compute a priori expected
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
         CLs-alpha: returns CLs - 0.05
         alpha-CLs: return 0.05 - CLs
         1-CLs: returns 1-CLs value
         CLs: returns CLs value
-        :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
-
-        :returns: CLs value
         """
-        return self._CLs ( mu / self.scale, evaluationType, return_type,
-                           workspace_index, nSigma )
+        return self._CLs ( mu / self.scale, evaluationType, return_type, workspace_index, nSigma )
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
@@ -1084,9 +1071,6 @@ class PyhfUpperLimitComputer:
         alpha-CLs: return 0.05 - CLs
         1-CLs: returns 1-CLs value
         CLs: returns CLs value
-        :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
-        :returns: CLs value
         """
         assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
         # If evaluationType == False, use unmodified (but patched) workspace
@@ -1096,16 +1080,14 @@ class PyhfUpperLimitComputer:
             workspace_index = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
-        workspace = self.updateWorkspace(workspace_index,
-                evaluationType=evaluationType)
+        workspace = self.updateWorkspace(workspace_index, evaluationType=evaluationType)
         # Same modifiers_settings as those use when running the 'pyhf cls' command line
         msettings = {
             "normsys": {"interpcode": "code4"},
             "histosys": {"interpcode": "code4p"},
         }
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", \
-                    category=(DeprecationWarning,UserWarning) )
+            warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
             model = workspace.model(modifier_settings=msettings)
             bounds = model.config.suggested_bounds()
             bounds[model.config.poi_index] = (0, 10)
@@ -1113,10 +1095,10 @@ class PyhfUpperLimitComputer:
             args = {}
             args["return_expected"] = evaluationType == aposteriori
             args["par_bounds"] = bounds
+            # args["maxiter"]=100000
             pver = float(pyhf.__version__[:3])
             stat = "qtilde"
             if evaluationType == observed:
-                # error band only for expected
                 nSigma = 0
             return_expected_set = (nSigma != 0)
             args["return_expected_set"] = return_expected_set
@@ -1137,52 +1119,34 @@ class PyhfUpperLimitComputer:
             end = time.time()
             logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
             logger.debug(f"result for {mu_rel} {result}")
-            idx = 0
-            if nSigma == 1:
-                idx = -2
-            if nSigma == -1:
-                idx = 1
-            if evaluationType == observed: # no 1 sigma band for observed
-                idx = 0
-
-            def retrieve ( r : np.ndarray, idx : int ) -> float:
-                """ a bit of a silly convenience function """
-                if r.shape == ():
-                    return float(r)
-                return float(r[idx])
-
-            if evaluationType == aposteriori:
-                logger.debug("computing a-posteriori evaluationType limit")
-                logger.debug(f"evaluationType = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
-                CLs = retrieve ( result, idx )
-            elif evaluationType == apriori and nSigma != 0:
-                r = result[1]
-                CLs = float(r[idx])
+            if evaluationType == observed:
+                CLs = float(result)
+            elif return_expected_set:
+                idx = 2 + nSigma
+                CLs = float(result[-1][idx])
             else:
-                logger.debug(f"expected = {evaluationType}, mu_rel = {mu_rel}, result = {result}")
-                CLs = retrieve ( result, 0 )
-            return clsType ( CLs, return_type, self.cl )
+                CLs = float(result[1])
+            return clsType ( CLs, return_type, 0.95 )
 
     # Trying a new method for upper limit computation :
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
     @lru_cache
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed,
-            workspace_index : Union[None,int] = None,
-            nSigma : int = 0 ) -> float:
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, 
+            workspace_index=None, nSigma : int = 0 ):
         """
         Compute the upper limit on the signal strength modifier with:
-        by default, the combination of the workspaces contained into self.workspaces
-        if workspace_index is specified, self.workspace[workspace_index]
-        (useful for computation of the best upper limit)
+            - by default, the combination of the workspaces contained into self.workspaces
+            - if workspace_index is specified, self.workspace[workspace_index]
+              (useful for computation of the best upper limit)
 
-        :param evaluationType: if set to apriori: uses evaluationType
-        SM backgrounds as signals else uses 'self.nsignals'
-        :param workspace_index: if different from 'None': index of the
-        workspace to use for upper limit else choose best combo
-
-        :returns: the upper limit at 'self.cl' level (0.95 by default)
+        :param evaluationType:  - if set to apriori: uses evaluationType SM backgrounds as signals
+                          - else: uses 'self.nsignals'
+        :param workspace_index: - if different from 'None': index of the workspace to use
+                                  for upper limit
+                                - else: choose best combo
+        :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         self.__init__(self.data, self.cl, self.lumi)
         with warnings.catch_warnings():
@@ -1229,11 +1193,11 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = self.CLs( lo_mu * self.scale, evaluationType, "alpha-CLs",
-                                workspace_index, nSigma = nSigma )
+                rt1 = self.CLs(lo_mu * self.scale, evaluationType, "alpha-CLs", 
+                        workspace_index, nSigma )
                 # rt5 = CLs(med_mu)
-                rt10 = self.CLs( hi_mu * self.scale, evaluationType, "alpha-CLs",
-                                 workspace_index, nSigma = nSigma )
+                rt10 = self.CLs(hi_mu * self.scale, evaluationType, "alpha-CLs", 
+                        workspace_index, nSigma )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1241,8 +1205,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = self.CLs( med_mu * self.scale, evaluationType,
-                                    "alpha-CLs", workspace_index, nSigma = nSigma )
+                    rt5 = self.CLs(med_mu * self.scale, evaluationType, "alpha-CLs", workspace_index, nSigma )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1254,8 +1217,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = self.CLs(med_mu * self.scale, evaluationType,
-                            "alpha-CLs", workspace_index, nSigma = nSigma )
+                    rt5 = self.CLs(med_mu * self.scale, evaluationType, "alpha-CLs", workspace_index, nSigma )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1285,9 +1247,8 @@ class PyhfUpperLimitComputer:
                     continue
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
-            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale,
-                    args=(evaluationType, "alpha-CLs", workspace_index, nSigma),
-                    rtol=1e-3, xtol=1e-3 )
+            # ul = findRoot ( self._CLs, lo_mu, hi_mu, args=(evaluationType, "alpha-CLs", workspace_index), rtol=1e-3, xtol=1e-3 )
+            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale, args=(evaluationType, "alpha-CLs", workspace_index, nSigma), rtol=1e-3, xtol=1e-3 )
 
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
