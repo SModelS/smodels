@@ -60,8 +60,7 @@ class DataSet(object):
                     txname = txnameObj.TxName(txtfile, self.globalInfo,
                                               self.dataInfo, databaseParticles)
                     if txname.hasOnlyZeroes():
-                        logger.debug("%s, %s has only zeroes. discard it." %
-                                     (self.path, txname.txName))
+                        logger.debug( f"{self.path}, {txname.txName} has only zeroes. discard it." )
                         continue
                     self.txnameList.append(txname)
                 except TypeError as e:
@@ -340,8 +339,8 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, evaluationType : bool = observed, 
-            txnames=None, compute : bool = False, 
+    def getUpperLimitFor(self, sms=None, evaluationType : bool = observed,
+            txnames=None, compute : bool = False,
             alpha : float = 0.05, deltas_rel : float = 0.2,
             mass=None, nSigma : int = 0 ) -> UnitXSec:
         """
@@ -419,20 +418,37 @@ class DataSet(object):
     def getSRUpperLimit( self,evaluationType : NllEvalType = observed,
                          nSigma : int = 0 ) -> UnitXSec:
         """
-        Returns the 95% upper limit on the signal*efficiency 
+        Returns the 95% upper limit on the signal*efficiency
         for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
 
         :returns: upper limit value on cross section
         """
 
         if not self.getType() == 'efficiencyMap':
-            logger.error("getSRUpperLimit can only be used for efficiency map results!")
-            raise SModelSError()
+            line = "getSRUpperLimit can only be used for efficiency map results!"
+            logger.error( line )
+            raise SModelSError( line )
+        if nSigma != 0 and evaluationType != aposteriori:
+            line = f"nSigma={nSigma} but evaluationType={evaluationType}: not implemented"
+            raise SModelSError ( line )
+
+        if nSigma != 0:
+            # we dont even cache, not like this will be used much
+            from smodels.statistics.simplifiedLikelihoods import Data, \
+                 UpperLimitComputer, LikelihoodComputer
+            lumi = self.globalInfo.lumi
+            m = Data ( self.dataInfo.observedN, self.dataInfo.expectedBG,
+                       self.dataInfo.bgError**2, None,
+                       1., lumi = lumi )
+            llhdComp = LikelihoodComputer  ( m, 1 - .05 )
+            ul = comp.getUpperLimitOnSigmaTimesEff (
+                evaluationType = evaluationType, nSigma = nSigma )
+            return ul.asNumber ( fb )
 
         if evaluationType != observed:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):
