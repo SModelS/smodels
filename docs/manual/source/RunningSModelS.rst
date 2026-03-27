@@ -336,10 +336,6 @@ Below we give more detailed information about each entry in the parameters file.
 
   * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
-.. _parameterFileErrorsForR:
-
-  * **errorsForR** (True/False): set True to add also +- 1 sigma values for r-values (both observed and expected) for sr-combined theory predictions. Available v3.1.2 onwards.
-
 .. _parameterFileAddNodesMap:
 
   * **addNodesMap** (True/False): set True to include the mapping of the nodes indices to the BSM labels. Available v3.0.0 onwards.
