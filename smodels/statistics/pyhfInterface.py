@@ -1119,13 +1119,14 @@ class PyhfUpperLimitComputer:
             end = time.time()
             logger.debug( f"Hypotest elapsed time : {end-start:1.4f} secs" )
             logger.debug(f"result for {mu_rel} {result}")
-            if evaluationType == observed:
+            try:
                 CLs = float(result)
-            elif return_expected_set:
-                idx = 2 + nSigma
-                CLs = float(result[-1][idx])
-            else:
-                CLs = float(result[1])
+            except TypeError as e:
+                if return_expected_set:
+                    idx = 2 + nSigma
+                    CLs = float(result[-1][idx])
+                else:
+                    CLs = float(result[1])
             return clsType ( CLs, return_type, 0.95 )
 
     # Trying a new method for upper limit computation :
