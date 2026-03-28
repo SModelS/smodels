@@ -11,7 +11,7 @@
 
 __all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
 
-from typing import Union, Text, Tuple, Dict, List
+from typing import Union, Text, Tuple, Dict, List, Optional
 import sys
 from spey import ExpectationType, StatisticalModel, get_backend
 import spey
@@ -22,7 +22,7 @@ try:
 except ImportError: # comes only with newer versions of spey
     AsimovTestStatZero = Exception # a dummy so we can still try
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.experiment.datasetObj import DataSet
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.base.crossSection import XSection
@@ -38,7 +38,8 @@ class SpeyComputer:
                   "model_index" ]
 
     def __init__ ( self, dataset, backendType : str, nsig : Union[float,list],
-                   deltas_rel : Union[None,float] = None ):
+                   deltas_rel : Union[None,float] = None,
+                   lumi : Optional[UnitLumi] = None ):
         """ initialise with dataset.
         :param dataset: a smodels (combined)dataset, or a onnx file (for now, will change)
         :param backendType: the type of backend to use ( "1bin", "SL", "pyhf", "ML" )
@@ -126,7 +127,7 @@ class SpeyComputer:
 
 
     @classmethod
-    def forSingleBin(cls, dataset, nsig, deltas_rel):
+    def forSingleBin(cls, dataset, nsig, deltas_rel, lumi : Optional[UnitLumi]=None):
         """ get a speycomputer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -136,7 +137,7 @@ class SpeyComputer:
         :returns: a SpeyComputer
         """
         computer = SpeyComputer(dataset=dataset, backendType="1bin",
-                                nsig=nsig, deltas_rel=deltas_rel)
+                                nsig=nsig, deltas_rel=deltas_rel,lumi=lumi)
 
         return computer
 
@@ -411,21 +412,10 @@ class SpeyComputer:
         expected_pvalue = "nominal"
         if nSigma != 0:
             expected_pvalue = "1sigma"
-        try:
-            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp,
-                   expected_pvalue = expected_pvalue )
-            if nSigma == 1:
-                return ret[-1]
-            if nSigma == -1:
-                return ret[0]
-        except ValueError as e:
-            logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
-            sys.exit(-1)
-        except AsimovTestStatZero as e:
-            logger.debug ( f"spey returned: {e}. will interpret as ul=inf" )
-            ret = float("inf")
-        ret = float(ret) # cast for the printers
-        if limit_on_xsec:
+
+        def addXSecs ( limit_on_xsec : bool, ret : float ):
+            if not limit_on_xsec:
+                return ret
             totsig = self.nsig
             if type ( self.nsig ) in [ list ]:
                 totsig = sum ( self.nsig )
@@ -433,7 +423,24 @@ class SpeyComputer:
                 totsig = sum ( self.nsig.values() )
             xsec = totsig / self.dataset.globalInfo.lumi
             ret = ret * xsec
-        return ret
+            return ret
+
+        try:
+            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp,
+                   expected_pvalue = expected_pvalue )
+            if nSigma == 1:
+                return addXSecs ( limit_on_xsec, float(ret[-1]) )
+            if nSigma == -1:
+                return addXSecs ( limit_on_xsec, float(ret[0]) )
+        except ValueError as e:
+            logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
+            sys.exit(-1)
+        except AsimovTestStatZero as e:
+            logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
+            logger.debug ( f"spey returned: {e}. will interpret as ul=inf" )
+            ret = float("inf")
+        ret = float(ret) # cast for the printers
+        return addXSecs ( limit_on_xsec, ret )
 
     def getBestCombinationIndex(self, data ):
         """find the index of the best evaluationType combination"""

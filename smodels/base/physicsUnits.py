@@ -11,9 +11,10 @@
 import unum
 # these are just for type hinting
 UnitLength = unum.Unum
-UnitXSec = unum.Unum 
+UnitXSec = unum.Unum
 UnitEnergy = unum.Unum
 UnitTime = unum.Unum
+UnitLumi = unum.Unum
 
 # description see
 # http://home.scarlet.be/be052320/Unum.html

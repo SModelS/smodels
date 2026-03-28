@@ -416,7 +416,7 @@ class DataSet(object):
             return None
 
     def getSRUpperLimit( self,evaluationType : NllEvalType = observed,
-                         nSigma : int = 0 ) -> UnitXSec:
+                         nSigma : int = 0, deltas_rel : float = 0.2 ) -> UnitXSec:
         """
         Returns the 95% upper limit on the signal*efficiency
         for a given dataset (signal region).
@@ -433,22 +433,22 @@ class DataSet(object):
             line = "getSRUpperLimit can only be used for efficiency map results!"
             logger.error( line )
             raise SModelSError( line )
-        if nSigma != 0 and evaluationType != aposteriori:
+        if nSigma != 0 and evaluationType == observed:
             line = f"nSigma={nSigma} but evaluationType={evaluationType}: not implemented"
             raise SModelSError ( line )
 
         if nSigma != 0:
+            from smodels.statistics.statsTools import getStatsComputerModule
+            mod = getStatsComputerModule()
+            # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
+            nsig = 1
+            comp = mod.forSingleBin ( dataset=self,
+                    nsig=nsig, deltas_rel = deltas_rel, lumi = self.getLumi() )
             # we dont even cache, not like this will be used much
-            from smodels.statistics.simplifiedLikelihoods import Data, \
-                 UpperLimitComputer, LikelihoodComputer
-            lumi = self.globalInfo.lumi
-            m = Data ( self.dataInfo.observedN, self.dataInfo.expectedBG,
-                       self.dataInfo.bgError**2, None,
-                       1., lumi = lumi )
-            llhdComp = LikelihoodComputer  ( m, 1 - .05 )
-            ul = comp.getUpperLimitOnSigmaTimesEff (
-                evaluationType = evaluationType, nSigma = nSigma )
-            return ul.asNumber ( fb )
+            ul = comp.poi_upper_limit (
+                evaluationType = evaluationType,
+                nSigma = nSigma, limit_on_xsec = True )
+            return ul
 
         if evaluationType != observed:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):

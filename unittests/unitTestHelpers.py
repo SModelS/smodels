@@ -208,7 +208,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 deffile = f" (default file {fname2})"
                 if fname2 == "unspecified":
                     deffile = ""
-                logger.warning(f"Key ``{key}'' missing in {where}:{fname}{deffile}")
+                logger.warning(f"Key ``{key}'' missing in {where}:{fname}{deffile}. Its value should be ``{obj1[key]}'")
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
                              where=key, fname=fname, fname2=fname2):
@@ -232,7 +232,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     if checkBothOrders:
         if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
                          fname2, fname, checkBothOrders=False):
-            logger.error(f"Objects {obj1} and {obj2} differ in {where}: {fname} != {fname2}")
+            logger.error(f"Objects ``{str(obj1)[:100]}'' and ``{str(obj2)[:100]}'' differ in {where}: {fname} != {fname2}")
             return False
     return True
 

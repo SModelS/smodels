@@ -15,14 +15,14 @@ __all__ = [ "StatsComputer", "getStatsComputerModule" ]
 from typing import Union, Text, Dict, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
-from typing import Union, Text
+from typing import Union, Text, Optional
 
 def getStatsComputerModule():
     """ very single convenience function to centralize
@@ -67,7 +67,7 @@ class StatsComputer:
         self.likelihoodComputer = None
 
     @classmethod
-    def forSingleBin(cls, dataset, nsig, deltas_rel):
+    def forSingleBin(cls, dataset, nsig, deltas_rel, lumi : Optional[UnitLumi]=None ):
         """ get a statscomputer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -80,7 +80,7 @@ class StatsComputer:
                                  dataType="1bin",
                                  nsig=nsig, deltas_rel=deltas_rel)
 
-        computer.getComputerSingleBin( )
+        computer.getComputerSingleBin( lumi )
 
         return computer
 
@@ -176,7 +176,7 @@ class StatsComputer:
 
         return computer
 
-    def getComputerSingleBin(self):
+    def getComputerSingleBin(self,lumi):
         """
         Create computer from a single bin
 
@@ -185,8 +185,8 @@ class StatsComputer:
         dataset = self.dataObject
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
-                     nsignal = self.nsig )
-        # self.data = data
+                     nsignal = self.nsig, lumi = lumi )
+        self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 

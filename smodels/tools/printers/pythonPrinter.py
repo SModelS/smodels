@@ -316,7 +316,7 @@ class PyPrinter(BasicPrinter):
                        'dataType': dataType,
                        'r': r, 'r_expected': r_expected,
                        'Width (GeV)' : widths})
-            if self.errorsforr and theoryPrediction.dataType() == "combined":
+            if self.errorsforr and theoryPrediction.dataType() != "upperLimit":
                 # the errors on R values feature is used only for SR-combinations
                 self.addErrorsForRValues ( theoryPrediction, resDict )
 

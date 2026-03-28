@@ -33,7 +33,7 @@ class SpeyTest(unittest.TestCase):
         """ see that we can turn on spey mode """
         filename = "./testFiles/slha/gluino_squarks.slha"
         inifile = "testParameters_spey.ini"
-        outputfile = runMain(filename, inifile = inifile, suppressStdout=False )
+        outputfile = runMain(filename, inifile = inifile, suppressStdout=True )
         smodelsOutput = importModule(outputfile)
         from default_with_spey import smodelsOutputDefault
         runtime._experimental["spey"]=False

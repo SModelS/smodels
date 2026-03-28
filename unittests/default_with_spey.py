@@ -88,6 +88,8 @@ smodelsOutputDefault = {
         'r' : 0.1296154,
         'r_expected' : 0.2078608,
         'Width (GeV)' : None,
+        'r_expected_p1' : 0.1478731,
+        'r_expected_m1' : 0.2956743,
         'nll' : 3.906258,
         'nll_min' : 3.573349,
         'nll_SM' : 4.330763
@@ -167,6 +169,8 @@ smodelsOutputDefault = {
             [13.4903869, 0.00112364506, 'stable'],
             [13.4903869, 0.00112364506, 'stable']
         ],
+        'r_expected_p1' : 0.03079634,
+        'r_expected_m1' : 0.06888626,
         'nll' : 3.254487,
         'nll_min' : 2.414861,
         'nll_SM' : 3.121637
@@ -227,6 +231,8 @@ smodelsOutputDefault = {
             [0.0456539663, 'stable'],
             [0.0456539663, 'stable']
         ],
+        'r_expected_p1' : 0.001328745,
+        'r_expected_m1' : 0.004956839,
         'nll' : 0.9238798,
         'nll_min' : 0.9189385,
         'nll_SM' : 0.9189385
@@ -246,6 +252,8 @@ smodelsOutputDefault = {
         'r' : 0.001829564,
         'r_expected' : 0.002090931,
         'Width (GeV)' : None,
+        'r_expected_p1' : 0.00150994,
+        'r_expected_m1' : 0.003242326,
         'nll' : 3.015969,
         'nll_min' : 2.989467,
         'nll_SM' : 3.019043
