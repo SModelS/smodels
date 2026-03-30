@@ -18,11 +18,13 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, NllEvalType
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
-from typing import Union, Text, Optional
+from smodels.base.physicsUnits import UnitXSec
+
+from typing import Union, Optional
 
 def getStatsComputerModule():
     """ very single convenience function to centralize
@@ -422,7 +424,7 @@ class StatsComputer:
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
-           nSigma : int = 0 ) -> float:
+           nSigma : int = 0 ) -> Union[float,UnitXSec,None]:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
 
@@ -432,6 +434,8 @@ class StatsComputer:
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         """
+
+        ret = None
         if self.dataType == "pyhf":
             if all([s == 0 for s in self.nsig]):
                 logger.warning("All signals are empty")

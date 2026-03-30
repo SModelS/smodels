@@ -11,6 +11,7 @@
 import os
 import glob
 import numpy as np
+from typing import Union
 from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
@@ -339,10 +340,10 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, evaluationType : bool = observed,
+    def getUpperLimitFor(self, sms=None, evaluationType : NllEvalType = observed,
             txnames=None, compute : bool = False,
             alpha : float = 0.05, deltas_rel : float = 0.2,
-            mass=None, nSigma : int = 0 ) -> UnitXSec:
+            mass=None, nSigma : int = 0 ) -> Union[None,bool,UnitXSec]:
         """
         Returns the upper limit for a given SMS (or mass) and txname. If
         the dataset hold an EM map result the upper limit is independent of
@@ -366,6 +367,9 @@ class DataSet(object):
                         from expected and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
+        :param nSigma: the upper limit for central value (0),
+                        + 1 sigma, - 1 sigma for error bands. 
+                        Only for efficiency-map results, and only if compute=True.
         :return: upper limit (Unum object)
         """
 
@@ -416,7 +420,7 @@ class DataSet(object):
             return None
 
     def getSRUpperLimit( self,evaluationType : NllEvalType = observed,
-                         nSigma : int = 0, deltas_rel : float = 0.2 ) -> UnitXSec:
+                         nSigma : int = 0, deltas_rel : float = 0.2 ) -> Union[None,UnitXSec]:
         """
         Returns the 95% upper limit on the signal*efficiency
         for a given dataset (signal region).
@@ -424,7 +428,7 @@ class DataSet(object):
 
         :param evaluationType: one of: observed, apriori, aposteriori
         :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
+                      + 1 sigma, - 1 sigma for error bands.
 
         :returns: upper limit value on cross section
         """

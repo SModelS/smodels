@@ -26,6 +26,7 @@ from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.experiment.datasetObj import DataSet
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.base.crossSection import XSection
+from smodels.base.physicsUnits import fb, UnitXSec
 import numpy as np
 
 _debug = { "writePoint": False } # for debugging only
@@ -393,7 +394,7 @@ class SpeyComputer:
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
            model_index : Union [int,None] = None,
-           nSigma : int = 0 ) -> float:
+           nSigma : int = 0 ) -> Union[float,UnitXSec]:
         """ simple frontend to spey::poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the
