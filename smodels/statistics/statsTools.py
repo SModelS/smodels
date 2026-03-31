@@ -280,6 +280,7 @@ class StatsComputer:
         for smname,pyhfname in translator.items():
             nsignals[pyhfname] = self.nsig[smname]
         # ic ( nsignals )
+        from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         data = NNData( nsignals, self.dataObject )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer
