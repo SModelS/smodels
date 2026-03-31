@@ -517,10 +517,10 @@ class StatsComputer:
                 return None
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType )
+                       evaluationType = evaluationType, nSigma = nSigma )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       evaluationType = evaluationType )
+                       evaluationType = evaluationType, nSigma = nSigma )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:

@@ -428,7 +428,8 @@ class NNUpperLimitComputer:
 
     def getUpperLimitOnSigmaTimesEff(self,
 			      evaluationType : NllEvalType = observed,
-            modelToUse : Union[None,str] = None ) -> UnitXSec:
+            modelToUse : Union[None,str] = None,
+            nSigma : int = 0 ) -> UnitXSec:
         """
         Compute the upper limit on the fiducial
         cross section sigma times efficiency:
@@ -436,6 +437,8 @@ class NNUpperLimitComputer:
         :param evaluationType: one of: observed, apriori, aposteriori
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :return: the upper limit on sigma times eff at 'self.cl' level
         (0.95 by default)
         """
@@ -443,7 +446,8 @@ class NNUpperLimitComputer:
             return None
         else:
             ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                                         modelToUse=modelToUse )
+                                         modelToUse=modelToUse,
+                                         nSigma = nSigma )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -454,7 +458,8 @@ class NNUpperLimitComputer:
 
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
 			      allowNegativeSignals : bool = False,
-            modelToUse : Union[None,str] = None ) -> float:
+            modelToUse : Union[None,str] = None,
+            nSigma : int = 0 ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
         - by default, the combination of the workspaces in self.workspaces
@@ -462,6 +467,8 @@ class NNUpperLimitComputer:
         :param evaluationType: one of: observed, apriori, aposteriori
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         if modelToUse in self.cachedULs:
@@ -474,7 +481,8 @@ class NNUpperLimitComputer:
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse )
+                modelToUse = modelToUse,
+                nSigma = nSigma )
         if mu_hat is None:
             return float("inf")
         # print ( f"@@NN76 clsRoot evaluationType {evaluationType} modelToUse {modelToUse}" )
@@ -496,13 +504,16 @@ class NNUpperLimitComputer:
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
             allowNegativeSignals : bool = True,
-            modelToUse : Union[None,str] = None ) -> Tuple[float, float, Callable]:
+            modelToUse : Union[None,str] = None,
+            nSigma : int = 0 ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
         :param evaluationType: one of: observed, apriori, aposteriori
         :param modelToUse: if given, compute the nll for that model.
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         If None compute for most sensitive analysis.
         """
         # print ( f"@@NN88 getCLsRootFunc modelToUse {modelToUse}" )
@@ -549,7 +560,7 @@ class NNUpperLimitComputer:
                     evaluationType=evaluationType,
                     modelToUse = modelToUse, asimov = False )
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
-                    return_type=return_type) if \
+                    return_type=return_type, nSigma = nSigma ) if \
                     (nll is not None and nllA is not None) else None
             if False: #  and expected == "posteriori" and abs(mu-.765)<.1:
                 print ( f"@@NN653 {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {modelToUse} {RESET}" )
