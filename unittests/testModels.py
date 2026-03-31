@@ -115,6 +115,7 @@ class ModelsTest(unittest.TestCase):
 
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
+        self.removeOutputs("alrsm.lhe")
 
     def testParticlesFromSLHA(self):
 
