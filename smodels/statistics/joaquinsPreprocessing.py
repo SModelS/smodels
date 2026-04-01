@@ -72,7 +72,8 @@ def preprocess_features(
     return_dict=False,
 ):
     assert np.isfinite(features_raw).all()
-    mean, std = 0.0, 1.0
+    # mean, std = 0.0, 1.0
+    # print ( f"@@preprocessing before mean,std={mean},{std}" )
 
     feature_sets = {}
     if trafos:
@@ -81,12 +82,14 @@ def preprocess_features(
             for fn_str in t_fns:
                 if fn_str == "standardization":
                     transformed_features, mean, std = standardization(
-                        transformed_features, return_mean_std=True, clip=False
-                    )
+                        transformed_features, return_mean_std=True,
+                        clip=False, use_previous_mean_std=True,
+                        mean=mean, std=std )
                 else:
                     fn = get_fn(fn_str)
                     transformed_features = fn(transformed_features, type_tokens)
             feature_sets[t_name] = transformed_features
+    #print ( f"@@preprocessing after mean,std={mean},{std}" )
 
     # if incl_fvs:
     #     feature_sets["fvs_raw"] = sort_features(features_raw, type_tokens, "E")
@@ -100,11 +103,14 @@ def preprocess_features(
     else:
         return np.concatenate(list(feature_sets.values()), axis=1), mean, std
 
-
-def standardization(features, return_mean_std=False, clip=True):
+def standardization( features, return_mean_std=False, clip=True, 
+                     use_previous_mean_std=False, mean=None, std=None):
     """standardize features"""
-    mean = features.mean(axis=0)
-    std = features.std(axis=0)
+    if use_previous_mean_std:
+        assert mean is not None and std is not None, "Mean and std must be provided if use_previous_mean_std is True"
+    else:
+        mean = features.mean(axis=0)
+        std = features.std(axis=0)
     if clip:
         std = np.clip(std, a_min=1e-6, a_max=None)  # avoid std=0.
     features = (features - mean) / std
@@ -113,7 +119,6 @@ def standardization(features, return_mean_std=False, clip=True):
         return features, mean, std
     else:
         return features
-
 
 def compute_invariants(features, eps=1e-4, incl_diag_invariants=False, reshape=True):
     """compute Lorentz invariants out of four-vectors"""
