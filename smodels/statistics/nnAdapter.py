@@ -310,18 +310,27 @@ class NNAdapter:
             "nLL_trafos": [ "standardization", "log_w_negatives" ],
         }
         print ( f"@@X nllMeans {self.onnxMeta['nllMeans']}" )
-        try:
-            ret = undo_preprocess_nLLs ( arr, mean = self.onnxMeta["nllMeans"]*2,
-                std = self.onnxMeta["nllErrors"]*2, trafos = trafos["nLL_trafos"] ) 
-        except Exception as e:
-            print ( f"@@exception {type(e)} {e}" )
-            sys.exit()
-        ret = [ float(x) for x in ret ]
-        dret = { "nll_exp_0": ret[0], "nll_exp_1": ret[1], "nll_obs_0": ret[2],
-                 "nll_obs_1": ret[3], "nllA_exp_0": ret[4], "nllA_exp_1": ret[5],
-                 "nllA_obs_0": ret[6], "nllA_obs_1": ret[7] }
+        deltas_prepd = np.array(arr[:4], dtype=np.float64)
+        deltas = undo_preprocess_nLLs ( deltas_prepd, 
+                mean = self.onnxMeta["nllMeans"],
+                std = self.onnxMeta["nllErrors"], trafos = trafos["nLL_trafos"] ) 
+        nll0exp  = self.onnxMeta["nLL_exp_mu0"]
+        nll0obs  = self.onnxMeta["nLL_obs_mu0"]
+        nllA0exp = self.onnxMeta["nLLA_exp_mu0"]
+        nllA0obs = self.onnxMeta["nLLA_obs_mu0"]
+
+        nll1exp  = nll0exp  + deltas[0]
+        nll1obs  = nll0obs  + deltas[1]
+        nllA1exp = nllA0exp + deltas[2]
+        nllA1obs = nllA0obs + deltas[3]
+
+        ret = { "nll_exp_0": nll0exp,  "nll_exp_1": float(nll1exp),
+                "nll_obs_0": nll0obs,  "nll_obs_1": float(nll1obs),
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
+        if self.onnxMeta["nLL_obs_max"][1] is not None:
+            ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         print ( f"@@postprocessJoaquin with the new method we get: {ret}" )
-        print ( f"@@postprocessJoaquin as dictionary {dret}" )
         sys.exit()
         return dret
 
