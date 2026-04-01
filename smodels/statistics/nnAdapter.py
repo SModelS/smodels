@@ -352,11 +352,17 @@ class NNAdapter:
         inp_list = self._log_with_negatives ( inp_list )
         scaled_yields = self._scaleYieldsJoaquin ( inp_list )
         print ( f"@@1 the old code gave {scaled_yields}" )
-        from smodels.statistics.joaquinsPreprocessing import preprocess_features
+        from smodels.statistics.joaquinsPreprocessing import preprocess_features, \
+            log_with_negatives
         return_dict = True
         incl_fvs = True
         type_tokens = None
         trafos = None
+        trafos = { "fvs_standardized": [
+                "log_w_negatives", "standardization" ],
+            "nLL_trafos": [ "log_w_negatives", "standardization"
+            ]
+        }
         re = preprocess_features ( yields, incl_fvs = incl_fvs,
             type_tokens = type_tokens, trafos = trafos,
             mean = self.onnxMeta["inputMeans"],
