@@ -847,6 +847,8 @@ class PyhfUpperLimitComputer:
         # Convert single element list/array to scalar:
         hessian = np.asarray(hessian).item()
         #return the inverse hessian at the poi
+        if hessian == 0.:
+            return float("inf")
         return 1.0/hessian
 
     @lru_cache
