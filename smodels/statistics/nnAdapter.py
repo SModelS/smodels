@@ -331,7 +331,8 @@ class NNAdapter:
             return self.preprocessJoaquin ( yields )
         return self.preprocessRafal ( yields )
 
-    def preprocessJoaquin ( self, yields : Union[dict,list] ) -> dict:
+    def preprocessJoaquinOld ( self, yields : Union[dict,list] ) -> dict:
+        ## this was the previous version of preprocessing
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
@@ -340,6 +341,29 @@ class NNAdapter:
         inp_list = self._log_with_negatives ( inp_list )
         scaled_yields = self._scaleYieldsJoaquin ( inp_list )
         return scaled_yields
+
+    def preprocessJoaquin ( self, yields : Union[dict,list] ) -> dict:
+        print ( f"@@0 we need to process {yields}" )
+        inp_list = yields
+        if type(inp_list)==dict:
+            inp_list = self._inputDictToList ( yields )
+        # print ( f"@@preprocessJoaquin predict {yields} inp_list {inp_list}" )
+        # print ( "@@postprocessJoaquin featureMeans", self.onnxMeta["featureMeans"] )
+        inp_list = self._log_with_negatives ( inp_list )
+        scaled_yields = self._scaleYieldsJoaquin ( inp_list )
+        print ( f"@@1 the old code gave {scaled_yields}" )
+        from smodels.statistics.joaquinsPreprocessing import preprocess_features
+        return_dict = True
+        incl_fvs = True
+        type_tokens = None
+        trafos = None
+        re = preprocess_features ( yields, incl_fvs = incl_fvs,
+            type_tokens = type_tokens, trafos = trafos,
+            mean = self.onnxMeta["inputMeans"],
+            std = self.onnxMeta["inputErrors"], return_dict = return_dict )
+        print ( f"@@2 joaquins code gives {re}" )
+
+        sys.exit()
 
     def preprocessRafal ( self, yields : Union[dict,list] ) -> dict:
         inp_list = yields
