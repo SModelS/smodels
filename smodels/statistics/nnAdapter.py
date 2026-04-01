@@ -280,6 +280,60 @@ class NNAdapter:
                 "nllA_exp_0": ..., "nllA_exp_1": ...,
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
+        print ( f"@@postprocessJoaquin input: {arr}" )
+        # print ( f"@@postprocessJoaquin onnxMeta {self.onnxMeta.keys()}" )
+        nll0obs =  self.onnxMeta["nLL_obs_mu0"]
+        nll0exp =  self.onnxMeta["nLL_exp_mu0"]
+        nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
+        nllA0exp =  self.onnxMeta["nLLA_exp_mu0"]
+        i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
+        # print ( "@@postprocessJoaquin nllMeans", self.onnxMeta["nllMeans"] )
+        # print ( "@@postprocessJoaquin nllErrors", self.onnxMeta["nllErrors"] )
+        d_nll1obs = self.onnxMeta["nllMeans"][i_obs] + self.onnxMeta["nllErrors"][i_obs]*arr[i_obs-4]
+        d_nll1exp = self.onnxMeta["nllMeans"][i_exp] + self.onnxMeta["nllErrors"][i_exp]*arr[i_exp-4]
+        d_nllA1obs = self.onnxMeta["nllMeans"][i_obsA] + self.onnxMeta["nllErrors"][i_obsA]*arr[i_obsA-4]
+        d_nllA1exp = self.onnxMeta["nllMeans"][i_expA] + self.onnxMeta["nllErrors"][i_expA]*arr[i_expA-4]
+        nll1obs = self._undo_log_with_negatives ( d_nll1obs ) + nll0obs
+        nll1exp = self._undo_log_with_negatives ( d_nll1exp ) + nll0exp
+        nllA1obs = self._undo_log_with_negatives ( d_nllA1obs ) + nllA0obs
+        nllA1exp = self._undo_log_with_negatives ( d_nllA1exp ) + nllA0exp
+
+        ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
+                "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
+        ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
+        print ( f"@@postprocessJoaquin old version {ret}" )
+        from smodels.statistics.joaquinsPreprocessing import undo_preprocess_nLLs
+        trafos = { "fvs_standardized": [
+                "log_w_negatives", "standardization" ],
+            "nLL_trafos": [ "standardization", "log_w_negatives" ],
+        }
+        print ( f"@@X nllMeans {self.onnxMeta['nllMeans']}" )
+        try:
+            ret = undo_preprocess_nLLs ( arr, mean = self.onnxMeta["nllMeans"]*2,
+                std = self.onnxMeta["nllErrors"]*2, trafos = trafos["nLL_trafos"] ) 
+        except Exception as e:
+            print ( f"@@exception {type(e)} {e}" )
+            sys.exit()
+        ret = [ float(x) for x in ret ]
+        dret = { "nll_exp_0": ret[0], "nll_exp_1": ret[1], "nll_obs_0": ret[2],
+                 "nll_obs_1": ret[3], "nllA_exp_0": ret[4], "nllA_exp_1": ret[5],
+                 "nllA_obs_0": ret[6], "nllA_obs_1": ret[7] }
+        print ( f"@@postprocessJoaquin with the new method we get: {ret}" )
+        print ( f"@@postprocessJoaquin as dictionary {dret}" )
+        sys.exit()
+        return dret
+
+    def postprocessJoaquinOld( self, arr ) -> dict:
+        """ given the networks predictions, compute the NLLs
+
+        :param arr: the neural network output
+        :returns: { "nll_exp_0": ..., "nll_exp_1": ...,
+                "nll_obs_0": ..., "nll_obs_1": ...,
+                "nllA_exp_0": ..., "nllA_exp_1": ...,
+                "nllA_obs_0": ..., "nllA_obs_1": ... }
+        """
         # print ( f"@@postprocessJoaquin: we start with {arr}" )
         # print ( f"@@postprocessJoaquin onnxMeta {self.onnxMeta.keys()}" )
         nll0obs =  self.onnxMeta["nLL_obs_mu0"]
@@ -305,6 +359,7 @@ class NNAdapter:
         ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         # print ( f"@@postprocessJoaquin we return {ret}" )
         return ret
+
 
     def predict ( self, yields : Union[dict,list] ) -> dict:
         """ predict for yields, the main method
