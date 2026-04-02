@@ -74,7 +74,7 @@ class NNAdapter:
             self.srOrder.append ( srname )
 
     def _removeSignalRegions ( self, channels : list, dictionary : dict ) -> dict:
-        """ remove a list of signal regions called "channels" 
+        """ remove a list of signal regions called "channels"
         from the dictionary of values.
         :returns: pruned dictionary
         """
@@ -229,13 +229,13 @@ class NNAdapter:
         return arr
 
     def _log_with_negatives ( self, x : np.array ) -> np.array:
-        """ a pre-processing step that joaquin is performing 
+        """ a pre-processing step that joaquin is performing
         but rafal is not
         """
         return np.sign(x) * np.log1p ( np.abs(x) )
 
     def _undo_log_with_negatives ( self, x : np.array ) -> np.array:
-        """ a post-processing step that joaquin is performing 
+        """ a post-processing step that joaquin is performing
         but rafal is not
         """
         return np.sign(x) * np.expm1 ( np.abs(x) )
@@ -290,10 +290,11 @@ class NNAdapter:
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
         from smodels.statistics.joaquinsPreprocessing import undo_preprocess_nLLs
-        deltas_prepd = np.array(arr[:4], dtype=np.float64)
+        deltas_prepd = np.array(arr, dtype=np.float64)
         trafos = self.onnxMeta["run_config"]["data"]["nLL_trafos"]
-        deltas = undo_preprocess_nLLs ( deltas_prepd, mean = self.onnxMeta["nllMeans"],
-                std = self.onnxMeta["nllErrors"], trafos = trafos ) 
+        deltas = undo_preprocess_nLLs ( deltas_prepd, mean = self.onnxMeta["nllMeans"]*2,
+                std = self.onnxMeta["nllErrors"]*2, trafos = trafos )
+        deltas = list ( map ( float, deltas ) )
         nll0exp  = self.onnxMeta["nLL_exp_mu0"]
         nll0obs  = self.onnxMeta["nLL_obs_mu0"]
         nllA0exp = self.onnxMeta["nLLA_exp_mu0"]
@@ -303,11 +304,19 @@ class NNAdapter:
         nll1obs  = nll0obs  + deltas[1]
         nllA1exp = nllA0exp + deltas[2]
         nllA1obs = nllA0obs + deltas[3]
+        s_nll1exp  = deltas[4]
+        s_nll1obs  = deltas[5]
+        s_nllA1exp = deltas[6]
+        s_nllA1obs = deltas[7]
 
-        ret = { "nll_exp_0": nll0exp,  "nll_exp_1": float(nll1exp),
-                "nll_obs_0": nll0obs,  "nll_obs_1": float(nll1obs),
-                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
-                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
+        ret = { "nll_exp_0": nll0exp,  "nll_exp_1": nll1exp,
+                "nll_obs_0": nll0obs,  "nll_obs_1": nll1obs,
+                "nllA_exp_0": nllA0exp, "nllA_exp_1": nllA1exp,
+                "nllA_obs_0": nllA0obs, "nllA_obs_1": nllA1obs }
+        ret["s_nll1exp"] = s_nll1exp
+        ret["s_nll1obs"] = s_nll1obs
+        ret["s_nllA1exp"] = s_nllA1exp
+        ret["s_nllA1obs"] = s_nllA1obs
         if self.onnxMeta["nLL_obs_max"][1] is not None:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         return ret
