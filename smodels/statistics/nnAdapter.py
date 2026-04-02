@@ -167,9 +167,10 @@ class NNAdapter:
 
         trafos = { "fvs_standardized": [
                 "log_w_negatives", "standardization" ],
-            "nLL_trafos": [ "standardization", "log_w_negatives" ],
+            "nLL_trafos": [ "log_w_negatives", "standardization" ],
         }
         self.onnxMeta["trafos"]=trafos
+        self.onnxMeta["nLL_trafos"]= [ "standardization", "log_w_negatives" ]
 
     def _scaleYieldsRafal ( self, yields : list ) -> np.array:
         """ scale the (total) yields
@@ -318,9 +319,8 @@ class NNAdapter:
         }
         print ( f"@@X nllMeans {self.onnxMeta['nllMeans']}" )
         deltas_prepd = np.array(arr[:4], dtype=np.float64)
-        deltas = undo_preprocess_nLLs ( deltas_prepd, 
-                mean = self.onnxMeta["nllMeans"],
-                std = self.onnxMeta["nllErrors"], trafos = trafos["nLL_trafos"] ) 
+        deltas = undo_preprocess_nLLs ( deltas_prepd, mean = self.onnxMeta["nllMeans"],
+				        std = self.onnxMeta["nllErrors"], trafos = self.onnxMeta["nLL_trafos"] ) 
         nll0exp  = self.onnxMeta["nLL_exp_mu0"]
         nll0obs  = self.onnxMeta["nLL_obs_mu0"]
         nllA0exp = self.onnxMeta["nLLA_exp_mu0"]
@@ -426,14 +426,8 @@ class NNAdapter:
         return_dict = True
         incl_fvs = True
         type_tokens = None
-        trafos = None
-        trafos = { "fvs_standardized": [
-                "log_w_negatives", "standardization" ],
-            "nLL_trafos": [ "log_w_negatives", "standardization"
-            ]
-        }
         re = preprocess_features ( yields, incl_fvs = incl_fvs,
-            type_tokens = type_tokens, trafos = trafos,
+            type_tokens = type_tokens, trafos = self.onnxMeta["trafos"],
             mean = self.onnxMeta["featureMeans"][:2],
             std = self.onnxMeta["featureErrors"][:2], return_dict = return_dict )
         ret = [ re[0]["fvs_standardized"] ]
