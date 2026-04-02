@@ -165,6 +165,12 @@ class NNAdapter:
         for key,value in data.items():
             self.onnxMeta[key]=value
 
+        trafos = { "fvs_standardized": [
+                "log_w_negatives", "standardization" ],
+            "nLL_trafos": [ "standardization", "log_w_negatives" ],
+        }
+        self.onnxMeta["trafos"]=trafos
+
     def _scaleYieldsRafal ( self, yields : list ) -> np.array:
         """ scale the (total) yields
 
@@ -234,6 +240,7 @@ class NNAdapter:
     def postprocess ( self, arr ) -> dict:
         if self.modelType == "joaquin":
             return self.postprocessJoaquin ( arr )
+            return self.postprocessJoaquinOld ( arr )
         return self.postprocessRafal ( arr )
 
     def postprocessRafal( self, arr ) -> dict:
@@ -332,7 +339,7 @@ class NNAdapter:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         print ( f"@@postprocessJoaquin with the new method we get: {ret}" )
         sys.exit()
-        return dret
+        return ret
 
     def postprocessJoaquinOld( self, arr ) -> dict:
         """ given the networks predictions, compute the NLLs
@@ -393,6 +400,7 @@ class NNAdapter:
         """
         if self.modelType == "joaquin":
             return self.preprocessJoaquin ( yields )
+            return self.preprocessJoaquinOld ( yields )
         return self.preprocessRafal ( yields )
 
     def preprocessJoaquinOld ( self, yields : Union[dict,list] ) -> dict:
