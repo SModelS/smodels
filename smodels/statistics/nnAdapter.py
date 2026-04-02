@@ -153,7 +153,10 @@ class NNAdapter:
                 data["featureErrors"] = values["features_std"][0]*3
                 data["nllMeans"] = values["nLLs_mean"][0]
                 data["nllErrors"] = values["nLLs_std"][0]
-
+            elif emkey == "run_config":
+                import yaml
+                content = yaml.safe_load ( em.value )
+                data["run_config"] = content
 
                 #values = json.loads(em.value)
         if len(remove_channels)>0:
@@ -161,15 +164,18 @@ class NNAdapter:
                                                    data["smYields"] )
             data["obsYields"]=self._removeSignalRegions ( remove_channels,
                                                     data["obsYields"] )
-        self.onnxMeta={}
-        for key,value in data.items():
-            self.onnxMeta[key]=value
+        #self.onnxMeta={}
+        #for key,value in data.items():
+        #    self.onnxMeta[key]=value
+        self.onnxMeta = data
 
+        """
         trafos = { "fvs_standardized": [
                 "log_w_negatives", "standardization" ],
             "nLL_trafos": [ "log_w_negatives", "standardization" ],
         }
         self.onnxMeta["trafos"]=trafos
+        """
 
     def _scaleYieldsRafal ( self, yields : list ) -> np.array:
         """ scale the (total) yields
@@ -285,8 +291,9 @@ class NNAdapter:
         """
         from smodels.statistics.joaquinsPreprocessing import undo_preprocess_nLLs
         deltas_prepd = np.array(arr[:4], dtype=np.float64)
+        trafos = self.onnxMeta["run_config"]["data"]["nLL_trafos"]
         deltas = undo_preprocess_nLLs ( deltas_prepd, mean = self.onnxMeta["nllMeans"],
-                std = self.onnxMeta["nllErrors"], trafos = self.onnxMeta["trafos"]["nLL_trafos"] ) 
+                std = self.onnxMeta["nllErrors"], trafos = trafos ) 
         nll0exp  = self.onnxMeta["nLL_exp_mu0"]
         nll0obs  = self.onnxMeta["nLL_obs_mu0"]
         nllA0exp = self.onnxMeta["nLLA_exp_mu0"]
@@ -390,8 +397,9 @@ class NNAdapter:
         return_dict = True
         incl_fvs = True
         type_tokens = None
+        trafos = self.onnxMeta["run_config"]["data"]["trafos"]
         re = preprocess_features ( yields, incl_fvs = incl_fvs,
-            type_tokens = type_tokens, trafos = self.onnxMeta["trafos"],
+            type_tokens = type_tokens, trafos = trafos,
             mean = self.onnxMeta["featureMeans"][:2],
             std = self.onnxMeta["featureErrors"][:2], return_dict = return_dict )
         ret = [ re[0]["fvs_standardized"] ]
