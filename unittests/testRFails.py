@@ -93,6 +93,7 @@ class RFailsTest(unittest.TestCase):
         self.assertTrue(equals)
         if equals:
             self.removeOutputs(outputfile)
+            os.unlink ( "mdm_r_fails.slha" )
 
     def testRFailSummary(self):
         warnings.filterwarnings( action='ignore', category=DeprecationWarning )
