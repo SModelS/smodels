@@ -144,7 +144,6 @@ class NNUpperLimitComputer:
         that were needed to compute that.
         """
         jsonfiles = list(self.adaptors.keys())
-        # print ( f"@@NN66 determineMostSensitiveModel jsonfiles {jsonfiles}" )
         self.cachedULs= { None: {} }
         if len(jsonfiles)==1:
             self.mostSensitiveModel = jsonfiles[0]
@@ -155,18 +154,12 @@ class NNUpperLimitComputer:
             self.cachedULs[None][apriori]=ulmu
             return
         mumin,mostSensitiveModel=float("inf"),None
-        # print ( f"@@NN66 more than one!" )
         for model in jsonfiles:
             ulmu = float("inf")
             try:
-                # print ( f"@@NN99 get ulmu for {model}" )
                 ulmu = self.getUpperLimitOnMu ( evaluationType=apriori,
                         modelToUse = model )
-                # self.cachedULs[model] = { apriori: ulmu }
-                # print ( f"@@NN54 determineMostSensitiveModel for {model} we have ulmu={mu}" )
             except SModelSError as e:
-                # self.cachedULs[model] = { apriori: ulmu }
-                print ( f"@@NN54 {e}: determineMostSensitiveModel for {model} we have ulmu={mu}" )
                 continue
             if ulmu < mumin:
                 mumin = ulmu
@@ -175,7 +168,6 @@ class NNUpperLimitComputer:
         ## the most sensitive model and its upper limit we store separately
         self.mostSensitiveModel = mostSensitiveModel
         self.mumin = mumin # the smallest expected UL
-        # print ( f"@@NN35 determineMostSensitiveModel after {model} {self.mostSensitiveModel}" )
 
     def isControlRegion ( self, srname : str, modelToUse : str ) -> bool:
         """ check if srname is control region
@@ -188,7 +180,6 @@ class NNUpperLimitComputer:
             return dct["type"]=="CR"
 
         for dct in self.data.globalInfo.mlModels[modelToUse]:
-            # print ( f"@@NN12 {dct}" )
             name = dct["onnx"]
             if name == srname:
                 return isCR ( dct )
@@ -206,7 +197,6 @@ class NNUpperLimitComputer:
         """
 
         yields = []
-        # print ( f"@@NNI smYields {self.adaptors[modelToUse].onnxMeta}" )
         for srname,smyield in self.adaptors[modelToUse].onnxMeta["smYields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -251,14 +241,6 @@ class NNUpperLimitComputer:
 
         # from signal yields compute total yields
         yields = self.totalYieldsFromSignals( modelToUse, poi_test )
-        """
-        # we scale these yields
-        scaled_yields = self.scaleYields ( yields, modelToUse )
-        # we send this through the network
-        arr = self.predict ( scaled_yields, modelToUse )
-        # from the output we compute the NLLs
-        ret = self.nllsFromPrediction ( arr, modelToUse, poi_test )
-        """
         ret = self.adaptors[modelToUse].predict(yields)
 
         # we return what has been asked
@@ -273,7 +255,6 @@ class NNUpperLimitComputer:
         if outputType != "extended":
             logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
             sys.exit(-1)
-        # print ( f"@@NN22 ret {ret} oldret {self.negative_log_likelihood_old(poi_test,modelToUse,outputType)}" )
         return ret
 
     def welcome(self):
@@ -370,16 +351,11 @@ class NNUpperLimitComputer:
             outputType = "expected"
         if evaluationType == aposteriori:
             outputType = "asimov"
-        #print ( f"@@NNO outputType {outputType} " )
-        #bounds=[(-1,10)]
-        #def callme ( args ):
-        #    print ( f"@@NN7 callme {args}" )
         options = { "disp": False, "maxiter": 200 }
 
         ## FIXME compute sigma_mu, compute via nllA
 
         def myNLL ( x ):
-            # print ( f"@@NN8 myNLL x={x}" )
             if type(x) in [ list, np.array, np.ndarray ]:
                 ret = []
                 for xi in x:
@@ -387,7 +363,6 @@ class NNUpperLimitComputer:
                 return np.array ( ret )
             ret = self.negative_log_likelihood ( x, modelToUse=modelToUse,
                                                  outputType=outputType )
-            # print ( f"@@NN90 myNLL ret={x}" )
             return ret
 
         method = "Nelder-Mead"
@@ -405,7 +380,6 @@ class NNUpperLimitComputer:
             #    print ( f"@@NN44 o {o}" )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
-                # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
                 o = differentiate.hessian ( myNLL, np.array ( [ muhat ] ) )
                 hessian = o.ddf[0][0][0]
                 sigma_mu = 0.
@@ -413,16 +387,9 @@ class NNUpperLimitComputer:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
                 ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
-                # print ( f"@@NN45 muhat {muhat} nllmin {nllmin} hessian {hessian} allowNegativeSignals {allowNegativeSignals}" )
-                # print ( f"@@NN47 negative_log_likelihood {self.negative_log_likelihood(muhat)}" )
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
-        #print ( f"could not find nll_min" )
-        #print ( f"nll(0) {self.negative_log_likelihood(0.)}" )
-        #print ( f"nll(.1) {self.negative_log_likelihood(.1)}" )
-        #print ( f"nll(-.1) {self.negative_log_likelihood(-.1)}" )
-        #sys.exit()
         logger.warning ( f"could not find nll_min!" )
         return None
 
@@ -485,7 +452,6 @@ class NNUpperLimitComputer:
                 nSigma = nSigma )
         if mu_hat is None:
             return float("inf")
-        # print ( f"@@NN76 clsRoot evaluationType {evaluationType} modelToUse {modelToUse}" )
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse }
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
@@ -495,8 +461,6 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
-        if False: # False and evaluationType == aposteriori:
-            print ( f"@@NN473 getUpperLimitOnMu r={1./mu_lim:.3f} evaluationType {evaluationType}" )
         if not modelToUse in self.cachedULs:
             self.cachedULs[modelToUse]={}
         self.cachedULs[modelToUse][evaluationType]=mu_lim # store
@@ -516,7 +480,6 @@ class NNUpperLimitComputer:
         + 1 sigma, - 1 sigma, etc.  For error bands.
         If None compute for most sensitive analysis.
         """
-        # print ( f"@@NN88 getCLsRootFunc modelToUse {modelToUse}" )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.lmax( evaluationType = aposteriori,
@@ -551,7 +514,6 @@ class NNUpperLimitComputer:
             # Make sure to always compute the correct llhd value (from
             # theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            # print ( f"@@NN732 clsRootAsimov modelToUse {modelToUse}" )
             nllA = self.likelihood(mu, return_nll=True,
                     modelToUse = modelToUse, asimov = True )
             nll = nllA
@@ -562,8 +524,6 @@ class NNUpperLimitComputer:
             ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
                     return_type=return_type, nSigma = nSigma ) if \
                     (nll is not None and nllA is not None) else None
-            if False: #  and expected == "posteriori" and abs(mu-.765)<.1:
-                print ( f"@@NN653 {RED}expected {expected} mu {mu:.3f} nllA {nllA:.3f} nll0A {nll0A:.3f} nll {nll:.3f} nll0 {nll0:.3f} muhat {mu_hat:.3f} CLs {ret} model {modelToUse} {RESET}" )
             return ret
 
         #from smodels.base import runtime
