@@ -97,6 +97,11 @@ shown in the example given by ATLAS-SUSY-2018-41:
 .. literalinclude:: /literals/globalInfo201841.txt
    :lines: 12-13
 
+Finally, for machine learned surrogate models an ``mlModels`` field exists with either the same syntax as the ``jsonFiles`` field above, or simply referencing the full pyhf model, in which case it is simply:
+
+.. literalinclude:: /literals/globalInfo201908.txt
+   :lines: 33
+
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
 
