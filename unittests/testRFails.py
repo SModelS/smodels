@@ -121,6 +121,7 @@ class RFailsTest(unittest.TestCase):
 
             if os.path.isfile(outSummary):
                 os.remove(outSummary)
+            os.unlink ( "mdm_r_fails.slha" )
 
 if __name__ == "__main__":
     unittest.main()
