@@ -1,226 +1,182 @@
+#!/usr/bin/env python3
+"""
+.. module:: preprocessing_nnAdapter
+   :synopsis: Preprocessing and inverse-preprocessing functions for the
+   NNAdapter. Handles feature standardisation and nLL postprocessing,
+   including uncertainty propagation through arbitrary transformation chains.
+
+"""
+
+__all__ = [
+    "preprocess_features",
+    "undo_preprocess_nLLs",
+    "undo_preprocess_nLLs_errors",
+]
+
 import numpy as np
-import torch
-from scipy.stats import boxcox
-from sklearn.preprocessing import QuantileTransformer
+from typing import Optional
 
 
-def preprocess_nLLs(nLLs, trafos=None):
-    mean, std = 0.0, 1.0
+# ---------------------------------------------------------------------------
+# Elementary transforms (forward and inverse)
+# ---------------------------------------------------------------------------
 
-    if trafos:
-        for fn_str in trafos:
-            print("Applying nLL transformation:", fn_str)
-
-            if fn_str == "standardization":
-                nLLs, mean, std = standardization(
-                    nLLs, return_mean_std=True, clip=False
-                )
-
-            elif fn_str == "log_w_negatives":
-                nLLs = log_with_negatives(nLLs)
-
-            else:
-                fn = get_fn(fn_str)
-                nLLs = fn(nLLs, None)
-
-    assert np.isfinite(nLLs).all()
-    return nLLs, mean, std
+def _log_with_negatives(x: np.ndarray) -> np.ndarray:
+    """Signed log1p transform, works for negative values, exactly invertible."""
+    return np.sign(x) * np.log1p(np.abs(x))
 
 
-def log_with_negatives(nLLs):
-    """
-    Signed log1p transform.
-    Works for negative values and is exactly invertible.
-    """
-    return np.sign(nLLs) * np.log1p(np.abs(nLLs))
-
-def undo_log_with_negatives(nLLs):
-    """
-    Exact inverse of log_with_negatives.
-    """
-    return np.sign(nLLs) * (np.expm1(np.abs(nLLs)))
+def _undo_log_with_negatives(x: np.ndarray) -> np.ndarray:
+    """Exact inverse of _log_with_negatives."""
+    return np.sign(x) * np.expm1(np.abs(x))
 
 
+def _standardize(
+    x: np.ndarray,
+    mean: np.ndarray,
+    std: np.ndarray,
+) -> np.ndarray:
+    """Apply standardisation using pre-computed mean and std."""
+    return (x - mean) / std
 
-def undo_preprocess_nLLs(nLLs, mean, std, trafos=None):
-    if trafos:
-        for fn_str in reversed(trafos):
 
-            if fn_str == "standardization":
-                nLLs = nLLs * std + mean
+def _undo_standardize(
+    x: np.ndarray,
+    mean: np.ndarray,
+    std: np.ndarray,
+) -> np.ndarray:
+    """Invert standardisation."""
+    return x * std + mean
 
-            elif fn_str == "log_w_negatives":
-                nLLs = undo_log_with_negatives(nLLs)
 
-            else:
-                inv_fn = get_inv_fn(fn_str)
-                nLLs = inv_fn(nLLs, None)
+# ---------------------------------------------------------------------------
+# Feature preprocessing (forward, used at inference time)
+# ---------------------------------------------------------------------------
 
-    assert np.isfinite(nLLs).all()
-    return nLLs
-
+def _get_fn(fn_str: str):
+    """Return a named scalar transform."""
+    match fn_str:
+        case "log":
+            return np.log
+        case "exp":
+            return np.exp
+        case "sqrt":
+            return np.sqrt
+        case "inverse":
+            return lambda x: 1.0 / x
+        case "log_w_negatives":
+            return _log_with_negatives
+        case _:
+            raise ValueError(f"Unknown transform '{fn_str}'.")
 
 
 def preprocess_features(
-    features_raw,
-    type_tokens=None,
-    trafos=None,
-    incl_fvs=True,
-    mean=None,
-    std=None,
-    eps_std=1e-2,
-    return_dict=False,
-):
-    assert np.isfinite(features_raw).all()
-    # mean, std = 0.0, 1.0
-    # print ( f"@@preprocessing before mean,std={mean},{std}" )
+    features_raw: np.ndarray,
+    trafos: Optional[dict] = None,
+    mean: Optional[np.ndarray] = None,
+    std: Optional[np.ndarray] = None,
+) -> tuple[np.ndarray, Optional[np.ndarray], Optional[np.ndarray]]:
+    """Apply feature preprocessing using saved mean/std from training.
+
+    :param features_raw: raw input features, shape (batch, n_features)
+    :param trafos: dict mapping set-name to list of transform strings,
+        e.g. ``{"fvs_standardized": ["log_w_negatives", "standardization"]}``
+    :param mean: per-feature mean saved at training time (required when
+        "standardization" is in trafos)
+    :param std: per-feature std saved at training time (required when
+        "standardization" is in trafos)
+    :returns: (scaled_features, mean, std)
+    """
+    assert np.isfinite(features_raw).all(), "Non-finite values in features_raw"
 
     feature_sets = {}
     if trafos:
-        for t_name, t_fns in trafos.items():
-            transformed_features = features_raw
-            for fn_str in t_fns:
+        for set_name, fn_list in trafos.items():
+            transformed = features_raw.copy()
+            for fn_str in fn_list:
                 if fn_str == "standardization":
-                    transformed_features, mean, std = standardization(
-                        transformed_features, return_mean_std=True,
-                        clip=False, use_previous_mean_std=True,
-                        mean=mean, std=std )
+                    assert mean is not None and std is not None, \
+                        "mean and std must be provided for standardization at inference time"
+                    transformed = _standardize(transformed, mean, std)
                 else:
-                    fn = get_fn(fn_str)
-                    transformed_features = fn(transformed_features, type_tokens)
-            feature_sets[t_name] = transformed_features
-    #print ( f"@@preprocessing after mean,std={mean},{std}" )
+                    transformed = _get_fn(fn_str)(transformed)
+            feature_sets[set_name] = transformed
 
-    # if incl_fvs:
-    #     feature_sets["fvs_raw"] = sort_features(features_raw, type_tokens, "E")
-    #     feature_sets["fvs_raw"] /= np.max(
-    #         np.abs(feature_sets["fvs_raw"][:, ::4])
-    #     )  # normalize by max energy of features
-    #     # feature_sets["fvs_raw"] = features_raw
-
-    if return_dict:
-        return feature_sets, mean, std
-    else:
-        return np.concatenate(list(feature_sets.values()), axis=1), mean, std
-
-def standardization( features, return_mean_std=False, clip=True, 
-                     use_previous_mean_std=False, mean=None, std=None):
-    """standardize features"""
-    if use_previous_mean_std:
-        assert mean is not None and std is not None, "Mean and std must be provided if use_previous_mean_std is True"
-    else:
-        mean = features.mean(axis=0)
-        std = features.std(axis=0)
-    if clip:
-        std = np.clip(std, a_min=1e-6, a_max=None)  # avoid std=0.
-    features = (features - mean) / std
-    assert np.isfinite(features).all()
-    if return_mean_std:
-        return features, mean, std
-    else:
-        return features
-
-def compute_invariants(features, eps=1e-4, incl_diag_invariants=False, reshape=True):
-    """compute Lorentz invariants out of four-vectors"""
-    if reshape:
-        ps = features.reshape(features.shape[0], features.shape[1] // 4, 4)
-    else:
-        ps = features
-
-    # compute matrix of all inner products
-    def inner_product(p1, p2):
-        return p1[..., 0] * p2[..., 0] - (p1[..., 1:] * p2[..., 1:]).sum(axis=-1)
-
-    if incl_diag_invariants:
-        offset = 0
-    else:
-        offset = 1
-
-    idxs = np.triu_indices(ps.shape[-2], k=offset)
-    invariants = inner_product(ps[..., idxs[0], :], ps[..., idxs[1], :])
-    if type(invariants) == np.ndarray:
-        invariants = np.clip(invariants, a_min=eps, a_max=None)
-    else:
-        invariants = torch.clip(invariants, eps, None)
-    return invariants
+    scaled = list ( map ( float, feature_sets["fvs_standardized"] ) )
+    # scaled = np.concatenate(list(feature_sets.values()), axis=1) if feature_sets else features_raw
+    return scaled, mean, std
 
 
-def sort_features(features, type_tokens, sort_key):
-    """sort features according to some property"""
-    ps = features.reshape(features.shape[0], features.shape[1] // 4, 4)
-    particle_types = np.unique(type_tokens)
-    sorted_ps = []
-    for particle_type in particle_types:
-        mask = type_tokens == particle_type
-        # sort according to energy, which is the first entry of the four-vector
-        match sort_key:
-            case "E":
-                sorted_indices = np.argsort(ps[:, mask][:, :, 0])
-            case "pt":
-                pts = np.linalg.norm(ps[:, mask][:, :, 1:3], axis=-1)
-                sorted_indices = np.argsort(pts)
-            case _:
-                raise ValueError(f"Unknown sort key {sort_key}")
-        sorted_ps.append(
-            np.take_along_axis(ps[:, mask], sorted_indices[:, :, np.newaxis], axis=1)
-        )
-    return np.concatenate(sorted_ps, axis=1).reshape(features.shape)
+# ---------------------------------------------------------------------------
+# nLL postprocessing (inverse transforms)
+# ---------------------------------------------------------------------------
 
-
-def apply_boxcox(features):
-    ps = features.transpose()
-    res = np.zeros(ps.shape)
-    for i in range(ps.shape[0]):
-        try:
-            res[i] = boxcox(ps[i])[0]
-        except:
-            res[i] = ps[i]
-    return res.transpose()
-
-
-def apply_quantile_transform(features):
-    return QuantileTransformer(output_distribution="normal").fit_transform(features)
-
-
-def get_fn(fn_str):
-    # get functions from string
+def _get_inv_fn(fn_str: str):
+    """Return the inverse of a named scalar transform."""
     match fn_str:
         case "log":
-            return lambda p, t: np.log(p)
+            return np.exp
         case "exp":
-            return lambda p, t: np.exp(p)
+            return np.log
         case "sqrt":
-            return lambda p, t: np.sqrt(p)
+            return lambda x: x ** 2
         case "inverse":
-            return lambda p, t: 1 / p
-        case "boxcox":
-            return lambda p, t: apply_boxcox(p)
-        case "quantile_transform":
-            return lambda p, t: apply_quantile_transform(p)
-        case "invs":
-            return lambda p, t: compute_invariants(p)
-        case "standardization":
-            return lambda p, t: standardization(p)
+            return lambda x: 1.0 / x
         case "log_w_negatives":
-            return lambda p, t: log_with_negatives(p)
-        case "sort_E":
-            return lambda p, t: sort_features(p, t, "E")
-        case "sort_pt":
-            return lambda p, t: sort_features(p, t, "pt")
+            return _undo_log_with_negatives
         case _:
-            raise ValueError(f"Unknown transformation function {fn_str}")
+            raise ValueError(f"No known inverse for transform '{fn_str}'.")
 
 
-def get_inv_fn(fn_str):
-    # get inverse functions from string
-    match fn_str:
-        case "log":
-            return lambda p, t: np.exp(p)
-        case "exp":
-            return lambda p, t: np.log(p)
-        case "sqrt":
-            return lambda p, t: p**2
-        case "inverse":
-            return lambda p, t: 1 / p
-        case _:
-            raise ValueError(f"Unknown inverse transformation function {fn_str}")
+def undo_preprocess_nLLs(
+    nLLs: np.ndarray,
+    mean: np.ndarray,
+    std: np.ndarray,
+    trafos: Optional[list] = None,
+) -> np.ndarray:
+    """Undo nLL preprocessing in reverse order.
+
+    :param nLLs: preprocessed nLL deltas output by the NN, shape (4,)
+    :param mean: per-output mean saved at training time
+    :param std: per-output std saved at training time
+    :param trafos: list of transform strings applied during training,
+        e.g. ``["log_w_negatives", "standardization"]``
+    :returns: unpreprocessed nLL deltas, same shape as nLLs
+    """
+    if trafos:
+        for fn_str in reversed(trafos):
+            if fn_str == "standardization":
+                nLLs = _undo_standardize(nLLs, mean, std)
+            else:
+                nLLs = _get_inv_fn(fn_str)(nLLs)
+    assert np.isfinite(nLLs).all(), "Non-finite values after undo_preprocess_nLLs"
+    return nLLs
+
+
+def undo_preprocess_nLLs_errors(
+    errors: np.ndarray,
+    nLLs_prepd: np.ndarray,
+    mean: np.ndarray,
+    std: np.ndarray,
+    trafos: Optional[list] = None,
+    eps: float = 1e-5,
+) -> np.ndarray:
+    """Propagate heteroskedastic errors through the inverse nLL preprocessing.
+
+    Uses central-difference numerical differentiation to compute
+    ``|d(undo_preprocess)/d(nLL)| * sigma`` for each output independently.
+
+    :param errors: NN-predicted uncertainties on the preprocessed deltas,
+        shape (4,), these are the errors on nLLs_prepd
+    :param nLLs_prepd: the central (mean) preprocessed nLL deltas, shape (4,)
+    :param mean: per-output mean saved at training time
+    :param std: per-output std saved at training time
+    :param trafos: same transform list used in undo_preprocess_nLLs
+    :param eps: step size for numerical differentiation
+    :returns: propagated uncertainties on the unpreprocessed nLL deltas,
+        shape (4,)
+    """
+    f_plus  = undo_preprocess_nLLs(nLLs_prepd + eps, mean, std, trafos)
+    f_minus = undo_preprocess_nLLs(nLLs_prepd - eps, mean, std, trafos)
+    deriv = np.abs(f_plus - f_minus) / (2.0 * eps)
+    return deriv * errors

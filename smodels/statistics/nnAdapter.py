@@ -360,18 +360,13 @@ class NNAdapter:
         inp_list = self._log_with_negatives ( inp_list )
         scaled_yields = self._scaleYieldsJoaquin ( inp_list )
         from smodels.statistics.joaquinsPreprocessing import preprocess_features
-        return_dict = True
-        incl_fvs = True
-        type_tokens = None
         trafos = self.onnxMeta["run_config"]["data"]["trafos"]
         nYields = len(yields)
-        re = preprocess_features ( yields, incl_fvs = incl_fvs,
-            type_tokens = type_tokens, trafos = trafos,
+        re = preprocess_features ( yields,
+            trafos = trafos,
             mean = self.onnxMeta["featureMeans"][:nYields],
-            std = self.onnxMeta["featureErrors"][:nYields], 
-            return_dict = return_dict )
-        ret = [ re[0]["fvs_standardized"] ]
-        # print ( f"@@00 preprocessJoaquin  ret {ret}" )
+            std = self.onnxMeta["featureErrors"][:nYields] )
+        ret = [ re[0] ]
         return ret
 
     def _inputDictToList ( self, in_dict : dict ) -> list:
