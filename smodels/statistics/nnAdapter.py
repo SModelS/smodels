@@ -325,42 +325,6 @@ class NNAdapter:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         return ret
 
-    def postprocessJoaquinOld( self, arr ) -> dict:
-        """ given the networks predictions, compute the NLLs
-
-        :param arr: the neural network output
-        :returns: { "nll_exp_0": ..., "nll_exp_1": ...,
-                "nll_obs_0": ..., "nll_obs_1": ...,
-                "nllA_exp_0": ..., "nllA_exp_1": ...,
-                "nllA_obs_0": ..., "nllA_obs_1": ... }
-        """
-        # print ( f"@@postprocessJoaquin: we start with {arr}" )
-        # print ( f"@@postprocessJoaquin onnxMeta {self.onnxMeta.keys()}" )
-        nll0obs =  self.onnxMeta["nLL_obs_mu0"]
-        nll0exp =  self.onnxMeta["nLL_exp_mu0"]
-        nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
-        nllA0exp =  self.onnxMeta["nLLA_exp_mu0"]
-        i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
-        # print ( "@@postprocessJoaquin nllMeans", self.onnxMeta["nllMeans"] )
-        # print ( "@@postprocessJoaquin nllErrors", self.onnxMeta["nllErrors"] )
-        d_nll1obs = self.onnxMeta["nllMeans"][i_obs] + self.onnxMeta["nllErrors"][i_obs]*arr[i_obs-4]
-        d_nll1exp = self.onnxMeta["nllMeans"][i_exp] + self.onnxMeta["nllErrors"][i_exp]*arr[i_exp-4]
-        d_nllA1obs = self.onnxMeta["nllMeans"][i_obsA] + self.onnxMeta["nllErrors"][i_obsA]*arr[i_obsA-4]
-        d_nllA1exp = self.onnxMeta["nllMeans"][i_expA] + self.onnxMeta["nllErrors"][i_expA]*arr[i_expA-4]
-        nll1obs = self._undo_log_with_negatives ( d_nll1obs ) + nll0obs
-        nll1exp = self._undo_log_with_negatives ( d_nll1exp ) + nll0exp
-        nllA1obs = self._undo_log_with_negatives ( d_nllA1obs ) + nllA0obs
-        nllA1exp = self._undo_log_with_negatives ( d_nllA1exp ) + nllA0exp
-
-        ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
-                "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
-                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
-                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
-        ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
-        # print ( f"@@postprocessJoaquin we return {ret}" )
-        return ret
-
-
     def predict ( self, yields : Union[dict,list] ) -> dict:
         """ predict for yields, the main method
         :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
@@ -387,17 +351,6 @@ class NNAdapter:
             return self.preprocessJoaquinOld ( yields )
         return self.preprocessRafal ( yields )
 
-    def preprocessJoaquinOld ( self, yields : Union[dict,list] ) -> dict:
-        ## this was the previous version of preprocessing
-        inp_list = yields
-        if type(inp_list)==dict:
-            inp_list = self._inputDictToList ( yields )
-        # print ( f"@@preprocessJoaquin predict {yields} inp_list {inp_list}" )
-        # print ( "@@postprocessJoaquin featureMeans", self.onnxMeta["featureMeans"] )
-        inp_list = self._log_with_negatives ( inp_list )
-        scaled_yields = self._scaleYieldsJoaquin ( inp_list )
-        return scaled_yields
-
     def preprocessJoaquin ( self, yields : Union[dict,list] ) -> dict:
         inp_list = yields
         if type(inp_list)==dict:
@@ -411,21 +364,15 @@ class NNAdapter:
         incl_fvs = True
         type_tokens = None
         trafos = self.onnxMeta["run_config"]["data"]["trafos"]
+        nYields = len(yields)
         re = preprocess_features ( yields, incl_fvs = incl_fvs,
             type_tokens = type_tokens, trafos = trafos,
-            mean = self.onnxMeta["featureMeans"][:2],
-            std = self.onnxMeta["featureErrors"][:2], return_dict = return_dict )
+            mean = self.onnxMeta["featureMeans"][:nYields],
+            std = self.onnxMeta["featureErrors"][:nYields], 
+            return_dict = return_dict )
         ret = [ re[0]["fvs_standardized"] ]
         # print ( f"@@00 preprocessJoaquin  ret {ret}" )
         return ret
-
-    def preprocessRafal ( self, yields : Union[dict,list] ) -> dict:
-        inp_list = yields
-        if type(inp_list)==dict:
-            inp_list = self._inputDictToList ( yields )
-        # print ( f"@@preprocessRafal predict {yields} inp_list {inp_list}" )
-        scaled_yields = self._scaleYieldsRafal ( inp_list )
-        return scaled_yields
 
     def _inputDictToList ( self, in_dict : dict ) -> list:
         """ translate a dictionary of input yields to a list
