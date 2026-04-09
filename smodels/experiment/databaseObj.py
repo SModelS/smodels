@@ -883,8 +883,8 @@ class SubDatabase(object):
             self.source = "pcl"
             if not os.path.exists(tmp):
                 if self.force_load == "pcl":
-                    logger.error(f"File not found: {tmp}")
-                    raise SModelSError()
+                    # logger.error(f"File not found: {tmp}")
+                    raise SModelSError( f"File not found: {tmp}" )
                 logger.info(f"File not found: {tmp}. Will generate.")
                 base = os.path.dirname(tmp)
                 return (base, tmp)
