@@ -113,7 +113,10 @@ class Info(object):
                 if type(mlModels)==dict:
                     for onnxFile,pointer in mlModels.items():
                         if type(pointer) == str:
-                            pointer = jsonFiles[pointer]
+                            if pointer in self.jsonFiles:
+                                pointer = self.jsonFiles[pointer]
+                            elif pointer in self.jsonFiles_FullLikelihood:
+                                pointer = self.jsonFiles_FullLikelihood[pointer]
                         newregions = self.canonizeRegions ( pointer, forNN=True )
                         mlModels[onnxFile]=newregions
                 value = str(mlModels)
