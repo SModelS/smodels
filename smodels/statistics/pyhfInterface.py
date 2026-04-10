@@ -716,7 +716,7 @@ class PyhfUpperLimitComputer:
                     1.0, data, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.error(f"pyhf fixed_poi_fit failed for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
+                logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{list(self.data.jsonFiles)[workspace_index]} for mu={mu:.3f}: {e}")
                 # lets try with different initialisation
                 init, n_ = pyhf.infer.mle.fixed_poi_fit(
                     0.0, data, model, return_fitted_val=True, maxiter=200
@@ -726,8 +726,10 @@ class PyhfUpperLimitComputer:
                 # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
                 initpars = self.rescaleBgYields(initpars, workspace, model)
                 # If the a total yield is still negative with the increased initial parameters, print a message
+                negYields = False
                 if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
-                    logger.debug(f'Negative total yield after increasing the initial parameters for mu={mu}')
+                    negYields = True
+                    logger.info(f'Negative total yield after increasing the initial parameters for mu={mu:.3f}')
                 try:
                     bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
@@ -742,7 +744,14 @@ class PyhfUpperLimitComputer:
                         self.restore()
                         return self.exponentiateNLL(None, not return_nll)
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    logger.info(f"pyhf fixed_poi_fit failed twice for {list(self.data.jsonFiles)[workspace_index]} for mu={mu}: {e}")
+                    jFile = list(self.data.jsonFiles)[workspace_index]
+                    anaId = self.data.globalInfo.id
+                    line = f"pyhf fixed_poi_fit failed twice for {anaId}:{jFile} for mu={mu:.3f}: {e}"
+                    if negYields:
+                        line += " -- some yields were negative"
+                    else:
+                        line += " -- yields were all positive"
+                    logger.error( line )
 
                     self.restore()
                     return self.exponentiateNLL(None, not return_nll)
