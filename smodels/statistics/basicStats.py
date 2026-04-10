@@ -12,10 +12,10 @@ from scipy import stats
 from smodels.base.smodelsLogging import logger
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from typing import Text, Union
+from typing import Text, Union, Tuple
 from collections.abc import Callable
 
-__all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket", "chi2FromLmax" ]
+__all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket" ]
 
 from enum import Enum
 
@@ -129,8 +129,9 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float,
                                 rtol=rtol, xtol=xtol )
     return root
 
-def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
-         allowNegative = True, args : dict = {}, verbose :  bool = True ):
+def determineBrentBracket( mu_hat : float, sigma_mu : float ,
+            rootfinder : Callable, allowNegative : bool = True,
+            args : dict = {}, verbose :  bool = True ) -> Tuple:
     """find a, b for brent bracketing
 
     :param mu_hat: mu that maximizes likelihood
@@ -148,15 +149,18 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
     ntrials = 20
     i = 0
     foundExtra = False
+    avalues = [ 0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1,
+                0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
+    if not allowNegative:
+        avalues = [0.0, 1.0, 3.0, 10.0, 0.1, 0.01, .001, 100., .0001 ]
     while ra < 0.0:
         # if this is negative, we move it to the left
         i += 1
         a -= (i**2.0) * sigma_mu
+        if not allowNegative and a < 0:
+            a = 0
         ra = rootfinder(a,**args)
-        if i > ntrials or a < -10000.0 or ra is None or ( a < 0 and not allowNegative ):
-            avalues = [0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1, 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
-            if not allowNegative:
-                avalues = [0.0, 1.0, 3.0, 10.0, 0.1, 0.01, .001, 100., .0001 ]
+        if i > ntrials or a < -10000.0 or ra is None:
             for a in avalues:
                 ra = rootfinder(a,**args)
                 if ra is None: # if cls computation failed, try with next a value
@@ -176,6 +180,12 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
     foundExtra = False
     b = mu_hat + 2.5 * sigma_mu
     rb = rootfinder(b,**args)
+    bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0,
+               100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 10000.0,
+               100000.0, 1000000.0 ]
+    if not allowNegative:
+        bvalues = [ 1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001,
+                    10000.0, 100000.0, 1000000.0 ]
     while rb > 0.0:
         # if this is positive, we move it to the right
         i += 1
@@ -186,9 +196,6 @@ def determineBrentBracket(mu_hat, sigma_mu, rootfinder,
         closestr, closest = float("inf"), None
         memoize = {}
         if i > ntrials or ( b < 0 and not allowNegative ):
-            bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0, 100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 10000.0, 100000.0, 1000000.0 ]
-            if not allowNegative:
-                bvalues = [1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001, 10000.0, 100000.0, 1000000.0 ]
             for b in bvalues:
                 rb = rootfinder(b,**args)
                 memoize[b]=float(rb)
@@ -217,16 +224,3 @@ def deltaChi2FromLlhd(likelihood):
 
     return -2.0 * np.log(likelihood)
 
-def chi2FromLmax(llhd, lmax):
-    """compute the chi2 from likelihood and lmax"""
-    if llhd is None or lmax is None:
-        return None
-    chi2 = 0.0
-    if llhd > 1e-200:
-        from math import log
-
-        chi2 = 2 * log(lmax / llhd)
-    if chi2 < 0.0 and llhd < 1e-100:
-        # numerical inaccuracy
-        chi2 = 0.0
-    return chi2
