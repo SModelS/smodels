@@ -169,46 +169,6 @@ class NNAdapter:
         #    self.onnxMeta[key]=value
         self.onnxMeta = data
 
-        """
-        trafos = { "fvs_standardized": [
-                "log_w_negatives", "standardization" ],
-            "nLL_trafos": [ "log_w_negatives", "standardization" ],
-        }
-        self.onnxMeta["trafos"]=trafos
-        """
-
-    def _scaleYieldsRafal ( self, yields : list ) -> np.array:
-        """ scale the (total) yields
-
-        :returns: the scaled total yields
-        """
-        scaled_yields = np.array( [yields], dtype=np.float32 )
-        for i,x in enumerate(scaled_yields[0]):
-            t = 0. # x
-            err = self.onnxMeta["inputErrors"][i]
-            if err > 1e-20:
-                t = (x - self.onnxMeta["inputMeans"][i])/err
-            #else:
-            #    t = # - self.data.globalInfo.inputMeans[i]
-            scaled_yields[0][i]=t
-        return scaled_yields
-
-    def _scaleYieldsJoaquin ( self, yields : list ) -> np.array:
-        """ scale the (total) yields Joaquin version
-
-        :returns: the scaled total yields
-        """
-        scaled_yields = np.array( [yields], dtype=np.float32 )
-        for i,x in enumerate(scaled_yields[0]):
-            t = 0. # x
-            err = self.onnxMeta["featureErrors"][i]
-            if err > 1e-20:
-                t = (x - self.onnxMeta["featureMeans"][i])/err
-            #else:
-            #    t = # - self.data.globalInfo.inputMeans[i]
-            scaled_yields[0][i]=t
-        return scaled_yields
-
     def _predictFromScaledYields ( self, scaled_yields : np.array ) -> np.array:
         """ get the prediction from the NN
 
@@ -228,59 +188,7 @@ class NNAdapter:
         arr = arr[0][0]
         return arr
 
-    def _log_with_negatives ( self, x : np.array ) -> np.array:
-        """ a pre-processing step that joaquin is performing
-        but rafal is not
-        """
-        return np.sign(x) * np.log1p ( np.abs(x) )
-
-    def _undo_log_with_negatives ( self, x : np.array ) -> np.array:
-        """ a post-processing step that joaquin is performing
-        but rafal is not
-        """
-        return np.sign(x) * np.expm1 ( np.abs(x) )
-
-    def postprocess ( self, arr ) -> dict:
-        if self.modelType == "joaquin":
-            return self.postprocessJoaquin ( arr )
-            return self.postprocessJoaquinOld ( arr )
-        return self.postprocessRafal ( arr )
-
-    def postprocessRafal( self, arr ) -> dict:
-        """ given the networks predictions, compute the NLLs
-
-        :param arr: the neural network output
-        :returns: { "nll_exp_0": ..., "nll_exp_1": ...,
-                "nll_obs_0": ..., "nll_obs_1": ...,
-                "nllA_exp_0": ..., "nllA_exp_1": ...,
-                "nllA_obs_0": ..., "nllA_obs_1": ... }
-        """
-        nll0obs =  self.onnxMeta["nLL_obs_mu0"]
-        nll0exp =  self.onnxMeta["nLL_exp_mu0"]
-        nllA0obs =  self.onnxMeta["nLLA_obs_mu0"]
-        nllA0exp =  self.onnxMeta["nLLA_exp_mu0"]
-        i_exp, i_obs, i_expA, i_obsA = -4, -3, -2, -1 # the indices
-        expDelta = self.onnxMeta["inputMeans"][i_exp]
-        obsDelta = self.onnxMeta["inputMeans"][i_obs]
-        expDeltaA = self.onnxMeta["inputMeans"][i_expA]
-        obsDeltaA = self.onnxMeta["inputMeans"][i_obsA]
-        expErr = self.onnxMeta["inputErrors"][i_exp]
-        obsErr = self.onnxMeta["inputErrors"][i_obs]
-        expErrA = self.onnxMeta["inputErrors"][i_expA]
-        obsErrA = self.onnxMeta["inputErrors"][i_obsA]
-        nll1exp = nll0exp + arr[i_exp]*expErr + expDelta
-        nll1obs = nll0obs + arr[i_obs]*obsErr + obsDelta
-        nllA1exp = nllA0exp + arr[i_expA]*expErrA + expDeltaA
-        nllA1obs = nllA0obs + arr[i_obsA]*obsErrA + obsDeltaA
-
-        ret = { "nll_exp_0": nll0exp, "nll_exp_1": float(nll1exp),
-                "nll_obs_0": nll0obs, "nll_obs_1": float(nll1obs),
-                "nllA_exp_0": nllA0exp, "nllA_exp_1": float(nllA1exp),
-                "nllA_obs_0": nllA0obs, "nllA_obs_1": float(nllA1obs) }
-        # print ( f"@@postprocessRafal ret {ret}" )
-        return ret
-
-    def postprocessJoaquin( self, arr ) -> dict:
+    def postprocess( self, arr ) -> dict:
         """ given the networks predictions, compute the NLLs
 
         :param arr: the neural network output
@@ -334,35 +242,19 @@ class NNAdapter:
                     'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
                     'nllA_obs_0': ..., 'nllA_obs_1': ... }
         """
-        # print ( f"@@predict for yields {yields}" )
         scaled_yields = self.preprocess ( yields )
         out = self._predictFromScaledYields ( scaled_yields )
         ret = self.postprocess ( out )
-        #print ( f"@@predict ret {ret}" )
         return ret
 
     def preprocess ( self, yields : Union[dict,list] ) -> dict:
-        """ perform all the preprocessing steps
-        :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
-        (in which case the order must match the one in the json)
-        """
-        if self.modelType == "joaquin":
-            return self.preprocessJoaquin ( yields )
-            return self.preprocessJoaquinOld ( yields )
-        return self.preprocessRafal ( yields )
-
-    def preprocessJoaquin ( self, yields : Union[dict,list] ) -> dict:
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
-        # print ( f"@@preprocessJoaquin predict {yields} inp_list {inp_list}" )
-        # print ( "@@postprocessJoaquin featureMeans", self.onnxMeta["featureMeans"] )
-        inp_list = self._log_with_negatives ( inp_list )
-        scaled_yields = self._scaleYieldsJoaquin ( inp_list )
         from smodels.statistics.joaquinsPreprocessing import preprocess_features
         trafos = self.onnxMeta["run_config"]["data"]["trafos"]
         nYields = len(yields)
-        re = preprocess_features ( yields,
+        re = preprocess_features ( inp_list,
             trafos = trafos,
             mean = self.onnxMeta["featureMeans"][:nYields],
             std = self.onnxMeta["featureErrors"][:nYields] )

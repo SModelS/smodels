@@ -37,13 +37,15 @@ class MLModelsTest(unittest.TestCase):
         for region in regions: # predict for no yields
             yields[ region ] = 0.
         ret = adapter.predict ( yields )
-        truths = { 'nll_exp_1' : 751.1195068359,
-                   'nll_obs_0' : 688.4482887700,
-                   'nll_obs_1' : 763.6027832031,
-                   'nllA_exp_0': 675.1034984500,
-                   'nllA_exp_1': 751.1370849609,
-                   'nllA_obs_0': 674.7278682391,
-                   'nllA_obs_1': 750.5723876953 }
+        truths = { 'nll_exp_0': 675.10349848, 
+                   'nll_exp_1': 675.2284106540345, 
+                   'nll_obs_0': 688.4482887699999, 
+                   'nll_obs_1': 691.6445574490972, 
+                   'nllA_exp_0': 675.10349845, 
+                   'nllA_exp_1': 675.228398256828, 
+                   'nllA_obs_0': 674.7278682388554, 
+                   'nllA_obs_1': 674.427532987276, 
+                   'nll_obs_max': 682.9210459104119 }
         for name,value in truths.items():
             self.assertAlmostEqual ( ret[name], value )
 
