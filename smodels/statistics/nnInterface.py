@@ -23,6 +23,8 @@ from smodels.statistics.basicStats import observed, apriori, aposteriori, \
 from scipy import optimize, differentiate
 from smodels_utils.helper.terminalcolors import *
 from smodels.statistics.nnAdapter import NNAdapter
+from smodels.tools.caching import roundCache, lru_cache
+from smodels.matching.theoryPrediction import mu_digits
 
 nninfo = {
     "hasgreeted": False,
@@ -70,8 +72,6 @@ def writeOutYields ( theoryPred,
         d = json.dumps ( dicts, indent=4 )
         f.write ( d )
         f.close()
-    # import sys, IPython; IPython.embed( colors = "neutral" ) # ; sys.exit()
-
 
 class NNData:
     """
@@ -124,13 +124,14 @@ class NNUpperLimitComputer:
         self.data = data
         # first thing we do, we determine whats the most sensitive model
         self.adaptors = {}
+        self.pyhfComputer = None
         for jsonfilename,onnxb in self.data.globalInfo.onnxes.items():
             self.adaptors[jsonfilename]=NNAdapter ( onnxb )
         # del self.data.globalInfo.onnxes # we wont need that, thank you
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         self.determineMostSensitiveModel()
-        logger.debug("Signals : {}".format(self.nsignals))
+        logger.debug( f"Signals : {self.nsignals}" )
         # self.zeroSignalsFlag = self.data.zeroSignalsFlag
         self.cl = cl
 
@@ -139,19 +140,16 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
+    @lru_cache
     def determineMostSensitiveModel ( self ):
         """ determines the most sensitive model, stores all the ULs
         that were needed to compute that.
         """
         jsonfiles = list(self.adaptors.keys())
-        self.cachedULs= { None: {} }
         if len(jsonfiles)==1:
             self.mostSensitiveModel = jsonfiles[0]
             ulmu = self.getUpperLimitOnMu ( evaluationType=apriori,
                     modelToUse = self.mostSensitiveModel )
-            self.cachedULs[self.mostSensitiveModel] = {}
-            self.cachedULs[self.mostSensitiveModel][apriori]=ulmu
-            self.cachedULs[None][apriori]=ulmu
             return
         mumin,mostSensitiveModel=float("inf"),None
         for model in jsonfiles:
@@ -164,7 +162,7 @@ class NNUpperLimitComputer:
             if ulmu < mumin:
                 mumin = ulmu
                 mostSensitiveModel = model
-        self.cachedULs[None][apriori]=mumin # the smallest expected UL
+        print ( f"@@01 haspyhf {hasattr(self,'pyhfComputer')}" )
         ## the most sensitive model and its upper limit we store separately
         self.mostSensitiveModel = mostSensitiveModel
         self.mumin = mumin # the smallest expected UL
@@ -202,6 +200,8 @@ class NNUpperLimitComputer:
             realname = srname[:p1]
             if not realname in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
+                if not realname in self.nsignals:
+                    continue
                 assert realname in self.nsignals, \
                   f"nnInterface: cannot find sr name {realname} in '{' '.join(self.nsignals.keys())}'"
             # smodelsname = self.data.globalInfo
@@ -268,6 +268,7 @@ class NNUpperLimitComputer:
         logger.info( f"NN interface, we are using onnxruntime v{ver}" )
         nninfo["hasgreeted"] = True
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
               modelToUse : Union[None,str] = None, asimov : bool = False ):
         """
@@ -308,6 +309,7 @@ class NNUpperLimitComputer:
             return np.exp(-nll )
         return nll
 
+    @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
@@ -330,6 +332,7 @@ class NNUpperLimitComputer:
             modelToUse = self.determineMostSensitiveModel()
         if modelToUse is None:
             print ( f"[nnInterface] no most sensitive model found" )
+            # return None
             for model in self.adaptors.keys():
             # for model in self.data.globalInfo.onnxMeta.keys():
                 ulmu = self.getUpperLimitOnMu ( evaluationType=apriori, modelToUse = model )
@@ -376,8 +379,6 @@ class NNUpperLimitComputer:
             o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
                     args=(modelToUse,outputType), tol=1e-8, options = options,
                     method = method, bounds=bounds )
-            #if o.fun < 0:
-            #    print ( f"@@NN44 o {o}" )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
                 o = differentiate.hessian ( myNLL, np.array ( [ muhat ] ) )
@@ -423,6 +424,7 @@ class NNUpperLimitComputer:
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
 
+    @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
 			      allowNegativeSignals : bool = False,
             modelToUse : Union[None,str] = None,
@@ -438,11 +440,6 @@ class NNUpperLimitComputer:
         + 1 sigma, - 1 sigma, etc.  For error bands.
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
-        if modelToUse in self.cachedULs:
-            if evaluationType in self.cachedULs[modelToUse]:
-                return self.cachedULs[modelToUse][evaluationType]
-        else:
-            self.cachedULs[modelToUse]={}
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
@@ -461,9 +458,6 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
-        if not modelToUse in self.cachedULs:
-            self.cachedULs[modelToUse]={}
-        self.cachedULs[modelToUse][evaluationType]=mu_lim # store
         return mu_lim
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,

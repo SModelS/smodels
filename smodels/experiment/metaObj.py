@@ -15,7 +15,7 @@ import time
 from smodels.base.smodelsLogging import logger
 
 class Meta(object):
-    current_version = 214 ## the current format version
+    current_version = 219 ## the current format version
 
     """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...

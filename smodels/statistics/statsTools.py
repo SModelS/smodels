@@ -259,7 +259,6 @@ class StatsComputer:
         mlModels = globalInfo.mlModels
         nsignals = {}
         translator = {}
-        import sys
         for mlModel, pointer in mlModels.items():
             # mlModel is e.g. model.onnx, pointer is either SRcombined.json
             # or directly the list of SRs, like in jsonFiles
@@ -283,8 +282,12 @@ class StatsComputer:
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         data = NNData( nsignals, self.dataObject )
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        if hasattr ( globalInfo, "jsonsWithoutMLModels" ):
+            # for now we put the pyhf computer inside the nnComputer
+            # later we should move it to statsTools
+            self.upperLimitComputer.pyhfComputer = StatsComputer.forPyhf (
+                    self.dataObject, self.nsig, self.deltas_sys )
         self.likelihoodComputer = self.upperLimitComputer
-
 
     def getComputerPyhf(self ):
         """
@@ -347,8 +350,6 @@ class StatsComputer:
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
         data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty, globalInfo )
-        if data.errorFlag:
-            return None
         self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
 
@@ -429,7 +430,7 @@ class StatsComputer:
         kwargs = { "evaluationType": evaluationType, "asimov": asimov }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
-                index = self.likelihoodComputer.getBestCombinationIndex()
+                index, _ = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
             ret = self.likelihoodComputer.likelihood (
                     poi_test, return_nll = return_nll, **kwargs )
@@ -471,7 +472,7 @@ class StatsComputer:
         kwargs = { }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
-                index = self.likelihoodComputer.getBestCombinationIndex()
+                index, _ = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
                 if evaluationType != observed:
                     kwargs["evaluationType"] = evaluationType
@@ -493,7 +494,7 @@ class StatsComputer:
 
         :param limit_on_xsec: if True, then return the limit on the
         cross section
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         """
@@ -503,7 +504,7 @@ class StatsComputer:
             if all([s == 0 for s in self.nsig]):
                 logger.warning("All signals are empty")
                 return None
-            index = self.likelihoodComputer.getBestCombinationIndex()
+            index, _ = self.likelihoodComputer.getBestCombinationIndex()
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
                        evaluationType = evaluationType, workspace_index = index,
@@ -541,7 +542,7 @@ class StatsComputer:
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
                         evaluationType = evaluationType,
-                        allowNegativeSignals=self.allowNegativeSignals, 
+                        allowNegativeSignals=self.allowNegativeSignals,
                         nSigma = nSigma )
         return ret
 

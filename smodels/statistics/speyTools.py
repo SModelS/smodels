@@ -295,7 +295,7 @@ class SpeyComputer:
         models = []
         patches = data.patchMaker()
         for i in range( len(data.inputJsons ) ):
-            # idx = self.getBestCombinationIndex( data )
+            # idx, _ = self.getBestCombinationIndex( data )
             inputJson = data.inputJsons[i]
             signal_patch = patches[i]
             #print ( "inputJsons", inputJson )
@@ -307,7 +307,7 @@ class SpeyComputer:
                             background_only_model = inputJson )
             models.append ( speyModel )
         self.speyModels = models
-        self.model_index = self.getBestCombinationIndex( data )
+        self.model_index, _ = self.getBestCombinationIndex( data )
         return models
 
     def getStatModelSingleBin(self, nsig: Union[float, np.ndarray],
@@ -443,10 +443,13 @@ class SpeyComputer:
         ret = float(ret) # cast for the printers
         return addXSecs ( limit_on_xsec, ret )
 
-    def getBestCombinationIndex(self, data ):
-        """find the index of the best evaluationType combination"""
+    def getBestCombinationIndex(self, data ) -> Tuple[int,float]:
+        """find the index of the best evaluationType combination
+        :returns: tuple ( best_index, upper limit )
+        """
         if len(data.inputJsons) == 1:
-            return 0
+            ul = self.poi_upper_limit(evaluationType=apriori, model_index=0 )
+            return 0, ul
         logger.debug( f"Finding best evaluationType combination among {len(data.inputJsons)} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
@@ -463,7 +466,7 @@ class SpeyComputer:
             if ul < ulMin:
                 ulMin = ul
                 i_best = i_ws
-        return i_best
+        return i_best, ul
 
 
     def asimov_likelihood ( self, poi_test : float, evaluationType : NllEvalType,

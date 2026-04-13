@@ -24,7 +24,7 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
-from typing import Dict, List, Union, Text
+from typing import Dict, List, Union, Text, Tuple
 
 jsonver = ""
 try:
@@ -699,7 +699,7 @@ class PyhfUpperLimitComputer:
             # warnings.filterwarnings ( "ignore", "", module="pyhf.exceptions" )
             old_index = workspace_index
             if workspace_index == None:
-                workspace_index = self.getBestCombinationIndex()
+                workspace_index, _ = self.getBestCombinationIndex()
             if workspace_index == None:
                 return None
             self.backup()
@@ -767,10 +767,14 @@ class PyhfUpperLimitComputer:
             return ret
 
     @lru_cache
-    def getBestCombinationIndex(self):
-        """find the index of the best evaluationType combination"""
+    def getBestCombinationIndex(self) -> Tuple[int,float]:
+        """find the index of the best evaluationType combination
+
+        :returns: tuple ( best_index, upper limit )
+        """
         if self.nWS == 1:
-            return 0
+            ul = self.getUpperLimitOnMu(evaluationType=apriori, workspace_index=0)
+            return 0, ul
         logger.debug( f"Finding best evaluationType combination among {self.nWS} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
@@ -787,7 +791,7 @@ class PyhfUpperLimitComputer:
             if ul < ulMin:
                 ulMin = ul
                 i_best = i_ws
-        return i_best
+        return i_best, ulMin
 
     def exponentiateNLL(self, twice_nll, doIt):
         """if doIt, then compute likelihood from nll,
@@ -884,7 +888,7 @@ class PyhfUpperLimitComputer:
             self.__init__(self.data, self.cl, self.lumi)
             old_index = workspace_index
             if workspace_index == None:
-                workspace_index = self.getBestCombinationIndex()
+                workspace_index, _ = self.getBestCombinationIndex()
             if workspace_index != None:
                 if self.zeroSignalsFlag[workspace_index] == True:
                     logger.warning( f"Workspace number {workspace_index} has zero signals" )
@@ -1034,7 +1038,7 @@ class PyhfUpperLimitComputer:
             "histosys": {"interpcode": "code4p"},
         }
         if workspace_index == None:
-            workspace_index = self.getBestCombinationIndex()
+            workspace_index, _ = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
         workspace = self.updateWorkspace(workspace_index, evaluationType=evaluationType)
@@ -1088,7 +1092,7 @@ class PyhfUpperLimitComputer:
         # If evaluationType == True, use modified workspace where observations = sum(bkg) (and patched)
         # If evaluationType == posteriori, use unmodified (but patched) workspace
         if workspace_index == None:
-            workspace_index = self.getBestCombinationIndex()
+            workspace_index, _ = self.getBestCombinationIndex()
         if workspace_index == None:
             return None
         workspace = self.updateWorkspace(workspace_index, evaluationType=evaluationType)
@@ -1180,7 +1184,7 @@ class PyhfUpperLimitComputer:
                     f"There is (are) {self.nWS} workspace(s) and no signal(s) was (were) found" )
                 return None
             if workspace_index == None:
-                workspace_index = self.getBestCombinationIndex()
+                workspace_index, _ = self.getBestCombinationIndex()
             if workspace_index == None:
                 logger.debug("Best combination index not found")
                 return None

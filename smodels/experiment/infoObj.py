@@ -77,6 +77,7 @@ class Info(object):
             # Get tags in info file:
             tags = [line.split(':', 1)[0].strip() for line in content]
             modelsLine = None # the mlModels line needs to be parsed
+            jsonsWithoutMLModels = set()
             for i, tag in enumerate(tags):
                 if not tag:
                     continue
@@ -92,6 +93,8 @@ class Info(object):
                     for jsonFileName,regions in jsonFiles.items():
                         newregions = self.canonizeRegions ( regions, forNN=False )
                         jsonFiles[jsonFileName] = newregions
+                        if tag == "jsonFiles":
+                            jsonsWithoutMLModels.add ( jsonFileName )
                     value = str(jsonFiles)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
@@ -114,12 +117,16 @@ class Info(object):
                     for onnxFile,pointer in mlModels.items():
                         if type(pointer) == str:
                             if pointer in self.jsonFiles:
+                                if pointer in jsonsWithoutMLModels:
+                                    jsonsWithoutMLModels.remove ( pointer )
                                 pointer = self.jsonFiles[pointer]
                             elif pointer in self.jsonFiles_FullLikelihood:
                                 pointer = self.jsonFiles_FullLikelihood[pointer]
                         newregions = self.canonizeRegions ( pointer, forNN=True )
                         mlModels[onnxFile]=newregions
                 value = str(mlModels)
+                if len(jsonsWithoutMLModels)>0:
+                    self.addInfo("jsonsWithoutMLModels",str(jsonsWithoutMLModels))
                 self.addInfo("mlModels", value )
 
             self.cacheJsons()
