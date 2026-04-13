@@ -125,7 +125,7 @@ class Info(object):
                         newregions = self.canonizeRegions ( pointer, forNN=True )
                         mlModels[onnxFile]=newregions
                 value = str(mlModels)
-                if len(jsonsWithoutMLModels)>0:
+                if len(jsonsWithoutMLModels)>0 and not hasattr ( self, "jsonsWithoutMLModels" ):
                     self.addInfo("jsonsWithoutMLModels",str(jsonsWithoutMLModels))
                 self.addInfo("mlModels", value )
 
