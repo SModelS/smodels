@@ -281,12 +281,13 @@ class StatsComputer:
         # ic ( nsignals )
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         data = NNData( nsignals, self.dataObject )
-        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        pyhfComputer = None
         if hasattr ( globalInfo, "jsonsWithoutMLModels" ):
             # for now we put the pyhf computer inside the nnComputer
             # later we should move it to statsTools
-            self.upperLimitComputer.pyhfComputer = StatsComputer.forPyhf (
+            pyhfComputer = StatsComputer.forPyhf (
                     self.dataObject, self.nsig, self.deltas_sys )
+        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi(), pyhfComputer = pyhfComputer )
         self.likelihoodComputer = self.upperLimitComputer
 
     def getComputerPyhf(self ):

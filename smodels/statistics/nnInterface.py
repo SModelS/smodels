@@ -105,12 +105,16 @@ class NNUpperLimitComputer:
     informations in the 'data' instance of 'NNData'
     """
 
-    def __init__(self, data, cl=0.95, lumi=None ):
+    def __init__( self, data, cl=0.95, lumi=None,
+                  pyhfComputer = None ):
         """
 
         :param data: instance of 'NNData' holding the signals information
         :param cl: confdence level at which the upper limit is desired
         to be computed
+        :param lumi: optional luminosity
+        :param pyhfComputer: optional pyhfComputer, if we need to fall back
+        for some super regions
         :ivar data: created from data
         :ivar nsignals: signal predictions list divided into sublists,
         one for each json file
@@ -120,11 +124,10 @@ class NNUpperLimitComputer:
         :ivar alreadyBeenThere: boolean flag that identifies when nsignals
         accidentally passes twice at two identical values
         """
-
+        self.pyhfComputer = pyhfComputer
         self.data = data
         # first thing we do, we determine whats the most sensitive model
         self.adaptors = {}
-        self.pyhfComputer = None
         for jsonfilename,onnxb in self.data.globalInfo.onnxes.items():
             self.adaptors[jsonfilename]=NNAdapter ( onnxb )
         # del self.data.globalInfo.onnxes # we wont need that, thank you
@@ -145,14 +148,14 @@ class NNUpperLimitComputer:
         """ determines the most sensitive model, stores all the ULs
         that were needed to compute that.
         """
-        jsonfiles = list(self.adaptors.keys())
-        if len(jsonfiles)==1:
-            self.mostSensitiveModel = jsonfiles[0]
+        onnxfiles = list(self.adaptors.keys())
+        if len(onnxfiles)==1:
+            self.mostSensitiveModel = onnxfiles[0]
             ulmu = self.getUpperLimitOnMu ( evaluationType=apriori,
                     modelToUse = self.mostSensitiveModel )
             return
         mumin,mostSensitiveModel=float("inf"),None
-        for model in jsonfiles:
+        for model in onnxfiles:
             ulmu = float("inf")
             try:
                 ulmu = self.getUpperLimitOnMu ( evaluationType=apriori,
@@ -162,10 +165,15 @@ class NNUpperLimitComputer:
             if ulmu < mumin:
                 mumin = ulmu
                 mostSensitiveModel = model
-        print ( f"@@01 haspyhf {hasattr(self,'pyhfComputer')}" )
         ## the most sensitive model and its upper limit we store separately
+        if self.pyhfComputer is not None:
+            i_idx, ul = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex()
+            if ul < mumin:
+                mumin = ul
+                mostSensitiveModel = i_idx # list(self.data.globalInfo.jsonFiles.keys())[i_idx]
         self.mostSensitiveModel = mostSensitiveModel
         self.mumin = mumin # the smallest expected UL
+
 
     def isControlRegion ( self, srname : str, modelToUse : str ) -> bool:
         """ check if srname is control region
@@ -216,6 +224,7 @@ class NNUpperLimitComputer:
             yields.append ( tot )
         return yields
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def negative_log_likelihood(self, poi_test : float,
         modelToUse : Union[None,str] = None,
         outputType : str = "extended" ):
@@ -233,15 +242,36 @@ class NNUpperLimitComputer:
             poi_test = poi_test[0]
         except (TypeError,IndexError) as e:
             pass
-
+ 
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
         if modelToUse == None:
             return None
-
-        # from signal yields compute total yields
-        yields = self.totalYieldsFromSignals( modelToUse, poi_test )
-        ret = self.adaptors[modelToUse].predict(yields)
+        if modelToUse in self.adaptors:
+            # from signal yields compute total yields
+            yields = self.totalYieldsFromSignals( modelToUse, poi_test )
+            ret = self.adaptors[modelToUse].predict(yields)
+        else:
+            nll = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+                    modelToUse, observed )
+            nllA = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+                    modelToUse, observed, True )
+            nllE = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+                    modelToUse, apriori )
+            nllEA = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+                    modelToUse, apriori, True )
+            nll0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+                    modelToUse, observed )
+            nllA0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+                    modelToUse, observed, True )
+            nllE0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+                    modelToUse, apriori )
+            nllEA0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+                    modelToUse, apriori, True )
+            ret = { "nll_obs_1": nll, "nll_exp_1": nllE,
+                    "nllA_obs_1": nllA, "nllA_exp_1": nllEA,
+                    "nll_obs_0": nll0, "nll_exp_0": nllE0,
+                    "nllA_obs_0": nllA0, "nllA_exp_0": nllEA0 }
 
         # we return what has been asked
         if outputType == "observed":
@@ -339,8 +369,12 @@ class NNUpperLimitComputer:
                 print ( f"[nnInterface] ulmu({model})={ulmu}" )
             return None
         if not modelToUse in self.adaptors.keys():
-            print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
-            return None
+            if asimov:
+                print ( f"[nnInterface] FIXME fix asimov" )
+            return self.pyhfComputer.upperLimitComputer.lmax ( modelToUse, 
+                    return_nll, evaluationType, allowNegativeSignals )
+            #print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
+            #return None
         muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_obs_max"]
         if asimov:
             muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_obs_max"]
@@ -376,6 +410,7 @@ class NNUpperLimitComputer:
                 bounds = [(x0,100)]
             if bounds[0][1] < x0:
                 bounds = [(bounds[0][0],x0)]
+
             o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
                     args=(modelToUse,outputType), tol=1e-8, options = options,
                     method = method, bounds=bounds )
@@ -410,6 +445,12 @@ class NNUpperLimitComputer:
         :return: the upper limit on sigma times eff at 'self.cl' level
         (0.95 by default)
         """
+        if modelToUse == None:
+            modelToUse = self.mostSensitiveModel
+        if not modelToUse in self.adaptors:
+            ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                    evaluationType,modelToUse, nSigma )
+            return ret
         if self.data.totalYield == 0.:
             return None
         else:
@@ -427,7 +468,7 @@ class NNUpperLimitComputer:
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
 			      allowNegativeSignals : bool = False,
-            modelToUse : Union[None,str] = None,
+            modelToUse : Union[None,str,int] = None,
             nSigma : int = 0 ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
@@ -442,6 +483,11 @@ class NNUpperLimitComputer:
         """
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
+        if modelToUse not in self.adaptors:
+            # so its a pyhf one
+            ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnMu(
+                    evaluationType,modelToUse, nSigma )
+            return ret
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
