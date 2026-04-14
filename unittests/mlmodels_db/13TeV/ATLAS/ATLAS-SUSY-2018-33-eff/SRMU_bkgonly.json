@@ -1,0 +1,77 @@
+{
+    "channels": [
+        {
+            "name": "SRMU_cuts",
+            "samples": [
+                {
+                    "data": [
+                        1.88
+                    ],
+                    "modifiers": [
+                        {
+                            "data": [0.2],
+                            "name": "BGSyst",
+                            "type": "shapesys"
+                        },
+                        {
+                            "data": [0.28],
+                            "name": "BGStat",
+                            "type": "staterror"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    },
+                    {
+                        "bounds": [
+                            [
+                                0.0,
+                                1000.0
+                            ]
+                        ],
+                        "fixed": false,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "mu_SIG"
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "Measurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                1
+            ],
+            "name": "SRMU_cuts"
+        }
+    ],
+    "version": "1.0.0"
+}

@@ -1,0 +1,14 @@
+id: ATLAS-SUSY-2018-33
+sqrts: 13*TeV
+lumi: 136.0/fb
+prettyName: DV with >= 1 muon
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-33/
+arxiv: https://arxiv.org/abs/2003.11956
+publication: Phys. Rev. D. 102 (2020) 032006
+publicationDOI: https://doi.org/10.1103/PhysRevD.102.032006
+contact: atlas-phys-susy-conveners@cern.ch
+comment: Efficiencies extracted from patchset files in orig/likelihood folder. The bkgonly.json files, however, are hand-made by ATLAS and correspond to a simplified llhd. Moreover, there's one bkgonly.json file per SR, so no combination. Provided LLHD leads to over-exclusion; need to use sig95 values from Table 6 to match official exclusion line.
+private: False
+implementedBy: Sahana Narasimha
+lastUpdate: 2024/7/22
+type: displaced

@@ -49,8 +49,35 @@ class MLModelsTest(unittest.TestCase):
         for name,value in truths.items():
             self.assertAlmostEqual ( ret[name], value )
 
-    def mestRunMLModels(self):
-        pass
+    def testRunMLModels(self):
+        from smodels.experiment.databaseObj import Database
+        from smodels.decomposition import decomposer
+        from smodels.base import runtime
+        from smodels.tools.particlesLoader import load
+        from smodels.base.model import Model
+        from smodels.base.physicsUnits import GeV
+        import os
+        from smodels.share.models.SMparticles import SMList
+        from smodels.matching.theoryPrediction import theoryPredictionsFor
+        from smodels.statistics.basicStats import observed, apriori, aposteriori
+        db = Database ( "./mlmodels_db/" ) ## a small database with mlmodels
+        slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
+        # slhafile = os.path.abspath('./testFiles/slha/lightEWinos.slha')
+        runtime.modelFile = "smodels.share.models.mssm"
+        BSMList = load()
+        model = Model(BSMparticles=BSMList, SMparticles=SMList)
+        model.updateParticles(inputFile=slhafile,
+                ignorePromptQNumbers = ['eCharge','colordim','spin'])
+
+        topDict = decomposer.decompose(model, sigmacut=0.001,
+                               massCompress=True, invisibleCompress=True,
+                               minmassgap=5*GeV)
+        allPredictions = theoryPredictionsFor( db, topDict, 
+                combinedResults=True )
+        self.assertAlmostEqual ( allPredictions[0].nll( 
+                    evaluationType = apriori), 108.34178187487768 )
+        self.assertAlmostEqual ( allPredictions[0].nll(), 
+                    108.34178187487768 )
 
 if __name__ == "__main__":
     unittest.main()

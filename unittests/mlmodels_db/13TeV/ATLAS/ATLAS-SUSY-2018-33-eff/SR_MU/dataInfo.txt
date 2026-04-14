@@ -1,0 +1,7 @@
+dataId: SR_MU
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 1.88
+bgError: 0.3440930106817051
+upperLimit: 0.0272*fb
+expectedUpperLimit: 0.0309*fb
