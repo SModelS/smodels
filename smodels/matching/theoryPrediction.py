@@ -85,6 +85,8 @@ class TheoryPrediction(object):
         return self.dataset.getType()
 
     def computeXSection(self):
+        if type(self.xsection) != type(None):
+            return
 
         xsection = 0*fb
         # Adds the contributions of all txnames
@@ -119,6 +121,7 @@ class TheoryPrediction(object):
             self.conditions = allConditions[:]
 
     def totalXsection(self):
+        self.computeXSection()
         return self.xsection
 
     def getmaxCondition(self):
