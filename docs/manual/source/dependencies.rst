@@ -8,3 +8,5 @@
  * pyhf>=0.6.1
  * jsonpatch>=1.25
  * jsonschema>=3.2.0
+ * onnx>=1.10.0
+ * onnxruntime>=1.20.0

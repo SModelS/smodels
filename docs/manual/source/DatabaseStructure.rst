@@ -102,6 +102,12 @@ Finally, for machine learned surrogate models an ``mlModels`` field exists with 
 .. literalinclude:: /literals/globalInfo201908.txt
    :lines: 33
 
+Machine-learned models can be mixed with full models. In this case -- unless the aforementioned shorthand notation was used -- it is advisable to mention the full models explicitly as a set in ``jsonsWithoutMLModels``:
+
+.. literalinclude:: /literals/globalInfo201909.txt
+   :lines: 165-167
+
+
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
 
