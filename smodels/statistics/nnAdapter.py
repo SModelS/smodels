@@ -113,7 +113,6 @@ class NNAdapter:
             self.modelType = "joaquin"
         for em in self.mlModel.metadata_props:
             emkey = em.key.replace ( "rafal::", "" )
-            # print ( f"@@XXX emkey {emkey} value {em.value}" )
             if emkey == "remove_channels":
                 # remove these channels at the end, so that order does not matter
                 remove_channels = eval(em.value)
@@ -226,10 +225,6 @@ class NNAdapter:
                 "nll_obs_0": nll0obs,  "nll_obs_1": nll1obs,
                 "nllA_exp_0": nllA0exp, "nllA_exp_1": nllA1exp,
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": nllA1obs }
-        #ret["s_nll1exp"] = s_nll1exp
-        #ret["s_nll1obs"] = s_nll1obs
-        #ret["s_nllA1exp"] = s_nllA1exp
-        #ret["s_nllA1obs"] = s_nllA1obs
         if self.onnxMeta["nLL_obs_max"][1] is not None:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         return ret

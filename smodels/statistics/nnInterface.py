@@ -253,21 +253,21 @@ class NNUpperLimitComputer:
             ret = self.adaptors[modelToUse].predict(yields)
         else:
             nll = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
-                    modelToUse, observed )
+                    modelToUse, evaluationType = observed )
             nllA = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
-                    modelToUse, observed, True )
+                    modelToUse, evaluationType = observed, asimov = 1. )
             nllE = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
-                    modelToUse, apriori )
+                    modelToUse, evaluationType = apriori )
             nllEA = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
-                    modelToUse, apriori, True )
+                    modelToUse, evaluationType = apriori, asimov = 1. )
             nll0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
-                    modelToUse, observed )
+                    modelToUse, evaluationType = observed )
             nllA0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
-                    modelToUse, observed, True )
+                    modelToUse, evaluationType = observed, asimov = 1. )
             nllE0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
-                    modelToUse, apriori )
+                    modelToUse, evaluationType = apriori )
             nllEA0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
-                    modelToUse, apriori, True )
+                    modelToUse, evaluationType = apriori, asimov = 1. )
             ret = { "nll_obs_1": nll, "nll_exp_1": nllE,
                     "nllA_obs_1": nllA, "nllA_exp_1": nllEA,
                     "nll_obs_0": nll0, "nll_exp_0": nllE0,
