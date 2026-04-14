@@ -50,6 +50,15 @@ class MLModelsTest(unittest.TestCase):
             self.assertAlmostEqual ( ret[name], value )
 
     def testRunMLModels(self):
+        import warnings
+
+        warnings.filterwarnings(
+            "ignore",
+            category=DeprecationWarning,
+            message=r".*RefResolver is deprecated.*",
+            module=r"pyhf\.schema\.validator",
+        )
+
         from smodels.experiment.databaseObj import Database
         from smodels.decomposition import decomposer
         from smodels.base import runtime
@@ -61,8 +70,9 @@ class MLModelsTest(unittest.TestCase):
         from smodels.matching.theoryPrediction import theoryPredictionsFor
         from smodels.statistics.basicStats import observed, apriori, aposteriori
         db = Database ( "./mlmodels_db/" ) ## a small database with mlmodels
+        db.getExpResults()
         slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
-        # slhafile = os.path.abspath('./testFiles/slha/lightEWinos.slha')
+        slhafile = os.path.abspath('./testFiles/mlmodels/ewkinos.slha')
         runtime.modelFile = "smodels.share.models.mssm"
         BSMList = load()
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
@@ -74,10 +84,15 @@ class MLModelsTest(unittest.TestCase):
                                minmassgap=5*GeV)
         allPredictions = theoryPredictionsFor( db, topDict, 
                 combinedResults=True )
-        self.assertAlmostEqual ( allPredictions[0].nll( 
-                    evaluationType = apriori), 108.34178187487768 )
-        self.assertAlmostEqual ( allPredictions[0].nll(), 
-                    108.34178187487768 )
+        nlls = { 'ATLAS-SUSY-2019-09': { 
+            'obs': 73.83118538806151, 'exp': 65.92082168244234 },
+                 'ATLAS-SUSY-2018-32': {
+            'obs': 93.80734619587368, 'exp': 82.58896814755686 } }
+        for p in allPredictions:
+            self.assertAlmostEqual ( p.nll( evaluationType = apriori), 
+                    nlls[p.analysisId()]["exp"] )
+            self.assertAlmostEqual ( p.nll(), 
+                    nlls[p.analysisId()]["obs"] )
 
 if __name__ == "__main__":
     unittest.main()

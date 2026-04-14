@@ -673,6 +673,22 @@ class PyhfUpperLimitComputer:
                                 break
         return init_pars
 
+    def nll ( self, mu : float = 1.0,
+            workspace_index : Union[None,int] =None,
+            evaluationType : NllEvalType=observed,
+            asimov : Union[None,float] = None ):
+        """
+        Returns the value of the likelihood. \
+        Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
+
+        :param workspace_index: supply index of workspace to use. If None, \
+                                choose index of best combo
+        :param evaluationType: one of: observed, apriori, aposteriori
+        """
+        return self.likelihood ( mu, workspace_index, True,
+                evaluationType, asimov )
+
+
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu : float = 1.0,
             workspace_index : Union[None,int] =None,

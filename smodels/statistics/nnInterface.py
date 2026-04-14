@@ -252,21 +252,21 @@ class NNUpperLimitComputer:
             yields = self.totalYieldsFromSignals( modelToUse, poi_test )
             ret = self.adaptors[modelToUse].predict(yields)
         else:
-            nll = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+            nll = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
                     modelToUse, evaluationType = observed )
-            nllA = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+            nllA = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
                     modelToUse, evaluationType = observed, asimov = 1. )
-            nllE = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+            nllE = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
                     modelToUse, evaluationType = apriori )
-            nllEA = self.pyhfComputer.upperLimitComputer.likelihood ( poi_test,
+            nllEA = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
                     modelToUse, evaluationType = apriori, asimov = 1. )
-            nll0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+            nll0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
                     modelToUse, evaluationType = observed )
-            nllA0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+            nllA0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
                     modelToUse, evaluationType = observed, asimov = 1. )
-            nllE0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+            nllE0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
                     modelToUse, evaluationType = apriori )
-            nllEA0 = self.pyhfComputer.upperLimitComputer.likelihood ( 0.,
+            nllEA0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
                     modelToUse, evaluationType = apriori, asimov = 1. )
             ret = { "nll_obs_1": nll, "nll_exp_1": nllE,
                     "nllA_obs_1": nllA, "nllA_exp_1": nllEA,
@@ -499,7 +499,7 @@ class NNUpperLimitComputer:
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
-                        verbose = True )
+                        verbose = False )
         except Exception as e:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
