@@ -105,8 +105,12 @@ Finally, for machine learned surrogate models an ``mlModels`` field exists with 
 Machine-learned models can be mixed with full models. In this case -- unless the aforementioned shorthand notation was used -- it is advisable to mention the full models explicitly as a set in ``jsonsWithoutMLModels``:
 
 .. literalinclude:: /literals/globalInfo201909.txt
-   :lines: 165-167
+   :lines: 165-168
 
+Similar to the ``pyhf`` entries for ``jsonFiles``, we can now specify ``onnx`` regions that do not necessarily have to connect with a SModelS region:
+
+.. literalinclude:: /literals/globalInfo201832.txt
+   :lines: 52
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
