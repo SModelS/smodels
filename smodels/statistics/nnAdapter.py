@@ -188,10 +188,13 @@ class NNAdapter:
         arr = arr[0][0]
         return arr
 
-    def postprocess( self, arr ) -> dict:
+    def postprocess( self, arr : np.ndarray,
+           add_errors : bool = True ) -> dict:
         """ given the networks predictions, compute the NLLs
 
         :param arr: the neural network output
+        :param add_errors: if true, then add errors also FIXME describe
+        more
         :returns: { "nll_exp_0": ..., "nll_exp_1": ...,
                 "nll_obs_0": ..., "nll_obs_1": ...,
                 "nllA_exp_0": ..., "nllA_exp_1": ...,
@@ -200,9 +203,10 @@ class NNAdapter:
         from smodels.statistics.joaquinsPreprocessing import undo_preprocess_nLLs
         deltas_prepd = np.array(arr, dtype=np.float64)
         trafos = self.onnxMeta["run_config"]["data"]["nLL_trafos"]
+        nll_means = self.onnxMeta["nllMeans"]
+        nll_errors = self.onnxMeta["nllErrors"]
         deltas = undo_preprocess_nLLs ( deltas_prepd[:4],
-                mean = self.onnxMeta["nllMeans"],
-                std = self.onnxMeta["nllErrors"], trafos = trafos )
+                mean = nll_means, std = nll_errors, trafos = trafos )
         deltas = list ( map ( float, deltas ) )
         nll0exp  = self.onnxMeta["nLL_exp_mu0"]
         nll0obs  = self.onnxMeta["nLL_obs_mu0"]
@@ -227,6 +231,18 @@ class NNAdapter:
                 "nllA_obs_0": nllA0obs, "nllA_obs_1": nllA1obs }
         if self.onnxMeta["nLL_obs_max"][1] is not None:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
+        if add_errors:
+            from smodels.statistics.joaquinsPreprocessing import \
+                undo_preprocess_nLLs_errors
+            errs = undo_preprocess_nLLs_errors ( deltas_prepd[4:],
+                    deltas_prepd[:4],
+                    mean = nll_means,
+                    std = nll_errors, trafos = trafos,
+                    eps = 1e-5 )
+            ret["sigma_exp"] = errs[0]
+            ret["sigma_obs"] = errs[1]
+            ret["sigma_expA"] = errs[2]
+            ret["sigma_obsA"] = errs[3]
         return ret
 
     def predict ( self, yields : Union[dict,list] ) -> dict:

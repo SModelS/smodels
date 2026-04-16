@@ -300,7 +300,8 @@ class NNUpperLimitComputer:
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = False ):
+              modelToUse : Union[None,str] = None, asimov : bool = False,
+              pmSigma : int = 0 ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -309,20 +310,33 @@ class NNUpperLimitComputer:
         :param evaluationType: one of: observed, apriori, aposteriori
         :param modelToUse: if given, compute likelihood for that model.
         :param asimov: if true, compute for asimov data
+        :param pmSigma: usually 0, +1 or -1. get the likelihood
+        plus that number of sigmas
         If None compute for most sensitive analysis.
         """
         ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
         if ret == None:
             return None
+        delta = 0
         if evaluationType != observed:
             if asimov:
                 nll = ret['nllA_exp_1']
+                if pmSigma:
+                    delta = ret["sigma_expA"]
             else:
                 nll = ret['nll_exp_1']
+                if pmSigma:
+                    delta = ret["sigma_exp"]
         else:
-            nll = ret['nll_obs_1']
             if asimov:
                 nll = ret['nllA_obs_1']
+                if pmSigma:
+                    delta = ret["sigma_obsA"]
+            else:
+                nll = ret['nll_obs_1']
+                if pmSigma:
+                    delta = ret["sigma_obs"]
+        nll += pmSigma * delta
 
         logger.debug( f"Calling likelihood")
         return self.exponentiateNLL ( nll, not return_nll )
