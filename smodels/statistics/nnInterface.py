@@ -543,7 +543,7 @@ class NNUpperLimitComputer:
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
                         verbose = False )
         except Exception as e:
-            # logger.warning ( f"exception {e}" )
+            logger.debug ( f"exception {e}" )
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
