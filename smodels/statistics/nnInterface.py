@@ -250,7 +250,7 @@ class NNUpperLimitComputer:
         return yields
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def negative_log_likelihood(self, poi_test : float,
+    def _actual_nll(self, poi_test : float,
         modelToUse : Union[None,str] = None,
         outputType : str = "extended" ):
         """ the method that really wraps around the llhd computation.
@@ -323,6 +323,15 @@ class NNUpperLimitComputer:
         logger.info( f"NN interface, we are using onnxruntime v{ver}" )
         nninfo["hasgreeted"] = True
 
+    def nll( self, mu=1.0, evaluationType=observed,
+              modelToUse : Union[None,str] = None, asimov : bool = False,
+              pmSigma : int = 0 ):
+        """ over the long run we will want to phase out .likelihood 
+        interfaces entirely """
+        return self.likelihood ( mu=mu, return_nll = True,
+            evaluationType=evaluationType, modelToUse = modelToUse,
+            asimov = asimov, pmSigma = pmSigma )
+
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
               modelToUse : Union[None,str] = None, asimov : bool = False,
@@ -339,10 +348,14 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
-        ret = self.negative_log_likelihood(mu,modelToUse=modelToUse)
+        ret = self._actual_nll(mu,modelToUse=modelToUse)
         if ret == None:
             return None
         delta = 0
+        if pmSigma != 0 and evaluationType == observed and \
+                not "sigma_obs" in ret:
+            ## probably we fell back to pyhf likelihoods
+            return None
         if evaluationType != observed:
             if asimov:
                 nll = ret['nllA_exp_1']
@@ -437,7 +450,7 @@ class NNUpperLimitComputer:
                 for xi in x:
                     ret.append ( myNLL ( xi ) )
                 return np.array ( ret )
-            ret = self.negative_log_likelihood ( x, modelToUse=modelToUse,
+            ret = self._actual_nll ( x, modelToUse=modelToUse,
                                                  outputType=outputType )
             return ret
 
@@ -450,7 +463,7 @@ class NNUpperLimitComputer:
             if bounds[0][1] < x0:
                 bounds = [(bounds[0][0],x0)]
 
-            o = optimize.minimize ( self.negative_log_likelihood, x0=x0,
+            o = optimize.minimize ( self._actual_nll, x0=x0,
                     args=(modelToUse,outputType), tol=1e-8, options = options,
                     method = method, bounds=bounds )
             if o.success == True and o.fun>0:
