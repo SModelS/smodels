@@ -784,7 +784,7 @@ class PyhfUpperLimitComputer:
 
     @lru_cache
     def getBestCombinationIndex(self) -> Tuple[int,float]:
-        """find the index of the best evaluationType combination
+        """ find the index of the best expected combination
 
         :returns: tuple ( best_index, upper limit )
         """
@@ -1014,7 +1014,7 @@ class PyhfUpperLimitComputer:
             else:
                 return self.workspaces[workspace_index]
 
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, 
+    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed,
             workspace_index=None, nSigma : int = 0 ):
         """
         Compute the upper limit on the fiducial cross section sigma times efficiency:
@@ -1032,7 +1032,7 @@ class PyhfUpperLimitComputer:
         if self.data.totalYield == 0.:
             return None
         else:
-            ul = self.getUpperLimitOnMu( evaluationType=evaluationType, 
+            ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
                     workspace_index=workspace_index, nSigma = nSigma )
             if ul == None:
                 return ul
@@ -1165,7 +1165,7 @@ class PyhfUpperLimitComputer:
     # looking for mu bounds
     # Usage of the index allows for rescaling
     @lru_cache
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, 
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed,
             workspace_index=None, nSigma : int = 0 ):
         """
         Compute the upper limit on the signal strength modifier with:
@@ -1225,10 +1225,10 @@ class PyhfUpperLimitComputer:
                     )
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
-                rt1 = self.CLs(lo_mu * self.scale, evaluationType, "alpha-CLs", 
+                rt1 = self.CLs(lo_mu * self.scale, evaluationType, "alpha-CLs",
                         workspace_index, nSigma )
                 # rt5 = CLs(med_mu)
-                rt10 = self.CLs(hi_mu * self.scale, evaluationType, "alpha-CLs", 
+                rt10 = self.CLs(hi_mu * self.scale, evaluationType, "alpha-CLs",
                         workspace_index, nSigma )
                 # print ( "we are at",lo_mu,med_mu,hi_mu,"values at", rt1, rt5, rt10, "scale at", self.scale,"factor at", factor )
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
