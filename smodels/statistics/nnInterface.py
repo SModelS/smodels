@@ -153,8 +153,9 @@ class NNUpperLimitComputer:
         self.data = data
         # first thing we do, we determine whats the most sensitive model
         self.adaptors = {}
-        for jsonfilename,onnxb in self.data.globalInfo.onnxes.items():
-            self.adaptors[jsonfilename]=NNAdapter ( onnxb )
+        for onnxfilename,onnxb in self.data.globalInfo.onnxes.items():
+            self.adaptors[onnxfilename]=NNAdapter ( onnxb,
+                    onnxfilename )
         # del self.data.globalInfo.onnxes # we wont need that, thank you
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
@@ -326,7 +327,7 @@ class NNUpperLimitComputer:
     def nll( self, mu=1.0, evaluationType=observed,
               modelToUse : Union[None,str] = None, asimov : bool = False,
               pmSigma : int = 0 ):
-        """ over the long run we will want to phase out .likelihood 
+        """ over the long run we will want to phase out .likelihood
         interfaces entirely """
         return self.likelihood ( mu=mu, return_nll = True,
             evaluationType=evaluationType, modelToUse = modelToUse,

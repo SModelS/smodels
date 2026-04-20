@@ -24,19 +24,24 @@ class NNAdapter:
                   "onnxMeta", "srOrder", "regressor" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
+                  onnxfilename : str,
                   allowsSyntheticData : bool = False ):
         """
         :param mlModel: the model, as a ModelProto, as a bytes stream,
         or as a path to an onnx file (needing to end with .onnx)
+        :param onnxfilename: filename of onnxfile, for debugging only
         :param allowsSyntheticData: if true, then also synthetic
         data can be supplied, not used yet
         """
-        self.mlModel = mlModel
         if type(mlModel) == str and mlModel.endswith ( "onnx") and \
                 os.path.exists ( mlModel ):
             self.mlModel = onnx.load ( mlModel )
         elif type(mlModel) in [ bytes, str ]:
-            self.mlModel = onnx.load_model_from_string ( mlModel )
+            try:
+                self.mlModel = onnx.load_model_from_string ( mlModel )
+            except Exception as e:
+                print( f"[nnAdapter] could not load model {onnxfilename}" )
+                sys.exit(-1)
         self.allowsSyntheticData = allowsSyntheticData
         self.modelType = "rafal"
         self._parseMetaData ()

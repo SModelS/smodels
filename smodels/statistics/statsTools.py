@@ -259,6 +259,7 @@ class StatsComputer:
         mlModels = globalInfo.mlModels
         nsignals = {}
         translator = {}
+        hasJsonsWithoutMLModels = False
         for mlModel, pointer in mlModels.items():
             # mlModel is e.g. model.onnx, pointer is either SRcombined.json
             # or directly the list of SRs, like in jsonFiles
@@ -267,14 +268,16 @@ class StatsComputer:
                 jsonFiles = globalInfo.jsonFiles
                 if pointer not in globalInfo.jsonFiles.keys():
                     logger.error ( f"no '{pointer}' defined in 'jsonFiles'!" )
-                    sys.exit(-1)
+                    import sys; sys.exit(-1)
                 ## pointer is e.g. SRcombined.json
                 self.addRegionsForNN ( jsonFiles[pointer], translator, nsignals )
             elif type(pointer) in [ list ]:
                 self.addRegionsForNN ( pointer, translator, nsignals )
+            elif type(pointer) == type(None):
+                hasJsonsWithoutMLModels = True
             else:
                 logger.error ( f"type of {pointer} is {type(pointer)}: dont know what to do." )
-                sys.exit(-1)
+                import sys; sys.exit(-1)
         ## translate the signal from smodels names to pyhf names
         for smname,pyhfname in translator.items():
             nsignals[pyhfname] = self.nsig[smname]
@@ -282,7 +285,8 @@ class StatsComputer:
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         data = NNData( nsignals, self.dataObject )
         pyhfComputer = None
-        if hasattr ( globalInfo, "jsonsWithoutMLModels" ):
+        if hasJsonsWithoutMLModels:
+        # if hasattr ( globalInfo, "jsonsWithoutMLModels" ):
             # for now we put the pyhf computer inside the nnComputer
             # later we should move it to statsTools
             pyhfComputer = StatsComputer.forPyhf (

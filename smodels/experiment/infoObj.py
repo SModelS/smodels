@@ -13,6 +13,7 @@ import os
 from smodels.base.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
+from typing import Optional
 
 
 class Info(object):
@@ -22,7 +23,8 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
-    def canonizeRegions ( self, regions : list, forNN : bool = False ) -> list:
+    def canonizeRegions ( self, regions : Optional[list],
+                          forNN : bool = False ) -> list:
         """ given a list of regions in globalInfo.txt in any of the
         jsonFiles, jsonFiles_FullLikelihood, or mlModels fields,
         return a canonical version of that list: strings in
@@ -35,6 +37,8 @@ class Info(object):
         "onnx" field
         :returns: canonical list of regions
         """
+        if regions == None:
+            return regions
         newregions = []
         for region in regions:
             if type(region)==str:
@@ -77,7 +81,6 @@ class Info(object):
             # Get tags in info file:
             tags = [line.split(':', 1)[0].strip() for line in content]
             modelsLine = None # the mlModels line needs to be parsed
-            jsonsWithoutMLModels = set()
             for i, tag in enumerate(tags):
                 if not tag:
                     continue
@@ -93,8 +96,6 @@ class Info(object):
                     for jsonFileName,regions in jsonFiles.items():
                         newregions = self.canonizeRegions ( regions, forNN=False )
                         jsonFiles[jsonFileName] = newregions
-                        if tag == "jsonFiles":
-                            jsonsWithoutMLModels.add ( jsonFileName )
                     value = str(jsonFiles)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
@@ -115,18 +116,16 @@ class Info(object):
                     mlModels = { mlModels: list(jsonFiles.values())[0] }
                 if type(mlModels)==dict:
                     for onnxFile,pointer in mlModels.items():
-                        if type(pointer) == str:
+                        if pointer == None:
+                            continue
+                        elif type(pointer) == str:
                             if pointer in self.jsonFiles:
-                                if pointer in jsonsWithoutMLModels:
-                                    jsonsWithoutMLModels.remove ( pointer )
                                 pointer = self.jsonFiles[pointer]
                             elif pointer in self.jsonFiles_FullLikelihood:
                                 pointer = self.jsonFiles_FullLikelihood[pointer]
                         newregions = self.canonizeRegions ( pointer, forNN=True )
                         mlModels[onnxFile]=newregions
                 value = str(mlModels)
-                if len(jsonsWithoutMLModels)>0 and not hasattr ( self, "jsonsWithoutMLModels" ):
-                    self.addInfo("jsonsWithoutMLModels",str(jsonsWithoutMLModels))
                 self.addInfo("mlModels", value )
 
             self.cacheJsons()
@@ -161,6 +160,9 @@ class Info(object):
         self.onnxes = {}
 
         for onnxFile, jsonfilename in self.mlModels.items():
+            if jsonfilename == None:
+                # skip for the fallback json entries
+                continue
             fullPath = os.path.join(dirp, onnxFile )
             with open ( fullPath, "rb" ) as f:
                 self.onnxes[onnxFile] = f.read()
