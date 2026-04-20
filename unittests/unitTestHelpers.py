@@ -194,7 +194,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         obj1 = obj1.replace(" ","")  # Remove blanks
         obj2 = obj2.replace(" ","")  # Remove blanks
         if obj1 != obj2:
-            logger.error(f"strings ``{obj1}'' and ``{obj2}'' differ in {where}:{fname}")
+            logger.error(f"strings ``{obj1}'' and ``{obj2}'' differ in {where}: {fname} != {fname2}")
         return obj1 == obj2
     elif isinstance(obj1, dict):
         for key in obj1:
@@ -216,14 +216,11 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
-            logger.warning('Lists for %s differ in length:\n   %i (this run)\n and\n   %i (default)' %
-                           (where,len(obj1), len(obj2)))
+            logger.warning( f'Lists for {where} differ in length:\n   {len(obj1)} (this run)\n and\n   {len(obj2)} (default)' )
             return False
         for ival, val in enumerate(obj1):
-            if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname, ignore=ignore,
-                             fname2=fname2):
-                # logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
-                #                (str(val),str(obj2[ival])))
+            if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname,
+                    ignore=ignore, where=f"{obj1}:{obj2}", fname2=fname2 ):
                 return False
     else:
         return obj1 == obj2
