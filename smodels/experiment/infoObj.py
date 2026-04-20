@@ -51,7 +51,7 @@ class Info(object):
                 if not "onnx" in region:
                     if "pyhf" in region:
                         region["onnx"]=region["pyhf"]
-                        region.pop("pyhf")
+                        # region.pop("pyhf")
                     else:
                         region["onnx"]=region["smodels"]
             else:
