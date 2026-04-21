@@ -378,8 +378,9 @@ class TheoryPrediction(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param return_nll: if True, return negative log likelihood, else likelihood
         """
-        assert asimov in [ None, 0. ], \
-               "currently we only need asimov data for 0., no?"
+        if asimov != None and abs(asimov)>1e-8 and abs(asimov-1)>1e-8:
+            raise SModelSError (
+               "currently we only handle asimov data for 0. or 1." )
         if "expected" in kwargs:
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
