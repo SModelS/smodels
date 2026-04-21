@@ -43,7 +43,7 @@ class NNAdapter:
                 print( f"[nnAdapter] could not load model {onnxfilename}" )
                 sys.exit(-1)
         self.allowsSyntheticData = allowsSyntheticData
-        self.modelType = "rafal"
+        self.modelType = "joaquin"
         self._parseMetaData ()
         self._getSROrder()
         self._instantiateRegressor()
@@ -110,12 +110,9 @@ class NNAdapter:
         data["nllErrors"]= []
         remove_channels=[]
         import json, math
-        isJoaquins = False
         for em in self.mlModel.metadata_props:
             if "rafal::" in str(em.key):
-                isJoaquins = True
-        if isJoaquins:
-            self.modelType = "joaquin"
+                self.modelType = "joaquin"
         for em in self.mlModel.metadata_props:
             emkey = em.key.replace ( "rafal::", "" )
             if emkey == "remove_channels":
@@ -186,9 +183,7 @@ class NNAdapter:
             print ( f"[nnAdapter] {line}" )
             print ( f"[nnAdapter] srOrder: {self.srOrder}" )
             sys.exit()
-        dct = { "input_1": scaled_yields }
-        if self.modelType == "joaquin":
-            dct = { "features": scaled_yields }
+        dct = { "features": scaled_yields }
         arr = self.regressor["session"].run(None, dct )
         arr = arr[0][0]
         return arr
