@@ -437,9 +437,11 @@ class DataSet(object):
             line = "getSRUpperLimit can only be used for efficiency map results!"
             logger.error( line )
             raise SModelSError( line )
+        """
         if nSigma != 0 and evaluationType == observed:
             line = f"nSigma={nSigma} but evaluationType={evaluationType}: not implemented"
             raise SModelSError ( line )
+        """
 
         if nSigma != 0:
             from smodels.statistics.statsTools import getStatsComputerModule
