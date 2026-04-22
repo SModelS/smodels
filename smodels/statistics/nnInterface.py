@@ -394,6 +394,9 @@ class NNUpperLimitComputer:
             return np.exp(-nll )
         return nll
 
+    def nll_min ( self, **kwargs ):
+        return self.lmax ( return_nll = True, **kwargs )
+
     @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
@@ -441,8 +444,12 @@ class NNUpperLimitComputer:
 
         outputType = "observed"
         if evaluationType == apriori:
+            # outputType = "asimov"
             outputType = "expected"
         if evaluationType == aposteriori:
+            # outputType = "expected"
+            outputType = "asimov"
+        if asimov:
             outputType = "asimov"
         options = { "disp": False, "maxiter": 200 }
 
@@ -551,7 +558,8 @@ class NNUpperLimitComputer:
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse,
-                nSigma = nSigma )
+                nSigma = nSigma,
+                pmSigma = pmSigma )
         if mu_hat is None:
             return float("inf")
         clsRootArgs = { "return_type": "CLs-alpha", "modelToUse": modelToUse,
@@ -586,9 +594,9 @@ class NNUpperLimitComputer:
         """
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax( evaluationType = aposteriori,
+        fmh = self.nll_min( evaluationType = observed,
                 allowNegativeSignals=allowNegativeSignals,
-                return_nll=True, modelToUse = modelToUse )
+                modelToUse = modelToUse, asimov=True )
         if fmh == None:
             return None, None, None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
@@ -596,30 +604,29 @@ class NNUpperLimitComputer:
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll0(A)
-            sigma = self.nll ( mu_hat, return_nll = True,
-                    evaluationType = aposteriori, modelToUse = modelToUse )
-            nll0A -= pmSigma * sigma
+            nll_sA = self.nll ( mu_hat,
+                    evaluationType = observed, modelToUse = modelToUse,
+                    pmSigma = pmSigma, asimov = True )
+            nll_sA = self.nll ( mu_hat,
+                    evaluationType = observed, modelToUse = modelToUse,
+                    pmSigma = 0, asimov = True )
+            # print ( f"@@YY nll_sA {nll_sA} nll0A {nll0A} pmSigma={pmSigma} mu_hat={mu_hat}" )
+            nll0A = nll_sA
 
         nll0 = nll0A
 
-        if True: # expected != "posteriori":
-            fmh = self.lmax( evaluationType=evaluationType,
-                    allowNegativeSignals=allowNegativeSignals,
-                    modelToUse = modelToUse )
-            if fmh == None:
-                return None, None, None, None, None
+        fmh = self.nll_min( evaluationType=evaluationType,
+                allowNegativeSignals=allowNegativeSignals,
+                modelToUse = modelToUse )
+        if fmh == None:
+            return None, None, None, None, None
 
-            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-            mu_hat = mu_hat if mu_hat is not None else 0.0
-        if False: # expected == "posteriori":
-            fmh = self.lmax( evaluationType=evaluationType,
-                    allowNegativeSignals=allowNegativeSignals,
-                    modelToUse = modelToUse )
-            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-            mu_hat = mu_hat if mu_hat is not None else 0.0
+        mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+        if pmSigma != 0:
+            nll_s = self.nll ( mu_hat,
+                    evaluationType = evaluationType, modelToUse = modelToUse,
+                    pmSigma = 0 )
+            nll0 = nll_s
+        mu_hat = mu_hat if mu_hat is not None else 0.0
 
-        #from smodels.base import runtime
-        #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
-        #if useTevatron:
-        #    return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootFunc, nll0, nll0A
