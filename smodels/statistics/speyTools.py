@@ -624,7 +624,8 @@ class SpeyAnalysesCombosComputer:
             print ( f"    {tp.analysisId()}:{tp.dataId()}" )
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False, nSigma : int = 0 ) -> float:
+           limit_on_xsec : bool = False, nSigma : int = 0,
+           **kwargs ) -> float:
         """ simple frontend, to spey::poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the

@@ -493,7 +493,7 @@ class StatsComputer:
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
-           nSigma : int = 0 ) -> Union[float,UnitXSec,None]:
+           nSigma : int = 0, **kwargs ) -> Union[float,UnitXSec,None]:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
 
@@ -501,6 +501,7 @@ class StatsComputer:
         cross section
         :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
+        :param kwargs:
         For error bands.
         """
 
@@ -524,10 +525,12 @@ class StatsComputer:
                 return None
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType, nSigma = nSigma )
+                       evaluationType = evaluationType, nSigma = nSigma,
+                       **kwargs )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       evaluationType = evaluationType, nSigma = nSigma )
+                       evaluationType = evaluationType, nSigma = nSigma,
+                       **kwargs )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:

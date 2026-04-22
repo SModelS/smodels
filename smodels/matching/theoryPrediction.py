@@ -226,7 +226,7 @@ class TheoryPrediction(object):
 
     @lru_cache
     def getUpperLimit( self, evaluationType : NllEvalType = observed,
-                       nSigma : int = 0 ) -> UnitXSec:
+                       nSigma : int = 0, **kwargs ) -> UnitXSec:
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -252,7 +252,7 @@ class TheoryPrediction(object):
             ul = self.statsComputer.poi_upper_limit(
                 evaluationType = evaluationType,
                 nSigma = nSigma,
-                limit_on_xsec = True )
+                limit_on_xsec = True, **kwargs )
         return ul
 
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
@@ -271,11 +271,12 @@ class TheoryPrediction(object):
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
+            kwargs.pop ( "expected" )
         if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
             logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
 
         upperLimit = self.getUpperLimit( evaluationType=evaluationType,
-                                         nSigma=nSigma )
+                                         nSigma=nSigma, **kwargs )
         xsec = self.totalXsection()
         if xsec is None or upperLimit is None:
             return None
@@ -296,9 +297,10 @@ class TheoryPrediction(object):
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
+            kwargs.pop ( "expected" )
         if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
             logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
-        upperLimit = self.getUpperLimit(evaluationType,nSigma = nSigma )
+        upperLimit = self.getUpperLimit(evaluationType,nSigma = nSigma, **kwargs )
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None
             return r
