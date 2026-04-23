@@ -403,8 +403,8 @@ class NNUpperLimitComputer:
             #    return 0.0
             #return 9000.0
         if doIt:
-            return np.exp(-nll )
-        return nll
+            return float ( np.exp(-nll ) )
+        return float ( nll )
 
     def nll_min ( self, **kwargs ):
         return self.lmax ( return_nll = True, **kwargs )
