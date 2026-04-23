@@ -9,7 +9,7 @@
 
 """
 
-from typing import Union, Text, Tuple, Callable, Dict
+from typing import Union, Text, Tuple, Callable, Dict, Optional
 import copy, os
 import numpy as np
 import sys
@@ -87,13 +87,13 @@ def clsRootFunc( mu : float, return_type: Text,
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.likelihood(mu, return_nll=True,
-            modelToUse = modelToUse, asimov = True,
+            modelToUse = modelToUse, asimov = 0.,
             pmSigma = pmSigma )
     nll = nllA
     if evaluationType != aposteriori:
         nll = obj.likelihood(mu, return_nll=True,
             evaluationType=evaluationType,
-            modelToUse = modelToUse, asimov = False,
+            modelToUse = modelToUse, asimov = None,
             pmSigma = pmSigma )
     ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
             return_type=return_type, nSigma = nSigma ) if \
@@ -327,18 +327,28 @@ class NNUpperLimitComputer:
         nninfo["hasgreeted"] = True
 
     def nll( self, mu=1.0, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = False,
-              pmSigma : int = 0 ):
+              modelToUse : Union[None,str] = None,
+              asimov : Optional[float] = None, pmSigma : int = 0 ) -> float:
         """ over the long run we will want to phase out .likelihood
         interfaces entirely """
         return self.likelihood ( mu=mu, return_nll = True,
             evaluationType=evaluationType, modelToUse = modelToUse,
             asimov = asimov, pmSigma = pmSigma )
 
+    def asimovAsInteger ( self, asimov : Optional[float] ) -> Union[None,int]:
+        """ asimov as either 0, 1 or None """
+        if asimov == None:
+            return None
+        if abs(asimov)<1e-5:
+            return 0
+        if abs(asimov-1)<1e-5:
+            return 1
+        raise SModelSError ( f"asimov {asimov} not supported" )
+
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = False,
-              pmSigma : int = 0 ):
+              modelToUse : Union[None,str] = None,
+              asimov : Optional[float] = None, pmSigma : int = 0 ) -> float:
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -351,6 +361,8 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
+        i_as = self.asimovAsInteger ( asimov )
+
         ret = self._actual_nll(mu,modelToUse=modelToUse)
         if ret == None:
             return None
@@ -360,23 +372,23 @@ class NNUpperLimitComputer:
             ## probably we fell back to pyhf likelihoods
             return None
         if evaluationType != observed:
-            if asimov:
-                nll = ret['nllA_exp_1']
-                if pmSigma:
-                    delta = ret["sigma_expA"]
-            else:
+            if i_as == None:
                 nll = ret['nll_exp_1']
                 if pmSigma:
                     delta = ret["sigma_exp"]
-        else:
-            if asimov:
-                nll = ret['nllA_obs_1']
-                if pmSigma:
-                    delta = ret["sigma_obsA"]
             else:
+                nll = ret[ f'nllA_exp_{i_as}']
+                if pmSigma:
+                    delta = ret["sigma_expA"]
+        else:
+            if i_as == None:
                 nll = ret['nll_obs_1']
                 if pmSigma:
                     delta = ret["sigma_obs"]
+            else:
+                nll = ret[ f'nllA_obs_{i_as}']
+                if pmSigma:
+                    delta = ret["sigma_obsA"]
         nll += pmSigma * delta
 
         logger.debug( f"Calling likelihood")
@@ -401,7 +413,7 @@ class NNUpperLimitComputer:
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
-              asimov : bool = False, pmSigma : float = 0 ):
+              asimov : Optional[float] = None, pmSigma : float = 0 ):
         """
         Returns the (negative log) max likelihood
 
@@ -596,7 +608,7 @@ class NNUpperLimitComputer:
         # mu_hat is mu_hat for signal_rel
         fmh = self.nll_min( evaluationType = observed,
                 allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse, asimov=True )
+                modelToUse = modelToUse, asimov=0. )
         if fmh == None:
             return None, None, None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
@@ -610,7 +622,6 @@ class NNUpperLimitComputer:
             nll_sA = self.nll ( mu_hat,
                     evaluationType = observed, modelToUse = modelToUse,
                     pmSigma = 0, asimov = True )
-            # print ( f"@@YY nll_sA {nll_sA} nll0A {nll0A} pmSigma={pmSigma} mu_hat={mu_hat}" )
             nll0A = nll_sA
 
         nll0 = nll0A
