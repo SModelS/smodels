@@ -298,7 +298,7 @@ class TheoryPrediction(object):
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
             kwargs.pop ( "expected" )
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
+        if len(kwargs)>2 or ( len(kwargs)==1 and not "pmSigma" in kwargs ):
             logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
         upperLimit = self.getUpperLimit(evaluationType,nSigma = nSigma, **kwargs )
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:

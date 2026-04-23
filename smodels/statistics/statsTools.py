@@ -428,6 +428,12 @@ class StatsComputer:
 
         return ret
 
+    def nll ( self, poi_test : float, evaluationType : NllEvalType,
+              asimov : Union[None,float] = None ) -> float:
+        """ convenience function, later turn the logic around """
+        return likelihood ( poit_test, evaluationType,
+            return_nll = True, asimov = asimov )
+
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
                   return_nll : bool, asimov : Union[None,float] = None ) -> float:
         """ simple frontend to individual computers """
