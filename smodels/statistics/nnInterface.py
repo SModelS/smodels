@@ -86,13 +86,11 @@ def clsRootFunc( mu : float, return_type: Text,
     # Make sure to always compute the correct llhd value (from
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
-    nllA = obj.likelihood(mu, return_nll=True,
-            modelToUse = modelToUse, asimov = 0.,
-            pmSigma = pmSigma )
+    nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 0,
+        pmSigma = pmSigma )
     nll = nllA
     if evaluationType != aposteriori:
-        nll = obj.likelihood(mu, return_nll=True,
-            evaluationType=evaluationType,
+        nll = obj.nll(mu, evaluationType=evaluationType,
             modelToUse = modelToUse, asimov = None,
             pmSigma = pmSigma )
     ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
@@ -475,7 +473,7 @@ class NNUpperLimitComputer:
                 return np.array ( ret )
             ret = self._actual_nll ( x, modelToUse=modelToUse,
                                      outputType=outputType )
-            return ret
+            return float(ret)
 
         method = "Nelder-Mead"
         initx0s = [ 0., .1, -.1, .3, -.3, 1., -1., 3., -3., 10., -10., 100,-100 ]
@@ -545,7 +543,7 @@ class NNUpperLimitComputer:
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
 			      allowNegativeSignals : bool = False,
             modelToUse : Union[None,str,int] = None,
-            nSigma : int = 0, pmSigma : float = 0. ) -> float:
+            nSigma : int = 0, pmSigma : int = 0 ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
         - by default, the combination of the workspaces in self.workspaces
@@ -564,7 +562,7 @@ class NNUpperLimitComputer:
         if modelToUse not in self.adaptors:
             # so its a pyhf one
             ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnMu(
-                    evaluationType,modelToUse, nSigma )
+                    evaluationType, modelToUse, nSigma )
             return ret
         mu_hat, sigma_mu, clsRoot, nll0, nll0A = self.getCLsRootFunc(
                 evaluationType=evaluationType,
@@ -583,7 +581,7 @@ class NNUpperLimitComputer:
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
                         verbose = False )
         except Exception as e:
-            logger.debug ( f"exception {e}" )
+            logger.debug( f"exception {e}" )
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
@@ -616,13 +614,13 @@ class NNUpperLimitComputer:
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll0(A)
-            nll_sA = self.nll ( mu_hat,
+            nll0A = self.nll ( mu_hat,
                     evaluationType = observed, modelToUse = modelToUse,
-                    pmSigma = pmSigma, asimov = True )
-            nll_sA = self.nll ( mu_hat,
-                    evaluationType = observed, modelToUse = modelToUse,
-                    pmSigma = 0, asimov = True )
-            nll0A = nll_sA
+                    pmSigma = -pmSigma, asimov = True )
+            # nll_sA = self.nll ( mu_hat,
+            #        evaluationType = observed, modelToUse = modelToUse,
+            #        pmSigma = 0, asimov = True )
+            # nll0A = nll_sA
 
         nll0 = nll0A
 
@@ -634,10 +632,10 @@ class NNUpperLimitComputer:
 
         mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
         if pmSigma != 0:
-            nll_s = self.nll ( mu_hat,
+            nll0 = self.nll ( mu_hat,
                     evaluationType = evaluationType, modelToUse = modelToUse,
-                    pmSigma = 0 )
-            nll0 = nll_s
+                    pmSigma = -pmSigma )
+            # nll0 = nll_s
         mu_hat = mu_hat if mu_hat is not None else 0.0
 
         return mu_hat, sigma_mu, clsRootFunc, nll0, nll0A
