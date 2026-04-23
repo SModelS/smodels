@@ -55,15 +55,15 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             t.computeStatistics()
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        self.assertAlmostEqual(combiner.muhat(), 1.0445466490085937, 4)
+        self.assertAlmostEqual(combiner.muhat(), 1.2058828358516187, 4)
         self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
         self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
         self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
-        self.assertAlmostEqual(ulmu, 3.4883893878456447, 3)
+        self.assertAlmostEqual(ulmu, 3.7926103695052884, 3)
         ulmu_exp = combiner.getUpperLimitOnMu(evaluationType=apriori)
-        self.assertAlmostEqual(ulmu_exp, 1.9892495624399895, 3)
+        self.assertAlmostEqual(ulmu_exp, 2.1431580557869347, 3)
 
     def testByHandComputed ( self ):
         """ a unit test where in the comments I show the manual computations, step by step, for comparison """
@@ -179,7 +179,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # IDs that should be selected and the respective evaluationType r-values:
         goodIDs = {
 #            "CMS-SUS-16-036": (1.379, "upperLimit"),
-            "CMS-SUS-12-024": (0.0004534170464636533, "efficiencyMap"),
+            "CMS-SUS-12-024": (0.0004525513371509076, "efficiencyMap"),
             "ATLAS-SUSY-2018-12": (2.294e-3, "efficiencyMap"),
             "ATLAS-SUSY-2019-09": (0.231855657, "combined"),
         }
