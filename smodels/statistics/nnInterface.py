@@ -397,7 +397,7 @@ class NNUpperLimitComputer:
               modelToUse : Union[None,str] = None,
               asimov : bool = False ):
         return self.lmax ( return_nll=True, evaluationType = evaluationType,
-              allowNegativeSignals = allowNegativeSignals, 
+              allowNegativeSignals = allowNegativeSignals,
 			        modelToUse = modelToUse, asimov = asimov )
 
     @lru_cache
@@ -614,6 +614,10 @@ class NNUpperLimitComputer:
 
         mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
+        if pmSigma != 0:
+            nll0 = self.nll ( mu_hat, evaluationType = evaluationType,
+                              modelToUse = modelToUse, pmSigma = -pmSigma )
+            # nll0 = nll_s
 
         #from smodels.base import runtime
         #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
