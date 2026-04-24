@@ -346,32 +346,33 @@ class NNUpperLimitComputer:
         if ret == None:
             return None
         delta = 0
-        if pmSigma != 0 and evaluationType == observed and \
-                not "sigma_obs" in ret:
-            ## probably we fell back to pyhf likelihoods
+        # evaluationType == observed and \
+        if pmSigma != 0 and not "sigma_obs" in ret:
+            ## probably we fell back to pyhf likelihoods,
+            # so we return Nones
             return None
-        if evaluationType != observed:
-            if asimov not in [ False, None ]:
-                nll = ret[ f'nllA_exp_{int(asimov)}']
-                if pmSigma:
-                    delta = ret["sigma_expA"]
-            else:
-                nll = ret[ f'nll_exp_1']
-                if pmSigma:
-                    delta = ret["sigma_exp"]
-        else:
+        if evaluationType == observed:
             if asimov not in [ False, None ]:
                 nll = ret[ f'nllA_obs_{int(asimov)}']
-                if pmSigma:
+                if pmSigma != 0:
                     delta = ret["sigma_obsA"]
             else:
                 nll = ret[ f'nll_obs_1']
-                if pmSigma:
+                if pmSigma != 0:
                     delta = ret["sigma_obs"]
+        else:
+            if asimov not in [ False, None ]:
+                nll = ret[ f'nllA_exp_{int(asimov)}']
+                if pmSigma != 0:
+                    delta = ret["sigma_expA"]
+            else:
+                nll = ret[ f'nll_exp_1']
+                if pmSigma != 0:
+                    delta = ret["sigma_exp"]
         nll += pmSigma * delta
 
         logger.debug( f"Calling likelihood")
-        return float ( nll )
+        return nll
 
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
               modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
@@ -384,7 +385,7 @@ class NNUpperLimitComputer:
             return nll
         return self.exponentiateNLL ( nll, True )
 
-    def exponentiateNLL(self, nll : Optional[float], 
+    def exponentiateNLL(self, nll : Optional[float],
             doIt : bool = True ) -> float:
         """if doIt, then compute likelihood from nll,
         else return nll"""
@@ -481,8 +482,8 @@ class NNUpperLimitComputer:
                 if hessian > 0.:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
-                ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ), 
-                        "sigma_mu": float ( sigma_mu ) }
+                ret = { "nll_min": nllmin, "muhat": muhat,
+                        "sigma_mu": sigma_mu }
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"

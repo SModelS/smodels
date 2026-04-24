@@ -239,6 +239,7 @@ class NNAdapter:
                     mean = nll_means,
                     std = nll_errors, trafos = trafos,
                     eps = 1e-5 )
+            errs = list ( map ( float, errs ) )
             ret["sigma_exp"] = errs[0]
             ret["sigma_obs"] = errs[1]
             ret["sigma_expA"] = errs[2]
