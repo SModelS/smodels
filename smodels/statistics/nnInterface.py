@@ -392,6 +392,14 @@ class NNUpperLimitComputer:
             return np.exp(-nll )
         return nll
 
+    def nll_min( self, evaluationType=observed,
+              allowNegativeSignals=True,
+              modelToUse : Union[None,str] = None,
+              asimov : bool = False ):
+        return self.lmax ( return_nll=True, evaluationType = evaluationType,
+              allowNegativeSignals = allowNegativeSignals, 
+			        modelToUse = modelToUse, asimov = asimov )
+
     @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
@@ -483,7 +491,7 @@ class NNUpperLimitComputer:
         return None
 
     def getUpperLimitOnSigmaTimesEff(self,
-			      evaluationType : NllEvalType = observed,
+                  evaluationType : NllEvalType = observed,
             modelToUse : Union[None,str] = None,
             nSigma : int = 0, pmSigma : int = 0 ) -> UnitXSec:
         """
@@ -520,7 +528,7 @@ class NNUpperLimitComputer:
 
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
-			      allowNegativeSignals : bool = False,
+                  allowNegativeSignals : bool = False,
             modelToUse : Union[None,str,int] = None,
             nSigma : int = 0 ) -> float:
         """
@@ -579,9 +587,9 @@ class NNUpperLimitComputer:
         """
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax( evaluationType = aposteriori,
+        fmh = self.nll_min( evaluationType = aposteriori,
                 allowNegativeSignals=allowNegativeSignals,
-                             return_nll=True, modelToUse = modelToUse )
+                modelToUse = modelToUse )
         if fmh == None:
             return None, None, None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
@@ -589,24 +597,23 @@ class NNUpperLimitComputer:
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll0(A)
-            nll0A = self.lmax ( mu_hat,
+            nll0A = self.nll_min ( mu_hat,
                     evaluationType = aposteriori , modelToUse = modelToUse,
-                    pmSigma = -pmSigma, return_nll = True )
+                    pmSigma = -pmSigma )
             # nll_sA = self.nll ( mu_hat,
             #        evaluationType = observed, modelToUse = modelToUse,
             #        pmSigma = 0, asimov = True )
             # nll0A = nll_sA
         nll0 = nll0A
 
-        if True: # expected != "posteriori":
-            fmh = self.lmax( evaluationType=evaluationType,
-                    allowNegativeSignals=allowNegativeSignals,
-                    modelToUse = modelToUse, return_nll = True )
-            if fmh == None:
-                return None, None, None, None, None
+        fmh = self.lmax( evaluationType=evaluationType,
+                allowNegativeSignals=allowNegativeSignals,
+                modelToUse = modelToUse, return_nll = True )
+        if fmh == None:
+            return None, None, None, None, None
 
-            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-            mu_hat = mu_hat if mu_hat is not None else 0.0
+        mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+        mu_hat = mu_hat if mu_hat is not None else 0.0
 
         #from smodels.base import runtime
         #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
