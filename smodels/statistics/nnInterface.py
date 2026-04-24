@@ -445,6 +445,8 @@ class NNUpperLimitComputer:
             outputType = "expected"
         if evaluationType == aposteriori:
             outputType = "asimov"
+        if asimov not in [ False, None ]:
+            outputType = "asimov"
         options = { "disp": False, "maxiter": 200 }
 
         ## FIXME compute sigma_mu, compute via nllA
@@ -599,7 +601,7 @@ class NNUpperLimitComputer:
         # mu_hat is mu_hat for signal_rel
         fmh = self.nll_min( evaluationType = aposteriori,
                 allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse )
+                modelToUse = modelToUse, asimov = 1 )
         if fmh == None:
             return None, None, None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
