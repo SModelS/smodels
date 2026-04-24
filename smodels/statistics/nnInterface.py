@@ -602,35 +602,35 @@ class NNUpperLimitComputer:
         """
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.nll_min( evaluationType = aposteriori,
+        fA = self.nll_min( evaluationType = aposteriori,
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse, asimov = 1 )
-        if fmh == None:
+        if fA == None:
             return None, None, None, None, None
-        mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-        if pmSigma != 0:
+        mu_hatA, sigma_muA, nll0A = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
+
+        f0 = self.nll_min ( evaluationType=evaluationType,
+                allowNegativeSignals=allowNegativeSignals,
+                modelToUse = modelToUse )
+
+        if f0 == None:
+            return None, None, None, None, None
+
+        mu_hat0, sigma_mu0, nll0 = f0["muhat"], f0["sigma_mu"], f0["nll_min"]
+        mu_hat0 = mu_hat0 if mu_hat0 is not None else 0.0
+        if False and pmSigma != 0:
+            # actually we get better coverage if we dont do this!
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll0(A)
-            nll0A = self.nll ( mu_hat,
+            nll0A = self.nll ( mu_hatA,
                     evaluationType = aposteriori , modelToUse = modelToUse,
                     pmSigma = -pmSigma, asimov = 1 )
             # nll_sA = self.nll ( mu_hat,
             #        evaluationType = observed, modelToUse = modelToUse,
             #        pmSigma = 0, asimov = True )
             # nll0A = nll_sA
-        nll0 = nll0A
-
-        fmh = self.nll_min ( evaluationType=evaluationType,
-                allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse )
-        if fmh == None:
-            return None, None, None, None, None
-
-        mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-        mu_hat = mu_hat if mu_hat is not None else 0.0
-        if pmSigma != 0:
-            nll0 = self.nll ( mu_hat, evaluationType = evaluationType,
+            nll0 = self.nll ( mu_hat0, evaluationType = evaluationType,
                               modelToUse = modelToUse, pmSigma = -pmSigma )
             # nll0 = nll_s
 
@@ -638,4 +638,4 @@ class NNUpperLimitComputer:
         #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
         #if useTevatron:
         #    return mu_hat, sigma_mu, clsRootTevatron
-        return mu_hat, sigma_mu, clsRootFunc, nll0, nll0A
+        return mu_hat0, sigma_mu0, clsRootFunc, nll0, nll0A
