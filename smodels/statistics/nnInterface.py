@@ -77,7 +77,7 @@ def clsRootFunc( mu : float, return_type: Text,
              modelToUse : Union[None,str], obj : Callable,
              evaluationType : NllEvalType,
              nll0 : float, nll0A : float, mu_hat : float,
-             nSigma : int ) -> float:
+             nSigma : int, pmSigma : int ) -> float:
     """ the cls root function for the ml models.
     i had to put it as a separate function because i want to be
     able to monkey patch it """
@@ -322,6 +322,7 @@ class NNUpperLimitComputer:
         logger.info( f"NN interface, we are using onnxruntime v{ver}" )
         nninfo["hasgreeted"] = True
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
               modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
               pmSigma : int = 0 ) -> Optional[float]:
@@ -337,6 +338,8 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
+        assert asimov in [ 1, 0, False, None ], \
+            f"asimov should be one of: 1, 0, False, None"
         ret = self._actual_nll(mu,modelToUse=modelToUse)
         if ret == None:
             return None
@@ -347,20 +350,20 @@ class NNUpperLimitComputer:
             return None
         if evaluationType != observed:
             if asimov not in [ False, None ]:
-                nll = ret['nllA_exp_1']
+                nll = ret[ f'nllA_exp_{asimov}']
                 if pmSigma:
                     delta = ret["sigma_expA"]
             else:
-                nll = ret['nll_exp_1']
+                nll = ret[ f'nll_exp_1']
                 if pmSigma:
                     delta = ret["sigma_exp"]
         else:
             if asimov not in [ False, None ]:
-                nll = ret['nllA_obs_1']
+                nll = ret[ f'nllA_obs_{asimov}']
                 if pmSigma:
                     delta = ret["sigma_obsA"]
             else:
-                nll = ret['nll_obs_1']
+                nll = ret[ f'nll_obs_1']
                 if pmSigma:
                     delta = ret["sigma_obs"]
         nll += pmSigma * delta
@@ -368,7 +371,6 @@ class NNUpperLimitComputer:
         logger.debug( f"Calling likelihood")
         return nll
 
-    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
               modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
               pmSigma : int = 0 ) -> Optional[float]:
@@ -393,6 +395,7 @@ class NNUpperLimitComputer:
             return np.exp(-nll )
         return nll
 
+    @lru_cache
     def nll_min( self, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
@@ -481,7 +484,6 @@ class NNUpperLimitComputer:
         logger.warning ( f"could not find nll_min!" )
         return None
 
-    @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
@@ -536,7 +538,7 @@ class NNUpperLimitComputer:
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
                   allowNegativeSignals : bool = False,
             modelToUse : Union[None,str,int] = None,
-            nSigma : int = 0 ) -> float:
+            nSigma : int = 0, pmSigma : int = 0 ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
         - by default, the combination of the workspaces in self.workspaces
@@ -565,7 +567,7 @@ class NNUpperLimitComputer:
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll0": nll0, "nll0A": nll0A, "mu_hat": mu_hat,
-            "nSigma": nSigma }
+            "nSigma": nSigma, "pmSigma": 0 }
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
