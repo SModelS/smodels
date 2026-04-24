@@ -9,7 +9,7 @@
 
 """
 
-from typing import Union, Text, Tuple, Callable, Dict, Optional
+from typing import Union, Text, Tuple, Callable, Dict
 import copy, os
 import numpy as np
 import sys
@@ -77,7 +77,7 @@ def clsRootFunc( mu : float, return_type: Text,
              modelToUse : Union[None,str], obj : Callable,
              evaluationType : NllEvalType,
              nll0 : float, nll0A : float, mu_hat : float,
-             nSigma : int, pmSigma : int ) -> float:
+             nSigma : int ) -> float:
     """ the cls root function for the ml models.
     i had to put it as a separate function because i want to be
     able to monkey patch it """
@@ -86,13 +86,13 @@ def clsRootFunc( mu : float, return_type: Text,
     # Make sure to always compute the correct llhd value (from
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
-    nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 0,
-        pmSigma = pmSigma )
+    nllA = obj.likelihood(mu, return_nll=True,
+            modelToUse = modelToUse, asimov = True )
     nll = nllA
     if evaluationType != aposteriori:
-        nll = obj.nll(mu, evaluationType=evaluationType,
-            modelToUse = modelToUse, asimov = None,
-            pmSigma = pmSigma )
+        nll = obj.likelihood(mu, return_nll=True,
+            evaluationType=evaluationType,
+            modelToUse = modelToUse, asimov = False )
     ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
             return_type=return_type, nSigma = nSigma ) if \
             (nll is not None and nllA is not None) else None
@@ -325,28 +325,18 @@ class NNUpperLimitComputer:
         nninfo["hasgreeted"] = True
 
     def nll( self, mu=1.0, evaluationType=observed,
-              modelToUse : Union[None,str] = None,
-              asimov : Optional[float] = None, pmSigma : int = 0 ) -> float:
+              modelToUse : Union[None,str] = None, asimov : bool = False,
+              pmSigma : int = 0 ):
         """ over the long run we will want to phase out .likelihood
         interfaces entirely """
         return self.likelihood ( mu=mu, return_nll = True,
             evaluationType=evaluationType, modelToUse = modelToUse,
             asimov = asimov, pmSigma = pmSigma )
 
-    def asimovAsInteger ( self, asimov : Optional[float] ) -> Union[None,int]:
-        """ asimov as either 0, 1 or None """
-        if asimov == None:
-            return None
-        if abs(asimov)<1e-5:
-            return 0
-        if abs(asimov-1)<1e-5:
-            return 1
-        raise SModelSError ( f"asimov {asimov} not supported" )
-
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
-              modelToUse : Union[None,str] = None,
-              asimov : Optional[float] = None, pmSigma : int = 0 ) -> float:
+              modelToUse : Union[None,str] = None, asimov : bool = False,
+              pmSigma : int = 0 ):
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -359,8 +349,6 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
-        i_as = self.asimovAsInteger ( asimov )
-
         ret = self._actual_nll(mu,modelToUse=modelToUse)
         if ret == None:
             return None
@@ -370,23 +358,23 @@ class NNUpperLimitComputer:
             ## probably we fell back to pyhf likelihoods
             return None
         if evaluationType != observed:
-            if i_as == None:
+            if asimov:
+                nll = ret['nllA_exp_1']
+                if pmSigma:
+                    delta = ret["sigma_expA"]
+            else:
                 nll = ret['nll_exp_1']
                 if pmSigma:
                     delta = ret["sigma_exp"]
-            else:
-                nll = ret[ f'nllA_exp_{i_as}']
-                if pmSigma:
-                    delta = ret["sigma_expA"]
         else:
-            if i_as == None:
+            if asimov:
+                nll = ret['nllA_obs_1']
+                if pmSigma:
+                    delta = ret["sigma_obsA"]
+            else:
                 nll = ret['nll_obs_1']
                 if pmSigma:
                     delta = ret["sigma_obs"]
-            else:
-                nll = ret[ f'nllA_obs_{i_as}']
-                if pmSigma:
-                    delta = ret["sigma_obsA"]
         nll += pmSigma * delta
 
         logger.debug( f"Calling likelihood")
@@ -401,17 +389,14 @@ class NNUpperLimitComputer:
             #    return 0.0
             #return 9000.0
         if doIt:
-            return float ( np.exp(-nll ) )
-        return float ( nll )
-
-    def nll_min ( self, **kwargs ):
-        return self.lmax ( return_nll = True, **kwargs )
+            return np.exp(-nll )
+        return nll
 
     @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
-              asimov : Optional[float] = None, pmSigma : float = 0 ):
+              asimov : bool = False ):
         """
         Returns the (negative log) max likelihood
 
@@ -422,7 +407,6 @@ class NNUpperLimitComputer:
         :param modelToUse: if given, compute lmax for that model.
         :param asimov: if true, compute for asimov data
         If None compute for most sensitive analysis.
-        :param pmSigma: get lmax plus minus a sigma
         """
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
@@ -454,12 +438,8 @@ class NNUpperLimitComputer:
 
         outputType = "observed"
         if evaluationType == apriori:
-            # outputType = "asimov"
             outputType = "expected"
         if evaluationType == aposteriori:
-            # outputType = "expected"
-            outputType = "asimov"
-        if asimov:
             outputType = "asimov"
         options = { "disp": False, "maxiter": 200 }
 
@@ -472,8 +452,8 @@ class NNUpperLimitComputer:
                     ret.append ( myNLL ( xi ) )
                 return np.array ( ret )
             ret = self._actual_nll ( x, modelToUse=modelToUse,
-                                     outputType=outputType )
-            return float(ret)
+                                                 outputType=outputType )
+            return ret
 
         method = "Nelder-Mead"
         initx0s = [ 0., .1, -.1, .3, -.3, 1., -1., 3., -3., 10., -10., 100,-100 ]
@@ -505,8 +485,7 @@ class NNUpperLimitComputer:
     def getUpperLimitOnSigmaTimesEff(self,
 			      evaluationType : NllEvalType = observed,
             modelToUse : Union[None,str] = None,
-            nSigma : int = 0,
-            **kwargs ) -> UnitXSec:
+            nSigma : int = 0, pmSigma : int = 0 ) -> UnitXSec:
         """
         Compute the upper limit on the fiducial
         cross section sigma times efficiency:
@@ -530,7 +509,7 @@ class NNUpperLimitComputer:
         else:
             ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
                                          modelToUse=modelToUse,
-                                         nSigma = nSigma, **kwargs )
+                                         nSigma = nSigma )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -543,7 +522,7 @@ class NNUpperLimitComputer:
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
 			      allowNegativeSignals : bool = False,
             modelToUse : Union[None,str,int] = None,
-            nSigma : int = 0, pmSigma : int = 0 ) -> float:
+            nSigma : int = 0 ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
         - by default, the combination of the workspaces in self.workspaces
@@ -553,8 +532,6 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
-        :param pmSigma: the upper limit for nlls +- so many sigmas.
-        For error bands only, for NN's only
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         if modelToUse == None:
@@ -562,26 +539,25 @@ class NNUpperLimitComputer:
         if modelToUse not in self.adaptors:
             # so its a pyhf one
             ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnMu(
-                    evaluationType, modelToUse, nSigma )
+                    evaluationType,modelToUse, nSigma )
             return ret
         mu_hat, sigma_mu, clsRoot, nll0, nll0A = self.getCLsRootFunc(
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse,
-                nSigma = nSigma,
-                pmSigma = pmSigma )
+                nSigma = nSigma )
         if mu_hat is None:
             return float("inf")
-        clsRootArgs = { "return_type": "CLs-alpha", "modelToUse": modelToUse,
+        clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll0": nll0, "nll0A": nll0A, "mu_hat": mu_hat,
-            "nSigma": nSigma, "pmSigma": pmSigma }
+            "nSigma": nSigma }
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
                         verbose = False )
         except Exception as e:
-            logger.debug( f"exception {e}" )
+            logger.debug ( f"exception {e}" )
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
@@ -590,52 +566,46 @@ class NNUpperLimitComputer:
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None,
-            nSigma : int = 0, pmSigma : int = 0 ) -> Tuple[float, float, Callable]:
+            nSigma : int = 0 ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
 
         :param evaluationType: one of: observed, apriori, aposteriori
         :param modelToUse: if given, compute the nll for that model.
-        :param nSigma: the CLs for central value (0),
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
         If None compute for most sensitive analysis.
-        :param pmSigma: get the CLs for nll +- so many sigmas
         """
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.nll_min( evaluationType = observed,
+        fmh = self.lmax( evaluationType = aposteriori,
                 allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse, asimov=0. )
+                             return_nll=True, modelToUse = modelToUse )
         if fmh == None:
             return None, None, None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-        if pmSigma != 0:
-            # if we want to compute ULs for nlls +- 1 sigma,
-            # we compute the usual mu_hat, but add pmSigma times sigma
-            # to nll0(A)
-            nll0A = self.nll ( mu_hat,
-                    evaluationType = observed, modelToUse = modelToUse,
-                    pmSigma = -pmSigma, asimov = True )
-            # nll_sA = self.nll ( mu_hat,
-            #        evaluationType = observed, modelToUse = modelToUse,
-            #        pmSigma = 0, asimov = True )
-            # nll0A = nll_sA
 
         nll0 = nll0A
 
-        fmh = self.nll_min( evaluationType=evaluationType,
-                allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse )
-        if fmh == None:
-            return None, None, None, None, None
+        if True: # expected != "posteriori":
+            fmh = self.lmax( evaluationType=evaluationType,
+                    allowNegativeSignals=allowNegativeSignals,
+                    modelToUse = modelToUse )
+            if fmh == None:
+                return None, None, None, None, None
 
-        mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-        if pmSigma != 0:
-            nll0 = self.nll ( mu_hat,
-                    evaluationType = evaluationType, modelToUse = modelToUse,
-                    pmSigma = -pmSigma )
-            # nll0 = nll_s
-        mu_hat = mu_hat if mu_hat is not None else 0.0
+            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat = mu_hat if mu_hat is not None else 0.0
+        if False: # expected == "posteriori":
+            fmh = self.lmax( evaluationType=evaluationType,
+                    allowNegativeSignals=allowNegativeSignals,
+                    modelToUse = modelToUse )
+            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+            mu_hat = mu_hat if mu_hat is not None else 0.0
 
+        #from smodels.base import runtime
+        #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
+        #if useTevatron:
+        #    return mu_hat, sigma_mu, clsRootTevatron
         return mu_hat, sigma_mu, clsRootFunc, nll0, nll0A
