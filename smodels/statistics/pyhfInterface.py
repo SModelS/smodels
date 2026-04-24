@@ -880,9 +880,15 @@ class PyhfUpperLimitComputer:
             return float("inf")
         return 1.0/hessian
 
+    def nll_min( self, workspace_index=None,
+            evaluationType : NllEvalType=observed, allowNegativeSignals=False):
+        return self.lmax ( workspace_index = workspace_index, return_nll = True,
+                evaluationType = evaluationType, 
+                allowNegativeSignals = allowNegativeSignals )
+
     @lru_cache
-    def lmax( self, workspace_index=None, return_nll=False, evaluationType : NllEvalType=observed,
-              allowNegativeSignals=False):
+    def lmax( self, workspace_index=None, return_nll=False, 
+            evaluationType : NllEvalType=observed, allowNegativeSignals=False):
         """
         Returns the negative log max likelihood
 

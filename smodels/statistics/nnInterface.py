@@ -337,7 +337,6 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
-        print ( f"@@XXY asimov {asimov}" )
         ret = self._actual_nll(mu,modelToUse=modelToUse)
         if ret == None:
             return None
@@ -398,19 +397,9 @@ class NNUpperLimitComputer:
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
               asimov : Optional[int] = None ):
-        return self.lmax ( return_nll=True, evaluationType = evaluationType,
-                           allowNegativeSignals = allowNegativeSignals,
-                           modelToUse = modelToUse, asimov = asimov )
-
-    @lru_cache
-    def lmax( self, return_nll=False, evaluationType=observed,
-              allowNegativeSignals=True,
-              modelToUse : Union[None,str] = None,
-              asimov : Optional[int] = None ):
         """
         Returns the (negative log) max likelihood
 
-        :param return_nll: if true, return nll, not llhd
         :param evaluationType: one of: observed, apriori, aposteriori
         :param allowNegativeSignals: if False, then negative nsigs are
         replaced with 0.
@@ -434,8 +423,8 @@ class NNUpperLimitComputer:
         if not modelToUse in self.adaptors.keys():
             if asimov not in [ False, None ]:
                 print ( f"[nnInterface] FIXME fix asimov" )
-            return self.pyhfComputer.upperLimitComputer.lmax ( modelToUse,
-                    return_nll, evaluationType, allowNegativeSignals )
+            return self.pyhfComputer.upperLimitComputer.nll_min ( modelToUse,
+                    evaluationType, allowNegativeSignals )
             #print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
             #return None
         muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_obs_max"]
@@ -491,6 +480,21 @@ class NNUpperLimitComputer:
                 method = "L-BFGS-B"
         logger.warning ( f"could not find nll_min!" )
         return None
+
+    @lru_cache
+    def lmax( self, return_nll=False, evaluationType=observed,
+              allowNegativeSignals=True,
+              modelToUse : Union[None,str] = None,
+              asimov : Optional[int] = None ):
+        """
+        :param return_nll: if true, return nll, not llhd
+        """
+        nll_min =  self.nll_min( evaluationType = evaluationType,
+                           allowNegativeSignals = allowNegativeSignals,
+                           modelToUse = modelToUse, asimov = asimov )
+        if return_nll:
+            return nll_min
+        return self.exponentiateNLL ( nll_min, doIt = True )
 
     def getUpperLimitOnSigmaTimesEff(self,
                   evaluationType : NllEvalType = observed,
