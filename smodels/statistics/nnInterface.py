@@ -371,7 +371,7 @@ class NNUpperLimitComputer:
         nll += pmSigma * delta
 
         logger.debug( f"Calling likelihood")
-        return nll
+        return float ( nll )
 
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
               modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
@@ -481,7 +481,8 @@ class NNUpperLimitComputer:
                 if hessian > 0.:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
-                ret = { "nll_min": nllmin, "muhat": muhat, "sigma_mu": sigma_mu }
+                ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ), 
+                        "sigma_mu": float ( sigma_mu ) }
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
@@ -493,6 +494,7 @@ class NNUpperLimitComputer:
               modelToUse : Union[None,str] = None,
               asimov : Optional[int] = None ):
         """
+        obsolete, use nll_min
         :param return_nll: if true, return nll, not llhd
         """
         nll_min =  self.nll_min( evaluationType = evaluationType,
@@ -503,9 +505,9 @@ class NNUpperLimitComputer:
         return self.exponentiateNLL ( nll_min, doIt = True )
 
     def getUpperLimitOnSigmaTimesEff(self,
-                  evaluationType : NllEvalType = observed,
+            evaluationType : NllEvalType = observed,
             modelToUse : Union[None,str] = None,
-            nSigma : int = 0, pmSigma : int = 0 ) -> UnitXSec:
+            nSigma : int = 0, **kwargs ) -> UnitXSec:
         """
         Compute the upper limit on the fiducial
         cross section sigma times efficiency:
@@ -529,7 +531,7 @@ class NNUpperLimitComputer:
         else:
             ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
                                          modelToUse=modelToUse,
-                                         nSigma = nSigma )
+                                         nSigma = nSigma, **kwargs )
             if ul == None:
                 return ul
             if self.lumi is None:
@@ -540,7 +542,7 @@ class NNUpperLimitComputer:
 
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
-                  allowNegativeSignals : bool = False,
+            allowNegativeSignals : bool = False,
             modelToUse : Union[None,str,int] = None,
             nSigma : int = 0, pmSigma : int = 0 ) -> float:
         """
@@ -609,9 +611,9 @@ class NNUpperLimitComputer:
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll0(A)
-            nll0A = self.nll_min ( mu_hat,
+            nll0A = self.nll ( mu_hat,
                     evaluationType = aposteriori , modelToUse = modelToUse,
-                    pmSigma = -pmSigma )
+                    pmSigma = -pmSigma, asimov = 1 )
             # nll_sA = self.nll ( mu_hat,
             #        evaluationType = observed, modelToUse = modelToUse,
             #        pmSigma = 0, asimov = True )
