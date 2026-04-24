@@ -86,12 +86,10 @@ def clsRootFunc( mu : float, return_type: Text,
     # Make sure to always compute the correct llhd value (from
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
-    nllA = obj.likelihood(mu, return_nll=True,
-            modelToUse = modelToUse, asimov = True )
+    nllA = obj.nll(mu, modelToUse = modelToUse, asimov = True )
     nll = nllA
     if evaluationType != aposteriori:
-        nll = obj.likelihood(mu, return_nll=True,
-            evaluationType=evaluationType,
+        nll = obj.nll (mu, evaluationType=evaluationType,
             modelToUse = modelToUse, asimov = False )
     ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
             return_type=return_type, nSigma = nSigma ) if \
@@ -358,7 +356,7 @@ class NNUpperLimitComputer:
             ## probably we fell back to pyhf likelihoods
             return None
         if evaluationType != observed:
-            if asimov:
+            if asimov not in [ False, None ]:
                 nll = ret['nllA_exp_1']
                 if pmSigma:
                     delta = ret["sigma_expA"]
@@ -367,7 +365,7 @@ class NNUpperLimitComputer:
                 if pmSigma:
                     delta = ret["sigma_exp"]
         else:
-            if asimov:
+            if asimov not in [ False, None ]:
                 nll = ret['nllA_obs_1']
                 if pmSigma:
                     delta = ret["sigma_obsA"]
@@ -430,14 +428,14 @@ class NNUpperLimitComputer:
                 print ( f"[nnInterface] ulmu({model})={ulmu}" )
             return None
         if not modelToUse in self.adaptors.keys():
-            if asimov:
+            if asimov not in [ False, None ]:
                 print ( f"[nnInterface] FIXME fix asimov" )
             return self.pyhfComputer.upperLimitComputer.lmax ( modelToUse,
                     return_nll, evaluationType, allowNegativeSignals )
             #print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
             #return None
         muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_obs_max"]
-        if asimov:
+        if asimov not in [ False, None ]:
             muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_obs_max"]
             if evaluationType != observed:
                 muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_exp_max"]
