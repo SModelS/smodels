@@ -566,7 +566,7 @@ class NNUpperLimitComputer:
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None,
-            nSigma : int = 0 ) -> Tuple[float, float, Callable]:
+            nSigma : int = 0, pmSigma : int = 0 ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
@@ -585,7 +585,17 @@ class NNUpperLimitComputer:
         if fmh == None:
             return None, None, None, None, None
         mu_hat, sigma_mu, nll0A = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-
+        if pmSigma != 0:
+            # if we want to compute ULs for nlls +- 1 sigma,
+            # we compute the usual mu_hat, but add pmSigma times sigma
+            # to nll0(A)
+            nll0A = self.lmax ( mu_hat,
+                    evaluationType = aposteriori , modelToUse = modelToUse,
+                    pmSigma = -pmSigma, return_nll = True )
+            # nll_sA = self.nll ( mu_hat,
+            #        evaluationType = observed, modelToUse = modelToUse,
+            #        pmSigma = 0, asimov = True )
+            # nll0A = nll_sA
         nll0 = nll0A
 
         if True: # expected != "posteriori":
