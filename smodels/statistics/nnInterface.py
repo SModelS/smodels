@@ -352,7 +352,7 @@ class NNUpperLimitComputer:
             return None
         if evaluationType != observed:
             if asimov not in [ False, None ]:
-                nll = ret[ f'nllA_exp_{asimov}']
+                nll = ret[ f'nllA_exp_{int(asimov)}']
                 if pmSigma:
                     delta = ret["sigma_expA"]
             else:
@@ -361,7 +361,7 @@ class NNUpperLimitComputer:
                     delta = ret["sigma_exp"]
         else:
             if asimov not in [ False, None ]:
-                nll = ret[ f'nllA_obs_{asimov}']
+                nll = ret[ f'nllA_obs_{int(asimov)}']
                 if pmSigma:
                     delta = ret["sigma_obsA"]
             else:
@@ -565,7 +565,7 @@ class NNUpperLimitComputer:
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse,
-                nSigma = nSigma )
+                nSigma = nSigma, pmSigma = pmSigma )
         if mu_hat is None:
             return float("inf")
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
