@@ -567,7 +567,7 @@ class NNUpperLimitComputer:
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll0": nll0, "nll0A": nll0A, "mu_hat": mu_hat,
-            "nSigma": nSigma, "pmSigma": 0 }
+            "nSigma": nSigma, "pmSigma": pmSigma }
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
