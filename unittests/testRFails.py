@@ -123,5 +123,9 @@ class RFailsTest(unittest.TestCase):
                 os.remove(outSummary)
             os.unlink ( "mdm_r_fails.slha" )
 
+            import glob
+            for f in glob.glob("scan_*.slha"):
+                os.unlink(f)
+
 if __name__ == "__main__":
     unittest.main()
