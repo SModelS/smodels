@@ -86,11 +86,13 @@ def clsRootFunc( mu : float, return_type: Text,
     # Make sure to always compute the correct llhd value (from
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
-    nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1 )
+    nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1,
+           pmSigma = pmSigma )
     nll = nllA
     if evaluationType != aposteriori:
         nll = obj.nll (mu, evaluationType=evaluationType,
-            modelToUse = modelToUse, asimov = None )
+            modelToUse = modelToUse, asimov = None,
+            pmSigma = pmSigma )
     ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
             return_type=return_type, nSigma = nSigma ) if \
             (nll is not None and nllA is not None) else None
