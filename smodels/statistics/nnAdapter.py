@@ -50,7 +50,13 @@ class NNAdapter:
 
     def _instantiateRegressor ( self ):
         """ create the actual inference session object """
-        sess = onnxruntime.InferenceSession ( self.mlModel.SerializeToString() )
+        so = None
+        if False:
+            so = ort.SessionOptions()
+            so.intra_op_num_threads = 1
+            so.inter_op_num_threads = 1
+        sess = onnxruntime.InferenceSession ( self.mlModel.SerializeToString(),
+               so )
         self.regressor={ "session": sess,
                          "dim": sess.get_inputs()[0].shape[1] }
 
