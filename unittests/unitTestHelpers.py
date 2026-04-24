@@ -30,13 +30,15 @@ def removeCruftOutputs( filename : str ):
     """ remove cruft outputfiles
 		:param filename: filename, remove it and its variants
 		"""
+    if os.path.exists ( filename ):
+        os.remove ( filename )
+        return
     f = os.path.splitext(filename)[0]
-    extList = ['py','pyc','smodels','smodelsslha','xml']
+    extList = [ 'py','pyc','smodels','smodelsslha','xml' ]
     for ext in extList:
         fname= f"{f}.{ext}"
         if os.path.exists(fname):
             os.remove(fname)
-
 
 def checkPythonRequirements(requirements_path:
             os.PathLike = "../smodels/share/requirements.txt"):
