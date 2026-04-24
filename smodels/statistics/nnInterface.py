@@ -601,16 +601,10 @@ class NNUpperLimitComputer:
         if True: # expected != "posteriori":
             fmh = self.lmax( evaluationType=evaluationType,
                     allowNegativeSignals=allowNegativeSignals,
-                    modelToUse = modelToUse )
+                    modelToUse = modelToUse, return_nll = True )
             if fmh == None:
                 return None, None, None, None, None
 
-            mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-            mu_hat = mu_hat if mu_hat is not None else 0.0
-        if False: # expected == "posteriori":
-            fmh = self.lmax( evaluationType=evaluationType,
-                    allowNegativeSignals=allowNegativeSignals,
-                    modelToUse = modelToUse )
             mu_hat, sigma_mu, nll0 = fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
             mu_hat = mu_hat if mu_hat is not None else 0.0
 
