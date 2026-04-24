@@ -9,7 +9,7 @@
 
 """
 
-from typing import Union, Text, Tuple, Callable, Dict
+from typing import Union, Text, Tuple, Callable, Dict, Optional
 import copy, os
 import numpy as np
 import sys
@@ -322,19 +322,9 @@ class NNUpperLimitComputer:
         logger.info( f"NN interface, we are using onnxruntime v{ver}" )
         nninfo["hasgreeted"] = True
 
-    def nll( self, mu=1.0, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = None,
-              pmSigma : int = 0 ):
-        """ over the long run we will want to phase out .likelihood
-        interfaces entirely """
-        return self.likelihood ( mu=mu, return_nll = True,
-            evaluationType=evaluationType, modelToUse = modelToUse,
-            asimov = asimov, pmSigma = pmSigma )
-
-    @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = None,
-              pmSigma : int = 0 ):
+    def nll( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
+              modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
+              pmSigma : int = 0 ) -> Optional[float]:
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -377,9 +367,22 @@ class NNUpperLimitComputer:
         nll += pmSigma * delta
 
         logger.debug( f"Calling likelihood")
-        return self.exponentiateNLL ( nll, not return_nll )
+        return nll
 
-    def exponentiateNLL(self, nll, doIt = True ):
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
+    def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
+              modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
+              pmSigma : int = 0 ) -> Optional[float]:
+        """ over the long run we will want to phase out .likelihood
+        interfaces entirely """
+        nll = self.nll ( mu=mu, evaluationType=evaluationType,
+                modelToUse = modelToUse, asimov = asimov, pmSigma = pmSigma )
+        if return_nll:
+            return nll
+        return self.exponentiateNLL ( nll, True )
+
+    def exponentiateNLL(self, nll : Optional[float], 
+            doIt : bool = True ) -> float:
         """if doIt, then compute likelihood from nll,
         else return nll"""
         if nll == None:
@@ -394,16 +397,16 @@ class NNUpperLimitComputer:
     def nll_min( self, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
-              asimov : bool = None ):
+              asimov : Optional[int] = None ):
         return self.lmax ( return_nll=True, evaluationType = evaluationType,
-              allowNegativeSignals = allowNegativeSignals,
-			        modelToUse = modelToUse, asimov = asimov )
+                           allowNegativeSignals = allowNegativeSignals,
+                           modelToUse = modelToUse, asimov = asimov )
 
     @lru_cache
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
-              asimov : bool = None ):
+              asimov : Optional[int] = None ):
         """
         Returns the (negative log) max likelihood
 
