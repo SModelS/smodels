@@ -98,6 +98,7 @@ class ModelsTest(unittest.TestCase):
 
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
+        self.removeOutputs(os.path.basename ( filename ) )
 
     def testModelFromLHE(self):
         filename = "./testFiles/lhe/alrsm.lhe"
