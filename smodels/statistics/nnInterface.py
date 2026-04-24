@@ -90,7 +90,7 @@ def clsRootFunc( mu : float, return_type: Text,
     nll = nllA
     if evaluationType != aposteriori:
         nll = obj.nll (mu, evaluationType=evaluationType,
-            modelToUse = modelToUse, asimov = False )
+            modelToUse = modelToUse, asimov = None )
     ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
             return_type=return_type, nSigma = nSigma ) if \
             (nll is not None and nllA is not None) else None
@@ -323,7 +323,7 @@ class NNUpperLimitComputer:
         nninfo["hasgreeted"] = True
 
     def nll( self, mu=1.0, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = False,
+              modelToUse : Union[None,str] = None, asimov : bool = None,
               pmSigma : int = 0 ):
         """ over the long run we will want to phase out .likelihood
         interfaces entirely """
@@ -333,7 +333,7 @@ class NNUpperLimitComputer:
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
-              modelToUse : Union[None,str] = None, asimov : bool = False,
+              modelToUse : Union[None,str] = None, asimov : bool = None,
               pmSigma : int = 0 ):
         """
         Returns the value of the likelihood. \
@@ -347,6 +347,7 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
+        print ( f"@@XXY asimov {asimov}" )
         ret = self._actual_nll(mu,modelToUse=modelToUse)
         if ret == None:
             return None
@@ -393,7 +394,7 @@ class NNUpperLimitComputer:
     def nll_min( self, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
-              asimov : bool = False ):
+              asimov : bool = None ):
         return self.lmax ( return_nll=True, evaluationType = evaluationType,
               allowNegativeSignals = allowNegativeSignals,
 			        modelToUse = modelToUse, asimov = asimov )
@@ -402,7 +403,7 @@ class NNUpperLimitComputer:
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               modelToUse : Union[None,str] = None,
-              asimov : bool = False ):
+              asimov : bool = None ):
         """
         Returns the (negative log) max likelihood
 
@@ -458,7 +459,7 @@ class NNUpperLimitComputer:
                     ret.append ( myNLL ( xi ) )
                 return np.array ( ret )
             ret = self._actual_nll ( x, modelToUse=modelToUse,
-                                                 outputType=outputType )
+                                     outputType=outputType )
             return ret
 
         method = "Nelder-Mead"
@@ -604,9 +605,9 @@ class NNUpperLimitComputer:
             # nll0A = nll_sA
         nll0 = nll0A
 
-        fmh = self.lmax( evaluationType=evaluationType,
+        fmh = self.nll_min ( evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse, return_nll = True )
+                modelToUse = modelToUse )
         if fmh == None:
             return None, None, None, None, None
 
