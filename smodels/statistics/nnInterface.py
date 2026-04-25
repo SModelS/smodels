@@ -153,9 +153,15 @@ class NNUpperLimitComputer:
         self.data = data
         # first thing we do, we determine whats the most sensitive model
         self.adaptors = {}
+        session_options = {}
+        import onnxruntime
+        version = onnxruntime.__version__.split(".")
+        if int(version[0])<=1 and int(version[1])<=20:
+            session_options={ "inter_op_num_threads": 1,
+                              "intra_op_num_threads": 1 }
         for onnxfilename,onnxb in self.data.globalInfo.onnxes.items():
             self.adaptors[onnxfilename]=NNAdapter ( onnxb,
-                    onnxfilename )
+                    onnxfilename, session_options = session_options )
         # del self.data.globalInfo.onnxes # we wont need that, thank you
         self.lumi = lumi
         self.nsignals = copy.deepcopy ( self.data.nsignals )
