@@ -21,7 +21,7 @@ class NNAdapter:
     Adapter that wraps around a neural network
     """
     __slots__ = [ "allowsSyntheticData", "mlModel", "modelType",
-                  "onnxMeta", "srOrder", "regressor" ]
+                  "onnxMeta", "srOrder", "regressor", "session_options" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
                   onnxfilename : str, session_options : dict = {},
@@ -172,9 +172,6 @@ class NNAdapter:
                                                    data["smYields"] )
             data["obsYields"]=self._removeSignalRegions ( remove_channels,
                                                     data["obsYields"] )
-        #self.onnxMeta={}
-        #for key,value in data.items():
-        #    self.onnxMeta[key]=value
         self.onnxMeta = data
 
     def _predictFromScaledYields ( self, scaled_yields : np.array ) -> np.array:
