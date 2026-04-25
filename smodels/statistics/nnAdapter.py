@@ -24,12 +24,14 @@ class NNAdapter:
                   "onnxMeta", "srOrder", "regressor" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
-                  onnxfilename : str,
+                  onnxfilename : str, session_options : dict = {},
                   allowsSyntheticData : bool = False ):
         """
         :param mlModel: the model, as a ModelProto, as a bytes stream,
         or as a path to an onnx file (needing to end with .onnx)
         :param onnxfilename: filename of onnxfile, for debugging only
+        :param session_options: options for the onnxruntime inference session,
+        e.g. { "inter_op_num_threads": 1 }
         :param allowsSyntheticData: if true, then also synthetic
         data can be supplied, not used yet
         """
@@ -43,6 +45,7 @@ class NNAdapter:
                 print( f"[nnAdapter] could not load model {onnxfilename}" )
                 sys.exit(-1)
         self.allowsSyntheticData = allowsSyntheticData
+        self.session_options = session_options
         self.modelType = "joaquin"
         self._parseMetaData ()
         self._getSROrder()
@@ -50,11 +53,9 @@ class NNAdapter:
 
     def _instantiateRegressor ( self ):
         """ create the actual inference session object """
-        so = None
-        if False:
-            so = ort.SessionOptions()
-            so.intra_op_num_threads = 1
-            so.inter_op_num_threads = 1
+        so = onnxruntime.SessionOptions()
+        for k,v in self.session_options.items():
+            setattr ( so, k, v )
         sess = onnxruntime.InferenceSession ( self.mlModel.SerializeToString(),
                so )
         self.regressor={ "session": sess,
