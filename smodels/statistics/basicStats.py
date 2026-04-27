@@ -12,7 +12,7 @@ from scipy import stats
 from smodels.base.smodelsLogging import logger
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from typing import Text, Union, Tuple
+from typing import Text, Union, Tuple, Optional
 from collections.abc import Callable
 
 __all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket",
