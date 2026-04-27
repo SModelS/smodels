@@ -66,14 +66,15 @@ def clsType ( CLs : float, return_type : str, cl : float = 0.95 ) -> float:
     return 1 - cl - CLs
 
 def CLsfromNLL(
-        nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,
-    return_type: Text = "CLs-alpha", nSigma : int = 0 ) -> float:
+        nllA: float, nll_minA: float, nll: float, nll_min: float, 
+        big_muhat : bool, return_type: Text = "CLs-alpha", 
+        nSigma : int = 0 ) -> float:
     """
     compute CLs (or similar) from the NLLs
     :param nllA: negative log likelihood for Asimov data
-    :param nll0A: negative log likelihood at muhat for Asimov data
+    :param nll_minA: negative log likelihood at muhat for Asimov data
     :param nll: negative log likelihood
-    :param nll0: negative log likelihood at muhat
+    :param nll_min: negative log likelihood at muhat
     :param big_muhat: true if muhat>mu
     :param return_type: (Text) one of "CLs-alpha", "alpha-CLs", "1-CLs", or "CLs":
     ========== =======================
@@ -89,9 +90,9 @@ def CLsfromNLL(
     """
     assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
            f"Unknown return type: {return_type}."
-    qmu = 0.0 if ( nll < nll0 or big_muhat ) else 2 * (nll - nll0)
+    qmu = 0.0 if ( nll < nll_min or big_muhat ) else 2 * (nll - nll_min)
     sqmu = np.sqrt(qmu)
-    qA = 2 * (nllA - nll0A)
+    qA = 2 * (nllA - nll_minA)
     if qA < 0.0:
         qA = 0.0
     sqA = np.sqrt(qA)
