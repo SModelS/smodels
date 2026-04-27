@@ -22,16 +22,17 @@ class CombinedTest(unittest.TestCase):
         filename = "./testFiles/slha/gluino_squarks.slha"
         from smodels.base.smodelsLogging import logger, setLogLevel
         setLogLevel ( "fatal" )
-        outputfile = runMain(filename, inifile="testParameters_agg.ini", suppressStdout=True)
+        outputfile = runMain(filename, inifile="testParameters_agg.ini",
+                suppressStdout=True )
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default_agg import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version',
-                        'model', 'promptwidth', 'stablewidth', 'checkinput',
-                        'doinvisible', 'docompress', 'computestatistics']
+        ignoreFields = ['input file', 'smodels version', 'ncpus',
+                'database version', 'model', 'promptwidth', 'stablewidth',
+                'checkinput', 'doinvisible', 'docompress', 'computestatistics']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
-                           ignore=ignoreFields, fname=outputfile)
+                key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault,
+                allowedRelDiff=0.02, ignore=ignoreFields, fname=outputfile)
         if equals != True:
             logger.error( f"gluino_squarks_default_agg.py differs from {outputfile}!" )
         self.assertTrue(equals)

@@ -805,7 +805,7 @@ class LikelihoodComputer:
                 bounds = [(-10 * x, 10 * x) for x in model.observed]
             ini = ret_c
             ret_c = optimize.fmin_tnc(
-                self.nllOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0, 
+                self.nllOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0,
                     bounds=bounds
             )
             if ret_c[-1] not in [0, 1, 2]:
@@ -851,14 +851,11 @@ class LikelihoodComputer:
         nll = self.nll ( mu, evaluationType, asimov )
         return exponentiateNLL ( nll, doIt = not return_nll )
 
-    def nll_min(self, allowNegativeSignals=False ):
-        return self.lmax ( return_nll=True, allowNegativeSignals = allowNegativeSignals )
-
-    def lmax(self, return_nll=False, allowNegativeSignals=False):
-        """convenience function, computes likelihood for nsig = nobs-nbg,
-
-        :param return_nll: return nll instead of likelihood
-        :param allowNegativeSignals: if False, then negative nsigs are replaced with 0.
+    def nll_min(self, allowNegativeSignals : bool = False ) -> dict:
+        """ nll_min
+        :param allowNegativeSignals: if False, then negative nsigs are
+        replaced with 0.
+        :returns: dictionary with muhat, sigma_mu and nll_min as keys
         """
         model = self.model
         if len(model.observed) == 1:
@@ -871,24 +868,39 @@ class LikelihoodComputer:
             #sigma_mu2 = np.sqrt(model.observed[0] / model.nsignal[0] + model.covariance[0][0] )
             theta_hat = self.findThetaHat( muhat )
             sigma_mu = self.getSigmaMu ( muhat, theta_hat[0] )
-            lmax = self.likelihood( return_nll=return_nll, mu = muhat )
+            nll_min = self.nll( mu = muhat )
             # print ( "sigma_mu", sigma_mu, "old", sigma_mu2 )
-            ret = { "muhat": muhat, "sigma_mu": sigma_mu }
-            if return_nll:
-                ret["nll_min"] = lmax
-            else:
-                ret["lmax"] = lmax
+            ret = { "muhat": muhat, "sigma_mu": sigma_mu, "nll_min": nll_min }
             return ret
 
-        s_max = "nll_min" if return_nll else "lmax"
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
-                              extended_output=True, return_nll=return_nll
-        )
-        muhat_, sigma_mu, lmax = fmh["muhat"], fmh["sigma_mu"], fmh[s_max]
-        lmax = self.likelihood ( return_nll=return_nll, mu=muhat_ )
+                              extended_output=True, return_nll=True)
+        return fmh
+        """
+        muhat_, sigma_mu, nll_min= fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
+        print ( f"@X0 {fmh}" )
+        print ( f"@X1 {nll_min}" )
+        nll_min = self.nll ( mu=muhat_ )
+        print ( f"@X2 {nll_min}" )
         ret = { "muhat": float ( muhat_ ), "sigma_mu": sigma_mu,
-                s_max : fmh [ s_max ] }
+                "nll_min" : nll_min }
         return ret
+        """
+
+    def lmax(self, return_nll : bool = False,
+            allowNegativeSignals : bool = False) -> dict:
+        """convenience function, computes likelihood for nsig = nobs-nbg,
+
+        :param return_nll: return nll instead of likelihood
+        :param allowNegativeSignals: if False, then negative nsigs are
+        replaced with 0.
+        """
+        d = self.nll_min ( allowNegativeSignals = allowNegativeSignals )
+        if return_nll:
+            return d
+        d["lmax"]=exponentiateNLL ( d["nll_min"], doIt=True )
+        d.pop ( "nll_min" )
+        return d
 
     def findMuHat(
     #def findMuHatViaGradientDescent(
@@ -1033,7 +1045,7 @@ class UpperLimitComputer:
 
         :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on fiducial cross section
         """
@@ -1062,7 +1074,7 @@ class UpperLimitComputer:
         :param model: statistical model
         :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :return: mu_hat, sigma_mu, CLs-alpha
@@ -1129,7 +1141,7 @@ class UpperLimitComputer:
 
         :param evaluationType: one of: observed, apriori, aposteriori.
         :param trylasttime: if True, then dont try extra.
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :returns: upper limit on the signal strength multiplier mu
@@ -1140,7 +1152,7 @@ class UpperLimitComputer:
         if mu_hat == None:
             return None
         try:
-            a, b = determineBrentBracket( mu_hat, sigma_mu, clsRoot, 
+            a, b = determineBrentBracket( mu_hat, sigma_mu, clsRoot,
                                           allowNegative=False )
         except SModelSError as e:
             return None
