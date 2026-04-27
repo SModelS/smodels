@@ -818,6 +818,10 @@ class LikelihoodComputer:
             raise Exception( f"cov-1={model.covariance + model.var_s(nsig)**(-1)}")
         return ini, -1
 
+    def nll(self, mu : float, evaluationType : NllEvalType=observed,
+           asimov : Union[None,float] = None  ):
+        return self.likelihood ( mu, True, evaluationType, asimov )
+
     def likelihood(self, mu : float, return_nll : bool = False,
            evaluationType : NllEvalType=observed,
            asimov : Union[None,float] = None  ):

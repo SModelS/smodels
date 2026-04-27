@@ -18,7 +18,8 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-from smodels.statistics.basicStats import observed, apriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, NllEvalType, \
+         exponentiateNLL
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
@@ -429,28 +430,30 @@ class StatsComputer:
         return ret
 
     def nll ( self, poi_test : float, evaluationType : NllEvalType,
-              asimov : Union[None,float] = None ) -> float:
-        """ convenience function, later turn the logic around """
-        return likelihood ( poit_test, evaluationType,
-            return_nll = True, asimov = asimov )
-
-    def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
-                  return_nll : bool, asimov : Union[None,float] = None ) -> float:
+              asimov : Union[None,float] = None, **kwargs  ) -> float:
         """ simple frontend to individual computers """
         self.transform ( evaluationType )
-        kwargs = { "evaluationType": evaluationType, "asimov": asimov }
+        kwargs.update ( { "evaluationType": evaluationType, "asimov": asimov } )
+        # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
                 index, _ = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-            ret = self.likelihoodComputer.likelihood (
-                    poi_test, return_nll = return_nll, **kwargs )
+            ret = self.likelihoodComputer.nll (
+                    poi_test, **kwargs )
             return ret
-        ret = self.likelihoodComputer.likelihood ( poi_test,
-                                            return_nll = return_nll, **kwargs)
+        ret = self.likelihoodComputer.nll ( poi_test, **kwargs)
         return ret
 
-    def CLs ( self, poi_test : float = 1., evaluationType : NllEvalType=observed ) -> Union[float,None]:
+    def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
+                  return_nll : bool, asimov : Union[None,float] = None,
+                  **kwargs ) -> float:
+        """ convenience function, should become obsolete longterm """
+        nll = self.nll ( poi_test, evaluationType, asimov, **kwargs )
+        return exponentiateNLL ( nll, doIt = not return_nll )
+
+    def CLs ( self, poi_test : float = 1., 
+              evaluationType : NllEvalType=observed ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( evaluationType )
         if hasattr ( self.upperLimitComputer, "CLs" ):

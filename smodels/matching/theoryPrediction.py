@@ -272,8 +272,9 @@ class TheoryPrediction(object):
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
             kwargs.pop ( "expected" )
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "pmSigma" in kwargs ):
-            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getUpperLimitOnMu()" )
+        for k,v in kwargs.items():
+            if k not in [ "pmSigma" ]:
+                logger.error ( f"unknown argument {k} in theoryPrediction.getUpperLimitOnMu()" )
 
         upperLimit = self.getUpperLimit( evaluationType=evaluationType,
                                          nSigma=nSigma, **kwargs )
@@ -298,9 +299,10 @@ class TheoryPrediction(object):
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
             kwargs.pop ( "expected" )
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "pmSigma" in kwargs ):
-            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
-        upperLimit = self.getUpperLimit(evaluationType,nSigma = nSigma, **kwargs )
+        for k,v in kwargs.items():
+            if k not in [ "pmSigma" ]:
+                logger.error ( f"unknown argument {k} in theoryPrediction.getRValue()" )
+        upperLimit = self.getUpperLimit(evaluationType, nSigma = nSigma, **kwargs )
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None
             return r
@@ -397,13 +399,14 @@ class TheoryPrediction(object):
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
-            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
+        for k,v in kwargs.items():
+            if k not in [ "pmSigma" ]:
+                logger.error ( f"unknown argument {k} in theoryPrediction.likelihood()" )
 
         # for truncated gaussians the fits only work with negative signals!
         nll = self.statsComputer.likelihood(poi_test = mu,
                        evaluationType = evaluationType, return_nll = return_nll,
-                       asimov = asimov )
+                       asimov = asimov, **kwargs )
         return nll
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):

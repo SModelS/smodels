@@ -15,9 +15,24 @@ from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Union, Tuple
 from collections.abc import Callable
 
-__all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket" ]
+__all__ = [ "NllEvalType", "CLsfromNLL", "determineBrentBracket",
+            "exponentiateNLL" ]
 
 from enum import Enum
+
+def exponentiateNLL( nll : Optional[float],
+        doIt : bool = True ) -> float:
+    """ if doIt, then compute likelihood from nll,
+    else return nll. Should become obsolete longterm
+    """
+    if nll == None:
+        return None
+        #if doIt:
+        #    return 0.0
+        #return 9000.0
+    if doIt:
+        return np.exp(-nll )
+    return nll
 
 class NllEvalType(Enum):
     """ an enum to account for the different types of likelihood values: observed,

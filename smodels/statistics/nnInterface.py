@@ -16,7 +16,8 @@ import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import UnitXSec
-from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL
+from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
+         exponentiateNLL
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, apriori, aposteriori, \
          NllEvalType
@@ -399,18 +400,6 @@ class NNUpperLimitComputer:
             return nll
         return self.exponentiateNLL ( nll, True )
 
-    def exponentiateNLL(self, nll : Optional[float],
-            doIt : bool = True ) -> float:
-        """if doIt, then compute likelihood from nll,
-        else return nll"""
-        if nll == None:
-            return None
-            #if doIt:
-            #    return 0.0
-            #return 9000.0
-        if doIt:
-            return np.exp(-nll )
-        return nll
 
     @lru_cache
     def nll_min( self, evaluationType=observed,
@@ -517,7 +506,7 @@ class NNUpperLimitComputer:
                            modelToUse = modelToUse, asimov = asimov )
         if return_nll:
             return nll_min
-        return self.exponentiateNLL ( nll_min, doIt = True )
+        return exponentiateNLL ( nll_min, doIt = True )
 
     def getUpperLimitOnSigmaTimesEff(self,
             evaluationType : NllEvalType = observed,
