@@ -76,7 +76,7 @@ def writeOutYields ( theoryPred,
 def clsRootFunc( mu : float, return_type: Text,
              modelToUse : Union[None,str], obj : Callable,
              evaluationType : NllEvalType,
-             nll0 : float, nll0A : float, mu_hat : float,
+             nll_min : float, nll_minA : float, mu_hat : float,
              nSigma : int, pmSigma : int ) -> float:
     """ the cls root function for the ml models.
     i had to put it as a separate function because i want to be
@@ -98,7 +98,7 @@ def clsRootFunc( mu : float, return_type: Text,
         nll = obj.nll (mu, evaluationType=evaluationType,
             modelToUse = modelToUse, asimov = None,
             pmSigma = pmSigma )
-    ret =  CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat > mu), \
+    ret =  CLsfromNLL(nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
             return_type=return_type, nSigma = nSigma ) if \
             (nll is not None and nllA is not None) else None
     return ret
@@ -575,7 +575,7 @@ class NNUpperLimitComputer:
             ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnMu(
                     evaluationType,modelToUse, nSigma )
             return ret
-        mu_hat, sigma_mu, clsRoot, nll0, nll0A = self.getCLsRootFunc(
+        mu_hat, sigma_mu, clsRoot, nll_min, nll_minA = self.getCLsRootFunc(
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse,
@@ -584,7 +584,7 @@ class NNUpperLimitComputer:
             return float("inf")
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
-            "nll0": nll0, "nll0A": nll0A, "mu_hat": mu_hat,
+            "nll_min": nll_min, "nll_minA": nll_minA, "mu_hat": mu_hat,
             "nSigma": nSigma, "pmSigma": pmSigma }
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
@@ -618,7 +618,7 @@ class NNUpperLimitComputer:
                 modelToUse = modelToUse, asimov = 1 )
         if fA == None:
             return None, None, None, None, None
-        mu_hatA, sigma_muA, nll0A = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
+        mu_hatA, sigma_muA, nll_minA = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
 
         f0 = self.nll_min ( evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
@@ -627,26 +627,26 @@ class NNUpperLimitComputer:
         if f0 == None:
             return None, None, None, None, None
 
-        mu_hat0, sigma_mu0, nll0 = f0["muhat"], f0["sigma_mu"], f0["nll_min"]
+        mu_hat0, sigma_mu0, nll_min = f0["muhat"], f0["sigma_mu"], f0["nll_min"]
         mu_hat0 = mu_hat0 if mu_hat0 is not None else 0.0
         if False and pmSigma != 0:
             # actually we get better coverage if we dont do this!
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
-            # to nll0(A)
-            nll0A = self.nll ( mu_hatA,
+            # to nll_min(A)
+            nll_minA = self.nll ( mu_hatA,
                     evaluationType = aposteriori , modelToUse = modelToUse,
                     pmSigma = -pmSigma, asimov = 1 )
             # nll_sA = self.nll ( mu_hat,
             #        evaluationType = observed, modelToUse = modelToUse,
             #        pmSigma = 0, asimov = True )
-            # nll0A = nll_sA
-            nll0 = self.nll ( mu_hat0, evaluationType = evaluationType,
+            # nll_minA = nll_sA
+            nll_min = self.nll ( mu_hat0, evaluationType = evaluationType,
                               modelToUse = modelToUse, pmSigma = -pmSigma )
-            # nll0 = nll_s
+            # nll_min = nll_s
 
         #from smodels.base import runtime
         #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
         #if useTevatron:
         #    return mu_hat, sigma_mu, clsRootTevatron
-        return mu_hat0, sigma_mu0, clsRootFunc, nll0, nll0A
+        return mu_hat0, sigma_mu0, clsRootFunc, nll_min, nll_minA
