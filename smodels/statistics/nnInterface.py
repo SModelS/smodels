@@ -357,6 +357,9 @@ class NNUpperLimitComputer:
         if ret == None:
             return None
         delta = 0
+        poi_test = 1
+        if abs(mu)<1e-10:
+            poi_test = 0
         # evaluationType == observed and \
         if pmSigma != 0 and not "sigma_obs" in ret:
             ## probably we fell back to pyhf likelihoods,
@@ -368,7 +371,7 @@ class NNUpperLimitComputer:
                 if pmSigma != 0:
                     delta = ret["sigma_obsA"]
             else:
-                nll = ret[ f'nll_obs_1']
+                nll = ret[ f'nll_obs_{poi_test}']
                 if pmSigma != 0:
                     delta = ret["sigma_obs"]
         else:
@@ -377,8 +380,8 @@ class NNUpperLimitComputer:
                 if pmSigma != 0:
                     delta = ret["sigma_expA"]
             else:
-                nll = ret[ f'nll_exp_1']
-                if pmSigma != 0:
+                nll = ret[ f'nll_exp_{poi_test}']
+                if pmSigma != 0 and poi_test != 0:
                     delta = ret["sigma_exp"]
         nll += pmSigma * delta
 

@@ -375,8 +375,9 @@ class TheoryPrediction(object):
 
         :param evaluationType: one of: observed, apriori, aposteriori
         """
-        return self.likelihood ( mu=mu, evaluationType=evaluationType,
-                                 asimov=asimov, return_nll=True )
+        ret = self.likelihood ( mu=mu, evaluationType=evaluationType,
+                                return_nll=True, asimov=asimov, **kwargs )
+        return ret
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
