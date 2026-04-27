@@ -87,7 +87,7 @@ def clsRootFunc( mu : float, return_type: Text,
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1,
-           pmSigma = 0 )
+           pmSigma = -pmSigma )
     if evaluationType == aposteriori:
         if pmSigma == 0:
             nll = nllA
