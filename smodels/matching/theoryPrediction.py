@@ -331,6 +331,12 @@ class TheoryPrediction(object):
         return self.nllToLikelihood (llhDict["nllsm"],return_nll )
 
     @whenDefined
+    def nll_min( self, evaluationType : NllEvalType = observed ):
+        """likelihood at mu_hat"""
+        llhDict = self.computeStatistics(evaluationType)
+        return self.nllToLikelihood (llhDict["nll_min"],return_nll=True )
+
+    @whenDefined
     def lmax( self, evaluationType : NllEvalType = observed,
               return_nll : bool = False ):
         """likelihood at mu_hat"""
