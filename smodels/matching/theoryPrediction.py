@@ -331,9 +331,13 @@ class TheoryPrediction(object):
         return self.nllToLikelihood (llhDict["nllsm"],return_nll )
 
     @whenDefined
-    def nll_min( self, evaluationType : NllEvalType = observed ):
+    def nll_min( self, evaluationType : NllEvalType = observed,
+                 **kwargs ):
         """likelihood at mu_hat"""
         llhDict = self.computeStatistics(evaluationType)
+        if len(kwargs)>0:
+            return self.statsComputer.nll_min ( evaluationType = evaluationType,
+                    **kwargs )
         return llhDict["nll_min"]
 
     @whenDefined

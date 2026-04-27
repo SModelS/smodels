@@ -97,13 +97,13 @@ def CLsfromNLL(
         qA = 0.0
     sqA = np.sqrt(qA)
     if qA >= qmu:
-        CLsb = 1.0 - stats.multivariate_normal.cdf(sqmu + nSigma )
-        CLb = stats.multivariate_normal.cdf(sqA - sqmu + nSigma )
+        CLsb = 1.0 - stats.norm.cdf(sqmu + nSigma )
+        CLb = stats.norm.cdf(sqA - sqmu + nSigma )
     else:
         CLsb = 1. if qA == 0. else \
-            1. - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA) + nSigma )
+            1. - stats.norm.cdf((qmu + qA) / (2 * sqA) + nSigma )
         CLb = 1. if qA == 0. else \
-            1. - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA) + nSigma )
+            1. - stats.norm.cdf((qmu - qA) / (2 * sqA) + nSigma )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
     return clsType ( CLs, return_type, 0.95 )

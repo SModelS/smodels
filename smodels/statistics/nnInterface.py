@@ -493,8 +493,8 @@ class NNUpperLimitComputer:
                 if hessian > 0.:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
-                ret = { "nll_min": nllmin, "muhat": muhat,
-                        "sigma_mu": sigma_mu }
+                ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ),
+                        "sigma_mu": float ( sigma_mu ) }
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"

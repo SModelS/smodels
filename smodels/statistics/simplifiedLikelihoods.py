@@ -842,6 +842,9 @@ class LikelihoodComputer:
         ret = self.llhdOfTheta( theta_hat, return_nll )
         return ret
 
+    def nll_min(self, allowNegativeSignals=False ):
+        return self.lmax ( return_nll=True, allowNegativeSignals = allowNegativeSignals )
+
     def lmax(self, return_nll=False, allowNegativeSignals=False):
         """convenience function, computes likelihood for nsig = nobs-nbg,
 

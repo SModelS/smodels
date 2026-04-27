@@ -661,9 +661,15 @@ class SpeyAnalysesCombosComputer:
             expected = evaluationType, return_nll = return_nll )
         return float(ret)
 
+    def nll_min ( self, evaluationType : NllEvalType,
+            allow_negative_signal : bool = True, **kwargs ) -> Tuple[float,float]:
+        """ slowly we transition to nlls everywhere """
+        return self.maximize_likelihood ( evaluationType,
+                allow_negative_signal, return_nll = True )
+
     def maximize_likelihood ( self, evaluationType : NllEvalType,
            allow_negative_signal : bool = True,
-           return_nll : bool = False  ) -> Tuple[float,float]:
+           return_nll : bool = False, **kwargs ) -> Tuple[float,float]:
         """ simple frontend to spey functionality
         :param return_nll: if True, return negative log likelihood
         :param allow_negative_signal: allow also negative muhats

@@ -471,8 +471,12 @@ class StatsComputer:
             return
         self.likelihoodComputer.model = self.likelihoodComputer.origModel
 
+    def nll_min ( self, evaluationType : NllEvalType ) -> dict:
+        return self.maximize_likelihood ( evaluationType,
+                return_nll = True, **kwargs )
+
     def maximize_likelihood ( self, evaluationType : NllEvalType,
-           return_nll : bool = False ) -> dict:
+           return_nll : bool = False, ** kwargs ) -> dict:
         """ simple frontend to the individual computers, later spey
         :param return_nll: if True, return negative log likelihood
         :returns: Dictionary of llhd (llhd at mu_hat), \
@@ -480,7 +484,7 @@ class StatsComputer:
                   optionally also theta_hat
         """
         self.transform ( evaluationType )
-        kwargs = { }
+        # kwargs = { }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
                 index, _ = self.likelihoodComputer.getBestCombinationIndex()
