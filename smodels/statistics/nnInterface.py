@@ -87,7 +87,7 @@ def clsRootFunc( mu : float, return_type: Text,
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1,
-           pmSigma = -pmSigma )
+           pmSigma = pmSigma )
     if evaluationType == aposteriori:
         if pmSigma == 0:
             nll = nllA
@@ -614,22 +614,23 @@ class NNUpperLimitComputer:
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fA = self.nll_min( evaluationType = aposteriori,
-                allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse, asimov = 1 )
+                           allowNegativeSignals=allowNegativeSignals,
+                           modelToUse = modelToUse, asimov = 1 )
         if fA == None:
             return None, None, None, None, None
         mu_hatA, sigma_muA, nll_minA = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
 
-        f0 = self.nll_min ( evaluationType=evaluationType,
-                allowNegativeSignals=allowNegativeSignals,
-                modelToUse = modelToUse )
+        fmin = self.nll_min ( evaluationType=evaluationType,
+                              allowNegativeSignals=allowNegativeSignals,
+                              modelToUse = modelToUse )
 
-        if f0 == None:
+        if fmin == None:
             return None, None, None, None, None
 
-        mu_hat0, sigma_mu0, nll_min = f0["muhat"], f0["sigma_mu"], f0["nll_min"]
-        mu_hat0 = mu_hat0 if mu_hat0 is not None else 0.0
-        if False and pmSigma != 0:
+        mu_hat, sigma_mu, nll_min = \
+                ( fmin[x] for x in ["muhat", "sigma_mu", "nll_min"] )
+        mu_hat = mu_hat if mu_hat is not None else 0.0
+        if True and pmSigma != 0:
             # actually we get better coverage if we dont do this!
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
@@ -641,7 +642,7 @@ class NNUpperLimitComputer:
             #        evaluationType = observed, modelToUse = modelToUse,
             #        pmSigma = 0, asimov = True )
             # nll_minA = nll_sA
-            nll_min = self.nll ( mu_hat0, evaluationType = evaluationType,
+            nll_min = self.nll ( mu_hat, evaluationType = evaluationType,
                               modelToUse = modelToUse, pmSigma = -pmSigma )
             # nll_min = nll_s
 
@@ -649,4 +650,4 @@ class NNUpperLimitComputer:
         #useTevatron = runtime.experimentalFeature ( "tevatroncls" )
         #if useTevatron:
         #    return mu_hat, sigma_mu, clsRootTevatron
-        return mu_hat0, sigma_mu0, clsRootFunc, nll_min, nll_minA
+        return mu_hat, sigma_mu, clsRootFunc, nll_min, nll_minA

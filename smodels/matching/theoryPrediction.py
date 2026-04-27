@@ -334,14 +334,13 @@ class TheoryPrediction(object):
     def nll_min( self, evaluationType : NllEvalType = observed ):
         """likelihood at mu_hat"""
         llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["nll_min"],return_nll=True )
+        return llhDict["nll_min"]
 
     @whenDefined
     def lmax( self, evaluationType : NllEvalType = observed,
               return_nll : bool = False ):
         """likelihood at mu_hat"""
-        llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["nll_min"],return_nll )
+        return self.nllToLikelihood ( self.nll_min ( evaluationType ),return_nll )
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
