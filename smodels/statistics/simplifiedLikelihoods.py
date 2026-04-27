@@ -15,7 +15,8 @@ from functools import reduce
 from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, aposteriori, \
+         NllEvalType, exponentiateNLL
 from typing import Text, Optional, Union, Tuple
 from smodels.statistics.basicStats import findRoot
 from smodels.tools.caching import roundCache, lru_cache
@@ -561,13 +562,14 @@ class LikelihoodComputer:
 
     # Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def llhdOfTheta(self, theta, nll = True ):
+    def nllOfTheta(self, theta ):
         """ likelihood for nuicance parameters theta, given signal strength \
             self.mu. notice, by default it returns nll
 
         :param theta: nuisance parameters
         :param nll: if True, compute negative log likelihood
         """
+        nll = True
         model = self.model
         # theta = array ( thetaA )
         # ntot = model.backgrounds + self.nsig
@@ -789,7 +791,7 @@ class LikelihoodComputer:
         self.gammaln = special.gammaln(model.observed + 1)
         try:
             ret_c = optimize.fmin_ncg(
-                self.llhdOfTheta,
+                self.nllOfTheta,
                 ini,
                 fprime=self.dNLLdTheta,
                 fhess=self.d2NLLdTheta2,
@@ -803,7 +805,8 @@ class LikelihoodComputer:
                 bounds = [(-10 * x, 10 * x) for x in model.observed]
             ini = ret_c
             ret_c = optimize.fmin_tnc(
-                self.llhdOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0, bounds=bounds
+                self.nllOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0, 
+                    bounds=bounds
             )
             if ret_c[-1] not in [0, 1, 2]:
                 return ret_c[0], ret_c[-1]
@@ -820,15 +823,10 @@ class LikelihoodComputer:
 
     def nll(self, mu : float, evaluationType : NllEvalType=observed,
            asimov : Union[None,float] = None  ):
-        return self.likelihood ( mu, True, evaluationType, asimov )
-
-    def likelihood(self, mu : float, return_nll : bool = False,
-           evaluationType : NllEvalType=observed,
-           asimov : Union[None,float] = None  ):
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
-        :param return_nll: if true, return nll instead of likelihood
+        :param asimov: if
         :returns: profile likelihood and error code (0=no error)
         """
         if evaluationType != observed:
@@ -837,14 +835,21 @@ class LikelihoodComputer:
             assert abs(asimov)<1e-20, "we currently treat asimov data only with mu=0."
             if self.asimovComputer == None:
                 self.asimovComputer = self.generateAsimovComputer(asimov)
-            return self.likelihood(mu,return_nll,asimov=None)
+            return self.nll(mu, asimov=None)
         # compute the profiled (not normalized) likelihood of observing
         # nsig signal events
         theta_hat, _ = self.findThetaHat(mu)
         if self.debug_mode:
             self.theta_hat = theta_hat
-        ret = self.llhdOfTheta( theta_hat, return_nll )
+        ret = self.nllOfTheta( theta_hat )
         return ret
+
+    def likelihood(self, mu : float, return_nll : bool = False,
+           evaluationType : NllEvalType=observed,
+           asimov : Union[None,float] = None  ):
+        """ legacy, should slowly phase out """
+        nll = self.nll ( mu, evaluationType, asimov )
+        return exponentiateNLL ( nll, doIt = not return_nll )
 
     def nll_min(self, allowNegativeSignals=False ):
         return self.lmax ( return_nll=True, allowNegativeSignals = allowNegativeSignals )
