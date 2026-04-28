@@ -223,6 +223,8 @@ class PyPrinter(BasicPrinter):
             expID = expResult.globalInfo.id
             datasetID = theoryPrediction.dataId()
             dataType = theoryPrediction.dataType()
+            if False and dataType == "combined":
+                datasetID = theoryPrediction.statsComputer.getMostSignificantModel()
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(
                 evaluationType=self.getTypeOfExpected())
