@@ -15,7 +15,7 @@ from smodels.statistics.basicStats import observed, apriori, aposteriori, \
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
-from typing import Union, Text, Dict, Callable
+from typing import Union, Text, Dict, Callable, Optional
 import numpy as np
 
 # number of digits for rounding the mu argument when computing likelihoods
@@ -369,28 +369,13 @@ class TheoryPrediction(object):
         return llhDict["muhat"]
 
     @whenDefined
-    def nll(self, mu=1.0, evaluationType : NllEvalType = observed,
-            asimov : Union[None,float] = None, **kwargs ) -> float:
-        """
-        get the negative log likelihood for a signal strength modifier mu.
-        this is a method to prepare for a transition to dealing with nlls only
-
-        :param evaluationType: one of: observed, apriori, aposteriori
-        """
-        ret = self.likelihood ( mu=mu, evaluationType=evaluationType,
-                                return_nll=True, asimov=asimov, **kwargs )
-        return ret
-
-    @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood(self, mu : float = 1.0, evaluationType : NllEvalType = observed,
-            return_nll : bool =False, asimov : Union[None,float] = None,
-            **kwargs ) -> float:
+    def nll(self, mu=1.0, evaluationType : NllEvalType = observed,
+            asimov : Optional[int] = None, **kwargs ) -> float:
         """
-        get the likelihood for a signal strength modifier mu
-
+        get the nll for a signal strength modifier mu
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param return_nll: if True, return negative log likelihood, else likelihood
+        :asimov: get for asimov data with this mu, or None
         """
         if asimov != None and abs(asimov)>1e-8 and abs(asimov-1)>1e-8:
             raise SModelSError (
@@ -404,10 +389,23 @@ class TheoryPrediction(object):
                 logger.error ( f"unknown argument {k} in theoryPrediction.likelihood()" )
 
         # for truncated gaussians the fits only work with negative signals!
-        nll = self.statsComputer.likelihood(poi_test = mu,
-                       evaluationType = evaluationType, return_nll = return_nll,
-                       asimov = asimov, **kwargs )
+        nll = self.statsComputer.nll(poi_test = mu, 
+                evaluationType = evaluationType, asimov = asimov, **kwargs )
         return nll
+
+    @whenDefined
+    def likelihood(self, mu : float = 1.0, evaluationType : NllEvalType = observed,
+            return_nll : bool =False, asimov : Optional[int] = None,
+            **kwargs ) -> float:
+        """
+        get the likelihood for a signal strength modifier mu.
+        this is a method to prepare for a transition to dealing with nlls only
+
+        :param evaluationType: one of: observed, apriori, aposteriori
+        """
+        mnll = self.nll ( mu=mu, evaluationType=evaluationType,
+                         asimov=asimov, **kwargs )
+        return self.nllToLikelihood ( mnll, return_nll )
 
     def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
         """ if not return_nll, then compute likelihood from nll """
