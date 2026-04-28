@@ -205,7 +205,7 @@ class NNUpperLimitComputer:
                 mostSensitiveModel = model
         ## the most sensitive model and its upper limit we store separately
         if self.pyhfComputer is not None:
-            i_idx, ul = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex()
+            i_idx, ul, jsonf_ = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex()
             if ul < mumin:
                 mumin = ul
                 mostSensitiveModel = i_idx # list(self.data.globalInfo.jsonFiles.keys())[i_idx]

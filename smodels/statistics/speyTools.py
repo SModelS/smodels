@@ -14,6 +14,7 @@ __all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
 from typing import Union, Text, Tuple, Dict, List, Optional
 import sys
 from spey import ExpectationType, StatisticalModel, get_backend
+from smodels.statistics.basicStats import exponentiateNLL
 import spey
 # spey.set_optimiser( "iminuit" )
 
@@ -502,10 +503,17 @@ class SpeyComputer:
                      return_nll : bool, asimov : bool = False ) -> float:
         """ simple frontend to spey functionality """
         ## FIXME treat the asimov flat
+        nll = self.nll ( poi_test, evaluationType, asimov )
+        return exponentiateNLL ( nll, doIt = not return_nll )
+
+    def nll ( self, poi_test : float, evaluationType : NllEvalType,
+              asimov : bool = False ) -> float:
+        """ simple frontend to spey functionality """
+        ## FIXME treat the asimov flat
         self.checkMinimumPoi ( poi_test )
         evaluationType = self.translateExpectationType ( evaluationType )
         ret = self.speyModels[self.model_index].likelihood ( poi_test = poi_test,
-            expected = evaluationType, return_nll = return_nll )
+            expected = evaluationType, return_nll = True )
         return float(ret)
 
     def maximize_likelihood ( self, evaluationType : NllEvalType,
@@ -656,9 +664,16 @@ class SpeyAnalysesCombosComputer:
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
                      return_nll : bool, asimov : bool = False ) -> float:
         """ simple frontend to spey functionality """
+        ## FIXME treat the asimov flat
+        nll = self.nll ( poi_test, evaluationType, asimov )
+        return exponentiateNLL ( nll, doIt = not return_nll )
+
+    def nll ( self, poi_test : float, evaluationType : NllEvalType,
+              asimov : bool = False ) -> float:
+        """ simple frontend to spey functionality """
         evaluationType = SpeyComputer.translateExpectationType ( evaluationType )
         ret = self.speyModel.likelihood ( poi_test = poi_test,
-            expected = evaluationType, return_nll = return_nll )
+            expected = evaluationType, return_nll = True )
         return float(ret)
 
     def nll_min ( self, evaluationType : NllEvalType,

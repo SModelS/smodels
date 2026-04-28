@@ -437,7 +437,7 @@ class StatsComputer:
         # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
-                index, _ = self.likelihoodComputer.getBestCombinationIndex()
+                index, _, _ = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
             ret = self.likelihoodComputer.nll (
                     poi_test, **kwargs )
@@ -490,7 +490,7 @@ class StatsComputer:
         # kwargs = { }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
-                index, _ = self.likelihoodComputer.getBestCombinationIndex()
+                index, _, _ = self.likelihoodComputer.getBestCombinationIndex()
                 kwargs["workspace_index"] = index
                 if evaluationType != observed:
                     kwargs["evaluationType"] = evaluationType
@@ -523,7 +523,7 @@ class StatsComputer:
             if all([s == 0 for s in self.nsig]):
                 logger.warning("All signals are empty")
                 return None
-            index, _ = self.likelihoodComputer.getBestCombinationIndex()
+            index, _, _ = self.likelihoodComputer.getBestCombinationIndex()
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
                        evaluationType = evaluationType, workspace_index = index,
