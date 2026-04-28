@@ -499,6 +499,11 @@ class SpeyComputer:
         if poi_test < config.minimum_poi:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
 
+    def getMostSignificantModel ( self ):
+        """ convenience function to get the most significant model
+        """
+        return f"speyTools.getMostSignificantModel FIXME implement"
+
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
                      return_nll : bool, asimov : bool = False ) -> float:
         """ simple frontend to spey functionality """

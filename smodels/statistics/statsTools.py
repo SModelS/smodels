@@ -504,6 +504,17 @@ class StatsComputer:
                                    **kwargs )
         return ret
 
+    def getMostSignificantModel ( self ):
+        """ convenience function to get the most significant model
+        """
+        if self.dataType == "pyhf":
+            w_idx, ul, name = self.upperLimitComputer.getBestCombinationIndex()
+            return name
+        if self.dataType == "nn":
+            self.upperLimitComputer.determineMostSensitiveModel()
+            return self.upperLimitComputer.mostSensitiveModel
+        return f"?? {self.dataType}"
+
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
            nSigma : int = 0, **kwargs ) -> Union[float,UnitXSec,None]:
