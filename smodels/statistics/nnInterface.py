@@ -203,9 +203,14 @@ class NNUpperLimitComputer:
             if ulmu < mumin:
                 mumin = ulmu
                 mostSensitiveModel = model
+        indices = []
+        for idx,model in enumerate(self.data.globalInfo.jsonFiles.keys()):
+            if model in self.data.globalInfo.mlModels.keys():
+                indices.append ( idx )
+
         ## the most sensitive model and its upper limit we store separately
-        if self.pyhfComputer is not None:
-            i_idx, ul, jsonf_ = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex()
+        if self.pyhfComputer is not None and indices is not []:
+            i_idx, ul, jsonf_ = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex( tuple ( indices ) )
             if ul < mumin:
                 mumin = ul
                 mostSensitiveModel = i_idx # list(self.data.globalInfo.jsonFiles.keys())[i_idx]
@@ -587,7 +592,7 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
-        return mu_lim
+        return float ( mu_lim )
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
             allowNegativeSignals : bool = True,

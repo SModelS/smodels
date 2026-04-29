@@ -782,7 +782,7 @@ class PyhfUpperLimitComputer:
             return ret
 
     @lru_cache
-    def getBestCombinationIndex(self, indices : Optional[List] = None ) -> \
+    def getBestCombinationIndex(self, indices : Optional[Tuple] = None ) -> \
             Tuple[int,float,str]:
         """ find the index of the best expected combination
 
@@ -803,7 +803,8 @@ class PyhfUpperLimitComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.getUpperLimitOnMu(evaluationType=apriori, workspace_index=i_ws)
+                ul = self.getUpperLimitOnMu( evaluationType=apriori, 
+                    workspace_index=i_ws)
             if ul == None:
                 continue
             if ul < ulMin:
