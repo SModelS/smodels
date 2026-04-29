@@ -24,7 +24,7 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
-from typing import Dict, List, Union, Text, Tuple
+from typing import Dict, List, Union, Text, Tuple, Optional
 
 jsonver = ""
 try:
@@ -782,7 +782,8 @@ class PyhfUpperLimitComputer:
             return ret
 
     @lru_cache
-    def getBestCombinationIndex(self) -> Tuple[int,float,str]:
+    def getBestCombinationIndex(self, indices : Optional[List] = None ) -> \
+            Tuple[int,float,str]:
         """ find the index of the best expected combination
 
         :returns: tuple ( best_index, upper limit )
@@ -793,7 +794,9 @@ class PyhfUpperLimitComputer:
         logger.debug( f"Finding best evaluationType combination among {self.nWS} workspace(s)" )
         ulMin = float("+inf")
         i_best = None
-        for i_ws in range(self.nWS):
+        if indices is None:
+            indices = range(self.nWS)
+        for i_ws in indices:
             if self.data.totalYield == 0.:
                 continue
             if self.zeroSignalsFlag[i_ws] == True:
