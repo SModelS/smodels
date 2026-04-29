@@ -90,9 +90,10 @@ def clsRootFunc( mu : float, return_type: Text,
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1,
            pmSigma = 0 )
+    s_nllA, s_nll = None, None
     if pmSigma != 0:
-        s_nllA = obj.nll( mu, modelToUse = modelToUse, asimov = 1,
-                          pmSigma = 1 ) - nllA
+        s_nllA = abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
+                          pmSigma = 1 ) - nllA )
     if evaluationType == aposteriori:
         nll = nllA
         if pmSigma != 0:
@@ -102,22 +103,32 @@ def clsRootFunc( mu : float, return_type: Text,
             modelToUse = modelToUse, asimov = None,
             pmSigma = 0 )
         if pmSigma != 0:
-            s_nll = obj.nll ( mu, evaluationType=evaluationType,
+            s_nll = abs ( obj.nll ( mu, evaluationType=evaluationType,
                               modelToUse = modelToUse, asimov = None,
-                              pmSigma = 1 ) - nll
-    if s_nll_min != None:
-        if nll is None or nllA is None:
-            ret = None, None
-        else:
-            ret =  CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
-                       s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
-                       return_type=return_type, nSigma = nSigma )
-        return ret[0]+pmSigma*ret[1]
+                              pmSigma = 1 ) - nll )
+            if s_nll > .3 * nll:
+                logger.error ( f"nll is {nll:.2f}+-{s_nll:.2f} something with the network goes awry" )
+                nll1 = obj.nll ( 0, evaluationType=evaluationType,
+                                  modelToUse = modelToUse, asimov = None,
+                                  pmSigma = 1 )
+                nll0 = obj.nll ( 0, evaluationType=evaluationType,
+                                  modelToUse = modelToUse, asimov = None,
+                                  pmSigma = 0 )
+                s_nll = abs ( nll1 - nll0 )
+    if pmSigma == 0:
+        ret = None
+        if nll is not None and nllA is not None:
+            ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
+                              return_type=return_type, nSigma = nSigma )
+        return ret
+    if nll is None or nllA is None:
+        ret = None, None
     else:
-        ret =  CLsfromNLL(nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
-                   return_type=return_type, nSigma = nSigma ) if \
-                   (nll is not None and nllA is not None) else None
-    return ret
+        ret =  CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
+                   s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
+                   return_type=return_type, nSigma = nSigma )
+    # print ( f"@@NNI so for {return_type} pmSigma {pmSigma} nll={nll:.2f}+-{s_nll:.2f} s_nll_minA {s_nll_minA}  we got {ret}, we will return {ret[0]+pmSigma*ret[1]}" )
+    return ret[0]+pmSigma*ret[1]
 
 class NNData:
     """
@@ -593,6 +604,7 @@ class NNUpperLimitComputer:
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse,
                 nSigma = nSigma, pmSigma = pmSigma )
+        s_nll_min, s_nll_minA = 0., 0. ## FIXME
         if mu_hat is None:
             return float("inf")
         clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
