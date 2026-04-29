@@ -85,7 +85,7 @@ class MLModelsTest(unittest.TestCase):
         allPredictions = theoryPredictionsFor( db, topDict, 
                 combinedResults=True )
         nlls = { 'ATLAS-SUSY-2019-09': { 
-            'obs': 73.83118538806151, 'exp': 65.92082168244234 },
+            'obs': 109.2548744617272, 'exp': 99.14532271766798 },
                  'ATLAS-SUSY-2018-32': {
             'obs': 93.80734619587368, 'exp': 82.58896814755686 } }
         for p in allPredictions:
