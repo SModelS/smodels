@@ -81,8 +81,8 @@ def clsType ( CLs : float, return_type : str, cl : float = 0.95 ) -> float:
     return 1 - cl - CLs
 
 def CLsfromNLL(
-        nllA: float, nll_minA: float, nll: float, nll_min: float, 
-        big_muhat : bool, return_type: Text = "CLs-alpha", 
+        nllA: float, nll_minA: float, nll: float, nll_min: float,
+        big_muhat : bool, return_type: Text = "CLs-alpha",
         nSigma : int = 0 ) -> float:
     """
     compute CLs (or similar) from the NLLs
@@ -122,6 +122,82 @@ def CLsfromNLL(
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
     return clsType ( CLs, return_type, 0.95 )
+
+def CLsWithErrorsfromNLL(
+        nllA: float, nll_minA: float, nll: float, nll_min: float,
+        s_nllA: float, s_nll_minA : float, s_nll: float, s_nll_min : float,
+        big_muhat : bool, return_type: Text = "CLs-alpha",
+        nSigma : int = 0 ) -> Tuple[float,float]:
+    """
+    compute CLs (or similar) from the NLLs
+    :param nllA: negative log likelihood for Asimov data
+    :param nll_minA: negative log likelihood at muhat for Asimov data
+    :param nll: negative log likelihood
+    :param nll_min: negative log likelihood at muhat
+    :param s_nll*: the nlls' errors
+    :param big_muhat: true if muhat>mu
+    :param return_type: (Text) one of "CLs-alpha", "alpha-CLs", "1-CLs", or "CLs":
+    ========== =======================
+    CLs-alpha: returns CLs - 0.05
+    alpha-CLs: returns 0.05 - CLs
+    1-CLs:     returns 1-CLs value
+    CLs:       returns "raw" CLs value
+    ========== =======================
+    :param nSigma: compute CLs not for central value but for this number of
+    sigmas (positive or negative), see Equations 86 - 89 in the CCGV paper.
+
+    :returns: Cls-type value, see above
+    """
+    assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
+           f"Unknown return type: {return_type}."
+    qmu = 0.0 if ( nll < nll_min or big_muhat ) else 2 * (nll - nll_min)
+    s_qmu = 0.0
+    if nll >= nll_min and not big_muhat:
+        s_qmu = 2* ( s_nll + s_nll_min )
+
+    sqrt_qmu = np.sqrt(qmu)
+    s_sqrt_qmu = 0.
+    if sqrt_qmu > 0.:
+        s_sqrt_qmu = s_qmu / ( 2*sqrt_qmu )
+
+    qA = 2 * (nllA - nll_minA)
+    s_qA = 2 * ( s_nllA + s_nll_minA )
+
+    if qA < 0.0:
+        qA = 0.0
+        s_qA = 0.
+
+    sqrt_qA = np.sqrt(qA)
+    s_sqrt_qA = 0.
+    if sqrt_qA > 0.:
+        s_sqrt_qA = s_qA / ( 2*sqrt_qA )
+
+    if qA >= qmu:
+        CLsb = 1.0 - stats.norm.cdf(sqrt_qmu + nSigma )
+        s_CLsb = stats.norm.pdf(sqrt_qmu + nSigma ) * s_sqrt_qmu
+        x = sqrt_qA - sqrt_qmu + nSigma
+        CLb = stats.norm.cdf( x )
+        s_CLb = stats.norm.pdf( x ) * (s_sqrt_qA + s_sqrt_qmu )
+    else:
+        s_CLsb, s_CLb = 0., 0.
+        CLsb, CLb = 1., 1.
+        if qA != 0.:
+            x = (sqrt_qmu + sqrt_qA) / (2 * sqrt_qA) + nSigma
+            CLsb = 1. - stats.norm.cdf( x )
+            s_CLsb = stats.norm.pdf( x ) * ( s_sqrt_qmu  / ( 2* sqrt_qA ) + \
+                                             s_sqrt_qA / 2. )
+            x2 = (sqrt_qmu - sqrt_qA) / (2 * sqrt_qA ) + nSigma
+            CLb = 1. - stats.norm.cdf( x2 )
+            s_CLb = stats.norm.pdf ( x2 ) * ( s_sqrt_qmu / ( 2*sqrt_qA ) +\
+                                              s_sqrt_qA / 2. )
+
+    CLs = 0.
+    s_CLs = 0.
+    if CLb > 0:
+        CLs = CLsb / CLb
+        s_CLs = float ( s_CLsb / CLb + s_CLb * CLsb / (CLb**2) )
+    ret = float ( clsType ( CLs, return_type, 0.95 ) )
+    return ( ret, s_CLs )
 
 def findRoot ( func : Callable, lower_bound : float, upper_bound : float,
         args : tuple = (), rtol : float = 8.881784197001252e-16,
