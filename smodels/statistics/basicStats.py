@@ -183,19 +183,22 @@ def CLsWithErrorsfromNLL(
         CLsb, CLb = 1., 1.
         if qA != 0.:
             x = (sqrt_qmu + sqrt_qA) / (2 * sqrt_qA) + nSigma
+            s_x = s_sqrt_qmu  / ( 2* sqrt_qA ) + s_sqrt_qA / 2.
             CLsb = 1. - stats.norm.cdf( x )
-            s_CLsb = stats.norm.pdf( x ) * ( s_sqrt_qmu  / ( 2* sqrt_qA ) + \
-                                             s_sqrt_qA / 2. )
+            s_CLsb = stats.norm.pdf( x ) * s_x
             x2 = (sqrt_qmu - sqrt_qA) / (2 * sqrt_qA ) + nSigma
+            # s_x2 = s_sqrt_qmu / ( 2*sqrt_qA ) + s_sqrt_qA / 2.
+            # abs(s_x2) is the same as s_x
             CLb = 1. - stats.norm.cdf( x2 )
-            s_CLb = stats.norm.pdf ( x2 ) * ( s_sqrt_qmu / ( 2*sqrt_qA ) +\
-                                              s_sqrt_qA / 2. )
+            s_CLb = stats.norm.pdf ( x2 ) * s_x
 
     CLs = 0.
     s_CLs = 0.
     if CLb > 0:
         CLs = CLsb / CLb
-        s_CLs = float ( s_CLsb / CLb + s_CLb * CLsb / (CLb**2) )
+        if abs(CLs)>1e-8: ##  CLs is close to zero, so this wont work
+            s_CLs = float ( s_CLsb / CLb + s_CLb * CLsb / (CLb**2) )
+    # s_CLs is the same for them all
     ret = float ( clsType ( CLs, return_type, 0.95 ) )
     return ( ret, s_CLs )
 
