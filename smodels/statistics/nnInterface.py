@@ -92,8 +92,10 @@ def clsRootFunc( mu : float, return_type: Text,
            pmSigma = 0 )
     s_nllA, s_nll = None, None
     if pmSigma != 0:
+        # s_nllA = 0. # abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
+                   #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
-                          pmSigma = 1 ) - nllA )
+                       pmSigma = 1 ) - nllA )
     if evaluationType == aposteriori:
         nll = nllA
         if pmSigma != 0:
@@ -106,15 +108,6 @@ def clsRootFunc( mu : float, return_type: Text,
             s_nll = abs ( obj.nll ( mu, evaluationType=evaluationType,
                               modelToUse = modelToUse, asimov = None,
                               pmSigma = 1 ) - nll )
-            if s_nll > .3 * nll:
-                logger.error ( f"nll is {nll:.2f}+-{s_nll:.2f} something with the network goes awry" )
-                nll1 = obj.nll ( 0, evaluationType=evaluationType,
-                                  modelToUse = modelToUse, asimov = None,
-                                  pmSigma = 1 )
-                nll0 = obj.nll ( 0, evaluationType=evaluationType,
-                                  modelToUse = modelToUse, asimov = None,
-                                  pmSigma = 0 )
-                s_nll = abs ( nll1 - nll0 )
     if pmSigma == 0:
         ret = None
         if nll is not None and nllA is not None:
@@ -124,10 +117,16 @@ def clsRootFunc( mu : float, return_type: Text,
     if nll is None or nllA is None:
         ret = None, None
     else:
-        ret =  CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
+        ret = CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
                    s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
                    return_type=return_type, nSigma = nSigma )
-    # print ( f"@@NNI so for {return_type} pmSigma {pmSigma} nll={nll:.2f}+-{s_nll:.2f} s_nll_minA {s_nll_minA}  we got {ret}, we will return {ret[0]+pmSigma*ret[1]}" )
+    if False:
+        print ( )
+        print ( f"@@NNI so for mu={mu:.3g} rt={return_type} pmSigma {pmSigma} nll={nll:.2f}+-{s_nll:.2f} nll_minA={nll_minA:.2f}+-{s_nll_minA:.3g} nllA={nllA:.2f}+-{s_nllA:.3g} nll_min={nll_min:.2f}+-{s_nll_min:.3g} big_muhat {mu_hat>mu}" )
+        print ( f"@@NNI we got {ret[0]:.2f}+-{ret[1]:.4f}, we will return {ret[0]+pmSigma*ret[1]:.3g}" )
+        ret2 = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
+                          return_type=return_type, nSigma = nSigma )
+        print ( f"@@NNI old was {ret2}" )
     return ret[0]+pmSigma*ret[1]
 
 class NNData:
@@ -604,6 +603,8 @@ class NNUpperLimitComputer:
                 allowNegativeSignals=allowNegativeSignals,
                 modelToUse = modelToUse,
                 nSigma = nSigma, pmSigma = pmSigma )
+        # we set these errors to zero, they should be strongly correlated
+        # with s_nll and s_nllA
         s_nll_min, s_nll_minA = 0., 0. ## FIXME
         if mu_hat is None:
             return float("inf")
@@ -618,7 +619,6 @@ class NNUpperLimitComputer:
                         verbose = False )
         except Exception as e:
             logger.debug ( f"exception {e}" )
-            print ( f"exception {e}" )
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
@@ -663,11 +663,11 @@ class NNUpperLimitComputer:
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll_min(A)
-            s_nll_minA = self.nll ( mu_hatA,
+            s_nll_minA = abs ( self.nll ( mu_hatA,
                     evaluationType = aposteriori , modelToUse = modelToUse,
-                    pmSigma = 1, asimov = 1 ) - nll_minA
-            s_nll_min = self.nll ( mu_hat, evaluationType = evaluationType,
-                     modelToUse = modelToUse, pmSigma = 1 ) - nll_min
+                    pmSigma = 1, asimov = 1 ) - nll_minA )
+            s_nll_min = abs ( self.nll ( mu_hat, evaluationType = evaluationType,
+                     modelToUse = modelToUse, pmSigma = 1 ) - nll_min )
 
         #from smodels.base import runtime
         #useTevatron = runtime.experimentalFeature ( "tevatroncls" )

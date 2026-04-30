@@ -182,11 +182,11 @@ def CLsWithErrorsfromNLL(
         s_CLsb, s_CLb = 0., 0.
         CLsb, CLb = 1., 1.
         if qA != 0.:
-            x = (sqrt_qmu + sqrt_qA) / (2 * sqrt_qA) + nSigma
-            s_x = s_sqrt_qmu  / ( 2* sqrt_qA ) + s_sqrt_qA / 2.
+            x = (qmu + qA) / (2 * sqrt_qA) + nSigma
+            s_x = s_sqrt_qmu  / ( 2* sqrt_qA ) + s_sqrt_qA / ( 4*sqrt_qA )
             CLsb = 1. - stats.norm.cdf( x )
             s_CLsb = stats.norm.pdf( x ) * s_x
-            x2 = (sqrt_qmu - sqrt_qA) / (2 * sqrt_qA ) + nSigma
+            x2 = ( qmu - qA) / (2 * sqrt_qA ) + nSigma
             # s_x2 = s_sqrt_qmu / ( 2*sqrt_qA ) + s_sqrt_qA / 2.
             # abs(s_x2) is the same as s_x
             CLb = 1. - stats.norm.cdf( x2 )
