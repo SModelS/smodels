@@ -223,8 +223,6 @@ class PyPrinter(BasicPrinter):
             expID = expResult.globalInfo.id
             datasetID = theoryPrediction.dataId()
             dataType = theoryPrediction.dataType()
-            if False and dataType == "combined":
-                datasetID = theoryPrediction.statsComputer.getMostSignificantModel()
             ul = theoryPrediction.getUpperLimit()
             ulExpected = theoryPrediction.getUpperLimit(
                 evaluationType=self.getTypeOfExpected())
@@ -318,6 +316,10 @@ class PyPrinter(BasicPrinter):
                        'dataType': dataType,
                        'r': r, 'r_expected': r_expected,
                        'Width (GeV)' : widths})
+            if hasattr ( self, "addstatmodel" ) and self.addstatmodel and dataType == "combined":
+                model = theoryPrediction.statsComputer.getMostSignificantModel()
+                resDict["StatModel"]=model
+
             if self.errorsforr and theoryPrediction.dataType() != "upperLimit":
                 # the errors on R values feature is used only for SR-combinations
                 self.addErrorsForRValues ( theoryPrediction, resDict )

@@ -513,6 +513,8 @@ class StatsComputer:
         if self.dataType == "nn":
             self.upperLimitComputer.determineMostSensitiveModel()
             return self.upperLimitComputer.mostSensitiveModel
+        if self.dataType == "SL":
+            return "SL"
         return f"?? {self.dataType}"
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
