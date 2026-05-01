@@ -153,51 +153,51 @@ def CLsWithErrorsfromNLL(
     qmu = 0.0 if ( nll < nll_min or big_muhat ) else 2 * (nll - nll_min)
     s_qmu = 0.0
     if nll >= nll_min and not big_muhat:
-        s_qmu = 2* ( s_nll + s_nll_min )
+        var_qmu = 4 * ( s_nll**2 + s_nll_min**2 )
 
     sqrt_qmu = np.sqrt(qmu)
-    s_sqrt_qmu = 0.
+    var_sqrt_qmu = 0.
     if sqrt_qmu > 0.:
-        s_sqrt_qmu = s_qmu / ( 2*sqrt_qmu )
+        var_sqrt_qmu = var_qmu / ( 4 * qmu )
 
     qA = 2 * (nllA - nll_minA)
-    s_qA = 2 * ( s_nllA + s_nll_minA )
+    var_qA = 4 * ( s_nllA**2 + s_nll_minA**2 )
 
     if qA < 0.0:
         qA = 0.0
-        s_qA = 0.
+        var_qA = 0.
 
     sqrt_qA = np.sqrt(qA)
-    s_sqrt_qA = 0.
+    var_sqrt_qA = 0.
     if sqrt_qA > 0.:
-        s_sqrt_qA = s_qA / ( 2*sqrt_qA )
+        var_sqrt_qA = var_qA / ( 4 * qA )
 
     if qA >= qmu:
         CLsb = 1.0 - stats.norm.cdf(sqrt_qmu + nSigma )
-        s_CLsb = stats.norm.pdf(sqrt_qmu + nSigma ) * s_sqrt_qmu
+        var_CLsb = stats.norm.pdf(sqrt_qmu + nSigma )**2 * ( var_sqrt_qmu )
         x = sqrt_qA - sqrt_qmu + nSigma
         CLb = stats.norm.cdf( x )
-        s_CLb = stats.norm.pdf( x ) * (s_sqrt_qA + s_sqrt_qmu )
+        var_CLb = stats.norm.pdf( x )**2 * ( var_sqrt_qA + var_sqrt_qmu )
     else:
         s_CLsb, s_CLb = 0., 0.
         CLsb, CLb = 1., 1.
         if qA != 0.:
             x = (qmu + qA) / (2 * sqrt_qA) + nSigma
-            s_x = s_sqrt_qmu  / ( 2* sqrt_qA ) + s_sqrt_qA / ( 4*sqrt_qA )
+            var_x = var_sqrt_qmu  / ( 4* qA ) + var_sqrt_qA / ( 16*qA )
             CLsb = 1. - stats.norm.cdf( x )
-            s_CLsb = stats.norm.pdf( x ) * s_x
+            var_CLsb = stats.norm.pdf( x )**2 * var_x
             x2 = ( qmu - qA) / (2 * sqrt_qA ) + nSigma
             # s_x2 = s_sqrt_qmu / ( 2*sqrt_qA ) + s_sqrt_qA / 2.
             # abs(s_x2) is the same as s_x
             CLb = 1. - stats.norm.cdf( x2 )
-            s_CLb = stats.norm.pdf ( x2 ) * s_x
+            var_CLb = stats.norm.pdf ( x2 )**2 * var_x
 
     CLs = 0.
     s_CLs = 0.
     if CLb > 0:
         CLs = CLsb / CLb
         if abs(CLs)>1e-8: ##  CLs is close to zero, so this wont work
-            s_CLs = float ( s_CLsb / CLb + s_CLb * CLsb / (CLb**2) )
+            s_CLs = float ( np.sqrt ( var_CLsb / CLb**2 + var_CLb * CLsb**2 / (CLb**4) ))
     # s_CLs is the same for them all
     ret = float ( clsType ( CLs, return_type, 0.95 ) )
     return ( ret, s_CLs )
