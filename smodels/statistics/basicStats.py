@@ -176,11 +176,13 @@ def CLsWithErrorsfromNLL(
         CLsb = 1.0 - stats.norm.cdf(sqrt_qmu + nSigma )
         var_CLsb = stats.norm.pdf(sqrt_qmu + nSigma )**2 * ( var_sqrt_qmu )
         x = sqrt_qA - sqrt_qmu + nSigma
+        var_x = var_sqrt_qA + var_sqrt_qmu
         CLb = stats.norm.cdf( x )
-        var_CLb = stats.norm.pdf( x )**2 * ( var_sqrt_qA + var_sqrt_qmu )
+        var_CLb = stats.norm.pdf( x )**2 * var_x
     else:
         s_CLsb, s_CLb = 0., 0.
         CLsb, CLb = 1., 1.
+        var_CLsb, var_CLb = 0., 0. # FIXME is that a good choice?
         if qA != 0.:
             x = (qmu + qA) / (2 * sqrt_qA) + nSigma
             var_x = var_qmu  / ( 4* qA ) + var_sqrt_qA / 4
@@ -188,7 +190,7 @@ def CLsWithErrorsfromNLL(
             var_CLsb = stats.norm.pdf( x )**2 * var_x
             x2 = ( qmu - qA) / (2 * sqrt_qA ) + nSigma
             # s_x2 = s_sqrt_qmu / ( 2*sqrt_qA ) + s_sqrt_qA / 2.
-            # abs(s_x2) is the same as s_x
+            # (var_x2) is the same as var_x
             CLb = 1. - stats.norm.cdf( x2 )
             var_CLb = stats.norm.pdf ( x2 )**2 * var_x
 
