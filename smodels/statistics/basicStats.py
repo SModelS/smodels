@@ -199,7 +199,8 @@ def CLsWithErrorsfromNLL(
     if CLb > 0:
         CLs = CLsb / CLb
         if abs(CLs)>1e-8: ##  CLs is close to zero, so this wont work
-            s_CLs = float ( np.sqrt ( var_CLsb / CLb**2 + var_CLb * CLsb**2 / (CLb**4) ))
+            var_CLs = var_CLsb / CLb**2 + var_CLb * CLsb**2 / (CLb**4)
+            s_CLs = float ( np.sqrt ( var_CLs ))
     # s_CLs is the same for them all
     ret = float ( clsType ( CLs, return_type, 0.95 ) )
     return ( ret, s_CLs )

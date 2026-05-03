@@ -350,10 +350,11 @@ class TheoryPrediction(object):
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def CLs(self, mu : float = 1., evaluationType : NllEvalType = observed ) -> \
-                    Union[float,None]:
+    def CLs( self, mu : float = 1., evaluationType : NllEvalType = observed,
+             pmSigma : int = 0 ) -> Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        cls = self.statsComputer.CLs ( poi_test = mu, evaluationType = evaluationType )
+        cls = self.statsComputer.CLs ( poi_test = mu, 
+                evaluationType = evaluationType, pmSigma = pmSigma )
         return cls
 
     @whenDefined

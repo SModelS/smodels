@@ -1083,7 +1083,8 @@ class PyhfUpperLimitComputer:
     def CLs( self, mu : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
              workspace_index : Union[int,None] = None,
-             nSigma : int = 0 ) -> float:
+             nSigma : int = 0,
+             pmSigma : int = 0 ) -> float:
         """
         This is the CLs method that heeds self.scale, i.e. you give it the
         _absolute_ mu
@@ -1097,6 +1098,7 @@ class PyhfUpperLimitComputer:
         1-CLs: returns 1-CLs value
         CLs: returns CLs value
         """
+        assert pmSigma == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
         return self._CLs ( mu / self.scale, evaluationType, return_type, workspace_index, nSigma )
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,

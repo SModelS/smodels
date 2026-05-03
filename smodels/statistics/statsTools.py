@@ -453,11 +453,13 @@ class StatsComputer:
         return exponentiateNLL ( nll, doIt = not return_nll )
 
     def CLs ( self, poi_test : float = 1., 
-              evaluationType : NllEvalType=observed ) -> Union[float,None]:
+              evaluationType : NllEvalType=observed,
+              pmSigma : int = 0 ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( evaluationType )
         if hasattr ( self.upperLimitComputer, "CLs" ):
-            return self.upperLimitComputer.CLs ( poi_test, evaluationType )
+            return self.upperLimitComputer.CLs ( poi_test, evaluationType,
+                   pmSigma = pmSigma )
         return None
 
     def transform ( self, evaluationType ):
