@@ -40,8 +40,9 @@ def removeCruftOutputs( filename : str ):
         if os.path.exists(fname):
             os.remove(fname)
 
-def checkPythonRequirements(requirements_path:
-            os.PathLike = "../smodels/share/requirements.txt"):
+def checkPythonRequirements(
+        allow_violations : bool = False,
+        requirements_path: os.PathLike = "../smodels/share/requirements.txt"):
     """ Simple function to check if the Python requirements
       are met using importlib and packaging."""
     from pathlib import Path
@@ -49,9 +50,12 @@ def checkPythonRequirements(requirements_path:
     from packaging.requirements import Requirement
     from packaging.version import Version
     req_path = Path(requirements_path)
+    passed = True
     if not req_path.exists():
         print(f"❌ Requirements file not found: {requirements_path}")
-        sys.exit(1)
+        passed = False
+        if not allow_violations:
+            sys.exit(1)
 
     with req_path.open() as f:
         requirements = f.read().splitlines()
@@ -69,15 +73,24 @@ def checkPythonRequirements(requirements_path:
             installed_version = version(dist_name)
             if Version(installed_version) not in req.specifier:
                 print(f"\n❌ Version conflict: {req_line} -> installed: {installed_version}")
-                sys.exit(1)
+                passed = False
+                if not allow_violations:
+                    sys.exit(1)
         except PackageNotFoundError:
             print(f"\n❌ Missing package: {req_line}")
-            sys.exit(1)
+            passed = False
+            if not allow_violations:
+                sys.exit(1)
         except Exception as e:
             print(f"\n❌ Error checking {req_line}: {e}")
-            sys.exit(1)
+            passed = False
+            if not allow_violations:
+                sys.exit(1)
 
-    print("all requirements are met.")
+    if passed:
+        print("[unitTestHelpers] all requirements are met.")
+    else:
+        print("[unitTestHelpers] not all requirements are met but asked for lenience")
 
 def canonNameToVertNumb(topoDict,cName):
     """

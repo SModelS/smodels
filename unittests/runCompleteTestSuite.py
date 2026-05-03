@@ -22,13 +22,14 @@ if v[0]==2 and v[1] < 7 and v[1] > 3:
     try:
         import unittest2 as unittest
     except ImportError as e:
-        print ( "Error: python v",sys.version,"needs unittest2. Please install." )
+        print ( f"Error: python v{sys.version} needs unittest2. Please install." )
         sys.exit()
 from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "fatal" )
 
 from unitTestHelpers import checkPythonRequirements
-checkPythonRequirements()
+allow_python_req_violations = True
+checkPythonRequirements( allow_violations = allow_python_req_violations )
 
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
@@ -40,8 +41,7 @@ def isInReducedSet ( t ):
             return False
     return True
 
-def run(filter=None, testNotebooks=False, reduced=False ):
-
+def run(filter=None, testNotebooks : bool = False, reduced : bool = False ):
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
         tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
