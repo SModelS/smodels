@@ -382,7 +382,7 @@ class NNUpperLimitComputer:
         s_nll_min, s_nll_minA = 0., 0. ## FIXME
         if mu_hat is None:
             return float("inf")
-        clsRootArgs = { "mu": mu, "return_type": "CLs-alpha", 
+        clsRootArgs = { "mu": mu, "return_type": "CLs",
             "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll_min": nll_min, "nll_minA": nll_minA, "mu_hat": mu_hat,
