@@ -9,10 +9,10 @@
 
 """
 
-from __future__ import print_function
 import sys, subprocess, os
 sys.path.insert(0,"../")
 from smodels.base.smodelsLogging import colors
+from typing import Optional
 colors.on = True
 
 v=sys.version_info
@@ -28,8 +28,6 @@ from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "fatal" )
 
 from unitTestHelpers import checkPythonRequirements
-allow_python_req_violations = True
-checkPythonRequirements( allow_violations = allow_python_req_violations )
 
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
@@ -41,7 +39,9 @@ def isInReducedSet ( t ):
             return False
     return True
 
-def run(filter=None, testNotebooks : bool = False, reduced : bool = False ):
+def run(filter : Optional[str] = None, testNotebooks : bool = False, 
+            reduced : bool = False, allow_python_req_violations : bool = False ):
+    checkPythonRequirements( allow_violations = allow_python_req_violations )
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
         tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
@@ -147,13 +147,16 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
     ap.add_argument('-c','--clean_database', help='remove database pickle files',
-                    action='store_true')
+            action='store_true')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
+    ap.add_argument('-a','--allow_failed_reqs', 
+            help='allow python requirements to fail',action='store_true')
     ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
-    ap.add_argument('-n','--notebooks', help='also test notebooks',action='store_true',default=False)
+    ap.add_argument('-n','--notebooks', help='also test notebooks',
+            action='store_true',default=False )
     ap.add_argument('-r','--reduced', help='run reduced set of tests (no C++ interface, no xsec computation or notebook tests)',
-                    action='store_true', default = False)
+            action='store_true', default = False)
     args = ap.parse_args()
 
     if args.clean_database:
@@ -172,4 +175,5 @@ if __name__ == "__main__":
             verbose_run(args.filter, args.notebooks, args.reduced)
             sys.exit()
         else:
-            run(args.filter, args.notebooks, args.reduced)
+            run(args.filter, args.notebooks, args.reduced,
+                    args.allow_failed_reqs )

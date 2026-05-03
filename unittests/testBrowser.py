@@ -21,7 +21,8 @@ class RunBrowserTest(unittest.TestCase):
     # ../smodelsTools.py interactive-plots -f ./testFiles/scanExample/smodels-output.tar.gz -s testFiles/scanExample/slhas.tar.gz -p iplots_parameters.py
     def testBrowser(self):
 
-        browser = databaseBrowser.Browser("unittest")
+        from databaseLoader import dbpath
+        browser = databaseBrowser.Browser( dbpath )
         self.assertEqual(len(browser),16)
 
         # Check the upper limit for the HM200 signal region:
