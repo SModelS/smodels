@@ -369,7 +369,8 @@ class NNUpperLimitComputer:
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
               modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
-              pmSigma : int = 0 ) -> Optional[float]:
+              allowNegativeSignals : bool = True,
+              nSigma : int = 0, pmSigma : int = 0 ) -> Optional[float]:
         mu_hat, sigma_mu, clsRoot, nll_min, nll_minA, \
             s_nll_min, s_nll_minA = self.getCLsRootFunc(
                 evaluationType=evaluationType,
@@ -381,12 +382,13 @@ class NNUpperLimitComputer:
         s_nll_min, s_nll_minA = 0., 0. ## FIXME
         if mu_hat is None:
             return float("inf")
-        clsRootArgs = {"return_type": "CLs-alpha", "modelToUse": modelToUse,
+        clsRootArgs = { "mu": mu, "return_type": "CLs-alpha", 
+            "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll_min": nll_min, "nll_minA": nll_minA, "mu_hat": mu_hat,
             "nSigma": nSigma, "pmSigma": pmSigma,
             "s_nll_min": s_nll_min, "s_nll_minA": s_nll_minA }
-        return clsRoot ( **clsRootArgs )
+        return float ( clsRoot ( **clsRootArgs ) )
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll( self, mu : float = 1.0, evaluationType : NllEvalType = observed,

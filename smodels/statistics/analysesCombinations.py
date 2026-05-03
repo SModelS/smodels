@@ -326,7 +326,8 @@ class AnaCombLikelihoodComputer(object):
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1., evaluationType : NllEvalType=observed,
-             return_type: Text = "CLs", nSigma : int = 0 ) -> float:
+             return_type: Text = "CLs", nSigma : int = 0,
+             pmSigma : int = 0 ) -> float:
         """
         Compute the exclusion confidence level of the model
 
@@ -338,6 +339,7 @@ class AnaCombLikelihoodComputer(object):
                         1-CLs: returns 1-CLs value \
                         CLs: returns CLs value
         """
+        assert pmSigma == 0, f"pmSigma {pmSigma} not supported by combiner"
         assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
             f"Unknown return type: {return_type}."
         _, _, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
