@@ -379,7 +379,7 @@ class NNUpperLimitComputer:
                 nSigma = nSigma, pmSigma = pmSigma )
         # we set these errors to zero, they should be strongly correlated
         # with s_nll and s_nllA
-        s_nll_min, s_nll_minA = 0., 0. ## FIXME
+        # s_nll_min, s_nll_minA = 0., 0. ## FIXME
         if mu_hat is None:
             return float("inf")
         clsRootArgs = { "mu": mu, "return_type": "CLs",

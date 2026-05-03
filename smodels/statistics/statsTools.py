@@ -458,8 +458,8 @@ class StatsComputer:
         """ compute CLs value for a given value of the poi """
         # self.transform ( evaluationType )
         if hasattr ( self.upperLimitComputer, "CLs" ):
-            return self.upperLimitComputer.CLs ( poi_test, evaluationType,
-                   pmSigma = pmSigma )
+            return self.upperLimitComputer.CLs ( poi_test, 
+                    evaluationType = evaluationType, pmSigma = pmSigma )
         return None
 
     def transform ( self, evaluationType ):
