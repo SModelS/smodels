@@ -31,6 +31,10 @@ nninfo = {
     "repeat": 0
 }
 
+nnSettings = {
+    "errs_on_min": True
+}
+
 def writeOutYields ( theoryPred,
         filename : Union[os.PathLike,None] = "yields.json" ):
     """ a function for debugging only: writes the actual NN input
@@ -681,8 +685,8 @@ class NNUpperLimitComputer:
         mu_hat, sigma_mu, nll_min = \
                 ( fmin[x] for x in ["muhat", "sigma_mu", "nll_min"] )
         mu_hat = mu_hat if mu_hat is not None else 0.0
-        s_nll_minA, s_nll_min = None, None
-        if True and pmSigma != 0:
+        s_nll_minA, s_nll_min = 0., 0.
+        if nnSettings["errs_on_min"] and pmSigma != 0:
             # actually we get better coverage if we dont do this!
             # if we want to compute ULs for nlls +- 1 sigma,
             # we compute the usual mu_hat, but add pmSigma times sigma

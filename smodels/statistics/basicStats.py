@@ -151,7 +151,7 @@ def CLsWithErrorsfromNLL(
     assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
            f"Unknown return type: {return_type}."
     qmu = 0.0 if ( nll < nll_min or big_muhat ) else 2 * (nll - nll_min)
-    s_qmu = 0.0
+    var_qmu = 0.0
     if nll >= nll_min and not big_muhat:
         var_qmu = 4 * ( s_nll**2 + s_nll_min**2 )
 
