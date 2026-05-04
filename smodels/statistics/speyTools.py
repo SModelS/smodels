@@ -681,6 +681,14 @@ class SpeyAnalysesCombosComputer:
             expected = evaluationType, return_nll = True )
         return float(ret)
 
+    def CLs ( self, poi_test : float, evaluationType : NllEvalType,
+              asimov : bool = False, **kwargs ) -> float:
+        """ simple frontend to spey functionality """
+        evaluationType = SpeyComputer.translateExpectationType ( evaluationType )
+        ret = self.speyModel.CLs ( poi_test = poi_test,
+            expected = evaluationType, return_nll = True, **kwargs )
+        return float(ret)
+
     def nll_min ( self, evaluationType : NllEvalType,
             allow_negative_signal : bool = True, **kwargs ) -> Tuple[float,float]:
         """ slowly we transition to nlls everywhere """
