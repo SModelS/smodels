@@ -194,14 +194,14 @@ class PyPrinter(BasicPrinter):
 
     def addErrorsForRValues(self, obj, resDict : dict ):
         """ for obj add the errors on the r values to resDict """
-        ul_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
+        r_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
                 nSigma = 1 )
-        if ul_e_p1 != None:
-            resDict['r_expected_p1'] = self._round ( ul_e_p1 )
-        ul_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
+        if r_e_p1 != None:
+            resDict['r_expected_p1'] = self._round ( r_e_p1 )
+        r_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
                 nSigma = -1 )
-        if ul_e_m1 != None:
-            resDict['r_expected_m1'] = self._round ( ul_e_m1 )
+        if r_e_m1 != None:
+            resDict['r_expected_m1'] = self._round ( r_e_m1 )
         # add only for expected
         # ul_p1 = obj.getRValue ( evaluationType = observed, nSigma = 1 )
         # ul_m1 = obj.getRValue ( evaluationType = observed, nSigma = -1 )
