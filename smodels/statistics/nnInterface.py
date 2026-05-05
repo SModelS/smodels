@@ -93,13 +93,13 @@ def clsRootFunc( mu : float, return_type: Text,
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1,
-           pmSigma = 0 )
+           pmSigma = 0, evaluationType = evaluationType )
     s_nllA, s_nll = None, None
     if pmSigma != 0:
         # s_nllA = 0. # abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
                    #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
-                       pmSigma = 1 ) - nllA )
+                       pmSigma = 1, evaluationType = evaluationType ) - nllA )
     if False: # asimov == 1 and evaluationType == observed:
         nll = nllA
         if pmSigma != 0:
@@ -299,14 +299,12 @@ class NNUpperLimitComputer:
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def _actual_nll(self, poi_test : float,
         modelToUse : Union[None,str] = None,
-        outputType : str = "extended" ):
+        outputType : Optional[str] = None ):
         """ the method that really wraps around the llhd computation.
         :param modelToUse: if given, compute the nll for that model.
         If None compute for most sensitive analysis.
-        :param outputType: if 'extended' return dictionary with all
-        values, if 'observed' return nll_obs_1, if 'expected' return
-        nll_exp_1, if 'asimov' return nllA_obs_1, if 'asimov_exp'
-        return nllA_exp_1
+        :param outputType: if None return dictionary with all
+        values, else supply string, e.g. nll_obs_1, for observed at mu=1.
 
         :returns: dictionary with nlls, obs and exp, mu=0 and 1
         """
@@ -345,19 +343,13 @@ class NNUpperLimitComputer:
                     "nll_obs_0": nll0, "nll_exp_0": nllE0,
                     "nllA_obs_0": nllA0, "nllA_exp_0": nllEA0 }
 
+        if outputType == None:
+            return ret
         # we return what has been asked
-        if outputType == "observed":
-            return ret["nll_obs_1"]
-        if outputType == "expected":
-            return ret["nll_exp_1"]
-        if outputType == "asimov":
-            return ret["nllA_obs_1"]
-        if outputType == "asimov_exp":
-            return ret["nllA_exp_1"]
-        if outputType != "extended":
-            logger.error ( f"outputType {outputType} unknown. should be one of 'observed', 'expected', 'extended'." )
-            sys.exit(-1)
-        return ret
+        if outputType in ret:
+            return ret[ outputType ]
+        logger.error ( f"outputType {outputType} unknown. should be one of: None, nll_obs_1, etc" )
+        sys.exit(-1)
 
     def welcome(self):
         """
@@ -372,14 +364,13 @@ class NNUpperLimitComputer:
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
-              modelToUse : Union[None,str] = None, asimov : Optional[int] = None,
+              modelToUse : Union[None,str] = None,
               allowNegativeSignals : bool = True,
-              nSigma : int = 0, pmSigma : int = 0 ) -> Optional[float]:
+              nSigma : int = 0, pmSigma : int = 0 ) -> float:
         mu_hat, sigma_mu, clsRoot, nll_min, nll_minA, \
             s_nll_min, s_nll_minA = self.getCLsRootFunc(
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
-                asimov = asimov,
                 modelToUse = modelToUse,
                 nSigma = nSigma, pmSigma = pmSigma )
         # we set these errors to zero, they should be strongly correlated
@@ -391,7 +382,6 @@ class NNUpperLimitComputer:
             "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll_min": nll_min, "nll_minA": nll_minA, "mu_hat": mu_hat,
-            "asimov": asimov,
             "nSigma": nSigma, "pmSigma": pmSigma,
             "s_nll_min": s_nll_min, "s_nll_minA": s_nll_minA }
         return float ( clsRoot ( **clsRootArgs ) )
@@ -496,21 +486,16 @@ class NNUpperLimitComputer:
                     evaluationType, allowNegativeSignals )
             #print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
             #return None
-        muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_obs_max"]
+        obs_v_exp = "obs"
+        if evaluationType != observed:
+            obs_v_exp = "exp"
+        A = ""
         if asimov not in [ False, None ]:
-            muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_obs_max"]
-            if evaluationType != observed:
-                muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLLA_exp_max"]
-        elif evaluationType != observed:
-            muhat,nllmin = self.adaptors[modelToUse].onnxMeta["nLL_exp_max"]
-
-        outputType = "observed"
-        if evaluationType == apriori:
-            outputType = "expected"
-        if evaluationType == aposteriori:
-            outputType = "asimov"
-        if asimov not in [ False, None ]:
-            outputType = "asimov"
+            A = "A"
+        str_nll = f"nLL{A}_{obs_v_exp}"
+        str_nll_min = f"{str_nll}_max"
+        str_nll_1 = f"nll{A}_{obs_v_exp}_1"
+        muhat,nllmin = self.adaptors[modelToUse].onnxMeta[ str_nll_min ]
         options = { "disp": False, "maxiter": 200 }
 
         ## FIXME compute sigma_mu, compute via nllA
@@ -521,8 +506,9 @@ class NNUpperLimitComputer:
                 for xi in x:
                     ret.append ( myNLL ( xi ) )
                 return np.array ( ret )
-            ret = self._actual_nll ( x, modelToUse=modelToUse,
-                                     outputType=outputType )
+            d = self._actual_nll ( x, modelToUse=modelToUse )
+            ret = d[ str_nll_1 ]
+            # print ( f"@@myNLL ret {ret} evaluationType {evaluationType} asimov {asimov}" )
             return ret
 
         method = "Nelder-Mead"
@@ -535,7 +521,7 @@ class NNUpperLimitComputer:
                 bounds = [(bounds[0][0],x0)]
 
             o = optimize.minimize ( self._actual_nll, x0=x0,
-                    args=(modelToUse,outputType), tol=1e-8, options = options,
+                    args=(modelToUse,str_nll_1), tol=1e-8, options = options,
                     method = method, bounds=bounds )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
@@ -661,7 +647,6 @@ class NNUpperLimitComputer:
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None,
-            asimov : Optional[int] = None,
             nSigma : int = 0, pmSigma : int = 0 ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
@@ -675,7 +660,7 @@ class NNUpperLimitComputer:
         """
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
-        fA = self.nll_min( evaluationType = aposteriori,
+        fA = self.nll_min( evaluationType = observed,
                            allowNegativeSignals=allowNegativeSignals,
                            modelToUse = modelToUse, asimov = 1 )
         if fA == None:
@@ -699,7 +684,7 @@ class NNUpperLimitComputer:
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll_min(A)
             s_nll_minA = abs ( self.nll ( mu_hatA,
-                    evaluationType = aposteriori , modelToUse = modelToUse,
+                    evaluationType = observed, modelToUse = modelToUse,
                     pmSigma = 1, asimov = 1 ) - nll_minA )
             s_nll_min = abs ( self.nll ( mu_hat, evaluationType = evaluationType,
                      modelToUse = modelToUse, pmSigma = 1 ) - nll_min )
