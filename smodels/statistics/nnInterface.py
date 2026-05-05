@@ -685,8 +685,9 @@ class NNUpperLimitComputer:
                     pmSigma = 1, asimov = 1 ) - nll_minA )
             if evaluationType == aposteriori:
                 s_nll_min = s_nll_minA
-            else: 
-                s_nll_min = abs ( self.nll ( mu_hat, evaluationType = evaluationType,
+            else:
+                s_nll_min = abs ( self.nll ( mu_hat,
+                     evaluationType = evaluationType,
                      modelToUse = modelToUse, pmSigma = 1 ) - nll_min )
 
         #from smodels.base import runtime
