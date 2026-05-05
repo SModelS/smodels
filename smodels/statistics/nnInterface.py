@@ -100,7 +100,7 @@ def clsRootFunc( mu : float, return_type: Text,
                    #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
                        pmSigma = 1 ) - nllA )
-    if asimov == 1 and evaluationType == observed:
+    if False: # asimov == 1 and evaluationType == observed:
         nll = nllA
         if pmSigma != 0:
             s_nll = s_nllA
@@ -379,6 +379,7 @@ class NNUpperLimitComputer:
             s_nll_min, s_nll_minA = self.getCLsRootFunc(
                 evaluationType=evaluationType,
                 allowNegativeSignals=allowNegativeSignals,
+                asimov = asimov,
                 modelToUse = modelToUse,
                 nSigma = nSigma, pmSigma = pmSigma )
         # we set these errors to zero, they should be strongly correlated
@@ -390,6 +391,7 @@ class NNUpperLimitComputer:
             "modelToUse": modelToUse,
             "obj": self, "evaluationType" : evaluationType,
             "nll_min": nll_min, "nll_minA": nll_minA, "mu_hat": mu_hat,
+            "asimov": asimov,
             "nSigma": nSigma, "pmSigma": pmSigma,
             "s_nll_min": s_nll_min, "s_nll_minA": s_nll_minA }
         return float ( clsRoot ( **clsRootArgs ) )
@@ -659,6 +661,7 @@ class NNUpperLimitComputer:
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
             allowNegativeSignals : bool = True,
             modelToUse : Union[None,str] = None,
+            asimov : Optional[int] = None,
             nSigma : int = 0, pmSigma : int = 0 ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
