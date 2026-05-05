@@ -634,8 +634,6 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
-        print ( f"@XY a,b {a},{b}" )
-        print ( f"@XY mu_lim {mu_lim} clsRootArgs {clsRootArgs}" )
         return float ( mu_lim )
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
@@ -659,14 +657,13 @@ class NNUpperLimitComputer:
                            modelToUse = modelToUse, asimov = 1 )
         if fA == None:
             return None, None, None, None, None, None, None
+        s_nll_minA, s_nll_min = 0., 0.
         mu_hatA, sigma_muA, nll_minA = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
-        s_nll_minA = 0.
 
         if evaluationType == aposteriori:
             nll_min = nll_minA
             mu_hat = mu_hatA
             sigma_mu = sigma_muA
-            s_nll_min = s_nll_minA
         else:
             fmin = self.nll_min ( evaluationType=evaluationType,
                                   allowNegativeSignals=allowNegativeSignals,
@@ -678,7 +675,6 @@ class NNUpperLimitComputer:
             mu_hat, sigma_mu, nll_min = \
                     ( fmin[x] for x in ["muhat", "sigma_mu", "nll_min"] )
             mu_hat = mu_hat if mu_hat is not None else 0.0
-            s_nll_minA, s_nll_min = 0., 0.
         if nnSettings["errs_on_min"] and pmSigma != 0:
             # actually we get better coverage if we dont do this!
             # if we want to compute ULs for nlls +- 1 sigma,
@@ -687,7 +683,10 @@ class NNUpperLimitComputer:
             s_nll_minA = abs ( self.nll ( mu_hatA,
                     evaluationType = observed, modelToUse = modelToUse,
                     pmSigma = 1, asimov = 1 ) - nll_minA )
-            s_nll_min = abs ( self.nll ( mu_hat, evaluationType = evaluationType,
+            if evaluationType == aposteriori:
+                s_nll_min = s_nll_minA
+            else: 
+                s_nll_min = abs ( self.nll ( mu_hat, evaluationType = evaluationType,
                      modelToUse = modelToUse, pmSigma = 1 ) - nll_min )
 
         #from smodels.base import runtime
