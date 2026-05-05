@@ -93,14 +93,14 @@ def clsRootFunc( mu : float, return_type: Text,
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.nll(mu, modelToUse = modelToUse, asimov = 1,
-           pmSigma = 0, evaluationType = evaluationType )
+           pmSigma = 0, evaluationType = observed )
     s_nllA, s_nll = None, None
     if pmSigma != 0:
         # s_nllA = 0. # abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
                    #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
-                       pmSigma = 1, evaluationType = evaluationType ) - nllA )
-    if False: # asimov == 1 and evaluationType == observed:
+                       pmSigma = 1, evaluationType = observed ) - nllA )
+    if evaluationType == aposteriori:
         nll = nllA
         if pmSigma != 0:
             s_nll = s_nllA
@@ -124,13 +124,6 @@ def clsRootFunc( mu : float, return_type: Text,
         ret = CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
                    s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
                    return_type=return_type, nSigma = nSigma )
-    if False:
-        print ( )
-        print ( f"@@NNI so for mu={mu:.3g} rt={return_type} pmSigma {pmSigma} nll={nll:.2f}+-{s_nll:.2f} nll_minA={nll_minA:.2f}+-{s_nll_minA:.3g} nllA={nllA:.2f}+-{s_nllA:.3g} nll_min={nll_min:.2f}+-{s_nll_min:.3g} big_muhat {mu_hat>mu}" )
-        print ( f"@@NNI we got {ret[0]:.2f}+-{ret[1]:.4f}, we will return {ret[0]+pmSigma*ret[1]:.3g}" )
-        ret2 = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
-                          return_type=return_type, nSigma = nSigma )
-        print ( f"@@NNI old was {ret2}" )
     return ret[0]+pmSigma*ret[1]
 
 class NNData:
@@ -508,7 +501,6 @@ class NNUpperLimitComputer:
                 return np.array ( ret )
             d = self._actual_nll ( x, modelToUse=modelToUse )
             ret = d[ str_nll_1 ]
-            # print ( f"@@myNLL ret {ret} evaluationType {evaluationType} asimov {asimov}" )
             return ret
 
         method = "Nelder-Mead"
@@ -642,6 +634,8 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
+        print ( f"@XY a,b {a},{b}" )
+        print ( f"@XY mu_lim {mu_lim} clsRootArgs {clsRootArgs}" )
         return float ( mu_lim )
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
@@ -666,18 +660,25 @@ class NNUpperLimitComputer:
         if fA == None:
             return None, None, None, None, None, None, None
         mu_hatA, sigma_muA, nll_minA = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
+        s_nll_minA = 0.
 
-        fmin = self.nll_min ( evaluationType=evaluationType,
-                              allowNegativeSignals=allowNegativeSignals,
-                              modelToUse = modelToUse )
+        if evaluationType == aposteriori:
+            nll_min = nll_minA
+            mu_hat = mu_hatA
+            sigma_mu = sigma_muA
+            s_nll_min = s_nll_minA
+        else:
+            fmin = self.nll_min ( evaluationType=evaluationType,
+                                  allowNegativeSignals=allowNegativeSignals,
+                                  modelToUse = modelToUse )
 
-        if fmin == None:
-            return None, None, None, None, None, None, None
+            if fmin == None:
+                return None, None, None, None, None, None, None
 
-        mu_hat, sigma_mu, nll_min = \
-                ( fmin[x] for x in ["muhat", "sigma_mu", "nll_min"] )
-        mu_hat = mu_hat if mu_hat is not None else 0.0
-        s_nll_minA, s_nll_min = 0., 0.
+            mu_hat, sigma_mu, nll_min = \
+                    ( fmin[x] for x in ["muhat", "sigma_mu", "nll_min"] )
+            mu_hat = mu_hat if mu_hat is not None else 0.0
+            s_nll_minA, s_nll_min = 0., 0.
         if nnSettings["errs_on_min"] and pmSigma != 0:
             # actually we get better coverage if we dont do this!
             # if we want to compute ULs for nlls +- 1 sigma,
