@@ -8,7 +8,7 @@
 import pyslha
 import os
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV, TeV
 from smodels.base import lheReader, crossSection
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.exceptions import SModelSBaseError as SModelSError
@@ -371,7 +371,7 @@ class Model(object):
                 continue
             ndecays = len([dec for dec in p.decays if dec is not None])
             if ndecays == 0:
-                if not p.isSM:
+                if not p.isSM and p.mass < 20*TeV:
                     logger.warning(f"No valid decay found for {p}. It will be considered stable.")
                 p.totalwidth = 0.*GeV
 
