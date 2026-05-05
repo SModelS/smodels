@@ -543,6 +543,10 @@ class NNUpperLimitComputer:
                 if hessian > 0.:
                     sigma_mu = np.sqrt ( 1. / hessian )
 
+                nll0 = self.nll ( mu=0., evaluationType = evaluationType,
+                        modelToUse = modelToUse, asimov = asimov )
+                if nll0 < nllmin: # if SM is lower, use it
+                    nllmin = nll0
                 ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ),
                         "sigma_mu": float ( sigma_mu ) }
                 return ret
