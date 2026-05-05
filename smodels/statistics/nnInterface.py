@@ -100,7 +100,7 @@ def clsRootFunc( mu : float, return_type: Text,
                    #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, modelToUse = modelToUse, asimov = 1,
                        pmSigma = 1 ) - nllA )
-    if evaluationType == aposteriori:
+    if asimov == 1 and evaluationType == observed:
         nll = nllA
         if pmSigma != 0:
             s_nll = s_nllA
