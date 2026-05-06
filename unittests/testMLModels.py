@@ -37,14 +37,14 @@ class MLModelsTest(unittest.TestCase):
         for region in regions: # predict for no yields
             yields[ region ] = 0.
         ret = adapter.predict ( yields )
-        truths = { 'nll_exp_0': 675.10349848, 
-                   'nll_exp_1': 675.2284106540345, 
-                   'nll_obs_0': 688.4482887699999, 
-                   'nll_obs_1': 691.6445574490972, 
-                   'nllA_exp_0': 675.10349845, 
-                   'nllA_exp_1': 675.228398256828, 
-                   'nllA_obs_0': 674.7278682388554, 
-                   'nllA_obs_1': 674.427532987276, 
+        truths = { 'nll_exp_0': 675.10349848,
+                   'nll_exp_1': 675.2284106540345,
+                   'nll_obs_0': 688.4482887699999,
+                   'nll_obs_1': 691.6445574490972,
+                   'nllA_exp_0': 675.10349845,
+                   'nllA_exp_1': 675.228398256828,
+                   'nllA_obs_0': 674.7278682388554,
+                   'nllA_obs_1': 674.427532987276,
                    'nll_obs_max': 682.9210459104119 }
         for name,value in truths.items():
             self.assertAlmostEqual ( ret[name], value )
@@ -82,17 +82,30 @@ class MLModelsTest(unittest.TestCase):
         topDict = decomposer.decompose(model, sigmacut=0.001,
                                massCompress=True, invisibleCompress=True,
                                minmassgap=5*GeV)
-        allPredictions = theoryPredictionsFor( db, topDict, 
+        allPredictions = theoryPredictionsFor( db, topDict,
                 combinedResults=True )
-        nlls = { 'ATLAS-SUSY-2019-09': { 
+        nlls = { 'ATLAS-SUSY-2019-09': {
             'obs': 109.2548744617272, 'exp': 99.14532271766798 },
                  'ATLAS-SUSY-2018-32': {
             'obs': 93.80734619587368, 'exp': 82.58896814755686 } }
+        uls = { 'ATLAS-SUSY-2019-09': {
+            'obs': 0.27512461085675616, 'exp': 0.3828992015046798,
+            'p1': 0.28588195660979965 },
+                 'ATLAS-SUSY-2018-32': {
+            'obs': 1.3190277005301172,  'exp': 1.5852880131898859,
+            'p1': 1.3302383061447438 } }
         for p in allPredictions:
-            self.assertAlmostEqual ( p.nll( evaluationType = apriori), 
+            self.assertAlmostEqual ( p.nll( evaluationType = apriori),
                     nlls[p.analysisId()]["exp"] )
-            self.assertAlmostEqual ( p.nll(), 
+            self.assertAlmostEqual ( p.nll(),
                     nlls[p.analysisId()]["obs"] )
+            self.assertAlmostEqual ( p.getUpperLimitOnMu(),
+                    uls[p.analysisId()]["obs"] )
+            self.assertAlmostEqual ( \
+                    p.getUpperLimitOnMu( evaluationType = aposteriori ),
+                    uls[p.analysisId()]["exp"] )
+            self.assertAlmostEqual ( p.getUpperLimitOnMu( pmSigma = 1 ),
+                    uls[p.analysisId()]["p1"] )
 
 if __name__ == "__main__":
     unittest.main()
