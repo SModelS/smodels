@@ -65,11 +65,9 @@ def testPoint(inputFile, outputDir, parser, database):
 
     """Get run parameters and options from the parser"""
     sigmacut = parser.getfloat("parameters", "sigmacut") * fb
+    nstepsmax = parser.getint("parameters", "nstepsmax",fallback=None)
     minmassgap = parser.getfloat("parameters", "minmassgap") * GeV
-    if parser.has_option("parameters","minmassgapISR"):
-        minmassgapISR = parser.getfloat("parameters", "minmassgapISR") * GeV
-    else:
-        minmassgapISR = 1.0*GeV
+    minmassgapISR = parser.getfloat("parameters", "minmassgapISR",fallback=1.0) * GeV
 
     """Setup output printers"""
     masterPrinter = MPrinter()
@@ -138,19 +136,20 @@ def testPoint(inputFile, outputDir, parser, database):
     =====================
     """
 
+    logger.debug("Starting decomposition of model %s" % inputFile)
     try:
 
-        """ Decompose the input model, store the output elements in smstoplist """
-        sigmacut = parser.getfloat("parameters", "sigmacut") * fb
+        """ Decompose the input model, store the output elements in smstoplist """ 
         smstoplist = decomposer.decompose(model, sigmacut,
                                           massCompress=parser.getboolean(
                                               "options", "doCompress"),
                                           invisibleCompress=parser.getboolean(
                                               "options", "doInvisible"),
                                           minmassgap=minmassgap,
-                                          minmassgapISR=minmassgapISR)
+                                          minmassgapISR=minmassgapISR,
+                                          nstepsmax=nstepsmax)
     except SModelSError as e:
-        print(f"Exception {e} {type(e)}")
+        logger.error(f"Exception {e} {type(e)}")
         """ Update status to fail, print error message and exit """
         outputStatus.updateStatus(-1)
         return {os.path.basename(inputFile): masterPrinter}

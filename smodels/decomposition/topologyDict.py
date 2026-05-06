@@ -94,13 +94,15 @@ class TopologyDict(OrderedDict):
                                   (if all mass differences < minmassgapISR allow a pure ISR SMS)
         """
 
-        for sms in self.getSMSList():
+        sms_tot = len(self.getSMSList())
+        for i,sms in enumerate(self.getSMSList()):
             newSMSList = sms.compress(doCompress, doInvisible, 
                                       minmassgap, minmassgapISR)
             if not newSMSList:
                 continue
             for sms in newSMSList:
                 self.addSMS(sms)
+            print(f'Compressed {i+1}/{sms_tot}')
 
     def sort(self):
         """
