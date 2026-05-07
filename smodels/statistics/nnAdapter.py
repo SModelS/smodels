@@ -20,20 +20,17 @@ class NNAdapter:
     """
     Adapter that wraps around a neural network
     """
-    __slots__ = [ "allowsSyntheticData", "mlModel", "modelType",
-                  "onnxMeta", "srOrder", "regressor", "session_options" ]
+    __slots__ = [ "mlModel", "modelType", "onnxMeta", "srOrder", "regressor", 
+                  "session_options" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
-                  onnxfilename : str, session_options : dict = {},
-                  allowsSyntheticData : bool = False ):
+                  onnxfilename : str, session_options : dict = {} ):
         """
         :param mlModel: the model, as a ModelProto, as a bytes stream,
         or as a path to an onnx file (needing to end with .onnx)
         :param onnxfilename: filename of onnxfile, for debugging only
         :param session_options: options for the onnxruntime inference session,
         e.g. { "inter_op_num_threads": 1 }
-        :param allowsSyntheticData: if true, then also synthetic
-        data can be supplied, not used yet
         """
         if type(mlModel) == str and mlModel.endswith ( "onnx") and \
                 os.path.exists ( mlModel ):
@@ -44,9 +41,7 @@ class NNAdapter:
             except Exception as e:
                 print( f"[nnAdapter] could not load model {onnxfilename}" )
                 sys.exit(-1)
-        self.allowsSyntheticData = allowsSyntheticData
         self.session_options = session_options
-        self.modelType = "joaquin"
         self._parseMetaData ()
         self._getSROrder()
         self._instantiateRegressor()
@@ -118,9 +113,6 @@ class NNAdapter:
         remove_channels=[]
         import json, math
         for em in self.mlModel.metadata_props:
-            if "rafal::" in str(em.key):
-                self.modelType = "joaquin"
-        for em in self.mlModel.metadata_props:
             emkey = em.key.replace ( "rafal::", "" )
             if emkey == "remove_channels":
                 # remove these channels at the end, so that order does not matter
@@ -155,7 +147,6 @@ class NNAdapter:
                     if data[name] != None:
                         data[name] = [None,values[index]]
             elif emkey == "standardization":
-                # joaquins values
                 values = eval(em.value)
                 data["featureMeans"] = values["features_mean"][0]*3
                 data["featureErrors"] = values["features_std"][0]*3
@@ -166,7 +157,6 @@ class NNAdapter:
                 content = yaml.safe_load ( em.value )
                 data["run_config"] = content
 
-                #values = json.loads(em.value)
         if len(remove_channels)>0:
             data["smYields"]=self._removeSignalRegions ( remove_channels,
                                                    data["smYields"] )
@@ -204,12 +194,12 @@ class NNAdapter:
                 "nllA_exp_0": ..., "nllA_exp_1": ...,
                 "nllA_obs_0": ..., "nllA_obs_1": ... }
         """
-        from smodels.statistics.joaquinsPreprocessing import undo_preprocess_nLLs
+        from smodels.statistics.nnPreprocessing import postprocess_nLLs
         deltas_prepd = np.array(arr, dtype=np.float64)
         trafos = self.onnxMeta["run_config"]["data"]["nLL_trafos"]
         nll_means = self.onnxMeta["nllMeans"]
         nll_errors = self.onnxMeta["nllErrors"]
-        deltas = undo_preprocess_nLLs ( deltas_prepd[:4],
+        deltas = postprocess_nLLs ( deltas_prepd[:4],
                 mean = nll_means, std = nll_errors, trafos = trafos )
         deltas = list ( map ( float, deltas ) )
         nll0exp  = self.onnxMeta["nLL_exp_mu0"]
@@ -236,9 +226,9 @@ class NNAdapter:
         if self.onnxMeta["nLL_obs_max"][1] is not None:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         if add_errors:
-            from smodels.statistics.joaquinsPreprocessing import \
-                undo_preprocess_nLLs_errors
-            errs = undo_preprocess_nLLs_errors ( deltas_prepd[4:],
+            from smodels.statistics.nnPreprocessing import \
+                postprocess_nLLs_errors
+            errs = postprocess_nLLs_errors ( deltas_prepd[4:],
                     deltas_prepd[:4],
                     mean = nll_means,
                     std = nll_errors, trafos = trafos,
@@ -268,7 +258,7 @@ class NNAdapter:
         inp_list = yields
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
-        from smodels.statistics.joaquinsPreprocessing import preprocess_features
+        from smodels.statistics.nnPreprocessing import preprocess_features
         trafos = self.onnxMeta["run_config"]["data"]["trafos"]
         nYields = len(yields)
         re = preprocess_features ( inp_list,

@@ -9,8 +9,8 @@
 
 __all__ = [
     "preprocess_features",
-    "undo_preprocess_nLLs",
-    "undo_preprocess_nLLs_errors",
+    "postprocess_nLLs",
+    "postprocess_nLLs_errors",
 ]
 
 import numpy as np
@@ -128,7 +128,7 @@ def _get_inv_fn(fn_str: str):
             raise ValueError(f"No known inverse for transform '{fn_str}'.")
 
 
-def undo_preprocess_nLLs(
+def postprocess_nLLs(
     nLLs: np.ndarray,
     mean: np.ndarray,
     std: np.ndarray,
@@ -149,11 +149,11 @@ def undo_preprocess_nLLs(
                 nLLs = _undo_standardize(nLLs, mean, std)
             else:
                 nLLs = _get_inv_fn(fn_str)(nLLs)
-    assert np.isfinite(nLLs).all(), "Non-finite values after undo_preprocess_nLLs"
+    assert np.isfinite(nLLs).all(), "Non-finite values after postprocess_nLLs"
     return nLLs
 
 
-def undo_preprocess_nLLs_errors(
+def postprocess_nLLs_errors(
     errors: np.ndarray,
     nLLs_prepd: np.ndarray,
     mean: np.ndarray,
@@ -164,19 +164,19 @@ def undo_preprocess_nLLs_errors(
     """Propagate heteroskedastic errors through the inverse nLL preprocessing.
 
     Uses central-difference numerical differentiation to compute
-    ``|d(undo_preprocess)/d(nLL)| * sigma`` for each output independently.
+    ``|d(postprocess)/d(nLL)| * sigma`` for each output independently.
 
     :param errors: NN-predicted uncertainties on the preprocessed deltas,
         shape (4,), these are the errors on nLLs_prepd
     :param nLLs_prepd: the central (mean) preprocessed nLL deltas, shape (4,)
     :param mean: per-output mean saved at training time
     :param std: per-output std saved at training time
-    :param trafos: same transform list used in undo_preprocess_nLLs
+    :param trafos: same transform list used in postprocess_nLLs
     :param eps: step size for numerical differentiation
     :returns: propagated uncertainties on the unpreprocessed nLL deltas,
         shape (4,)
     """
-    f_plus  = undo_preprocess_nLLs(nLLs_prepd + eps, mean, std, trafos)
-    f_minus = undo_preprocess_nLLs(nLLs_prepd - eps, mean, std, trafos)
+    f_plus  = postprocess_nLLs(nLLs_prepd + eps, mean, std, trafos)
+    f_minus = postprocess_nLLs(nLLs_prepd - eps, mean, std, trafos)
     deriv = np.abs(f_plus - f_minus) / (2.0 * eps)
     return deriv * errors
