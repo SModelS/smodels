@@ -53,7 +53,7 @@ class Info(object):
             if not "label" in region:
                 # if there isnt a label, we take
                 # the smodels as the label
-                if region["smodels"] is None:
+                if region["smodels"] is not None:
                     region["label"]=region["smodels"]
                 else:
                     region["label"]=region["pyhf"]
@@ -96,9 +96,33 @@ class Info(object):
                 else:
                     logger.info(f"tag {tag} given multiple times in {self.path}" )
                     continue
-
+            self.createSRMappingsDict()
+            self.checkConsistencyOfStatsModels()
             self.cacheStatsModels()
 
+    def isInSRMapping ( self, region ):
+        for m in self.srMappings:
+            if region == m["label"]:
+                return True
+        return False
+
+    def createSRMappingsDict ( self ):
+        """ we have srMappings, create srMappingsDict from it """
+        if not hasattr ( self, "srMappings" ):
+            return
+        self.srMappingsDict = {}
+        for region in self.srMappings:
+            self.srMappingsDict[ region["label"] ] = region
+
+    def checkConsistencyOfStatsModels( self ):
+        """ check that all SRs mentioned in srSets are indeed in srMappings """
+        if not hasattr ( self, "srSets" ):
+            return
+        for srSetName, regions in self.srSets.items():
+            for region in regions:
+                if not self.isInSRMapping ( region ):
+                    raise SModelSError ( f"region {region} not mentioned in srMapping" )
+                
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False

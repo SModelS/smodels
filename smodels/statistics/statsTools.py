@@ -281,16 +281,45 @@ class StatsComputer:
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi(), pyhfComputer = pyhfComputer )
         self.likelihoodComputer = self.upperLimitComputer
 
+    def getSRsOnly ( self, srSet : list, srMappingsDict : dict ) -> list:
+        """ for the srSet, return list only of signal regions,
+        drop others """
+        ret = []
+        for r in srSet:
+            if r in srMappingsDict:
+                m = srMappingsDict[r]
+                if m["type"] == "SR":
+                    ret.append ( r )
+        return ret
+
+    def getRegions ( self, region_labels : list, srMappingsDict : dict ) -> list:
+        """ given a list of the region_labels, return the 
+        corresponding list of the region dictionaries """
+        ret = []
+        for label in region_labels:
+            if not label in srMappingsDict:
+                continue
+            ret.append ( srMappingsDict[label] )
+        return ret
+
     def getComputerPyhf(self ):
         """
         Create computer for a pyhf result
         """
 
         globalInfo = self.dataObject.globalInfo
+        datasets = [ds.getID() for ds in self.dataObject.origdatasets]
+        jsonFiles, jsons = [], []
+        for srSetName, models in globalInfo.statModels.items():
+            for model in models:
+                if model.endswith ( ".json" ):
+                    jsonFiles.append ( model )
+                    jsons.append ( globalInfo.cachedModels[model] )
+                    break # we only take the first json model
+        """
         jsonFiles = [js for js in globalInfo.jsonFiles]
         jsons = globalInfo.jsons.copy()
         # datasets = [ds.getID() for ds in dataset._datasets]
-        datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         # Filtering the json files by looking at the available datasets
         for jsName in globalInfo.jsonFiles:
             jsonSRs = []
@@ -311,17 +340,23 @@ class StatsComputer:
             if not all([SR in datasets for SR in jsonSRs]):
                 # Some SRs are missing for this json combination
                 logger.error( f"Wrong json definition in globalInfo.jsonFiles for json : {jsName}" )
+        print ( f"FIXME we skipped the filtering step" )
+        logger.debug(f"jsonFiles after filtering: {jsonFiles}")
+        """
 
         jsonDictNames = {}
-        for jsName in jsonFiles:
-            jsonDictNames.update( { jsName: [ region['smodels'] for region in globalInfo.jsonFiles[jsName] if region is not None and "smodels" in region ] } )
-        # jsonRegions = [ [region['smodels'] for region in globalInfo.jsonFiles[jsName]] for jsName in jsonFiles]
+        for srSetName, models in globalInfo.statModels.items():
+            for model in models:
+                if not model.endswith ( '.json' ):
+                    continue
+                jsonDictNames[model]=self.getSRsOnly ( \
+                        globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
+ 
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
         for ds in datasets:
             if not ds in jsonRegions:
                 logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
         logger.debug(f"list of datasets: {datasets}")
-        logger.debug(f"jsonFiles after filtering: {jsonFiles}")
 
         # Constructing the list of signals with subsignals matching each json
         nsignals = {}
@@ -339,8 +374,20 @@ class StatsComputer:
         if hasattr(globalInfo,"signalUncertainty"):
             signalUncertainty = globalInfo.signalUncertainty
 
+        r_jsonFiles = {} ## here we reconstruct the old jsonFiles dict
+        ## (for now, maybe we will see that there is a smarter way)
+        for srSetName, models in globalInfo.statModels.items():
+            for model in models:
+                if not model.endswith ( ".json" ):
+                    continue
+                region_names = globalInfo.srSets[srSetName]
+                regions = self.getRegions ( region_names, 
+                        globalInfo.srMappingsDict )
+                r_jsonFiles[model]=regions
+
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        data = PyhfData(nsignals, jsons, globalInfo.jsonFiles, includeCRs, signalUncertainty, globalInfo )
+        data = PyhfData(nsignals, jsons, r_jsonFiles, includeCRs, signalUncertainty, globalInfo )
+        # data = PyhfData(nsignals, jsons, jsonFiles, includeCRs, signalUncertainty, globalInfo )
         self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
         self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
 
@@ -437,13 +484,13 @@ class StatsComputer:
         nll = self.nll ( poi_test, evaluationType, asimov, **kwargs )
         return exponentiateNLL ( nll, doIt = not return_nll )
 
-    def CLs ( self, poi_test : float = 1., 
+    def CLs ( self, poi_test : float = 1.,
               evaluationType : NllEvalType=observed,
               **kwargs ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( evaluationType )
         if hasattr ( self.upperLimitComputer, "CLs" ):
-            return self.upperLimitComputer.CLs ( poi_test, 
+            return self.upperLimitComputer.CLs ( poi_test,
                     evaluationType = evaluationType, **kwargs )
         return None
 
