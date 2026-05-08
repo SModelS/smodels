@@ -57,23 +57,20 @@ class ExpResult(object):
             folders.append((root, files))
         folders.sort()
         self.datasets = []
-        hasJsons = hasattr(self.globalInfo, "jsonFiles" )
-        if hasJsons:
+        hasModels = hasattr(self.globalInfo, "srMappings" )
+        if hasModels:
             dsOrder = []
-            for SRs in self.globalInfo.jsonFiles.values():
-                if not isinstance(SRs,list):
-                    raise SModelSExperimentError(f"The entries in jsonFiles keys should be a list and not {type(SRs)}")
-                for SR in SRs:
-                    if not isinstance(SR,dict):
-                        raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
-                    # In case the smodels label is not defined, ignore SR
-                    if not "smodels" in SR:
-                        continue
-                    smodelsLabel = SR["smodels"]
-                    if smodelsLabel is None or smodelsLabel in dsOrder:
-                        continue
-                    # Store the dataset following the order defined in globalInfo.jsonFiles
-                    dsOrder.append ( smodelsLabel )
+            for SR in self.globalInfo.srMappings:
+                if not isinstance(SR,dict):
+                    raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
+                # In case the smodels label is not defined, ignore SR
+                if not "smodels" in SR:
+                    continue
+                smodelsLabel = SR["smodels"]
+                if smodelsLabel is None or smodelsLabel in dsOrder:
+                    continue
+                # Store the dataset following the order defined in globalInfo.jsonFiles
+                dsOrder.append ( smodelsLabel )
             self.globalInfo.datasetOrder = dsOrder
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
@@ -100,7 +97,7 @@ class ExpResult(object):
         if type(self.globalInfo.datasetOrder)==tuple:
             self.globalInfo.datasetOrder = list ( self.globalInfo.datasetOrder )
         # now append the rest -- but only for json file case
-        if hasJsons:
+        if hasModels:
             for dsName,ds in datasets.items():
                 if dsName not in dsOrder:
                     self.datasets.append ( ds )
@@ -204,6 +201,15 @@ class ExpResult(object):
         else:
             return None
 
+    def hasStatsModel(self) -> bool:
+        """ do we have any kind of statistical model """
+        if hasattr(self.globalInfo, "covariance"):
+            return True
+        if hasattr ( self.globalInfo, "srMappings" ):
+            return True
+        return False
+
+    """
     def hasCovarianceMatrix(self) -> bool:
         return hasattr(self.globalInfo, "covariance")
 
@@ -212,6 +218,7 @@ class ExpResult(object):
 
     def hasMLModel(self):
         return hasattr(self.globalInfo, "mlModels")
+    """
 
     def isCombinableWith ( self, other ) -> bool:
         """ can this expResult be safely assumed to be approximately uncorrelated

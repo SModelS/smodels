@@ -200,15 +200,8 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
-
-            if hasattr(self.dataset.globalInfo, "mlModels"):
-                # Get computer
-                computer = StatsComputer.forNNs(dataset=self.dataset,
-                                              nsig=srNsigDict,
-                                              deltas_rel = self.deltas_rel)
-
             # Get ordered list of datasets:
-            elif hasattr(self.dataset.globalInfo, "covariance"):
+            if hasattr(self.dataset.globalInfo, "covariance"):
                 datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] for dataID in datasetList]
@@ -217,10 +210,22 @@ class TheoryPrediction(object):
                                                        nsig=srNsigs,
                                                        deltas_rel = self.deltas_rel)
 
-            elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                computer = StatsComputer.forPyhf(dataset=self.dataset,
-                                                       nsig=srNsigDict,
-                                                       deltas_rel = self.deltas_rel)
+            elif hasattr(self.dataset.globalInfo, "statModels"):
+                # Get computer
+                hasOnnx = False
+                for srSetName, models in self.dataset.globalInfo.statModels.items():
+                    for model in models:
+                        if model.endswith ( ".onnx" ):
+                            hasOnnx = True
+                            break
+                if hasOnnx:
+                    computer = StatsComputer.forNNs(dataset=self.dataset,
+                                              nsig=srNsigDict,
+                                              deltas_rel = self.deltas_rel)
+                else:
+                    computer = StatsComputer.forPyhf(dataset=self.dataset,
+                                              nsig=srNsigDict,
+                                              deltas_rel = self.deltas_rel)
 
         self._statsComputer = computer
 
@@ -876,8 +881,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile() \
-            and not expResult.hasMLModel():
+    elif not expResult.hasStatsModel():
         return None
 
     txnameList = []

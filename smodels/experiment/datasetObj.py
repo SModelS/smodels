@@ -500,10 +500,12 @@ class CombinedDataSet(object):
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
         if hasattr(self.globalInfo, "covariance"):
             self.type = "simplified"
-        if hasattr(self.globalInfo, "jsonFiles"):
+        if hasattr(self.globalInfo, "statModels"):
             self.type = "pyhf"
-        if hasattr(self.globalInfo, "mlModels"):
-            self.type = "nn"
+            for srSetName, models in self.globalInfo.statModels.items():
+                for model in models:
+                    if model.endswith ( ".onnx" ):
+                        self.type = "nn"
 
     def __str__(self):
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
