@@ -9,12 +9,11 @@ publicationDOI: https://doi.org/10.1103/PhysRevD.101.052005
 contact: atlas-phys-susy-conveners@cern.ch
 comment: Be careful when testing models allowing for the production of only electrons or muons against this analysis. The EMs in the slepton CRs are correct only if both leptons can be produced. Moreover, but not related, the higgsino mass plane has been implemented in another database entry to reduce its computation time and to increase its result validity. No full stat model exists for this mass plane since only EMs from inclusive SRs are published. Merging it with ATLAS-SUSY-2018-16 then requires to create fake, individual, bkg-only stat models for them to be picked up when combining SRs. In that case, all the stat models have to be computed, even if they are almost unsensitive to the tested model. The wino-bino mass plane uses a full stat model, thus increasing the computation time of pure higgsino models by a lot. On top of that, the higgsino exclusion limits obtained though the validation are farther from the official ones.
 private: False
-implementedBy: Wolfgang Waltenberger
-lastUpdate: 2024/7/30
-# datasetOrder: ['CR_ewk_VV_high', 'CR_ewk_VV_low', 'CR_ewk_tau_high', 'CR_ewk_tau_low', 'CR_ewk_top_high', 'CR_ewk_top_low', 'SR_ewk_2l_ee_high_c', 'SR_ewk_2l_ee_low_c', 'SR_ewk_2l_ee_med_c', 'SR_ewk_2l_ee_high_d', 'SR_ewk_2l_ee_low_d', 'SR_ewk_2l_ee_med_d', 'SR_ewk_2l_ee_high_e', 'SR_ewk_2l_ee_low_e', 'SR_ewk_2l_ee_med_e', 'SR_ewk_2l_ee_high_f', 'SR_ewk_2l_ee_low_f', 'SR_ewk_2l_ee_med_f', 'SR_ewk_2l_ee_high_g', 'SR_ewk_2l_ee_low_g', 'SR_ewk_2l_ee_high_h', 'SR_ewk_2l_ee_low_h', 'SR_ewk_2l_mm_high_a', 'SR_ewk_2l_mm_low_a', 'SR_ewk_2l_mm_med_a', 'SR_ewk_2l_mm_high_b', 'SR_ewk_2l_mm_low_b', 'SR_ewk_2l_mm_med_b', 'SR_ewk_2l_mm_high_c', 'SR_ewk_2l_mm_low_c', 'SR_ewk_2l_mm_med_c', 'SR_ewk_2l_mm_high_d', 'SR_ewk_2l_mm_low_d', 'SR_ewk_2l_mm_med_d', 'SR_ewk_2l_mm_high_e', 'SR_ewk_2l_mm_low_e', 'SR_ewk_2l_mm_med_e', 'SR_ewk_2l_mm_high_f', 'SR_ewk_2l_mm_low_f', 'SR_ewk_2l_mm_med_f', 'SR_ewk_2l_mm_high_g', 'SR_ewk_2l_mm_low_g', 'SR_ewk_2l_mm_high_h', 'SR_ewk_2l_mm_low_h','CR_slep_VV_high', 'CR_slep_VV_low', 'CR_slep_tau_high', 'CR_slep_tau_low', 'CR_slep_top_high', 'CR_slep_top_low', 'SR_slep_2l_ee_high_a', 'SR_slep_2l_ee_low_a', 'SR_slep_2l_ee_high_b', 'SR_slep_2l_ee_low_b', 'SR_slep_2l_ee_high_c', 'SR_slep_2l_ee_low_c', 'SR_slep_2l_ee_high_d', 'SR_slep_2l_ee_low_d', 'SR_slep_2l_ee_high_e', 'SR_slep_2l_ee_low_e', 'SR_slep_2l_ee_high_f', 'SR_slep_2l_ee_low_f', 'SR_slep_2l_ee_high_g', 'SR_slep_2l_ee_low_g', 'SR_slep_2l_ee_high_h', 'SR_slep_2l_ee_low_h', 'SR_slep_2l_mm_high_a', 'SR_slep_2l_mm_low_a', 'SR_slep_2l_mm_high_b', 'SR_slep_2l_mm_low_b', 'SR_slep_2l_mm_high_c', 'SR_slep_2l_mm_low_c', 'SR_slep_2l_mm_high_d', 'SR_slep_2l_mm_low_d', 'SR_slep_2l_mm_high_e', 'SR_slep_2l_mm_low_e', 'SR_slep_2l_mm_high_f', 'SR_slep_2l_mm_low_f', 'SR_slep_2l_mm_high_g', 'SR_slep_2l_mm_low_g', 'SR_slep_2l_mm_high_h', 'SR_slep_2l_mm_low_h,'SR_ewk_1l1T']
-#jsonFiles: {'EWKinos_bkgonly_SR2lOnly.json': ['CR_ewk_VV_high', 'CR_ewk_VV_low', 'CR_ewk_tau_high', 'CR_ewk_tau_low', 'CR_ewk_top_high', 'CR_ewk_top_low', 'SR_ewk_2l_ee_high_c', 'SR_ewk_2l_ee_low_c', 'SR_ewk_2l_ee_med_c', 'SR_ewk_2l_ee_high_d', 'SR_ewk_2l_ee_low_d', 'SR_ewk_2l_ee_med_d', 'SR_ewk_2l_ee_high_e', 'SR_ewk_2l_ee_low_e', 'SR_ewk_2l_ee_med_e', 'SR_ewk_2l_ee_high_f', 'SR_ewk_2l_ee_low_f', 'SR_ewk_2l_ee_med_f', 'SR_ewk_2l_ee_high_g', 'SR_ewk_2l_ee_low_g', 'SR_ewk_2l_ee_high_h', 'SR_ewk_2l_ee_low_h', 'SR_ewk_2l_mm_high_a', 'SR_ewk_2l_mm_low_a', 'SR_ewk_2l_mm_med_a', 'SR_ewk_2l_mm_high_b', 'SR_ewk_2l_mm_low_b', 'SR_ewk_2l_mm_med_b', 'SR_ewk_2l_mm_high_c', 'SR_ewk_2l_mm_low_c', 'SR_ewk_2l_mm_med_c', 'SR_ewk_2l_mm_high_d', 'SR_ewk_2l_mm_low_d', 'SR_ewk_2l_mm_med_d', 'SR_ewk_2l_mm_high_e', 'SR_ewk_2l_mm_low_e', 'SR_ewk_2l_mm_med_e', 'SR_ewk_2l_mm_high_f', 'SR_ewk_2l_mm_low_f', 'SR_ewk_2l_mm_med_f', 'SR_ewk_2l_mm_high_g', 'SR_ewk_2l_mm_low_g', 'SR_ewk_2l_mm_high_h', 'SR_ewk_2l_mm_low_h'], 'Sleptons_bkgonly.json': ['CR_slep_VV_high', 'CR_slep_VV_low', 'CR_slep_tau_high', 'CR_slep_tau_low', 'CR_slep_top_high', 'CR_slep_top_low', 'SR_slep_2l_ee_high_a', 'SR_slep_2l_ee_low_a', 'SR_slep_2l_ee_high_b', 'SR_slep_2l_ee_low_b', 'SR_slep_2l_ee_high_c', 'SR_slep_2l_ee_low_c', 'SR_slep_2l_ee_high_d', 'SR_slep_2l_ee_low_d', 'SR_slep_2l_ee_high_e', 'SR_slep_2l_ee_low_e', 'SR_slep_2l_ee_high_f', 'SR_slep_2l_ee_low_f', 'SR_slep_2l_ee_high_g', 'SR_slep_2l_ee_low_g', 'SR_slep_2l_ee_high_h', 'SR_slep_2l_ee_low_h', 'SR_slep_2l_mm_high_a', 'SR_slep_2l_mm_low_a', 'SR_slep_2l_mm_high_b', 'SR_slep_2l_mm_low_b', 'SR_slep_2l_mm_high_c', 'SR_slep_2l_mm_low_c', 'SR_slep_2l_mm_high_d', 'SR_slep_2l_mm_low_d', 'SR_slep_2l_mm_high_e', 'SR_slep_2l_mm_low_e', 'SR_slep_2l_mm_high_f', 'SR_slep_2l_mm_low_f', 'SR_slep_2l_mm_high_g', 'SR_slep_2l_mm_low_g', 'SR_slep_2l_mm_high_h', 'SR_slep_2l_mm_low_h']}
-jsonFiles: {
-  'EWKinos_bkgonly_SR2lOnly.json': [
+implementedBy: Timothee Pascal
+lastUpdate: 2024/7/2
+includeCRs: True
+signalUncertainty: 0.22
+srMappings: [
     {'pyhf': 'CRVV_MLL_hghmet_cuts', 'smodels': 'CR_ewk_VV_high', 'type': 'CR'},
     {'pyhf': 'CRVV_MLL_lowmet_cuts', 'smodels': 'CR_ewk_VV_low', 'type': 'CR'},
     {'pyhf': 'CRtau_MLL_hghmet_cuts', 'smodels': 'CR_ewk_tau_high', 'type': 'CR'},
@@ -58,8 +57,7 @@ jsonFiles: {
     {'pyhf': 'SRmm_eMLLg_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_g', 'type': 'SR'},
     {'pyhf': 'SRmm_eMLLg_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_g', 'type': 'SR'},
     {'pyhf': 'SRmm_eMLLh_hghmet_cuts', 'smodels': 'SR_ewk_2l_mm_high_h', 'type': 'SR'},
-    {'pyhf': 'SRmm_eMLLh_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_h', 'type': 'SR'}],
-  'Sleptons_bkgonly.json': [
+    {'pyhf': 'SRmm_eMLLh_lowmet_deltaM_high_cuts', 'smodels': 'SR_ewk_2l_mm_low_h', 'type': 'SR'},
     {'pyhf': 'CRVV_MT2_hghmet_cuts', 'smodels': 'CR_slep_VV_high', 'type': 'CR'},
     {'pyhf': 'CRVV_MT2_lowmet_cuts', 'smodels': 'CR_slep_VV_low', 'type': 'CR'},
     {'pyhf': 'CRtau_MT2_hghmet_cuts', 'smodels': 'CR_slep_tau_high', 'type': 'CR'},
@@ -98,6 +96,89 @@ jsonFiles: {
     {'pyhf': 'SRmm_eMT2g_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_g', 'type': 'SR'},
     {'pyhf': 'SRmm_eMT2h_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_h', 'type': 'SR'},
     {'pyhf': 'SRmm_eMT2h_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_h', 'type': 'SR'}]
-  }
-includeCRs: True
-signalUncertainty: 0.22
+srSets: { 'EWKinos_SR2lOnly': ['CR_ewk_VV_high',
+          'CR_ewk_VV_low',
+          'CR_ewk_tau_high',
+          'CR_ewk_tau_low',
+          'CR_ewk_top_high',
+          'CR_ewk_top_low',
+          'SR_ewk_2l_ee_high_c',
+          'SR_ewk_2l_ee_low_c',
+          'SR_ewk_2l_ee_med_c',
+          'SR_ewk_2l_ee_high_d',
+          'SR_ewk_2l_ee_low_d',
+          'SR_ewk_2l_ee_med_d',
+          'SR_ewk_2l_ee_high_e',
+          'SR_ewk_2l_ee_low_e',
+          'SR_ewk_2l_ee_med_e',
+          'SR_ewk_2l_ee_high_f',
+          'SR_ewk_2l_ee_low_f',
+          'SR_ewk_2l_ee_med_f',
+          'SR_ewk_2l_ee_high_g',
+          'SR_ewk_2l_ee_low_g',
+          'SR_ewk_2l_ee_high_h',
+          'SR_ewk_2l_ee_low_h',
+          'SR_ewk_2l_mm_high_a',
+          'SR_ewk_2l_mm_low_a',
+          'SR_ewk_2l_mm_med_a',
+          'SR_ewk_2l_mm_high_b',
+          'SR_ewk_2l_mm_low_b',
+          'SR_ewk_2l_mm_med_b',
+          'SR_ewk_2l_mm_high_c',
+          'SR_ewk_2l_mm_low_c',
+          'SR_ewk_2l_mm_med_c',
+          'SR_ewk_2l_mm_high_d',
+          'SR_ewk_2l_mm_low_d',
+          'SR_ewk_2l_mm_med_d',
+          'SR_ewk_2l_mm_high_e',
+          'SR_ewk_2l_mm_low_e',
+          'SR_ewk_2l_mm_med_e',
+          'SR_ewk_2l_mm_high_f',
+          'SR_ewk_2l_mm_low_f',
+          'SR_ewk_2l_mm_med_f',
+          'SR_ewk_2l_mm_high_g',
+          'SR_ewk_2l_mm_low_g',
+          'SR_ewk_2l_mm_high_h',
+          'SR_ewk_2l_mm_low_h',
+          ],
+    'Sleptons': ['CR_slep_VV_high',
+          'CR_slep_VV_low',
+          'CR_slep_tau_high',
+          'CR_slep_tau_low',
+          'CR_slep_top_high',
+          'CR_slep_top_low',
+          'SR_slep_2l_ee_high_a',
+          'SR_slep_2l_ee_low_a',
+          'SR_slep_2l_ee_high_b',
+          'SR_slep_2l_ee_low_b',
+          'SR_slep_2l_ee_high_c',
+          'SR_slep_2l_ee_low_c',
+          'SR_slep_2l_ee_high_d',
+          'SR_slep_2l_ee_low_d',
+          'SR_slep_2l_ee_high_e',
+          'SR_slep_2l_ee_low_e',
+          'SR_slep_2l_ee_high_f',
+          'SR_slep_2l_ee_low_f',
+          'SR_slep_2l_ee_high_g',
+          'SR_slep_2l_ee_low_g',
+          'SR_slep_2l_ee_high_h',
+          'SR_slep_2l_ee_low_h',
+          'SR_slep_2l_mm_high_a',
+          'SR_slep_2l_mm_low_a',
+          'SR_slep_2l_mm_high_b',
+          'SR_slep_2l_mm_low_b',
+          'SR_slep_2l_mm_high_c',
+          'SR_slep_2l_mm_low_c',
+          'SR_slep_2l_mm_high_d',
+          'SR_slep_2l_mm_low_d',
+          'SR_slep_2l_mm_high_e',
+          'SR_slep_2l_mm_low_e',
+          'SR_slep_2l_mm_high_f',
+          'SR_slep_2l_mm_low_f',
+          'SR_slep_2l_mm_high_g',
+          'SR_slep_2l_mm_low_g',
+          'SR_slep_2l_mm_high_h',
+          'SR_slep_2l_mm_low_h',
+          ]}
+statModels: { 'EWKinos_SR2lOnly': ['EWKinos_bkgonly_SR2lOnly.json'],
+     'Sleptons': ['Sleptons_bkgonly.json']}
