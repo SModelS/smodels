@@ -281,14 +281,14 @@ class StatsComputer:
         self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi(), pyhfComputer = pyhfComputer )
         self.likelihoodComputer = self.upperLimitComputer
 
-    def getSRsOnly ( self, srSet : list, srMappingsDict : dict ) -> list:
+    def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
         """ for the srSet, return list only of signal regions,
         drop others """
         ret = []
         for r in srSet:
             if r in srMappingsDict:
                 m = srMappingsDict[r]
-                if m["type"] == "SR":
+                if True: # m["type"] == "SR":
                     ret.append ( r )
         return ret
 
@@ -349,7 +349,7 @@ class StatsComputer:
             for model in models:
                 if not model.endswith ( '.json' ):
                     continue
-                jsonDictNames[model]=self.getSRsOnly ( \
+                jsonDictNames[model]=self.getAll ( \
                         globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
  
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
@@ -386,6 +386,7 @@ class StatsComputer:
                 if model in r_jsonFiles:
                     raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
                 r_jsonFiles[model]=regions
+                break
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
         data = PyhfData(nsignals, jsons, r_jsonFiles, includeCRs, signalUncertainty, globalInfo )
