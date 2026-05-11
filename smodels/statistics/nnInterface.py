@@ -261,9 +261,16 @@ class NNUpperLimitComputer:
         """ check if srname is control region
         :returns: true if srname is control region
         """
+        srname0 = srname
+        if srname.endswith ( "-0" ):
+            srname0 = srname[:-2]
         for region in self.data.globalInfo.srMappings:
             if srname == region["onnx"]:
-                return region["type"]=="CR"
+                ret = region["type"]=="CR"
+                return ret
+            if srname0 == region["onnx"]:
+                ret = region["type"]=="CR"
+                return ret
         return False
 
     def totalYieldsFromSignals ( self, modelToUse : str, poi_test : float ) -> list :
