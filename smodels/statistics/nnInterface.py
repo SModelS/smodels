@@ -238,7 +238,8 @@ class NNUpperLimitComputer:
         ## but later we will anyways rewrite this
         # logger.error ( f"we are assuming an order here" )
         indices = []
-        for idx,(srSetName,models) in enumerate(self.data.globalInfo.statModels.items()):
+        for idx,(srSetName,models) in enumerate(\
+                self.data.globalInfo.statModels.items()):
             if len(models)>0 and models[0].endswith(".json"):
                 indices.append ( idx )
         """
