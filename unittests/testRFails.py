@@ -41,7 +41,8 @@ class RFailsTest(unittest.TestCase):
 
         # Reduce the number of attempts 
         pyhfInterface.nattempts_max = 5
-        database = Database('official')
+        # database = Database('official')
+        from fullDatabase import database
         out = runMain(filename,inifile='testParameters_rfails.ini',
                              overridedatabase = database, 
                              suppressStdout=True)
@@ -104,7 +105,8 @@ class RFailsTest(unittest.TestCase):
 
         # Reduce the number of attempts 
         pyhfInterface.nattempts_max = 10
-        database = Database('official')
+        from fullDatabase import database
+        # database = Database('official')
         runMain(dirname,inifile='testParameters_rfails.ini',
                              overridedatabase = database,suppressStdout=True )
         outSummary = os.path.join(out, 'summary.txt')
