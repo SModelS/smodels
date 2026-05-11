@@ -379,10 +379,12 @@ class PyhfTest(unittest.TestCase):
         from smodels.share.models.SMparticles import SMList
         import os
         from smodels.decomposition import decomposer
-        from smodels.matching.theoryPrediction import _getDataSetPredictions, _getCombinedResultFor, TheoryPredictionList
+        from smodels.matching.theoryPrediction import _getDataSetPredictions, \
+            _getCombinedResultFor, TheoryPredictionList
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        database = Database('./database/')
+        from databaseLoader import database
+        # database = Database('./database/')
         runtime.modelFile = "smodels.share.models.mssm"
         BSMList = load()
 
