@@ -384,7 +384,7 @@ class StatsComputer:
                 regions = self.getRegions ( region_names, 
                         globalInfo.srMappingsDict )
                 if model in r_jsonFiles:
-                    logger.error ( f"model {model} mentioned more than once in {globalInfo.path}" )
+                    raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
                 r_jsonFiles[model]=regions
 
         # Loading the jsonFiles, unless we already have them (because we pickled)

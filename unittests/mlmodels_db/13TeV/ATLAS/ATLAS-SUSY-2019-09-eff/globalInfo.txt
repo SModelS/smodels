@@ -147,7 +147,7 @@ statModels: {
   'WH_nj': [
     'SR_WH_nj_fake_bkgonly.json'],
   'WH_DFOS': [
-    'SR_WH_nj_fake_bkgonly.json'] }
+    'SR_WH_DFOS_fake_bkgonly.json'] }
 
 private: False
 implementedBy: Wolfgang Waltenberger
