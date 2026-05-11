@@ -1035,9 +1035,7 @@ class SubDatabase(object):
         logger.debug(f"Creating {root}, pcl={pclfile}")
         expres = None
         try:
-            # logger.info( "%s exists? %d" % ( pclfile,os.path.exists( pclfile ) ) )
             if not self.force_load == "txt" and os.path.exists(pclfile):
-                # logger.info( "%s exists" % ( pclfile ) )
                 with open(pclfile, "rb") as f:
                     logger.debug(f"Loading: {pclfile}")
                     ## read meta from pickle
@@ -1053,8 +1051,14 @@ class SubDatabase(object):
         except IOError as e:
             logger.error(f"exception {e}")
         if not expres:  # create from text file
-            expres = ExpResult(root,
-                databaseParticles=self.databaseParticles)
+            try:
+                expres = ExpResult(root,
+                    databaseParticles=self.databaseParticles)
+            except SyntaxError as e:
+                logger.error ( f"when parsing {root}: {e}" )
+                import traceback
+                logger.error ( f"{traceback.format_exc()}")
+                sys.exit(-1)
             if self.subpickle and expres:
                 expres.writePickle(self.databaseVersion)
         if expres:
