@@ -232,11 +232,20 @@ class NNUpperLimitComputer:
             if ulmu < mumin:
                 mumin = ulmu
                 mostSensitiveModel = model
+        ## get the indices of all the pyhf models that
+        ## do not have an NN model
+        ## FIXME here we assume an order of the keys,
+        ## but later we will anyways rewrite this
+        # logger.error ( f"we are assuming an order here" )
         indices = []
+        for idx,(srSetName,models) in enumerate(self.data.globalInfo.statModels.items()):
+            if len(models)>0 and models[0].endswith(".json"):
+                indices.append ( idx )
+        """
         for idx,model in enumerate(self.data.globalInfo.jsonFiles.keys()):
             if model in self.data.globalInfo.mlModels.keys():
                 indices.append ( idx )
-
+        """
         ## the most sensitive model and its upper limit we store separately
         if self.pyhfComputer is not None and indices is not []:
             i_idx, ul, jsonf_ = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex( tuple ( indices ) )
