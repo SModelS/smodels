@@ -46,7 +46,7 @@ class DatabaseTest(unittest.TestCase):
 
 
     def testLoadOfficial(self):
-        dblatest=Database ("official")
+        dblatest=Database ("official") # I think here I want the official
         latestver = dblatest.databaseVersion.replace(".","").replace("official","")
         from databaseLoader import database
         thisver = database.databaseVersion.replace("unittest","").replace(".","")

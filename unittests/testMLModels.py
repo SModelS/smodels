@@ -95,10 +95,10 @@ class MLModelsTest(unittest.TestCase):
             'obs': 1.3190277005301172,  'exp': 1.5852880131898859,
             'p1': 1.3302383061447438 } }
         for p in allPredictions:
-            self.assertAlmostEqual ( p.nll( evaluationType = apriori),
-                    nlls[p.analysisId()]["exp"] )
             self.assertAlmostEqual ( p.nll(),
                     nlls[p.analysisId()]["obs"] )
+            self.assertAlmostEqual ( p.nll( evaluationType = apriori),
+                    nlls[p.analysisId()]["exp"] )
             self.assertAlmostEqual ( p.getUpperLimitOnMu(),
                     uls[p.analysisId()]["obs"] )
             self.assertAlmostEqual ( \
