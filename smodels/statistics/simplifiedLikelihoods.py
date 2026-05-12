@@ -1034,6 +1034,13 @@ class UpperLimitComputer:
         self.likelihoodComputer = likelihoodComputer
         self.cl = cl
 
+    def nll_min(self,**kwargs) -> float:
+        return self.likelihoodComputer.nll_min ( **kwargs )
+
+    def nll( self, poi_test : float, evaluationType : NllEvalType,
+             **kwargs) -> float:
+        return self.likelihoodComputer.nll ( poi_test, evaluationType, **kwargs )
+
     def getUpperLimitOnSigmaTimesEff(
         self, evaluationType : NllEvalType = observed, trylasttime : bool =False,
         nSigma : int = 0 ) -> UnitXSec:

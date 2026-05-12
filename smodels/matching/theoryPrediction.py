@@ -626,7 +626,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         over muvals.
         """
 
-        return self.statsComputer.likelihoodComputer.getLlhds(muvals,evaluationType,normalize)
+        return self.statsComputer.subComputers[0].getLlhds(muvals,evaluationType,normalize)
 
     def describe(self):
         """returns a string containing a list of all analysisId and dataIds"""

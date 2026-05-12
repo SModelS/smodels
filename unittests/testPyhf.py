@@ -413,7 +413,7 @@ class PyhfTest(unittest.TestCase):
         combinedRes = _getCombinedResultFor(dataSetResults,expResult)
         combinedRes.setStatsComputer()
 
-        patch = combinedRes._statsComputer.likelihoodComputer.patches[0]
+        patch = combinedRes._statsComputer.subComputers[0].patches[0]
 
         with open('patch_2018-16.json','r') as f:
             patch_ref = json.load(f)

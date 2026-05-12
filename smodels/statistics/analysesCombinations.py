@@ -15,7 +15,7 @@ import numpy as np
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
-     findRoot
+     findRoot, exponentiateNLL
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
@@ -56,7 +56,7 @@ class AnaCombLikelihoodComputer(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
-        return self.likelihood ( mu, evaluationType, return_nll=True, 
+        return self.likelihood ( mu, evaluationType, return_nll=True,
                                  asimov=asimov )
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -97,7 +97,6 @@ class AnaCombLikelihoodComputer(object):
 
         return nll
 
-    @lru_cache
     def lmax(
         self,
         allowNegativeSignals: bool = False,
@@ -115,7 +114,32 @@ class AnaCombLikelihoodComputer(object):
                   sigma_mu -- the standard deviation around mu_hat, and lmax, \
                   i.e. the likelihood at mu_hat
         """
+        nllm = self.nll_min ( allowNegativeSignals = allowNegativeSignals,
+                evaluationType = evaluationType, asimov = asimov )
+        if nllm is None:
+            return nllm
+        if return_nll == True:
+            return nllm
+        if "nll_min" in nllm:
+            nllm["lmax"] = exponentiateNLL ( nllm["nll_min"], doIt = True )
+            nllm.pop ( "nll_min" )
+        return nllm
 
+    def nll_min(
+        self,
+        allowNegativeSignals: bool = False,
+        evaluationType : NllEvalType = observed,
+        asimov: Union[None,float] = None,
+    ) -> Union[Dict, None]:
+        """find muhat and lmax.
+
+        :param allowNegativeSignals: if true, then also allow for negative values
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
+                  output is requested, it returns a dictionary with mu_hat, \
+                  sigma_mu -- the standard deviation around mu_hat, and lmax, \
+                  i.e. the likelihood at mu_hat
+        """
 
         muhats, weighted = [], []
         totweight = 0.0
@@ -135,22 +159,14 @@ class AnaCombLikelihoodComputer(object):
         if len(muhats)==1:
             if muhat < 0. and not allowNegativeSignals:
                 muhat = 0.
-            retllh = self.theoryPredictions[0].likelihood ( muhat, return_nll = return_nll, evaluationType = evaluationType, asimov=asimov )
-            ret = {"muhat": float(muhat), "sigma_mu": float(sigma_mu) }
-            if return_nll:
-                ret["nll_min"] = retllh
-            else:
-                ret["lmax"] = retllh
+            retnllh = self.theoryPredictions[0].nll ( muhat, evaluationType = evaluationType, asimov=asimov )
+            ret = {"muhat": float(muhat), "sigma_mu": float(sigma_mu), "nll_min": retnllh }
             return ret
 
         if len(muhats) == 0:
             logger.error(f"asked to compute muhat for combination, but no individual values")
-            ret = {"muhat": None, "sigma_mu": None }
-            if return_nll:
-                ret["nll_min"]=None
-            else:
-                ret["lmax"] = None
-            return  ret
+            ret = {"muhat": None, "sigma_mu": None, "nll_min": None }
+            return ret
 
 
         toTry = [sum(weighted) / totweight]
@@ -166,7 +182,7 @@ class AnaCombLikelihoodComputer(object):
                 x = float(mu[0])
             else:
                 x = float(mu)
-            return self.likelihood(x, evaluationType=evaluationType, return_nll=True, asimov=asimov)
+            return self.nll(x, evaluationType=evaluationType, asimov=asimov)
 
         if allowNegativeSignals:
             toTry += [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1]
@@ -216,7 +232,7 @@ class AnaCombLikelihoodComputer(object):
                     "try again with different initialisation."
                 )
         mu_hat = o.x[0]
-        lmax = np.exp(-o.fun)  # fun is *always* nll
+        # lmax = np.exp(-o.fun)  # fun is *always* nll
         if hessian < 0.0:    #or nll_ > 998.0: again remove nll_ cut
             logger.error(
                 "tried with several starting points to find maximum, always ended up in minimum. "
@@ -227,24 +243,18 @@ class AnaCombLikelihoodComputer(object):
         if not allowNegativeSignals and mu_hat < 0.0:
             mu_hat = 0.0  # fixme for this case we should reevaluate the hessian!
         sigma_mu = np.sqrt(hessian)
-        retllh = lmax
-        if return_nll:
-            retllh = nll_
         ret = {"muhat": float(mu_hat), "sigma_mu": float(sigma_mu) }
-        if return_nll:
-            ret["nll_min"] = retllh
-        else:
-            ret["lmax"]=retllh
+        ret["nll_min"] = nll_
         return ret
 
     @lru_cache
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, 
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed,
             allowNegativeSignals = False, nSigma : int = 0 ) -> float:
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on signal strength multiplier mu
         """
@@ -258,7 +268,7 @@ class AnaCombLikelihoodComputer(object):
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, 
+    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed,
             allowNegativeSignals : bool = False, nSigma : int = 0 ) -> UnitXSec:
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
@@ -267,7 +277,7 @@ class AnaCombLikelihoodComputer(object):
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on fiducial cross section
         """
@@ -287,11 +297,11 @@ class AnaCombLikelihoodComputer(object):
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.  For error bands.
         :param evaluationType: one of: observed, apriori, aposteriori
         """
-        fmh = self.lmax( evaluationType=evaluationType, 
+        fmh = self.nll_min( evaluationType=evaluationType,
                          allowNegativeSignals=allowNegativeSignals )
         mu_hat, sigma_mu = fmh["muhat"], fmh["sigma_mu"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
@@ -299,9 +309,9 @@ class AnaCombLikelihoodComputer(object):
                                return_nll=True,asimov=None )
         # a posteriori evaluationType is needed here
         # mu_hat is mu_hat for signal_rel
-        fmh = self.lmax(evaluationType=evaluationType,
+        fmh = self.nll_min(evaluationType=evaluationType,
                         allowNegativeSignals=allowNegativeSignals,
-                        return_nll=True, asimov = 0. )
+                        asimov = 0. )
         nll0A = fmh["nll_min"]
 
         # logger.error ( f"COMB nll0A {nll0A:.3f} mu_hatA {mu_hatA:.3f}" )

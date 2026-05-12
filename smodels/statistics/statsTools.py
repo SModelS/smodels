@@ -38,8 +38,8 @@ def getStatsComputerModule():
         return StatsComputer
 
 class StatsComputer:
-    __slots__ = [ "nsig", "dataObject", "dataType", "likelihoodComputer", "data",
-                  "upperLimitComputer", "deltas_sys", "allowNegativeSignals" ]
+    __slots__ = [ "nsig", "dataObject", "dataType", "subComputers", "data",
+                  "deltas_sys", "allowNegativeSignals" ]
 
     def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list],
                    dataType : str,
@@ -68,8 +68,7 @@ class StatsComputer:
         if self.deltas_sys is None:
             self.deltas_sys = 0.
         self.allowNegativeSignals = allowNegativeSignals
-        self.upperLimitComputer = None
-        self.likelihoodComputer = None
+        self.subComputers = []
 
     @classmethod
     def forSingleBin(cls, dataset, nsig, deltas_rel, lumi : Optional[UnitLumi]=None ):
@@ -210,8 +209,9 @@ class StatsComputer:
                      dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
                      nsignal = self.nsig, lumi = lumi )
         self.data = data
-        self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
+        likelihoodComputer = LikelihoodComputer ( data )
+        #self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
+        self.subComputers = [ UpperLimitComputer ( likelihoodComputer ) ]
 
     def getComputerMultiBinSL(self):
         """
@@ -241,8 +241,9 @@ class StatsComputer:
         data = Data( nobs, bg, cov, third_moment=third_momenta, nsignal = self.nsig,
                      deltas_rel = self.deltas_sys, lumi=dataset.getLumi() )
         self.data = data
-        self.likelihoodComputer = LikelihoodComputer ( data )
-        self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
+        likelihoodComputer = LikelihoodComputer ( data )
+        computer = UpperLimitComputer ( likelihoodComputer )
+        self.subComputers = [ computer ]
 
     def getComputerNN(self ):
         """
@@ -281,8 +282,8 @@ class StatsComputer:
             # later we should move it to statsTools
             pyhfComputer = StatsComputer.forPyhf (
                     self.dataObject, self.nsig, self.deltas_sys )
-        self.upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi(), pyhfComputer = pyhfComputer )
-        self.likelihoodComputer = self.upperLimitComputer
+        upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi(), pyhfComputer = pyhfComputer )
+        self.subComputers = [ upperLimitComputer ]
 
     def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
         """ for the srSet, return list only of signal regions,
@@ -366,8 +367,8 @@ class StatsComputer:
         # Loading the jsonFiles, unless we already have them (because we pickled)
         data = PyhfData(nsignals, jsons, r_jsonFiles, includeCRs, signalUncertainty, globalInfo )
         # data = PyhfData(nsignals, jsons, jsonFiles, includeCRs, signalUncertainty, globalInfo )
-        self.upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
-        self.likelihoodComputer = self.upperLimitComputer # for pyhf its the same
+        upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
+        self.subComputers = [ upperLimitComputer ]
 
     def getComputerTruncGaussian ( self, **kwargs ):
         """
@@ -375,8 +376,9 @@ class StatsComputer:
         """
         computer = TruncatedGaussians ( **kwargs )
         self.data = None
-        self.likelihoodComputer = computer
-        self.upperLimitComputer = computer
+        #self.likelihoodComputer = computer
+        #self.upperLimitComputer = computer
+        self.subComputers = [ computer ]
 
     def getComputerAnalysesComb(self):
         """
@@ -384,9 +386,10 @@ class StatsComputer:
         :param nsig: signal yields.
         """
 
-        self.upperLimitComputer = AnaCombLikelihoodComputer(theoryPredictions=self.dataObject,
+        computer = AnaCombLikelihoodComputer(theoryPredictions=self.dataObject,
                                                             deltas_rel=self.deltas_sys)
-        self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
+        # self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
+        self.subComputers  = [ computer ]
 
     def get_five_values ( self, evaluationType : NllEvalType,
                       return_nll : bool = False,
@@ -447,12 +450,12 @@ class StatsComputer:
         # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
-                index, _, _ = self.likelihoodComputer.getBestCombinationIndex()
+                index, _, _ = self.subComputers[0].getBestCombinationIndex()
                 kwargs["workspace_index"] = index
-            ret = self.likelihoodComputer.nll (
+            ret = self.subComputers[0].nll (
                     poi_test, **kwargs )
             return ret
-        ret = self.likelihoodComputer.nll ( poi_test, **kwargs)
+        ret = self.subComputers[0].nll ( poi_test, **kwargs)
         return ret
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
@@ -467,8 +470,8 @@ class StatsComputer:
               **kwargs ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
         # self.transform ( evaluationType )
-        if hasattr ( self.upperLimitComputer, "CLs" ):
-            return self.upperLimitComputer.CLs ( poi_test,
+        if hasattr ( self.subComputers[0] , "CLs" ):
+            return self.subComputers[0].CLs ( poi_test,
                     evaluationType = evaluationType, **kwargs )
         return None
 
@@ -476,7 +479,7 @@ class StatsComputer:
         """ SL only. transform the data to evaluationType or observed """
         if self.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
             return
-        self.likelihoodComputer.transform ( evaluationType )
+        self.subComputers[0].likelihoodComputer.transform ( evaluationType )
 
     def restore ( self, evaluationType ):
         """ SL only. transform the data to evaluationType or observed """
@@ -484,25 +487,14 @@ class StatsComputer:
             return
         if evaluationType != observed:
             return
-        self.likelihoodComputer.model = self.likelihoodComputer.origModel
+        self.subComputers[0].model = self.subComputers[0].origModel
 
-    def nll_min ( self, evaluationType : NllEvalType ) -> dict:
-        return self.maximize_likelihood ( evaluationType,
-                return_nll = True, **kwargs )
-
-    def maximize_likelihood ( self, evaluationType : NllEvalType,
-           return_nll : bool = False, ** kwargs ) -> dict:
-        """ simple frontend to the individual computers, later spey
-        :param return_nll: if True, return negative log likelihood
-        :returns: Dictionary of llhd (llhd at mu_hat), \
-                  muhat, sigma_mu (sigma of mu_hat), \
-                  optionally also theta_hat
-        """
+    def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> dict:
         self.transform ( evaluationType )
         # kwargs = { }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
-                index, _, _ = self.likelihoodComputer.getBestCombinationIndex()
+                index, _, _ = self.subComputers[0].getBestCombinationIndex()
                 kwargs["workspace_index"] = index
                 if evaluationType != observed:
                     kwargs["evaluationType"] = evaluationType
@@ -511,20 +503,36 @@ class StatsComputer:
         elif self.dataType == "analysesComb":
             kwargs["evaluationType"]=evaluationType
 
-        ret = self.likelihoodComputer.lmax ( return_nll = return_nll,
-                                   allowNegativeSignals = self.allowNegativeSignals,
-                                   **kwargs )
+        ret = self.subComputers[0].nll_min ( 
+            allowNegativeSignals = self.allowNegativeSignals, **kwargs )
+        return ret
+
+    def maximize_likelihood ( self, evaluationType : NllEvalType,
+           return_nll : bool = False, **kwargs ) -> dict:
+        """ simple frontend to the individual computers, later spey
+        :param return_nll: if True, return negative log likelihood
+        :returns: Dictionary of llhd (llhd at mu_hat), \
+                  muhat, sigma_mu (sigma of mu_hat), \
+                  optionally also theta_hat
+        """
+        ret = self.nll_min ( evaluationType, **kwargs )
+        if return_nll == True:
+            return ret
+        if type(ret) == dict and "nll_min" in ret and ret["nll_min"]!=None:
+            ret["lmax"] = exponentiateNLL ( ret["nll_min"], doIt = True )
+            ret.pop("nll_min")
         return ret
 
     def getMostSignificantModel ( self ):
         """ convenience function to get the most significant model
         """
         if self.dataType == "pyhf":
-            w_idx, ul, name = self.upperLimitComputer.getBestCombinationIndex()
+            w_idx, ul, name = self.subComputers[0].getBestCombinationIndex()
+            # w_idx, ul, name = self.upperLimitComputer.getBestCombinationIndex()
             return name
         if self.dataType == "nn":
-            self.upperLimitComputer.determineMostSensitiveModel()
-            return self.upperLimitComputer.mostSensitiveModel
+            self.subComputers[0].determineMostSensitiveModel()
+            return self.subComputers[0].mostSensitiveModel
         if self.dataType == "SL":
             return "SL"
         return f"?? {self.dataType}"
@@ -547,13 +555,13 @@ class StatsComputer:
             if all([s == 0 for s in self.nsig]):
                 logger.warning("All signals are empty")
                 return None
-            index, _, _ = self.likelihoodComputer.getBestCombinationIndex()
+            index, _, _ = self.subComputers[0].getBestCombinationIndex()
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
                        evaluationType = evaluationType, workspace_index = index,
                        nSigma = nSigma )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                ret = self.subComputers[0].getUpperLimitOnMu(
                        evaluationType = evaluationType, workspace_index = index,
                        nSigma = nSigma )
         elif self.dataType == "nn":
@@ -561,31 +569,31 @@ class StatsComputer:
                 logger.warning("All signals are empty")
                 return None
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
                        evaluationType = evaluationType, nSigma = nSigma,
                        **kwargs )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                ret = self.subComputers[0].getUpperLimitOnMu(
                        evaluationType = evaluationType, nSigma = nSigma,
                        **kwargs )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
-            self.upperLimitComputer.likelihoodComputer.model = self.data
+            self.subComputers[0].likelihoodComputer.model = self.data
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
                        evaluationType = evaluationType,
                        nSigma = nSigma )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                ret = self.subComputers[0].getUpperLimitOnMu(
                        evaluationType = evaluationType,
                        nSigma = nSigma )
         elif self.dataType in ["analysesComb"]:
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
                         evaluationType = evaluationType,
                         allowNegativeSignals=self.allowNegativeSignals,
                         nSigma = nSigma )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                ret = self.subComputers[0].getUpperLimitOnMu(
                         evaluationType = evaluationType,
                         allowNegativeSignals=self.allowNegativeSignals,
                         nSigma = nSigma )

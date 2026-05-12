@@ -249,7 +249,7 @@ class NNUpperLimitComputer:
         """
         ## the most sensitive model and its upper limit we store separately
         if self.pyhfComputer is not None and indices is not []:
-            i_idx, ul, jsonf_ = self.pyhfComputer.upperLimitComputer.getBestCombinationIndex( tuple ( indices ) )
+            i_idx, ul, jsonf_ = self.pyhfComputer.subComputers[0].getBestCombinationIndex( tuple ( indices ) )
             if ul < mumin:
                 mumin = ul
                 mostSensitiveModel = i_idx # list(self.data.globalInfo.jsonFiles.keys())[i_idx]
@@ -329,21 +329,21 @@ class NNUpperLimitComputer:
             yields = self.totalYieldsFromSignals( modelToUse, poi_test )
             ret = self.adaptors[modelToUse].predict(yields)
         else:
-            nll = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
+            nll = self.pyhfComputer.subComputers[0].nll ( poi_test,
                     modelToUse, evaluationType = observed )
-            nllA = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
+            nllA = self.pyhfComputer.subComputers[0].nll ( poi_test,
                     modelToUse, evaluationType = observed, asimov = 1. )
-            nllE = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
+            nllE = self.pyhfComputer.subComputers[0].nll ( poi_test,
                     modelToUse, evaluationType = apriori )
-            nllEA = self.pyhfComputer.upperLimitComputer.nll ( poi_test,
+            nllEA = self.pyhfComputer.subComputers[0].nll ( poi_test,
                     modelToUse, evaluationType = apriori, asimov = 1. )
-            nll0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
+            nll0 = self.pyhfComputer.subComputers[0].nll ( 0.,
                     modelToUse, evaluationType = observed )
-            nllA0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
+            nllA0 = self.pyhfComputer.subComputers[0].nll ( 0.,
                     modelToUse, evaluationType = observed, asimov = 1. )
-            nllE0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
+            nllE0 = self.pyhfComputer.subComputers[0].nll ( 0.,
                     modelToUse, evaluationType = apriori )
-            nllEA0 = self.pyhfComputer.upperLimitComputer.nll ( 0.,
+            nllEA0 = self.pyhfComputer.subComputers[0].nll ( 0.,
                     modelToUse, evaluationType = apriori, asimov = 1. )
             ret = { "nll_obs_1": nll, "nll_exp_1": nllE,
                     "nllA_obs_1": nllA, "nllA_exp_1": nllEA,
@@ -489,7 +489,7 @@ class NNUpperLimitComputer:
         if not modelToUse in self.adaptors.keys():
             if asimov not in [ False, None ]:
                 print ( f"[nnInterface] FIXME fix asimov" )
-            return self.pyhfComputer.upperLimitComputer.nll_min ( modelToUse,
+            return self.pyhfComputer.subComputers[0].nll_min ( modelToUse,
                     evaluationType, allowNegativeSignals )
             #print ( f"[nnInterface] no {modelToUse} in {', '.join(self.adaptors.keys())}" )
             #return None
@@ -583,7 +583,7 @@ class NNUpperLimitComputer:
         if modelToUse == None:
             modelToUse = self.mostSensitiveModel
         if not modelToUse in self.adaptors:
-            ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+            ret = self.pyhfComputer.subComputers[0].getUpperLimitOnSigmaTimesEff(
                     evaluationType,modelToUse, nSigma )
             return ret
         if self.data.totalYield == 0.:
@@ -620,7 +620,7 @@ class NNUpperLimitComputer:
             modelToUse = self.mostSensitiveModel
         if modelToUse not in self.adaptors:
             # so its a pyhf one
-            ret = self.pyhfComputer.upperLimitComputer.getUpperLimitOnMu(
+            ret = self.pyhfComputer.subComputers[0].getUpperLimitOnMu(
                     evaluationType,modelToUse, nSigma )
             return ret
         mu_hat, sigma_mu, clsRoot, nll_min, nll_minA, \
