@@ -41,17 +41,20 @@ class StatsComputer:
     __slots__ = [ "nsig", "dataObject", "dataType", "likelihoodComputer", "data",
                   "upperLimitComputer", "deltas_sys", "allowNegativeSignals" ]
 
-    def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list], dataType : str,
+    def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list],
+                   dataType : str,
                    nsig : Union[None,float,List,Dict] = None,
                    deltas_rel : Union[None,float] = None,
-                   allowNegativeSignals : bool = False):
+                   allowNegativeSignals : bool = False ):
         """
          Initialise.
 
-        :param dataObject: a smodels (combined)dataset or a list of theory predictions (for combination of analyses)
+        :param dataObject: a smodels (combined)dataset or a list of
+        theory predictions (for combination of analyses)
         :param nsig: signal yield, either as float or as list
         :param deltas_rel: relative error on signal. currently unused
-        :allowNegativeSignals: if True, negative values for the signal (mu) are allowed.
+        :allowNegativeSignals: if True, negative values for the signal (mu)
+        are allowed.
         """
 
         if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
@@ -293,7 +296,7 @@ class StatsComputer:
         return ret
 
     def getRegions ( self, region_labels : list, srMappingsDict : dict ) -> list:
-        """ given a list of the region_labels, return the 
+        """ given a list of the region_labels, return the
         corresponding list of the region dictionaries """
         ret = []
         for label in region_labels:
@@ -316,34 +319,6 @@ class StatsComputer:
                     jsonFiles.append ( model )
                     jsons.append ( globalInfo.cachedModels[model] )
                     break # we only take the first json model
-        """
-        jsonFiles = [js for js in globalInfo.jsonFiles]
-        jsons = globalInfo.jsons.copy()
-        # datasets = [ds.getID() for ds in dataset._datasets]
-        # Filtering the json files by looking at the available datasets
-        for jsName in globalInfo.jsonFiles:
-            jsonSRs = []
-            for ir,region in enumerate ( globalInfo.jsonFiles[jsName] ):
-                if not isinstance(region,dict):
-                    raise SModelSError(f"The jsonFiles field should contain lists \
-                        of strings or dictionaries ({type(region)} is not allowed)" )
-
-                globalInfo.jsonFiles[jsName][ir] = region
-                if region['type'] == 'SR':
-                    jsonSRs.append(region['smodels'])
-            if all([ds not in jsonSRs for ds in datasets]):
-                # No datasets found for this json combination
-                jsIndex = jsonFiles.index(jsName)
-                jsonFiles.pop(jsIndex)
-                jsons.pop(jsIndex)
-                continue
-            if not all([SR in datasets for SR in jsonSRs]):
-                # Some SRs are missing for this json combination
-                logger.error( f"Wrong json definition in globalInfo.jsonFiles for json : {jsName}" )
-        print ( f"FIXME we skipped the filtering step" )
-        logger.debug(f"jsonFiles after filtering: {jsonFiles}")
-        """
-
         jsonDictNames = {}
         for srSetName, models in globalInfo.statModels.items():
             for model in models:
@@ -351,7 +326,7 @@ class StatsComputer:
                     continue
                 jsonDictNames[model]=self.getAll ( \
                         globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
- 
+
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
         for ds in datasets:
             if not ds in jsonRegions:
@@ -381,7 +356,7 @@ class StatsComputer:
                 if not model.endswith ( ".json" ):
                     continue
                 region_names = globalInfo.srSets[srSetName]
-                regions = self.getRegions ( region_names, 
+                regions = self.getRegions ( region_names,
                         globalInfo.srMappingsDict )
                 if model in r_jsonFiles:
                     raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
@@ -650,7 +625,9 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleStatsDataSet ( nobs, bg, bgerr, lumi )
     computer = StatsComputer ( dataset, 1. )
-    ul = computer.poi_upper_limit ( evaluationType = observed, limit_on_xsec = True )
+    ul = computer.poi_upper_limit ( evaluationType = observed,
+                                    limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( evaluationType = apriori, limit_on_xsec = True )
+    ule = computer.poi_upper_limit ( evaluationType = apriori,
+                                     limit_on_xsec = True )
     print ( "ule", ule )
