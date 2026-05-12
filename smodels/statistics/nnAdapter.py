@@ -21,7 +21,7 @@ class NNAdapter:
     Adapter that wraps around a neural network
     """
     __slots__ = [ "mlModel", "modelType", "onnxMeta", "srOrder", "regressor", 
-                  "session_options" ]
+                  "session_options", "onnxfilename" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
                   onnxfilename : str, session_options : dict = {} ):
@@ -41,6 +41,7 @@ class NNAdapter:
             except Exception as e:
                 print( f"[nnAdapter] could not load model {onnxfilename}" )
                 sys.exit(-1)
+        self.onnxfilename = onnxfilename
         self.session_options = session_options
         self._parseMetaData ()
         self._getSROrder()
@@ -139,7 +140,7 @@ class NNAdapter:
             elif emkey == 'y_min':
                 values = json.loads(em.value)
                 if len(values)<7:
-                    print ( f"[nnAdapter] 'y_min' in {onnxFile} has only {len(values)} entries, need 7." )
+                    print ( f"[nnAdapter] 'y_min' in {self.onnxfilename} has only {len(values)} entries, need 7." )
                     import sys; sys.exit(-1)
                 indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3,
                             "nLL_obs_max" : -5, "nLL_exp_max": -7 }
