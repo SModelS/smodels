@@ -851,7 +851,8 @@ class LikelihoodComputer:
         nll = self.nll ( mu, evaluationType, asimov )
         return exponentiateNLL ( nll, doIt = not return_nll )
 
-    def nll_min(self, allowNegativeSignals : bool = False ) -> dict:
+    def nll_min( self, evaluationType : NllEvalType = observed,
+                 allowNegativeSignals : bool = False ) -> dict:
         """ nll_min
         :param allowNegativeSignals: if False, then negative nsigs are
         replaced with 0.
@@ -1033,6 +1034,7 @@ class UpperLimitComputer:
         """
         self.likelihoodComputer = likelihoodComputer
         self.cl = cl
+        self.name = "SL" ## later we give the name of the srSet here
 
     def nll_min(self,**kwargs) -> float:
         return self.likelihoodComputer.nll_min ( **kwargs )

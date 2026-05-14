@@ -20,7 +20,7 @@ from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
 import time
 import subprocess
 from smodels.base.smodelsLogging import logger
-
+from databaseLoader import database
 
 class RunSModelSTest(unittest.TestCase):
     definingRun = False  # meant only to adapt to changes in output format
@@ -116,7 +116,8 @@ class RunSModelSTest(unittest.TestCase):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         filename = "./testFiles/slha/T6bbHH_pyhf.slha"
         inifile = "./testParameters_pyhf.ini"
-        outputfile = runMain(filename, inifile=inifile, suppressStdout=True )
+        outputfile = runMain(filename, inifile=inifile, suppressStdout=False,
+                              overridedatabase=database )
         smodelsOutput = importModule(outputfile)
         from T6bbHH_pyhf_default import smodelsOutputDefault
         ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
@@ -128,7 +129,8 @@ class RunSModelSTest(unittest.TestCase):
             e = "T6bbHH_pyhf_default.py != ./unitTestOutput/T6bbHH_pyhf.slha.py"
             logger.error(e)
         self.assertTrue(equals)
-        removeCruftOutputs(outputfile)
+        if equals:
+            removeCruftOutputs(outputfile)
 
     def testGoodFile13(self):
 

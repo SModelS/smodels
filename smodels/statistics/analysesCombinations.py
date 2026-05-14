@@ -41,6 +41,7 @@ class AnaCombLikelihoodComputer(object):
 
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
+        self.name = "anaComb"
 
     def nll(
         self,

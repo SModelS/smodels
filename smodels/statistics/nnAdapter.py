@@ -32,6 +32,8 @@ class NNAdapter:
         :param session_options: options for the onnxruntime inference session,
         e.g. { "inter_op_num_threads": 1 }
         """
+        assert type(mlModel) in [ bytes, str, onnx.ModelProto,os.PathLike],\
+            f"mlModel needs to be one of: bytes, str, onnx.ModelProto, os.PathLike"
         if type(mlModel) == str and mlModel.endswith ( "onnx") and \
                 os.path.exists ( mlModel ):
             self.mlModel = onnx.load ( mlModel )

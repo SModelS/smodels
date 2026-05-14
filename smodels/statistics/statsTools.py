@@ -24,6 +24,7 @@ from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from smodels.base.physicsUnits import UnitXSec
+from smodels.tools.caching import roundCache, lru_cache
 from typing import Union, Text, Optional
 
 def getStatsComputerModule():
@@ -272,18 +273,28 @@ class StatsComputer:
         ## translate the signal from smodels names to pyhf names
         for smname,pyhfname in translator.items():
             nsignals[pyhfname] = self.nsig[smname]
-        # ic ( nsignals )
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         data = NNData( nsignals, self.dataObject )
-        pyhfComputer = None
-        if hasJsonsWithoutMLModels:
+        self.getComputerPyhf()
+        for srSetName, models in data.globalInfo.statModels.items():
+            modelfilename = models[0]
+            if modelfilename.endswith ( ".json" ):
+                #print ( f"@@ FIXME need to do for pyhf model {modelfilename} here" )
+                #print ( f"@@ nsikg {self.nsig.keys()}" )
+                #print ( f"@@ nsikg {self.dataObject}" )
+                continue
+            upperLimitComputer = NNUpperLimitComputer(data,
+                    lumi=self.dataObject.getLumi(),
+                    onnxfilename = modelfilename )
+            self.subComputers.append ( upperLimitComputer )
+        if False: # hasJsonsWithoutMLModels:
         # if hasattr ( globalInfo, "jsonsWithoutMLModels" ):
             # for now we put the pyhf computer inside the nnComputer
             # later we should move it to statsTools
-            pyhfComputer = StatsComputer.forPyhf (
-                    self.dataObject, self.nsig, self.deltas_sys )
-        upperLimitComputer = NNUpperLimitComputer(data, lumi=self.dataObject.getLumi(), pyhfComputer = pyhfComputer )
-        self.subComputers = [ upperLimitComputer ]
+            import sys, IPython; IPython.embed( colors = "neutral" )
+            #pyhfComputer = StatsComputer.forPyhf (
+            #        self.dataObject, self.nsig, self.deltas_sys )
+            #self.subComputers.append ( pyhfComputer )
 
     def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
         """ for the srSet, return list only of signal regions,
@@ -314,19 +325,15 @@ class StatsComputer:
         globalInfo = self.dataObject.globalInfo
         datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         jsonFiles, jsons = [], []
-        for srSetName, models in globalInfo.statModels.items():
-            for model in models:
-                if model.endswith ( ".json" ):
-                    jsonFiles.append ( model )
-                    jsons.append ( globalInfo.cachedModels[model] )
-                    break # we only take the first json model
         jsonDictNames = {}
         for srSetName, models in globalInfo.statModels.items():
-            for model in models:
-                if not model.endswith ( '.json' ):
-                    continue
-                jsonDictNames[model]=self.getAll ( \
-                        globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
+            model = models[0]
+            if not model.endswith ( ".json" ):
+                continue
+            jsonFiles.append ( model )
+            jsons.append ( globalInfo.cachedModels[model] )
+            jsonDictNames[model]=self.getAll ( \
+                    globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
 
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
         for ds in datasets:
@@ -353,22 +360,27 @@ class StatsComputer:
         r_jsonFiles = {} ## here we reconstruct the old jsonFiles dict
         ## (for now, maybe we will see that there is a smarter way)
         for srSetName, models in globalInfo.statModels.items():
-            for model in models:
-                if not model.endswith ( ".json" ):
-                    continue
-                region_names = globalInfo.srSets[srSetName]
-                regions = self.getRegions ( region_names,
-                        globalInfo.srMappingsDict )
-                if model in r_jsonFiles:
-                    raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
-                r_jsonFiles[model]=regions
-                break
+            model = models[0]
+            if not model.endswith ( ".json" ):
+                continue
+            region_names = globalInfo.srSets[srSetName]
+            regions = self.getRegions ( region_names,
+                    globalInfo.srMappingsDict )
+            if model in r_jsonFiles:
+                raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
+            r_jsonFiles[model]=regions
 
-        # Loading the jsonFiles, unless we already have them (because we pickled)
-        data = PyhfData(nsignals, jsons, r_jsonFiles, includeCRs, signalUncertainty, globalInfo )
-        # data = PyhfData(nsignals, jsons, jsonFiles, includeCRs, signalUncertainty, globalInfo )
-        upperLimitComputer = PyhfUpperLimitComputer(data, lumi=self.dataObject.getLumi() )
-        self.subComputers = [ upperLimitComputer ]
+        self.subComputers = []
+        for nsignal,json,(jsonFileName,r_jsonFile) in zip(nsignals.values(),jsons,r_jsonFiles.items() ):
+            # Loading the jsonFiles, unless we already have them (because we pickled)
+            data = PyhfData(nsignal, json, r_jsonFile,
+                    includeCRs, signalUncertainty, globalInfo,
+                    jsonFileName = jsonFileName )
+            # data = PyhfData(nsignals, jsons, jsonFiles, includeCRs, signalUncertainty, globalInfo )
+            upperLimitComputer = PyhfUpperLimitComputer( data,
+                    lumi=self.dataObject.getLumi() )
+            self.subComputers.append ( upperLimitComputer )
+        #self.subComputers = [ upperLimitComputer ]
 
     def getComputerTruncGaussian ( self, **kwargs ):
         """
@@ -445,9 +457,11 @@ class StatsComputer:
     def nll ( self, poi_test : float, evaluationType : NllEvalType,
               asimov : Union[None,float] = None, **kwargs  ) -> float:
         """ simple frontend to individual computers """
+        msm = self.getMostSensitiveModel()
         self.transform ( evaluationType )
         kwargs.update ( { "evaluationType": evaluationType, "asimov": asimov } )
         # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
+        """
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
                 index, _, _ = self.subComputers[0].getBestCombinationIndex()
@@ -455,7 +469,8 @@ class StatsComputer:
             ret = self.subComputers[0].nll (
                     poi_test, **kwargs )
             return ret
-        ret = self.subComputers[0].nll ( poi_test, **kwargs)
+        """
+        ret = self.subComputers[ msm["idx"] ].nll ( poi_test, **kwargs)
         return ret
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
@@ -469,9 +484,10 @@ class StatsComputer:
               evaluationType : NllEvalType=observed,
               **kwargs ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
+        idx = self.getMostSensitiveModel()["idx"]
         # self.transform ( evaluationType )
-        if hasattr ( self.subComputers[0] , "CLs" ):
-            return self.subComputers[0].CLs ( poi_test,
+        if hasattr ( self.subComputers[ idx ] , "CLs" ):
+            return self.subComputers[ idx ].CLs ( poi_test,
                     evaluationType = evaluationType, **kwargs )
         return None
 
@@ -490,7 +506,10 @@ class StatsComputer:
         self.subComputers[0].model = self.subComputers[0].origModel
 
     def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> dict:
+        msm = self.getMostSensitiveModel()
+        computer = self.subComputers[ msm["idx"] ]
         self.transform ( evaluationType )
+        """
         # kwargs = { }
         if self.dataType == "pyhf":
             if not "workspace_index" in kwargs:
@@ -502,8 +521,10 @@ class StatsComputer:
             kwargs["evaluationType"]=evaluationType
         elif self.dataType == "analysesComb":
             kwargs["evaluationType"]=evaluationType
+        """
 
-        ret = self.subComputers[0].nll_min ( 
+        ret = computer.nll_min (
+            evaluationType = evaluationType,
             allowNegativeSignals = self.allowNegativeSignals, **kwargs )
         return ret
 
@@ -523,9 +544,23 @@ class StatsComputer:
             ret.pop("nll_min")
         return ret
 
-    def getMostSignificantModel ( self ):
+    @lru_cache
+    def getMostSensitiveModel ( self ) -> dict:
         """ convenience function to get the most significant model
+
+        :returns: dictionary with idx of the computer, ul_min,
+        and the name of the most sensitive model
         """
+        ul_min,idx,name = float("inf"), -1, ""
+        for i,computer in enumerate ( self.subComputers ):
+            ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
+            if ul != None and ul < ul_min:
+                ul_min, idx, name = ul, i, computer.name
+        return { "idx": idx, "ul_min": ul_min, "name": name }
+
+    """
+    def getMostSensitiveModel ( self ):
+        # convenience function to get the most significant model
         if self.dataType == "pyhf":
             w_idx, ul, name = self.subComputers[0].getBestCombinationIndex()
             # w_idx, ul, name = self.upperLimitComputer.getBestCombinationIndex()
@@ -536,6 +571,7 @@ class StatsComputer:
         if self.dataType == "SL":
             return "SL"
         return f"?? {self.dataType}"
+    """
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
@@ -550,6 +586,18 @@ class StatsComputer:
         :param kwargs:
         For error bands.
         """
+        msm = self.getMostSensitiveModel()
+        idx = msm["idx"]
+        if limit_on_xsec:
+            ret = self.subComputers[ idx ].getUpperLimitOnSigmaTimesEff(
+                   evaluationType = evaluationType, nSigma = nSigma, **kwargs )
+        else:
+            ret = self.subComputers[ idx ].getUpperLimitOnMu(
+                   evaluationType = evaluationType, nSigma = nSigma, **kwargs )
+        return ret
+        """
+        print ( f"@@STx id {self.dataObject.globalInfo.id}" )
+        print ( f"@@STx getUpperLimit idx {idx} ret {ret} nComputers {len(self.subComputers)}" )
         ret = None
         if self.dataType == "pyhf":
             if all([s == 0 for s in self.nsig]):
@@ -598,6 +646,7 @@ class StatsComputer:
                         allowNegativeSignals=self.allowNegativeSignals,
                         nSigma = nSigma )
         return ret
+        """
 
 class SimpleStatsDataSet:
     """ a very simple data class that can replace a smodels.dataset,

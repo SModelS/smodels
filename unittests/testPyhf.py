@@ -91,11 +91,11 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        signal = { "dummy0": { "SR1": 0.1 } }
-        data = PyhfData( signal, [ws] )
+        signal = { "SR1": 0.1 }
+        data = PyhfData( signal, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertEqual(ulcomputer.workspaces, None)
+        self.assertEqual(ulcomputer.workspace, None)
         self.assertEqual(ul, None)
         # Missing measurements
         ws = dict(channels=channels,
@@ -103,10 +103,10 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData( signal, [ws] )
+        data = PyhfData( signal, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertEqual(ulcomputer.workspaces, None)
+        self.assertEqual(ulcomputer.workspace, None)
         self.assertEqual(ul, None)
         # Missing observations
         ws = dict(channels=channels,
@@ -114,10 +114,10 @@ class PyhfTest(unittest.TestCase):
                   #observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData( signal, [ws])
+        data = PyhfData( signal, ws)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertEqual(ulcomputer.workspaces, None)
+        self.assertEqual(ulcomputer.workspace, None)
         self.assertEqual(ul, None)
         # Missing version
         ws = dict(channels=channels,
@@ -125,10 +125,10 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   #version='1.0.0'
                   )
-        data = PyhfData(signal, [ws])
+        data = PyhfData(signal, ws)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertIsNone(ulcomputer.workspaces)
+        self.assertIsNone(ulcomputer.workspace)
         self.assertIsNone(ul)
 
     def testCorruptJson2Signal(self):
@@ -165,12 +165,12 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   ) 
-        signal = { "dummy0": { "SR1": 0.1, "SR2": 0.2 } }
-        data = PyhfData(signal, [ws])
+        signal = { "SR1": 0.1, "SR2": 0.2 }
+        data = PyhfData(signal, ws)
         #data = PyhfData([[0.1, 0.2]], [ws])
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertEqual(ulcomputer.workspaces, None)
+        self.assertEqual(ulcomputer.workspace, None)
         self.assertEqual(ul, None)
         # Missing measurements
         ws = dict(channels=channels,
@@ -178,10 +178,10 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData(signal, [ws] )
+        data = PyhfData(signal, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertEqual(ulcomputer.workspaces, None)
+        self.assertEqual(ulcomputer.workspace, None)
         self.assertEqual(ul, None)
         # Missing observations
         ws = dict(channels=channels,
@@ -189,10 +189,10 @@ class PyhfTest(unittest.TestCase):
                   #observations=observations,
                   version='1.0.0'
                   )
-        data = PyhfData(signal, [ws] )
+        data = PyhfData(signal, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertEqual(ulcomputer.workspaces, None)
+        self.assertEqual(ulcomputer.workspace, None)
         self.assertEqual(ul, None)
         # Missing version
         ws = dict(channels=channels,
@@ -200,10 +200,10 @@ class PyhfTest(unittest.TestCase):
                   observations=observations,
                   #version='1.0.0'
                   )
-        data = PyhfData(signal, [ws] )
+        data = PyhfData(signal, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
-        self.assertIsNone(ulcomputer.workspaces)
+        self.assertIsNone(ulcomputer.workspace)
         self.assertIsNone(ul)
 
     def testNoSignal(self):
@@ -211,8 +211,8 @@ class PyhfTest(unittest.TestCase):
         Tests the case where all SRs are empty
         """
         ws = self.simpleJson([0.9], [10])
-        signal = { "dummy0": { "SR1": 0. } }
-        data = PyhfData(signal, [ws])
+        signal = { "SR1": 0. }
+        data = PyhfData(signal, ws)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertIsNone(ul)
@@ -223,25 +223,26 @@ class PyhfTest(unittest.TestCase):
         """
         # One single json but too much signals
         ws = self.simpleJson([0.9], [10])
-        nsignals = [[0.9, 0.5]]
-        nsignals = { "dummy0": { "SR1": 0.9, "SR2": 0.5 } }
-        data = PyhfData( nsignals, [ws] )
+        # nsignals = [0.9, 0.5]
+        nsignals = { "SR1": 0.9, "SR2": 0.5 }
+        data = PyhfData( nsignals, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul1 = ulcomputer.getUpperLimitOnMu()
+        self.assertIsNone(ul1)
+        """
         # Two jsons but only one signal
         ws = [self.simpleJson([0.9], [10]), self.simpleJson([0.8], [9])]
-        signal = { "dummy0": { "SR1": 0.5 } }
+        signal = { "SR1": 0.5 }
         data = PyhfData( signal, ws )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul2 = ulcomputer.getUpperLimitOnMu(workspace_index=0)
-        self.assertIsNone(ul1)
         self.assertIsNone(ul2)
+        """
 
+    """ 
     def testWSindex(self):
-        """
-        Tests how the module reacts when giving several jsons but not specifying for
-        which the UL should be computed
-        """
+        # Tests how the module reacts when giving several jsons but not specifying for
+        # which the UL should be computed
         bg = [ .9, .8 ]
         obs = [ 10, 9 ]
         # nsig = [ .1, .2 ]
@@ -252,22 +253,18 @@ class PyhfTest(unittest.TestCase):
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         self.assertAlmostEqual ( ul, 70.44942696708914, 1 )
-        """ compare with:
-        m = Data( observed=[10,9], backgrounds=[.9,.8],
-        covariance=[[1e-6,0],[0,1e-6]], nsignal=[.1,.2])
-        ulComp = UpperLimitComputer()
-        ul = ulComp.getUpperLimitOnMu(m )
-        """
+    """
 
     def testFullPyhfModule1(self):
         """
-        Computes the UL using the pyhfInterface module and checks if, outside of the module, this UL still gives a 95% CLs
+        Computes the UL using the pyhfInterface module and checks if, 
+        outside of the module, this UL still gives a 95% CLs
         """
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         bkg = self.simpleJson([0.8], [10])
         signals = [ 0.4 ]
         # Make the patch by hand
-        patch = [dict(
+        patch = dict(
             op='add',
             path='/channels/0/samples/0',
             value=dict(
@@ -286,11 +283,11 @@ class PyhfTest(unittest.TestCase):
                     )
                 ]
             )
-        )]
-        signals = { "dummy0": { "SR1": 0.4 } }
-        llhdSpec = jsonpatch.apply_patch(bkg, patch)
+        )
+        signals = { "SR1": 0.4 }
+        llhdSpec = jsonpatch.apply_patch(bkg, [patch])
         # Computing the upper limit with the SModelS/pyhf interface
-        data = PyhfData(signals, [bkg])
+        data = PyhfData(signals, bkg)
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         # ul = ul * data.totalYield
@@ -343,8 +340,8 @@ class PyhfTest(unittest.TestCase):
         )]
         llhdSpec = jsonpatch.apply_patch(bkg, patch)
         # Computing the upper limit with the SModelS/pyhf interface
-        signals = { "dummy0": { "SR1[0]": 0.4, "SR1[1]": 0.2 } }
-        data = PyhfData(signals, [bkg] )
+        signals = { "SR1[0]": 0.4, "SR1[1]": 0.2 }
+        data = PyhfData(signals, bkg )
         ulcomputer = PyhfUpperLimitComputer(data)
         ul = ulcomputer.getUpperLimitOnMu()
         # Computing the cls outside of SModelS with POI = ul, should give 0.95
@@ -368,7 +365,8 @@ class PyhfTest(unittest.TestCase):
 
     def testPatchUncertaintyAndCRs(self):
         """
-        Test if signal uncertainty and signal in the CRs are patched, with ATLAS-SUSY-2018-16 as a test case
+        Test if signal uncertainty and signal in the CRs are patched, 
+        with ATLAS-SUSY-2018-16 as a test case
 
         """
         from smodels.base.physicsUnits import GeV
@@ -390,7 +388,8 @@ class PyhfTest(unittest.TestCase):
 
         model = Model(BSMparticles=BSMList, SMparticles=SMList)
         slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
-        model.updateParticles(inputFile=slhafile,ignorePromptQNumbers = ['eCharge','colordim','spin'])
+        model.updateParticles(inputFile=slhafile,
+                ignorePromptQNumbers = ['eCharge','colordim','spin'])
 
         # Set main options for decomposition
         topDict = decomposer.decompose(model, sigmacut=0.001,
@@ -406,14 +405,15 @@ class PyhfTest(unittest.TestCase):
         smsMatch = expSMSDict.getMatchesFrom(topDict)
         dataSetResults = []
         for dataset in expResult.datasets:
-            predList = _getDataSetPredictions(dataset, smsMatch, expSMSDict, maxMassDist=0.2)
+            predList = _getDataSetPredictions( dataset, smsMatch, expSMSDict, 
+                                               maxMassDist=0.2 )
             if predList:
                 dataSetResults.append(predList)
 
         combinedRes = _getCombinedResultFor(dataSetResults,expResult)
         combinedRes.setStatsComputer()
 
-        patch = combinedRes._statsComputer.subComputers[0].patches[0]
+        patch = combinedRes._statsComputer.subComputers[0].patch
 
         with open('patch_2018-16.json','r') as f:
             patch_ref = json.load(f)

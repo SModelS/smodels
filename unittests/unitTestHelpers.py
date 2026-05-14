@@ -634,10 +634,22 @@ class Summary():
                 for i, label in enumerate(lkeys):
                     setattr(self, f"comb{label.strip()}", lvals[i])
             elif 'combined r-value (expected)' in line:
-                rexp = eval(line.split(':')[1])
-                self.rexpComb = rexp
+                rl = line.split(':')[1].strip()
+                if "NaN" in rl:
+                    self.rexpComb = float("nan")
+                else:
+                    rexp = eval( rl )
+                    self.rexpComb = rexp
             elif 'combined r-value' in line:
-                r = eval(line.split(':')[1])
+                try:
+                    rl = line.split(":")[1]
+                    rl = rl.strip()
+                    if "NaN" in rl:
+                        r = float("nan")
+                    else:
+                        r = eval( rl )
+                except SyntaxError as e:
+                    print ( f"[unitTestOutput] couldnt parse '{rl}'" )
                 self.rComb = r
 
     def _getMissingSummary(self, inputLines):
