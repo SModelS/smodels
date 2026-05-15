@@ -19,7 +19,11 @@ srMappings: [
     {'smodels': 'SRC_24', 'pyhf': 'SR_metsigST[1]'},
     {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
     {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'}]
-srSets: {'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'], 'C': ['SRC_22', 'SRC_24', 'SRC_26', 'SRC_28']}
-statModels: {'A': ['BkgOnlyA.json'], 'B': ['BkgOnlyB.json'], 'C': ['BkgOnlyC.json']}
-# statModels: {'A': ['simplifiedA.json', 'BkgOnlyA.json'], 
-#'B': ['simplifiedB.json', 'BkgOnlyB.json'], 'C': ['simplifiedC.json', 'BkgOnlyC.json']}
+srSets: { 'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'],
+			    'C': ['SRC_22', 'SRC_24', 'SRC_26', 'SRC_28']}
+statModels: { 'A': ['BkgOnlyA.json'], 'B': ['BkgOnlyB.json'],
+				      'C': ['BkgOnlyC.json'] }
+
+#statModels: { 'A': ['simplifiedA.json', 'BkgOnlyA.json'],
+#              'B': ['simplifiedB.json', 'BkgOnlyB.json'],
+#              'C': ['simplifiedC.json', 'BkgOnlyC.json']}
