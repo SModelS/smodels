@@ -53,7 +53,7 @@ class RFailsTest(unittest.TestCase):
         output = Summary(outputfile, allowedRelDiff=0.05)
         default = Summary(defaultfile, allowedRelDiff=0.05)
         if output != default:
-            logger.error ( f"{out} differs from {defaultfile}" )
+            logger.error ( f"{outputfile} differs from {defaultfile}" )
         else:
             self.assertEqual(default, output)
             

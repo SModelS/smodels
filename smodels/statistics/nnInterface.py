@@ -128,11 +128,11 @@ class NNData:
 
     def __init__(self, nsignals, dataObject ):
         self.nsignals = nsignals  # fb
-        self.getTotalYield()
         self.dataObject = dataObject
         self.globalInfo = dataObject.globalInfo
         datasets = [ds.getID() for ds in self.dataObject.origdatasets]
         self.origDataSetOrder = datasets
+        self.getTotalYield()
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
@@ -154,7 +154,7 @@ class NNUpperLimitComputer:
     informations in the 'data' instance of 'NNData'
     """
 
-    def __init__( self, data, cl : float = 0.95,
+    def __init__( self, data : NNData, cl : float = 0.95,
             lumi : Optional[UnitLumi] = None, onnxfilename : str = "?" ):
         """
 
@@ -203,46 +203,6 @@ class NNUpperLimitComputer:
             False  # boolean to detect wether self.signals has returned to an older value
         )
         self.welcome()
-
-    """
-    @lru_cache
-    def determineMostSensitiveModel ( self ):
-        # determines the most sensitive model, stores all the ULs
-        #that were needed to compute that.
-        onnxfiles = list(self.adaptors.keys())
-        if len(onnxfiles)==1:
-            self.mostSensitiveModel = onnxfiles[0]
-            ulmu = self.getUpperLimitOnMu ( evaluationType=apriori,
-                    modelToUse = self.mostSensitiveModel )
-            return
-        mumin,mostSensitiveModel=float("inf"),None
-        for model in onnxfiles:
-            ulmu = float("inf")
-            try:
-                ulmu = self.getUpperLimitOnMu ( evaluationType=apriori,
-                        modelToUse = model )
-            except SModelSError as e:
-                continue
-            if ulmu < mumin:
-                mumin = ulmu
-                mostSensitiveModel = model
-        ## get the indices of all the pyhf models that
-        ## do not have an NN model
-        ## FIXME here we assume an order of the keys,
-        ## but later we will anyways rewrite this
-        # logger.error ( f"we are assuming an order here" )
-        indices = []
-        for idx,(srSetName,models) in enumerate(\
-                self.data.globalInfo.statModels.items()):
-            if len(models)>0 and models[0].endswith(".json"):
-                indices.append ( idx )
-        #for idx,model in enumerate(self.data.globalInfo.jsonFiles.keys()):
-        #    if model in self.data.globalInfo.mlModels.keys():
-        #        indices.append ( idx )
-        ## the most sensitive model and its upper limit we store separately
-        self.mostSensitiveModel = mostSensitiveModel
-        self.mumin = mumin # the smallest expected UL
-        """
 
     def getTotalXSec ( self ):
         return self.data.getTotalXSec()
@@ -484,13 +444,12 @@ class NNUpperLimitComputer:
         logger.warning ( f"could not find nll_min!" )
         return None
 
+    """
     def lmax( self, return_nll=False, evaluationType=observed,
               allowNegativeSignals=True,
               asimov : Optional[int] = None ):
-        """
-        obsolete, use nll_min
-        :param return_nll: if true, return nll, not llhd
-        """
+        #obsolete, use nll_min
+        #:param return_nll: if true, return nll, not llhd
         nll_min =  self.nll_min( evaluationType = evaluationType,
               allowNegativeSignals = allowNegativeSignals, asimov = asimov )
         if return_nll:
@@ -500,16 +459,14 @@ class NNUpperLimitComputer:
     def getUpperLimitOnSigmaTimesEff(self,
             evaluationType : NllEvalType = observed,
             nSigma : int = 0, **kwargs ) -> UnitXSec:
-        """
-        Compute the upper limit on the fiducial
-        cross section sigma times efficiency:
+        #Compute the upper limit on the fiducial
+        #cross section sigma times efficiency:
 
-        :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
-        :return: the upper limit on sigma times eff at 'self.cl' level
-        (0.95 by default)
-        """
+        #:param evaluationType: one of: observed, apriori, aposteriori
+        #:param nSigma: the upper limit for central value (0),
+        #+ 1 sigma, - 1 sigma, etc.  For error bands.
+        #:return: the upper limit on sigma times eff at 'self.cl' level
+        #(0.95 by default)
         if self.data.totalYield == 0.:
             return None
         else:
@@ -522,6 +479,7 @@ class NNUpperLimitComputer:
                 return ul
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
+    """
 
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,

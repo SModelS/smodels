@@ -960,30 +960,6 @@ class PyhfUpperLimitComputer:
         else:
             return self.workspace
 
-    """
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed,
-            nSigma : int = 0 ):
-        #Compute the upper limit on the fiducial cross section sigma times
-        #efficiency:
-        #:param evaluationType: if set to apriori:
-        #uses expected SM backgrounds as signals
-        #else: uses 'self.nsignals'
-        #:return: the upper limit on sigma times eff at 'self.cl'
-        #level (0.95 by default)
-        if self.data.totalYield == 0.:
-            return None
-        else:
-            ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                                         nSigma = nSigma )
-            if ul == None:
-                return ul
-            if self.lumi is None:
-                logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
-                return ul
-            xsec = self.data.totalYield / self.lumi
-            return ul * xsec
-        """
-
     def generateAsimovData ( self, mu : Union[None,float] = 0.,
             evaluationType : NllEvalType=observed ) -> list:
         """ generate asimov data for the model for signal strength mu

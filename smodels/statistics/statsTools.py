@@ -252,49 +252,41 @@ class StatsComputer:
         """
         globalInfo = self.dataObject.globalInfo
         statModels = globalInfo.statModels
-        nsignals = {}
-        translator = {}
+        #nsignals = {}
+        labelToONNX = {}
+        labelToSModelS = {}
         hasJsonsWithoutMLModels = False
 
         for sr in globalInfo.srMappings:
-            nsignals[ sr["onnx"] ] = 0.
-            if sr["smodels"] != None:
-                translator [ sr["smodels"] ] = sr["onnx"]
-
-        for srSetName, models in statModels.items():
-            hasOnnx = False
-            for model in models:
-                if model.endswith ( ".onnx" ):
-                    hasOnnx = True
-                    break
-            if not hasOnnx:
-                hasJsonsWithoutMLModels = True
+           # nsignals[ sr["onnx"] ] = 0.
+            if sr["label"] != None:
+                labelToONNX [ sr["label"] ] = sr["onnx"]
+                labelToSModelS [ sr["label"] ] = sr["smodels"]
 
         ## translate the signal from smodels names to pyhf names
-        for smname,pyhfname in translator.items():
-            nsignals[pyhfname] = self.nsig[smname]
+        #for smname,onnxname in translator.items():
+        #    nsignals[onnxname] = self.nsig[smname]
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
-        data = NNData( nsignals, self.dataObject )
         self.getComputerPyhf()
-        for srSetName, models in data.globalInfo.statModels.items():
+        for srSetName, models in globalInfo.statModels.items():
+            f_signals = {}
+            for sr in globalInfo.srMappings:
+                f_signals[ sr["onnx"] ] = 0.
+            for label in globalInfo.srSets[srSetName]:
+                smodelsName = labelToSModelS[label]
+                if smodelsName in self.nsig:
+                    f_signals[ labelToONNX[label] ] = \
+                        self.nsig[ smodelsName ]
+            data = NNData( f_signals, self.dataObject )
             modelfilename = models[0]
             if modelfilename.endswith ( ".json" ):
-                #print ( f"@@ FIXME need to do for pyhf model {modelfilename} here" )
-                #print ( f"@@ nsikg {self.nsig.keys()}" )
-                #print ( f"@@ nsikg {self.dataObject}" )
                 continue
             upperLimitComputer = NNUpperLimitComputer(data,
                     lumi=self.dataObject.getLumi(),
                     onnxfilename = modelfilename )
             self.subComputers.append ( upperLimitComputer )
-        if False: # hasJsonsWithoutMLModels:
-        # if hasattr ( globalInfo, "jsonsWithoutMLModels" ):
-            # for now we put the pyhf computer inside the nnComputer
-            # later we should move it to statsTools
-            import sys, IPython; IPython.embed( colors = "neutral" )
-            #pyhfComputer = StatsComputer.forPyhf (
-            #        self.dataObject, self.nsig, self.deltas_sys )
-            #self.subComputers.append ( pyhfComputer )
+        if False: # data.globalInfo.id == "ATLAS-SUSY-2019-09":
+            import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
 
     def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
         """ for the srSet, return list only of signal regions,
@@ -578,7 +570,8 @@ class StatsComputer:
         """ get the total yield, summing over all computers """
         ret = 0.*fb
         for computer in self.subComputers:
-            ret += computer.getTotalXSec()
+            add = computer.getTotalXSec()
+            ret += add
         return ret
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
@@ -597,64 +590,10 @@ class StatsComputer:
         idx = msm["idx"]
         ulmu = self.subComputers[ idx ].getUpperLimitOnMu(
                    evaluationType = evaluationType, nSigma = nSigma, **kwargs )
-        ret = ulmu
-        if limit_on_xsec:
-            ret = ulmu * self.getTotalXSec()
-        #ret2 = self.subComputers[ idx ].getUpperLimitOnMu(
-        #           evaluationType = evaluationType, nSigma = nSigma, **kwargs )
+        if ulmu == None or not limit_on_xsec:
+            return ulmu
+        ret = ulmu * self.getTotalXSec()
         return ret
-        """
-        print ( f"@@STx id {self.dataObject.globalInfo.id}" )
-        print ( f"@@STx getUpperLimit idx {idx} ret {ret} nComputers {len(self.subComputers)}" )
-        ret = None
-        if self.dataType == "pyhf":
-            if all([s == 0 for s in self.nsig]):
-                logger.warning("All signals are empty")
-                return None
-            index, _, _ = self.subComputers[0].getBestCombinationIndex()
-            if limit_on_xsec:
-                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType, workspace_index = index,
-                       nSigma = nSigma )
-            else:
-                ret = self.subComputers[0].getUpperLimitOnMu(
-                       evaluationType = evaluationType, workspace_index = index,
-                       nSigma = nSigma )
-        elif self.dataType == "nn":
-            if all([s == 0 for s in self.nsig]):
-                logger.warning("All signals are empty")
-                return None
-            if limit_on_xsec:
-                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType, nSigma = nSigma,
-                       **kwargs )
-            else:
-                ret = self.subComputers[0].getUpperLimitOnMu(
-                       evaluationType = evaluationType, nSigma = nSigma,
-                       **kwargs )
-        elif self.dataType in ["SL", "1bin", "truncGaussian"]:
-            self.subComputers[0].likelihoodComputer.model = self.data
-            if limit_on_xsec:
-                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType,
-                       nSigma = nSigma )
-            else:
-                ret = self.subComputers[0].getUpperLimitOnMu(
-                       evaluationType = evaluationType,
-                       nSigma = nSigma )
-        elif self.dataType in ["analysesComb"]:
-            if limit_on_xsec:
-                ret = self.subComputers[0].getUpperLimitOnSigmaTimesEff(
-                        evaluationType = evaluationType,
-                        allowNegativeSignals=self.allowNegativeSignals,
-                        nSigma = nSigma )
-            else:
-                ret = self.subComputers[0].getUpperLimitOnMu(
-                        evaluationType = evaluationType,
-                        allowNegativeSignals=self.allowNegativeSignals,
-                        nSigma = nSigma )
-        return ret
-        """
 
 class SimpleStatsDataSet:
     """ a very simple data class that can replace a smodels.dataset,
