@@ -98,6 +98,7 @@ class AnaCombLikelihoodComputer(object):
 
         return nll
 
+    """
     def lmax(
         self,
         allowNegativeSignals: bool = False,
@@ -105,16 +106,15 @@ class AnaCombLikelihoodComputer(object):
         return_nll: bool = False,
         asimov: Union[None,float] = None,
     ) -> Union[Dict, None]:
-        """find muhat and lmax.
+        #find muhat and lmax.
 
-        :param allowNegativeSignals: if true, then also allow for negative values
-        :param evaluationType: one of: observed, apriori, aposteriori
-        :param return_nll: if true, return negative log max likelihood instead of lmax
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
-                  output is requested, it returns a dictionary with mu_hat, \
-                  sigma_mu -- the standard deviation around mu_hat, and lmax, \
-                  i.e. the likelihood at mu_hat
-        """
+        #:param allowNegativeSignals: if true, then also allow for negative values
+        #:param evaluationType: one of: observed, apriori, aposteriori
+        #:param return_nll: if true, return negative log max likelihood instead of lmax
+        #:returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
+        #          output is requested, it returns a dictionary with mu_hat, \
+        #          sigma_mu -- the standard deviation around mu_hat, and lmax, \
+        #          i.e. the likelihood at mu_hat
         nllm = self.nll_min ( allowNegativeSignals = allowNegativeSignals,
                 evaluationType = evaluationType, asimov = asimov )
         if nllm is None:
@@ -125,6 +125,7 @@ class AnaCombLikelihoodComputer(object):
             nllm["lmax"] = exponentiateNLL ( nllm["nll_min"], doIt = True )
             nllm.pop ( "nll_min" )
         return nllm
+    """
 
     def nll_min(
         self,

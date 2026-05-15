@@ -725,46 +725,11 @@ class PyhfUpperLimitComputer:
             except:
                 ret = float(ret[0])
             ret = self.exponentiateNLL(ret, not return_nll)
-            # print ( "now leaving the fit mu=", mu, "llhd", ret, "nsig was", self.data.nsignals )
             self.restore()
             return ret
 
-    """
-    @lru_cache
-    def getBestCombinationIndex(self, indices : Optional[Tuple] = None ) -> \
-            Tuple[int,float,str]:
-        # find the index of the best expected combination
-        # :returns: tuple ( best_index, upper limit )
-        if self.nWS == 1:
-            ul = self.getUpperLimitOnMu(evaluationType=apriori, workspace_index=0)
-            return 0, ul, list(self.data.jsonFiles)[0]
-        logger.debug( f"Finding best evaluationType combination among {self.nWS} workspace(s)" )
-        ulMin = float("+inf")
-        i_best = None
-        if indices is None:
-            indices = range(self.nWS)
-        for i_ws in indices:
-            if self.data.totalYield == 0.:
-                continue
-            if self.zeroSignalsFlag[i_ws] == True:
-                logger.debug( f"Workspace number {i_ws} has zero signals" )
-                continue
-            else:
-                ul = self.getUpperLimitOnMu( evaluationType=apriori,
-                    workspace_index=i_ws)
-            if ul == None:
-                continue
-            if ul < ulMin:
-                ulMin = ul
-                i_best = i_ws
-        name = "none"
-        if i_best is not None:
-            name = list(self.data.jsonFiles)[i_best]
-        return i_best, ulMin, name
-    """
-
     def exponentiateNLL(self, twice_nll, doIt):
-        """if doIt, then compute likelihood from nll,
+        """ if doIt, then compute likelihood from nll,
         else return nll"""
         if twice_nll == None:
             return None
@@ -776,15 +741,20 @@ class PyhfUpperLimitComputer:
         return twice_nll / 2.0
 
     def compute_invhess(self, x, data, model, index, epsilon=1e-05):
-        '''
-        if inv_hess is not given by the optimiser, calculate numerically by evaluating second order partial derivatives using 2 point central finite differences method
-        :param x: parameter values given to pyhf.infer.mle.twice_nll taken from pyhf.infer.mle.fit - optimizer.x (best_fit parameter values)
+        """
+        if inv_hess is not given by the optimiser, calculate numerically by 
+        evaluating second order partial derivatives using 2 point central 
+        finite differences method
+        :param x: parameter values given to pyhf.infer.mle.twice_nll taken 
+        from pyhf.infer.mle.fit - optimizer.x (best_fit parameter values)
         :param data: workspace.data(model) passed to pyhf.infer.mle.fit
         :param model: model passed to pyhf.infer.mle.fit
         :param index: index of the POI
-        Note : If len(x) <=5, compute the entire hessian matrix and ind its inverse. Else, compute the hessian at the index of the POI and return its inverse (diagonal approximation)
-        returns the inverse hessian at the index of the poi
-        '''
+        Note : If len(x) <=5, compute the entire hessian matrix and ind 
+        its inverse. Else, compute the hessian at the index of the POI and 
+        return its inverse (diagonal approximation)
+        at the index of the poi
+        """
 
         n = len(x)
         if n<=5:
@@ -834,26 +804,18 @@ class PyhfUpperLimitComputer:
             return float("inf")
         return 1.0/hessian
 
+    # @lru_cache
     def nll_min( self, evaluationType : NllEvalType=observed,
             allowNegativeSignals : bool = False ) -> Optional[dict]:
-        return self.lmax ( return_nll = True,
-                evaluationType = evaluationType,
-                allowNegativeSignals = allowNegativeSignals )
-
-    @lru_cache
-    def lmax( self, return_nll : bool = False,
-              evaluationType : NllEvalType=observed,
-              allowNegativeSignals : bool = False ) -> Optional[dict]:
         """
-        Returns the negative log max likelihood
-
-        :param return_nll: if true, return nll, not llhd
+        Returns the minimum negative log likelihood
         :param evaluationType: one of: observed, apriori, aposteriori
         :param allowNegativeSignals: if False, then negative nsigs are replaced \
             with 0.
         """
+
         # logger.error("expected flag needs to be heeded!!!")
-        logger.debug("Calling lmax")
+        logger.debug("Calling nll_min")
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
@@ -929,20 +891,15 @@ class PyhfUpperLimitComputer:
 
             muhat = float ( muhat[model.config.poi_index]*self.scale )
             try:
-                lmax = maxNllh.tolist()
+                nllmin2 = maxNllh.tolist()
             except:
-                lmax= maxNllh
+                nllmin2 = maxNllh
             try:
-                lmax = float(lmax)
+                nllmin2 = float(nllmin2)
             except:
-                lmax = float(lmax[0])
-            lmax = self.exponentiateNLL(lmax, not return_nll)
-
-            ret = { "muhat": muhat, "sigma_mu": sigma_mu }
-            if return_nll:
-                ret["nll_min"] = lmax
-            else:
-                ret["lmax"] = lmax
+                nllmin2 = float(nllmin2[0])
+            nllmin = nllmin2 / 2. # pyhf gives twice_nll
+            ret = { "muhat": muhat, "sigma_mu": sigma_mu, "nll_min": nllmin }
             return ret
 
     def updateWorkspace(self, evaluationType : NllEvalType=observed ) \

@@ -932,7 +932,7 @@ class LikelihoodComputer:
             if isinstance(mu,(np.ndarray,list)):
                 mu = mu[0]
             theta = self.findThetaHat ( mu=float(mu) )
-            ret = self.likelihood(return_nll=True, mu = mu )
+            ret = self.nll( mu = mu )
             return ret
 
         import scipy.optimize
