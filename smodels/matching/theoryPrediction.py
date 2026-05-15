@@ -330,12 +330,21 @@ class TheoryPrediction(object):
 
         return wrapper
 
+    """
     @whenDefined
     def lsm( self, evaluationType : NllEvalType = observed,
              return_nll : bool = False ):
-        """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
+        # likelihood at SM point, same as .def likelihood( ( mu = 0. )
         llhDict = self.computeStatistics(evaluationType)
         return self.nllToLikelihood (llhDict["nllsm"],return_nll )
+    """
+
+    @whenDefined
+    def nllsm( self, evaluationType : NllEvalType = observed,
+             return_nll : bool = False ):
+        """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
+        llhDict = self.computeStatistics(evaluationType)
+        return llhDict["nllsm"]
 
     @whenDefined
     def nll_min( self, evaluationType : NllEvalType = observed,
@@ -347,11 +356,13 @@ class TheoryPrediction(object):
                     **kwargs )
         return llhDict["nll_min"]
 
+    """
     @whenDefined
     def lmax( self, evaluationType : NllEvalType = observed,
               return_nll : bool = False ):
-        """likelihood at mu_hat"""
+        # likelihood at mu_hat
         return self.nllToLikelihood ( self.nll_min ( evaluationType ),return_nll )
+    """
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)

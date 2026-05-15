@@ -362,18 +362,16 @@ class TxTPrinter(BasicPrinter):
                 serv = self._formatNumber(theoryPrediction.getRValue(
                     evaluationType=self.getTypeOfExpected()), 4)
                 output += f"Expected r-value: {serv}\n"
-            nll = theoryPrediction.likelihood( return_nll = True )
+            nll = theoryPrediction.nll ()
             if nll is not None:
                 chi2, chi2sm = None, None
-                nllsm = theoryPrediction.lsm( return_nll = True )
-                nllmin = theoryPrediction.lmax( return_nll = True )
+                nllsm = theoryPrediction.nllsm( )
+                nllmin = theoryPrediction.nll_min( )
                 try:
-                    # chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
                     chi2sm = 2*(nll - nllsm )
                 except TypeError:
                     pass
                 try:
-                    # chi2 = -2*np.log(llhd/theoryPrediction.lmax())
                     chi2 = 2*(nll - nllmin )
                 except TypeError:
                     pass
@@ -487,9 +485,9 @@ class TxTPrinter(BasicPrinter):
         r = self._formatNumber(obj.getRValue(),4)
         r_expected = self._formatNumber(obj.getRValue(evaluationType=self.getTypeOfExpected()),4)
         # Get likelihoods:
-        nllsm = obj.lsm( return_nll = True )
-        nll = obj.likelihood( return_nll = True )
-        nllmin = obj.lmax( return_nll = True )
+        nllsm = obj.nllsm( )
+        nll = obj.nll( )
+        nllmin = obj.nll_min( )
         # Get sorted txnames
         txnames = []
         for tx in obj.getTxNamesWeights(sort=True):

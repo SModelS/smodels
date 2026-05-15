@@ -404,46 +404,27 @@ class StatsComputer:
         :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
                                  correct, if necessary
         """
-        ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll  )
+        assert return_nll == True, f"get_five_values return_nll {return_nll}"
+        ret = self.nll_min ( evaluationType = evaluationType )
         if ret is None:
             return {}
-        s_max = "nll_min" if return_nll else "lmax"
-        lmax = ret[ s_max ]
+        nll_min = ret[ "nll_min" ]
 
-        lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType,
-                                 return_nll = return_nll )
-        lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType,
-                                return_nll = return_nll )
-        if return_nll:
-            ret["nllbsm"] = lbsm
-            ret["nllsm"] = lsm
-        else:
-            ret["lbsm"] = lbsm
-            ret["lsm"] = lsm
+        nllbsm = self.nll ( poi_test = 1., evaluationType=evaluationType )
+        nllsm = self.nll ( poi_test = 0., evaluationType=evaluationType )
+        ret["nllbsm"] = nllbsm
+        ret["nllsm"] = nllsm
         if check_for_maxima:
-            if return_nll:
-                if lsm < lmax: ## if return_nll is off, its the other way
-                    muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ s_max ] = lsm
-                    ret["muhat"] = 0.0
-                if lbsm < lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ s_max ] = lbsm
-                    ret["muhat"] = 1.0
-            else:
-                if lsm > lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ s_max ] = lsm
-                    ret["muhat"] = 0.0
-                if lbsm > lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ s_max ] = lbsm
-                    ret["muhat"] = 1.0
-
+            if nllsm < nll_min: ## if return_nll is off, its the other way
+                muhat = ret["muhat"]
+                logger.debug(f"nllsm={nllsm:.2g} < nll_min({muhat:.2g})={nll_min:.2g}: will correct")
+                ret[ "nll_min" ] = nllsm
+                ret["muhat"] = 0.0
+            if nllbsm < nll_min:
+                muhat = ret["muhat"]
+                logger.debug(f"nllbsm={nllbsm:.2g} < nll_min({muhat:.2g})={nll_min:.2g}: will correct")
+                ret[ "nll_min" ] = nllbsm
+                ret["muhat"] = 1.0
         return ret
 
     def nll ( self, poi_test : float, evaluationType : NllEvalType,

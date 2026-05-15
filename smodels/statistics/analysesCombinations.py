@@ -83,17 +83,16 @@ class AnaCombLikelihoodComputer(object):
         return_nll: bool = False,
         asimov: Union[None,float] = None,
     ) -> float:
-        """
-        Compute the likelihood at a given mu
+        #Compute the likelihood at a given mu
 
-        :param mu: signal strength
-        :param evaluationType: one of: observed, apriori, aposteriori
-        :param return_nll: if True, return negative log likelihood, else likelihood
-        :param asimov: if not None, compute llhd for asimov data with mu=asimov
-        """
+        #:param mu: signal strength
+        #:param evaluationType: one of: observed, apriori, aposteriori
+        #:param return_nll: if True, return negative log likelihood, else likelihood
+        #:param asimov: if not None, compute llhd for asimov data with mu=asimov
         ret = self.nll ( mu, evaluationType, asimov=asimov )
         return exponentiateNLL ( ret, doIt = not return_nll )
 
+    @lru_cache
     def nll_min(
         self,
         allowNegativeSignals: bool = False,
@@ -279,8 +278,8 @@ class AnaCombLikelihoodComputer(object):
                          allowNegativeSignals=allowNegativeSignals )
         mu_hat, sigma_mu = fmh["muhat"], fmh["sigma_mu"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
-        nll0 = self.likelihood(mu_hat, evaluationType=evaluationType,
-                               return_nll=True,asimov=None )
+        nll0 = self.nll(mu_hat, evaluationType=evaluationType,
+                        asimov=None )
         # a posteriori evaluationType is needed here
         # mu_hat is mu_hat for signal_rel
         fmh = self.nll_min(evaluationType=evaluationType,
@@ -296,10 +295,10 @@ class AnaCombLikelihoodComputer(object):
             # at + infinity it should -.05
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
-            nll = self.likelihood(mu, return_nll=True,
+            nll = self.nll (mu,
                     evaluationType=evaluationType, asimov = None)
-            nllA = self.likelihood(mu, evaluationType=evaluationType,
-                    return_nll=True, asimov = 0. )
+            nllA = self.nll ( mu, evaluationType=evaluationType,
+                              asimov = 0. )
 
             if nll is None or nllA is None:
                 return None
@@ -331,8 +330,8 @@ class AnaCombLikelihoodComputer(object):
 
         return float(clsRoot(mu, return_type=return_type))
 
-    def getLlhds(self,muvals,evaluationType : NllEvalType=observed,
-			     normalize : bool =True):
+    def getLlhds( self, muvals, evaluationType : NllEvalType=observed,
+			            normalize : bool =True):
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.

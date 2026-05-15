@@ -135,10 +135,10 @@ class SummaryPrinter(TxTPrinter):
             if self.outputFormat != 'version2':
                 output += " Final States: " + fStates_str + "\n"
 
-            nll = theoPred.likelihood( return_nll = True )
+            nll = theoPred.nll ( )
             if nll is not None:
-                nllmin = theoPred.lmax( return_nll = True )
-                nllsm = theoPred.lsm( return_nll = True )
+                nllmin = theoPred.nll_min( )
+                nllsm = theoPred.nllsm( )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.floating)):
@@ -189,9 +189,9 @@ class SummaryPrinter(TxTPrinter):
         r = obj.getRValue()
         r_expected = obj.getRValue(evaluationType=self.getTypeOfExpected())
         # Get likelihoods:
-        nllsm = obj.lsm( return_nll = True )
-        nll = obj.likelihood( return_nll = True )
-        nllmin = obj.lmax( return_nll = True )
+        nllsm = obj.nllsm( )
+        nll = obj.nll( )
+        nllmin = obj.nll_min( )
         # Get sorted txnames
         txnames = []
         for tx in obj.getTxNamesWeights(sort=True):

@@ -56,9 +56,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
         self.assertAlmostEqual(combiner.muhat(), 1.2058828358516187, 4)
-        self.assertAlmostEqual(combiner.lsm(), 2.756169857697467e-06, 4)
-        self.assertAlmostEqual(combiner.likelihood(), 5.001298746531528e-06, 4)
-        self.assertAlmostEqual(combiner.lmax(), 5.131156389020586e-06, 4)
+        self.assertAlmostEqual(combiner.nllsm(),12.801668574746357, 4)
+        self.assertAlmostEqual(combiner.nll(), 12.23876128425637, 4)
+        self.assertAlmostEqual(combiner.nll_min(), 12.223407084934427, 4)
         ulmu = combiner.getUpperLimitOnMu()
         # 16.78997035426023/4.71
         self.assertAlmostEqual(ulmu, 3.7926103695052884, 3)
@@ -90,26 +90,26 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         model.updateParticles(inputFile=slhafile)
         smstopos = decomposer.decompose(model)
         tpreds = []
-        defaultLSMs, defaultLmax = {}, {}
+        defaultnllSMs, defaultnll_min = {}, {}
         # theta_hat = 0., x = 13.
         # scipy.stats.norm.pdf ( x, 13., 3. ) * scipy.stats.poisson.pmf(14, x)
         # = 0.013575602920029094, so we are actually a little off
-        defaultLSMs["ATLAS-CONF-2013-037:SRtN2"] = 0.013786096355236995
+        defaultnllSMs["ATLAS-CONF-2013-037:SRtN2"] = 4.2840947051889025
 
         # theta_hat = 2.87723307, x = 3.7 + theta_hat = 6.57723307
         # scipy.stats.norm.pdf(x, 3.7, 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.007423073728232388
-        defaultLSMs["CMS-SUS-16-050-agg:ar8"] = 0.007423073728232388
+        defaultnllSMs["CMS-SUS-16-050-agg:ar8"] = 4.903162058492391
 
         # nsig = 1., theta_hat = 0., x = 14.
         # scipy.stats.norm.pdf(x, 14.0, 3.0) * scipy.stats.poisson.pmf(14, x)
         # = 0.014094517457734808
-        defaultLmax["ATLAS-CONF-2013-037:SRtN2"] = 0.014094517457734808
+        defaultnll_min["ATLAS-CONF-2013-037:SRtN2"] = 4.261969389997849
 
         # nsig = 5.3, theta_hat = 0, x = 9.
         # scipy.stats.norm.pdf(x, 9., 2.7948166) * scipy.stats.poisson.pmf(9, x)
         # = 0.01880727876784458
-        defaultLmax["CMS-SUS-16-050-agg:ar8"] = 0.01880727876784458
+        defaultnll_min["CMS-SUS-16-050-agg:ar8"] = 3.973511315574247
         tpreds = theoryPredictionsFor(database, smstopos,
                                       combinedResults=False, useBestDataset=False)
         for t in tpreds:
@@ -117,34 +117,35 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             dId = t.dataset.dataInfo.dataId
             Id = f"{t.dataset.globalInfo.id}:{dId}"
             # print ( "Id", Id )
-            lsm = t.lsm()
+            nllsm = t.nllsm()
             # print ( "l(mu_hat)", t.likelihood ( 0.03533022229777052 ) )
             # print ( "theta_hat", t.dataset.theta_hat )
             # print ( "dataset", t.dataset.dataInfo.observedN, t.dataset.dataInfo.expectedBG, t.dataset.dataInfo.bgError )
-            lmax = t.lmax()
+            nll_min = t.nll_min()
             if False:
-                print(f"dataset {Id}: theta_hat {t.dataset.theta_hat[0]:.3f} lsm {lsm} lmax {lmax}")
+                print(f"dataset {Id}: theta_hat {t.dataset.theta_hat[0]:.3f} nllsm {nllsm} nll_min {nll_min}")
             # print ( "[er]", Id, "lsm", lsm, "lmax", lmax )
-            self.assertAlmostEqual(lsm, defaultLSMs[Id], 5)
-            self.assertAlmostEqual(lmax, defaultLmax[Id], 5)
+            self.assertAlmostEqual(nllsm, defaultnllSMs[Id], 5)
+            self.assertAlmostEqual(nll_min, defaultnll_min[Id], 5)
         # combination:
         # mu_hat 0.035 lmax 0.00011 ul_mu 0.27
         combiner = TheoryPredictionsCombiner(tpreds)
         combiner.computeStatistics()
-        fmh = combiner.statsComputer.get_five_values(evaluationType=observed)
-        mu_hat, lmax = fmh["muhat"], fmh["lmax"]
-        lsm = combiner.lsm()
+        fmh = combiner.statsComputer.get_five_values(evaluationType=observed,
+                return_nll = True )
+        mu_hat, nll_min = fmh["muhat"], fmh["nll_min"]
+        nllsm = combiner.nllsm()
         # print ( "muhat", mu_hat, "lmax", lmax )
         # multiply the previous lsms, 0.013786096355236995 * 0.007423073728232388
         # = 0.00010233520966944002
-        self.assertAlmostEqual(lsm, 0.00010233520966944002, 4)
+        self.assertAlmostEqual(nllsm, 9.187256763681294, 4)
         # mu_hat is determined numerically, but its easy to verify graphically,
         # see http://smodels.github.io/test/testTheoryPredCombinations.png
         self.assertAlmostEqual(mu_hat, 0.03533022229777052, 4)
         # lmax must be the product of likelihoods evaluated at mu_hat
         # 0.007672358984439363 * 0.014016921020572387
         # = 0.00010754284992636553
-        self.assertAlmostEqual(lmax, 0.00010754284992636553, 4)
+        self.assertAlmostEqual(nll_min, 9.137621066391294, 4)
 
     def testFilter(self):
         import warnings
@@ -196,9 +197,9 @@ class CombinedTheoryPredsTest(unittest.TestCase):
             self.assertAlmostEqual(diff_rel,0.,2)
             self.assertEqual(goodIDs[ana][1], selectedIDs[ana][1])
 
-        self.assertAlmostEqual(combiner.lsm() / 8.032708820262497e-27, 1., 2)
-        self.assertAlmostEqual(combiner.likelihood() / 6.1811227091720504e-27, 1., 2)
-        self.assertAlmostEqual(combiner.lmax() / 8.032708820262498e-27, 1., 2)
+        self.assertAlmostEqual(combiner.nllsm() / 60.08627570224895, 1., 2)
+        self.assertAlmostEqual(combiner.nll() / 60.34829758771848, 1., 2)
+        self.assertAlmostEqual(combiner.nll_min() / 60.08627570224895, 1., 2)
         self.assertAlmostEqual(combiner.getRValue() / 0.26067132943352256, 1., 2)
         self.assertAlmostEqual(combiner.CLs(), 0.5745589222694297, 2 )
         self.assertAlmostEqual(combiner.CLs( evaluationType = apriori ), 0.6370833948782422, 2 )
@@ -212,19 +213,17 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         parfile = "./testParameters_comb.ini"
 
         combiner = getCombiner(slhafile, parfile)
-        lmax = combiner.lmax()
-        lsm = combiner.lsm()
-        lbsm = combiner.likelihood(mu=1.0)
-        lbsmE = combiner.likelihood(mu=1.0, evaluationType=apriori)
+        nll_min = combiner.nll_min()
+        nllsm = combiner.nllsm()
+        nllbsm = combiner.nll(mu=1.0)
+        nllbsmE = combiner.nll(mu=1.0, evaluationType=apriori)
 
         nllbsm = combiner.nll( mu=1.0)
         nllbsmE = combiner.nll( mu=1.0, evaluationType=apriori)
 
-        self.assertAlmostEqual(lsm, 0.1009, 2)
-        self.assertAlmostEqual(lbsm,0.15356, 2)
-        self.assertAlmostEqual(lmax, 0.21210, 2)
-        self.assertAlmostEqual( - np.log(lbsm), nllbsm, 6 )
-        self.assertAlmostEqual( - np.log(lbsmE), nllbsmE, 6 )
+        self.assertAlmostEqual(nllsm, 2.2936253516225737, 2)
+        self.assertAlmostEqual(nllbsm, 1.8736639088495401, 2)
+        self.assertAlmostEqual(nll_min, 1.5506974174115002, 2)
         self.assertAlmostEqual(combiner.getRValue(), 0.1209701850476386, 4)
 
         # Also check if likelihood dict is defined:

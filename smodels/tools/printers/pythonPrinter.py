@@ -330,12 +330,12 @@ class PyPrinter(BasicPrinter):
             if hasattr(self, "addnodesmap") and self.addnodesmap:
                 resDict['Nodes Map'] = nodesDict
 
-            nll = theoryPrediction.likelihood( return_nll = True )
+            nll = theoryPrediction.nll ( )
             if nll is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
                 resDict['nll'] = self._round(nll)
-                resDict['nll_min'] = self._round(theoryPrediction.lmax(return_nll = True ))
-                resDict['nll_SM'] = self._round(theoryPrediction.lsm( return_nll = True ))
+                resDict['nll_min'] = self._round(theoryPrediction.nll_min())
+                resDict['nll_SM'] = self._round(theoryPrediction.nllsm( ))
             ExptRes.append(resDict)
 
         return {'ExptRes': ExptRes}
@@ -446,9 +446,9 @@ class PyPrinter(BasicPrinter):
         r = self._round(obj.getRValue(evaluationType=observed ))
         r_expected = self._round(obj.getRValue(evaluationType=self.getTypeOfExpected()))
 
-        nll = self._round(obj.likelihood( return_nll = True ))
-        nllmin = self._round(obj.lmax( return_nll = True ))
-        nllsm = self._round(obj.lsm( return_nll = True ))
+        nll = self._round(obj.nll( ) )
+        nllmin = self._round(obj.nll_min( ) )
+        nllsm = self._round(obj.nllsm( ) )
 
         # Get sorted txnames
         txnames = []
