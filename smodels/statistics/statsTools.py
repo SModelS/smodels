@@ -549,6 +549,7 @@ class StatsComputer:
         """ convenience function to get the most significant model
 
         :returns: dictionary with idx of the computer, ul_min,
+        limit_on_xsecs
         and the name of the most sensitive model
         """
         ul_min,idx,name = float("inf"), -1, ""
@@ -573,6 +574,13 @@ class StatsComputer:
         return f"?? {self.dataType}"
     """
 
+    def getTotalXSec ( self ):
+        """ get the total yield, summing over all computers """
+        ret = 0.*fb
+        for computer in self.subComputers:
+            ret += computer.getTotalXSec()
+        return ret
+
     def poi_upper_limit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
            nSigma : int = 0, **kwargs ) -> Union[float,UnitXSec,None]:
@@ -582,18 +590,18 @@ class StatsComputer:
         :param limit_on_xsec: if True, then return the limit on the
         cross section
         :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.
-        :param kwargs:
-        For error bands.
+        + 1 sigma, - 1 sigma, etc. For error bands.
+        :param kwargs: e.g. pmSigma
         """
         msm = self.getMostSensitiveModel()
         idx = msm["idx"]
+        ulmu = self.subComputers[ idx ].getUpperLimitOnMu(
+                   evaluationType = evaluationType, nSigma = nSigma, **kwargs )
+        ret = ulmu
         if limit_on_xsec:
-            ret = self.subComputers[ idx ].getUpperLimitOnSigmaTimesEff(
-                   evaluationType = evaluationType, nSigma = nSigma, **kwargs )
-        else:
-            ret = self.subComputers[ idx ].getUpperLimitOnMu(
-                   evaluationType = evaluationType, nSigma = nSigma, **kwargs )
+            ret = ulmu * self.getTotalXSec()
+        #ret2 = self.subComputers[ idx ].getUpperLimitOnMu(
+        #           evaluationType = evaluationType, nSigma = nSigma, **kwargs )
         return ret
         """
         print ( f"@@STx id {self.dataObject.globalInfo.id}" )

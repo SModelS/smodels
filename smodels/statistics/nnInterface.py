@@ -145,6 +145,9 @@ class NNData:
                 S += signal
         self.totalYield = S
 
+    def getTotalXSec ( self ):
+        return self.totalYield / self.globalInfo.lumi
+
 class NNUpperLimitComputer:
     """
     Class that computes the upper limit using the jsons files and signal
@@ -241,6 +244,8 @@ class NNUpperLimitComputer:
         self.mumin = mumin # the smallest expected UL
         """
 
+    def getTotalXSec ( self ):
+        return self.data.getTotalXSec()
 
     def isControlRegion ( self, srname : str ) -> bool:
         """ check if srname is control region

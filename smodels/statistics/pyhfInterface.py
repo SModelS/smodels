@@ -158,6 +158,10 @@ class PyhfData:
                     raise SModelSError ( f"type {self.nsignals} is {type(signal)}" )
         self.totalYield = S
 
+    def getTotalXSec ( self ):
+        """ the total fiducial xsec for this computer """
+        return self.totalYield / self.globalInfo.lumi
+
     def createPatchForRegion ( self, region, i_ch, ch, jsName ):
         chname = ch['name']
         chname2 = f'{ch["name"]}[0]' ## binned SRs
@@ -395,6 +399,9 @@ class PyhfUpperLimitComputer:
         # self.checkPyhfVersion()
         self.welcome()
 
+    def getTotalXSec ( self ):
+        return self.data.getTotalXSec()
+
     def welcome(self):
         """
         greet the world
@@ -525,12 +532,12 @@ class PyhfUpperLimitComputer:
 
     def wsMaker(self, apriori : bool = False) -> pyhf.Workspace:
         """
-        Apply each region patch (self.patch) to his associated json (self.inputJson) 
+        Apply each region patch (self.patch) to his associated json (self.inputJson)
         to obtain the complete workspace
 
-        :param apriori: - If set to 'True': Replace the observation data entries 
+        :param apriori: - If set to 'True': Replace the observation data entries
         of the workspace by the corresponding sum of the evaluationType yields
-        - Else: The observed yields put in the workspace are the ones written in 
+        - Else: The observed yields put in the workspace are the ones written in
         the corresponfing json dictionary
 
         :returns: the patched workspace
@@ -743,7 +750,7 @@ class PyhfUpperLimitComputer:
                 logger.debug( f"Workspace number {i_ws} has zero signals" )
                 continue
             else:
-                ul = self.getUpperLimitOnMu( evaluationType=apriori, 
+                ul = self.getUpperLimitOnMu( evaluationType=apriori,
                     workspace_index=i_ws)
             if ul == None:
                 continue
@@ -827,15 +834,15 @@ class PyhfUpperLimitComputer:
             return float("inf")
         return 1.0/hessian
 
-    def nll_min( self, evaluationType : NllEvalType=observed, 
+    def nll_min( self, evaluationType : NllEvalType=observed,
             allowNegativeSignals : bool = False ) -> Optional[dict]:
         return self.lmax ( return_nll = True,
-                evaluationType = evaluationType, 
+                evaluationType = evaluationType,
                 allowNegativeSignals = allowNegativeSignals )
 
     @lru_cache
-    def lmax( self, return_nll : bool = False, 
-              evaluationType : NllEvalType=observed, 
+    def lmax( self, return_nll : bool = False,
+              evaluationType : NllEvalType=observed,
               allowNegativeSignals : bool = False ) -> Optional[dict]:
         """
         Returns the negative log max likelihood
@@ -943,9 +950,9 @@ class PyhfUpperLimitComputer:
         """
         Small method used to return the appropriate workspace
 
-        :param evaluationType: if False, retuns the unmodified (but patched) 
+        :param evaluationType: if False, retuns the unmodified (but patched)
         workspace. Used for computing observed or aposteriori evaluationType limits.
-        if apriori, retuns the modified (and patched) workspace, where 
+        if apriori, retuns the modified (and patched) workspace, where
         obs = sum(bkg). Used for computing apriori evaluationType limit.
         """
         if evaluationType == apriori:
@@ -953,17 +960,16 @@ class PyhfUpperLimitComputer:
         else:
             return self.workspace
 
+    """
     def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed,
             nSigma : int = 0 ):
-        """
-        Compute the upper limit on the fiducial cross section sigma times 
-        efficiency:
-        :param evaluationType: if set to apriori: 
-        uses expected SM backgrounds as signals
-        else: uses 'self.nsignals'
-        :return: the upper limit on sigma times eff at 'self.cl' 
-        level (0.95 by default)
-        """
+        #Compute the upper limit on the fiducial cross section sigma times
+        #efficiency:
+        #:param evaluationType: if set to apriori:
+        #uses expected SM backgrounds as signals
+        #else: uses 'self.nsignals'
+        #:return: the upper limit on sigma times eff at 'self.cl'
+        #level (0.95 by default)
         if self.data.totalYield == 0.:
             return None
         else:
@@ -976,6 +982,7 @@ class PyhfUpperLimitComputer:
                 return ul
             xsec = self.data.totalYield / self.lumi
             return ul * xsec
+        """
 
     def generateAsimovData ( self, mu : Union[None,float] = 0.,
             evaluationType : NllEvalType=observed ) -> list:
@@ -1006,7 +1013,7 @@ class PyhfUpperLimitComputer:
         _absolute_ mu
 
         :param mu: compute for the parameter of interest mu
-        :param evaluationType: if observed, compute observed, 
+        :param evaluationType: if observed, compute observed,
         apriori: compute a priori expected
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
@@ -1090,13 +1097,12 @@ class PyhfUpperLimitComputer:
     # re-scaling the signal predictions so that mu falls in [0, 10] instead of
     # looking for mu bounds
     # Usage of the index allows for rescaling
-    @lru_cache
     def getUpperLimitOnMu( self, evaluationType : NllEvalType=observed,
-                           nSigma : int = 0 ):
+                           nSigma : int = 0 ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
 
-        :param evaluationType: if set to apriori: uses expected SM backgrounds 
+        :param evaluationType: if set to apriori: uses expected SM backgrounds
         as signals, else uses 'self.nsignals'
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
@@ -1149,7 +1155,7 @@ class PyhfUpperLimitComputer:
                     factor = 1 + .75 * (factor - 1)
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
-                    rt5 = self.CLs( med_mu * self.scale, evaluationType, 
+                    rt5 = self.CLs( med_mu * self.scale, evaluationType,
                                     "alpha-CLs", nSigma )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
@@ -1162,7 +1168,7 @@ class PyhfUpperLimitComputer:
                     self.rescale(factor)
                     continue
                 if np.isnan(rt10):
-                    rt5 = self.CLs( med_mu * self.scale, evaluationType, 
+                    rt5 = self.CLs( med_mu * self.scale, evaluationType,
                                     "alpha-CLs", nSigma )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
@@ -1199,7 +1205,8 @@ class PyhfUpperLimitComputer:
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
             # ul = ul * self.scale
-            return ul  # self.scale has been updated within self.rescale() method
+            # self.scale has been updated within self.rescale() method
+            return float(ul)
 
 if __name__ == "__main__":
     ### Needs to be updated

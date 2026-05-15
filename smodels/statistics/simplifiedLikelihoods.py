@@ -1067,8 +1067,12 @@ class UpperLimitComputer:
         if model.lumi is None:
             logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
             return ul
-        xsec = sum(model.nsignal) / model.lumi
-        return ul * xsec
+        # xsec = sum(model.nsignal) / model.lumi
+        return ul * self.getTotalXSec()
+
+    def getTotalXSec ( self ):
+        model = self.likelihoodComputer.model
+        return sum ( model.nsignal) / model.lumi
 
     def getCLsRootFunc(
         self,

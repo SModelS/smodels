@@ -287,10 +287,15 @@ class AnaCombLikelihoodComputer(object):
 
         if ul == None:
             return ul
+        xsec = self.getTotalXSec()
+        return ul * xsec
+
+    def getTotalXSec ( self ):
         xsec = 0.0*fb
         for tp in self.theoryPredictions:
             xsec += tp.xsection
-        return ul * xsec
+        return xsec
+
 
     def getCLsRootFunc(self, evaluationType : NllEvalType=observed,
 			              allowNegativeSignals : bool = False, nSigma : int = 0 ) \
