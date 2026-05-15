@@ -6,6 +6,7 @@ Release v3.2.0, xxx
 	* First support for NN surrogate statistical models,
     backwards-incompatible change in some fields in 
 	  the database
+	* Moved all interface from .likelihoods to .nlls
 
 Release v3.1.1, Wed 4 Feb 2026
 =======================================================
