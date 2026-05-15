@@ -716,30 +716,6 @@ class PyhfUpperLimitComputer:
             self.restore()
             return ret / 2.
 
-    """
-    def likelihood( self, mu : float = 1.0,
-            return_nll : bool = False, evaluationType : NllEvalType=observed,
-            asimov : Union[None,float] = None ):
-        #Returns the value of the likelihood. \
-        #Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
-        #:param return_nll: if true, return nll, not llhd
-        #:param evaluationType: one of: observed, apriori, aposteriori
-        ret = self.nll ( mu, True, evaluationType, asimov )
-        return exponentiateNLL ( ret, doIt = not return_nll )
-
-    def exponentiateNLL(self, twice_nll, doIt):
-        # if doIt, then compute likelihood from nll,
-        # else return nll
-        if twice_nll == None:
-            return None
-            #if doIt:
-            #    return 0.0
-            #return 9000.0
-        if doIt:
-            return np.exp(-twice_nll / 2.0)
-        return twice_nll / 2.0
-    """
-
     def compute_invhess(self, x, data, model, index, epsilon=1e-05):
         """
         if inv_hess is not given by the optimiser, calculate numerically by 

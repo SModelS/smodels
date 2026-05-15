@@ -877,38 +877,29 @@ class LikelihoodComputer:
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
                               extended_output=True, return_nll=True)
         return fmh
-        """
-        muhat_, sigma_mu, nll_min= fmh["muhat"], fmh["sigma_mu"], fmh["nll_min"]
-        print ( f"@X0 {fmh}" )
-        print ( f"@X1 {nll_min}" )
-        nll_min = self.nll ( mu=muhat_ )
-        print ( f"@X2 {nll_min}" )
-        ret = { "muhat": float ( muhat_ ), "sigma_mu": sigma_mu,
-                "nll_min" : nll_min }
-        return ret
-        """
 
+    """
     def lmax(self, return_nll : bool = False,
             allowNegativeSignals : bool = False) -> dict:
-        """convenience function, computes likelihood for nsig = nobs-nbg,
+        # convenience function, computes likelihood for nsig = nobs-nbg,
 
-        :param return_nll: return nll instead of likelihood
-        :param allowNegativeSignals: if False, then negative nsigs are
-        replaced with 0.
-        """
+        #:param return_nll: return nll instead of likelihood
+        #:param allowNegativeSignals: if False, then negative nsigs are
+        #replaced with 0.
         d = self.nll_min ( allowNegativeSignals = allowNegativeSignals )
         if return_nll:
             return d
         d["lmax"]=exponentiateNLL ( d["nll_min"], doIt=True )
         d.pop ( "nll_min" )
         return d
+    """
 
     def findMuHat(
     #def findMuHatViaGradientDescent(
         self,
-        allowNegativeSignals=False,
-        extended_output=False,
-        return_nll=False,
+        allowNegativeSignals : bool = False,
+        extended_output : bool = False,
+        return_nll : bool = False
     ):
         """
         Find the most likely signal strength mu via gradient descent
@@ -957,7 +948,8 @@ class LikelihoodComputer:
         mu_hat = float(o.x[0])
         if extended_output:
             sigma_mu = self.getSigmaMu ( mu_hat, theta_hat )
-            llhd = self.likelihood( mu_hat, return_nll=return_nll)
+            nll = self.nll( mu_hat )
+            llhd = exponentiateNLL ( nll, doIt = not return_nll )
             # sigma_mu = float(np.sqrt(hess[0][0]))
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu }
             if return_nll:
@@ -975,7 +967,6 @@ class LikelihoodComputer:
         :returns: LikelihoodComputer, with theta_hat as data member
         """
         theta_hat, _ = self.findThetaHat( mu )
-        # mu_hat = self.findMuHat( allowNegativeSignals=False, extended_output=False)
         # sigma_mu = self.getSigmaMu(mu_hat, theta_hat0)
 
         # nll0 = computer.likelihood( mu_hat, return_nll=True)
@@ -998,7 +989,7 @@ class LikelihoodComputer:
 
         model = self.model
         # Compute the likelhood for the null hypothesis (signal hypothesis) H0:
-        llhd = self.likelihood(1., return_nll=True)
+        nll_ = self.nll(1.)
 
         # Compute the maximum likelihood H1, which sits at nsig = nobs - nb
         # (keeping the same % error on signal):
@@ -1006,16 +997,15 @@ class LikelihoodComputer:
             # TODO this nsig initiation seems wrong and changing maxllhd to likelihood
             # fails ./testStatistics.py : zero division error in L115
             mu_hat = ( model.observed - model.backgrounds ) / model.nsignal
-            maxllhd = self.likelihood (mu_hat, return_nll=True )
+            minnll = self.nll (mu_hat )
         else:
-            maxllhd = self.lmax( return_nll=True, allowNegativeSignals=False)
-        chi2 = 2 * (llhd - maxllhd)
+            minnll = self.nll_min( allowNegativeSignals=False )
+        chi2 = 2 * ( nll_ - minnll)
 
         if not np.isfinite(chi2):
             logger.error( f"chi2 is not a finite number! {chi2},{llhd},{maxllhd}")
         # Return the test statistic -2log(H0/H1)
         return chi2
-
 
 class UpperLimitComputer:
     debug_mode = False
@@ -1104,10 +1094,11 @@ class UpperLimitComputer:
                 #    d += theta_hat_[i]
                 ### FIXME!
         computer = LikelihoodComputer(model )
-        mu_hat = computer.findMuHat( allowNegativeSignals=False, extended_output=False)
+        mu_hat = computer.findMuHat( allowNegativeSignals=False, 
+                                     extended_output=False)
         compA = computer.generateAsimovComputer ( 0. )
         sigma_mu = computer.getSigmaMu(mu_hat, compA.theta_hat)
-        nll0 = computer.likelihood( mu_hat, return_nll=True)
+        nll0 = computer.nll( mu_hat )
 
         theta_hat0 = compA.theta_hat
         # theta_hat0, _ = computer.findThetaHat( 0. )
@@ -1117,7 +1108,7 @@ class UpperLimitComputer:
         ## compute
         mu_hatA = compA.findMuHat()
         # TODO convert rel_signals to signals
-        nll0A = compA.likelihood( mu=mu_hatA, return_nll=True)
+        nll0A = compA.nll( mu=mu_hatA )
         # return 1.
 
         def clsRoot(mu: float, return_type: Text = "CLs-alpha") -> float:

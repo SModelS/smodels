@@ -99,19 +99,19 @@ class SLTest(unittest.TestCase):
         ulProf = ulComp.getUpperLimitOnMu(  )
         self.assertAlmostEqual( ulProf / 2163.1435825822646, 1.0, 3 )
         ## Nick's profiling code gets for n=3 ul=2135.66
-        ret = lComp.lmax ( )
-        lmax = ret["lmax"]
+        ret = lComp.nll_min ( )
+        nll_min = ret["nll_min"]
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
-        self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
+        self.assertAlmostEqual( nll_min, 19.947522865110603, 7 )
         self.assertAlmostEqual( muhat, 0. )
         # self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147, 2 )
         self.assertAlmostEqual( sigma_mu, 800.1380826235132, 2 )
-        ret = lComp.lmax ( allowNegativeSignals=True )
-        lmax = ret["lmax"]
+        ret = lComp.nll_min ( allowNegativeSignals=True )
+        nll_min = ret["nll_min"]
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
-        self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 8 )
+        self.assertAlmostEqual( nll_min, 19.948188270790936, 8 )
         #self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
         self.assertAlmostEqual( muhat, -72.63852360245156, 7 )
         #self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )
@@ -179,9 +179,9 @@ class SLTest(unittest.TestCase):
         lComp = LikelihoodComputer( m )
         theta_hat = lComp.findThetaHat( 1. )
         pprint ( "theta_hat", theta_hat )
-        ret = lComp.lmax()
-        lmax = ret["lmax"]
-        lm = lComp.likelihood ( 1. )
+        ret = lComp.nll_min()
+        nll_min = ret["nll_min"]
+        nll = lComp.nll ( 1. )
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
         pprint ( "muhat", muhat, "sigma_mu", sigma_mu )
@@ -193,7 +193,7 @@ class SLTest(unittest.TestCase):
         ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu ( )
         pprint ( "ulProf", ulProf )
-        self.assertAlmostEqual ( lmax, lm, 3 )
+        self.assertAlmostEqual ( nll_min, nll, 3 )
         self.assertAlmostEqual ( muhat, 1., 5 )
         self.assertAlmostEqual ( sigma_mu, 0.655333438756686, 5 )
         # self.assertAlmostEqual ( lComp.sigma_mu, 0.6123724356957945 )

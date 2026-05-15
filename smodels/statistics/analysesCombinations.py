@@ -43,6 +43,7 @@ class AnaCombLikelihoodComputer(object):
         self.deltas_rel = deltas_rel
         self.name = "anaComb"
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll(
         self,
         mu: float = 1.0,
@@ -57,10 +58,24 @@ class AnaCombLikelihoodComputer(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
-        return self.likelihood ( mu, evaluationType, return_nll=True,
-                                 asimov=asimov )
+        try:
+            mu = mu[0]  # some of these methods use arrays with a single element
+        except:
+            pass
 
-    @roundCache(argname='mu',argpos=1,digits=mu_digits)
+        nll = 0.0
+        changed = False
+        for tp in self.theoryPredictions:
+            tmp = tp.nll(mu, evaluationType=evaluationType, asimov=asimov )
+            if tmp != None:
+                nll = nll + tmp     #Add neg log llhds
+                changed = True
+            else:
+                return None
+        if changed == False:
+            return None
+        return nll
+
     def likelihood(
         self,
         mu: float = 1.0,
@@ -76,56 +91,8 @@ class AnaCombLikelihoodComputer(object):
         :param return_nll: if True, return negative log likelihood, else likelihood
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
-        try:
-            mu = mu[0]  # some of these methods use arrays with a single element
-        except:
-            pass
-
-        nll = 0.0
-        changed = False
-        for tp in self.theoryPredictions:
-            tmp = tp.likelihood(mu, evaluationType=evaluationType, return_nll=True, asimov=asimov)
-            if tmp != None:
-                nll = nll + tmp     #Add neg log llhds
-                changed = True
-            else:
-                return None
-        if changed == False:
-            return None
-        if not return_nll:
-            llhd = np.exp(-nll)
-            return llhd
-
-        return nll
-
-    """
-    def lmax(
-        self,
-        allowNegativeSignals: bool = False,
-        evaluationType : NllEvalType = observed,
-        return_nll: bool = False,
-        asimov: Union[None,float] = None,
-    ) -> Union[Dict, None]:
-        #find muhat and lmax.
-
-        #:param allowNegativeSignals: if true, then also allow for negative values
-        #:param evaluationType: one of: observed, apriori, aposteriori
-        #:param return_nll: if true, return negative log max likelihood instead of lmax
-        #:returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
-        #          output is requested, it returns a dictionary with mu_hat, \
-        #          sigma_mu -- the standard deviation around mu_hat, and lmax, \
-        #          i.e. the likelihood at mu_hat
-        nllm = self.nll_min ( allowNegativeSignals = allowNegativeSignals,
-                evaluationType = evaluationType, asimov = asimov )
-        if nllm is None:
-            return nllm
-        if return_nll == True:
-            return nllm
-        if "nll_min" in nllm:
-            nllm["lmax"] = exponentiateNLL ( nllm["nll_min"], doIt = True )
-            nllm.pop ( "nll_min" )
-        return nllm
-    """
+        ret = self.nll ( mu, evaluationType, asimov=asimov )
+        return exponentiateNLL ( ret, doIt = not return_nll )
 
     def nll_min(
         self,
@@ -133,14 +100,14 @@ class AnaCombLikelihoodComputer(object):
         evaluationType : NllEvalType = observed,
         asimov: Union[None,float] = None,
     ) -> Union[Dict, None]:
-        """find muhat and lmax.
+        """find muhat and nll_min.
 
         :param allowNegativeSignals: if true, then also allow for negative values
         :param evaluationType: one of: observed, apriori, aposteriori
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
-                  output is requested, it returns a dictionary with mu_hat, \
-                  sigma_mu -- the standard deviation around mu_hat, and lmax, \
-                  i.e. the likelihood at mu_hat
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended
+        output is requested, it returns a dictionary with mu_hat,
+        sigma_mu -- the standard deviation around mu_hat, and nll_min,
+        i.e. the likelihood at mu_hat
         """
 
         muhats, weighted = [], []
@@ -211,7 +178,7 @@ class AnaCombLikelihoodComputer(object):
             o = optimize.minimize(fun, mu0, bounds=bounds, tol=1e-9)
             if not o.success:
                 logger.debug(
-                    f"combiner.lmax did not terminate successfully: {o.message} "
+                    f"combiner.nll_min did not terminate successfully: {o.message} "
                     f"mu_hat={o.x} hess={o.hess_inv}"
                 )
             # the inverted hessian is a good approximation for the variance at the
@@ -230,7 +197,7 @@ class AnaCombLikelihoodComputer(object):
             # the hessian is negative meaning we found a maximum, not a minimum
             if hessian <= 0.0:
                 logger.debug(
-                    f"combiner.lmax the hessian {hessian} is negative at mu_hat={o.x}. "+
+                    f"combiner.nll_min the hessian {hessian} is negative at mu_hat={o.x}. "+
                     "try again with different initialisation."
                 )
         mu_hat = o.x[0]
