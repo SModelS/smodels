@@ -444,43 +444,6 @@ class NNUpperLimitComputer:
         logger.warning ( f"could not find nll_min!" )
         return None
 
-    """
-    def lmax( self, return_nll=False, evaluationType=observed,
-              allowNegativeSignals=True,
-              asimov : Optional[int] = None ):
-        #obsolete, use nll_min
-        #:param return_nll: if true, return nll, not llhd
-        nll_min =  self.nll_min( evaluationType = evaluationType,
-              allowNegativeSignals = allowNegativeSignals, asimov = asimov )
-        if return_nll:
-            return nll_min
-        return exponentiateNLL ( nll_min, doIt = True )
-
-    def getUpperLimitOnSigmaTimesEff(self,
-            evaluationType : NllEvalType = observed,
-            nSigma : int = 0, **kwargs ) -> UnitXSec:
-        #Compute the upper limit on the fiducial
-        #cross section sigma times efficiency:
-
-        #:param evaluationType: one of: observed, apriori, aposteriori
-        #:param nSigma: the upper limit for central value (0),
-        #+ 1 sigma, - 1 sigma, etc.  For error bands.
-        #:return: the upper limit on sigma times eff at 'self.cl' level
-        #(0.95 by default)
-        if self.data.totalYield == 0.:
-            return None
-        else:
-            ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                                         nSigma = nSigma, **kwargs )
-            if ul == None:
-                return ul
-            if self.lumi is None:
-                logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
-                return ul
-            xsec = self.data.totalYield / self.lumi
-            return ul * xsec
-    """
-
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
             allowNegativeSignals : bool = False,

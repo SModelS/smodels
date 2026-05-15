@@ -76,6 +76,7 @@ class AnaCombLikelihoodComputer(object):
             return None
         return nll
 
+    """
     def likelihood(
         self,
         mu: float = 1.0,
@@ -91,6 +92,7 @@ class AnaCombLikelihoodComputer(object):
         #:param asimov: if not None, compute llhd for asimov data with mu=asimov
         ret = self.nll ( mu, evaluationType, asimov=asimov )
         return exponentiateNLL ( ret, doIt = not return_nll )
+    """
 
     @lru_cache
     def nll_min(
@@ -330,8 +332,8 @@ class AnaCombLikelihoodComputer(object):
 
         return float(clsRoot(mu, return_type=return_type))
 
-    def getLlhds( self, muvals, evaluationType : NllEvalType=observed,
-			            normalize : bool =True):
+    def getLlhds( self, muvals : list, evaluationType : NllEvalType=observed,
+			            normalize : bool = True) -> dict:
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
@@ -347,13 +349,13 @@ class AnaCombLikelihoodComputer(object):
 
         llhds = {}
         llhds['combined'] = np.array(\
-            [self.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
+            [exponentiateNLL(self.nll(mu,evaluationType=evaluationType)) for mu in muvals])
         tpreds = self.theoryPredictions
         for t in tpreds:
             Id = t.analysisId()
             t.computeStatistics( evaluationType = evaluationType )
             l = np.array(\
-                [t.likelihood(mu,evaluationType=evaluationType) for mu in muvals])
+                [exponentiateNLL(t.nll(mu,evaluationType=evaluationType)) for mu in muvals])
             llhds[Id]=l
 
         if normalize:
