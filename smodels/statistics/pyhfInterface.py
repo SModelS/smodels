@@ -16,7 +16,7 @@ import jsonschema
 import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import findRoot, clsType
+from smodels.statistics.basicStats import findRoot, clsType, exponentiateNLL
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -637,6 +637,7 @@ class PyhfUpperLimitComputer:
                                 break
         return init_pars
 
+    @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll ( self, mu : float = 1.0,
             evaluationType : NllEvalType=observed,
             asimov : Union[None,float] = None ):
@@ -645,19 +646,7 @@ class PyhfUpperLimitComputer:
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
         :param evaluationType: one of: observed, apriori, aposteriori
         """
-        return self.likelihood ( mu, True, evaluationType, asimov )
-
-    @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood( self, mu : float = 1.0,
-            return_nll : bool = False, evaluationType : NllEvalType=observed,
-            asimov : Union[None,float] = None ):
-        """
-        Returns the value of the likelihood. \
-        Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
-        :param return_nll: if true, return nll, not llhd
-        :param evaluationType: one of: observed, apriori, aposteriori
-        """
-        logger.debug("Calling likelihood")
+        logger.debug("Calling nll")
         # logger.error("expected flag needs to be heeded!!!")
         with warnings.catch_warnings():
             warnings.filterwarnings(
@@ -675,7 +664,7 @@ class PyhfUpperLimitComputer:
                 model,data,workspace = self.generateAsimovData ( asimov,
                        evaluationType = evaluationType )
 
-                _, nllh = pyhf.infer.mle.fixed_poi_fit(
+                _, nllh2 = pyhf.infer.mle.fixed_poi_fit(
                     1.0, data, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
@@ -694,7 +683,7 @@ class PyhfUpperLimitComputer:
                     negYields = True
                     logger.info(f'Negative total yield after increasing the initial parameters for mu={mu:.3f}')
                 try:
-                    bestFitParam, nllh = pyhf.infer.mle.fixed_poi_fit(
+                    bestFitParam, nllh2 = pyhf.infer.mle.fixed_poi_fit(
                         1.0,
                         data,
                         model,
@@ -705,7 +694,7 @@ class PyhfUpperLimitComputer:
                     # If a total yield is negative with the best profiled parameters, return None
                     if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
                         self.restore()
-                        return self.exponentiateNLL(None, not return_nll)
+                        return None
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                     jFile = self.data.jsonFile
                     anaId = self.data.globalInfo.id
@@ -717,20 +706,30 @@ class PyhfUpperLimitComputer:
                     logger.error( line )
 
                     self.restore()
-                    return self.exponentiateNLL(None, not return_nll)
+                    return None
 
-            ret = nllh.tolist()
+            ret = nllh2.tolist()
             try:
                 ret = float(ret)
             except:
                 ret = float(ret[0])
-            ret = self.exponentiateNLL(ret, not return_nll)
             self.restore()
-            return ret
+            return ret / 2.
+
+    """
+    def likelihood( self, mu : float = 1.0,
+            return_nll : bool = False, evaluationType : NllEvalType=observed,
+            asimov : Union[None,float] = None ):
+        #Returns the value of the likelihood. \
+        #Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
+        #:param return_nll: if true, return nll, not llhd
+        #:param evaluationType: one of: observed, apriori, aposteriori
+        ret = self.nll ( mu, True, evaluationType, asimov )
+        return exponentiateNLL ( ret, doIt = not return_nll )
 
     def exponentiateNLL(self, twice_nll, doIt):
-        """ if doIt, then compute likelihood from nll,
-        else return nll"""
+        # if doIt, then compute likelihood from nll,
+        # else return nll
         if twice_nll == None:
             return None
             #if doIt:
@@ -739,6 +738,7 @@ class PyhfUpperLimitComputer:
         if doIt:
             return np.exp(-twice_nll / 2.0)
         return twice_nll / 2.0
+    """
 
     def compute_invhess(self, x, data, model, index, epsilon=1e-05):
         """
@@ -804,7 +804,7 @@ class PyhfUpperLimitComputer:
             return float("inf")
         return 1.0/hessian
 
-    # @lru_cache
+    @lru_cache
     def nll_min( self, evaluationType : NllEvalType=observed,
             allowNegativeSignals : bool = False ) -> Optional[dict]:
         """
@@ -830,7 +830,7 @@ class PyhfUpperLimitComputer:
             # Same modifiers_settings as those used when running the 'pyhf cls' command line
             msettings = {"normsys": {"interpcode": "code4"}, "histosys": {"interpcode": "code4p"}}
             model = workspace.model(modifier_settings=msettings)
-            muhat, maxNllh = model.config.suggested_init(), float("nan")
+            muhat, maxNllh2 = model.config.suggested_init(), float("nan")
             sigma_mu = float("nan")
             # obs = workspace.data(model)
             try:
@@ -840,7 +840,7 @@ class PyhfUpperLimitComputer:
 
                 o = None
                 try:
-                    muhat, maxNllh, o = pyhf.infer.mle.fit(workspace.data(model), model,
+                    muhat, maxNllh2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                     #removed jacobain way of computing sigma_mu
 
@@ -891,9 +891,9 @@ class PyhfUpperLimitComputer:
 
             muhat = float ( muhat[model.config.poi_index]*self.scale )
             try:
-                nllmin2 = maxNllh.tolist()
+                nllmin2 = maxNllh2.tolist()
             except:
-                nllmin2 = maxNllh
+                nllmin2 = maxNllh2
             try:
                 nllmin2 = float(nllmin2)
             except:

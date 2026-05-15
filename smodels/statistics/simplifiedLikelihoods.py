@@ -954,13 +954,6 @@ class LikelihoodComputer:
         llhd = o.fun
         if not return_nll:
             llhd = np.exp(-o.fun)
-        """
-        hess = o.hess_inv
-        try:
-            hess = hess.todense()
-        except Exception as e:
-            pass
-        """
         mu_hat = float(o.x[0])
         if extended_output:
             sigma_mu = self.getSigmaMu ( mu_hat, theta_hat )
