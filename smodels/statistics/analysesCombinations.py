@@ -238,28 +238,6 @@ class AnaCombLikelihoodComputer(object):
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    """
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed,
-            allowNegativeSignals : bool = False, nSigma : int = 0 ) -> UnitXSec:
-#upper limit on the fiducial cross section sigma times efficiency,
-#           summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
-#           obtained from the defined Data (using the signal prediction
-#           for each signal region/dataset), by using
-#           the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
-
-#       :param evaluationType: one of: observed, apriori, aposteriori
-#       :param nSigma: the upper limit for central value (0),
-#       + 1 sigma, - 1 sigma, etc.  For error bands.
-#:returns: upper limit on fiducial cross section
-        ul = self.getUpperLimitOnMu(evaluationType=evaluationType,
-                                    allowNegativeSignals=allowNegativeSignals)
-
-        if ul == None:
-            return ul
-        xsec = self.getTotalXSec()
-        return ul * xsec
-    """
-
     def getTotalXSec ( self ):
         xsec = 0.0*fb
         for tp in self.theoryPredictions:

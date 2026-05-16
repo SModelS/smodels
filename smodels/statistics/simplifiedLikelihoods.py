@@ -1026,34 +1026,6 @@ class UpperLimitComputer:
              **kwargs) -> float:
         return self.likelihoodComputer.nll ( poi_test, evaluationType, **kwargs )
 
-    """
-    def getUpperLimitOnSigmaTimesEff(
-        self, evaluationType : NllEvalType = observed, trylasttime : bool =False,
-        nSigma : int = 0 ) -> UnitXSec:
-        #upper limit on the fiducial cross section sigma times efficiency,
-        #    summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
-        #    obtained from the defined Data (using the signal prediction
-         #   for each signal region/dataset), by using
-        #    the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
-#
-#        :param evaluationType: one of: observed, apriori, aposteriori
-#        :param trylasttime: if True, then dont try extra
-#        :param nSigma: the upper limit for central value (0),
-#        + 1 sigma, - 1 sigma, etc.  For error bands.
-#        :returns: upper limit on fiducial cross section
-        model = self.likelihoodComputer.model
-        ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                                     trylasttime=trylasttime, nSigma = nSigma )
-
-        if ul == None:
-            return ul
-        if model.lumi is None:
-            logger.error(f"asked for upper limit on fiducial xsec, but no lumi given with the data")
-            return ul
-        # xsec = sum(model.nsignal) / model.lumi
-        return ul * self.getTotalXSec()
-    """
-
     def getTotalXSec ( self ):
         model = self.likelihoodComputer.model
         return sum ( model.nsignal) / model.lumi
