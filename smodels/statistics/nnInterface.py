@@ -15,7 +15,7 @@ import numpy as np
 import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import UnitXSec
+from smodels.base.physicsUnits import UnitXSec, UnitLumi
 from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
          exponentiateNLL, observed, apriori, aposteriori, NllEvalType, \
          CLsWithErrorsfromNLL
