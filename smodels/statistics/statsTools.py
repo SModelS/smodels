@@ -485,22 +485,6 @@ class StatsComputer:
             allowNegativeSignals = self.allowNegativeSignals, **kwargs )
         return ret
 
-    """
-    def maximize_likelihood ( self, evaluationType : NllEvalType,
-           return_nll : bool = False, **kwargs ) -> dict:
-        #simple frontend to the individual computers, later spey
-        #:param return_nll: if True, return negative log likelihood
-        #:returns: Dictionary of llhd (llhd at mu_hat), \
-        #          muhat, sigma_mu (sigma of mu_hat), \
-        #          optionally also theta_hat
-        if return_nll == True:
-            return ret
-        if type(ret) == dict and "nll_min" in ret and ret["nll_min"]!=None:
-            ret["lmax"] = exponentiateNLL ( ret["nll_min"], doIt = True )
-            ret.pop("nll_min")
-        return ret
-    """
-
     @lru_cache
     def getMostSensitiveModel ( self ) -> dict:
         """ convenience function to get the most significant model
