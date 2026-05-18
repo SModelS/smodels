@@ -204,7 +204,6 @@ class StatsComputer:
         Create computer from a single bin
 
         """
-
         dataset = self.dataObject
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
@@ -220,31 +219,40 @@ class StatsComputer:
         """
 
         dataset = self.dataObject
-        cov = dataset.globalInfo.covariance
-        if type(cov) != list:
-            raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
-        if len(cov) < 1:
-            raise SModelSError( f"covariance matrix has length {len(cov)}." )
+        covs = dataset.globalInfo.covariances
+        if type(dataset.globalInfo.covariances)==list:
+            raise SModelSError ( f"covariance matrices are list not dict, maybe not converted to new format?")
+        offset = 0
+        self.subComputers = []
+        for covname,cov in covs.items():
+            if type(cov) != list:
+                raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
+            if len(cov) < 1:
+                raise SModelSError( f"covariance matrix has length {len(cov)}." )
+            n = len(cov)
 
-        nobs = [ x.dataInfo.observedN for x in dataset.origdatasets ]
-        bg = [ x.dataInfo.expectedBG for x in dataset.origdatasets ]
-        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset.origdatasets ]
-        # FIXME are we sure thats right, its not the one below?
-        # nobs = [ x.dataInfo.observedN for x in dataset._datasets ]
-        # bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
-        # third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets ]
-        c = third_momenta.count ( None )
-        if c > 0:
-            if c < len(third_momenta):
-                logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
-            third_momenta = None
+            # FIXME are we sure thats right, its not the one below?
+            #nobs = [ x.dataInfo.observedN for x in dataset.origdatasets[offset:offset+n] ]
+            #bg = [ x.dataInfo.expectedBG for x in dataset.origdatasets[offset:offset+n] ]
+            #third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset.origdatasets[offset:offset+n] ]
+            nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
+            bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
+            third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
+            c = third_momenta.count ( None )
+            if c > 0:
+                if c < len(third_momenta):
+                    logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
+                third_momenta = None
 
-        data = Data( nobs, bg, cov, third_moment=third_momenta, nsignal = self.nsig,
-                     deltas_rel = self.deltas_sys, lumi=dataset.getLumi() )
-        self.data = data
-        likelihoodComputer = LikelihoodComputer ( data )
-        computer = UpperLimitComputer ( likelihoodComputer )
-        self.subComputers = [ computer ]
+            data = Data( nobs, bg, cov, third_moment=third_momenta,
+                         nsignal = self.nsig[offset:offset+n],
+                         deltas_rel = self.deltas_sys, lumi=dataset.getLumi(),
+                         name = covname )
+            self.data = data
+            likelihoodComputer = LikelihoodComputer ( data )
+            computer = UpperLimitComputer ( likelihoodComputer )
+            self.subComputers.append ( computer )
+            offset += n
 
     def getComputerNN(self ):
         """
@@ -368,7 +376,6 @@ class StatsComputer:
             data = PyhfData(nsignal, json, r_jsonFile,
                     includeCRs, signalUncertainty, globalInfo,
                     jsonFileName = jsonFileName )
-            # data = PyhfData(nsignals, jsons, jsonFiles, includeCRs, signalUncertainty, globalInfo )
             upperLimitComputer = PyhfUpperLimitComputer( data,
                     lumi=self.dataObject.getLumi() )
             self.subComputers.append ( upperLimitComputer )
@@ -390,9 +397,8 @@ class StatsComputer:
         :param nsig: signal yields.
         """
 
-        computer = AnaCombLikelihoodComputer(theoryPredictions=self.dataObject,
-                                                            deltas_rel=self.deltas_sys)
-        # self.likelihoodComputer = self.upperLimitComputer # for analyses combination its the same
+        computer = AnaCombLikelihoodComputer( theoryPredictions=self.dataObject,
+                                              deltas_rel=self.deltas_sys )
         self.subComputers  = [ computer ]
 
     def get_five_values ( self, evaluationType : NllEvalType,
@@ -434,15 +440,6 @@ class StatsComputer:
         self.transform ( evaluationType )
         kwargs.update ( { "evaluationType": evaluationType, "asimov": asimov } )
         # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
-        """
-        if self.dataType == "pyhf":
-            if not "workspace_index" in kwargs:
-                index, _, _ = self.subComputers[0].getBestCombinationIndex()
-                kwargs["workspace_index"] = index
-            ret = self.subComputers[0].nll (
-                    poi_test, **kwargs )
-            return ret
-        """
         ret = self.subComputers[ msm["idx"] ].nll ( poi_test, **kwargs)
         return ret
 
@@ -482,40 +479,27 @@ class StatsComputer:
         msm = self.getMostSensitiveModel()
         computer = self.subComputers[ msm["idx"] ]
         self.transform ( evaluationType )
-        """
-        # kwargs = { }
-        if self.dataType == "pyhf":
-            if not "workspace_index" in kwargs:
-                index, _, _ = self.subComputers[0].getBestCombinationIndex()
-                kwargs["workspace_index"] = index
-                if evaluationType != observed:
-                    kwargs["evaluationType"] = evaluationType
-        elif self.dataType == "truncGaussian":
-            kwargs["evaluationType"]=evaluationType
-        elif self.dataType == "analysesComb":
-            kwargs["evaluationType"]=evaluationType
-        """
 
         ret = computer.nll_min (
             evaluationType = evaluationType,
             allowNegativeSignals = self.allowNegativeSignals, **kwargs )
         return ret
 
+    """
     def maximize_likelihood ( self, evaluationType : NllEvalType,
            return_nll : bool = False, **kwargs ) -> dict:
-        """ simple frontend to the individual computers, later spey
-        :param return_nll: if True, return negative log likelihood
-        :returns: Dictionary of llhd (llhd at mu_hat), \
-                  muhat, sigma_mu (sigma of mu_hat), \
-                  optionally also theta_hat
-        """
-        ret = self.nll_min ( evaluationType, **kwargs )
+        #simple frontend to the individual computers, later spey
+        #:param return_nll: if True, return negative log likelihood
+        #:returns: Dictionary of llhd (llhd at mu_hat), \
+        #          muhat, sigma_mu (sigma of mu_hat), \
+        #          optionally also theta_hat
         if return_nll == True:
             return ret
         if type(ret) == dict and "nll_min" in ret and ret["nll_min"]!=None:
             ret["lmax"] = exponentiateNLL ( ret["nll_min"], doIt = True )
             ret.pop("nll_min")
         return ret
+    """
 
     @lru_cache
     def getMostSensitiveModel ( self ) -> dict:
@@ -531,21 +515,6 @@ class StatsComputer:
             if ul != None and ul < ul_min:
                 ul_min, idx, name = ul, i, computer.name
         return { "idx": idx, "ul_min": ul_min, "name": name }
-
-    """
-    def getMostSensitiveModel ( self ):
-        # convenience function to get the most significant model
-        if self.dataType == "pyhf":
-            w_idx, ul, name = self.subComputers[0].getBestCombinationIndex()
-            # w_idx, ul, name = self.upperLimitComputer.getBestCombinationIndex()
-            return name
-        if self.dataType == "nn":
-            self.subComputers[0].determineMostSensitiveModel()
-            return self.subComputers[0].mostSensitiveModel
-        if self.dataType == "SL":
-            return "SL"
-        return f"?? {self.dataType}"
-    """
 
     def getTotalXSec ( self ):
         """ get the total yield, summing over all computers """

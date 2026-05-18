@@ -201,14 +201,16 @@ class TheoryPrediction(object):
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
             # Get ordered list of datasets:
-            if hasattr(self.dataset.globalInfo, "covariance"):
-                datasetList = self.dataset.globalInfo.datasetOrder[:]
+            if hasattr(self.dataset.globalInfo, "covariances"):
+                datasetList = []
+                for srSetName,regions in self.dataset.globalInfo.srSets.items():
+                    datasetList += regions
+                # datasetList = self.dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] for dataID in datasetList]
                 # Get computer
                 computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
-                                                       nsig=srNsigs,
-                                                       deltas_rel = self.deltas_rel)
+                    nsig=srNsigs, deltas_rel = self.deltas_rel )
 
             elif hasattr(self.dataset.globalInfo, "statModels"):
                 # Get computer

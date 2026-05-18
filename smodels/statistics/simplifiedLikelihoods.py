@@ -337,6 +337,10 @@ class LikelihoodComputer:
             obs = self.model.A + thetahat + self.model.C * thetahat**2 / self.model.B**2
         self.model.observed = obs
 
+    @property
+    def name ( self ):
+        return self.model.name
+
     def dNLLdMu(self, mu, theta_hat = None ):
         """
         d (- ln L)/d mu, if L is the likelihood. The function
@@ -1017,7 +1021,7 @@ class UpperLimitComputer:
         """
         self.likelihoodComputer = likelihoodComputer
         self.cl = cl
-        self.name = "SL" ## later we give the name of the srSet here
+        self.name = likelihoodComputer.model.name
 
     def nll_min(self,**kwargs) -> float:
         return self.likelihoodComputer.nll_min ( **kwargs )

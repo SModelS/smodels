@@ -203,22 +203,11 @@ class ExpResult(object):
 
     def hasStatsModel(self) -> bool:
         """ do we have any kind of statistical model """
-        if hasattr(self.globalInfo, "covariance"):
-            return True
         if hasattr ( self.globalInfo, "srMappings" ):
             return True
+        if hasattr(self.globalInfo, "covariances"):
+            return True
         return False
-
-    """
-    def hasCovarianceMatrix(self) -> bool:
-        return hasattr(self.globalInfo, "covariance")
-
-    def hasJsonFile(self) -> bool:
-        return hasattr(self.globalInfo, "jsonFiles")
-
-    def hasMLModel(self):
-        return hasattr(self.globalInfo, "mlModels")
-    """
 
     def isCombinableWith ( self, other ) -> bool:
         """ can this expResult be safely assumed to be approximately uncorrelated

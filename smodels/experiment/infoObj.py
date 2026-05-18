@@ -101,6 +101,13 @@ class Info(object):
             self.cacheStatsModels()
 
     def isInSRMapping ( self, region ):
+        if not hasattr ( self, "srMappings" ):
+            ## if there is no srMappings, we look directly
+            ## in srSets
+            for srSetName,regions in self.srSets.items():
+                if region in regions:
+                    return True
+            return False
         for m in self.srMappings:
             if region == m["label"]:
                 return True
@@ -122,7 +129,7 @@ class Info(object):
             for region in regions:
                 if not self.isInSRMapping ( region ):
                     raise SModelSError ( f"region {region} not mentioned in srMapping" )
-                
+
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
             return False
@@ -134,7 +141,7 @@ class Info(object):
         if not hasattr(self, "statModels"):
             ## we dont have any stats models, nothing to cache
             return
-        if hasattr(self, "cachedModels"):  
+        if hasattr(self, "cachedModels"):
             # seems like we already have cached them
             return
         import json
@@ -142,6 +149,8 @@ class Info(object):
         dirp = os.path.dirname(self.path)
         for setName, models in self.statModels.items():
             for model in models:
+                if not model.endswith ( ".json" ) and not model.endswith ( ".onnx" ):
+                    continue
                 fullPath = os.path.join(dirp, model )
                 with open ( fullPath, "rb" ) as f:
                     if model.endswith ( ".json" ):

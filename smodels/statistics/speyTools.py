@@ -108,7 +108,7 @@ class SpeyComputer:
                           for pred in predictions}
 
             # Get ordered list of datasets:
-            if hasattr(dataset.globalInfo, "covariance"):
+            if hasattr(dataset.globalInfo, "covariances"):
                 datasetList = dataset.globalInfo.datasetOrder[:]
                 # Get list of signal yields corresponding to the dataset order:
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0

@@ -498,7 +498,7 @@ class CombinedDataSet(object):
     def findType(self):
         """ find the type of the combined dataset """
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
-        if hasattr(self.globalInfo, "covariance"):
+        if hasattr(self.globalInfo, "covariances"):
             self.type = "simplified"
         if hasattr(self.globalInfo, "statModels"):
             self.type = "pyhf"
@@ -543,13 +543,23 @@ class CombinedDataSet(object):
         """
         Sort datasets according to globalInfo.datasetOrder.
         """
-        if hasattr(self.globalInfo, "covariance"):
+        if hasattr(self.globalInfo, "covariances"):
             datasets = self.origdatasets[:]
-            if not hasattr(self.globalInfo, "datasetOrder"):
-                raise SModelSError(f"datasetOrder not given in globalInfo.txt for {self.globalInfo.id}")
-            datasetOrder = self.globalInfo.datasetOrder
-            if isinstance(datasetOrder, str):
-                datasetOrder = [datasetOrder]
+            datasetOrder = []
+            if hasattr(self.globalInfo, "srMappings"):
+                #raise SModelSError(f"srMappings not given in globalInfo.txt for {self.globalInfo.id}")
+            ## datasetOrder goes by srMappings
+                for region in self.globalInfo.srMappings:
+                    datasetOrder.append ( region["smodels"] )
+            elif hasattr(self.globalInfo, "srSets" ):
+                for srSetName,regions in self.globalInfo.srSets.items():
+                    datasetOrder += regions
+
+            #if not hasattr(self.globalInfo, "datasetOrder"):
+            #    raise SModelSError(f"datasetOrder not given in globalInfo.txt for {self.globalInfo.id}")
+            # datasetOrder = self.globalInfo.datasetOrder
+            #if isinstance(datasetOrder, str):
+            #    datasetOrder = [datasetOrder]
 
             if len(datasetOrder) != len(datasets):
                 raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
