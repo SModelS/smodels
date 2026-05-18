@@ -131,6 +131,8 @@ class Info(object):
                 return
         self.srMappingsDict = {}
         for region in self.srMappings:
+            if region["label"] in self.srMappingsDict:
+                raise SModelSError ( f"label {region['label']} appearing twice in srMappings" )
             self.srMappingsDict[ region["label"] ] = region
 
     def checkConsistencyOfStatsModels( self ):

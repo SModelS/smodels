@@ -570,7 +570,7 @@ class CombinedDataSet(object):
                 datasetOrder += regions
 
         if len(datasetOrder) != len(datasets):
-            raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
+            raise SModelSError( f"Number of datasets in the srMappings field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
         ## need to reinitialise, we might have lost some datasets when filtering
         self._datasets = [ None ] * len(datasets)
         for dataset in datasets:
