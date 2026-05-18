@@ -498,14 +498,19 @@ class CombinedDataSet(object):
     def findType(self):
         """ find the type of the combined dataset """
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
-        if hasattr(self.globalInfo, "covariances"):
-            self.type = "simplified"
         if hasattr(self.globalInfo, "statModels"):
-            self.type = "pyhf"
+            self.type = ""
+            types = set()
             for srSetName, models in self.globalInfo.statModels.items():
-                for model in models:
-                    if model.endswith ( ".onnx" ):
-                        self.type = "nn"
+                if len(models)==0:
+                    continue
+                if models[0].endswith ( ".onnx" ):
+                    types.add ( "nn" )
+                if models[0].endswith ( ".json" ):
+                    types.add ( "pyhf" )
+                if models[0].endswith ( ".cov" ):
+                    types.add ( "simplified" )
+            return "+".join ( types )
 
     def __str__(self):
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
@@ -541,37 +546,40 @@ class CombinedDataSet(object):
 
     def sortDataSets(self):
         """
-        Sort datasets according to globalInfo.datasetOrder.
+        Sort datasets according to globalInfo.srMappings / srSets.
+        Needs to be done only for cov matrices
         """
-        if hasattr(self.globalInfo, "covariances"):
-            datasets = self.origdatasets[:]
-            datasetOrder = []
-            if hasattr(self.globalInfo, "srMappings"):
-                #raise SModelSError(f"srMappings not given in globalInfo.txt for {self.globalInfo.id}")
-            ## datasetOrder goes by srMappings
-                for region in self.globalInfo.srMappings:
-                    datasetOrder.append ( region["smodels"] )
-            elif hasattr(self.globalInfo, "srSets" ):
-                for srSetName,regions in self.globalInfo.srSets.items():
-                    datasetOrder += regions
+        if not hasattr ( self.globalInfo, "statModels" ):
+            return
+        hasSL = False
+        for srSetName,models in self.globalInfo.statModels.items():
+            if models[0].endswith ( ".cov" ):
+                hasSL = True
+            break
+        if not hasSL:
+            return
+        # if hasattr(self.globalInfo, "covariances"):
+        datasets = self.origdatasets[:]
+        datasetOrder = []
+        if hasattr(self.globalInfo, "srMappings"):
+        ## datasetOrder goes by srMappings
+            for region in self.globalInfo.srMappings:
+                datasetOrder.append ( region["smodels"] )
+        elif hasattr(self.globalInfo, "srSets" ):
+            for srSetName,regions in self.globalInfo.srSets.items():
+                datasetOrder += regions
 
-            #if not hasattr(self.globalInfo, "datasetOrder"):
-            #    raise SModelSError(f"datasetOrder not given in globalInfo.txt for {self.globalInfo.id}")
-            # datasetOrder = self.globalInfo.datasetOrder
-            #if isinstance(datasetOrder, str):
-            #    datasetOrder = [datasetOrder]
-
-            if len(datasetOrder) != len(datasets):
-                raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
-            ## need to reinitialise, we might have lost some datasets when filtering
-            self._datasets = [ None ] * len(datasets)
-            for dataset in datasets:
-                idx = self.getIndex(dataset.getID(), datasetOrder)
-                if idx == -1:
-                    raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
-                self._datasets[idx] = dataset
-                # dsIndex = datasetOrder.index(dataset.getID())
-                # self._datasets[dsIndex] = dataset
+        if len(datasetOrder) != len(datasets):
+            raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
+        ## need to reinitialise, we might have lost some datasets when filtering
+        self._datasets = [ None ] * len(datasets)
+        for dataset in datasets:
+            idx = self.getIndex(dataset.getID(), datasetOrder)
+            if idx == -1:
+                raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
+            self._datasets[idx] = dataset
+            # dsIndex = datasetOrder.index(dataset.getID())
+            # self._datasets[dsIndex] = dataset
 
     def getType(self):
         """

@@ -101,22 +101,34 @@ class Info(object):
             self.cacheStatsModels()
 
     def isInSRMapping ( self, region ):
-        if not hasattr ( self, "srMappings" ):
-            ## if there is no srMappings, we look directly
-            ## in srSets
-            for srSetName,regions in self.srSets.items():
-                if region in regions:
+        if hasattr ( self, "srMappings" ):
+            for m in self.srMappings:
+                if region == m["label"]:
                     return True
             return False
-        for m in self.srMappings:
-            if region == m["label"]:
+        ## if there is no srMappings, we look directly
+        ## in srSets
+        for srSetName,regions in self.srSets.items():
+            if region in regions:
                 return True
         return False
 
     def createSRMappingsDict ( self ):
         """ we have srMappings, create srMappingsDict from it """
         if not hasattr ( self, "srMappings" ):
-            return
+            if hasattr ( self, "srSets" ):
+                self.srMappingsDict = {}
+                self.srMappings = []
+                for srSetName,regions in self.srSets.items():
+                    for region in regions:
+                        self.srMappingsDict[region] = region
+                        d = { "smodels": region, "label": region, "onnx": region,
+                              "pyhf": region }
+                        self.srMappings.append ( d )
+
+                return
+            else:
+                return
         self.srMappingsDict = {}
         for region in self.srMappings:
             self.srMappingsDict[ region["label"] ] = region
@@ -149,17 +161,20 @@ class Info(object):
         dirp = os.path.dirname(self.path)
         for setName, models in self.statModels.items():
             for model in models:
-                if not model.endswith ( ".json" ) and not model.endswith ( ".onnx" ):
-                    continue
+#                if not model.endswith ( ".json" ) and not model.endswith ( ".onnx" ):
+#                    continue
                 fullPath = os.path.join(dirp, model )
                 with open ( fullPath, "rb" ) as f:
-                    if model.endswith ( ".json" ):
+                    if model.endswith ( ".cov" ):
+                        with open(fullPath,"rt") as f:
+                            txt = eval ( f.read() )
+                    elif model.endswith ( ".json" ):
                         with open(fullPath,"rt") as f:
                             txt = json.load(f)
                     elif model.endswith ( ".onnx" ):
                         txt = f.read()
                     else:
-                        logger.error ( f"{model} has unrecognized file extension: should be either json or onnx" )
+                        logger.error ( f"{model} has unrecognized file extension: should be one of: json, onnx, cov" )
                     self.cachedModels[model] = txt
                     f.close()
 
@@ -185,7 +200,8 @@ class Info(object):
             setattr(self, "lastUpdate", str(value))
             return
         try:
-            setattr(self, tag, eval(value, {'fb': fb, 'pb': pb, 'GeV': GeV, 'TeV': TeV}))
+            setattr( self, tag, eval(value,
+                     {'fb': fb, 'pb': pb, 'GeV': GeV, 'TeV': TeV}))
         except (SyntaxError,NameError,TypeError):
             setattr(self, tag, value)
 

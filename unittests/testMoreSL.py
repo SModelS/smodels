@@ -7,7 +7,7 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-        
+
 import unittest
 import sys
 sys.path.insert(0,"../")
@@ -58,7 +58,7 @@ class MoreSLTest(unittest.TestCase):
                     if verbose:
                         print ( f"{slhaname} {exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
                     if delta > .15:
-                        line = f"mismatch for {slhaname}({exp}): base={base[exp]}, computed={r[exp]}"
+                        line = f"mismatch for {slhaname}({exp}): base={base[exp]:.2f}, computed={r[exp]:.2f}"
                         logger.error ( line )
                         self.assertTrue ( delta < .15 )
         t = time.time() - t0
@@ -83,7 +83,8 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( evaluationType=apriori ) }
+                r = { "obs": p.getRValue(),
+                      "exp": p.getRValue ( evaluationType=apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
@@ -91,7 +92,7 @@ class MoreSLTest(unittest.TestCase):
                     if verbose:
                         print ( f"{slhaname} {exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
                     if delta > .02:
-                        line = f"mismatch for {slhaname}({exp}): base={base[exp]}, computed={r[exp]}"
+                        line = f"mismatch for {slhaname}({exp}): base={base[exp]:.2f}, computed={r[exp]:.2f}"
                         logger.error ( line )
                         self.assertTrue ( delta < .15 )
         t = time.time() - t0

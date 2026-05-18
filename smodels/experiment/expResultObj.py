@@ -205,8 +205,6 @@ class ExpResult(object):
         """ do we have any kind of statistical model """
         if hasattr ( self.globalInfo, "srMappings" ):
             return True
-        if hasattr(self.globalInfo, "covariances"):
-            return True
         return False
 
     def isCombinableWith ( self, other ) -> bool:

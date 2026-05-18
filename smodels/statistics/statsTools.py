@@ -219,12 +219,12 @@ class StatsComputer:
         """
 
         dataset = self.dataObject
-        covs = dataset.globalInfo.covariances
-        if type(dataset.globalInfo.covariances)==list:
-            raise SModelSError ( f"covariance matrices are list not dict, maybe not converted to new format?")
+        covs = dataset.globalInfo.cachedModels
         offset = 0
         self.subComputers = []
         for covname,cov in covs.items():
+            if not covname.endswith ( ".cov" ):
+                continue
             if type(cov) != list:
                 raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
             if len(cov) < 1:
@@ -522,6 +522,8 @@ class StatsComputer:
         """
         msm = self.getMostSensitiveModel()
         idx = msm["idx"]
+        if idx >= len(self.subComputers):
+            raise SModelSError ( f"most sensitive model is {msm} but we only have {len(self.subComputers)} subComputers" )
         ulmu = self.subComputers[ idx ].getUpperLimitOnMu(
                    evaluationType = evaluationType, nSigma = nSigma, **kwargs )
         if ulmu == None or not limit_on_xsec:

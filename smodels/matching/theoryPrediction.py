@@ -200,6 +200,7 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
+            """
             # Get ordered list of datasets:
             if hasattr(self.dataset.globalInfo, "covariances"):
                 datasetList = []
@@ -211,16 +212,28 @@ class TheoryPrediction(object):
                 # Get computer
                 computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
                     nsig=srNsigs, deltas_rel = self.deltas_rel )
+            """
 
-            elif hasattr(self.dataset.globalInfo, "statModels"):
+            if hasattr(self.dataset.globalInfo, "statModels"):
                 # Get computer
+                hasSL = False
                 hasOnnx = False
                 for srSetName, models in self.dataset.globalInfo.statModels.items():
-                    for model in models:
-                        if model.endswith ( ".onnx" ):
-                            hasOnnx = True
-                            break
-                if hasOnnx:
+                    if models[0].endswith ( ".onnx" ):
+                        hasOnnx = True
+                    if models[0].endswith ( ".cov" ):
+                        hasSL = True
+                if hasSL:
+                    datasetList = []
+                    for srSetName,regions in self.dataset.globalInfo.srSets.items():
+                        datasetList += regions
+                    # datasetList = self.dataset.globalInfo.datasetOrder[:]
+                    # Get list of signal yields corresponding to the dataset order:
+                    srNsigs = [srNsigDict[dataID] for dataID in datasetList]
+                    # Get computer
+                    computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
+                        nsig=srNsigs, deltas_rel = self.deltas_rel )
+                elif hasOnnx:
                     computer = StatsComputer.forNNs(dataset=self.dataset,
                                               nsig=srNsigDict,
                                               deltas_rel = self.deltas_rel)
