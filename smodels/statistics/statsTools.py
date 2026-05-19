@@ -137,11 +137,6 @@ class CompRetriever:
 
         :returns: a StatsComputer
         """
-        #retriever = CompRetriever ( dataObject=dataset,
-        #                       dataType="1bin",
-        #                       nsig=nsig, deltas_rel=deltas_rel )
-        #return retriever.getComputerSingleBin( lumi )
-        #dataset = self.dataObject
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
                      nsignal = nsig, lumi = lumi )
@@ -153,7 +148,7 @@ class CompRetriever:
 
     @classmethod
     def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
-        """ get a statscomputer for pyhf combination.
+        """ get a statscomputer for an NN combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
@@ -176,11 +171,70 @@ class CompRetriever:
 
         :returns: a StatsComputer
         """
-        retriever = CompRetriever ( dataObject=dataset,
-                               dataType="pyhf",
-                               nsig=nsig, deltas_rel=deltas_rel)
+        #retriever = CompRetriever ( dataObject=dataset,
+        #                       dataType="pyhf",
+        #                       nsig=nsig, deltas_rel=deltas_rel)
+        #return retriever.getComputerPyhf( )
+        globalInfo = dataset.globalInfo
+        datasets = [ds.getID() for ds in dataset.origdatasets]
+        jsonFiles, jsons = [], []
+        jsonDictNames = {}
+        for srSetName, models in globalInfo.statModels.items():
+            model = models[0]
+            if not model.endswith ( ".json" ):
+                continue
+            jsonFiles.append ( model )
+            jsons.append ( globalInfo.cachedModels[model] )
+            jsonDictNames[model]=cls.getAll ( \
+                    globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
 
-        return retriever.getComputerPyhf( )
+        jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
+        for ds in datasets:
+            if not ds in jsonRegions:
+                logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
+        logger.debug(f"list of datasets: {datasets}")
+
+        # Constructing the list of signals with subsignals matching each json
+        nsignals = {}
+        for jsName in jsonFiles:
+            nsignals.update( { jsName: {} } )
+        for name, nsig in nsig.items():
+            for jsName in nsignals.keys():
+                if name in jsonDictNames[jsName]:
+                    nsignals[jsName].update( { name: nsig } )
+
+        includeCRs = False
+        if hasattr(globalInfo,'includeCRs'):
+            includeCRs = globalInfo.includeCRs
+        signalUncertainty = None
+        if hasattr(globalInfo,"signalUncertainty"):
+            signalUncertainty = globalInfo.signalUncertainty
+
+        r_jsonFiles = {} ## here we reconstruct the old jsonFiles dict
+        ## (for now, maybe we will see that there is a smarter way)
+        for srSetName, models in globalInfo.statModels.items():
+            model = models[0]
+            if not model.endswith ( ".json" ):
+                continue
+            region_names = globalInfo.srSets[srSetName]
+            regions = cls.getRegions ( region_names,
+                    globalInfo.srMappingsDict )
+            if model in r_jsonFiles:
+                raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
+            r_jsonFiles[model]=regions
+
+        subComputers = []
+        for nsignal,json,(jsonFileName,r_jsonFile) in zip(nsignals.values(),jsons,r_jsonFiles.items() ):
+            # Loading the jsonFiles, unless we already have them (because we pickled)
+            data = PyhfData(nsignal, json, r_jsonFile,
+                    includeCRs, signalUncertainty, globalInfo,
+                    jsonFileName = jsonFileName )
+            upperLimitComputer = PyhfUpperLimitComputer( data,
+                    lumi=dataset.getLumi() )
+            upperLimitComputer.dataType = "pyhf"
+            upperLimitComputer.allowNegativeSignals = False
+            subComputers.append ( upperLimitComputer )
+        return subComputers
 
     @classmethod
     def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
@@ -225,25 +279,14 @@ class CompRetriever:
         allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
                                     for tp in theoryPredictions])
 
-        retriever = CompRetriever(dataObject=theoryPredictions,
-                                 dataType="analysesComb",
-                                 nsig=None, deltas_rel=deltas_rel,
-                                 allowNegativeSignals=allowNegativeSignals)
-
-        return retriever.getComputerAnalysesComb( )
-
-    def getComputerSingleBin(self, lumi : UnitLumi ) -> list:
-        """
-        Create computer from a single bin
-
-        """
-        dataset = self.dataObject
-        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
-                     dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
-                     nsignal = self.nsig, lumi = lumi )
-        self.data = data
-        likelihoodComputer = LikelihoodComputer ( data )
-        computer = self.attachAttributes ( UpperLimitComputer ( likelihoodComputer ) )
+        #retriever = CompRetriever(dataObject=theoryPredictions,
+        #                         dataType="analysesComb",
+        #                         nsig=None, deltas_rel=deltas_rel,
+        #                         allowNegativeSignals=allowNegativeSignals)
+        computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
+                                              deltas_rel=deltas_rel )
+        computer.dataType = "analysesComb"
+        computer.allowNegativeSignals = allowNegativeSignals
         return [ computer ]
 
     def getComputerNN(self ):
@@ -358,16 +401,6 @@ class CompRetriever:
         computer = TruncatedGaussians ( **kwargs )
         # self.data = None
         return [ computer ]
-
-    def getComputerAnalysesComb(self) -> list:
-        """
-        Create computer from a single bin
-        :param nsig: signal yields.
-        """
-
-        computer = AnaCombLikelihoodComputer( theoryPredictions=self.dataObject,
-                                              deltas_rel=self.deltas_sys )
-        return [ self.attachAttributes ( computer ) ]
 
     @classmethod
     def getAll ( obj, srSet : list, srMappingsDict : dict ) -> list:
