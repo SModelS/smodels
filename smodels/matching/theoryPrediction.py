@@ -175,21 +175,22 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
-        from smodels.statistics.statsTools import getStatsComputerModule
-        StatsComputer = getStatsComputerModule()
+        from smodels.statistics.statsTools import StatsComputer
+        from smodels.statistics.statsTools import getCompRetrieverModule
+        CompRetriever = getCompRetrieverModule()
 
         if self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
             if not experimentalFeature( "truncatedGaussians" ):
-                computer = 'N/A'
+                computers = 'N/A'
             else:
-                computer = StatsComputer.forTruncatedGaussian(self)
-                if computer is None: # No evaluationType UL available
-                    computer = 'N/A'
+                computers = CompRetriever.forTruncatedGaussian(self)
+                if computers is None: # No evaluationType UL available
+                    computers = 'N/A'
 
         elif self.dataType() == "efficiencyMap":
             nsig = (self.xsection * self.dataset.getLumi()).asNumber()
-            computer = StatsComputer.forSingleBin(dataset=self.dataset,
+            computers = CompRetriever.forSingleBin(dataset=self.dataset,
                                                   nsig=nsig,
                                                   deltas_rel=self.deltas_rel )
 
@@ -200,19 +201,6 @@ class TheoryPrediction(object):
             srNsigDict.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
-            """
-            # Get ordered list of datasets, old version:
-            if hasattr(self.dataset.globalInfo, "covariances"):
-                datasetList = []
-                for srSetName,regions in self.dataset.globalInfo.srSets.items():
-                    datasetList += regions
-                # datasetList = self.dataset.globalInfo.datasetOrder[:]
-                # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] for dataID in datasetList]
-                # Get computer
-                computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
-                    nsig=srNsigs, deltas_rel = self.deltas_rel )
-            """
 
             if hasattr(self.dataset.globalInfo, "statModels"):
                 # Get computer
@@ -230,18 +218,21 @@ class TheoryPrediction(object):
                     # datasetList = self.dataset.globalInfo.datasetOrder[:]
                     # Get list of signal yields corresponding to the dataset order:
                     srNsigs = [srNsigDict[dataID] for dataID in datasetList]
-                    computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
+                    computers = CompRetriever.forMultiBinSL(dataset=self.dataset,
                         nsig=srNsigs, deltas_rel = self.deltas_rel )
                 elif hasOnnx:
-                    computer = StatsComputer.forNNs(dataset=self.dataset,
+                    computers = CompRetriever.forNNs(dataset=self.dataset,
                                               nsig=srNsigDict,
                                               deltas_rel = self.deltas_rel)
                 else:
-                    computer = StatsComputer.forPyhf(dataset=self.dataset,
+                    computers = CompRetriever.forPyhf(dataset=self.dataset,
                                               nsig=srNsigDict,
                                               deltas_rel = self.deltas_rel)
 
-        self._statsComputer = computer
+        if computers == "N/A":
+            self._statsComputer = computers
+            return
+        self._statsComputer = StatsComputer ( computers )
 
     @lru_cache
     def getUpperLimit( self, evaluationType : NllEvalType = observed,
@@ -627,14 +618,18 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         # First make sure all theory predictions in the combiner
         # have well-defined stats models
         if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
-            computer = 'N/A'
+            self._statsComputer = "N/A"
         else:
-            from smodels.statistics.statsTools import getStatsComputerModule
-            StatsComputer = getStatsComputerModule()
-            computer = StatsComputer.forAnalysesComb(self.theoryPredictions,
+            from smodels.statistics.statsTools import getCompRetrieverModule, StatsComputer
+            CompRetriever = getCompRetrieverModule()
+            computer = CompRetriever.forAnalysesComb(self.theoryPredictions,
                     self.deltas_rel)
+            self._statsComputer = StatsComputer ( computer )
 
-        self._statsComputer = computer
+        if computer == "N/A":
+            self._statsComputer = computer
+        else:
+            self._statsComputer = StatsComputer ( computer )
 
     def getLlhds(self,muvals,evaluationType : bool = False,
                   normalize : bool = True ) -> dict:

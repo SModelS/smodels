@@ -10,9 +10,9 @@
 
 """
 
-__all__ = [ "StatsComputer", "getStatsComputerModule" ]
+__all__ = [ "StatsComputer", "getCompRetrieverModule" ]
 
-from typing import Union, Text, Dict, List
+from typing import Union, Text, Dict, List, Optional
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
@@ -27,25 +27,32 @@ from smodels.base.physicsUnits import UnitXSec
 from smodels.tools.caching import roundCache, lru_cache
 from typing import Union, Text, Optional
 
-def getStatsComputerModule():
+def getCompRetrieverModule():
     """ very single convenience function to centralize
     switching between our stats code and spey. """
     from smodels.base import runtime
     if runtime._experimental["spey"]:
-        from smodels.statistics.speyTools import SpeyComputer as StatsComputer
-        return StatsComputer
+        from smodels.statistics.speyTools import SpeyRetriever as CompRetriever
+        return CompRetriever
     else:
-        from smodels.statistics.statsTools import StatsComputer
-        return StatsComputer
+        from smodels.statistics.statsTools import CompRetriever
+        return CompRetriever
 
-class StatsComputer:
-    __slots__ = [ "nsig", "dataObject", "dataType", "subComputers", "data",
+class CompRetriever:
+    __slots__ = [ "nsig", "dataObject", "dataType", "data",
                   "deltas_sys", "allowNegativeSignals" ]
 
+    """ simple class that retrieves and constructs the sub computers,
+    in StatsComputer """
+
+    def attachAttributes ( self, computer ):
+        computer.allowNegativeSignals = self.allowNegativeSignals
+        computer.dataType = self.dataType
+        return computer
+
     def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list],
-                   dataType : str,
-                   nsig : Union[None,float,List,Dict] = None,
-                   deltas_rel : Union[None,float] = None,
+                   dataType : str, nsig : Union[None,float,List,Dict] = None,
+                   deltas_rel : Optional[float] = None,
                    allowNegativeSignals : bool = False ):
         """
          Initialise.
@@ -58,39 +65,20 @@ class StatsComputer:
         are allowed.
         """
 
-        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian", "analysesComb", "nn" ]:
-            logger.error ( f"I do not recognize the data type {dataType}" )
-            raise SModelSError()
+        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian",
+                             "analysesComb", "nn" ]:
+            raise SModelSError( f"I do not recognize the data type {dataType}" )
 
-        self.dataObject = dataObject
         self.dataType = dataType
+        self.dataObject = dataObject
         self.nsig = nsig
         self.deltas_sys = deltas_rel
         if self.deltas_sys is None:
             self.deltas_sys = 0.
         self.allowNegativeSignals = allowNegativeSignals
-        self.subComputers = []
 
     @classmethod
-    def forSingleBin(cls, dataset, nsig, deltas_rel, lumi : Optional[UnitLumi]=None ):
-        """ get a statscomputer for an efficiency map (single bin).
-
-        :param dataset: DataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a StatsComputer
-        """
-        computer = StatsComputer(dataObject=dataset,
-                                 dataType="1bin",
-                                 nsig=nsig, deltas_rel=deltas_rel)
-
-        computer.getComputerSingleBin( lumi )
-
-        return computer
-
-    @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel):
+    def forMultiBinSL(cls,dataset, nsig, deltas_rel) -> list:
         """ get a statscomputer for simplified likelihood combination.
 
         :param dataset: CombinedDataSet object
@@ -99,121 +87,12 @@ class StatsComputer:
 
         :returns: a StatsComputer
         """
+        retriever = CompRetriever ( dataObject=dataset,
+                               dataType="SL",
+                               nsig=nsig, deltas_rel=deltas_rel)
+        return retriever.getComputerMultiBinSL( )
 
-        computer = StatsComputer(dataObject=dataset,
-                                 dataType="SL",
-                                 nsig=nsig, deltas_rel=deltas_rel)
-
-        computer.getComputerMultiBinSL( )
-
-        return computer
-
-    @classmethod
-    def forNNs(cls, dataset, nsig, deltas_rel):
-        """ get a statscomputer for pyhf combination.
-
-        :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a StatsComputer
-        """
-        computer = StatsComputer(dataObject=dataset,
-                                 dataType="nn",
-                                 nsig=nsig, deltas_rel=deltas_rel)
-
-        computer.getComputerNN( )
-
-        return computer
-
-    @classmethod
-    def forPyhf(cls, dataset, nsig, deltas_rel):
-        """ get a statscomputer for pyhf combination.
-
-        :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a StatsComputer
-        """
-        computer = StatsComputer(dataObject=dataset,
-                                 dataType="pyhf",
-                                 nsig=nsig, deltas_rel=deltas_rel)
-
-        computer.getComputerPyhf( )
-
-        return computer
-
-    @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ):
-        """ get a statscomputer for truncated gaussians
-        :param theorypred: TheoryPrediction object
-        :param corr: correction factor: \
-                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
-                a factor of corr = 0.6 is proposed.
-        :returns: a StatsComputer
-        """
-        # marked as experimental feature
-        if not hasattr(theorypred, "avgElement"):
-            logger.error( f"theory prediction {theorypred.analysisId()} has no average element! why??" )
-            return None
-
-        eul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=apriori
-        )
-        if eul is None:
-            return None
-        eul = eul / theorypred.xsection
-        ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=observed
-        ) / theorypred.xsection
-        kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
-                   "corr": corr }
-        computer = StatsComputer(dataObject=theorypred.dataset,
-                                 dataType="truncGaussian",
-                                 nsig=0.,
-                                 allowNegativeSignals=True)
-
-        computer.getComputerTruncGaussian( **kwargs)
-
-        return computer
-
-    @classmethod
-    def forAnalysesComb(cls,theoryPredictions, deltas_rel):
-        """ get a statscomputer for combination of analyses
-        :param theoryPredictions: list of TheoryPrediction objects
-        :param deltas_rel: relative error for the signal
-        :returns: a StatsComputer
-        """
-
-        # Only allow negative signal if all theory predictions allow for it
-        allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
-                                    for tp in theoryPredictions])
-
-        computer = StatsComputer(dataObject=theoryPredictions,
-                                 dataType="analysesComb",
-                                 nsig=None, deltas_rel=deltas_rel,
-                                 allowNegativeSignals=allowNegativeSignals)
-
-        computer.getComputerAnalysesComb( )
-
-        return computer
-
-    def getComputerSingleBin(self,lumi):
-        """
-        Create computer from a single bin
-
-        """
-        dataset = self.dataObject
-        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
-                     dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
-                     nsignal = self.nsig, lumi = lumi )
-        self.data = data
-        likelihoodComputer = LikelihoodComputer ( data )
-        #self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
-        self.subComputers = [ UpperLimitComputer ( likelihoodComputer ) ]
-
-    def getComputerMultiBinSL(self):
+    def getComputerMultiBinSL(self) -> list:
         """
         Create computer from a multi bin SL result
         """
@@ -221,7 +100,7 @@ class StatsComputer:
         dataset = self.dataObject
         covs = dataset.globalInfo.cachedModels
         offset = 0
-        self.subComputers = []
+        subComputers = []
         for covname,cov in covs.items():
             if not covname.endswith ( ".cov" ):
                 continue
@@ -252,8 +131,120 @@ class StatsComputer:
             self.data = data
             likelihoodComputer = LikelihoodComputer ( data )
             computer = UpperLimitComputer ( likelihoodComputer )
-            self.subComputers.append ( computer )
+            subComputers.append ( self.attachAttributes ( computer ) )
             offset += n
+        return subComputers
+
+    @classmethod
+    def forSingleBin( cls, dataset, nsig, deltas_rel : Optional[float],
+                      lumi : Optional[UnitLumi]=None ) -> list:
+        """ get a statscomputer for an efficiency map (single bin).
+
+        :param dataset: DataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        retriever = CompRetriever ( dataObject=dataset,
+                               dataType="1bin",
+                               nsig=nsig, deltas_rel=deltas_rel )
+        return retriever.getComputerSingleBin( lumi )
+
+    @classmethod
+    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        retriever = CompRetriever ( dataObject=dataset, dataType="nn",
+                               nsig=nsig, deltas_rel=deltas_rel)
+
+        return retriever.getComputerNN( )
+
+    @classmethod
+    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
+        """ get a statscomputer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a StatsComputer
+        """
+        retriever = CompRetriever ( dataObject=dataset,
+                               dataType="pyhf",
+                               nsig=nsig, deltas_rel=deltas_rel)
+
+        return retriever.getComputerPyhf( )
+
+    @classmethod
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
+        """ get a statscomputer for truncated gaussians
+        :param theorypred: TheoryPrediction object
+        :param corr: correction factor: \
+                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
+                a factor of corr = 0.6 is proposed.
+        :returns: a StatsComputer
+        """
+        # marked as experimental feature
+        if not hasattr(theorypred, "avgElement"):
+            logger.error( f"theory prediction {theorypred.analysisId()} has no average element! why??" )
+            return None
+
+        eul = theorypred.dataset.getUpperLimitFor(
+            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=apriori
+        )
+        if eul is None:
+            return None
+        eul = eul / theorypred.xsection
+        ul = theorypred.dataset.getUpperLimitFor(
+            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=observed
+        ) / theorypred.xsection
+        kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
+                   "corr": corr }
+        retriever = CompRetriever ( dataObject=theorypred.dataset,
+                               dataType="truncGaussian", nsig=0.,
+                               allowNegativeSignals=True)
+
+        return retriever.getComputerTruncGaussian( **kwargs)
+
+    @classmethod
+    def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
+            -> list:
+        """ get a statscomputer for combination of analyses
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param deltas_rel: relative error for the signal
+        :returns: a StatsComputer
+        """
+        # Only allow negative signal if all theory predictions allow for it
+        allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
+                                    for tp in theoryPredictions])
+
+        retriever = CompRetriever(dataObject=theoryPredictions,
+                                 dataType="analysesComb",
+                                 nsig=None, deltas_rel=deltas_rel,
+                                 allowNegativeSignals=allowNegativeSignals)
+
+        return retriever.getComputerAnalysesComb( )
+
+    def getComputerSingleBin(self, lumi : UnitLumi ) -> list:
+        """
+        Create computer from a single bin
+
+        """
+        dataset = self.dataObject
+        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
+                     dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
+                     nsignal = self.nsig, lumi = lumi )
+        self.data = data
+        likelihoodComputer = LikelihoodComputer ( data )
+        computer = self.attachAttributes ( UpperLimitComputer ( likelihoodComputer ) )
+        return [ computer ]
 
     def getComputerNN(self ):
         """
@@ -276,7 +267,7 @@ class StatsComputer:
         #for smname,onnxname in translator.items():
         #    nsignals[onnxname] = self.nsig[smname]
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
-        self.getComputerPyhf()
+        subComputers = self.getComputerPyhf()
         for srSetName, models in globalInfo.statModels.items():
             f_signals = {}
             for sr in globalInfo.srMappings:
@@ -293,32 +284,10 @@ class StatsComputer:
             upperLimitComputer = NNUpperLimitComputer(data,
                     lumi=self.dataObject.getLumi(),
                     onnxfilename = modelfilename )
-            self.subComputers.append ( upperLimitComputer )
-        if False: # data.globalInfo.id == "ATLAS-SUSY-2019-09":
-            import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+            subComputers.append ( self.attachAttributes ( upperLimitComputer ) )
+        return subComputers
 
-    def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
-        """ for the srSet, return list only of signal regions,
-        drop others """
-        ret = []
-        for r in srSet:
-            if r in srMappingsDict:
-                m = srMappingsDict[r]
-                if True: # m["type"] == "SR":
-                    ret.append ( r )
-        return ret
-
-    def getRegions ( self, region_labels : list, srMappingsDict : dict ) -> list:
-        """ given a list of the region_labels, return the
-        corresponding list of the region dictionaries """
-        ret = []
-        for label in region_labels:
-            if not label in srMappingsDict:
-                continue
-            ret.append ( srMappingsDict[label] )
-        return ret
-
-    def getComputerPyhf(self ):
+    def getComputerPyhf(self ) -> list:
         """
         Create computer for a pyhf result
         """
@@ -371,7 +340,7 @@ class StatsComputer:
                 raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
             r_jsonFiles[model]=regions
 
-        self.subComputers = []
+        subComputers = []
         for nsignal,json,(jsonFileName,r_jsonFile) in zip(nsignals.values(),jsons,r_jsonFiles.items() ):
             # Loading the jsonFiles, unless we already have them (because we pickled)
             data = PyhfData(nsignal, json, r_jsonFile,
@@ -379,20 +348,18 @@ class StatsComputer:
                     jsonFileName = jsonFileName )
             upperLimitComputer = PyhfUpperLimitComputer( data,
                     lumi=self.dataObject.getLumi() )
-            self.subComputers.append ( upperLimitComputer )
-        #self.subComputers = [ upperLimitComputer ]
+            subComputers.append ( self.attachAttributes ( upperLimitComputer ))
+        return subComputers
 
     def getComputerTruncGaussian ( self, **kwargs ):
         """
         Create computer for truncated gaussians
         """
         computer = TruncatedGaussians ( **kwargs )
-        self.data = None
-        #self.likelihoodComputer = computer
-        #self.upperLimitComputer = computer
-        self.subComputers = [ computer ]
+        # self.data = None
+        return [ computer ]
 
-    def getComputerAnalysesComb(self):
+    def getComputerAnalysesComb(self) -> list:
         """
         Create computer from a single bin
         :param nsig: signal yields.
@@ -400,7 +367,46 @@ class StatsComputer:
 
         computer = AnaCombLikelihoodComputer( theoryPredictions=self.dataObject,
                                               deltas_rel=self.deltas_sys )
-        self.subComputers  = [ computer ]
+        return [ self.attachAttributes ( computer ) ]
+
+    def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
+        """ for the srSet, return list only of signal regions,
+        drop others """
+        ret = []
+        for r in srSet:
+            if r in srMappingsDict:
+                m = srMappingsDict[r]
+                if True: # m["type"] == "SR":
+                    ret.append ( r )
+        return ret
+
+    def getRegions ( self, region_labels : list, srMappingsDict : dict ) -> list:
+        """ given a list of the region_labels, return the
+        corresponding list of the region dictionaries """
+        ret = []
+        for label in region_labels:
+            if not label in srMappingsDict:
+                continue
+            ret.append ( srMappingsDict[label] )
+        return ret
+
+class StatsComputer:
+    """ this is the stats computer, it takes the subcomputers
+    upon construction, and handles all the delegations to them,
+    getting the most sensitive model, etc
+    """
+
+    def __init__ ( self, subComputers : list ):
+        """
+         Initialise. allowNegativeSignals is true if its true for all
+         subcomputers.
+        """
+        self.subComputers = subComputers
+        self.allowNegativeSignals = True
+        for computer in subComputers:
+            if not self.allowNegativeSignals:
+                self.allowNegativeSignals = False
+                break
 
     def get_five_values ( self, evaluationType : NllEvalType,
                       return_nll : bool = False,
@@ -441,7 +447,10 @@ class StatsComputer:
         self.transform ( evaluationType )
         kwargs.update ( { "evaluationType": evaluationType, "asimov": asimov } )
         # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
-        ret = self.subComputers[ msm["idx"] ].nll ( poi_test, **kwargs)
+        idx = msm["idx"]
+        if idx == None:
+            return None
+        ret = self.subComputers[ idx ].nll ( poi_test, **kwargs)
         return ret
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
@@ -464,26 +473,38 @@ class StatsComputer:
 
     def transform ( self, evaluationType ):
         """ SL only. transform the data to evaluationType or observed """
-        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
-            return
-        self.subComputers[0].likelihoodComputer.transform ( evaluationType )
+        for subComputer in self.subComputers:
+            if subComputer is None:
+                continue
+            if subComputer.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
+                continue
+            subComputer.likelihoodComputer.transform ( evaluationType )
 
     def restore ( self, evaluationType ):
         """ SL only. transform the data to evaluationType or observed """
-        if self.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
-            return
         if evaluationType != observed:
             return
-        self.subComputers[0].model = self.subComputers[0].origModel
+        for subComputer in self.subComputers:
+            if subComputer is None:
+                continue
+            if subComputer.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+                continue
+            subComputer.model = subComputer.origModel
 
     def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> dict:
+        """
+        :returns: dictionary with muhat, sigma_mu and nll_min as keys
+        """
         msm = self.getMostSensitiveModel()
+        if msm["idx"] == None:
+            return { "nll_min": float("nan" ), "mu_hat": float("nan"),
+                     "sigma_mu": float("nan") }
         computer = self.subComputers[ msm["idx"] ]
         self.transform ( evaluationType )
 
         ret = computer.nll_min (
             evaluationType = evaluationType,
-            allowNegativeSignals = self.allowNegativeSignals, **kwargs )
+            allowNegativeSignals = computer.allowNegativeSignals, **kwargs )
         return ret
 
     @lru_cache
@@ -494,8 +515,10 @@ class StatsComputer:
         limit_on_xsecs
         and the name of the most sensitive model
         """
-        ul_min,idx,name = float("inf"), -1, ""
+        ul_min,idx,name = float("inf"), None, ""
         for i,computer in enumerate ( self.subComputers ):
+            if computer is None:
+                continue
             ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
             if ul != None and ul < ul_min:
                 ul_min, idx, name = ul, i, computer.name
@@ -523,6 +546,8 @@ class StatsComputer:
         """
         msm = self.getMostSensitiveModel()
         idx = msm["idx"]
+        if idx == None:
+            return None
         if idx >= len(self.subComputers):
             raise SModelSError ( f"most sensitive model is {msm} but we only have {len(self.subComputers)} subComputers" )
         ulmu = self.subComputers[ idx ].getUpperLimitOnMu(
