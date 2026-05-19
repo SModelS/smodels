@@ -522,7 +522,8 @@ class CombinedDataSet(object):
 
     def getIndex(self, dId, datasetOrder):
         """
-        Get the index of dataset within the datasetOrder, but allow for abbreviated names.
+        Get the index of dataset within the datasetOrder, 
+        but allow for abbreviated names.
 
         :param dId: id of dataset to search for, may be abbreviated
         :param datasetOrder: the ordered list of datasetIds, long form
@@ -564,14 +565,20 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "srMappings"):
         ## datasetOrder goes by srMappings
             for region in self.globalInfo.srMappings:
-                datasetOrder.append ( region["smodels"] )
+                if not "sl" in region or region["sl"]!=None:
+                    datasetOrder.append ( region["smodels"] )
         elif hasattr(self.globalInfo, "srSets" ):
             for srSetName,regions in self.globalInfo.srSets.items():
                 datasetOrder += regions
+        dim_covs = 0
+        for srSetName,models in self.globalInfo.statModels.items():
+            assert srSetName in self.globalInfo.srSets, \
+                f"{models[0]} does not appear in srSets"
+            dim_covs += len ( self.globalInfo.srSets[srSetName] )
 
-        if len(datasetOrder) != len(datasets):
-            pass
-            # raise SModelSError( f"Number of datasets in the srMappings field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
+        if len(datasetOrder) != dim_covs:
+            # pass
+            raise SModelSError( f"Number of datasets with sl entry in the srMappings field {len(datasetOrder)} does not match the dimensions of the cov matrices {dim_covs} for {self.globalInfo.id}" )
         ## need to reinitialise, we might have lost some datasets when filtering
         tmp = [ None ] * len(datasets)
         for dataset in datasets:

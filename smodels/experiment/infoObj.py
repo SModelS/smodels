@@ -50,6 +50,8 @@ class Info(object):
                 region["pyhf"]=region["smodels"]
             if not "onnx" in region:
                 region["onnx"]=region["pyhf"]
+            if not "sl" in region:
+                region["sl"]=region["smodels"]
             if not "label" in region:
                 # if there isnt a label, we take
                 # the smodels as the label

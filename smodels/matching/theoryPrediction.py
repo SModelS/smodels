@@ -824,12 +824,18 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 theoPred.upperLimit = theoPred.getUpperLimit()
                 continue
             else:
-                if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
-                    for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
-                        for region in regionSet:
-                            if region["smodels"] == theoPred.dataset.dataInfo.dataId:
-                                tpe = region["type"]
-                                break
+                gD = theoPred.dataset
+                gI = gD.globalInfo
+                if hasattr( gI, "srMappingsDict" ):
+                    if gD.dataInfo.dataId in gI.srMappingsDict:
+                        region = gI.srMappingsDict[gD.dataInfo.dataId]
+                        tpe = region["type"]
+#                if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
+#                    for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
+#                        for region in regionSet:
+#                            if region["smodels"] == theoPred.dataset.dataInfo.dataId:
+#                                tpe = region["type"]
+#                                break
                 else:
                     tpe = "SR"
 
@@ -860,29 +866,31 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     in the combination of that result.
     :returns: true if its in, false if it is not in, None if there is no combination
     """
-    assert hasattr ( dataset, "dataInfo" ), "why does the dataset here not have a dataInfo?"
+    assert hasattr ( dataset, "dataInfo" ), \
+        "why does the dataset here not have a dataInfo?"
     dataId = dataset.dataInfo.dataId
-    if hasattr ( expResult.globalInfo, "jsonFiles" ):
-        for regionSet in expResult.globalInfo.jsonFiles.values():
-            for region in regionSet:
-                if dataId == region["smodels"]:
-                    return True
+    if not dataId in expResult.globalInfo.srMappingsDict:
         return False
-    if hasattr ( expResult.globalInfo, "datasetOrder" ):
-        for ds in expResult.globalInfo.datasetOrder:
-            if dataId == ds:
+    region = expResult.globalInfo.srMappingsDict[dataId]
+    if not "sl" in region:
+        region["sl"]=region["smodels"] ## FIXME should disappear
+    for srSetName,models in expResult.globalInfo.statModels.items():
+        dType = expResult.typeOfStatsModel ( srSetName )
+        assert dType != None, "dont know which model type"
+        for regions in expResult.globalInfo.srSets [ srSetName ]:
+            if dataId in regions and region[dType]!=None:
                 return True
-        return False
-    return None
+    return False
 
 def _getCombinedResultFor(dataSetResults, expResult):
     """
     Compute the combined result for all datasets, if covariance
-    matrices or jsonFiles are available. Return a TheoryPrediction object
+    matrices or json files are available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
 
-    :param datasetPredictions: List of TheoryPrediction objects for each signal region
+    :param datasetPredictions: List of TheoryPrediction objects 
+    for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
 
     :return: TheoryPrediction object
@@ -893,7 +901,6 @@ def _getCombinedResultFor(dataSetResults, expResult):
         gI = expResult.globalInfo
         if hasattr ( gI, "statModels" ):
             for srSetName,models in gI.statModels.items():
-            # for regionSet in expResult.globalInfo.jsonFiles.values():
                 for regionName in gI.srSets[ srSetName ]:
                     region = gI.srMappingsDict[regionName]
                     if region['smodels'] == predList[0].dataset.dataInfo.dataId:
@@ -991,18 +998,10 @@ def _getBestResult(dataSetResults):
         globalInfo = dataset.globalInfo
 
         # Only a SR can be the best SR
-        stop = False
-        if hasattr(globalInfo,"jsonFiles"):
-            for regionSet in globalInfo.jsonFiles.values():
-                for region in regionSet:
-                    if type(region) == dict and \
-                            region['smodels'] == dataset.dataInfo.dataId:
-                        if "type" in region and region['type'] != 'SR':
-                            stop = True
-                    if stop: break
-                if stop: break
-        if stop:
-            continue
+        if hasattr(globalInfo,"srMappingsDict"):
+            region = globalInfo.srMappingsDict[dataset.dataInfo.dataId]
+            if region["type"] != "SR":
+                continue
 
         if dataset.getType() != "efficiencyMap":
             txt = (

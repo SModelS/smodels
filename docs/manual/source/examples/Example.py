@@ -118,8 +118,8 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
         # Compute likelihoods for EM-type results:
         if dataset.getType() == 'efficiencyMap':
             theoryPrediction.computeStatistics()
-            print('nll_BSM, nll_SM, nll_min = %1.3f, %1.3f, %1.3f' % (theoryPrediction.likelihood( return_nll = True ),
-                    theoryPrediction.lsm( return_nll = True ), theoryPrediction.lmax( return_nll = True )))
+            print('nll_BSM, nll_SM, nll_min = %1.3f, %1.3f, %1.3f' % (theoryPrediction.nll( ),
+                    theoryPrediction.nllsm( ), theoryPrediction.nll_min( )) )
         if r > rmax:
             rmax = r
             bestResult = theoryPrediction.analysisId()
@@ -151,9 +151,9 @@ def main(inputFile='./inputFiles/slha/lightEWinos.slha', sigmacut=0.05*fb,
     elif len(selectedTheoryPreds) > 1:
         combiner = TheoryPredictionsCombiner(selectedTheoryPreds)
         combiner.computeStatistics()
-        nll = combiner.likelihood( return_nll = True )
-        nllmin = combiner.lmax( return_nll = True )
-        nllsm = combiner.lsm( return_nll = True )
+        nll = combiner.nll(  )
+        nllmin = combiner.nll_min(  )
+        nllsm = combiner.nllsm ( )
         print("\n\nCombined analyses:", combiner.analysisId())
         print(f"Combined r value: {combiner.getRValue():1.3E}")
         print(f"Combined r value (evaluationType): {combiner.getRValue(evaluationType=apriori):1.3E}")

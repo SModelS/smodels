@@ -62,14 +62,14 @@ class ExpResult(object):
             dsOrder = []
             for SR in self.globalInfo.srMappings:
                 if not isinstance(SR,dict):
-                    raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
+                    raise SModelSExperimentError(f"The SRs in the srMappings should be a dictionary and not {type(SR)}")
                 # In case the smodels label is not defined, ignore SR
                 if not "smodels" in SR:
                     continue
                 smodelsLabel = SR["smodels"]
                 if smodelsLabel is None or smodelsLabel in dsOrder:
                     continue
-                # Store the dataset following the order defined in globalInfo.jsonFiles
+                # Store the dataset following the order defined in globalInfo.srMappings
                 dsOrder.append ( smodelsLabel )
             self.globalInfo.datasetOrder = dsOrder
         hasOrder = hasattr(self.globalInfo, "datasetOrder")
@@ -103,7 +103,7 @@ class ExpResult(object):
                 if dsName not in self.globalInfo.srMappingsDict:
                     # if it does not appear in srMappingsDict, we dont add
                     continue
-                if dsName not in dsOrder:
+                if dsName not in dsOrder: #  and self.globalInfo.srMappingsDict["sl"]!=None:
                     self.datasets.append ( ds )
                     self.globalInfo.datasetOrder.append ( dsName )
         if len(self.datasets) != len(dsOrder):
@@ -207,9 +207,31 @@ class ExpResult(object):
 
     def hasStatsModel(self) -> bool:
         """ do we have any kind of statistical model """
-        if hasattr ( self.globalInfo, "srMappings" ):
+        if hasattr ( self.globalInfo, "statModels" ):
             return True
         return False
+
+    def typeOfStatsModel(self, srSetName : str, idx : int = 0 ) -> \
+            Optional[str]:
+        """ what type of statistics model do we have for
+        srSetName?
+        :param srSetName: the name of the signal region set
+        :param idx: which index in a list
+
+        :returns: one of: onnx, cov, json
+        """
+        if not self.hasStatsModel():
+            return None
+        for srSetName, models in self.globalInfo.statModels.items():
+            if idx >= len(models):
+                return None
+            if models[idx].endswith ( ".onnx" ):
+                return "onnx"
+            if models[idx].endswith ( ".cov" ):
+                return "sl"
+            if models[idx].endswith ( ".json" ):
+                return "pyhf"
+        return "?"
 
     def isCombinableWith ( self, other ) -> bool:
         """ can this expResult be safely assumed to be approximately uncorrelated

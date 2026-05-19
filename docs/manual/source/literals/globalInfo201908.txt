@@ -10,12 +10,12 @@ comment: In addition to the default material provided by ATLAS for TChiWH, we al
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2024/7/30
-jsonFiles: {
-  'BkgOnly.json': [
-    {'pyhf': 'STCREM_cuts', 'smodels': None, 'type': 'CR'},
-    {'pyhf': 'WREM_cuts', 'smodels': None, 'type': 'CR'},
-    {'pyhf': 'TRHMEM_cuts', 'smodels': None, 'type': 'CR'},
-    {'pyhf': 'TRMMEM_cuts', 'smodels': None, 'type': 'CR'},
+includeCRs: True
+srMappings: [
+    {'pyhf': 'STCREM_cuts', 'smodels': None, 'type': 'CR'},                         
+    {'pyhf': 'WREM_cuts', 'smodels': None, 'type': 'CR'},                           
+    {'pyhf': 'TRHMEM_cuts', 'smodels': None, 'type': 'CR'},                         
+    {'pyhf': 'TRMMEM_cuts', 'smodels': None, 'type': 'CR'},                         
     {'pyhf': 'TRLMEM_cuts', 'smodels': None, 'type': 'CR'},
     {'pyhf': 'SRHMEM_mct2[0]', 'smodels': 'SR_HM_Low_MCT'},
     {'pyhf': 'SRHMEM_mct2[1]', 'smodels': 'SR_HM_Med_MCT'},
@@ -26,8 +26,15 @@ jsonFiles: {
     {'pyhf': 'SRLMEM_mct2[0]', 'smodels': 'SR_LM_Low_MCT'},
     {'pyhf': 'SRLMEM_mct2[1]', 'smodels': 'SR_LM_Med_MCT'},
     {'pyhf': 'SRLMEM_mct2[2]', 'smodels': 'SR_LM_High_MCT'}]
-  }
-includeCRs: True
-# mlModels: model.onnx
-# mlModels: { 'NNAsimov_v6.onnx': 'BkgOnly.json' }
-mlModels: { 'SUSY-2019-08.onnx': 'BkgOnly.json' }
+srSets: { 'bkgonly': ['STCREM_cuts', 'WREM_cuts', 'TRHMEM_cuts',
+          'TRMMEM_cuts', 'TRLMEM_cuts',
+          'SR_HM_Med_MCT',
+          'SR_HM_High_MCT',
+          'SR_MM_Low_MCT',
+          'SR_MM_Med_MCT',
+          'SR_MM_High_MCT',
+          'SR_LM_Low_MCT',
+          'SR_LM_Med_MCT',
+          'SR_LM_High_MCT',
+          ]}
+statModels: { 'bkgonly': ['SUSY-2019-08.onnx', 'simplified.json','BkgOnly.json']}

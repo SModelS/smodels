@@ -21,8 +21,9 @@ class CombinedTest(unittest.TestCase):
         from smodels.base.smodelsLogging import logger, setLogLevel
         filename = "./testFiles/slha/gluino_squarks.slha"
         setLogLevel ( "error" )
+        from databaseLoader import database
         outputfile = runMain(filename, inifile="testParameters_agg.ini",
-                suppressStdout=True )
+                overridedatabase = database, suppressStdout=True )
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default_agg import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus',

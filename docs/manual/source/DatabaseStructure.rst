@@ -77,51 +77,62 @@ Each |ExpRes| folder contains:
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
-data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>` or a :ref:`full pyhf likelihood <pyhfllhd>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
+data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>`, a :ref:`full pyhf likelihood <pyhfllhd>`, or a :ref:`ml surrogate model <surrogateMLModels>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
 
 .. literalinclude:: /literals/globalInfo201804.txt
-   :lines: 1-20
+   :lines: 1-22
 
-In this case, the connection of SModelS with the pyhf model is specified as
-a dictionary, with the json file name as the keys and a list of analysis region
-entries as the values. The region entries match the SModelS names (``smodels``), 
-i.e. the dataId's of the relevant efficiency maps, with the pyhf region names (``pyhf``) 
-used in the json file; the region type (signal, control, or validation region) is 
-specified as ``type`` (default: **SR**). If the pyhf name is omitted, it is assumed to be equal to the 
-SModelS name. If the SModelS name is omitted, we assume **None** as value, indicating
-that there is no corresponding efficiency map implemented; in this case no signal counts will be patched in this region. This is typically the case for control or validation regions. 
+Here, ``srMappings`` lists all signal regions that SModelS should be aware of,
+with ``smodels`` being the name known to SModelS (can be ``None``).
+Optionally, a ``type`` can be specified -- it should be one of **SR**, **CR**, 
+with **SR** being the default. If a label is given, it is the
+name the region is kwown as within the ``globalInfo.txt`` file,
+else the ``smodels`` field is used.
+The optional fields ``pyhf``,  ``sl``, and ``onnx`` are the names
+used to map them onto the names in the according statistics models.
+Currently, the ``sl`` name is not used except as an indicator that it
+is used for the simplified likelihood. These fields default to ``None``.
 
-In case of simplified likelihoods, the covariance matrix is supplied in the ``covariance`` field, with the order of the regions specified in a ``datasetOrder`` field, 
-shown in the example given by ATLAS-SUSY-2018-41:
+
+The ``srSets`` field groups these regions into named sets. In the example
+above a set **all** is defined that contains all 5 regions.
+
+Finall, ``statModels`` maps these sets to lists of statistical models.
+By default, for each region set, SModelS uses the first model given in
+the list.
+
+Some shorthand notations are possible. For example, in the 
+case of the ATLAS-SUSY-2018-41 simplified likelihood listed below, 
+``srMappings`` is not given.
+In this case assumed that all regions named in ``srSets`` should
+appear in ``srMapping`` with all the region names being the same
+as the SModelS name and ``type`` being always **SR**:
 
 .. literalinclude:: /literals/globalInfo201841.txt
    :lines: 12-13
 
-Finally, for machine learned surrogate models an ``mlModels`` field exists with either the same syntax as the ``jsonFiles`` field above, or simply referencing ("copying") the full pyhf model, in which case it is simply:
+In what follows, ATLAS-SUSY-2019-08 is given as another example,
+this time with a machine learned surrogate model. It is used by default,
+with a simplified pyhf model as its backup, and a full pyhf model as
+that model's backup. Since the onnx region names are not given explicitly,
+they are assumed to be the same as the pyhf names:
 
 .. literalinclude:: /literals/globalInfo201908.txt
-   :lines: 33
+   :lines: 14-40
 
-Alternatively, we can also specify the list of signal regions individually:
-
-.. literalinclude:: /literals/globalInfo201804fake.txt
-   :lines: 14-19
-
-Note how instead of ``phyf`` entries, we now specify ``onnx``.
-We can also specify both ``pyhf`` and ``onnx``, a syntax that comes in handy when
-using the copy mechanism described above:
+The following case, taken from ATLAS-SUSY-2018-32 has control regions
+that are used for the ML surrogate model, but not in the pyhf model:
 
 .. literalinclude:: /literals/globalInfo201832.txt
-   :lines: 52
+   :lines: 52-54
 
-In case of using the copy mechanism, if ``onnx`` is omitted, it is assumed to
-take on the same value as ``pyhf``.
-
-Machine-learned models can be mixed with full models. In this case mention the json file as the key and specify ``None`` as the value, as is done in e.g. ATLAS-SUSY-2019-09:
+Machine-learned models can be mixed with full models. In this case
+of ATLAS-SUSY-2019-09, by default surrogate models are used for the
+**onshell** and **offshell** region sets, but pyhf models for
+the other three region sets (**WH_0j**, **WH_nj**, **WH_DFOS**):
 
 .. literalinclude:: /literals/globalInfo201909.txt
-   :lines: 144-149
-
+   :lines: 134-146
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
