@@ -243,7 +243,7 @@ class CompRetriever:
         :param corr: correction factor: \
                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
                 a factor of corr = 0.6 is proposed.
-        :returns: a StatsComputer
+        :returns: list of subComputers (with a single entry)
         """
         # marked as experimental feature
         if not hasattr(theorypred, "avgElement"):
@@ -261,11 +261,13 @@ class CompRetriever:
         ) / theorypred.xsection
         kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
-        retriever = CompRetriever ( dataObject=theorypred.dataset,
-                               dataType="truncGaussian", nsig=0.,
-                               allowNegativeSignals=True)
-
-        return retriever.getComputerTruncGaussian( **kwargs)
+        #retriever = CompRetriever ( dataObject=theorypred.dataset,
+        #                       dataType="truncGaussian", nsig=0.,
+        #                       allowNegativeSignals=True)
+        #return retriever.getComputerTruncGaussian( **kwargs)
+        computer = TruncatedGaussians ( **kwargs )
+        # self.data = None
+        return [ computer ]
 
     @classmethod
     def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
@@ -393,14 +395,6 @@ class CompRetriever:
                     lumi=self.dataObject.getLumi() )
             subComputers.append ( self.attachAttributes ( upperLimitComputer ))
         return subComputers
-
-    def getComputerTruncGaussian ( self, **kwargs ):
-        """
-        Create computer for truncated gaussians
-        """
-        computer = TruncatedGaussians ( **kwargs )
-        # self.data = None
-        return [ computer ]
 
     @classmethod
     def getAll ( obj, srSet : list, srMappingsDict : dict ) -> list:
