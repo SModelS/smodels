@@ -78,8 +78,8 @@ class CompRetriever:
         self.allowNegativeSignals = allowNegativeSignals
 
     @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel) -> list:
-        """ get a statscomputer for simplified likelihood combination.
+    def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> list:
+        """ get a statscomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
@@ -87,17 +87,7 @@ class CompRetriever:
 
         :returns: a StatsComputer
         """
-        retriever = CompRetriever ( dataObject=dataset,
-                               dataType="SL",
-                               nsig=nsig, deltas_rel=deltas_rel)
-        return retriever.getComputerMultiBinSL( )
-
-    def getComputerMultiBinSL(self) -> list:
-        """
-        Create computer from a multi bin SL result
-        """
-
-        dataset = self.dataObject
+        dataType = "SL"
         covs = dataset.globalInfo.cachedModels
         offset = 0
         subComputers = []
@@ -116,7 +106,7 @@ class CompRetriever:
             #third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset.origdatasets[offset:offset+n] ]
             nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
             bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
-            nsig = self.nsig[offset:offset+n]
+            nsig = nsig[offset:offset+n]
             third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
             c = third_momenta.count ( None )
             if c > 0:
@@ -126,12 +116,13 @@ class CompRetriever:
 
             data = Data( nobs, bg, cov, third_moment=third_momenta,
                          nsignal = nsig,
-                         deltas_rel = self.deltas_sys, lumi=dataset.getLumi(),
+                         deltas_rel = deltas_rel, lumi=dataset.getLumi(),
                          name = covname )
-            self.data = data
             likelihoodComputer = LikelihoodComputer ( data )
             computer = UpperLimitComputer ( likelihoodComputer )
-            subComputers.append ( self.attachAttributes ( computer ) )
+            computer.allowNegativeSignals = False
+            computer.dataType = dataType
+            subComputers.append ( computer )
             offset += n
         return subComputers
 
@@ -146,10 +137,19 @@ class CompRetriever:
 
         :returns: a StatsComputer
         """
-        retriever = CompRetriever ( dataObject=dataset,
-                               dataType="1bin",
-                               nsig=nsig, deltas_rel=deltas_rel )
-        return retriever.getComputerSingleBin( lumi )
+        #retriever = CompRetriever ( dataObject=dataset,
+        #                       dataType="1bin",
+        #                       nsig=nsig, deltas_rel=deltas_rel )
+        #return retriever.getComputerSingleBin( lumi )
+        #dataset = self.dataObject
+        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
+                     dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
+                     nsignal = nsig, lumi = lumi )
+        likelihoodComputer = LikelihoodComputer ( data )
+        computer = UpperLimitComputer ( likelihoodComputer )
+        computer.dataType = "1bin"
+        computer.allowNegativeSignals = False
+        return [ computer ]
 
     @classmethod
     def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
@@ -369,7 +369,8 @@ class CompRetriever:
                                               deltas_rel=self.deltas_sys )
         return [ self.attachAttributes ( computer ) ]
 
-    def getAll ( self, srSet : list, srMappingsDict : dict ) -> list:
+    @classmethod
+    def getAll ( obj, srSet : list, srMappingsDict : dict ) -> list:
         """ for the srSet, return list only of signal regions,
         drop others """
         ret = []
@@ -380,7 +381,8 @@ class CompRetriever:
                     ret.append ( r )
         return ret
 
-    def getRegions ( self, region_labels : list, srMappingsDict : dict ) -> list:
+    @classmethod
+    def getRegions ( obj, region_labels : list, srMappingsDict : dict ) -> list:
         """ given a list of the region_labels, return the
         corresponding list of the region dictionaries """
         ret = []
