@@ -95,7 +95,11 @@ srMappings: [
     {'pyhf': 'SRmm_eMT2g_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_g', 'type': 'SR'},
     {'pyhf': 'SRmm_eMT2g_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_g', 'type': 'SR'},
     {'pyhf': 'SRmm_eMT2h_hghmet_cuts', 'smodels': 'SR_slep_2l_mm_high_h', 'type': 'SR'},
-    {'pyhf': 'SRmm_eMT2h_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_h', 'type': 'SR'}]
+    {'pyhf': 'SRmm_eMT2h_lowmet_V2_cuts', 'smodels': 'SR_slep_2l_mm_low_h', 'type': 'SR'},
+    {'smodels': 'SR_ewk_1l1T', 'pyhf': None},
+    {'smodels': 'SR_ewk_2l_high', 'pyhf': None},
+    {'smodels': 'SR_ewk_2l_med', 'pyhf': None},
+    {'smodels': 'SR_ewk_2l_low', 'pyhf': None} ]
 srSets: { 'EWKinos_SR2lOnly': ['CR_ewk_VV_high',
           'CR_ewk_VV_low',
           'CR_ewk_tau_high',

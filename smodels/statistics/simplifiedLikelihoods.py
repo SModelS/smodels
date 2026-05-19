@@ -746,9 +746,9 @@ class LikelihoodComputer:
         """
         if isinstance(mu,(np.ndarray,list)):
             mu = mu[0]
-        mu = float(mu)
-        if np.isinf ( mu ):
+        if mu == None or np.isinf ( mu ):
             return None
+        mu = float(mu)
         model = self.model
         nsig = mu * model.nsignal
 

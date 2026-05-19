@@ -121,9 +121,9 @@ class Info(object):
                 self.srMappings = []
                 for srSetName,regions in self.srSets.items():
                     for region in regions:
-                        self.srMappingsDict[region] = region
                         d = { "smodels": region, "label": region, "onnx": region,
-                              "pyhf": region }
+                              "pyhf": region, "type": "SR" }
+                        self.srMappingsDict[region] = d
                         self.srMappings.append ( d )
 
                 return

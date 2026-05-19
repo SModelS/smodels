@@ -18,7 +18,8 @@ srMappings: [
     {'smodels': 'SRC_22', 'pyhf': 'SR_metsigST[0]'},
     {'smodels': 'SRC_24', 'pyhf': 'SR_metsigST[1]'},
     {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
-    {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'}]
+    {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'},
+    {'smodels': 'SRC_incl', 'pyhf': None }]
 srSets: { 'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'],
 			    'C': ['SRC_22', 'SRC_24', 'SRC_26', 'SRC_28']}
 statModels: { 'A': ['BkgOnlyA.json'], 'B': ['BkgOnlyB.json'],

@@ -570,16 +570,23 @@ class CombinedDataSet(object):
                 datasetOrder += regions
 
         if len(datasetOrder) != len(datasets):
-            raise SModelSError( f"Number of datasets in the srMappings field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
+            pass
+            # raise SModelSError( f"Number of datasets in the srMappings field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
         ## need to reinitialise, we might have lost some datasets when filtering
-        self._datasets = [ None ] * len(datasets)
+        tmp = [ None ] * len(datasets)
         for dataset in datasets:
             idx = self.getIndex(dataset.getID(), datasetOrder)
             if idx == -1:
-                raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
-            self._datasets[idx] = dataset
+                continue
+                # raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
+            tmp[idx] = dataset
             # dsIndex = datasetOrder.index(dataset.getID())
             # self._datasets[dsIndex] = dataset
+        newds = []
+        for ds in tmp:
+            if ds != None:
+                newds.append ( ds )
+        self._datasets = newds
 
     def getType(self):
         """

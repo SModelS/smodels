@@ -93,12 +93,16 @@ class ExpResult(object):
             ## for debugging only, we allow a single dataset
             dsOrder = [dsOrder]
         for dsname in dsOrder:
-            self.datasets.append(datasets[dsname])
+            if dsname in datasets:
+                self.datasets.append(datasets[dsname])
         if type(self.globalInfo.datasetOrder)==tuple:
             self.globalInfo.datasetOrder = list ( self.globalInfo.datasetOrder )
         # now append the rest -- but only for json file case
         if hasModels:
             for dsName,ds in datasets.items():
+                if dsName not in self.globalInfo.srMappingsDict:
+                    # if it does not appear in srMappingsDict, we dont add
+                    continue
                 if dsName not in dsOrder:
                     self.datasets.append ( ds )
                     self.globalInfo.datasetOrder.append ( dsName )

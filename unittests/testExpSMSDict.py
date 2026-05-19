@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testRunSModelS
-   :synopsis: Tests runSModelS
+.. module:: testExpSMSDict
+   :synopsis: Tests sms dictionary
 
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
 import sys
-
 sys.path.insert(0,"../")
 import unittest
-
 from databaseLoader import database
-
 from smodels.experiment.databaseObj import Database
-
 
 class ExpSMSDictTest(unittest.TestCase):
 

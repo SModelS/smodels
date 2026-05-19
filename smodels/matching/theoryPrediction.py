@@ -201,7 +201,7 @@ class TheoryPrediction(object):
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
             """
-            # Get ordered list of datasets:
+            # Get ordered list of datasets, old version:
             if hasattr(self.dataset.globalInfo, "covariances"):
                 datasetList = []
                 for srSetName,regions in self.dataset.globalInfo.srSets.items():
@@ -230,7 +230,6 @@ class TheoryPrediction(object):
                     # datasetList = self.dataset.globalInfo.datasetOrder[:]
                     # Get list of signal yields corresponding to the dataset order:
                     srNsigs = [srNsigDict[dataID] for dataID in datasetList]
-                    # Get computer
                     computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
                         nsig=srNsigs, deltas_rel = self.deltas_rel )
                 elif hasOnnx:
@@ -891,9 +890,12 @@ def _getCombinedResultFor(dataSetResults, expResult):
     # Don't give combined result if all regions are CRs
     isNotSR = []
     for predList in dataSetResults:
-        if hasattr ( expResult.globalInfo, "jsonFiles" ):
-            for regionSet in expResult.globalInfo.jsonFiles.values():
-                for region in regionSet:
+        gI = expResult.globalInfo
+        if hasattr ( gI, "statModels" ):
+            for srSetName,models in gI.statModels.items():
+            # for regionSet in expResult.globalInfo.jsonFiles.values():
+                for regionName in gI.srSets[ srSetName ]:
+                    region = gI.srMappingsDict[regionName]
                     if region['smodels'] == predList[0].dataset.dataInfo.dataId:
                         if region['type'] == 'SR':
                             isNotSR.append(False)

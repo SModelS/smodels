@@ -237,6 +237,7 @@ class StatsComputer:
             #third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset.origdatasets[offset:offset+n] ]
             nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
             bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
+            nsig = self.nsig[offset:offset+n]
             third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
             c = third_momenta.count ( None )
             if c > 0:
@@ -245,7 +246,7 @@ class StatsComputer:
                 third_momenta = None
 
             data = Data( nobs, bg, cov, third_moment=third_momenta,
-                         nsignal = self.nsig[offset:offset+n],
+                         nsignal = nsig,
                          deltas_rel = self.deltas_sys, lumi=dataset.getLumi(),
                          name = covname )
             self.data = data
