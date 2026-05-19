@@ -135,7 +135,7 @@ the other three region sets (**WH_0j**, **WH_nj**, **WH_DFOS**):
    :lines: 134-146
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
-* **globalInfo files  are descrived by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
+* **globalInfo files  are described by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
 
 Data Set Folder
 ^^^^^^^^^^^^^^^
