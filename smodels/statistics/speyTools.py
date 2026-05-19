@@ -32,7 +32,7 @@ import numpy as np
 
 _debug = { "writePoint": False } # for debugging only
 
-class SpeyComputer:
+class SpeyRetriever:
     """ the facade that delegates all statistical computations to spey.
     takes care of all interactions with spey except for analysis combinations. """
 
