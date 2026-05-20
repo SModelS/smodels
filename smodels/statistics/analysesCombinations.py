@@ -76,24 +76,6 @@ class AnaCombLikelihoodComputer(object):
             return None
         return nll
 
-    """
-    def likelihood(
-        self,
-        mu: float = 1.0,
-        evaluationType : NllEvalType = observed,
-        return_nll: bool = False,
-        asimov: Union[None,float] = None,
-    ) -> float:
-        #Compute the likelihood at a given mu
-
-        #:param mu: signal strength
-        #:param evaluationType: one of: observed, apriori, aposteriori
-        #:param return_nll: if True, return negative log likelihood, else likelihood
-        #:param asimov: if not None, compute llhd for asimov data with mu=asimov
-        ret = self.nll ( mu, evaluationType, asimov=asimov )
-        return exponentiateNLL ( ret, doIt = not return_nll )
-    """
-
     @lru_cache
     def nll_min(
         self,
@@ -283,8 +265,9 @@ class AnaCombLikelihoodComputer(object):
 
             if nll is None or nllA is None:
                 return None
-            return CLsfromNLL( nllA, nll0A, nll, nll0, (mu_hat>mu),
-                               return_type=return_type, nSigma=nSigma )
+            ret = CLsfromNLL( nllA, nll0A, nll, nll0, (mu_hat>mu),
+                              return_type=return_type, nSigma=nSigma )
+            return ret
 
         return mu_hat, sigma_mu, clsRoot
 

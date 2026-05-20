@@ -97,52 +97,32 @@ class SpeyPyhfData:
     @classmethod
     def createDataObject ( cls, dataset, nsig : list ):
         """ an object creator method """
-        jsonFiles = dataset.globalInfo.jsonFiles
+        # jsonFiles = dataset.globalInfo.jsonFiles
 
         globalInfo = dataset.globalInfo
-        jsonFiles = [js for js in globalInfo.jsonFiles]
-        jsons = globalInfo.jsons.copy()
+        jsonFiles = []
+        srSetNames = {} # set names for jsonFiles
+        # jsons = []
+        for srSetName,models in globalInfo.statModels.items():
+            if models[0].endswith(".json"):
+                jsonFiles.append ( models[0] )
+                srSetNames[ models[0] ] = srSetName
+                # jsons.append ( globalInfo.cachedModels[srSetName] )
+        # jsonFiles = [js for js in globalInfo.jsonFiles]
+        #jsons = globalInfo.jsons.copy()
         # datasets = [ds.getID() for ds in dataset._datasets]
-        datasets = [ds.getID() for ds in dataset.origdatasets]
+        # datasets = [ds.getID() for ds in dataset.origdatasets]
+        datasets = [ sr["smodels"] for sr in dataset.srMappings ]
         # Filtering the json files by looking at the available datasets
 
-        def hasDatasets ( jsonFileSnippet : list, datasets : list[str] ) -> bool:
-            """ method that checks that we indeed have all the datasets
-            for json file jsName 
-            :param jsonFileSnippet: e.g. 
-                [{'pyhf': 'QCR1cut_cuts', 'type': 'CR', 'smodels': None} ... ]
-            :param datasets: e.g. ['SRlow', 'SRhigh']
-            returns: true if all datasets are there
-            """
-            hasAll = True
-            hasSome = False
-            allSModelSNames = set ( [ x["smodels"] for x in jsonFileSnippet ] )
-            # print ( f"@@@hasDatasets {jsonFileSnippet}" )
-            for ds in datasets:
-                if ds in allSModelSNames:
-                    hasSome = True
-                else:
-                    hasAll = False
-            if hasSome and not hasAll:
-                logger.error( f"Wrong json definition in globalInfo.jsonFiles for json {jsName}" )
-                sys.exit(-1)
-            return hasAll
-
-        for jsName in globalInfo.jsonFiles:
-            hasDSes = hasDatasets ( globalInfo.jsonFiles[jsName], datasets )
-            if not hasDSes:
-                # No datasets found for this json combination
-                jsIndex = jsonFiles.index(jsName)
-                jsonFiles.pop(jsIndex)
-                jsons.pop(jsIndex)
-                continue
         logger.error( f"list of datasets: {datasets}" )
         logger.error( f"jsonFiles after filtering: {jsonFiles}" )
         # Constructing the list of signals with subsignals matching each json
         nsignals = list()
         for jsName in jsonFiles:
             subSig = list()
-            for sr in globalInfo.jsonFiles[jsName]:
+            srSet = globalInfo.srSets [ srSetNames [ jsName ] ]
+            for sr in srSet:
                 srName = sr["smodels"]
                 if srName == None:
                     continue

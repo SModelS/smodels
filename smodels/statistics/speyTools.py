@@ -15,6 +15,7 @@ from typing import Union, Text, Tuple, Dict, List, Optional
 import sys
 from spey import ExpectationType, StatisticalModel, get_backend
 from smodels.statistics.basicStats import exponentiateNLL
+from smodels.base.physicsUnits import UnitXSec
 import spey
 # spey.set_optimiser( "iminuit" )
 
@@ -76,6 +77,7 @@ class SpeyRetriever:
                 if c < len(third_momenta):
                     logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
                 third_momenta = None
+            xsec = sum ( nsig ) / dataset.getLumi()
             if third_momenta == None:
                 try:
                     stat_wrapper = get_backend("default.correlated_background")
@@ -98,7 +100,8 @@ class SpeyRetriever:
                                 xsection = [ x / lumi for x in nsig ],
                                 analysis = dataset.globalInfo.id,
                 )
-                subComputers.append ( SpeyModelFacade ( speyModel, "SL", covname ) )
+                facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
+                subComputers.append ( facade )
             else:
                 # SLv2
                 try:
@@ -121,7 +124,8 @@ class SpeyRetriever:
                     f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
                     f.write ( f"lumi={lumi}\n" )
                     f.close()
-                return [ SpeyModelFacade ( speyModel, "SL", covname ) ]
+                facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
+                subComputers.append ( facade )
         return subComputers
 
     @classmethod
@@ -151,9 +155,10 @@ class SpeyRetriever:
                         analysis = id,
 #                        backend = 'simplified_likelihoods'
         )
-        # speyModel.dataType = "1bin"
-        # speyModel.allowNegativeSignals = False
-        return [ SpeyModelFacade ( speyModel, "1bin", dataset.dataInfo.dataId ) ]
+        name = dataset.dataInfo.dataId
+        xsec = nsig / dataset.globalInfo.lumi
+        facade = SpeyModelFacade ( speyModel, "1bin", name, xsec )
+        return [ facade ]
 
     @classmethod
     def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
@@ -214,7 +219,9 @@ class SpeyRetriever:
             speyModel = stat_wrapper(nsig,tempf)
             if os.path.exists ( tempf ):
                 os.unlink ( tempf )
-                facade = speyModelFacade ( upperLimitComputer, "nn", modelfilename )
+                xsec = sum(nsig) / dataset.globalInfo.lumi
+                facade = speyModelFacade ( upperLimitComputer, "nn", 
+                                           modelfilename, xsec )
                 subComputers.append ( facade )
         return subComputers
 
@@ -244,9 +251,9 @@ class SpeyRetriever:
             speyModel = stat_wrapper( analysis = analysis,
                             signal_patch = signal_patch,
                             background_only_model = inputJson )
-            models.append ( SpeyModelFacade ( speyModel, "pyhf" ) )
-        # self.speyModels = models
-        # self.model_index, _ = self.getBestCombinationIndex( data )
+            xsec = sum (nsig ) / dataset.globalInfo.lumi
+            facade = SpeyModelFacade ( speyModel, "pyhf", mname, xsec )
+            models.append ( facade )
         return models
 
     @classmethod
@@ -309,12 +316,14 @@ class SpeyModelFacade:
     """ very simple container that wraps around spey models,
     and adapts the API to SModelS """
 
-    def __init__ ( self, speyModel, dataType : str, name : str ):
+    def __init__ ( self, speyModel, dataType : str, name : str,
+                   totalXsec: UnitXSec ):
         self.speyModel = speyModel
         self.dataType = dataType
         self.name = name
         self.likelihoodComputer = self
         self.allowNegativeSignals = False
+        self.totalXsec = totalXsec
 
     def nll_min ( self, evaluationType : NllEvalType = observed,
                   allowNegativeSignals : bool = False,
@@ -333,12 +342,17 @@ class SpeyModelFacade:
         ret[ "sigma_mu" ] = sigma_mu
         return ret
 
-    def nll ( self, mu : float, evaluationType : NllEvalType = observed, 
-              asimov : Optional[float] = None, 
+    def nll ( self, mu : float, evaluationType : NllEvalType = observed,
+              asimov : Optional[float] = None,
               **kwargs ):
+        exp = self.translateExpectationType ( evaluationType )
         kwargs["return_nll"]=True
-        ret = self.speyModel.likelihood ( **kwargs )
+        ret = self.speyModel.likelihood ( poi_test=mu,
+               expected = exp, **kwargs )
         return float(ret)
+
+    def getTotalXSec ( self ):
+        return self.totalXsec
 
     @classmethod
     def transform ( cls, evaluationType : NllEvalType ):
@@ -362,8 +376,19 @@ class SpeyModelFacade:
             nSigma : int = 0, **kwargs ) -> float:
         exp = self.translateExpectationType ( evaluationType )
         expected_pvalue = "nominal"
+        if nSigma != 0:
+            expected_pvalue = "1sigma"
+
         ret = self.speyModel.poi_upper_limit ( expected = exp,
                expected_pvalue = expected_pvalue )
+        idx = 0
+        if nSigma == 0:
+            ret = float ( ret )
+        elif nSigma == 1:
+            ret = float(ret[-1])
+        elif nSigma == -1:
+            ret = float(ret[0])
+        return ret
 
 if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
