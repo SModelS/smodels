@@ -444,14 +444,16 @@ class DataSet(object):
         """
 
         if nSigma != 0:
-            from smodels.statistics.statsTools import getCompRetrieverModule
+            from smodels.statistics.statsTools import getCompRetrieverModule,\
+                StatsComputer
             mod = getCompRetrieverModule()
             # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
             nsig = 1
-            comp = mod.forSingleBin ( dataset=self,
+            m = mod.forSingleBin ( dataset=self,
                     nsig=nsig, deltas_rel = deltas_rel, lumi = self.getLumi() )
+            comp = StatsComputer ( m )
             # we dont even cache, not like this will be used much
-            ul = comp.poi_upper_limit (
+            ul = comp.getUpperLimit (
                 evaluationType = evaluationType,
                 nSigma = nSigma, limit_on_xsec = True )
             return ul

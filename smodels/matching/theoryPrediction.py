@@ -259,7 +259,7 @@ class TheoryPrediction(object):
                 nSigma = nSigma
             )
         if self.dataType() == "combined":
-            ul = self.statsComputer.poi_upper_limit(
+            ul = self.statsComputer.getUpperLimit(
                 evaluationType = evaluationType,
                 nSigma = nSigma,
                 limit_on_xsec = True, **kwargs )

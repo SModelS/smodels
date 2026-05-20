@@ -359,10 +359,10 @@ class SpeyModelFacade:
         return None
 
     def getUpperLimitOnMu ( self, evaluationType : NllEvalType = observed,
-            **kwargs ):
+            nSigma : int = 0, **kwargs ) -> float:
         exp = self.translateExpectationType ( evaluationType )
         expected_pvalue = "nominal"
-        return self.speyModel.poi_upper_limit ( expected = exp,
+        ret = self.speyModel.poi_upper_limit ( expected = exp,
                expected_pvalue = expected_pvalue )
 
 if __name__ == "__main__":
@@ -372,9 +372,9 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
     computer = SpeyRetriever ( dataset, "1bin", 1. )
-    ul = computer.poi_upper_limit ( evaluationType = observed,
-                                    limit_on_xsec = True )
+    ul = computer.getUpperLimit ( evaluationType = observed,
+                                  limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( evaluationType = apriori,
-                                     limit_on_xsec = True )
+    ule = computer.getUpperLimit ( evaluationType = apriori,
+                                   limit_on_xsec = True )
     print ( "ule", ule )

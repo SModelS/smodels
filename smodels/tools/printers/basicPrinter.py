@@ -144,7 +144,7 @@ class BasicPrinter(object):
             # print ( " `-", len(ret))
             return ret
         except AttributeError as e:
-            logger.warning(f'Error formating object {typeStr}: \n {e}')
+            logger.warning(f'Error formating object {typeStr} for {type(self).__name__}: \n {e}')
             return False
 
     def _round(self, number, n=6):

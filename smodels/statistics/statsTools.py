@@ -42,35 +42,6 @@ class CompRetriever:
     """ simple class that retrieves and constructs the sub computers,
     in StatsComputer """
 
-    """
-    __slots__ = [ "nsig", "dataObject", "dataType", "data",
-                  "deltas_sys", "allowNegativeSignals" ]
-    def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list],
-                   dataType : str, nsig : Union[None,float,List,Dict] = None,
-                   deltas_rel : Optional[float] = None,
-                   allowNegativeSignals : bool = False ):
-         Initialise.
-
-        :param dataObject: a smodels (combined)dataset or a list of
-        theory predictions (for combination of analyses)
-        :param nsig: signal yield, either as float or as list
-        :param deltas_rel: relative error on signal. currently unused
-        :allowNegativeSignals: if True, negative values for the signal (mu)
-        are allowed.
-
-        if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian",
-                             "analysesComb", "nn" ]:
-            raise SModelSError( f"I do not recognize the data type {dataType}" )
-
-        self.dataType = dataType
-        self.dataObject = dataObject
-        self.nsig = nsig
-        self.deltas_sys = deltas_rel
-        if self.deltas_sys is None:
-            self.deltas_sys = 0.
-        self.allowNegativeSignals = allowNegativeSignals
-    """
-
     @classmethod
     def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> list:
         """ get a subcomputer for simplified likelihood sr-combination.
@@ -471,7 +442,7 @@ class StatsComputer:
             ret += add
         return ret
 
-    def poi_upper_limit ( self, evaluationType : NllEvalType,
+    def getUpperLimit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
            nSigma : int = 0, **kwargs ) -> Union[float,UnitXSec,None]:
         """
@@ -530,9 +501,9 @@ if __name__ == "__main__":
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleStatsDataSet ( nobs, bg, bgerr, lumi )
     computer = StatsComputer ( dataset, 1. )
-    ul = computer.poi_upper_limit ( evaluationType = observed,
+    ul = computer.getUpperLimit ( evaluationType = observed,
                                     limit_on_xsec = True )
     print ( "ul", ul )
-    ule = computer.poi_upper_limit ( evaluationType = apriori,
+    ule = computer.getUpperLimit ( evaluationType = apriori,
                                      limit_on_xsec = True )
     print ( "ule", ule )
