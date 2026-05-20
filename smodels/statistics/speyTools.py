@@ -317,8 +317,10 @@ class SpeyModelFacade:
         self.allowNegativeSignals = False
 
     def nll_min ( self, evaluationType : NllEvalType = observed,
+                  allowNegativeSignals : bool = False,
                   **kwargs ) -> dict:
         kwargs["return_nll"]=True
+        kwargs["allow_negative_signal"] = allowNegativeSignals
         speyret = self.speyModel.maximize_likelihood ( **kwargs )
         muhat = float(speyret[0])
         ret = { "muhat": muhat, "nll_min": float(speyret[1]) }
@@ -332,7 +334,8 @@ class SpeyModelFacade:
         return ret
 
     def nll ( self, mu : float, evaluationType : NllEvalType = observed, 
-              asimov : Optional[float] = None, **kwargs ):
+              asimov : Optional[float] = None, 
+              **kwargs ):
         kwargs["return_nll"]=True
         ret = self.speyModel.likelihood ( **kwargs )
         return float(ret)
