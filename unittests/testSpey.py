@@ -13,19 +13,20 @@ sys.path.insert(0, "../")
 import unittest
 
 # from smodels.tools import statistics
-from smodels.statistics.statsTools import getCompRetrieverModule, StatsComputer
+from smodels.statistics.statsTools import getCompRetrieverModule, \
+         StatsComputer, CompRetriever
 from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
 from smodels.base import runtime
 
 class SpeyTest(unittest.TestCase):
     def testSwitch(self):
-        from smodels.statistics.speyTools import SpeyComputer
+        from smodels.statistics.speyTools import SpeyRetriever
         """ see that we can turn on spey mode """
         computer = getCompRetrieverModule()
-        self.assertTrue( type(computer) == type(StatsComputer) )
+        self.assertTrue( type(computer) == type(CompRetriever) )
         runtime._experimental["spey"]=True
         computer = getCompRetrieverModule()
-        self.assertTrue( type(computer) == type(SpeyComputer) )
+        self.assertTrue( type(computer) == type(SpeyRetriever) )
         ## important! need to set back
         runtime._experimental["spey"]=False
 
