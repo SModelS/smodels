@@ -381,13 +381,12 @@ class SpeyModelFacade:
 
         ret = self.speyModel.poi_upper_limit ( expected = exp,
                expected_pvalue = expected_pvalue )
-        idx = 0
         if nSigma == 0:
             ret = float ( ret )
         elif nSigma == 1:
-            ret = float(ret[-1])
-        elif nSigma == -1:
             ret = float(ret[0])
+        elif nSigma == -1:
+            ret = float(ret[-1])
         return ret
 
 if __name__ == "__main__":

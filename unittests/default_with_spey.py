@@ -15,8 +15,8 @@ smodelsOutputDefault = {
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
     'input file' : './testFiles/slha/gluino_squarks.slha',
-    'database version' : 'unittest310',
-    'smodels version' : '3.1.1'
+    'database version' : 'unittest312',
+    'smodels version' : '3.1.2'
 },
 'ExptRes' : [
     {
@@ -88,8 +88,6 @@ smodelsOutputDefault = {
         'r' : 0.1296154,
         'r_expected' : 0.2078608,
         'Width (GeV)' : None,
-        'r_expected_p1' : 0.1478731,
-        'r_expected_m1' : 0.2956743,
         'nll' : 3.906258,
         'nll_min' : 3.573349,
         'nll_SM' : 4.330763
@@ -153,7 +151,7 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.002080421,
+        'theory prediction (fb)' : 0.002050205,
         'upper limit (fb)' : 0.0299,
         'expected upper limit (fb)' : 0.0511,
         'TxNames' : ['T6bbHH'],
@@ -163,16 +161,14 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
         'dataType' : 'efficiencyMap',
-        'r' : 0.0695793,
-        'r_expected' : 0.04071274,
+        'r' : 0.06856872,
+        'r_expected' : 0.04012143,
         'Width (GeV)' : [
             [13.4903869, 0.00112364506, 'stable'],
             [13.4903869, 0.00112364506, 'stable']
         ],
-        'r_expected_p1' : 0.03079634,
-        'r_expected_m1' : 0.06888626,
-        'nll' : 3.254487,
-        'nll_min' : 2.414861,
+        'nll' : 3.252503,
+        'nll_min' : 3.121636,
         'nll_SM' : 3.121637
     },
     {
@@ -215,7 +211,7 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.0001376405,
+        'theory prediction (fb)' : 0.0001382733,
         'upper limit (fb)' : 0.05351,
         'expected upper limit (fb)' : 0.05351,
         'TxNames' : ['T1tttt'],
@@ -225,15 +221,13 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 35.9,
         'dataType' : 'efficiencyMap',
-        'r' : 0.002572239,
-        'r_expected' : 0.002572239,
+        'r' : 0.002584066,
+        'r_expected' : 0.002584066,
         'Width (GeV)' : [
             [0.0456539663, 'stable'],
             [0.0456539663, 'stable']
         ],
-        'r_expected_p1' : 0.001328745,
-        'r_expected_m1' : 0.004956839,
-        'nll' : 0.9238798,
+        'nll' : 0.9239025,
         'nll_min' : 0.9189385,
         'nll_SM' : 0.9189385
     },
@@ -252,8 +246,6 @@ smodelsOutputDefault = {
         'r' : 0.001829564,
         'r_expected' : 0.002090931,
         'Width (GeV)' : None,
-        'r_expected_p1' : 0.00150994,
-        'r_expected_m1' : 0.003242326,
         'nll' : 3.015969,
         'nll_min' : 2.989467,
         'nll_SM' : 3.019043
@@ -261,7 +253,7 @@ smodelsOutputDefault = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.03496325,
-        'upper limit (fb)' : 42.0723,
+        'upper limit (fb)' : 42.0614,
         'expected upper limit (fb)' : None,
         'TxNames' : ['T1tttt'],
         'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
@@ -270,7 +262,7 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 2.2,
         'dataType' : 'upperLimit',
-        'r' : 0.0008310277,
+        'r' : 0.000831243,
         'r_expected' : None,
         'Width (GeV)' : [
             [0.0456539663, 'stable'],
@@ -300,14 +292,12 @@ smodelsOutputDefault = {
 'CombinedRes' : [
     {
         'AnalysisID' : 'CMS-SUS-13-012,CMS-SUS-16-050-agg',
-        'r' : 0.1298018,
-        'r_expected' : 0.2114129,
-        'nll' : 4.830138,
-        'nll_min' : 4.507136,
+        'r' : 0.1209729,
+        'r_expected' : 0.2114212,
+        'nll' : 4.830161,
+        'nll_min' : 4.507204,
         'nll_SM' : 5.249701,
-        'Txnames' : ['T2', 'T1', 'T1tttt'],
-        'r_expected_p1' : 0.1485891,
-        'r_expected_m1' : 0.2982496
+        'Txnames' : ['T2', 'T1', 'T1tttt']
     }
 ],
 'Total xsec for missing topologies (fb)' : 3067.167,
