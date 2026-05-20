@@ -39,22 +39,16 @@ def getCompRetrieverModule():
         return CompRetriever
 
 class CompRetriever:
-    __slots__ = [ "nsig", "dataObject", "dataType", "data",
-                  "deltas_sys", "allowNegativeSignals" ]
-
     """ simple class that retrieves and constructs the sub computers,
     in StatsComputer """
 
-    def attachAttributes ( self, computer ):
-        computer.allowNegativeSignals = self.allowNegativeSignals
-        computer.dataType = self.dataType
-        return computer
-
+    """
+    __slots__ = [ "nsig", "dataObject", "dataType", "data",
+                  "deltas_sys", "allowNegativeSignals" ]
     def __init__ ( self, dataObject : Union['DataSet','CombinedDataSet', list],
                    dataType : str, nsig : Union[None,float,List,Dict] = None,
                    deltas_rel : Optional[float] = None,
                    allowNegativeSignals : bool = False ):
-        """
          Initialise.
 
         :param dataObject: a smodels (combined)dataset or a list of
@@ -63,7 +57,6 @@ class CompRetriever:
         :param deltas_rel: relative error on signal. currently unused
         :allowNegativeSignals: if True, negative values for the signal (mu)
         are allowed.
-        """
 
         if dataType not in [ "1bin", "SL", "pyhf", "truncGaussian",
                              "analysesComb", "nn" ]:
@@ -76,16 +69,17 @@ class CompRetriever:
         if self.deltas_sys is None:
             self.deltas_sys = 0.
         self.allowNegativeSignals = allowNegativeSignals
+    """
 
     @classmethod
     def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> list:
-        """ get a statscomputer for simplified likelihood sr-combination.
+        """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
-        :returns: a StatsComputer
+        :returns: a subcomputer
         """
         dataType = "SL"
         covs = dataset.globalInfo.cachedModels
@@ -129,13 +123,13 @@ class CompRetriever:
     @classmethod
     def forSingleBin( cls, dataset, nsig, deltas_rel : Optional[float],
                       lumi : Optional[UnitLumi]=None ) -> list:
-        """ get a statscomputer for an efficiency map (single bin).
+        """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
         :param nsig: Number of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
-        :returns: a StatsComputer
+        :returns: a sub computer
         """
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
@@ -148,33 +142,63 @@ class CompRetriever:
 
     @classmethod
     def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
-        """ get a statscomputer for an NN combination.
+        """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
-        :returns: a StatsComputer
+        :returns: a sub computer
         """
-        retriever = CompRetriever ( dataObject=dataset, dataType="nn",
-                               nsig=nsig, deltas_rel=deltas_rel)
+        globalInfo = dataset.globalInfo
+        statModels = globalInfo.statModels
+        #nsignals = {}
+        labelToONNX = {}
+        labelToSModelS = {}
+        hasJsonsWithoutMLModels = False
 
-        return retriever.getComputerNN( )
+        for sr in globalInfo.srMappings:
+           # nsignals[ sr["onnx"] ] = 0.
+            if sr["label"] != None:
+                labelToONNX [ sr["label"] ] = sr["onnx"]
+                labelToSModelS [ sr["label"] ] = sr["smodels"]
+
+        ## translate the signal from smodels names to pyhf names
+        #for smname,onnxname in translator.items():
+        #    nsignals[onnxname] = self.nsig[smname]
+        from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
+        subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
+        for srSetName, models in globalInfo.statModels.items():
+            f_signals = {}
+            for sr in globalInfo.srMappings:
+                f_signals[ sr["onnx"] ] = 0.
+            for label in globalInfo.srSets[srSetName]:
+                smodelsName = labelToSModelS[label]
+                if smodelsName in nsig:
+                    f_signals[ labelToONNX[label] ] = \
+                        nsig[ smodelsName ]
+            data = NNData( f_signals, dataset )
+            modelfilename = models[0]
+            if modelfilename.endswith ( ".json" ):
+                continue
+            upperLimitComputer = NNUpperLimitComputer(data,
+                    lumi=dataset.getLumi(),
+                    onnxfilename = modelfilename )
+            upperLimitComputer.allowNegativeSignals = False
+            upperLimitComputer.dataType = "nn"
+            subComputers.append ( upperLimitComputer )
+        return subComputers
 
     @classmethod
     def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
-        """ get a statscomputer for pyhf combination.
+        """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
-        :returns: a StatsComputer
+        :returns: a sub computer
         """
-        #retriever = CompRetriever ( dataObject=dataset,
-        #                       dataType="pyhf",
-        #                       nsig=nsig, deltas_rel=deltas_rel)
-        #return retriever.getComputerPyhf( )
         globalInfo = dataset.globalInfo
         datasets = [ds.getID() for ds in dataset.origdatasets]
         jsonFiles, jsons = [], []
@@ -238,7 +262,7 @@ class CompRetriever:
 
     @classmethod
     def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
-        """ get a statscomputer for truncated gaussians
+        """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
@@ -257,44 +281,35 @@ class CompRetriever:
             return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=observed
-        ) / theorypred.xsection
-        kwargs = { "upperLimitOnMu": float(ul), "expectedUpperLimitOnMu": float(eul),
+            element=theorypred.avgElement, txnames=theorypred.txnames, 
+            evaluationType=observed) / theorypred.xsection
+        kwargs = { "upperLimitOnMu": float(ul), 
+                   "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
-        #retriever = CompRetriever ( dataObject=theorypred.dataset,
-        #                       dataType="truncGaussian", nsig=0.,
-        #                       allowNegativeSignals=True)
-        #return retriever.getComputerTruncGaussian( **kwargs)
         computer = TruncatedGaussians ( **kwargs )
-        # self.data = None
         return [ computer ]
 
     @classmethod
     def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
             -> list:
-        """ get a statscomputer for combination of analyses
+        """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
         :param deltas_rel: relative error for the signal
-        :returns: a StatsComputer
+        :returns: a sub computer
         """
         # Only allow negative signal if all theory predictions allow for it
         allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
                                     for tp in theoryPredictions])
 
-        #retriever = CompRetriever(dataObject=theoryPredictions,
-        #                         dataType="analysesComb",
-        #                         nsig=None, deltas_rel=deltas_rel,
-        #                         allowNegativeSignals=allowNegativeSignals)
         computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
                                               deltas_rel=deltas_rel )
         computer.dataType = "analysesComb"
         computer.allowNegativeSignals = allowNegativeSignals
         return [ computer ]
 
+    """
     def getComputerNN(self ):
-        """
-        Create computer for a machine learned model
-        """
+        #Create computer for a machine learned model
         globalInfo = self.dataObject.globalInfo
         statModels = globalInfo.statModels
         #nsignals = {}
@@ -333,9 +348,7 @@ class CompRetriever:
         return subComputers
 
     def getComputerPyhf(self ) -> list:
-        """
-        Create computer for a pyhf result
-        """
+        #Create computer for a pyhf result
 
         globalInfo = self.dataObject.globalInfo
         datasets = [ds.getID() for ds in self.dataObject.origdatasets]
@@ -395,6 +408,7 @@ class CompRetriever:
                     lumi=self.dataObject.getLumi() )
             subComputers.append ( self.attachAttributes ( upperLimitComputer ))
         return subComputers
+    """
 
     @classmethod
     def getAll ( obj, srSet : list, srMappingsDict : dict ) -> list:

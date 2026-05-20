@@ -9,7 +9,7 @@
 
 """
 
-__all__ = [ "SpeyComputer", "SpeyAnalysesCombosComputer" ]
+__all__ = [ "SpeyRetriever", "SpeyAnalysesCombosComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List, Optional
 import sys
@@ -33,6 +33,77 @@ import numpy as np
 _debug = { "writePoint": False } # for debugging only
 
 class SpeyRetriever:
+    @classmethod
+    def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> list:
+        """ get a subcomputer for simplified likelihood sr-combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a subcomputer
+        """
+        return None
+
+    @classmethod
+    def forSingleBin( cls, dataset, nsig, deltas_rel : Optional[float],
+                      lumi : Optional[UnitLumi]=None ) -> list:
+        """ get a sub computer for an efficiency map (single bin).
+
+        :param dataset: DataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a sub computer
+        """
+        return None
+
+    @classmethod
+    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
+        """ get a sub computer for an NN combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a sub computer
+        """
+        return None
+
+    @classmethod
+    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
+        """ get a sub computer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a sub computer
+        """
+        return None
+
+    @classmethod
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
+        """ get a sub computer for truncated gaussians
+        :param theorypred: TheoryPrediction object
+        :param corr: correction factor: \
+                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
+                a factor of corr = 0.6 is proposed.
+        :returns: list of subComputers (with a single entry)
+        """
+        return None
+
+    @classmethod
+    def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
+            -> list:
+        """ get a sub computer for combination of analyses
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param deltas_rel: relative error for the signal
+        :returns: a sub computer
+        """
+        return None
+
+class SpeyRetrieverOld:
     """ the facade that delegates all statistical computations to spey.
     takes care of all interactions with spey except for analysis combinations. """
 
@@ -78,7 +149,7 @@ class SpeyRetriever:
     def create ( cls, dataset : DataSet, xsection : XSection,
                  predictions, deltas_rel : float ):
         """ generic entry point for theoryPrediction. given the
-            data, create the appropriate SpeyComputer
+            data, create the appropriate SpeyRetriever
 
         :param dataset: the dataset to create the stats model for
         :param xsection: the cross section, needed just as a scale factor
@@ -91,13 +162,13 @@ class SpeyRetriever:
             if not experimentalFeatures():
                 computer = 'N/A'
             else:
-                computer = SpeyComputer.forTruncatedGaussian(self)
+                computer = SpeyRetriever.forTruncatedGaussian(self)
                 if computer is None: # No evaluationType UL available
                     computer = 'N/A'
 
         elif dataType == "efficiencyMap":
             nsig = (xsection * dataset.getLumi()).asNumber()
-            computer = SpeyComputer.forSingleBin(dataset=dataset,
+            computer = SpeyRetriever.forSingleBin(dataset=dataset,
                                                   nsig=nsig,deltas_rel=deltas_rel)
 
         elif dataType == "combined":
@@ -114,7 +185,7 @@ class SpeyRetriever:
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                        for dataID in datasetList]
                 # Get computer
-                computer = SpeyComputer.forMultiBinSL(dataset=dataset,
+                computer = SpeyRetriever.forMultiBinSL(dataset=dataset,
                                         nsig=srNsigs,deltas_rel = deltas_rel)
 
             elif hasattr(dataset.globalInfo, "jsonFiles"):
@@ -123,7 +194,7 @@ class SpeyRetriever:
                 srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
                        for dataID in datasetList]
                 # Get computer
-                computer = SpeyComputer.forPyhf(dataset=dataset,
+                computer = SpeyRetriever.forPyhf(dataset=dataset,
                                          nsig=srNsigs, deltas_rel = deltas_rel)
         return computer
 
@@ -136,9 +207,9 @@ class SpeyRetriever:
         :param nsig: Number of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
-        :returns: a SpeyComputer
+        :returns: a SpeyRetriever
         """
-        computer = SpeyComputer(dataset=dataset, backendType="1bin",
+        computer = SpeyRetriever(dataset=dataset, backendType="1bin",
                                 nsig=nsig, deltas_rel=deltas_rel,lumi=lumi)
 
         return computer
@@ -154,7 +225,7 @@ class SpeyRetriever:
         :returns: a StatsComputer
         """
 
-        computer = SpeyComputer(dataset=dataset,
+        computer = SpeyRetriever(dataset=dataset,
                                 backendType="SL",
                                  nsig=nsig, deltas_rel=deltas_rel)
         return computer
@@ -489,7 +560,7 @@ class SpeyRetriever:
 
         :returns: a StatsComputer
         """
-        computer = SpeyComputer(dataset=dataset, backendType="pyhf",
+        computer = SpeyRetriever(dataset=dataset, backendType="pyhf",
                                 nsig=nsig, deltas_rel=deltas_rel)
         return computer
 
@@ -498,88 +569,6 @@ class SpeyRetriever:
         config = self.speyModels[self.model_index].backend.config()
         if poi_test < config.minimum_poi:
             logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
-
-    def getMostSensitiveModel ( self ):
-        """ convenience function to get the most sensitive model
-        """
-        return f"speyTools.getMostSensitiveModel FIXME implement"
-
-    def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
-                     return_nll : bool, asimov : bool = False ) -> float:
-        """ simple frontend to spey functionality """
-        ## FIXME treat the asimov flat
-        nll = self.nll ( poi_test, evaluationType, asimov )
-        return exponentiateNLL ( nll, doIt = not return_nll )
-
-    def nll ( self, poi_test : float, evaluationType : NllEvalType,
-              asimov : bool = False ) -> float:
-        """ simple frontend to spey functionality """
-        ## FIXME treat the asimov flat
-        self.checkMinimumPoi ( poi_test )
-        evaluationType = self.translateExpectationType ( evaluationType )
-        ret = self.speyModels[self.model_index].likelihood ( poi_test = poi_test,
-            expected = evaluationType, return_nll = True )
-        return float(ret)
-
-    def maximize_likelihood ( self, evaluationType : NllEvalType,
-           allow_negative_signal : bool = True,
-           return_nll : bool = False  ) -> Tuple[float,float]:
-        """ simple frontend to spey functionality
-        :param return_nll: if True, return negative log likelihood
-        :param allow_negative_signal: allow also negative muhats
-        :returns: tuple of muhat,lmax
-        """
-        evaluationType = self.translateExpectationType ( evaluationType )
-        speyret = self.speyModels[self.model_index].maximize_likelihood (
-                expected = evaluationType,
-                allow_negative_signal = allow_negative_signal,
-                return_nll = return_nll )
-        ret = { "muhat": float(speyret[0]) }
-        if return_nll:
-            ret["nll_min"] = float(speyret[1])
-        else:
-            ret["lmax"] = float(speyret[1])
-        ## not clear if bounds will be hard bounds
-        if not allow_negative_signal and speyret[0]< 0.:
-            llhd0 = float ( self.likelihood ( 0., evaluationType = evaluationType,
-                                              return_nll = return_nll ) )
-            ret = { "muhat": 0. }
-            if return_nll:
-                ret["nll_min"] = llhd0
-            else:
-                ret["lmax"] = llhd0
-        return ret
-
-    def sigma_mu ( self, poi_test : float, evaluationType : NllEvalType,
-                   allow_negative_signal : bool = False ) -> float:
-        """ determine sigma at poi_test.
-        :param: FIXME allow_negative_signal should not be needed!
-        """
-        test_statistic = "q" if allow_negative_signal else "qmutilde"
-        exp = SpeyComputer.translateExpectationType ( evaluationType )
-        sigma_mu = self.speyModels[self.model_index].sigma_mu( poi_test=poi_test,
-                expected=exp, test_statistics=test_statistic )
-        return float(sigma_mu)
-
-    def maximize_asimov_likelihood ( self, evaluationType : NllEvalType,
-           return_nll : bool = False ) -> Tuple[float,float]:
-        """ simple frontend to spey functionality
-        :param return_nll: if True, return negative log likelihood
-        :param allow_negative_signal: allow also negative muhats
-        :returns: tuple of muhat,lmax
-        """
-        evaluationType = self.translateExpectationType ( evaluationType )
-        # init = self.getSpeyInitialisation ( True )
-        # opt = init["optimiser"]
-        # opt["test_statistics"]="qmutilde"
-        ret = self.speyModels[self.model_index].maximize_asimov_likelihood (
-                expected = evaluationType, return_nll = return_nll ) # , **opt )
-        assert ret[0]>=0., "maximum of asimov likelihood should not be below zero"
-        for k,v in ret.items():
-            ret[k]=float(v)
-        #if not allow_negative_signal and ret[0]< 0.:
-        #    ret = ( 0., self.likelihood ( 0., evaluationType = evaluationType, return_nll = return_nll ) )
-        return ret
 
     @property
     def xsection(self):
@@ -623,7 +612,7 @@ class SpeyAnalysesCombosComputer:
         models = []
         self.xsecs = []
         for pred in theorypreds:
-            computer = SpeyComputer.create ( pred.dataset, pred.xsection,
+            computer = SpeyRetriever.create ( pred.dataset, pred.xsection,
                     theorypreds, deltas_rel )
             models.append ( computer.speyModels[0] )
             xsec = pred.xsection
@@ -648,7 +637,7 @@ class SpeyAnalysesCombosComputer:
 
         :returns: upper limit on parameter of interest (signal strength mu)
         """
-        exp = SpeyComputer.translateExpectationType ( evaluationType )
+        exp = SpeyRetriever.translateExpectationType ( evaluationType )
         expected_pvalue = "nominal"
         if evaluationType == observed:
             nSigma = 0 # no errors for observed
@@ -676,7 +665,7 @@ class SpeyAnalysesCombosComputer:
     def nll ( self, poi_test : float, evaluationType : NllEvalType,
               asimov : bool = False ) -> float:
         """ simple frontend to spey functionality """
-        evaluationType = SpeyComputer.translateExpectationType ( evaluationType )
+        evaluationType = SpeyRetriever.translateExpectationType ( evaluationType )
         ret = self.speyModel.likelihood ( poi_test = poi_test,
             expected = evaluationType, return_nll = True )
         return float(ret)
@@ -695,7 +684,7 @@ class SpeyAnalysesCombosComputer:
         :param allow_negative_signal: allow also negative muhats
         :returns: tuple of muhat,lmax
         """
-        evaluationType = SpeyComputer.translateExpectationType ( evaluationType )
+        evaluationType = SpeyRetriever.translateExpectationType ( evaluationType )
         speyret = self.speyModel.maximize_likelihood ( expected = evaluationType,
                 allow_negative_signal = allow_negative_signal,
                 return_nll = return_nll )
@@ -768,7 +757,7 @@ class SpeyAnalysesCombosComputer:
         :param: FIXME allow_negative_signal should not be needed!
         """
         test_statistic = "q" if allow_negative_signal else "qmutilde"
-        exp = SpeyComputer.translateExpectationType ( evaluationType )
+        exp = SpeyRetriever.translateExpectationType ( evaluationType )
         sigma_mu = self.speyModel.sigma_mu( poi_test=poi_test,expected=exp,
                                             test_statistics=test_statistic )
         return float(sigma_mu)
@@ -780,7 +769,7 @@ if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 0, 0.001, 0.01, 35.9/fb
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleSpeyDataSet ( nobs, bg, bgerr, lumi )
-    computer = SpeyComputer ( dataset, "1bin", 1. )
+    computer = SpeyRetriever ( dataset, "1bin", 1. )
     ul = computer.poi_upper_limit ( evaluationType = observed,
                                     limit_on_xsec = True )
     print ( "ul", ul )
