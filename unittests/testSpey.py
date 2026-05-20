@@ -34,7 +34,10 @@ class SpeyTest(unittest.TestCase):
         """ see that we can turn on spey mode """
         filename = "./testFiles/slha/gluino_squarks.slha"
         inifile = "testParameters_spey.ini"
-        outputfile = runMain(filename, inifile = inifile, suppressStdout=True )
+        from databaseLoader import database
+        outputfile = runMain( filename, inifile = inifile,
+                              overridedatabase = database,
+                              suppressStdout=True )
         smodelsOutput = importModule(outputfile)
         from default_with_spey import smodelsOutputDefault
         runtime._experimental["spey"]=False
@@ -42,7 +45,7 @@ class SpeyTest(unittest.TestCase):
                         'database version', 'model']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                            key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault,
                            allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         if not equals:

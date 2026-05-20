@@ -38,12 +38,91 @@ class SpeyRetriever:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsig: number of signal events. For simplified likelihood backend
+        this input can contain `np.array` or `List[float]` which contains
+        signal yields per region.
+        For `pyhf` backend this input evaluationType to be a JSON-patch
+        i.e. `List[Dict]`, see `pyhf` documentation for details on
+        JSON-patch format.
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a subcomputer
         """
-        return None
+        obsN = [ x.dataInfo.observedN for x in dataset._datasets ]
+        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        # cov = dataset.globalInfo.covariance
+        covs = dataset.globalInfo.cachedModels
+        subComputers = []
+        lumi = float ( dataset.getLumi().asNumber(1./fb) )
+        thirdmomenta=[]
+        for ds in dataset._datasets:
+            if hasattr ( ds.dataInfo, "thirdMoment" ):
+                thirdmomenta.append ( ds.dataInfo.thirdMoment )
+
+        for covname,cov in covs.items():
+            if not covname.endswith ( ".cov" ):
+                continue
+            if type(cov) != list:
+                raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
+            if len(cov) < 1:
+                raise SModelSError( f"covariance matrix has length {len(cov)}." )
+            n = len(cov)
+            nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
+            bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
+            nsig = nsig[offset:offset+n]
+            third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
+            c = third_momenta.count ( None )
+            if c > 0:
+                if c < len(third_momenta):
+                    logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
+                third_momenta = None
+            if third_momenta == None:
+                try:
+                    stat_wrapper = get_backend("default.correlated_background")
+                except spey.PluginError as e: ## older spey?
+                    stat_wrapper = get_backend("default_pdf.correlated_background")
+                if _debug["writePoint"]:
+                    f=open ( "data.txt","wt" )
+                    f.write ( f"obsN={obsN}\n" )
+                    f.write ( f"bg={bg}\n" )
+                    f.write ( f"cov={cov}\n" )
+                    f.write ( f"nsig={nsig}\n" )
+                    f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
+                    f.write ( f"lumi={lumi}\n" )
+                    f.close()
+    # import sys; sys.exit()
+
+                speyModel = stat_wrapper( data = obsN,
+                                background_yields = bg, covariance_matrix = cov,
+                                signal_yields = nsig,
+                                xsection = [ x / lumi for x in nsig ],
+                                analysis = dataset.globalInfo.id,
+                )
+                subComputers.append ( SpeyModelFacade ( speyModel, "SL", covname ) )
+            else:
+                # SLv2
+                try:
+                    stat_wrapper = get_backend("default.third_moment_expansion")
+                except ImportError as e:
+                    stat_wrapper = get_backend("default_pdf.third_moment_expansion")
+                speyModel = stat_wrapper( data = obsN,
+                                background_yields = bg, covariance_matrix = cov,
+                                signal_yields = nsig,
+                                xsection = [ x / lumi for x in nsig ],
+                                third_moment = thirdmomenta,
+                                analysis = dataset.globalInfo.id,
+                )
+                if _debug["writePoint"]:
+                    f=open ( "data.txt","wt" )
+                    f.write ( f"obsN={obsN}\n" )
+                    f.write ( f"bg={bg}\n" )
+                    f.write ( f"cov={cov}\n" )
+                    f.write ( f"nsig={nsig}\n" )
+                    f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
+                    f.write ( f"lumi={lumi}\n" )
+                    f.close()
+                return [ SpeyModelFacade ( speyModel, "SL", covname ) ]
+        return subComputers
 
     @classmethod
     def forSingleBin( cls, dataset, nsig, deltas_rel : Optional[float],
@@ -55,346 +134,8 @@ class SpeyRetriever:
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
-        """
-        return None
-
-    @classmethod
-    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
-        """ get a sub computer for an NN combination.
-
-        :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a sub computer
-        """
-        return None
-
-    @classmethod
-    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
-        """ get a sub computer for pyhf combination.
-
-        :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a sub computer
-        """
-        return None
-
-    @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
-        """ get a sub computer for truncated gaussians
-        :param theorypred: TheoryPrediction object
-        :param corr: correction factor: \
-                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
-                a factor of corr = 0.6 is proposed.
-        :returns: list of subComputers (with a single entry)
-        """
-        return None
-
-    @classmethod
-    def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
-            -> list:
-        """ get a sub computer for combination of analyses
-        :param theoryPredictions: list of TheoryPrediction objects
-        :param deltas_rel: relative error for the signal
-        :returns: a sub computer
-        """
-        return None
-
-class SpeyRetrieverOld:
-    """ the facade that delegates all statistical computations to spey.
-    takes care of all interactions with spey except for analysis combinations. """
-
-    __slots__ = [ "speyModels", "dataset", "backendType", "nsig",
-                  "model_index" ]
-
-    def __init__ ( self, dataset, backendType : str, nsig : Union[float,list],
-                   deltas_rel : Union[None,float] = None,
-                   lumi : Optional[UnitLumi] = None ):
-        """ initialise with dataset.
-        :param dataset: a smodels (combined)dataset, or a onnx file (for now, will change)
-        :param backendType: the type of backend to use ( "1bin", "SL", "pyhf", "ML" )
-        :param nsig: signal yield, either as float or as list
-        :param deltas_rel: relative error on signal. currently unused
-        """
-        if type(dataset) not in [ list] and dataset.getType() not in \
-                [ "efficiencyMap", "combined" ]:
-            logger.error(f"I do not recognize the dataset type {dataset.getType()}")
-
-        self.backendType = backendType
-        self.dataset = dataset
-        self.nsig = nsig
-        self.speyModels = self.getStatModels ( nsig )
-        self.model_index = 0 # we might have several models and need to choose
-
-    @property
-    def dataType ( self ):
-        return self.dataset.getType()
-
-    def getStatModels(self, nsig ) -> StatisticalModel:
-        """ retrieve the statistical model """
-        assert self.backendType in [ "1bin", "SL", "ML", "pyhf" ], f"unknown backend type {self.backendType}"
-        if hasattr ( self.dataset.globalInfo, "onnxFile" ):
-            # an onnxfile is defined, we use it!
-            return self.getNNModel ( nsig )
-        if self.backendType == "pyhf":
-            return self.getStatModelPyhf ( nsig )
-        if self.dataset.getType() == "efficiencyMap":
-            return self.getStatModelSingleBin ( nsig )
-        return self.getStatModelMultiBin ( nsig )
-
-    @classmethod
-    def create ( cls, dataset : DataSet, xsection : XSection,
-                 predictions, deltas_rel : float ):
-        """ generic entry point for theoryPrediction. given the
-            data, create the appropriate SpeyRetriever
-
-        :param dataset: the dataset to create the stats model for
-        :param xsection: the cross section, needed just as a scale factor
-        :param predictions: the individual predictions, in case of multiple SRs
-            for e.g. upper limits on them
-        """
-        dataType = dataset.getType()
-        if dataType == "upperLimit":
-            from smodels.tools.runtime import experimentalFeatures
-            if not experimentalFeatures():
-                computer = 'N/A'
-            else:
-                computer = SpeyRetriever.forTruncatedGaussian(self)
-                if computer is None: # No evaluationType UL available
-                    computer = 'N/A'
-
-        elif dataType == "efficiencyMap":
-            nsig = (xsection * dataset.getLumi()).asNumber()
-            computer = SpeyRetriever.forSingleBin(dataset=dataset,
-                                                  nsig=nsig,deltas_rel=deltas_rel)
-
-        elif dataType == "combined":
-            ## FIXME this should be removable
-            # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {pred.dataset.getID() :
-                          (pred.xsection*pred.dataset.getLumi()).asNumber()
-                          for pred in predictions}
-
-            # Get ordered list of datasets:
-            if hasattr(dataset.globalInfo, "covariances"):
-                datasetList = dataset.globalInfo.datasetOrder[:]
-                # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                       for dataID in datasetList]
-                # Get computer
-                computer = SpeyRetriever.forMultiBinSL(dataset=dataset,
-                                        nsig=srNsigs,deltas_rel = deltas_rel)
-
-            elif hasattr(dataset.globalInfo, "jsonFiles"):
-                datasetList = [ds.getID() for ds in dataset.origdatasets]
-                # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] if dataID in srNsigDict else 0.0
-                       for dataID in datasetList]
-                # Get computer
-                computer = SpeyRetriever.forPyhf(dataset=dataset,
-                                         nsig=srNsigs, deltas_rel = deltas_rel)
-        return computer
-
-
-    @classmethod
-    def forSingleBin(cls, dataset, nsig, deltas_rel, lumi : Optional[UnitLumi]=None):
-        """ get a speycomputer for an efficiency map (single bin).
-
-        :param dataset: DataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a SpeyRetriever
-        """
-        computer = SpeyRetriever(dataset=dataset, backendType="1bin",
-                                nsig=nsig, deltas_rel=deltas_rel,lumi=lumi)
-
-        return computer
-
-    @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel):
-        """ get a statscomputer for simplified likelihood combination.
-
-        :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
-
-        :returns: a StatsComputer
-        """
-
-        computer = SpeyRetriever(dataset=dataset,
-                                backendType="SL",
-                                 nsig=nsig, deltas_rel=deltas_rel)
-        return computer
-
-    def getNNModel ( self, nsig ):
-        """ here is the code for how we create a spey speyModel that uses an NN
-            as its backend """
-        #For the moment, the ml-likelihood backned has to be dowanloaded and installed manually. In the future, the backend could be directly embedded and installed in SmodelS.
-#        MLlikePath='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods'
-#        MLlikePath='/home/walten/git/ML_LHClikelihoods/'
-
-#        sys.path.append(MLlikePath)
-        import spey
-        stat_wrapper = spey.get_backend('ml.likelihoods')
-
-        #The current ML-likelihood backend takes a local path. This has to be
-        #updated, I think the idea is that the backend takes 'dataset' as input,
-#        where 'dataset' is a loaded onnx model. Thus, the onnx has to be loaded
-#        by SmodelS beforehand. It seems to be the more consistent wrt the other
-#        backends.
-
-        #network_path='/Users/humberto/Documents/work/learn_pyhf_smodels/ML_LHClikelihoods/ML_models/ATLAS-SUSY-2018-04/ensemble_model.onnx'
-        onnxBlob=self.dataset.globalInfo.onnx
-        # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
-        ## the following code is just for now to see if it works in principle
-        import tempfile
-        tempf = tempfile.mktemp ( prefix="/tmp", postfix=".onnx" )
-        # tempf = "/tmp/my.onnx"
-        f = open ( tempf, "wb" )
-        import onnx
-        onnx.save ( onnxBlob, f )
-        f.close()
-        speyModel = stat_wrapper(nsig,tempf)
-        if os.path.exists ( tempf ):
-            os.unlink ( tempf )
-        #self.speyModel = get_ml_model ( ... )
-        return [ speyModel ]
-
-    def getStatModelMultiBin(self,
-        nsig: Union[np.ndarray, List[Dict[Text, List]], List[float]] ):
-        """
-        Create a statistical model from multibin data.
-
-        :param nsig: number of signal events. For simplified likelihood backend
-            this input can contain `np.array` or `List[float]` which contains
-            signal yields per region.
-            For `pyhf` backend this input evaluationType to be a JSON-patch
-            i.e. `List[Dict]`, see `pyhf` documentation for details on
-            JSON-patch format.
-        :param delta_sys: systematic uncertainty on signal. Currently unused.
-        :param allow_negative_signal: if True, the evaluationType upper limit on mu,
-            used to find the best statistical model, can be negative.
-
-        :returns: spey StatisticalModel object.
-
-        """
-        dataset = self.dataset
-        obsN = [ x.dataInfo.observedN for x in dataset._datasets ]
-        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
-        cov = dataset.globalInfo.covariance
-        lumi = float ( dataset.getLumi().asNumber(1./fb) )
-        thirdmomenta=[]
-        for ds in dataset._datasets:
-            if hasattr ( ds.dataInfo, "thirdMoment" ):
-                thirdmomenta.append ( ds.dataInfo.thirdMoment )
-        if len(thirdmomenta)==0: # SLv1
-            try:
-                stat_wrapper = get_backend("default.correlated_background")
-            except spey.PluginError as e: ## older spey?
-                stat_wrapper = get_backend("default_pdf.correlated_background")
-            if _debug["writePoint"]:
-                f=open ( "data.txt","wt" )
-                f.write ( f"obsN={obsN}\n" )
-                f.write ( f"bg={bg}\n" )
-                f.write ( f"cov={cov}\n" )
-                f.write ( f"nsig={nsig}\n" )
-                f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
-                f.write ( f"lumi={lumi}\n" )
-                f.close()
-# import sys; sys.exit()
-
-            speyModel = stat_wrapper( data = obsN,
-                            background_yields = bg, covariance_matrix = cov,
-                            signal_yields = nsig,
-                            xsection = [ x / lumi for x in nsig ],
-                            analysis = dataset.globalInfo.id,
-            )
-            return [ speyModel ]
-        # SLv2
-        try:
-            stat_wrapper = get_backend("default.third_moment_expansion")
-        except ImportError as e:
-            stat_wrapper = get_backend("default_pdf.third_moment_expansion")
-        speyModel = stat_wrapper( data = obsN,
-                        background_yields = bg, covariance_matrix = cov,
-                        signal_yields = nsig,
-                        xsection = [ x / lumi for x in nsig ],
-                        third_moment = thirdmomenta,
-                        analysis = dataset.globalInfo.id,
-        )
-        if _debug["writePoint"]:
-            f=open ( "data.txt","wt" )
-            f.write ( f"obsN={obsN}\n" )
-            f.write ( f"bg={bg}\n" )
-            f.write ( f"cov={cov}\n" )
-            f.write ( f"nsig={nsig}\n" )
-            f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
-            f.write ( f"lumi={lumi}\n" )
-            f.close()
-        return [ speyModel ]
-
-    @classmethod
-    def forAnalysesComb(cls,theoryPredictions, deltas_rel):
-        """ get a statscomputer for combination of analyses
-        :param theoryPredictions: list of TheoryPrediction objects
-        :param deltas_rel: relative error for the signal
-        :returns: a StatsComputer
-        """
-
-        # Only allow negative signal if all theory predictions allow for it
-        # allowNegativeSignals = all([tp.statsComputer.allowNegativeSignals
-        #                             for tp in theoryPredictions])
-
-        computer = SpeyAnalysesCombosComputer(theorypreds=theoryPredictions,
-                                 deltas_rel=deltas_rel )
-        return computer
-
-    def getStatModelPyhf(self, nsig: Union[float, np.ndarray] ):
-        """
-        Create statistical model from a pyhf json file
-
-        :param nsig: signal yields.
-        :return: spey StatisticalModel object.
-        """
-        dataset = self.dataset
-        stat_wrapper = get_backend("pyhf")
-        from smodels.statistics.speyPyhf import SpeyPyhfData
-        data = SpeyPyhfData.createDataObject ( dataset, self.nsig )
-        models = []
-        patches = data.patchMaker()
-        for i in range( len(data.inputJsons ) ):
-            # idx, _ = self.getBestCombinationIndex( data )
-            inputJson = data.inputJsons[i]
-            signal_patch = patches[i]
-            #print ( "inputJsons", inputJson )
-            # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
-            analysis = dataset.globalInfo.id
-
-            speyModel = stat_wrapper( analysis = analysis,
-                            signal_patch = signal_patch,
-                            background_only_model = inputJson )
-            models.append ( speyModel )
-        self.speyModels = models
-        self.model_index, _ = self.getBestCombinationIndex( data )
-        return models
-
-    def getStatModelSingleBin(self, nsig: Union[float, np.ndarray],
-            delta_sys : Union[None,float] = None,
-            allow_negative_signal : bool = False
-    ):
-        """
-        Create statistical model from a single bin or multiple uncorrelated regions.
-
-        :param nsig: signal yields.
-        :return: spey StatisticalModel object.
-
         :raises NotImplementedError: If requested backend has not been recognised.
         """
-        dataset = self.dataset
         try:
             stat_wrapper = get_backend("default.uncorrelated_background")
         except spey.PluginError as e: ## older spey?
@@ -410,169 +151,132 @@ class SpeyRetrieverOld:
                         analysis = id,
 #                        backend = 'simplified_likelihoods'
         )
-        return [ speyModel ]
+        # speyModel.dataType = "1bin"
+        # speyModel.allowNegativeSignals = False
+        return [ SpeyModelFacade ( speyModel, "1bin", dataset.dataInfo.dataId ) ]
 
     @classmethod
-    def translateExpectationType ( cls, evaluationType : NllEvalType ) -> ExpectationType:
-        """ translate the specification for evaluationType values from smodels
-            lingo to spey convention """
-        if type(evaluationType)==ExpectationType:
-            return expected
-        expectedDict = { observed: ExpectationType.observed,
-                         apriori: ExpectationType.apriori,
-                         aposteriori: ExpectationType.aposteriori}
-        if evaluationType in expectedDict:
-            return expectedDict[evaluationType]
-        logger.error( f'{expected} is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' )
-        return None
-
-    def get_five_values ( self, evaluationType : NllEvalType,
-                      return_nll : bool = False,
-                      check_for_maxima : bool = False )-> Dict:
-        """ return the Five Values: l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
-
-        :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
-             correct, if necessary
-        """
-        assert return_nll == True, "we are phasing out return_nll=False"
-        ret = self.maximize_likelihood ( evaluationType = evaluationType,
-               return_nll = True )
-        nll_min = ret["nll_min"]
-
-        nllbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType,
-                return_nll = True, asimov = False )
-        ret["nllbsm"] = nllbsm
-        nllsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType,
-                return_nll = True, asimov = False )
-        ret["nllsm"] = nllsm
-        if check_for_maxima:
-            if nllsm < nll_min: ## if return_nll is off, its the other way
-                muhat = ret["muhat"]
-                logger.debug(f"nllsm={nllsm:.2g} > nll_min({muhat:.2g})={nll_min:.2g}: will correct")
-                ret["nll_min"] = nllsm
-                ret["muhat"] = 0.0
-            if nllbsm < nll_min:
-                muhat = ret["muhat"]
-                logger.debug(f"nllbsm={nllbsm:.2g} > nll_min({muhat:.2g})={nll_min:.2g}: will correct")
-                ret["nll_min"] = nllbsm
-                ret["muhat"] = 1.0
-        if return_nll == False:
-            # if we really need to, we cast to likelihoods here
-            # but not needed yet
-            pass
-        return ret
-
-
-    def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False,
-           model_index : Union [int,None] = None,
-           nSigma : int = 0 ) -> Union[float,UnitXSec]:
-        """ simple frontend to spey::poi_upper_limit
-
-        :param limit_on_xsec: if True, then return the limit on the
-            cross section
-        :param model_index: if None, then get upper limit for most sensitive model,
-            if integer, get UL for that model
-        :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
-
-        :returns: upper limit on parameter of interest (signal strength mu)
-        """
-        if model_index == None:
-            model_index = self.model_index
-        exp = self.translateExpectationType ( evaluationType )
-
-        expected_pvalue = "nominal"
-        if nSigma != 0:
-            expected_pvalue = "1sigma"
-
-        def addXSecs ( limit_on_xsec : bool, ret : float ):
-            if not limit_on_xsec:
-                return ret
-            totsig = self.nsig
-            if type ( self.nsig ) in [ list ]:
-                totsig = sum ( self.nsig )
-            if type ( self.nsig ) in [ dict ]:
-                totsig = sum ( self.nsig.values() )
-            xsec = totsig / self.dataset.globalInfo.lumi
-            ret = ret * xsec
-            return ret
-
-        try:
-            ret = self.speyModels[model_index].poi_upper_limit ( expected = exp,
-                   expected_pvalue = expected_pvalue )
-            if nSigma == 1:
-                return addXSecs ( limit_on_xsec, float(ret[-1]) )
-            if nSigma == -1:
-                return addXSecs ( limit_on_xsec, float(ret[0]) )
-        except ValueError as e:
-            logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
-            sys.exit(-1)
-        except AsimovTestStatZero as e:
-            logger.warning ( f"when computing upper limit for SL: {e}. Will try with other method" )
-            logger.debug ( f"spey returned: {e}. will interpret as ul=inf" )
-            ret = float("inf")
-        ret = float(ret) # cast for the printers
-        return addXSecs ( limit_on_xsec, ret )
-
-    def getBestCombinationIndex(self, data ) -> Tuple[int,float]:
-        """find the index of the best evaluationType combination
-        :returns: tuple ( best_index, upper limit )
-        """
-        if len(data.inputJsons) == 1:
-            ul = self.poi_upper_limit(evaluationType=apriori, model_index=0 )
-            return 0, ul
-        logger.debug( f"Finding best evaluationType combination among {len(data.inputJsons)} workspace(s)" )
-        ulMin = float("+inf")
-        i_best = None
-        for i_ws in range(len(data.inputJsons)):
-            if data.totalYield == 0.:
-                continue
-            if data.zeroSignalsFlag[i_ws] == True:
-                logger.debug( f"Workspace number {i_ws} has zero signals" )
-                continue
-            else:
-                ul = self.poi_upper_limit(evaluationType=apriori, model_index=i_ws)
-            if ul == None:
-                continue
-            if ul < ulMin:
-                ulMin = ul
-                i_best = i_ws
-        return i_best, ul
-
-
-    def asimov_likelihood ( self, poi_test : float, evaluationType : NllEvalType,
-                            return_nll : bool ) -> float:
-        """ simple frontend to spey functionality """
-        self.checkMinimumPoi( poi_test )
-        evaluationType = self.translateExpectationType ( evaluationType )
-        return self.speyModel[self.model_index].asimov_likelihood (
-            poi_test = poi_test, expected= evaluationType,
-            return_nll = return_nll )
-
-    @classmethod
-    def forPyhf(cls, dataset, nsig, deltas_rel):
-        """ get a statscomputer for pyhf combination.
+    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
+        """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
-        :returns: a StatsComputer
+        :returns: a sub computer
         """
-        computer = SpeyRetriever(dataset=dataset, backendType="pyhf",
-                                nsig=nsig, deltas_rel=deltas_rel)
-        return computer
+        import spey
+        stat_wrapper = spey.get_backend('ml.likelihoods')
+        globalInfo = dataset.globalInfo
+        statModels = globalInfo.statModels
+        labelToONNX = {}
+        labelToSModelS = {}
+        hasJsonsWithoutMLModels = False
 
-    def checkMinimumPoi ( self, poi_test : float ):
-        """ check if poi is below minimum_poi """
-        config = self.speyModels[self.model_index].backend.config()
-        if poi_test < config.minimum_poi:
-            logger.error ( f'Calling likelihood for {self.dataset.globalInfo.id} (using combination of SRs) for a mu giving a negative total yield. mu = {mu} and minimum_mu = {config.minimum_poi}.' )
+        for sr in globalInfo.srMappings:
+           # nsignals[ sr["onnx"] ] = 0.
+            if sr["label"] != None:
+                labelToONNX [ sr["label"] ] = sr["onnx"]
+                labelToSModelS [ sr["label"] ] = sr["smodels"]
 
-    @property
-    def xsection(self):
-        return self.speyModels[self.model_index].xsection
+        subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
+
+        for srSetName, models in globalInfo.statModels.items():
+            f_signals = {}
+            for sr in globalInfo.srMappings:
+                f_signals[ sr["onnx"] ] = 0.
+            for label in globalInfo.srSets[srSetName]:
+                smodelsName = labelToSModelS[label]
+                if smodelsName in nsig:
+                    f_signals[ labelToONNX[label] ] = \
+                        nsig[ smodelsName ]
+            modelfilename = models[0]
+            if modelfilename.endswith ( ".json" ):
+                continue
+            """
+            data = NNData( f_signals, dataset )
+            upperLimitComputer = NNUpperLimitComputer(data,
+                    lumi=dataset.getLumi(),
+                    onnxfilename = modelfilename )
+            upperLimitComputer.allowNegativeSignals = False
+            upperLimitComputer.dataType = "nn"
+            """
+            onnxBlob=dataset.globalInfo.cachedModels[srSetName]
+            # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
+            ## the following code is just for now to see if it works in principle
+            import tempfile
+            tempf = tempfile.mktemp ( prefix="/tmp", postfix=".onnx" )
+            # tempf = "/tmp/my.onnx"
+            f = open ( tempf, "wb" )
+            import onnx
+            onnx.save ( onnxBlob, f )
+            f.close()
+            speyModel = stat_wrapper(nsig,tempf)
+            if os.path.exists ( tempf ):
+                os.unlink ( tempf )
+                facade = speyModelFacade ( upperLimitComputer, "nn", modelfilename )
+                subComputers.append ( facade )
+        return subComputers
+
+    @classmethod
+    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
+        """ get a sub computer for pyhf combination.
+
+        :param dataset: CombinedDataSet object
+        :param nsig: Number of signal events for each SR
+        :deltas_rel: Relative uncertainty for the signal
+
+        :returns: a sub computer
+        """
+        stat_wrapper = get_backend("pyhf")
+        from smodels.statistics.speyPyhf import SpeyPyhfData
+        data = SpeyPyhfData.createDataObject ( dataset, nsig )
+        models = []
+        patches = data.patchMaker()
+        for i in range( len(data.inputJsons ) ):
+            # idx, _ = self.getBestCombinationIndex( data )
+            inputJson = data.inputJsons[i]
+            signal_patch = patches[i]
+            #print ( "inputJsons", inputJson )
+            # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+            analysis = dataset.globalInfo.id
+
+            speyModel = stat_wrapper( analysis = analysis,
+                            signal_patch = signal_patch,
+                            background_only_model = inputJson )
+            models.append ( SpeyModelFacade ( speyModel, "pyhf" ) )
+        # self.speyModels = models
+        # self.model_index, _ = self.getBestCombinationIndex( data )
+        return models
+
+    @classmethod
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
+        """ get a sub computer for truncated gaussians
+        :param theorypred: TheoryPrediction object
+        :param corr: correction factor: \
+                ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
+                a factor of corr = 0.6 is proposed.
+        :returns: list of subComputers (with a single entry)
+        """
+        logger.error ( f"speyTools no truncated Gaussian backend exists" )
+        return None
+
+    @classmethod
+    def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
+            -> list:
+        """ get a sub computer for combination of analyses
+        :param theoryPredictions: list of TheoryPrediction objects
+        :param deltas_rel: relative error for the signal
+        :returns: a sub computer
+        """
+        from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
+        computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
+                                              deltas_rel=deltas_rel )
+        computer.dataType = "analysesComb"
+        computer.allowNegativeSignals = False
+        #computer.dataType = "analysesComb"
+        #computer.allowNegativeSignals = allowNegativeSignals
+        return [ computer ]
 
 class SimpleSpeyDataSet:
     """ a very simple data class that can replace a smodels.dataset,
@@ -601,167 +305,62 @@ class SimpleSpeyDataSet:
     def getType ( self ):
         return "efficiencyMap"
 
+class SpeyModelFacade:
+    """ very simple container that wraps around spey models,
+    and adapts the API to SModelS """
 
-class SpeyAnalysesCombosComputer:
-    """ the facade class to spey for analysis combinations """
-    def __init__  ( self, theorypreds, deltas_rel : float ):
-        self.theorypreds = theorypreds
-        self.deltas_rel = deltas_rel
-        # self.pprint()
-        from spey import UnCorrStatisticsCombiner
-        models = []
-        self.xsecs = []
-        for pred in theorypreds:
-            computer = SpeyRetriever.create ( pred.dataset, pred.xsection,
-                    theorypreds, deltas_rel )
-            models.append ( computer.speyModels[0] )
-            xsec = pred.xsection
-            self.xsecs.append ( xsec )
-        self.speyModel = UnCorrStatisticsCombiner ( *models )
+    def __init__ ( self, speyModel, dataType : str, name : str ):
+        self.speyModel = speyModel
+        self.dataType = dataType
+        self.name = name
+        self.likelihoodComputer = self
+        self.allowNegativeSignals = False
 
-    def pprint ( self ):
-        """ print some info about the analyses combination """
-        print ( "[SpeyAnalysesCombo] combining:" )
-        for tp in self.theorypreds:
-            print ( f"    {tp.analysisId()}:{tp.dataId()}" )
-
-    def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False, nSigma : int = 0,
-           **kwargs ) -> float:
-        """ simple frontend, to spey::poi_upper_limit
-
-        :param limit_on_xsec: if True, then return the limit on the
-                              cross section
-        :param nSigma: the upper limit for central value (0),
-        + 1 sigma, - 1 sigma, etc.  For error bands.
-
-        :returns: upper limit on parameter of interest (signal strength mu)
-        """
-        exp = SpeyRetriever.translateExpectationType ( evaluationType )
-        expected_pvalue = "nominal"
-        if evaluationType == observed:
-            nSigma = 0 # no errors for observed
-        if nSigma != 0:
-            expected_pvalue = "1sigma"
-        ret = self.speyModel.poi_upper_limit ( expected = exp,
-               expected_pvalue = expected_pvalue )
-        if nSigma == -1:
-            ret = ret[0]
-        if nSigma == 1:
-            ret = ret[-1]
-        ret = float(ret) # cast for the printers
-        if limit_on_xsec:
-            totxsec = sum(self.xsecs,0.*fb)
-            ret = ret * totxsec
+    def nll_min ( self, evaluationType : NllEvalType = observed,
+                  **kwargs ) -> dict:
+        kwargs["return_nll"]=True
+        speyret = self.speyModel.maximize_likelihood ( **kwargs )
+        muhat = float(speyret[0])
+        ret = { "muhat": muhat, "nll_min": float(speyret[1]) }
+        ## if we need sigma_mu we need to add it here
+        test_statistic = "q" if self.allowNegativeSignals else "qmutilde"
+        exp = self.translateExpectationType ( evaluationType )
+        #sigma_mu = self.speyModel.sigma_mu( poi_test=muhat,
+        #        expected=exp, test_statistics=test_statistic )
+        sigma_mu = 1.
+        ret[ "sigma_mu" ] = sigma_mu
         return ret
 
-    def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
-                     return_nll : bool, asimov : bool = False ) -> float:
-        """ simple frontend to spey functionality """
-        ## FIXME treat the asimov flat
-        nll = self.nll ( poi_test, evaluationType, asimov )
-        return exponentiateNLL ( nll, doIt = not return_nll )
-
-    def nll ( self, poi_test : float, evaluationType : NllEvalType,
-              asimov : bool = False ) -> float:
-        """ simple frontend to spey functionality """
-        evaluationType = SpeyRetriever.translateExpectationType ( evaluationType )
-        ret = self.speyModel.likelihood ( poi_test = poi_test,
-            expected = evaluationType, return_nll = True )
+    def nll ( self, mu : float, evaluationType : NllEvalType = observed, 
+              asimov : Optional[float] = None, **kwargs ):
+        kwargs["return_nll"]=True
+        ret = self.speyModel.likelihood ( **kwargs )
         return float(ret)
 
-    def nll_min ( self, evaluationType : NllEvalType,
-            allow_negative_signal : bool = True, **kwargs ) -> Tuple[float,float]:
-        """ slowly we transition to nlls everywhere """
-        return self.maximize_likelihood ( evaluationType,
-                allow_negative_signal, return_nll = True )
+    @classmethod
+    def transform ( cls, evaluationType : NllEvalType ):
+        return
 
-    def maximize_likelihood ( self, evaluationType : NllEvalType,
-           allow_negative_signal : bool = True,
-           return_nll : bool = False, **kwargs ) -> Tuple[float,float]:
-        """ simple frontend to spey functionality
-        :param return_nll: if True, return negative log likelihood
-        :param allow_negative_signal: allow also negative muhats
-        :returns: tuple of muhat,lmax
-        """
-        evaluationType = SpeyRetriever.translateExpectationType ( evaluationType )
-        speyret = self.speyModel.maximize_likelihood ( expected = evaluationType,
-                allow_negative_signal = allow_negative_signal,
-                return_nll = return_nll )
-        ret = { "muhat": float(speyret[0]) }
-        if return_nll:
-            ret["nll_min"] = float(speyret[1])
-        else:
-            ret["lmax"] = float(speyret[1])
-        ## not clear if bounds will be hard bounds
-        if not allow_negative_signal and speyret[0]< 0.:
-            l0 = float ( self.likelihood ( 0., evaluationType = evaluationType,
-                                           return_nll = return_nll ) )
-            ret = { "muhat": 0. }
-            if return_nll:
-                ret["nll_min"] = l0
-            else:
-                ret["lmax"] = l0
-        return ret
+    @classmethod
+    def translateExpectationType ( cls, evaluationType : NllEvalType ) -> ExpectationType:
+        """ translate the specification for evaluationType values from smodels
+            lingo to spey convention """
+        if type(evaluationType)==ExpectationType:
+            return expected
+        expectedDict = { observed: ExpectationType.observed,
+                         apriori: ExpectationType.apriori,
+                         aposteriori: ExpectationType.aposteriori}
+        if evaluationType in expectedDict:
+            return expectedDict[evaluationType]
+        logger.error( f'{expected} is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' )
+        return None
 
-    def get_five_values ( self, evaluationType : NllEvalType,
-                      return_nll : bool = False,
-                      check_for_maxima : bool = False )-> Dict:
-        """ method returning the Five Values:
-        l(bsm), l(sm), muhat, l(muhat), sigma(mu_hat)
-
-        :param check_for_maxima: if true, then check lmax against l(sm) and l(bsm)
-            correct, if necessary
-        """
-        ret = self.maximize_likelihood ( evaluationType = evaluationType, return_nll = return_nll )
-        max_s = "nll_min" if return_nll else "lmax"
-        lmax = ret[ max_s ]
-
-        lbsm = self.likelihood ( poi_test = 1., evaluationType=evaluationType, return_nll = return_nll )
-        lsm = self.likelihood ( poi_test = 0., evaluationType=evaluationType, return_nll = return_nll )
-        if return_nll:
-            ret["nllbsm"] = lbsm
-            ret["nllsm"] = lsm
-        else:
-            ret["lbsm"] = lbsm
-            ret["lsm"] = lsm
-        if check_for_maxima:
-            if return_nll:
-                if lsm < lmax: ## if return_nll is off, its the other way
-                    muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ max_s ] = lsm
-                    ret["muhat"] = 0.0
-                if lbsm < lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ max_s ] = lbsm
-                    ret["muhat"] = 1.0
-            else:
-                if lsm > lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lsm={lsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ max_s ] = lsm
-                    ret["muhat"] = 0.0
-                if lbsm > lmax:
-                    muhat = ret["muhat"]
-                    logger.debug(f"lbsm={lbsm:.2g} > lmax({muhat:.2g})={lmax:.2g}: will correct")
-                    ret[ max_s ] = lbsm
-                    ret["muhat"] = 1.0
-
-        return ret
-
-    def sigma_mu ( self, poi_test : float, evaluationType : NllEvalType,
-                   allow_negative_signal : bool = False ) -> float:
-        """ determine sigma at poi_test.
-        :param: FIXME allow_negative_signal should not be needed!
-        """
-        test_statistic = "q" if allow_negative_signal else "qmutilde"
-        exp = SpeyRetriever.translateExpectationType ( evaluationType )
-        sigma_mu = self.speyModel.sigma_mu( poi_test=poi_test,expected=exp,
-                                            test_statistics=test_statistic )
-        return float(sigma_mu)
-
+    def getUpperLimitOnMu ( self, evaluationType : NllEvalType = observed,
+            **kwargs ):
+        exp = self.translateExpectationType ( evaluationType )
+        expected_pvalue = "nominal"
+        return self.speyModel.poi_upper_limit ( expected = exp,
+               expected_pvalue = expected_pvalue )
 
 if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb

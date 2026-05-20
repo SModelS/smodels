@@ -152,7 +152,6 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         statModels = globalInfo.statModels
-        #nsignals = {}
         labelToONNX = {}
         labelToSModelS = {}
         hasJsonsWithoutMLModels = False
