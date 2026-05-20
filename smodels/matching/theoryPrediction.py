@@ -632,7 +632,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
             self._statsComputer = StatsComputer ( computer )
 
     def getLlhds(self,muvals,evaluationType : bool = False,
-                  normalize : bool = True ) -> dict:
+                  normalize : bool = True,
+                  idx : int = 0 ) -> dict:
         """
         Facility to access the likelihoods for the individual analyses and
         the combined likelihood.
@@ -645,8 +646,9 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
+        assert idx < len(self.statsComputer.subComputers), f"only {len(self.statsComputer.subComputers)} computers for prediction but you wanted index {idx}"
 
-        return self.statsComputer.subComputers[0].getLlhds(muvals,evaluationType,normalize)
+        return self.statsComputer.subComputers[idx].getLlhds(muvals,evaluationType,normalize)
 
     def describe(self):
         """returns a string containing a list of all analysisId and dataIds"""

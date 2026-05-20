@@ -444,8 +444,8 @@ class DataSet(object):
         """
 
         if nSigma != 0:
-            from smodels.statistics.statsTools import getStatsComputerModule
-            mod = getStatsComputerModule()
+            from smodels.statistics.statsTools import getCompRetrieverModule
+            mod = getCompRetrieverModule()
             # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
             nsig = 1
             comp = mod.forSingleBin ( dataset=self,
