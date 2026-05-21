@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 
-dbpath = "official"
+dbpath = "https://smodels.github.io/database/official312fast"
 # dbpath = "../../smodels-database/"
 database = Database( dbpath)
 
