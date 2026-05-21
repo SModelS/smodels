@@ -239,7 +239,7 @@ class ExpResult(object):
             if idx >= len(models):
                 return None
             if models[idx].endswith ( ".onnx" ):
-                return "onnx"
+                return "nn"
             if models[idx].endswith ( ".cov" ):
                 if not specifySL:
                     return "sl"
