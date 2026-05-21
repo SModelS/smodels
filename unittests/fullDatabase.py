@@ -14,7 +14,7 @@ sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 
 dbpath = "official"
-dbpath = "../../branches/smodels-database/"
+# dbpath = "../../smodels-database/"
 database = Database( dbpath)
 
 if __name__ == "__main__":
