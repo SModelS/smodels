@@ -160,11 +160,12 @@ class CombinedTheoryPredsTest(unittest.TestCase):
           'CMS-SUS-12-028',
           'ATLAS-SUSY-2018-12',
           'ATLAS-SUSY-2016-15','ATLAS-SUSY-2019-09']
-        mdbpath = 'unittest+unittestextra'
-        from databaseLoader import dbpath
-        if "./database" in dbpath:
-            # seems like we are meant to use local databases
-            mdbpath =  './database+./database_extra/'
+        #mdbpath = 'unittest+unittestextra'
+        from databaseLoader import dbpath, dbpathextra
+        mdbpath = f"{dbpath}+{dbpathextra}"
+        #if "./database" in dbpath:
+        #    # seems like we are meant to use local databases
+        #    mdbpath =  './database+./database_extra/'
         db = Database( mdbpath )
         slhafile = "testFiles/slha/gluino_squarks.slha"
         model = Model(BSMparticles=BSMList, SMparticles=SMList)

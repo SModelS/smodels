@@ -23,10 +23,10 @@ from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 from smodels.base.physicsUnits import fb, GeV
 from databaseLoader import database as db
+from databaseLoader import dbpathextra
 from smodels.base.inclusiveObjects import InclusiveValue
 from unitTestHelpers import getNodesIndices, getEdges
-db_extra = Database('unittestextra')
-
+db_extra = Database( dbpathextra )
 
 class TestInclusiveExpRes(unittest.TestCase):
 
