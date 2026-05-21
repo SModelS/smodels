@@ -14,7 +14,7 @@ from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, cleanWalk
-from typing import Union
+from typing import Union, Optional, Set
 
 try:
     import cPickle as serializer
@@ -211,24 +211,40 @@ class ExpResult(object):
             return True
         return False
 
-    def typeOfStatsModel(self, srSetName : str, idx : int = 0 ) -> \
-            Optional[str]:
+    def typeOfStatsModel(self, srSetName : Optional[str], idx : int = 0,
+                specifySL : bool = False ) -> Union[None,str,Set]:
         """ what type of statistics model do we have for
         srSetName?
-        :param srSetName: the name of the signal region set
-        :param idx: which index in a list
+        :param srSetName: the name of the signal region set.
+        If None, return for all
+        :param idx: which index in a list (ignored if srSetName==None)
+        :param specifySL: if true, then say "slv1" or "slv2", not "sl"
 
         :returns: one of: onnx, cov, json
         """
         if not self.hasStatsModel():
             return None
+        if srSetName == None:
+            ret = set()
+            for name in self.globalInfo.srSets.keys():
+                n = len ( self.globalInfo.statModels[name] )
+                for i in range(n):
+                    tp = self.typeOfStatsModel ( name, i, specifySL )
+                if tp != None:
+                    ret.add ( tp )
+            return ret
         for srSetName, models in self.globalInfo.statModels.items():
             if idx >= len(models):
                 return None
             if models[idx].endswith ( ".onnx" ):
                 return "onnx"
             if models[idx].endswith ( ".cov" ):
-                return "sl"
+                if not specifySL:
+                    return "sl"
+                if hasattr ( self.datasets[0].dataInfo, "thirdMoment" ):
+                    if self.datasets[0].dataInfo.thirdMoment != None:
+                        return "slv2"
+                return "slv1"
             if models[idx].endswith ( ".json" ):
                 return "pyhf"
         return "?"
