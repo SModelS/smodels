@@ -116,46 +116,35 @@ class NNAdapter:
         remove_channels=[]
         import json, math
         for em in self.mlModel.metadata_props:
-            emkey = em.key.replace ( "rafal::", "" )
-            if emkey == "remove_channels":
+            if em.key == "remove_channels":
                 # remove these channels at the end, so that order does not matter
                 remove_channels = eval(em.value)
                 data["remove_channels"] = remove_channels
-            elif emkey == "obs_yields":
+            elif em.key == "obs_yields":
                 st = eval(em.value)
                 for l in st: ## the sm yields are tuple of (name,value)
                     data["obsYields"][ l[0] ]= int ( l[1] )
-            elif emkey == "bkg_yields":
+            elif em.key == "bkg_yields":
                 st = eval(em.value)
                 for l in st: ## the sm yields are tuple of (name,value)
                     data["smYields"][ l[0] ] = l[1]
-            elif emkey == "standardization_mean":
+            elif em.key == "standardization_mean":
                 data["inputMeans"] = eval(em.value)
-            elif emkey == "standardization_std":
+            elif em.key == "standardization_std":
                 data["inputErrors"] = eval(em.value)
-            elif emkey  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
+            elif em.key  in [ 'nLL_exp_mu0', 'nLL_obs_mu0', 'nLLA_exp_mu0', \
                               'nLLA_obs_mu0' ]:
-                data[emkey] = json.loads(em.value)
-            elif emkey in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
+                data[em.key] = json.loads(em.value)
+            elif em.key in [ 'nLL_exp_max', 'nLL_obs_max', 'nLLA_exp_max', \
                              'nLLA_obs_max', 'nLL_exp_mu0', ]:
-                data[emkey] = self._fillValues ( emkey, em.value )
-            elif emkey == 'y_min':
-                values = json.loads(em.value)
-                if len(values)<7:
-                    print ( f"[nnAdapter] 'y_min' in {self.onnxfilename} has only {len(values)} entries, need 7." )
-                    import sys; sys.exit(-1)
-                indices = { "nLLA_obs_max": -1, "nLLA_exp_max": -3,
-                            "nLL_obs_max" : -5, "nLL_exp_max": -7 }
-                for name,index in indices.items():
-                    if data[name] != None:
-                        data[name] = [None,values[index]]
-            elif emkey == "standardization":
+                data[em.key] = self._fillValues ( em.key, em.value )
+            elif em.key == "standardization":
                 values = eval(em.value)
                 data["featureMeans"] = values["features_mean"][0]*3
                 data["featureErrors"] = values["features_std"][0]*3
                 data["nllMeans"] = values["nLLs_mean"][0]
                 data["nllErrors"] = values["nLLs_std"][0]
-            elif emkey == "run_config":
+            elif em.key == "run_config":
                 import yaml
                 content = yaml.safe_load ( em.value )
                 data["run_config"] = content
@@ -258,7 +247,7 @@ class NNAdapter:
         return ret
 
     def preprocess ( self, yields : Union[dict,list] ) -> dict:
-        inp_list = yields
+        inp_list = np.array ( yields )
         if type(inp_list)==dict:
             inp_list = self._inputDictToList ( yields )
         from smodels.statistics.nnPreprocessing import preprocess_features
@@ -266,8 +255,8 @@ class NNAdapter:
         nYields = len(yields)
         re = preprocess_features ( inp_list,
             trafos = trafos,
-            mean = self.onnxMeta["featureMeans"][:nYields],
-            std = self.onnxMeta["featureErrors"][:nYields] )
+            mean = np.array ( self.onnxMeta["featureMeans"][:nYields] ),
+            std = np.array ( self.onnxMeta["featureErrors"][:nYields] ) )
         ret = [ re[0] ]
         return ret
 
