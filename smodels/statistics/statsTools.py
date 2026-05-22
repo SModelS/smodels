@@ -183,9 +183,11 @@ class CompRetriever:
                     globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
 
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
+        """
         for ds in datasets:
             if not ds in jsonRegions:
                 logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
+        """
         logger.debug(f"list of datasets: {datasets}")
 
         # Constructing the list of signals with subsignals matching each json
