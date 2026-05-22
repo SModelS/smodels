@@ -247,9 +247,9 @@ class NNAdapter:
         return ret
 
     def preprocess ( self, yields : Union[dict,list] ) -> dict:
+        if type(yields)==dict:
+            yields = self._inputDictToList ( yields )
         inp_list = np.array ( yields )
-        if type(inp_list)==dict:
-            inp_list = self._inputDictToList ( yields )
         from smodels.statistics.nnPreprocessing import preprocess_features
         trafos = self.onnxMeta["run_config"]["data"]["trafos"]
         nYields = len(yields)
