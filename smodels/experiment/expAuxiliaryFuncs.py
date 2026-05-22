@@ -14,6 +14,7 @@ import unum
 import re
 import numpy as np
 from collections import OrderedDict, deque
+import os
 
 try:
     from collections.abc import Iterable
@@ -80,7 +81,7 @@ def cGtr(weightA, weightB):
     return result
 
 
-def removeUnits(value, stdUnits=standardUnits, returnUnit=False):
+def removeUnits(value, stdUnits=standardUnits, returnUnit : bool = False ):
     """
     Remove units from unum objects. Uses the units defined
     in base.physicsUnits.standard units to normalize the data.
@@ -553,7 +554,7 @@ def sortParticleList(ptcList):
     return newPtcList
 
 
-def cleanWalk ( topdir ):
+def cleanWalk ( topdir : os.PathLike ) -> list:
     """ perform os.walk, but ignore all hidden files and directories """
     import os
     ret = []
@@ -576,17 +577,27 @@ def cleanWalk ( topdir ):
         ret.append ( [ root, dirs, files ] )
     return ret
 
-def concatenateLines ( oldcontent ):
+def removeComments ( oldcontent : list ) -> list:
+    """ first we remove all comments """
+    newcontent = []
+    for line in oldcontent:
+        p1 = line.find ( "#" )
+        if p1 == 0 or ( p1 >= 0 and line[p1-1]!="\\" ):
+            line = line[:p1]
+        line = line.rstrip()
+        if len(line)>0:
+            newcontent.append ( line )
+    return newcontent
+
+def concatenateLines ( oldcontent : list ) -> list:
     """ of all lines in the list "oldcontent", concatenate the ones
         that end with '\'  or ',' """
     content=[] ## concatenate lines that end with "," or "\"
     tmp=""
     import re
+    oldcontent = removeComments ( oldcontent )
     for i,line in enumerate ( oldcontent ):
-        p1 = line.find ( "#" )
-        if p1 > -1:
-            line = line[:p1]
-        tmp+=line.strip()
+        tmp+=line
         ## if next line starts with tab or whitespace or "}",
         ## merge the lines
         if i < len(oldcontent)-1 and re.match("[ \t}]",oldcontent[i+1] ):
