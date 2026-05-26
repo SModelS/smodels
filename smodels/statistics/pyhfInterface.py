@@ -1007,7 +1007,7 @@ class PyhfUpperLimitComputer:
     # looking for mu bounds
     # Usage of the index allows for rescaling
     def getUpperLimitOnMu( self, evaluationType : NllEvalType=observed,
-                           nSigma : int = 0 ) -> float:
+                           nSigma : int = 0, **kwargs ) -> float:
         """
         Compute the upper limit on the signal strength modifier with:
 
@@ -1016,6 +1016,10 @@ class PyhfUpperLimitComputer:
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         self.__init__(self.data, self.cl, self.lumi)
+        if "pmSigma" in kwargs and kwargs["pmSigma"] == 0:
+            kwargs.pop ( "pmSigma" )
+        if len ( kwargs ) > 0:
+            logger.warning ( f"pyhf computer will ignore {kwargs}" )
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
