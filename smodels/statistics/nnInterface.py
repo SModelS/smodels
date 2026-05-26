@@ -62,6 +62,8 @@ def writeOutYields ( theoryPred,
     ms = theoryPred.statsComputer.getMostSensitiveModel()
     Dict["most_sensitive"]=ms["name"]
     Dict["ul_min"]=ms["ul_min"]
+    Dict["nll"]=theoryPred.nll ( mu=1. )
+    Dict["nllE"]=theoryPred.nll ( mu=1., evaluationType = aposteriori )
     dicts.append ( Dict )
 
     def removeZeros ( nsig : dict ) -> dict:
