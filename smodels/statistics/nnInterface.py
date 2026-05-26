@@ -36,13 +36,12 @@ nnSettings = {
 }
 
 def writeOutYields ( theoryPred,
-        filename : Union[os.PathLike,None] = "yields.json" ):
+        filename : Union[os.PathLike,None] = None ):
     """ a function for debugging only: writes the actual NN input
     into a file called filename
 
     :param filename: output file name, if None, then it is
-    yields_<massparams>,json
-
+    yields_<massparams>.json
     """
 
     from smodels.base.physicsUnits import GeV
@@ -52,22 +51,39 @@ def writeOutYields ( theoryPred,
             continue
         masses.append ( float(node.particle.mass.asNumber(GeV)) )
     if filename == None:
-        filename = f"yields_{'_'.join(map(str(masses)))}.json"
-    nsig = theoryPred.statsComputer.nsig
-    computer = theoryPred.statsComputer.upperLimitComputer
-    models = computer.adaptors.keys()
+        filename = f"yields_{'_'.join(map(str,map(int,masses)))}.json"
     gI = theoryPred.dataset.globalInfo
-    Dict = { "anaId": gI.id, "masses": masses, "nsignals": nsig,
-             "txnames":list( set(map(str,theoryPred.txnames))) }
+    print ( f"[nnInterface] writing yields for {gI.id} to {filename}" )
     dicts = []
-    if False:
-        for m in models:
-            yields = computer.totalYieldsFromSignals( m, 1. )
-            scaled_yields = computer.scaleYields ( yields, m )
-            nn_input = scaled_yields.tolist()
-            Dict["model"]=m
-            Dict["nn_input"]=nn_input
-            dicts.append ( Dict )
+    Dict = { "anaId": gI.id, "masses": masses,
+             "txnames":list( set(map(str,theoryPred.txnames))) }
+    ms = theoryPred.statsComputer.getMostSensitiveModel()
+    Dict["most_sensitive"]=ms["name"]
+    Dict["ul_min"]=ms["ul_min"]
+    dicts.append ( Dict )
+
+    def removeZeros ( nsig : dict ) -> dict:
+        newD = {}
+        for k,v in nsig.items():
+            if v > 0.:
+                newD[k]=v
+        return newD
+
+    for computer in theoryPred.statsComputer.subComputers:
+        if not hasattr ( computer, "totalYieldsFromSignals" ):
+            continue
+        Dict = {}
+        # m = computer.data
+        yields_0 = computer.totalYieldsFromSignals( 0. )
+        yields = computer.totalYieldsFromSignals( 1. )
+        # scaled_yields = computer.scaleYields ( yields, m )
+        # nn_input = scaled_yields.tolist()
+        Dict["model"]=computer.name
+        Dict["nsignals"]=removeZeros ( computer.nsignals )
+        Dict["yields"]= yields
+        Dict["yields_0"]= yields_0
+        # Dict["nn_input"]=nn_input
+        dicts.append ( Dict )
 
     with open ( filename, "wt" ) as f:
         import json

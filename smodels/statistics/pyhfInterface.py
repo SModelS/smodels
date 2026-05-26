@@ -1016,8 +1016,9 @@ class PyhfUpperLimitComputer:
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         self.__init__(self.data, self.cl, self.lumi)
-        if "pmSigma" in kwargs and kwargs["pmSigma"] == 0:
+        if "pmSigma" in kwargs: #  and kwargs["pmSigma"] == 0:
             kwargs.pop ( "pmSigma" )
+            return self.getUpperLimitOnMu ( evaluationType, nSigma, **kwargs )
         if len ( kwargs ) > 0:
             logger.warning ( f"pyhf computer will ignore {kwargs}" )
         with warnings.catch_warnings():
