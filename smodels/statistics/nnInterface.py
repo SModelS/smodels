@@ -21,7 +21,6 @@ from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
          CLsWithErrorsfromNLL
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from scipy import optimize, differentiate
-from smodels_utils.helper.terminalcolors import *
 from smodels.statistics.nnAdapter import NNAdapter
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
