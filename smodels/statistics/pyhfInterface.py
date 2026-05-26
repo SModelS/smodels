@@ -1002,13 +1002,27 @@ class PyhfUpperLimitComputer:
                     CLs = float(result[1])
             return clsType ( CLs, return_type, 0.95 )
 
-    # Trying a new method for upper limit computation :
-    # re-scaling the signal predictions so that mu falls in [0, 10] instead of
-    # looking for mu bounds
-    # Usage of the index allows for rescaling
     def getUpperLimitOnMu( self, evaluationType : NllEvalType=observed,
                            nSigma : int = 0, **kwargs ) -> float:
         """
+        The version with kwargs, we cannot cache
+        Compute the upper limit on the signal strength modifier with:
+
+        :param evaluationType: if set to apriori: uses expected SM backgrounds
+        as signals, else uses 'self.nsignals'
+        :return: the upper limit at 'self.cl' level (0.95 by default)
+        """
+        if "pmSigma" in kwargs: #  and kwargs["pmSigma"] == 0:
+            kwargs.pop ( "pmSigma" )
+        if len ( kwargs ) > 0:
+            logger.warning ( f"pyhf computer will ignore {kwargs}" )
+        return self._getUpperLimitOnMu ( evaluationType, nSigma )
+
+    @lru_cache
+    def _getUpperLimitOnMu( self, evaluationType : NllEvalType=observed,
+                           nSigma : int = 0 ) -> float:
+        """
+        The version without any kwargs, so we can cache:
         Compute the upper limit on the signal strength modifier with:
 
         :param evaluationType: if set to apriori: uses expected SM backgrounds
@@ -1016,11 +1030,6 @@ class PyhfUpperLimitComputer:
         :return: the upper limit at 'self.cl' level (0.95 by default)
         """
         self.__init__(self.data, self.cl, self.lumi)
-        if "pmSigma" in kwargs: #  and kwargs["pmSigma"] == 0:
-            kwargs.pop ( "pmSigma" )
-            return self.getUpperLimitOnMu ( evaluationType, nSigma, **kwargs )
-        if len ( kwargs ) > 0:
-            logger.warning ( f"pyhf computer will ignore {kwargs}" )
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",

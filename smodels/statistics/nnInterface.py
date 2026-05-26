@@ -53,6 +53,8 @@ def writeOutYields ( theoryPred,
     if filename == None:
         filename = f"yields_{'_'.join(map(str,map(int,masses)))}.json"
     gI = theoryPred.dataset.globalInfo
+    if "-orig" in gI.id:
+        return
     print ( f"[nnInterface] writing yields for {gI.id} to {filename}" )
     dicts = []
     Dict = { "anaId": gI.id, "masses": masses,

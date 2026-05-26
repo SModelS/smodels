@@ -24,6 +24,8 @@ mu_digits = 8
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor",
             "TheoryPredictionsCombiner" ]
 
+writeYields = [ False ]
+
 class TheoryPrediction(object):
     """
     An instance of this class represents the results of the theory prediction
@@ -249,6 +251,10 @@ class TheoryPrediction(object):
         For error bands.
         :return: upper limit (Unum object)
         """
+        if writeYields[0]:
+            from smodels.statistics.nnInterface import writeOutYields
+            writeOutYields ( self )
+
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType,
                     nSigma = nSigma )
@@ -285,7 +291,6 @@ class TheoryPrediction(object):
         for k,v in kwargs.items():
             if k not in [ "pmSigma" ]:
                 logger.error ( f"unknown argument {k} in theoryPrediction.getUpperLimitOnMu()" )
-
         upperLimit = self.getUpperLimit( evaluationType=evaluationType,
                                          nSigma=nSigma, **kwargs )
         xsec = self.totalXsection()
