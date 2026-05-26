@@ -503,15 +503,26 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "statModels"):
             self.type = ""
             types = set()
-            for srSetName, models in self.globalInfo.statModels.items():
-                if len(models)==0:
+            for srSetName, model_tuples in self.globalInfo.statModels.items():
+                ### models is e.g. [ ( "onnx", "bla.onnx" ), ... ]
+                if len(model_tuples)==0:
                     continue
+                model_type = model_tuples[0][0]
+                if model_type == "onnx":
+                    types.add ( "nn" )
+                elif model_type == "sl":
+                    types.add ( "simplified" )
+                elif model_type in [ "full_pyhf", "pyhf" ]:
+                    types.add ( "pyhf" )
+                """
+                types.add ( models[0][0] )
                 if models[0].endswith ( ".onnx" ):
                     types.add ( "nn" )
                 if models[0].endswith ( ".json" ):
                     types.add ( "pyhf" )
                 if models[0].endswith ( ".cov" ):
                     types.add ( "simplified" )
+                """
             return "+".join ( types )
 
     def __str__(self):
@@ -555,8 +566,10 @@ class CombinedDataSet(object):
         if not hasattr ( self.globalInfo, "statModels" ):
             return
         hasSL = False
-        for srSetName,models in self.globalInfo.statModels.items():
-            if models[0].endswith ( ".cov" ):
+        for srSetName,model_tuples in self.globalInfo.statModels.items():
+            model_tuple = model_tuples[0]
+            # if models[0].endswith ( ".cov" ):
+            if model_tuple[0] == "sl":
                 hasSL = True
             break
         if not hasSL:
@@ -573,9 +586,9 @@ class CombinedDataSet(object):
             for srSetName,regions in self.globalInfo.srSets.items():
                 datasetOrder += regions
         dim_covs = 0
-        for srSetName,models in self.globalInfo.statModels.items():
+        for srSetName,_ in self.globalInfo.statModels.items():
             assert srSetName in self.globalInfo.srSets, \
-                f"{models[0]} does not appear in srSets"
+                f"{srSetName} does not appear in srSets"
             dim_covs += len ( self.globalInfo.srSets[srSetName] )
 
         if len(datasetOrder) != dim_covs:

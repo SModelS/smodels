@@ -184,5 +184,5 @@ srSets: { 'EWKinos_SR2lOnly': ['CR_ewk_VV_high',
           'SR_slep_2l_mm_high_h',
           'SR_slep_2l_mm_low_h',
           ]}
-statModels: { 'EWKinos_SR2lOnly': ['EWKinos_bkgonly_SR2lOnly.json'],
-     'Sleptons': ['Sleptons_bkgonly.json']}
+statModels: { 'EWKinos_SR2lOnly': [ ( 'pyhf', 'EWKinos_bkgonly_SR2lOnly.json' )],
+     'Sleptons': [ ( 'pyhf', 'Sleptons_bkgonly.json' ) ]}

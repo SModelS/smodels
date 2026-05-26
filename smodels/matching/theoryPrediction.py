@@ -208,10 +208,12 @@ class TheoryPrediction(object):
                 # Get computer
                 hasSL = False
                 hasOnnx = False
-                for srSetName, models in self.dataset.globalInfo.statModels.items():
-                    if models[0].endswith ( ".onnx" ):
+                for srSetName, model_tuples in self.dataset.globalInfo.statModels.items():
+                    model_tuple = model_tuples[0]
+                    model_type = model_tuple[0]
+                    if model_type == "onnx":
                         hasOnnx = True
-                    if models[0].endswith ( ".cov" ):
+                    if model_type == "sl":
                         hasSL = True
                 if hasSL:
                     datasetList = []
@@ -876,7 +878,7 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     region = expResult.globalInfo.srMappingsDict[dataId]
     if not "sl" in region:
         region["sl"]=region["smodels"] ## FIXME should disappear
-    for srSetName,models in expResult.globalInfo.statModels.items():
+    for srSetName in expResult.globalInfo.statModels.keys():
         dType = expResult.typeOfStatsModel ( srSetName )
         assert dType != None, "dont know which model type"
         for regions in expResult.globalInfo.srSets [ srSetName ]:

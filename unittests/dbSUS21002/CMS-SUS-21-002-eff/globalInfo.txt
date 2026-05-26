@@ -11,4 +11,4 @@ private: False
 implementedBy: Sahana Narasimha
 lastUpdate: 2023/2/15
 srSets: { "all": [ 'b_veto_SR0', 'b_veto_SR1', 'b_veto_SR2', 'b_veto_SR3', 'b_veto_SR4', 'b_veto_SR5', 'b_veto_SR6', 'b_veto_SR7', 'b_veto_SR8', 'WH_SR0', 'WH_SR1', 'WH_SR2', 'WH_SR3', 'WH_SR4', 'WH_SR5', 'WH_SR6', 'WH_SR7', 'W_SR0', 'W_SR1', 'W_SR2', 'W_SR3', 'W_SR4', 'W_SR5', 'W_SR6', 'W_SR7', 'W_SR8', 'H_SR0', 'H_SR1', 'H_SR2', 'H_SR3', 'H_SR4', 'H_SR5', 'H_SR6', 'H_SR7', 'H_SR8' ] }
-statModels: { "all": [ "matrix.cov" ] }
+statModels: { "all": [ ( "sl", "matrix.cov" ) ] }

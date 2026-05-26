@@ -92,4 +92,4 @@ srSets: { 'bkgonly': ['SRDF_0a_cuts',
           'CRWW_cuts',
           'CRtop_cuts'
           ]}
-statModels: { 'bkgonly': [ 'combined.onnx' ] } # , 'bkgonly_simplified.json', 'bkgonly.json']}
+statModels: { 'bkgonly': [ ( 'onnx', 'combined.onnx' ) ] }

@@ -126,8 +126,8 @@ srSets: { 'bkg_onshell': ['SRWZ_1',
           ],
     'sr_wh_dfos_fake': ['SR_WH_DFOS',
           ]}
-statModels: { 'bkg_onshell': ['bkg_onshell_simplified.json' ],
-     'bkg_offshell': ['bkg_offshell_simplified.json' ],
-     'sr_wh_0j_fake': ['SR_WH_0j_fake_bkgonly.json' ],
-     'sr_wh_nj_fake': ['SR_WH_nj_fake_bkgonly.json' ],
-     'sr_wh_dfos_fake': ['SR_WH_DFOS_fake_bkgonly.json' ]}
+statModels: { 'bkg_onshell': [ ( 'pyhf', 'bkg_onshell_simplified.json' ) ],
+     'bkg_offshell': [ ( 'pyhf', 'bkg_offshell_simplified.json' ) ],
+     'sr_wh_0j_fake': [ ( 'pyhf', 'SR_WH_0j_fake_bkgonly.json' ) ],
+     'sr_wh_nj_fake': [ ( 'pyhf', 'SR_WH_nj_fake_bkgonly.json' ) ],
+     'sr_wh_dfos_fake': [ ( 'pyhf', 'SR_WH_DFOS_fake_bkgonly.json' ) ]}

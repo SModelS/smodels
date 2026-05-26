@@ -163,22 +163,26 @@ class Info(object):
         import json
         self.cachedModels = {}
         dirp = os.path.dirname(self.path)
-        for setName, models in self.statModels.items():
-            for model in models:
-#                if not model.endswith ( ".json" ) and not model.endswith ( ".onnx" ):
-#                    continue
+        if type ( self.statModels ) == str:
+            raise SModelSError ( f"in {self.id}: could not parse {self.statModels}" )
+        for setName, model_tuples in self.statModels.items():
+            for model_tuple in model_tuples:
+                if type(model_tuple)==str:
+                    raise SModelSError ( f"in {self.id}: statModels have to be tuples" )
+                model_type = model_tuple[0]
+                model = model_tuple[1]
                 fullPath = os.path.join(dirp, model )
                 with open ( fullPath, "rb" ) as f:
-                    if model.endswith ( ".cov" ):
+                    if model_type == "sl":
                         with open(fullPath,"rt") as f:
                             txt = eval ( f.read() )
-                    elif model.endswith ( ".json" ):
+                    elif model_type in [ "full_pyhf", "pyhf" ]:
                         with open(fullPath,"rt") as f:
                             txt = json.load(f)
-                    elif model.endswith ( ".onnx" ):
+                    elif model_type == "onnx":
                         txt = f.read()
                     else:
-                        logger.error ( f"{model} has unrecognized file extension: should be one of: json, onnx, cov" )
+                        logger.error ( f"model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, sl" )
                     self.cachedModels[model] = txt
                     f.close()
 

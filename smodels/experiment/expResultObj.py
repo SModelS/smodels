@@ -235,19 +235,21 @@ class ExpResult(object):
                 if tp != None:
                     ret.add ( tp )
             return ret
-        for srSetName, models in self.globalInfo.statModels.items():
-            if idx >= len(models):
+        for srSetName, model_tuples in self.globalInfo.statModels.items():
+            if idx >= len(model_tuples):
                 return None
-            if models[idx].endswith ( ".onnx" ):
+            model_tuple = model_tuples[idx]
+            model_type = model_tuple[0]
+            if model_type=="onnx":
                 return "onnx"
-            if models[idx].endswith ( ".cov" ):
+            if model_type=="sl":
                 if not specifySL:
                     return "sl"
                 if hasattr ( self.datasets[0].dataInfo, "thirdMoment" ):
                     if self.datasets[0].dataInfo.thirdMoment != None:
                         return "slv2"
                 return "slv1"
-            if models[idx].endswith ( ".json" ):
+            if model_type in [ "full_pyhf", "pyhf" ]:
                 return "pyhf"
         return "?"
 

@@ -138,7 +138,7 @@ class CompRetriever:
         #    nsignals[onnxname] = self.nsig[smname]
         from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
-        for srSetName, models in globalInfo.statModels.items():
+        for srSetName, model_tuples in globalInfo.statModels.items():
             f_signals = {}
             for sr in globalInfo.srMappings:
                 f_signals[ sr["onnx"] ] = 0.
@@ -148,8 +148,10 @@ class CompRetriever:
                     f_signals[ labelToONNX[label] ] = \
                         nsig[ smodelsName ]
             data = NNData( f_signals, dataset )
-            modelfilename = models[0]
-            if modelfilename.endswith ( ".json" ):
+            model_tuple = model_tuples[0]
+            modelfilename = model_tuple[1]
+            model_type = model_tuple[0]
+            if "pyhf" in model_type:
                 continue
             upperLimitComputer = NNUpperLimitComputer(data,
                     lumi=dataset.getLumi(),
@@ -173,13 +175,15 @@ class CompRetriever:
         datasets = [ds.getID() for ds in dataset.origdatasets]
         jsonFiles, jsons = [], []
         jsonDictNames = {}
-        for srSetName, models in globalInfo.statModels.items():
-            model = models[0]
-            if not model.endswith ( ".json" ):
+        for srSetName, model_tuples in globalInfo.statModels.items():
+            model_tuple = model_tuples[0]
+            model_type = model_tuple[0]
+            model_name = model_tuple[1]
+            if not "pyhf" in model_type:
                 continue
-            jsonFiles.append ( model )
-            jsons.append ( globalInfo.cachedModels[model] )
-            jsonDictNames[model]=cls.getAll ( \
+            jsonFiles.append ( model_name )
+            jsons.append ( globalInfo.cachedModels[model_name] )
+            jsonDictNames[model_name]=cls.getAll ( \
                     globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
 
         jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
@@ -208,16 +212,16 @@ class CompRetriever:
 
         r_jsonFiles = {} ## here we reconstruct the old jsonFiles dict
         ## (for now, maybe we will see that there is a smarter way)
-        for srSetName, models in globalInfo.statModels.items():
-            model = models[0]
-            if not model.endswith ( ".json" ):
+        for srSetName, model_tuples in globalInfo.statModels.items():
+            model_tuple = model_tuples[0]
+            if not model_tuple[0] in [ "pyhf", "full_pyhf" ]:
                 continue
             region_names = globalInfo.srSets[srSetName]
             regions = cls.getRegions ( region_names,
                     globalInfo.srMappingsDict )
-            if model in r_jsonFiles:
+            if model_tuple[1] in r_jsonFiles:
                 raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
-            r_jsonFiles[model]=regions
+            r_jsonFiles[model_tuple[1]]=regions
 
         subComputers = []
         for nsignal,json,(jsonFileName,r_jsonFile) in zip(nsignals.values(),jsons,r_jsonFiles.items() ):

@@ -186,7 +186,7 @@ class SpeyRetriever:
 
         subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
 
-        for srSetName, models in globalInfo.statModels.items():
+        for srSetName, model_tuples in globalInfo.statModels.items():
             f_signals = {}
             for sr in globalInfo.srMappings:
                 f_signals[ sr["onnx"] ] = 0.
@@ -195,17 +195,10 @@ class SpeyRetriever:
                 if smodelsName in nsig:
                     f_signals[ labelToONNX[label] ] = \
                         nsig[ smodelsName ]
-            modelfilename = models[0]
-            if modelfilename.endswith ( ".json" ):
+            model_tuple = model_tuples[0]
+            modelfilename = model_tuple[1]
+            if "pyhf" in model_tuple[0]:
                 continue
-            """
-            data = NNData( f_signals, dataset )
-            upperLimitComputer = NNUpperLimitComputer(data,
-                    lumi=dataset.getLumi(),
-                    onnxfilename = modelfilename )
-            upperLimitComputer.allowNegativeSignals = False
-            upperLimitComputer.dataType = "nn"
-            """
             onnxBlob=dataset.globalInfo.cachedModels[srSetName]
             # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
             ## the following code is just for now to see if it works in principle

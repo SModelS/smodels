@@ -103,10 +103,11 @@ class SpeyPyhfData:
         jsonFiles = []
         srSetNames = {} # set names for jsonFiles
         # jsons = []
-        for srSetName,models in globalInfo.statModels.items():
-            if models[0].endswith(".json"):
-                jsonFiles.append ( models[0] )
-                srSetNames[ models[0] ] = srSetName
+        for srSetName,model_tuples in globalInfo.statModels.items():
+            model_tuple = models[0]
+            if "pyhf" in model_tuple[0]:
+                jsonFiles.append ( model_tuple[1] )
+                srSetNames[ model_tuple[1] ] = srSetName
                 # jsons.append ( globalInfo.cachedModels[srSetName] )
         # jsonFiles = [js for js in globalInfo.jsonFiles]
         #jsons = globalInfo.jsons.copy()
