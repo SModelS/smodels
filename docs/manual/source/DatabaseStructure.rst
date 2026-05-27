@@ -77,7 +77,11 @@ Each |ExpRes| folder contains:
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
-data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>`, a :ref:`full pyhf likelihood <pyhfllhd>`, or a :ref:`ml surrogate model <surrogateMLModels>`), it is also referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an example:
+data. In case a statistical model is given (either a :ref:`simplified
+ likelihood <simplifiedllhd>`, a :ref:`full pyhf likelihood <pyhfllhd>`,
+or a :ref:`ml surrogate model <surrogateMLModels>`), it is also
+referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an
+example:
 
 .. literalinclude:: /literals/globalInfo201804.txt
    :lines: 1-22
@@ -85,8 +89,8 @@ data. In case a statistical model is given (either a :ref:`simplified likelihood
 Here, ``srMappings`` lists all signal regions that SModelS should be aware of,
 with ``smodels`` being the name known to SModelS (can be ``None``).
 Optionally, a ``type`` can be specified -- it should be one of **SR**, **CR**, 
-with **SR** being the default. If a label is given, it is the
-name the region is kwown as within the ``globalInfo.txt`` file,
+with **SR** being the default. If a ``label`` is given, it is the
+name the region is kwown as within and only within the ``globalInfo.txt`` file,
 else the ``smodels`` field is used.
 The optional fields ``pyhf``,  ``sl``, and ``onnx`` are the names
 used to map them onto the names in the according statistics models.
@@ -97,19 +101,23 @@ is used for the simplified likelihood. These fields default to ``None``.
 The ``srSets`` field groups these regions into named sets. In the example
 above a set **all** is defined that contains all 5 regions.
 
-Finall, ``statModels`` maps these sets to lists of statistical models.
-By default, for each region set, SModelS uses the first model given in
-the list.
+Finall, ``statModels`` maps the aforementioned ``srSets`` to lists of
+statistical models.  By default, for each region set, SModelS uses the first
+model given in the list.
 
 Some shorthand notations are possible. For example, in the 
 case of the ATLAS-SUSY-2018-41 simplified likelihood listed below, 
 ``srMappings`` is not given.
-In this case assumed that all regions named in ``srSets`` should
+In this case it is assumed that all regions named in ``srSets`` should
 appear in ``srMapping`` with all the region names being the same
 as the SModelS name and ``type`` being always **SR**:
 
 .. literalinclude:: /literals/globalInfo201841.txt
    :lines: 12-13
+
+The matrix.cov file must contain a python list of lists, e.g.
+``[[v_11, v_12],[v_12,v_22]]``; the content of the file gets
+``eval``'ed.
 
 In what follows, ATLAS-SUSY-2019-08 is given as another example,
 this time with a machine learned surrogate model. It is used by default,
@@ -133,6 +141,10 @@ the other three region sets (**WH_0j**, **WH_nj**, **WH_DFOS**):
 
 .. literalinclude:: /literals/globalInfo201909.txt
    :lines: 134-146
+
+Note that the field ``includeCRs: False`` inhibits patching
+of control regions for the pyhf models. This field has no meaning
+for the machine learned surrogate models.
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are described by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
