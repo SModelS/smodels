@@ -129,6 +129,8 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         if nll is not None and nllA is not None:
             ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
                               return_type=return_type, nSigma = nSigma )
+        if False and abs(mu-1)<1e-5:
+            print ( f"@@NNI0 CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} {ret}" )
         return ret
     if nll is None or nllA is None:
         ret = None, None
@@ -136,6 +138,8 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         ret = CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
                    s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
                    return_type=return_type, nSigma = nSigma )
+    if False:
+        print ( f"@@NNI1 CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} return_type {return_type} pmSigma {pmSigma} {ret}" )
     return ret[0]+pmSigma*ret[1]
 
 class NNData:
@@ -311,7 +315,7 @@ class NNUpperLimitComputer:
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
-             allowNegativeSignals : bool = True,
+             allowNegativeSignals : bool = False,
              nSigma : int = 0, pmSigma : int = 0 ) -> float:
         mu_hat, sigma_mu, clsRoot, nll_min, nll_minA, \
             s_nll_min, s_nll_minA = self.getCLsRootFunc(
@@ -457,6 +461,7 @@ class NNUpperLimitComputer:
                     nllmin = nll0
                 ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ),
                         "sigma_mu": float ( sigma_mu ) }
+                # print ( f"@@NNr nll_min ret {ret} allowNegativeSignals {allowNegativeSignals}" )
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
@@ -500,10 +505,11 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
+        # print ( f"@@NNI get UL {mu_lim} {self.name} allowN {allowNegativeSignals}" )
         return float ( mu_lim )
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
-            allowNegativeSignals : bool = True,
+            allowNegativeSignals : bool = False,
             nSigma : int = 0, pmSigma : int = 0 ) -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
@@ -514,6 +520,7 @@ class NNUpperLimitComputer:
         + 1 sigma, - 1 sigma, etc.  For error bands.
         If None compute for most sensitive analysis.
         """
+        # print ( f"@@NN5 getCLsRootFunc.allowNegativeSignals {allowNegativeSignals}" )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fA = self.nll_min( evaluationType = observed,
