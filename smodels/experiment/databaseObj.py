@@ -135,7 +135,7 @@ class Database(object):
         for tmp in lists:
             for t in tmp:
                 if len(t.datasets) == 0:  # skip empty entries
-                    logger.warning(f"Analysis {t.globalInfo.id} has no datasets. Will remove it.")
+                    logger.warning(f"Analysis {t.globalInfo.id} in {t.globalInfo.path} has no datasets. Will remove it.")
                     continue
                 anaid = t.globalInfo.id + t.datasets[0].getType()
                 if anaid not in D:
