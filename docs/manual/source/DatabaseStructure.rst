@@ -88,6 +88,8 @@ example:
 
 Here, ``srMappings`` lists all signal regions that SModelS should be aware of,
 with ``smodels`` being the name known to SModelS (can be ``None``).
+Every *signal* region must appear in this list with ``smodels`` being something 
+other than ``None``.
 Optionally, a ``type`` can be specified -- it should be one of **SR**, **CR**, 
 with **SR** being the default. If a ``label`` is given, it is the
 name the region is kwown as within and only within the ``globalInfo.txt`` file,
@@ -103,7 +105,10 @@ above a set **all** is defined that contains all 5 regions.
 
 Finall, ``statModels`` maps the aforementioned ``srSets`` to lists of
 statistical models.  By default, for each region set, SModelS uses the first
-model given in the list.
+model given in the list. Ever region used by a given statistical model 
+must thus appear in ``srMappings``. If we do not compute signal contributions
+but use it for e.g. nuisance fits, the region must still appear in 
+``srMappings``, with ``None`` as the ``smodels`` name.
 
 Some shorthand notations are possible. For example, in the 
 case of the ATLAS-SUSY-2018-41 simplified likelihood listed below, 
@@ -128,6 +133,8 @@ they are assumed to be the same as the pyhf names:
 .. literalinclude:: /literals/globalInfo201908.txt
    :lines: 14-40
 
+Note that the ``onnx`` region names may be different from the ``pyhf``
+region names (and both may be different from ``smodels``).
 The following case, taken from ATLAS-SUSY-2018-32 has control regions
 that are used for the ML surrogate model, but not in the pyhf model:
 
