@@ -931,9 +931,13 @@ class PyhfUpperLimitComputer:
         1-CLs: returns 1-CLs value
         CLs: returns CLs value
         """
+        self.__init__(self.data, self.cl, self.lumi)
         if "pmSigma" in kwargs:
             assert kwargs["pmSigma"] == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
-        return self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
+        ret = self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
+        if False and nSigma == 0:
+            print ( f"@@PYHF mu {mu} scale {self.scale} CLs {ret} evaluationType {evaluationType} return_type {return_type}" )
+        return ret
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
@@ -1000,6 +1004,7 @@ class PyhfUpperLimitComputer:
                     CLs = float(result[-1][idx])
                 else:
                     CLs = float(result[1])
+            # print ( f"@@before return_type {CLs} result {result}" )
             return clsType ( CLs, return_type, 0.95 )
 
     def getUpperLimitOnMu( self, evaluationType : NllEvalType=observed,
