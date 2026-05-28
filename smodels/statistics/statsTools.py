@@ -380,7 +380,11 @@ class StatsComputer:
               evaluationType : NllEvalType=observed,
               **kwargs ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
-        idx = self.getMostSensitiveModel()["idx"]
+        ret = self.getMostSensitiveModel()
+        # print ( f"@@ST0 getMostSensitiveModel eType {evaluationType} ret {ret}" )
+        idx = ret["idx"]
+        if idx == None:
+            return None
         # self.transform ( evaluationType )
         if hasattr ( self.subComputers[ idx ] , "CLs" ):
             return self.subComputers[ idx ].CLs ( poi_test,
