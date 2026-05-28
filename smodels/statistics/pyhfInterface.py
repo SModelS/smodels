@@ -938,8 +938,9 @@ class PyhfUpperLimitComputer:
         if "pmSigma" in kwargs:
             assert kwargs["pmSigma"] == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
         ret = self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
-        if False and nSigma == 0:
+        if False and nSigma == 0 and abs(mu-1)<.01:
             print ( f"@@PYHF mu {mu} scale {self.scale} CLs {ret} evaluationType {evaluationType} return_type {return_type}" )
+            fN = self.clsFromNLLs ( mu, evaluationType, return_type )
         return ret
 
     def clsFromNLLs ( self, mu : float, 
@@ -955,9 +956,11 @@ class PyhfUpperLimitComputer:
                           asimov = 0. )
         #nll_minA = retA["nll_min"]
         #print ( f"@@DD nll_minA {nll_minA}" )
-        CLs, CLb, CLsb, sqmu, sqA = CLsfromNLL ( nllA, nll_minA, nll, nll_min, 
+        #CLs, CLb, CLsb, sqmu, sqA = CLsfromNLL ( nllA, nll_minA, nll, nll_min, 
+        #        muhat > mu, return_type ) # , report_all = True )
+        CLs = CLsfromNLL ( nllA, nll_minA, nll, nll_min, 
                 muhat > mu, return_type ) # , report_all = True )
-        if False and abs(mu-1)<.01:
+        if True and abs(mu-1)<.01:
             # print ( f"@@PI2 nll {nll} nllA {nllA} nll_min {nll_min} nll_minA {nll_minA}" )
             # print ( f"@@PI2 CLsb {CLsb} CLb {CLb} sqmu {sqmu} sqA {sqA}" )
             print ( f"@@PI2 CLs via nlls: {CLs} evaluationType {evaluationType}" )
