@@ -103,8 +103,13 @@ is used for the simplified likelihood. These fields default to ``None``.
 The ``srSets`` field groups these regions into named sets. In the example
 above a set **all** is defined that contains all 5 regions.
 
-Finall, ``statModels`` maps the aforementioned ``srSets`` to lists of
-statistical models.  By default, for each region set, SModelS uses the first
+Finally, ``statModels`` maps the aforementioned ``srSets`` to lists of
+statistical models. Each entry in that list is composed of a tuple
+with the model type as the first entry, and the model's file name
+as the second entry. For model types, we currently have: ``sl`` for simplified
+likelihoods (both v1 and v2), ``pyhf``, ``full_pyhf`` (for full stastical pyhf
+models if we also have a simpler one),  and``onnx`` for machine learned
+surrogate models.  By default, for each region set, SModelS uses the first
 model given in the list. Ever region used by a given statistical model 
 must thus appear in ``srMappings``. If we do not compute signal contributions
 but use it for e.g. nuisance fits, the region must still appear in 
