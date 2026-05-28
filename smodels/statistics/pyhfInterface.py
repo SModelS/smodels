@@ -916,7 +916,8 @@ class PyhfUpperLimitComputer:
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
-             nSigma : int = 0, **kwargs ) -> float:
+             nSigma : int = 0, reset_data : bool = False,
+             **kwargs ) -> float:
         """
         This is the CLs method that heeds self.scale, i.e. you give it the
         _absolute_ mu
@@ -924,6 +925,7 @@ class PyhfUpperLimitComputer:
         :param mu: compute for the parameter of interest mu
         :param evaluationType: if observed, compute observed,
         apriori: compute a priori expected
+        :param reset_data: awkward quirk to make things work directly also
         :param return_type: (Text) can be one of:
         "CLs-alpha", "1-CLs", "CLs" "alpha-CLs"
         CLs-alpha: returns CLs - 0.05
@@ -931,13 +933,35 @@ class PyhfUpperLimitComputer:
         1-CLs: returns 1-CLs value
         CLs: returns CLs value
         """
-        self.__init__(self.data, self.cl, self.lumi)
+        if reset_data:
+            self.__init__(self.data, self.cl, self.lumi)
         if "pmSigma" in kwargs:
             assert kwargs["pmSigma"] == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
         ret = self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
         if False and nSigma == 0:
             print ( f"@@PYHF mu {mu} scale {self.scale} CLs {ret} evaluationType {evaluationType} return_type {return_type}" )
         return ret
+
+    def clsFromNLLs ( self, mu : float, 
+                      evaluationType : NllEvalType, return_type : str ) -> float:
+        """ compute CLs from nlls, so we can compare """
+        from smodels.statistics.basicStats import CLsfromNLL
+        ret = self.nll_min ( evaluationType = evaluationType )
+        nll_min = ret["nll_min"]
+        muhat = ret["muhat"]
+        nll = self.nll ( mu=mu, evaluationType = evaluationType )
+        nllA = self.nll ( mu=mu, evaluationType = evaluationType, asimov = 0. )
+        nll_minA = self.nll ( evaluationType = evaluationType, mu=0,
+                          asimov = 0. )
+        #nll_minA = retA["nll_min"]
+        #print ( f"@@DD nll_minA {nll_minA}" )
+        CLs, CLb, CLsb, sqmu, sqA = CLsfromNLL ( nllA, nll_minA, nll, nll_min, 
+                muhat > mu, return_type ) # , report_all = True )
+        if False and abs(mu-1)<.01:
+            # print ( f"@@PI2 nll {nll} nllA {nllA} nll_min {nll_min} nll_minA {nll_minA}" )
+            # print ( f"@@PI2 CLsb {CLsb} CLb {CLb} sqmu {sqmu} sqA {sqA}" )
+            print ( f"@@PI2 CLs via nlls: {CLs} evaluationType {evaluationType}" )
+        return CLs
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
@@ -1072,10 +1096,10 @@ class PyhfUpperLimitComputer:
                     return None
                 # Computing CL(1) - 0.95 and CL(10) - 0.95 once and for all
                 rt1 = self.CLs( lo_mu * self.scale, evaluationType, "alpha-CLs",
-                                nSigma )
+                                nSigma, reset_data = False )
                 # rt5 = CLs(med_mu)
                 rt10 = self.CLs( hi_mu * self.scale, evaluationType, "alpha-CLs",
-                                 nSigma )
+                                 nSigma, reset_data = False )
 
                 if rt1 < 0.0 and 0.0 < rt10:  # Here's the real while condition
                     break
@@ -1084,7 +1108,7 @@ class PyhfUpperLimitComputer:
                     logger.debug("Diminishing rescaling factor")
                 if np.isnan(rt1):
                     rt5 = self.CLs( med_mu * self.scale, evaluationType,
-                                    "alpha-CLs", nSigma )
+                                    "alpha-CLs", nSigma, reset_data = False )
                     if rt5 < 0.0 and rt10 > 0.0:
                         lo_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1097,7 +1121,7 @@ class PyhfUpperLimitComputer:
                     continue
                 if np.isnan(rt10):
                     rt5 = self.CLs( med_mu * self.scale, evaluationType,
-                                    "alpha-CLs", nSigma )
+                                    "alpha-CLs", nSigma, reset_data = False )
                     if rt5 > 0.0 and rt1 < 0.0:
                         hi_mu = med_mu
                         med_mu = np.sqrt(lo_mu * hi_mu)
@@ -1128,7 +1152,7 @@ class PyhfUpperLimitComputer:
             # Finding the root (Brent bracketing part)
             logger.debug( f"Final scale : {self.scale}" )
 
-            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale, args=(evaluationType, "alpha-CLs", nSigma), rtol=1e-3, xtol=1e-3 )
+            ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale, args=(evaluationType, "alpha-CLs", nSigma, False), rtol=1e-3, xtol=1e-3 )
 
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
