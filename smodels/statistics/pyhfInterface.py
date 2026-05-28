@@ -888,7 +888,7 @@ class PyhfUpperLimitComputer:
         if apriori, retuns the modified (and patched) workspace, where
         obs = sum(bkg). Used for computing apriori evaluationType limit.
         """
-        if evaluationType == apriori:
+        if evaluationType in [ apriori, aposteriori ]:
             return self.workspace_expected
         else:
             return self.workspace
