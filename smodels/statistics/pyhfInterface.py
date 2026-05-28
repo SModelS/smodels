@@ -916,7 +916,7 @@ class PyhfUpperLimitComputer:
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
-             nSigma : int = 0, reset_data : bool = False,
+             nSigma : int = 0, reset_data : bool = True,
              **kwargs ) -> float:
         """
         This is the CLs method that heeds self.scale, i.e. you give it the
