@@ -17,6 +17,6 @@ srMappings: [
     {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'},
     {'pyhf': 'WCRcut_cuts', 'type': 'CR', 'label': 'WCR' } ]
 srSets: { "all": [ 'QCR1', 'QCR2', 'SRlow', 'SRhigh', 'WCR' ] }
-statModels: { "all": [ 'SUSY-2018-04.onnx', 'SRcombined.json' ] }
+statModels: { "all": [ ( 'onnx', 'SUSY-2018-04.onnx' ), ( 'pyhf', 'SRcombined.json' ) ] }
 
 includeCRs: False

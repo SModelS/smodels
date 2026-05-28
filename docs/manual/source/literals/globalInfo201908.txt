@@ -37,4 +37,4 @@ srSets: { 'bkgonly': ['STCREM_cuts', 'WREM_cuts', 'TRHMEM_cuts',
           'SR_LM_Med_MCT',
           'SR_LM_High_MCT',
           ]}
-statModels: { 'bkgonly': ['SUSY-2019-08.onnx', 'simplified.json','BkgOnly.json']}
+statModels: { 'bkgonly': [ ( 'onnx', 'SUSY-2019-08.onnx'), ( 'pyhf', 'simplified.json'), ('full_pyhf', 'BkgOnly.json' ) ]}
