@@ -80,6 +80,19 @@ class TruncatedGaussians:
         ret = dsig[sllhd]
         return ret
 
+    def nll( self, mu : Union[float,None], return_nll : Optional[bool]=False,
+            allowNegativeSignals : Optional[bool] = True,
+            corr : Optional[float] = 0.6,
+            evaluationType : NllEvalType = observed ) -> Union[None,float]:
+        return self.likelihood ( mu, True, allowNegativeSignals,
+                corr, evaluationType )
+
+    def nll_min( self, return_nll : Optional[bool]=False,
+            allowNegativeSignals : Optional[bool] = True,
+            corr : Optional[float] = 0.6,
+            evaluationType : NllEvalType = observed ) -> Dict:
+        return self.lmax ( True, allowNegativeSignals, corr, evaluationType )
+
     def lmax ( self, return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
@@ -90,9 +103,9 @@ class TruncatedGaussians:
         :param mu: number of signal events, if None then mu = muhat
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
-                                     else demand that muhat >= 0. In the presence of underfluctuations
-                                     in the data, setting this to True results in more realistic
-                                     approximate likelihoods.
+        else demand that muhat >= 0. In the presence of underfluctuations
+        in the data, setting this to True results in more realistic
+        approximate likelihoods.
 
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
@@ -104,7 +117,7 @@ class TruncatedGaussians:
         dsig = self._likelihoodOfMu ( 1., return_nll=return_nll,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
         muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
-        # llhd evaluated at mu_hat 
+        # llhd evaluated at mu_hat
         if evaluationType != observed:
             muhat = 0.
         lmax = self.likelihood ( muhat, return_nll=return_nll )
@@ -112,10 +125,10 @@ class TruncatedGaussians:
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
 
-    def _likelihoodOfMu ( self, mu : Union[float,None], 
+    def _likelihoodOfMu ( self, mu : Union[float,None],
             return_nll : Optional[bool] = False,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6, 
+            corr : Optional[float] = 0.6,
             evaluationType : NllEvalType = observed ) -> float:
         """ return the likelihood, as a function of nsig
 
@@ -180,9 +193,9 @@ class TruncatedGaussians:
         ret = numerator / denominator - self.cl
         return ret
 
-    def _findMuhat( self, xa : float = 0., 
+    def _findMuhat( self, xa : float = 0.,
                         xb : Union[float,None] = None ):
-        """ find muhat, in [xa,xb] 
+        """ find muhat, in [xa,xb]
 
         :param xa: lower limit of initial bracket
         :param xb: upper limit of initial bracket. if none, then max(ul,eul)

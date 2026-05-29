@@ -131,9 +131,9 @@ class StatisticsTest(unittest.TestCase):
         # ulobsmu should roughly equal sqrt(100*2 / 35. + ( 110 -100 ) / 35. = 85
         self.assertAlmostEqual ( ulobsmu, 0.834560746, 3 )
         llhdcomp = LikelihoodComputer(m)
-        llhddir = llhdcomp.likelihood(mu=1.)
+        llhddir = math.exp ( - llhdcomp.nll(mu=1.) )
         computer = TruncatedGaussians ( ulobsmu, ulexpmu )
-        llhdlim = computer.likelihood ( mu=1. )
+        llhdlim = math.exp ( - computer.nll ( mu=1. ) )
         ret = computer.lmax ( )
         # muhat should roughly sit at ulobsmu - ulexpmu = 0.237
         self.assertAlmostEqual ( ret["muhat"], 0.23311, 3 )
@@ -179,9 +179,11 @@ class StatisticsTest(unittest.TestCase):
 
         llhds = []
         for muval in numpy.arange(0.0, 0.2, 0.02):
-            llhd = prediction.likelihood(mu=muval)
+            llhd = prediction.nll(mu=muval)
+            if llhd != None:
+                llhd = math.exp ( - llhd )
             llhds.append ( llhd )
-        self.assertEqual(prediction.likelihood(), None )
+        self.assertEqual( prediction.nll(), None )
         self.assertEqual(llhds, [ None ] * len(llhds) )
 
 
@@ -200,9 +202,9 @@ class StatisticsTest(unittest.TestCase):
 
         c = 0.0
         for muval in numpy.arange(0.0, 0.2, 0.02):
-            llhd = prediction.likelihood(mu=muval)
+            llhd = math.exp ( - prediction.nll(mu=muval) )
             c += llhd
-        self.assertAlmostEqual(prediction.likelihood(), 1.563288e-35, 3)
+        self.assertAlmostEqual( math.exp ( -prediction.nll() ), 1.563288e-35, 3)
         self.assertAlmostEqual(c, 0.011523436957977766, 3)
 
     def testPredictionInterface(self):
@@ -218,26 +220,24 @@ class StatisticsTest(unittest.TestCase):
         prediction = theoryPredictionsFor(database, smstoplist)[0]
         pred_signal_strength = prediction.xsection
         prediction.computeStatistics()
-        ill = math.log(prediction.likelihood())
         nll = prediction.nll()
-        self.assertAlmostEqual(-ill,nll,6)
-        illE = -math.log(prediction.likelihood( evaluationType=aposteriori ))
+        self.assertAlmostEqual(nll,25.091652032938583,6)
         nllE = prediction.nll(evaluationType = aposteriori )
-        self.assertAlmostEqual(illE,nllE,6)
+        self.assertAlmostEqual(nllE,29.17639764242797,6)
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
         m = Data(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
-        dll = math.log(computer.likelihood(mu=1.))
-        self.assertAlmostEqual(ill, dll, places=2)
+        dll =computer.nll(mu=1.)
+        self.assertAlmostEqual(dll, 25.091652032938583, places=2)
 
     def testZeroLikelihood(self):
         """A test to check if a llhd of 0 is being tolerated"""
         nsig = 2
         m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
-        llhd = computer.likelihood(mu=1. )
-        nll = computer.likelihood(mu=1., return_nll=True)
-        self.assertAlmostEqual(0.0, llhd, places=2)
+        # llhd = math.exp ( - computer.nll(mu=1. ) )
+        nll = computer.nll(mu=1. )
+        self.assertAlmostEqual( nll, 2.2430540749864315e+21, places=2)
         dchi2 = computer.chi2( )
         ichi2 = 4.486108149972863e21
         self.assertAlmostEqual(dchi2 / ichi2, 1.0, places=4)
@@ -779,7 +779,7 @@ class StatisticsTest(unittest.TestCase):
             # likelihood as computed by statistics module:
             # likelihood_actual = statistics.likelihood( nsig,
             #    nobs, nb, deltab, deltas)
-            likelihood_actual = computer.likelihood(mu=1. )
+            likelihood_actual = math.exp ( - computer.nll(mu=1. ) )
             # likelihood_actual = statistics.likelihood()
             #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
             # print('llhdactual', likelihood_actual)
