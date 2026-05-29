@@ -83,7 +83,7 @@ def clsType ( CLs : float, return_type : str, cl : float = 0.95 ) -> float:
 def CLsfromNLL(
         nllA: float, nll_minA: float, nll: float, nll_min: float,
         big_muhat : bool, return_type: Text = "CLs-alpha",
-        nSigma : int = 0 ) -> float:
+        nSigma : int = 0, report_all : bool = False ) -> Union[float,dict]:
     """
     compute CLs (or similar) from the NLLs
     :param nllA: negative log likelihood for Asimov data
@@ -100,8 +100,10 @@ def CLsfromNLL(
     ========== =======================
     :param nSigma: compute CLs not for central value but for this number of
     sigmas (positive or negative), see Equations 86 - 89 in the CCGV paper.
+    :param report_all: if true, report CLs, CLsb
 
-    :returns: Cls-type value, see above
+    :returns: Cls-type value, see above. if report_all, report dict
+    with several entries
     """
     assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
            f"Unknown return type: {return_type}."
@@ -121,7 +123,14 @@ def CLsfromNLL(
             1. - stats.norm.cdf((qmu - qA) / (2 * sqA) + nSigma )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
-    return clsType ( CLs, return_type, 0.95 )
+    ret = clsType ( CLs, return_type, 0.95 )
+    if report_all:
+        r = { "CLs": CLs, "CLsb": CLsb, "CLb": CLb, "sqA": sqA,
+              "returns": ret }
+        # r["sqmu"]=sqmu
+        # r["sqA"]=sqA
+        return r
+    return ret
 
 def CLsWithErrorsfromNLL(
         nllA: float, nll_minA: float, nll: float, nll_min: float,
