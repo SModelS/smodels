@@ -848,12 +848,14 @@ class LikelihoodComputer:
         ret = self.nllOfTheta( theta_hat )
         return ret
 
+    """
     def likelihood(self, mu : float, return_nll : bool = False,
            evaluationType : NllEvalType=observed,
            asimov : Union[None,float] = None  ):
-        """ legacy, should slowly phase out """
+        # legacy, should slowly phase out
         nll = self.nll ( mu, evaluationType, asimov )
         return exponentiateNLL ( nll, doIt = not return_nll )
+    """
 
     def nll_min( self, evaluationType : NllEvalType = observed,
                  allowNegativeSignals : bool = False ) -> dict:
@@ -882,22 +884,6 @@ class LikelihoodComputer:
                               extended_output=True, return_nll=True)
         return fmh
 
-    """
-    def lmax(self, return_nll : bool = False,
-            allowNegativeSignals : bool = False) -> dict:
-        # convenience function, computes likelihood for nsig = nobs-nbg,
-
-        #:param return_nll: return nll instead of likelihood
-        #:param allowNegativeSignals: if False, then negative nsigs are
-        #replaced with 0.
-        d = self.nll_min ( allowNegativeSignals = allowNegativeSignals )
-        if return_nll:
-            return d
-        d["lmax"]=exponentiateNLL ( d["nll_min"], doIt=True )
-        d.pop ( "nll_min" )
-        return d
-    """
-
     def findMuHat(
     #def findMuHatViaGradientDescent(
         self,
@@ -910,12 +896,14 @@ class LikelihoodComputer:
         given the relative signal strengths in each dataset (signal region).
 
         :param allowNegativeSignals: if true, then also allow for negative values
-        :param extended_output: if true, return also sigma_mu, the estimate of the error of mu_hat,
+        :param extended_output: if true, return also sigma_mu, 
+        the estimate of the error of mu_hat,
          and lmax, the likelihood at mu_hat
-        :param return_nll: if true, return nll instead of lmax in the extended output
+        :param return_nll: if true, return nll instead of lmax in 
+        the extended output
 
-        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if extended \
-        output is requested, it returns mu_hat, sigma_mu \
+        :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if 
+        extended output is requested, it returns mu_hat, sigma_mu \
         -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
         """
         theta_hat, _ = self.findThetaHat( 0. )

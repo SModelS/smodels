@@ -365,37 +365,37 @@ class NNUpperLimitComputer:
             return None
         if evaluationType == observed:
             if asimov not in [ False, None ]:
-                nll = ret[ f'nllA_obs_{int(asimov)}']
-                if pmSigma != 0:
-                    delta = ret["sigma_obsA"]
+                c_label = f'nllA_obs_{int(asimov)}'
+                s_label = "sigma_obsA"
             else:
-                nll = ret[ f'nll_obs_{poi_test}']
-                if pmSigma != 0:
-                    delta = ret["sigma_obs"]
+                c_label = f'nll_obs_{poi_test}'
+                s_label = "sigma_obs"
         else:
             if asimov not in [ False, None ]:
-                nll = ret[ f'nllA_exp_{int(asimov)}']
-                if pmSigma != 0:
-                    delta = ret["sigma_expA"]
+                c_label = f'nllA_exp_{int(asimov)}'
+                s_label = "sigma_expA"
             else:
-                nll = ret[ f'nll_exp_{poi_test}']
-                if pmSigma != 0 and poi_test != 0:
-                    delta = ret["sigma_exp"]
-        nll += pmSigma * delta
+                c_label = f'nll_exp_{poi_test}'
+                s_label = "sigma_exp"
+        nll = ret[ c_label ]
+        if pmSigma != 0:
+            nll += pmSigma * ret[ s_label ]
 
         logger.debug( f"Calling likelihood")
         return nll
 
+    """
     def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
                     asimov : Optional[int] = None,
                     pmSigma : int = 0 ) -> Optional[float]:
-        """ over the long run we will want to phase out .likelihood
-        interfaces entirely """
+        #over the long run we will want to phase out .likelihood
+        #interfaces entirely
         nll = self.nll ( mu=mu, evaluationType=evaluationType,
                          asimov = asimov, pmSigma = pmSigma )
         if return_nll:
             return nll
         return self.exponentiateNLL ( nll, True )
+    """
 
 
     @lru_cache
