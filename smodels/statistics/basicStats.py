@@ -117,18 +117,21 @@ def CLsfromNLL(
         CLsb = 1.0 - stats.norm.cdf(sqmu + nSigma )
         CLb = stats.norm.cdf(sqA - sqmu + nSigma )
     else:
-        CLsb = 1. if qA == 0. else \
-            1. - stats.norm.cdf((qmu + qA) / (2 * sqA) + nSigma )
-        CLb = 1. if qA == 0. else \
-            1. - stats.norm.cdf((qmu - qA) / (2 * sqA) + nSigma )
+        CLsb = 1.
+        CLb = 1.
+        if qA != 0.:
+            teststat = (qmu - qA) / (2 * sqA) ## for pyhf comparison
+            CLsb = 1. - stats.norm.cdf((qmu + qA) / (2 * sqA) + nSigma )
+            CLb = 1. - stats.norm.cdf( teststat + nSigma )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
-    ret = clsType ( CLs, return_type, 0.95 )
+    ret = float ( clsType ( CLs, return_type, 0.95 ) )
     if report_all:
-        r = { "CLs": CLs, "CLsb": CLsb, "CLb": CLb, "sqA": sqA,
+        r = { "CLs": float(CLs), "CLsb": float(CLsb),
+              "CLb": float(CLb),
               "returns": ret }
-        # r["sqmu"]=sqmu
-        # r["sqA"]=sqA
+        r["sqmu"]=float(sqmu)
+        r["sqA"]=float(sqA)
         return r
     return ret
 

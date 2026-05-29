@@ -679,6 +679,9 @@ class PyhfUpperLimitComputer:
                 initpars = self.rescaleBgYields(initpars, workspace, model)
                 # If the a total yield is still negative with the increased initial parameters, print a message
                 negYields = False
+                args = {}
+                args["return_expected"] = evaluationType == aposteriori
+
                 if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
                     negYields = True
                     logger.info(f'Negative total yield after increasing the initial parameters for mu={mu:.3f}')
@@ -689,7 +692,7 @@ class PyhfUpperLimitComputer:
                         model,
                         return_fitted_val=True,
                         init_pars=initpars,
-                        maxiter=2000,
+                        maxiter=2000, **args
                     )
                     # If a total yield is negative with the best profiled parameters, return None
                     if not all([True if yld >= 0 else False for yld in model.expected_actualdata(bestFitParam)]):
@@ -718,16 +721,16 @@ class PyhfUpperLimitComputer:
 
     def compute_invhess(self, x, data, model, index, epsilon=1e-05):
         """
-        if inv_hess is not given by the optimiser, calculate numerically by 
-        evaluating second order partial derivatives using 2 point central 
+        if inv_hess is not given by the optimiser, calculate numerically by
+        evaluating second order partial derivatives using 2 point central
         finite differences method
-        :param x: parameter values given to pyhf.infer.mle.twice_nll taken 
+        :param x: parameter values given to pyhf.infer.mle.twice_nll taken
         from pyhf.infer.mle.fit - optimizer.x (best_fit parameter values)
         :param data: workspace.data(model) passed to pyhf.infer.mle.fit
         :param model: model passed to pyhf.infer.mle.fit
         :param index: index of the POI
-        Note : If len(x) <=5, compute the entire hessian matrix and ind 
-        its inverse. Else, compute the hessian at the index of the POI and 
+        Note : If len(x) <=5, compute the entire hessian matrix and ind
+        its inverse. Else, compute the hessian at the index of the POI and
         return its inverse (diagonal approximation)
         at the index of the poi
         """
@@ -888,7 +891,7 @@ class PyhfUpperLimitComputer:
         if apriori, retuns the modified (and patched) workspace, where
         obs = sum(bkg). Used for computing apriori evaluationType limit.
         """
-        if evaluationType in [ apriori, aposteriori ]:
+        if evaluationType in [ apriori ]: # , aposteriori ]:
             return self.workspace_expected
         else:
             return self.workspace
@@ -905,12 +908,23 @@ class PyhfUpperLimitComputer:
         }
         workspace = self.updateWorkspace(evaluationType=evaluationType)
         #with warnings.catch_warnings():
-        #    warnings.simplefilter("ignore", category=(DeprecationWarning,UserWarning))
+        #    warnings.simplefilter("ignore",
+        #    category=(DeprecationWarning,UserWarning))
         model = workspace.model(modifier_settings=msettings)
         data = workspace.data(model)
         if mu == None:
             return (model,data,workspace)
-        ad = pyhf.infer.calculators.generate_asimov_data(mu, data, model, None, None, None)
+        if evaluationType == aposteriori:
+            pars_at_mu = pyhf.infer.mle.fixed_poi_fit(mu,
+                        data, model, return_fitted_val=False)
+            data[:len(pars_at_mu)] = pars_at_mu
+            #idx = model.config.poi_index
+            #for i,p in pars_at_mu:
+            #    data
+            #data = pars_at_mu[:idx] + pars_at_mu[idx+1:]
+
+        ad = pyhf.infer.calculators.generate_asimov_data(\
+                mu, data, model, None, None, None)
         return (model,ad,workspace)
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -938,12 +952,13 @@ class PyhfUpperLimitComputer:
         if "pmSigma" in kwargs:
             assert kwargs["pmSigma"] == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
         ret = self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
-        if False and nSigma == 0 and abs(mu-1)<.01:
-            print ( f"@@PYHF mu {mu} scale {self.scale} CLs {ret} evaluationType {evaluationType} return_type {return_type}" )
+        if False and nSigma == 0 and abs(mu-1)<.01 and evaluationType == aposteriori:
+            print ( )
+            print ( f"@@pyhfInterface mu {mu} scale {self.scale} CLs {ret} evaluationType {evaluationType} return_type {return_type}" )
             fN = self.clsFromNLLs ( mu, evaluationType, return_type )
         return ret
 
-    def clsFromNLLs ( self, mu : float, 
+    def clsFromNLLs ( self, mu : float,
                       evaluationType : NllEvalType, return_type : str ) -> float:
         """ compute CLs from nlls, so we can compare """
         from smodels.statistics.basicStats import CLsfromNLL
@@ -951,17 +966,20 @@ class PyhfUpperLimitComputer:
         nll_min = ret["nll_min"]
         muhat = ret["muhat"]
         nll = self.nll ( mu=mu, evaluationType = evaluationType )
-        nllA = self.nll ( mu=mu, evaluationType = evaluationType, asimov = 0. )
-        nll_minA = self.nll ( evaluationType = evaluationType, mu=0,
-                          asimov = 0. )
-        #nll_minA = retA["nll_min"]
-        #print ( f"@@DD nll_minA {nll_minA}" )
-        #CLs, CLb, CLsb, sqmu, sqA = CLsfromNLL ( nllA, nll_minA, nll, nll_min, 
+        eT = evaluationType
+        if eT == aposteriori:
+            eT = observed
+        nllA = self.nll ( mu=mu, evaluationType = eT, asimov = 0. )
+        nll_minA = self.nll ( evaluationType = eT, mu=0, asimov = 0. )
+        ret = CLsfromNLL ( nllA, nll_minA, nll, nll_min,
+                           muhat > mu, return_type, report_all = True )
+        CLs = ret["returns"]
+        if False and abs(mu-1)<.01 and evaluationType == aposteriori:
+            print ( f"@@PI3 ret {ret}" )
+        #CLs = CLsfromNLL ( nllA, nll_minA, nll, nll_min,
         #        muhat > mu, return_type ) # , report_all = True )
-        CLs = CLsfromNLL ( nllA, nll_minA, nll, nll_min, 
-                muhat > mu, return_type ) # , report_all = True )
-        if True and abs(mu-1)<.01:
-            # print ( f"@@PI2 nll {nll} nllA {nllA} nll_min {nll_min} nll_minA {nll_minA}" )
+        if False and abs(mu-1)<.01 and evaluationType == aposteriori:
+            # print ( f"@@PI2 nll {nll} nllA {nllA} nll_min {nll_min} nll_minA {nll_minA} evalType {evaluationType}" )
             # print ( f"@@PI2 CLsb {CLsb} CLb {CLb} sqmu {sqmu} sqA {sqA}" )
             print ( f"@@PI2 CLs via nlls: {CLs} evaluationType {evaluationType}" )
         return CLs
@@ -1002,19 +1020,21 @@ class PyhfUpperLimitComputer:
             # args["maxiter"]=100000
             pver = float(pyhf.__version__[:3])
             stat = "qtilde"
-            if evaluationType == observed:
-                nSigma = 0
+            #if evaluationType == observed:
+            #    nSigma = 0
             return_expected_set = (nSigma != 0)
             args["return_expected_set"] = return_expected_set
             if pver < 0.6:
                 args["qtilde"] = True
             else:
                 args["test_stat"] = stat
+            #args["return_tail_probs"]=True
             with np.testing.suppress_warnings() as sup:
                 if pyhfinfo["backend"] == "numpy":
                     sup.filter(RuntimeWarning, r"invalid value encountered in log")
                 try:
                     result = pyhf.infer.hypotest(mu_rel, workspace.data(model), model, **args)
+                    # result = result[0]
                 except Exception as e:
                     logger.error(f"when testing hypothesis {mu_rel}, caught exception: {e}")
                     result = float("nan")
@@ -1031,7 +1051,6 @@ class PyhfUpperLimitComputer:
                     CLs = float(result[-1][idx])
                 else:
                     CLs = float(result[1])
-            # print ( f"@@before return_type {CLs} result {result}" )
             return clsType ( CLs, return_type, 0.95 )
 
     def getUpperLimitOnMu( self, evaluationType : NllEvalType=observed,
