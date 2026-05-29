@@ -384,13 +384,10 @@ class LikelihoodComputer:
         return ret
 
     def extendedOutput(self, extended_output : bool,
-            default : Union[None,float] = None, return_nll : bool = False ):
+            default : Union[None,float] = None ):
         if extended_output:
             ret = { "muhat": default, "sigma_mu": default }
-            if return_nll:
-                ret["nll_min"] = default
-            else:
-                ret["lmax"] = default
+            ret["nll_min"] = default
             return ret
         return default
 
@@ -448,7 +445,7 @@ class LikelihoodComputer:
 
     #def findMuHat(
     def findMuHatViaBracketing( self, allowNegativeSignals=False,
-        extended_output=False, return_nll=False ):
+        extended_output=False ):
         """
         Find the most likely signal strength mu via a brent bracketing technique
         given the relative signal strengths in each dataset (signal region).
@@ -456,8 +453,6 @@ class LikelihoodComputer:
         :param allowNegativeSignals: if true, then also allow for negative values
         :param extended_output: if true, return also sigma_mu, the estimate \
         of the error of mu_hat, and lmax, the likelihood at mu_hat
-        :param return_nll: if true, return nll instead of lmax in the
-        extended output
 
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if \
         extended output is requested, it returns a dictionary with mu_hat, \
@@ -466,7 +461,7 @@ class LikelihoodComputer:
         """
         model = self.model
         if (model.backgrounds == model.observed).all():
-            return self.extendedOutput(extended_output, 0.0, return_nll)
+            return self.extendedOutput(extended_output, 0.0 )
         nsig = model.nsignal
 
         if type(nsig) in [list, ndarray]:
@@ -512,7 +507,7 @@ class LikelihoodComputer:
                 logger.debug(
                     f"did not find a lower value with rootfinder(lower) < 0. Closest: f({closestl})={closestr}"
                 )
-                return self.extendedOutput(extended_output, 0.0, return_nll )
+                return self.extendedOutput(extended_output, 0.0 )
             ustarters = [ avgr + 0.2 * abs(avgr), maxr, 0.0, 1.0, 10.0, -1.0 - 0.1,\
                 0.1, 100.0, -100.0, 1000.0, -1000.0, 0.01, -0.01, ]
             closestl, closestr = None, float("inf")
@@ -524,7 +519,7 @@ class LikelihoodComputer:
                     closestl, closestr = upper, upper_v
             if upper_v < 0.0:
                 logger.debug("did not find an upper value with rootfinder(upper) > 0.")
-                return self.extendedOutput(extended_output, 0.0, return_nll )
+                return self.extendedOutput(extended_output, 0.0 )
             mu_hat = findRoot(self.dNLLdMu, lower, upper, args=(theta_hat, ), rtol=1e-9 )
             if not allowNegativeSignals and mu_hat < 0.0:
                 mu_hat = 0.0
@@ -533,13 +528,10 @@ class LikelihoodComputer:
 
         if extended_output:
             sigma_mu = self.getSigmaMu(mu_hat, theta_hat)
-            llhd = self.likelihood( mu_hat, return_nll=return_nll)
+            nll_ = self.nll( mu_hat )
             # print ( f"returning {allowNegativeSignals}: mu_hat {mu_hat}+-{sigma_mu} llhd {llhd}" )
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu }
-            if nll:
-                ret["nll_min"] = llhd
-            else:
-                ret["lmax"] = llhd
+            ret["nll_min"] = nll_
             return ret
         return mu_hat
 
@@ -881,7 +873,7 @@ class LikelihoodComputer:
             return ret
 
         fmh = self.findMuHat( allowNegativeSignals=allowNegativeSignals,
-                              extended_output=True, return_nll=True)
+                              extended_output=True )
         return fmh
 
     def findMuHat(
@@ -889,7 +881,6 @@ class LikelihoodComputer:
         self,
         allowNegativeSignals : bool = False,
         extended_output : bool = False,
-        return_nll : bool = False
     ):
         """
         Find the most likely signal strength mu via gradient descent
@@ -934,20 +925,15 @@ class LikelihoodComputer:
             bounds = [(0, max(maxr,1e-5))]
         assert bounds[0][1] > bounds[0][0], f"bounds are in wrong order: {bounds}"
         o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
-        llhd = o.fun
-        if not return_nll:
-            llhd = np.exp(-o.fun)
+        nll = o.fun
         mu_hat = float(o.x[0])
         if extended_output:
             sigma_mu = self.getSigmaMu ( mu_hat, theta_hat )
             nll = self.nll( mu_hat )
-            llhd = exponentiateNLL ( nll, doIt = not return_nll )
+            # llhd = exponentiateNLL ( nll, doIt = not return_nll )
             # sigma_mu = float(np.sqrt(hess[0][0]))
             ret = {"muhat": mu_hat, "sigma_mu": sigma_mu }
-            if return_nll:
-                ret["nll_min"] = llhd
-            else:
-                ret["lmax"] = llhd
+            ret["nll_min"] = nll
             return ret
         return mu_hat
 
@@ -1086,8 +1072,8 @@ class UpperLimitComputer:
                         1-CLs: returns 1-CLs value
                         CLs: returns CLs value
             """
-            nll = computer.likelihood(mu, return_nll=True)
-            nllA = compA.likelihood(mu, return_nll=True)
+            nll = computer.nll(mu )
+            nllA = compA.nll(mu )
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
                     return_type=return_type, nSigma = nSigma )
 

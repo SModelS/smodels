@@ -342,7 +342,6 @@ class NNUpperLimitComputer:
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
 
-        :param return_nll: if true, return nll, not llhd
         :param evaluationType: one of: observed, apriori, aposteriori
         :param asimov: if true, compute for asimov data
         :param pmSigma: usually 0, +1 or -1. get the likelihood
