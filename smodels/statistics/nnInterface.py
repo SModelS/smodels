@@ -348,8 +348,8 @@ class NNUpperLimitComputer:
         plus that number of sigmas
         If None compute for most sensitive analysis.
         """
-        assert asimov in [ 1, 0, False, None ], \
-            f"asimov should be one of: 1, 0, False, None"
+        assert asimov in [ 0, 1, None ], \
+            f"asimov {asimov} not acccepted. should be one of: 0, 1, None"
         ret = self._actual_nll(mu)
         if ret == None:
             return None
@@ -364,14 +364,14 @@ class NNUpperLimitComputer:
             return None
         # print ( f"getting nll asimov={asimov} mu={poi_test} eype={evaluationType}" )
         if evaluationType == observed:
-            if asimov not in [ False, None ]:
+            if asimov not in [ None ]:
                 c_label = f'nllA_obs_1'
                 s_label = "sigma_obsA"
             else:
                 c_label = f'nll_obs_{poi_test}'
                 s_label = "sigma_obs"
         else:
-            if asimov not in [ False, None ]:
+            if asimov not in [ None ]:
                 c_label = f'nllA_exp_1'
                 s_label = "sigma_expA"
             else:
