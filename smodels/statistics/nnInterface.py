@@ -362,16 +362,17 @@ class NNUpperLimitComputer:
             ## probably we fell back to pyhf likelihoods,
             # so we return Nones
             return None
+        # print ( f"getting nll asimov={asimov} mu={poi_test} eype={evaluationType}" )
         if evaluationType == observed:
             if asimov not in [ False, None ]:
-                c_label = f'nllA_obs_{int(asimov)}'
+                c_label = f'nllA_obs_1'
                 s_label = "sigma_obsA"
             else:
                 c_label = f'nll_obs_{poi_test}'
                 s_label = "sigma_obs"
         else:
             if asimov not in [ False, None ]:
-                c_label = f'nllA_exp_{int(asimov)}'
+                c_label = f'nllA_exp_1'
                 s_label = "sigma_expA"
             else:
                 c_label = f'nll_exp_{poi_test}'
@@ -382,20 +383,6 @@ class NNUpperLimitComputer:
 
         logger.debug( f"Calling likelihood")
         return nll
-
-    """
-    def likelihood( self, mu=1.0, return_nll=False, evaluationType=observed,
-                    asimov : Optional[int] = None,
-                    pmSigma : int = 0 ) -> Optional[float]:
-        #over the long run we will want to phase out .likelihood
-        #interfaces entirely
-        nll = self.nll ( mu=mu, evaluationType=evaluationType,
-                         asimov = asimov, pmSigma = pmSigma )
-        if return_nll:
-            return nll
-        return self.exponentiateNLL ( nll, True )
-    """
-
 
     @lru_cache
     def nll_min( self, evaluationType=observed,
