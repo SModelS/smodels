@@ -107,12 +107,12 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
     # Make sure to always compute the correct llhd value (from
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
-    nllA = obj.nll(mu, asimov = 1, pmSigma = 0, evaluationType = observed )
+    nllA = obj.nll(mu, asimov = 0, pmSigma = 0, evaluationType = observed )
     s_nllA, s_nll = None, None
     if pmSigma != 0:
-        # s_nllA = 0. # abs ( obj.nll( mu, asimov = 1,
+        # s_nllA = 0. # abs ( obj.nll( mu, asimov = 0,
         #       pmSigma = 1 ) - nllA )
-        s_nllA = abs ( obj.nll( mu, asimov = 1, pmSigma = 1,
+        s_nllA = abs ( obj.nll( mu, asimov = 0, pmSigma = 1,
                        evaluationType = observed ) - nllA )
     if evaluationType == aposteriori:
         nll = nllA
@@ -510,7 +510,7 @@ class NNUpperLimitComputer:
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         fA = self.nll_min( evaluationType = observed,
-            allowNegativeSignals=allowNegativeSignals, asimov = 1 )
+            allowNegativeSignals=allowNegativeSignals, asimov = 0 )
         if fA == None:
             return None, None, None, None, None, None, None
         s_nll_minA, s_nll_min = 0., 0.
@@ -537,7 +537,7 @@ class NNUpperLimitComputer:
             # to nll_min(A)
             s_nll_minA = abs ( self.nll ( mu_hatA,
                     evaluationType = observed,
-                    pmSigma = 1, asimov = 1 ) - nll_minA )
+                    pmSigma = 1, asimov = 0 ) - nll_minA )
             if evaluationType == aposteriori:
                 s_nll_min = s_nll_minA
             else:

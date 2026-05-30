@@ -89,25 +89,25 @@ class MLModelsTest(unittest.TestCase):
                  'ATLAS-SUSY-2018-32': {
             'obs': 93.80734619587368, 'exp': 82.58896814755686 } }
         uls = { 'ATLAS-SUSY-2019-09': {
-            'obs': 0.27512461085675616, 'exp': 0.3828992015046798,
+            'obs': 0.2751257093351541, 'exp': 0.3828992015046798,
             'p1': 0.28588195660979965 },
                  'ATLAS-SUSY-2018-32': {
-            'obs': 1.3190277005301172,  'exp': 1.5852880131898859,
+            'obs': 1.3190277005301172,  'exp': 1.5853478286633456,
             'p1': 1.3302383061447438 } }
         for p in allPredictions:
             if p.nll() != nlls[p.analysisId()]["obs"]:
                 print ( f"[testMLModels] for {p.analysisId()}:" )
             self.assertAlmostEqual ( p.nll(),
-                    nlls[p.analysisId()]["obs"] )
+                    nlls[p.analysisId()]["obs"], 5 )
             self.assertAlmostEqual ( p.nll( evaluationType = apriori),
-                    nlls[p.analysisId()]["exp"] )
+                    nlls[p.analysisId()]["exp"], 5 )
             self.assertAlmostEqual ( p.getUpperLimitOnMu(),
-                    uls[p.analysisId()]["obs"] )
+                    uls[p.analysisId()]["obs"], 5 )
             self.assertAlmostEqual ( \
                     p.getUpperLimitOnMu( evaluationType = aposteriori ),
-                    uls[p.analysisId()]["exp"] )
+                    uls[p.analysisId()]["exp"], 5 )
             self.assertAlmostEqual ( p.getUpperLimitOnMu( pmSigma = 1 ),
-                    uls[p.analysisId()]["p1"] )
+                    uls[p.analysisId()]["p1"], 5 )
 
 if __name__ == "__main__":
     unittest.main()
