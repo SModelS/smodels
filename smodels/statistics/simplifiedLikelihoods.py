@@ -452,12 +452,12 @@ class LikelihoodComputer:
 
         :param allowNegativeSignals: if true, then also allow for negative values
         :param extended_output: if true, return also sigma_mu, the estimate \
-        of the error of mu_hat, and lmax, the likelihood at mu_hat
+        of the error of mu_hat, and nll_min, the nll at mu_hat
 
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if \
         extended output is requested, it returns a dictionary with mu_hat, \
-        sigma_mu -- the standard deviation around mu_hat, and lmax, \
-        i.e. the likelihood at mu_hat
+        sigma_mu -- the standard deviation around mu_hat, and nll_min, \
+        i.e. the nll at mu_hat
         """
         model = self.model
         if (model.backgrounds == model.observed).all():
@@ -889,10 +889,7 @@ class LikelihoodComputer:
         :param allowNegativeSignals: if true, then also allow for negative values
         :param extended_output: if true, return also sigma_mu, 
         the estimate of the error of mu_hat,
-         and lmax, the likelihood at mu_hat
-        :param return_nll: if true, return nll instead of lmax in 
-        the extended output
-
+         and nll_min, the nll at mu_hat
         :returns: mu_hat, i.e. the maximum likelihood estimate of mu, if 
         extended output is requested, it returns mu_hat, sigma_mu \
         -- the standard deviation around mu_hat, and llhd, the likelihood at mu_hat
