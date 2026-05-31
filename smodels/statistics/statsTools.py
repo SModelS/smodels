@@ -440,6 +440,7 @@ class StatsComputer:
             if computer is None:
                 continue
             ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
+            # print ( f"@@0 getMostSensitiveModel {i} {computer.name} {ul}" )
             if ul != None and ul < ul_min:
                 ul_min, idx, name = ul, i, computer.name
         return { "idx": idx, "ul_min": ul_min, "name": name }

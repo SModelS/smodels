@@ -34,6 +34,7 @@ nnSettings = {
     "errs_on_min": True
 }
 
+
 def writeOutYields ( theoryPred,
         filename : Union[os.PathLike,None] = None ):
     """ a function for debugging only: writes the actual NN input
@@ -227,6 +228,30 @@ class NNUpperLimitComputer:
         )
         self.welcome()
 
+    def myNLL ( self, x : list ) -> np.array:
+        if type(x) in [ list, np.array, np.ndarray ]:
+            ret = []
+            for xi in x:
+                ret.append ( self.myNLL ( xi ) )
+            return np.array ( ret )
+        d = self._actual_nll ( x )
+        ret = d[ self.str_nll_1 ]
+        return ret
+
+    def getSigmaMu ( self, mu : float, str_nll_1 : str ) -> float:
+        """ get sigma at mu
+        :param str_nll_1: what nll to ask, e.g. nll_obs_1
+
+        :returns: sigma
+        """
+        self.str_nll_1 = str_nll_1
+        o = differentiate.hessian ( self.myNLL, np.array ( [ mu ]  ) )
+        hessian = o.ddf[0][0][0]
+        sigma_mu = 0.
+        if hessian > 0.:
+            sigma_mu = np.sqrt ( 1. / hessian )
+        return sigma_mu
+
     def getTotalXSec ( self ):
         return self.data.getTotalXSec()
 
@@ -402,7 +427,7 @@ class NNUpperLimitComputer:
             obs_v_exp = "exp"
         A = ""
         if asimov not in [ False, None ]:
-            A = "A"
+            ggA = "A"
         str_nll = f"nLL{A}_{obs_v_exp}"
         str_nll_min = f"{str_nll}_max"
         str_nll_1 = f"nll{A}_{obs_v_exp}_1"
@@ -411,15 +436,6 @@ class NNUpperLimitComputer:
 
         ## FIXME compute sigma_mu, compute via nllA
 
-        def myNLL ( x ):
-            if type(x) in [ list, np.array, np.ndarray ]:
-                ret = []
-                for xi in x:
-                    ret.append ( myNLL ( xi ) )
-                return np.array ( ret )
-            d = self._actual_nll ( x )
-            ret = d[ str_nll_1 ]
-            return ret
 
         method = "Nelder-Mead"
         initx0s = [ 0., .1, -.1, .3, -.3, 1., -1., 3., -3., 10., -10., 100,-100 ]
@@ -435,11 +451,7 @@ class NNUpperLimitComputer:
                     method = method, bounds=bounds )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
-                o = differentiate.hessian ( myNLL, np.array ( [ muhat ] ) )
-                hessian = o.ddf[0][0][0]
-                sigma_mu = 0.
-                if hessian > 0.:
-                    sigma_mu = np.sqrt ( 1. / hessian )
+                sigma_mu = self.getSigmaMu ( muhat, str_nll_1 )
 
                 nll0 = self.nll ( mu=0., evaluationType = evaluationType,
                                   asimov = asimov )
@@ -453,6 +465,7 @@ class NNUpperLimitComputer:
                 method = "L-BFGS-B"
         logger.warning ( f"could not find nll_min!" )
         return None
+
 
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
@@ -509,12 +522,18 @@ class NNUpperLimitComputer:
         # print ( f"@@NN5 getCLsRootFunc.allowNegativeSignals {allowNegativeSignals}" )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
+        """
         fA = self.nll_min( evaluationType = observed,
             allowNegativeSignals=allowNegativeSignals, asimov = 0 )
         if fA == None:
             return None, None, None, None, None, None, None
-        s_nll_minA, s_nll_min = 0., 0.
         mu_hatA, sigma_muA, nll_minA = fA["muhat"], fA["sigma_mu"], fA["nll_min"]
+        print ( f"@@02 mu_hatA {mu_hatA} nll_minA {nll_minA}" )
+        """
+        s_nll_minA, s_nll_min = 0., 0.
+        mu_hatA = 0
+        nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
+        sigma_muA = 1
 
         if evaluationType == aposteriori:
             nll_min = nll_minA
