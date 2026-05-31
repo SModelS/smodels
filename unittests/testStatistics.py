@@ -141,7 +141,7 @@ class StatisticsTest(unittest.TestCase):
         # lmax is the truncated gaussian evaulated at muhat
         # norm.pdf ( muhat, muhat, sigma_mu ) / (1. - norm.cdf ( 0., muhat, sigma_mu ))
         # = 1.5626
-        self.assertAlmostEqual ( math.exp ( - ret["nll_min"] ), 1.56261789, 3 )
+        self.assertAlmostEqual ( ret["nll_min"], -0.4463625493822416, 3 )
 
 
         doPrint = False
@@ -203,7 +203,8 @@ class StatisticsTest(unittest.TestCase):
         for muval in numpy.arange(0.0, 0.2, 0.02):
             llhd = math.exp ( - prediction.nll(mu=muval) )
             c += llhd
-        self.assertAlmostEqual( math.exp ( -prediction.nll() ), 1.563288e-35, 3)
+        # self.assertAlmostEqual( math.exp ( -prediction.nll() ), 1.563288e-35, 3)
+        self.assertAlmostEqual( prediction.nll(), 80.14368695928977, 3)
         self.assertAlmostEqual(c, 0.011523436957977766, 3)
 
     def testPredictionInterface(self):
@@ -234,7 +235,6 @@ class StatisticsTest(unittest.TestCase):
         nsig = 2
         m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
-        # llhd = math.exp ( - computer.nll(mu=1. ) )
         nll = computer.nll(mu=1. )
         self.assertAlmostEqual( nll, 2.2430540749864315e+21, places=2)
         dchi2 = computer.chi2( )
