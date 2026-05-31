@@ -71,7 +71,7 @@ class StatisticsTest(unittest.TestCase):
         ulobs = ulcomp.getUpperLimitOnMu()
         ulexp = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
-        ret = computer.lmax ( return_nll = False)
+        ret = computer.nll_min ( )
         doPrint = False
         if doPrint:
             smu = computer.sigma_mu
@@ -94,10 +94,9 @@ class StatisticsTest(unittest.TestCase):
         for nsig in [0, 5]:
             for allowNegatives in [False, True]:
                 computer = TruncatedGaussians ( 4.5, 5.45, corr=0. )
-                llhdlim = computer.likelihood ( mu=nsig,
-                       return_nll = False, allowNegativeSignals = allowNegatives )
-                ret = computer.lmax ( return_nll = False,
-                        allowNegativeSignals = allowNegatives )
+                llhdlim = math.exp ( - computer.nll ( mu=nsig,
+                       allowNegativeSignals = allowNegatives ) )
+                ret = computer.nll_min ( allowNegativeSignals = allowNegatives )
                 muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[allowNegatives][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
@@ -112,8 +111,8 @@ class StatisticsTest(unittest.TestCase):
         for nsig in [0, 3, 5]:
             for x in [0.0, 0.6]:
                 computer = TruncatedGaussians ( 8.52, 6.18, corr = x )
-                llhdlim = computer.likelihood ( nsig, False, False )
-                ret = computer.lmax ( False, False )
+                llhdlim = math.exp ( - computer.nll ( nsig, False ) )
+                ret = computer.nll_min ( )
                 muhat, sigma_mu = ret["muhat"], ret["sigma_mu"]
                 c = comparisons[x][nsig]
                 self.assertAlmostEqual(llhdlim, c, 2)
@@ -134,7 +133,7 @@ class StatisticsTest(unittest.TestCase):
         llhddir = math.exp ( - llhdcomp.nll(mu=1.) )
         computer = TruncatedGaussians ( ulobsmu, ulexpmu )
         llhdlim = math.exp ( - computer.nll ( mu=1. ) )
-        ret = computer.lmax ( )
+        ret = computer.nll_min ( )
         # muhat should roughly sit at ulobsmu - ulexpmu = 0.237
         self.assertAlmostEqual ( ret["muhat"], 0.23311, 3 )
         # sigma_mu should be approximately sqrt(nobs)/nsig = 0.29966
@@ -142,7 +141,7 @@ class StatisticsTest(unittest.TestCase):
         # lmax is the truncated gaussian evaulated at muhat
         # norm.pdf ( muhat, muhat, sigma_mu ) / (1. - norm.cdf ( 0., muhat, sigma_mu ))
         # = 1.5626
-        self.assertAlmostEqual ( ret["lmax"], 1.56261789, 3 )
+        self.assertAlmostEqual ( math.exp ( - ret["nll_min"] ), 1.56261789, 3 )
 
 
         doPrint = False

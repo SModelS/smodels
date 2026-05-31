@@ -91,17 +91,10 @@ class TruncatedGaussians:
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             evaluationType : NllEvalType = observed ) -> Dict:
-        return self.lmax ( True, allowNegativeSignals, corr, evaluationType )
-
-    def lmax ( self, return_nll : Optional[bool]=False,
-            allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6,
-            evaluationType : NllEvalType = observed ) -> Dict:
         """
-        Return the likelihood, as a function of mu
+        Return the nll at muhat
 
         :param mu: number of signal events, if None then mu = muhat
-        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
         else demand that muhat >= 0. In the presence of underfluctuations
         in the data, setting this to True results in more realistic
@@ -109,6 +102,35 @@ class TruncatedGaussians:
 
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
+        default = { "muhat": None, "sigma_mu": None, "lmax": None }
+        sllhd = "nll"
+        muhat, sigma_mu = float("inf"), float("inf")
+        dsig = self._likelihoodOfMu ( 1., return_nll=True,
+                allowNegativeSignals = allowNegativeSignals, corr = corr )
+        muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
+        # llhd evaluated at mu_hat
+        if evaluationType != observed:
+            muhat = 0.
+        nll_min = self.nll ( muhat )
+
+        ret = { "muhat": muhat, "sigma_mu": sigma_mu, "nll_min": nll_min }
+        return ret
+
+    """
+    def lmax ( self, return_nll : Optional[bool]=False,
+            allowNegativeSignals : Optional[bool] = True,
+            corr : Optional[float] = 0.6,
+            evaluationType : NllEvalType = observed ) -> Dict:
+        #Return the likelihood, as a function of mu
+
+        #:param mu: number of signal events, if None then mu = muhat
+        #:param return_nll: if True, return negative log likelihood
+        #:param allowNegativeSignals: if True, then allow muhat to become negative,
+        #else demand that muhat >= 0. In the presence of underfluctuations
+        #in the data, setting this to True results in more realistic
+        #approximate likelihoods.
+
+        #:returns: dictionary with likelihood (float), muhat, and sigma_mu
         default = { "muhat": None, "sigma_mu": None, "lmax": None }
         sllhd = "llhd"
         if return_nll:
@@ -124,6 +146,7 @@ class TruncatedGaussians:
 
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
         return ret
+    """
 
     def _likelihoodOfMu ( self, mu : Union[float,None],
             return_nll : Optional[bool] = False,
@@ -135,13 +158,13 @@ class TruncatedGaussians:
         :param mu: signal strength
         :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
-               else demand that muhat >= 0. In the presence of underfluctuations
-               in the data, setting this to True results in more realistic
-               approximate likelihoods.
+        else demand that muhat >= 0. In the presence of underfluctuations
+        in the data, setting this to True results in more realistic
+        approximate likelihoods.
         :param corr: correction factor:
-                     ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
-                     When comparing with likelihoods constructed from efficiency maps,
-                     a factor of corr = 0.6 has been found to result in the best approximations.
+        ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+        When comparing with likelihoods constructed from efficiency maps,
+        a factor of corr = 0.6 has been found to result in the best approximations.
         :returns: likelihood (float), muhat, and sigma_mu
         """
         sllhd = "llhd"
