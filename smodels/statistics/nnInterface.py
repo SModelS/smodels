@@ -235,16 +235,16 @@ class NNUpperLimitComputer:
                 ret.append ( self.myNLL ( xi ) )
             return np.array ( ret )
         d = self._actual_nll ( x )
-        ret = d[ self.str_nll_1 ]
+        ret = d[ self.str_nll ]
         return ret
 
-    def getSigmaMu ( self, mu : float, str_nll_1 : str ) -> float:
+    def getSigmaMu ( self, mu : float, str_nll : str ) -> float:
         """ get sigma at mu
-        :param str_nll_1: what nll to ask, e.g. nll_obs_1
+        :param str_nll: what nll to ask, e.g. nll_obs_1
 
         :returns: sigma
         """
-        self.str_nll_1 = str_nll_1
+        self.str_nll = str_nll
         o = differentiate.hessian ( self.myNLL, np.array ( [ mu ]  ) )
         hessian = o.ddf[0][0][0]
         sigma_mu = 0.
@@ -415,9 +415,9 @@ class NNUpperLimitComputer:
         return nll
 
     @lru_cache
-    def nll_min( self, evaluationType=observed,
-              allowNegativeSignals=True,
-              asimov : Optional[int] = None ):
+    def nll_min( self, evaluationType : NllEvalType = observed,
+              allowNegativeSignals : bool = True,
+              asimov : Optional[int] = None ) -> dict:
         """
         Returns the (negative log) max likelihood
 
@@ -428,15 +428,20 @@ class NNUpperLimitComputer:
         If None compute for most sensitive analysis.
         """
         obs_v_exp = "obs"
-        if evaluationType != observed:
+        if evaluationType == apriori:
+        # if evaluationType != observed:
             obs_v_exp = "exp"
         A = ""
-        if asimov not in [ False, None ]:
-            ggA = "A"
-        str_nll = f"nLL{A}_{obs_v_exp}"
-        str_nll_min = f"{str_nll}_max"
-        str_nll_1 = f"nll{A}_{obs_v_exp}_1"
-        muhat,nllmin = self.adaptor.onnxMeta[ str_nll_min ]
+        if asimov not in [ None ] or evaluationType == aposteriori:
+            A = "A"
+        str_nll = f"nll{A}_{obs_v_exp}_1"
+        self.str_nll = str_nll
+        # print ( f"@@nll_min for eType {evaluationType} asimov {asimov}: str_nll {str_nll}" )
+        ## these values are global nll_min
+        # str_nll = f"nLL{A}_{obs_v_exp}"
+        # str_nll_min = f"{str_nll}_max"
+        #muhat_g,nllmin_g = self.adaptor.onnxMeta[ str_nll_min ]
+        #print ( f"@@  --- muhat_g {muhat_g} nllmin_g {nllmin_g}" )
         options = { "disp": False, "maxiter": 200 }
 
         ## FIXME compute sigma_mu, compute via nllA
@@ -452,11 +457,11 @@ class NNUpperLimitComputer:
                 bounds = [(bounds[0][0],x0)]
 
             o = optimize.minimize ( self._actual_nll, x0=x0,
-                    args=(str_nll_1,), tol=1e-8, options = options,
+                    args=(str_nll,), tol=1e-8, options = options,
                     method = method, bounds=bounds )
             if o.success == True and o.fun>0:
                 muhat, nllmin = o.x[0], o.fun
-                sigma_mu = self.getSigmaMu ( muhat, str_nll_1 )
+                sigma_mu = self.getSigmaMu ( muhat, str_nll )
 
                 nll0 = self.nll ( mu=0., evaluationType = evaluationType,
                                   asimov = asimov )
@@ -464,7 +469,7 @@ class NNUpperLimitComputer:
                     nllmin = nll0
                 ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ),
                         "sigma_mu": float ( sigma_mu ) }
-                # print ( f"@@NNr nll_min ret {ret} allowNegativeSignals {allowNegativeSignals}" )
+                # print ( f"@@NNr nll_min ret {ret} allowNegativeSignals {allowNegativeSignals} evaluationType {evaluationType} asimov {asimov} name {self.name}" )
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
