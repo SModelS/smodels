@@ -18,7 +18,8 @@ from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, aposteriori, \
+    NllEvalType
 from typing import Text, Optional, Union, Dict
 from smodels.statistics.basicStats import deltaChi2FromLlhd
 
@@ -36,11 +37,13 @@ class TruncatedGaussians:
                     corr : Optional[float] = 0.6, cl=.95 ):
         """
         :param upperLimitOnMu: observed upper limit on signal strength mu
-        :param expectedUpperLimitOnMu: evaluationType upper limit on signal strength mu
+        :param expectedUpperLimitOnMu: evaluationType upper limit
+        on signal strength mu
         :param corr: correction factor:
-           ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
-           When comparing with likelihoods constructed from efficiency maps,
-           a factor of corr = 0.6 has been found to result in the best approximations.
+        ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+        When comparing with likelihoods constructed from efficiency maps,
+        a factor of corr = 0.6 has been found to result
+        in the best approximations.
         :param cl: confidence level
         """
         assert type(upperLimitOnMu) in [ float, np.float64, np.float32 ], f"the upper limits must be given as floats not {type(upperLimitOnMu)}, are you providing upper limits on xsecs?"
@@ -55,6 +58,7 @@ class TruncatedGaussians:
         self.denominator = np.sqrt(2.0) * self.sigma_mu
         self.cl = cl
 
+    """
     def likelihood ( self, mu : Union[float,None], return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
@@ -64,6 +68,7 @@ class TruncatedGaussians:
         if return_nll:
             return ret
         return math.exp ( - ret )
+    """
 
     def nll( self, mu : Union[float,None],
             allowNegativeSignals : Optional[bool] = True,
@@ -80,7 +85,7 @@ class TruncatedGaussians:
         :returns: nll (float)
         """
         muhat, sigma_mu = float("inf"), float("inf")
-        dsig = self._nllOfMu ( mu, allowNegativeSignals = allowNegativeSignals, 
+        dsig = self._nllOfMu ( mu, allowNegativeSignals = allowNegativeSignals,
                 corr = corr, evaluationType = evaluationType )
         ret = dsig["nll"]
         return ret
@@ -100,7 +105,7 @@ class TruncatedGaussians:
 
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
-        default = { "muhat": None, "sigma_mu": None, "lmax": None }
+        default = { "muhat": None, "sigma_mu": None, "nll_min": None }
         muhat, sigma_mu = float("inf"), float("inf")
         dsig = self._nllOfMu ( 1.,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
@@ -116,7 +121,7 @@ class TruncatedGaussians:
     def _nllOfMu ( self, mu : Union[float,None],
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
-            evaluationType : NllEvalType = observed ) -> float:
+            evaluationType : NllEvalType = observed ) -> Dict:
         """ return the nll, as a function of nsig
 
         :param mu: signal strength
@@ -152,9 +157,10 @@ class TruncatedGaussians:
         ret = self._computeNLL(mu, muhat )
         return { "nll": ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
 
-    def _getSigmaMu( self ):
+    def _getSigmaMu( self ) -> float :
         """ get the standard deviation sigma on the signal strength mu, given
-        an upper limit and a central value. assumes a truncated Gaussian likelihood
+        an upper limit and a central value.
+        assumes a truncated Gaussian likelihood
         """
         # the evaluationType scale, eq 3.24 in arXiv:1202.3415
         sigma_mu = self.expectedUpperLimitOnMu / 1.96
@@ -162,7 +168,7 @@ class TruncatedGaussians:
         #    sigma_mu = sigma_mu / ( 1. - self.corr/2.)
         return sigma_mu
 
-    def _root_func( self, mu : float ):
+    def _root_func( self, mu : float ) -> float:
         """ the root of this one should determine muhat """
         numerator = erf((self.upperLimitOnMu - mu) / self.denominator) + \
                     erf( mu / self.denominator)
@@ -174,7 +180,7 @@ class TruncatedGaussians:
         return ret
 
     def _findMuhat( self, xa : float = 0.,
-                        xb : Union[float,None] = None ):
+                        xb : Optional[float] = None ) -> float:
         """ find muhat, in [xa,xb]
 
         :param xa: lower limit of initial bracket
@@ -200,11 +206,13 @@ class TruncatedGaussians:
                 rb = self._root_func ( xb )
 
         try:
-            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
+            muhat = optimize.toms748( self._root_func, xa, xb, rtol=1e-07,
+                                      xtol=1e-07 )
         except ValueError as e:
             logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
             logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
-            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02, full_output = True )
+            muhat = optimize.toms748( self._root_func, xa, xb, rtol=1e-02,
+                                      xtol=1e-02, full_output = True )
             if muhat[1].converged:
                 muhat = muhat[0]
                 logger.error ( f"retry with tol=1e-2 seemed to have worked" )
@@ -213,7 +221,7 @@ class TruncatedGaussians:
                 logger.error ( f"retry with brentq seemed to have worked" )
         return muhat
 
-    def _computeNLL( self, mu, muhat ):
+    def _computeNLL( self, mu : float, muhat : float ) -> float:
         if mu is None:
             mu = muhat
         sigma_mu = self.sigma_mu
@@ -227,5 +235,5 @@ class TruncatedGaussians:
         # now compute the area of the truncated gaussian
         A = stats.norm.cdf(Zprime)
         # if return_nll:
-        return np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu)
+        return float ( np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu) )
         #return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
