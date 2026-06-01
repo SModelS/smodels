@@ -773,7 +773,6 @@ class StatisticsTest(unittest.TestCase):
             deltab = d["deltab"]
             m = Data(nobs, nb, deltab**2, deltas_rel=0.2, nsignal = nsig )
             computer = LikelihoodComputer(m)
-            # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
 
             # likelihood as computed by statistics module:
             likelihood_actual = math.exp ( - computer.nll(mu=1. ) )
