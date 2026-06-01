@@ -917,11 +917,11 @@ class PyhfUpperLimitComputer:
         if evaluationType == aposteriori:
             pars_at_mu = pyhf.infer.mle.fixed_poi_fit(mu,
                         data, model, return_fitted_val=False)
+            idx = model.config.poi_index
             data[:len(pars_at_mu)] = pars_at_mu
-            #idx = model.config.poi_index
             #for i,p in pars_at_mu:
             #    data
-            #data = pars_at_mu[:idx] + pars_at_mu[idx+1:]
+            # data = pars_at_mu[:idx] + pars_at_mu[idx+1:]
 
         ad = pyhf.infer.calculators.generate_asimov_data(\
                 mu, data, model, None, None, None)
