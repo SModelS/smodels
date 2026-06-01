@@ -130,7 +130,7 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         if nll is not None and nllA is not None:
             ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
                               return_type=return_type, nSigma = nSigma )
-        if False and abs(mu-1)<1e-5:
+        if False and abs(mu-1)<1e-5 and evaluationType == aposteriori:
             print ( f"@@NNI0 CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} {ret}" )
         return ret
     if nll is None or nllA is None:
@@ -357,7 +357,8 @@ class NNUpperLimitComputer:
             "nll_min": nll_min, "nll_minA": nll_minA, "mu_hat": mu_hat,
             "nSigma": nSigma, "pmSigma": pmSigma,
             "s_nll_min": s_nll_min, "s_nll_minA": s_nll_minA }
-        return float ( clsRoot ( **clsRootArgs ) )
+        ret = float ( clsRoot ( **clsRootArgs ) )
+        return ret
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
