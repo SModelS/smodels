@@ -248,7 +248,7 @@ class TheoryPrediction(object):
         For combined results, returns the upper limit on the
         total sigma*eff (for all signal regions/datasets).
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :return: upper limit (Unum object)
@@ -262,8 +262,8 @@ class TheoryPrediction(object):
                     nSigma = nSigma )
         if self.dataType() == "upperLimit":
             ul = self.dataset.getUpperLimitFor(
-                sms=self.avgSMS, txnames=self.txnames, 
-                evaluationType=evaluationType, 
+                sms=self.avgSMS, txnames=self.txnames,
+                evaluationType=evaluationType,
                 nSigma = nSigma
             )
         if self.dataType() == "combined":
@@ -280,7 +280,7 @@ class TheoryPrediction(object):
         theory prediction value and the corresponding upper limit
         (i.e. mu_UL = upper limit/theory xsec)
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :returns: upper limit on signal strength multiplier mu
@@ -342,46 +342,34 @@ class TheoryPrediction(object):
 
         return wrapper
 
-    """
-    @whenDefined
-    def lsm( self, evaluationType : NllEvalType = observed,
-             return_nll : bool = False ):
-        # likelihood at SM point, same as .def likelihood( ( mu = 0. )
-        llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["nllsm"],return_nll )
-    """
-
     @whenDefined
     def nllsm( self, evaluationType : NllEvalType = observed,
-             return_nll : bool = False ):
+             return_nll : bool = False ) -> float:
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        llhDict = self.computeStatistics(evaluationType)
-        return llhDict["nllsm"]
+        nllDict = self.computeStatistics(evaluationType)
+        return nllDict["nllsm"]
 
     @whenDefined
     def nll_min( self, evaluationType : NllEvalType = observed,
-                 **kwargs ):
-        """likelihood at mu_hat"""
-        llhDict = self.computeStatistics(evaluationType)
+                 return_dict : bool = False,
+                 **kwargs ) -> Union[float,dict]:
+        """ nll at mu_hat
+        :param return_dict: if true, return also mu_hat and sigma_mu
+        """
+        nllDict = self.computeStatistics(evaluationType)
         if len(kwargs)>0:
-            return self.statsComputer.nll_min ( evaluationType = evaluationType,
-                    **kwargs )
-        return llhDict["nll_min"]
-
-    """
-    @whenDefined
-    def lmax( self, evaluationType : NllEvalType = observed,
-              return_nll : bool = False ):
-        # likelihood at mu_hat
-        return self.nllToLikelihood ( self.nll_min ( evaluationType ),return_nll )
-    """
+            nllDict = self.statsComputer.nll_min (
+                    evaluationType = evaluationType, **kwargs )
+        if return_dict:
+            return nllDict
+        return nllDict["nll_min"]
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1., evaluationType : NllEvalType = observed,
              **kwargs ) -> Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        cls = self.statsComputer.CLs ( poi_test = mu, 
+        cls = self.statsComputer.CLs ( poi_test = mu,
                 evaluationType = evaluationType, **kwargs )
         return cls
 
@@ -418,7 +406,7 @@ class TheoryPrediction(object):
                 logger.error ( f"unknown argument {k} in theoryPrediction.likelihood()" )
 
         # for truncated gaussians the fits only work with negative signals!
-        nll = self.statsComputer.nll(poi_test = mu, 
+        nll = self.statsComputer.nll(poi_test = mu,
                 evaluationType = evaluationType, asimov = asimov, **kwargs )
         return nll
 
@@ -893,7 +881,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
 
-    :param datasetPredictions: List of TheoryPrediction objects 
+    :param datasetPredictions: List of TheoryPrediction objects
     for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
 
