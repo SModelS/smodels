@@ -952,7 +952,7 @@ class PyhfUpperLimitComputer:
         if "pmSigma" in kwargs:
             assert kwargs["pmSigma"] == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
         ret = self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
-        if False and nSigma == 0 and abs(mu-1)<.0001 and evaluationType == aposteriori:
+        if False and nSigma == 0 and abs(mu-1)<.001 and evaluationType == aposteriori:
             print ( )
             print ( f"@@true CLs: {ret:.5f} evaluationType {evaluationType} return_type {return_type}" )
             fN = self.clsFromNLLs ( mu, evaluationType, return_type )

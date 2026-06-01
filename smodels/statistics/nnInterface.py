@@ -115,7 +115,7 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, asimov = 0, pmSigma = 1,
                        evaluationType = observed ) - nllA )
-    if False: # evaluationType == aposteriori:
+    if evaluationType == aposteriori:
         nll = nllA
         if pmSigma != 0:
             s_nll = s_nllA
@@ -544,7 +544,7 @@ class NNUpperLimitComputer:
         nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
         sigma_muA = 1
 
-        if False: # evaluationType == aposteriori:
+        if evaluationType == aposteriori:
             # this is not true, right?
             nll_min = nll_minA
             mu_hat = mu_hatA

@@ -47,11 +47,11 @@ class StatisticsTest(unittest.TestCase):
             print("nsig=", nsig)
             m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
             llhdcomp = LikelihoodComputer(m)
-            llhddir = llhdcomp.likelihood(nsig)
+            llhddir = math.exp ( - llhdcomp.nll(nsig) )
             chi2dir = llhdcomp.chi2()
             print("llhd direct", llhddir, chi2dir)
             computer = TruncatedGaussians ( ulobs, ulexp, nsig )
-            ret = computer.likelihood ( mu=1.)
+            ret = math.exp ( - computer.nll ( mu=1.) )
             llhdlim,_,_ = ret["llhd"], ret["muhat"], ret["sigma_mu"]
             chi2lim = computer.chi2 ( llhdlim )
             print("llhd from limits", llhdlim, chi2lim)
@@ -776,12 +776,7 @@ class StatisticsTest(unittest.TestCase):
             # print ("ns="+str(nsig)+"; nobs = "+str(nobs)+"; nb="+str(nb)+"; db="+str(deltab))
 
             # likelihood as computed by statistics module:
-            # likelihood_actual = statistics.likelihood( nsig,
-            #    nobs, nb, deltab, deltas)
             likelihood_actual = math.exp ( - computer.nll(mu=1. ) )
-            # likelihood_actual = statistics.likelihood()
-            #             logger.error("llk= "+str(likelihood_actual)+" nsig="+str(nsig)+" nobs = "+str(nobs)+" nb="+str(nb)+"+-"+str(deltab))
-            # print('llhdactual', likelihood_actual)
             if not likelihood_actual == None and not np.isnan(likelihood_actual):
                 likelihood_actual = self.round_to_sign(likelihood_actual, 4)
 
