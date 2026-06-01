@@ -380,8 +380,10 @@ class NNUpperLimitComputer:
             return None
         delta = 0
         poi_test = 1
-        if abs(mu)<1e-10:
-            poi_test = 0
+        # if mu=0 lets still use the values predicted by the network
+        # -- for now
+        #if abs(mu)<1e-10:
+        #    poi_test = 0
         # evaluationType == observed and \
         if pmSigma != 0 and not "sigma_obs" in ret:
             ## probably we fell back to pyhf likelihoods,
@@ -390,7 +392,7 @@ class NNUpperLimitComputer:
         # print ( f"@@0 getting nll asimov={asimov} mu={poi_test} etype={evaluationType}" )
         if evaluationType == observed:
             if asimov not in [ None ]:
-                c_label = f'nllA_obs_1'
+                c_label = f'nllA_obs_{poi_test}'
                 s_label = "sigma_obsA"
             else:
                 c_label = f'nll_obs_{poi_test}'
@@ -519,7 +521,6 @@ class NNUpperLimitComputer:
         + 1 sigma, - 1 sigma, etc.  For error bands.
         If None compute for most sensitive analysis.
         """
-        # print ( f"@@NN5 getCLsRootFunc.allowNegativeSignals {allowNegativeSignals}" )
         # a posteriori expected is needed here
         # mu_hat is mu_hat for signal_rel
         """
