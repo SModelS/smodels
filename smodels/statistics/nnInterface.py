@@ -378,7 +378,6 @@ class NNUpperLimitComputer:
         ret = self._actual_nll(mu)
         if ret == None:
             return None
-        delta = 0
         poi_test = 1
         # if mu=0 lets still use the values predicted by the network
         # -- for now
@@ -397,7 +396,11 @@ class NNUpperLimitComputer:
             else:
                 c_label = f'nll_obs_{poi_test}'
                 s_label = "sigma_obs"
-        else:
+        elif evaluationType == aposteriori:
+            ## when asked for a posteriori, we return nllA_obs_1
+            c_label = f'nllA_obs_{poi_test}'
+            s_label = "sigma_obsA"
+        else: # evaluationType = apriori
             if asimov not in [ None ]:
                 c_label = f'nllA_exp_{poi_test}'
                 s_label = "sigma_expA"
