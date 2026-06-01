@@ -115,7 +115,7 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, asimov = 0, pmSigma = 1,
                        evaluationType = observed ) - nllA )
-    if evaluationType == aposteriori:
+    if False: # evaluationType == aposteriori:
         nll = nllA
         if pmSigma != 0:
             s_nll = s_nllA
@@ -379,10 +379,8 @@ class NNUpperLimitComputer:
         if ret == None:
             return None
         poi_test = 1
-        # if mu=0 lets still use the values predicted by the network
-        # -- for now
-        #if abs(mu)<1e-10:
-        #    poi_test = 0
+        if abs(mu)<1e-10:
+            poi_test = 0
         # evaluationType == observed and \
         if pmSigma != 0 and not "sigma_obs" in ret:
             ## probably we fell back to pyhf likelihoods,
@@ -398,8 +396,8 @@ class NNUpperLimitComputer:
                 s_label = "sigma_obs"
         elif evaluationType == aposteriori:
             ## when asked for a posteriori, we return nllA_obs_1
-            c_label = f'nllA_obs_{poi_test}'
-            s_label = "sigma_obsA"
+            c_label = f'nll_obs_{poi_test}'
+            s_label = "sigma_obs"
         else: # evaluationType = apriori
             if asimov not in [ None ]:
                 c_label = f'nllA_exp_{poi_test}'
@@ -432,11 +430,11 @@ class NNUpperLimitComputer:
         # if evaluationType != observed:
             obs_v_exp = "exp"
         A = ""
-        if asimov not in [ None ] or evaluationType == aposteriori:
+        if asimov not in [ None ]: #  or evaluationType == aposteriori:
             A = "A"
         str_nll = f"nll{A}_{obs_v_exp}_1"
         self.str_nll = str_nll
-        # print ( f"@@nll_min for eType {evaluationType} asimov {asimov}: str_nll {str_nll}" )
+        # print ( f"@@NNI nll_min for eType {evaluationType} asimov {asimov}: str_nll {str_nll}" )
         ## these values are global nll_min
         # str_nll = f"nLL{A}_{obs_v_exp}"
         # str_nll_min = f"{str_nll}_max"
@@ -463,10 +461,11 @@ class NNUpperLimitComputer:
                 muhat, nllmin = o.x[0], o.fun
                 sigma_mu = self.getSigmaMu ( muhat, str_nll )
 
-                nll0 = self.nll ( mu=0., evaluationType = evaluationType,
-                                  asimov = asimov )
-                if nll0 < nllmin: # if SM is lower, use it
-                    nllmin = nll0
+                #nll0 = self.nll ( mu=0., evaluationType = evaluationType,
+                #                  asimov = asimov )
+                #if nll0 < nllmin: # if SM is lower, use it
+                #    nllmin = nll0
+                #    muhat = 0.
                 ret = { "nll_min": float ( nllmin ), "muhat": float ( muhat ),
                         "sigma_mu": float ( sigma_mu ) }
                 # print ( f"@@NNr nll_min ret {ret} allowNegativeSignals {allowNegativeSignals} evaluationType {evaluationType} asimov {asimov} name {self.name}" )
@@ -544,7 +543,8 @@ class NNUpperLimitComputer:
         nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
         sigma_muA = 1
 
-        if evaluationType == aposteriori:
+        if False: # evaluationType == aposteriori:
+            # this is not true, right?
             nll_min = nll_minA
             mu_hat = mu_hatA
             sigma_mu = sigma_muA
