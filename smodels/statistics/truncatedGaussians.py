@@ -79,11 +79,10 @@ class TruncatedGaussians:
 
         :returns: nll (float)
         """
-        sllhd = "nll"
         muhat, sigma_mu = float("inf"), float("inf")
         dsig = self._nllOfMu ( mu, allowNegativeSignals = allowNegativeSignals, 
                 corr = corr, evaluationType = evaluationType )
-        ret = dsig[sllhd]
+        ret = dsig["nll"]
         return ret
 
     def nll_min( self, return_nll : Optional[bool]=False,
@@ -102,7 +101,6 @@ class TruncatedGaussians:
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
         default = { "muhat": None, "sigma_mu": None, "lmax": None }
-        sllhd = "nll"
         muhat, sigma_mu = float("inf"), float("inf")
         dsig = self._nllOfMu ( 1.,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
@@ -132,8 +130,6 @@ class TruncatedGaussians:
         a factor of corr = 0.6 has been found to result in the best approximations.
         :returns: nll (float), muhat, and sigma_mu
         """
-        sllhd = "nll"
-
         if self.upperLimitOnMu < self.expectedUpperLimitOnMu:
             ## underfluctuation. muhat = 0.
             if allowNegativeSignals:
@@ -142,19 +138,19 @@ class TruncatedGaussians:
                 muhat = 0.
                 if evaluationType == observed:
                     muhat = self._findMuhat( xa, xb )
-                ret = self._computeLlhd(mu, muhat, return_nll = True )
-                return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
+                ret = self._computeNLL(mu, muhat )
+                return { "nll": ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
             else:
-                ret = self._computeLlhd(mu, 0.0, return_nll = True )
-                return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
+                ret = self._computeNLL(mu, 0.0 )
+                return { "nll": ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
         muhat = 0.
         if evaluationType == observed:
             xa = -self.expectedUpperLimitOnMu
             xb = self.expectedUpperLimitOnMu
             muhat = self._findMuhat(xa,xb)
-        ret = self._computeLlhd(mu, muhat, return_nll = True )
-        return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
+        ret = self._computeNLL(mu, muhat )
+        return { "nll": ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
 
     def _getSigmaMu( self ):
         """ get the standard deviation sigma on the signal strength mu, given
@@ -217,7 +213,7 @@ class TruncatedGaussians:
                 logger.error ( f"retry with brentq seemed to have worked" )
         return muhat
 
-    def _computeLlhd( self, mu, muhat, return_nll):
+    def _computeNLL( self, mu, muhat ):
         if mu is None:
             mu = muhat
         sigma_mu = self.sigma_mu
@@ -230,6 +226,6 @@ class TruncatedGaussians:
         Zprime = muhat / sigma_mu
         # now compute the area of the truncated gaussian
         A = stats.norm.cdf(Zprime)
-        if return_nll:
-            return np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu)
-        return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
+        # if return_nll:
+        return np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu)
+        #return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
