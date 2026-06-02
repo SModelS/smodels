@@ -280,7 +280,7 @@ class NNUpperLimitComputer:
         """
 
         yields = []
-        for srname,smyield in self.adaptor.onnxMeta["smYields"].items():
+        for srname,smyield in self.adaptor.onnxMeta["bkg_yields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
             if not realname in self.nsignals:
@@ -294,7 +294,7 @@ class NNUpperLimitComputer:
             if self.isControlRegion ( srname ):
                 if hasattr ( self.data.globalInfo, "includeCRs" ) and self.data.globalInfo.includeCRs == False:
                     continue
-                obsyield = self.adaptor.onnxMeta["obsYields"][srname]
+                obsyield = self.adaptor.onnxMeta["obs_yields"][srname]
                 ## seems like a CR! replaced bkgexpected with observed (postfit)
                 smyield = obsyield
             tot = smyield + signal
@@ -318,6 +318,9 @@ class NNUpperLimitComputer:
         # from signal yields compute total yields
         yields = self.totalYieldsFromSignals( poi_test )
         ret = self.adaptor.predict(yields)
+        if False and poi_test == 0.0:
+            print ( f"@@X yields {yields} ret {ret}" )
+            print ( f"@@name {self.name}" )
 
         if outputType == None:
             return ret

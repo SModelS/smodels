@@ -76,11 +76,11 @@ class NNAdapter:
 
     def _getSROrder ( self ):
         """ get the order of the signal regions as specified in the
-        onnx meta information. We rely on smYields in the meta information
+        onnx meta information. We rely on bkg_yields in the meta information
         to define the canonical order.
         """
         self.srOrder = []
-        for srname in self.onnxMeta["smYields"]:
+        for srname in self.onnxMeta["bkg_yields"]:
             self.srOrder.append ( srname )
 
     def _removeSignalRegions ( self, channels : list, dictionary : dict ) -> dict:
@@ -103,8 +103,8 @@ class NNAdapter:
         data = { "inputMeans": [], "inputErrors": [],
             "nLL_exp_mu0": [ None ]*2, "nLL_obs_mu0": [ None ]*2,
             "nLLA_exp_mu0": [ None ]*2, "nLLA_obs_mu0": [ None ]*2 }
-        data [ "smYields" ] = {}
-        data [ "obsYields" ] = {}
+        data [ "bkg_yields" ] = {}
+        data [ "obs_yields" ] = {}
         data["nLL_obs_max"]= [ None ] * 2
         data["nLL_exp_max"]= [ None ] * 2
         data["nLLA_obs_max"]= [ None ] * 2
@@ -123,11 +123,11 @@ class NNAdapter:
             elif em.key == "obs_yields":
                 st = eval(em.value)
                 for l in st: ## the sm yields are tuple of (name,value)
-                    data["obsYields"][ l[0] ]= int ( l[1] )
+                    data["obs_yields"][ l[0] ]= int ( l[1] )
             elif em.key == "bkg_yields":
                 st = eval(em.value)
                 for l in st: ## the sm yields are tuple of (name,value)
-                    data["smYields"][ l[0] ] = l[1]
+                    data["bkg_yields"][ l[0] ] = l[1]
             elif em.key == "standardization_mean":
                 data["inputMeans"] = eval(em.value)
             elif em.key == "standardization_std":
@@ -150,10 +150,10 @@ class NNAdapter:
                 data["run_config"] = content
 
         if len(remove_channels)>0:
-            data["smYields"]=self._removeSignalRegions ( remove_channels,
-                                                   data["smYields"] )
-            data["obsYields"]=self._removeSignalRegions ( remove_channels,
-                                                    data["obsYields"] )
+            data["bkg_yields"]=self._removeSignalRegions ( remove_channels,
+                data["bkg_yields"] )
+            data["obs_yields"]=self._removeSignalRegions ( remove_channels,
+                data["obs_yields"] )
         self.onnxMeta = data
 
     def _predictFromScaledYields ( self, scaled_yields : np.array ) -> np.array:
