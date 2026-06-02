@@ -274,16 +274,15 @@ class NNUpperLimitComputer:
 
     def checkConsistencyMu0 ( self ):
         """ when getting predictions for bkg_yields (SRs) and obs_yields (CRs),
-        nll_*_mu0 and nll_*_mu1 should coincide. check for this.
+        nll_*_mu0 == nll_*_mu1. check for this.
         """
         tolerance = 1e-2
         nlls = self._actual_nll ( poi_test = 0. )
-        #errors = {}
         for label in [ "nll_exp", "nll_obs", "nllA_exp", "nllA_obs" ]:
-            err = 2. * abs ( nlls[ f"{label}_1"]-nlls[f"{label}_0"] ) / ( nlls[ f"{label}_1"]+nlls[f"{label}_0"] )
+            nll0, nll1 = nlls[f"{label}_0"], nlls[f"{label}_1"]
+            err = 2. * abs ( nll1-nll0 ) / ( nll1+nll0 )
             if err > tolerance:
-                logger.error ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
-                sys.exit()
+                raise SModelSError ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
 
     def totalYieldsFromSignals ( self, poi_test : float ) -> list :
         """ given the signal yields self.nsignals, return the total
