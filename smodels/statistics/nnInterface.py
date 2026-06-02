@@ -276,7 +276,7 @@ class NNUpperLimitComputer:
         """ when getting predictions for bkg_yields (SRs) and obs_yields (CRs),
         nll_*_mu0 == nll_*_mu1. check for this.
         """
-        tolerance = 1e-2
+        tolerance = 1e-2 # FIXME eventually we need to lower this number
         nlls = self._actual_nll ( poi_test = 0. )
         errors = {}
         for label in [ "nll_exp", "nll_obs", "nllA_exp", "nllA_obs" ]:
