@@ -278,11 +278,17 @@ class NNUpperLimitComputer:
         """
         tolerance = 1e-2
         nlls = self._actual_nll ( poi_test = 0. )
+        errors = {}
         for label in [ "nll_exp", "nll_obs", "nllA_exp", "nllA_obs" ]:
             nll0, nll1 = nlls[f"{label}_0"], nlls[f"{label}_1"]
             err = 2. * abs ( nll1-nll0 ) / ( nll1+nll0 )
+            errors[label]=err
             if err > tolerance:
                 raise SModelSError ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
+        if False:
+            print ( f"[nnInterface] consistency check for {self.name}: max relative error={max(errors.values()):.3g}" )
+            print ( f"[nnInterface] consistency check for {self.name}: errors: {errors}" )
+            print ( f"[nnInterface] consistency check for {self.name}: nlls: {nlls}" )
 
     def totalYieldsFromSignals ( self, poi_test : float ) -> list :
         """ given the signal yields self.nsignals, return the total
