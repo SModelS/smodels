@@ -227,6 +227,7 @@ class NNUpperLimitComputer:
             False  # boolean to detect wether self.signals has returned to an older value
         )
         self.welcome()
+        self.checkConsistencyMu0()
 
     def myNLL ( self, x : list ) -> np.array:
         if type(x) in [ list, np.array, np.ndarray ]:
@@ -270,6 +271,19 @@ class NNUpperLimitComputer:
                 ret = region["type"]=="CR"
                 return ret
         return False
+
+    def checkConsistencyMu0 ( self ):
+        """ when getting predictions for bkg_yields (SRs) and obs_yields (CRs),
+        nll_*_mu0 and nll_*_mu1 should coincide. check for this.
+        """
+        tolerance = 1e-2
+        nlls = self._actual_nll ( poi_test = 0. )
+        #errors = {}
+        for label in [ "nll_exp", "nll_obs", "nllA_exp", "nllA_obs" ]:
+            err = 2. * abs ( nlls[ f"{label}_1"]-nlls[f"{label}_0"] ) / ( nlls[ f"{label}_1"]+nlls[f"{label}_0"] )
+            if err > tolerance:
+                logger.error ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
+                sys.exit()
 
     def totalYieldsFromSignals ( self, poi_test : float ) -> list :
         """ given the signal yields self.nsignals, return the total
@@ -383,7 +397,7 @@ class NNUpperLimitComputer:
         if ret == None:
             return None
         poi_test = 1
-        if abs(mu)<1e-10:
+        if abs(mu)<1e-6:
             poi_test = 0
         # evaluationType == observed and \
         if pmSigma != 0 and not "sigma_obs" in ret:
