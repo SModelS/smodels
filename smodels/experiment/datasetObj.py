@@ -514,15 +514,6 @@ class CombinedDataSet(object):
                     types.add ( "simplified" )
                 elif model_type in [ "full_pyhf", "pyhf" ]:
                     types.add ( "pyhf" )
-                """
-                types.add ( models[0][0] )
-                if models[0].endswith ( ".onnx" ):
-                    types.add ( "nn" )
-                if models[0].endswith ( ".json" ):
-                    types.add ( "pyhf" )
-                if models[0].endswith ( ".cov" ):
-                    types.add ( "simplified" )
-                """
             return "+".join ( types )
 
     def __str__(self):

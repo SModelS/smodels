@@ -147,12 +147,12 @@ class CompRetriever:
                 if smodelsName in nsig:
                     f_signals[ labelToONNX[label] ] = \
                         nsig[ smodelsName ]
-            data = NNData( f_signals, dataset )
             model_tuple = model_tuples[0]
             modelfilename = model_tuple[1]
             model_type = model_tuple[0]
             if "pyhf" in model_type:
                 continue
+            data = NNData( f_signals, dataset )
             upperLimitComputer = NNUpperLimitComputer(data,
                     lumi=dataset.getLumi(),
                     onnxfilename = modelfilename )
