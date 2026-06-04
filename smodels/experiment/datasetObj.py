@@ -503,7 +503,7 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "statModels"):
             self.type = ""
             types = set()
-            for srSetName, model_tuples in self.globalInfo.statModels.items():
+            for model_tuples in self.globalInfo.statModels.values():
                 ### models is e.g. [ ( "onnx", "bla.onnx" ), ... ]
                 if len(model_tuples)==0:
                     continue

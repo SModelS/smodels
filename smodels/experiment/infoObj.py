@@ -13,7 +13,7 @@ import os
 from smodels.base.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
-from typing import Optional
+from typing import Optional,Union
 
 
 class Info(object):
@@ -23,7 +23,7 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
-    def canonizeRegions ( self, regions : Optional[list] ) -> list:
+    def canonizeRegions ( self, regions : Optional[Union[list, None]] ) -> Union[list,None]:
         """ given a list of regions in globalInfo.txt in the
         srMappings field,
         return a canonical version of that list: strings in
@@ -36,7 +36,7 @@ class Info(object):
         :param regions: list of regions in srMappings globalInfo.txt
         :returns: canonical list of regions
         """
-        if regions == None:
+        if regions is None:
             return regions
         newregions = []
         for region in regions:
@@ -110,7 +110,7 @@ class Info(object):
             return False
         ## if there is no srMappings, we look directly
         ## in srSets
-        for srSetName,regions in self.srSets.items():
+        for regions in self.srSets.values():
             if region in regions:
                 return True
         return False
@@ -121,7 +121,7 @@ class Info(object):
             if hasattr ( self, "srSets" ):
                 self.srMappingsDict = {}
                 self.srMappings = []
-                for srSetName,regions in self.srSets.items():
+                for regions in self.srSets.values():
                     for region in regions:
                         d = { "smodels": region, "label": region, "onnx": region,
                               "pyhf": region, "type": "SR" }
@@ -141,7 +141,9 @@ class Info(object):
         """ check that all SRs mentioned in srSets are indeed in srMappings """
         if not hasattr ( self, "srSets" ):
             return
-        for srSetName, regions in self.srSets.items():
+        elif not isinstance ( self.srSets, dict ):
+            raise SModelSError ( f"srSets has to be a dict, but is {type(self.srSets)}" )
+        for regions in self.srSets.values():
             for region in regions:
                 if not self.isInSRMapping ( region ):
                     raise SModelSError ( f"region {region} not mentioned in srMapping" )

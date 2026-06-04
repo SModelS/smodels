@@ -14,5 +14,5 @@ Module contents
 
 .. automodule:: share
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

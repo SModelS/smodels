@@ -77,40 +77,47 @@ Each |ExpRes| folder contains:
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
-data. In case a statistical model is given (either a :ref:`simplified
- likelihood <simplifiedllhd>`, a :ref:`full pyhf likelihood <pyhfllhd>`,
-or a :ref:`ml surrogate model <surrogateMLModels>`), it is also
+data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>`, 
+a :ref:`full pyhf likelihood <pyhfllhd>`, or a :ref:`ml surrogate model <surrogateMLModels>`), it is also
 referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an
 example:
 
 .. literalinclude:: /literals/globalInfo201804.txt
    :lines: 1-22
 
-Here, ``srMappings`` lists all signal regions that SModelS should be aware of,
-with ``smodels`` being the name known to SModelS (can be ``None``).
-Every *signal* region must appear in this list with ``smodels`` being something 
-other than ``None``.
-Optionally, a ``type`` can be specified -- it should be one of **SR**, **CR**, 
-with **SR** being the default. If a ``label`` is given, it is the
-name the region is kwown as within and only within the ``globalInfo.txt`` file,
-else the ``smodels`` field is used.
-The optional fields ``pyhf``,  ``sl``, and ``onnx`` are the names
-used to map them onto the names in the according statistics models.
-Currently, the ``sl`` name is not used except as an indicator that it
-is used for the simplified likelihood. These fields default to ``None``.
+Here, ``srMappings`` describes the mapping between the SR names used within the
+statistical models and the names used in the SModelS database.
+All SRs used by the statistical model must be included in this list.
+The following (optional) fields are defined for each SR: 
+* the name of the region as known to SModelS (``smodels``),
+* the ``type`` of region (SR or CR), 
+* the name of the region as known to pyhf (``pyhf``), if there is a pyhf implementation of thestatistical model,
+* the name of the region as known by the surrogate ML model (``onnx``), if there is a onnx surrogate model for the statistical model and
+* the name of the region as known to the simplified likelihood (``sl``), if the statistical model corresponds to a simplified likelihood.
 
 
-The ``srSets`` field groups these regions into named sets. In the example
-above a set **all** is defined that contains all 5 regions.
+If any of the fields above is not given, the following default values are assumed:
+```
+type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels, label = smodels if smodels is not None, otherwise label = pyhf
+```
+
+In case ``smodels`` is ``None``, the region is not used for computing signal contributions, but it can still be used for other purposes, such as nuisance fits.
+Finally, if ``srMappings`` is not given, it is assumed that all regions appearing in ``srSets`` (see below) are included in the mapping, with the SModelS name used for all fields and ``type = SR``.
+
+
+The ``srSets`` field groups the regions defined in ``srMappings`` into groups which can be combined with
+the available statistical model(s). Each entry in ``srSets`` is composed of a name and a list of region names (as defined in ``srMappings``). 
+The region names appearing in the list must be defined in ``srMappings``. 
+In the example above a combination **all** is defined, which combines all 5 regions.
 
 Finally, ``statModels`` maps the aforementioned ``srSets`` to lists of
 statistical models. Each entry in that list is composed of a tuple
 with the model type as the first entry, and the model's file name
 as the second entry. For model types, we currently have: ``sl`` for simplified
-likelihoods (both v1 and v2), ``pyhf``, ``full_pyhf`` (for full stastical pyhf
-models if we also have a simpler one),  and``onnx`` for machine learned
+likelihoods (both v1 and v2), ``pyhf``, ``full_pyhf`` (for the full stastical pyhf
+models in case there is also a simplified version),  and ``onnx`` for machine learned
 surrogate models.  By default, for each region set, SModelS uses the first
-model given in the list. Ever region used by a given statistical model 
+model given in the list. Every region used by a given statistical model 
 must thus appear in ``srMappings``. If we do not compute signal contributions
 but use it for e.g. nuisance fits, the region must still appear in 
 ``srMappings``, with ``None`` as the ``smodels`` name.
@@ -144,7 +151,7 @@ The following case, taken from ATLAS-SUSY-2018-32 has control regions
 that are used for the ML surrogate model, but not in the pyhf model:
 
 .. literalinclude:: /literals/globalInfo201832.txt
-   :lines: 52-54
+   :lines: 15-40
 
 Machine-learned models can be mixed with full models. In this case
 of ATLAS-SUSY-2019-09, by default surrogate models are used for the
@@ -152,7 +159,7 @@ of ATLAS-SUSY-2019-09, by default surrogate models are used for the
 the other three region sets (**WH_0j**, **WH_nj**, **WH_DFOS**):
 
 .. literalinclude:: /literals/globalInfo201909.txt
-   :lines: 134-146
+   :lines: 11-69
 
 Note that the field ``includeCRs: False`` inhibits patching
 of control regions for the pyhf models. This field has no meaning
