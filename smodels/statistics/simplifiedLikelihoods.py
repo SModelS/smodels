@@ -996,7 +996,7 @@ class SLUpperLimitComputer:
         self.allowNegativeSignals = False
         self.dataType = "SL"
 
-    def nll_min(self,**kwargs) -> float:
+    def nll_min(self,**kwargs) -> dict:
         return self.likelihoodComputer.nll_min ( **kwargs )
 
     def nll( self, poi_test : float, evaluationType : NllEvalType,

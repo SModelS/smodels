@@ -56,6 +56,7 @@ class TruncatedGaussians:
         self.corr = corr
         self.sigma_mu = self._getSigmaMu()  # the evaluationType scale, eq 3.24 in arXiv:1202.3415
         self.denominator = np.sqrt(2.0) * self.sigma_mu
+        self.allowNegativeSignals = False
         self.cl = cl
 
     """

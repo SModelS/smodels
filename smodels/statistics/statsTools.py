@@ -348,10 +348,9 @@ class StatsComputer:
         self.transform ( evaluationType )
         kwargs.update ( { "evaluationType": evaluationType, "asimov": asimov } )
         # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
-        idx = msm["idx"]
-        if idx == None:
+        if msm is None:
             return None
-        ret = self.subComputers[ idx ].nll ( poi_test, **kwargs)
+        ret = msm.nll ( poi_test, **kwargs)
         return ret
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
@@ -365,14 +364,13 @@ class StatsComputer:
               evaluationType : NllEvalType=observed,
               **kwargs ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
-        ret = self.getMostSensitiveModel()
+        msm = self.getMostSensitiveModel()
         # print ( f"@@ST0 getMostSensitiveModel eType {evaluationType} ret {ret}" )
-        idx = ret["idx"]
-        if idx == None:
+        if msm is None:
             return None
         # self.transform ( evaluationType )
-        if hasattr ( self.subComputers[ idx ] , "CLs" ):
-            return self.subComputers[ idx ].CLs ( poi_test,
+        if hasattr ( msm , "CLs" ):
+            return msm.CLs ( poi_test,
                     evaluationType = evaluationType, **kwargs )
         return None
 
@@ -396,20 +394,19 @@ class StatsComputer:
                 continue
             subComputer.model = subComputer.origModel
 
-    def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> dict:
+    def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> Union[None,dict]:
         """
         :returns: dictionary with muhat, sigma_mu and nll_min as keys
         """
         msm = self.getMostSensitiveModel()
-        if msm["idx"] == None:
+        if msm is None:
             return { "nll_min": float("nan" ), "mu_hat": float("nan"),
                      "sigma_mu": float("nan") }
-        computer = self.subComputers[ msm["idx"] ]
         self.transform ( evaluationType )
 
-        ret = computer.nll_min (
+        ret = msm.nll_min (
             evaluationType = evaluationType,
-            allowNegativeSignals = computer.allowNegativeSignals, **kwargs )
+            allowNegativeSignals = msm.allowNegativeSignals, **kwargs )
         return ret
 
     @lru_cache
@@ -453,7 +450,7 @@ class StatsComputer:
         :param kwargs: e.g. pmSigma
         """
         msm = self.getMostSensitiveModel()
-        if msm == None:
+        if msm is None:
             return None
         ulmu = msm.getUpperLimitOnMu(
                    evaluationType = evaluationType, nSigma = nSigma, **kwargs )
