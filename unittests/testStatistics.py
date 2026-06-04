@@ -14,7 +14,7 @@ sys.path.insert(0, "../")
 import unittest
 
 # from smodels.tools import statistics
-from smodels.statistics.simplifiedLikelihoods import UpperLimitComputer, LikelihoodComputer, Data
+from smodels.statistics.simplifiedLikelihoods import SLUpperLimitComputer, LikelihoodComputer, Data
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
@@ -34,7 +34,7 @@ class StatisticsTest(unittest.TestCase):
         nsig = 1.0
         nobs, nbg = 100, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
-        ulcomp = UpperLimitComputer()
+        ulcomp = SLUpperLimitComputer()
         ulobs = ulcomp.getUpperLimitOnMu(m)
         ulexp = ulcomp.getUpperLimitOnMu(m, evaluationType=apriori)
         print("ulobs", ulobs)
@@ -67,7 +67,7 @@ class StatisticsTest(unittest.TestCase):
         nsig = 3.0
         nobs, nbg = 35, 30
         m = Data(nobs, nbg, 0.001, None, nsig )
-        ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
+        ulcomp = SLUpperLimitComputer( LikelihoodComputer(m) )
         ulobs = ulcomp.getUpperLimitOnMu()
         ulexp = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
@@ -122,7 +122,7 @@ class StatisticsTest(unittest.TestCase):
         nsig = 35.0
         nobs, nbg = 110, 100.0
         m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
-        ulcomp = UpperLimitComputer( LikelihoodComputer(m) )
+        ulcomp = SLUpperLimitComputer( LikelihoodComputer(m) )
         ulexpmu = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
         self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
@@ -158,7 +158,7 @@ class StatisticsTest(unittest.TestCase):
 
     def testUpperLimit(self):
         m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
-        comp = UpperLimitComputer( LikelihoodComputer(m) )
+        comp = SLUpperLimitComputer( LikelihoodComputer(m) )
         re = comp.getUpperLimitOnMu()
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 

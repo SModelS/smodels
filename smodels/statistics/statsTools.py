@@ -12,14 +12,14 @@
 
 __all__ = [ "StatsComputer", "getCompRetrieverModule" ]
 
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
-from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
+from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, SLUpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-from smodels.statistics.basicStats import observed, apriori, NllEvalType, \
-         exponentiateNLL
+from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
+from smodels.statistics.basicStats import observed, apriori, NllEvalType, exponentiateNLL
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.base.physicsUnits import UnitXSec
@@ -41,7 +41,7 @@ class CompRetriever:
     in StatsComputer """
 
     @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> list:
+    def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> List[SLUpperLimitComputer]:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -81,7 +81,7 @@ class CompRetriever:
                          deltas_rel = deltas_rel, lumi=dataset.getLumi(),
                          name = covname )
             likelihoodComputer = LikelihoodComputer ( data )
-            computer = UpperLimitComputer ( likelihoodComputer )
+            computer = SLUpperLimitComputer ( likelihoodComputer )
             computer.dataType = "SL"
             computer.allowNegativeSignals = False
             subComputers.append ( computer )
@@ -90,7 +90,7 @@ class CompRetriever:
 
     @classmethod
     def forSingleBin( cls, dataset, nsig, deltas_rel : float = 0.2,
-                      lumi : Optional[UnitLumi]=None ) -> list:
+                      lumi : Optional[UnitLumi]=None ) ->  List[SLUpperLimitComputer]:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -103,13 +103,13 @@ class CompRetriever:
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
                      nsignal = nsig, lumi = lumi )
         likelihoodComputer = LikelihoodComputer ( data )
-        computer = UpperLimitComputer ( likelihoodComputer )
+        computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
         computer.allowNegativeSignals = False
         return [ computer ]
 
     @classmethod
-    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
+    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> List[NNUpperLimitComputer]:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -119,10 +119,8 @@ class CompRetriever:
         :returns: a sub computer
         """
         globalInfo = dataset.globalInfo
-        statModels = globalInfo.statModels
         labelToONNX = {}
         labelToSModelS = {}
-        hasJsonsWithoutMLModels = False
 
         for sr in globalInfo.srMappings:
            # nsignals[ sr["onnx"] ] = 0.
@@ -133,7 +131,6 @@ class CompRetriever:
         ## translate the signal from smodels names to pyhf names
         #for smname,onnxname in translator.items():
         #    nsignals[onnxname] = self.nsig[smname]
-        from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
         subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
         for srSetName, model_tuples in globalInfo.statModels.items():
             f_signals = {}
@@ -154,12 +151,11 @@ class CompRetriever:
                     lumi=dataset.getLumi(),
                     onnxfilename = modelfilename )
             upperLimitComputer.allowNegativeSignals = False
-            upperLimitComputer.dataType = "nn"
             subComputers.append ( upperLimitComputer )
         return subComputers
 
     @classmethod
-    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
+    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> List[PyhfUpperLimitComputer]:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
@@ -183,12 +179,6 @@ class CompRetriever:
             jsonDictNames[model_name]=cls.getAll ( \
                     globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
 
-        jsonRegions = [ region for regions in jsonDictNames.values() for region in regions ]
-        """
-        for ds in datasets:
-            if not ds in jsonRegions:
-                logger.info(f'Region {ds} does not appear in any json file for {globalInfo.id}')
-        """
         logger.debug(f"list of datasets: {datasets}")
 
         # Constructing the list of signals with subsignals matching each json
@@ -217,24 +207,23 @@ class CompRetriever:
             regions = cls.getRegions ( region_names,
                     globalInfo.srMappingsDict )
             if model_tuple[1] in r_jsonFiles:
-                raise SModelSError ( f"model {model} mentioned more than once in {globalInfo.path}" )
+                raise SModelSError ( f"model {model_tuple[1]} mentioned more than once in {globalInfo.path}" )
             r_jsonFiles[model_tuple[1]]=regions
 
         subComputers = []
         for nsignal,json,(jsonFileName,r_jsonFile) in zip(nsignals.values(),jsons,r_jsonFiles.items() ):
             # Loading the jsonFiles, unless we already have them (because we pickled)
             data = PyhfData(nsignal, json, r_jsonFile,
-                    includeCRs, signalUncertainty, globalInfo,
-                    jsonFileName = jsonFileName )
+                            includeCRs, signalUncertainty, globalInfo,
+                            jsonFileName = jsonFileName )
             upperLimitComputer = PyhfUpperLimitComputer( data,
-                    lumi=dataset.getLumi() )
-            upperLimitComputer.dataType = "pyhf"
+                                                         lumi=dataset.getLumi() )
             upperLimitComputer.allowNegativeSignals = False
             subComputers.append ( upperLimitComputer )
         return subComputers
 
     @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> List[TruncatedGaussians]:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
@@ -245,13 +234,13 @@ class CompRetriever:
         # marked as experimental feature
         if not hasattr(theorypred, "avgElement"):
             logger.error( f"theory prediction {theorypred.analysisId()} has no average element! why??" )
-            return None
+            return []
 
         eul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=apriori
         )
         if eul is None:
-            return None
+            return []
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, 
@@ -264,7 +253,7 @@ class CompRetriever:
 
     @classmethod
     def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
-            -> list:
+            -> List[AnaCombLikelihoodComputer]:
         """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
         :param deltas_rel: relative error for the signal
@@ -276,12 +265,11 @@ class CompRetriever:
 
         computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
                                               deltas_rel=deltas_rel )
-        computer.dataType = "analysesComb"
         computer.allowNegativeSignals = allowNegativeSignals
         return [ computer ]
 
     @classmethod
-    def getAll ( obj, srSet : list, srMappingsDict : dict ) -> list:
+    def getAll ( cls, srSet : list, srMappingsDict : dict ) -> list:
         """ for the srSet, return list only of signal regions,
         drop others """
         ret = []
@@ -293,7 +281,7 @@ class CompRetriever:
         return ret
 
     @classmethod
-    def getRegions ( obj, region_labels : list, srMappingsDict : dict ) -> list:
+    def getRegions ( cls, region_labels : list, srMappingsDict : dict ) -> list:
         """ given a list of the region_labels, return the
         corresponding list of the region dictionaries """
         ret = []
@@ -354,7 +342,7 @@ class StatsComputer:
         return ret
 
     def nll ( self, poi_test : float, evaluationType : NllEvalType,
-              asimov : Union[None,float] = None, **kwargs  ) -> float:
+              asimov : Union[None,float] = None, **kwargs  ) -> Union[None,float]:
         """ simple frontend to individual computers """
         msm = self.getMostSensitiveModel()
         self.transform ( evaluationType )
@@ -368,7 +356,7 @@ class StatsComputer:
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
                   return_nll : bool, asimov : Union[None,float] = None,
-                  **kwargs ) -> float:
+                  **kwargs ) -> Union[None,float]:
         """ convenience function, should become obsolete longterm """
         nll = self.nll ( poi_test, evaluationType, asimov, **kwargs )
         return exponentiateNLL ( nll, doIt = not return_nll )
@@ -425,22 +413,24 @@ class StatsComputer:
         return ret
 
     @lru_cache
-    def getMostSensitiveModel ( self ) -> dict:
+    def getMostSensitiveModel ( self ) -> Union[PyhfUpperLimitComputer,NNUpperLimitComputer,\
+                                                SLUpperLimitComputer,AnaCombLikelihoodComputer,\
+                                                TruncatedGaussians,None]:
         """ convenience function to get the most significant model
 
         :returns: dictionary with idx of the computer, ul_min,
         limit_on_xsecs
         and the name of the most sensitive model
         """
-        ul_min,idx,name = float("inf"), None, ""
+        ul_min = float("inf")
+        most_sensitive_computer = None
         for i,computer in enumerate ( self.subComputers ):
-            if computer is None:
-                continue
             ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
             # print ( f"@@0 getMostSensitiveModel {i} {computer.name} {ul}" )
-            if ul != None and ul < ul_min:
-                ul_min, idx, name = ul, i, computer.name
-        return { "idx": idx, "ul_min": ul_min, "name": name }
+            if ul is not None and ul < ul_min:
+                ul_min = ul
+                most_sensitive_computer = computer
+        return most_sensitive_computer
 
     def getTotalXSec ( self ):
         """ get the total yield, summing over all computers """
@@ -463,12 +453,9 @@ class StatsComputer:
         :param kwargs: e.g. pmSigma
         """
         msm = self.getMostSensitiveModel()
-        idx = msm["idx"]
-        if idx == None:
+        if msm == None:
             return None
-        if idx >= len(self.subComputers):
-            raise SModelSError ( f"most sensitive model is {msm} but we only have {len(self.subComputers)} subComputers" )
-        ulmu = self.subComputers[ idx ].getUpperLimitOnMu(
+        ulmu = msm.getUpperLimitOnMu(
                    evaluationType = evaluationType, nSigma = nSigma, **kwargs )
         if ulmu == None or not limit_on_xsec:
             return ulmu

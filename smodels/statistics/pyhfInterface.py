@@ -378,6 +378,8 @@ class PyhfUpperLimitComputer:
         self.data = data
         self.lumi = lumi
         self.name = data.jsonFileName
+        self.dataType = "pyhf"
+        self.allowNegativeSignals = False
         self.nsignals = copy.deepcopy ( self.data.nsignals )
         logger.debug(f"Signals : {self.nsignals}")
         self.inputJson = self.data.inputJson

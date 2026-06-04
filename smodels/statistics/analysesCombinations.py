@@ -42,6 +42,8 @@ class AnaCombLikelihoodComputer(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self.name = "anaComb"
+        self.dataType = "analysesComb"
+        self.allowNegativeSignals = False
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll(

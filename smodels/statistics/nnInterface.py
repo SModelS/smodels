@@ -199,6 +199,8 @@ class NNUpperLimitComputer:
         """
         self.data = data
         self.name = onnxfilename
+        self.allowNegativeSignals = False
+        self.dataType = "nn"
         # first thing we do, we determine whats the most sensitive model
         session_options = {}
         import onnxruntime

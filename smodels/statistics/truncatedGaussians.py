@@ -237,3 +237,10 @@ class TruncatedGaussians:
         # if return_nll:
         return float ( np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu) )
         #return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
+
+    def getUpperLimitOnMu(self, **kwargs) -> Optional[float]:
+        """
+        Get the upper limit on the signal strength mu directly from its definition.
+        """
+        
+        return self.upperLimitOnMu

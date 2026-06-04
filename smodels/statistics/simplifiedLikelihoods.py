@@ -982,7 +982,7 @@ class LikelihoodComputer:
         # Return the test statistic -2log(H0/H1)
         return chi2
 
-class UpperLimitComputer:
+class SLUpperLimitComputer:
     debug_mode = False
 
     def __init__(self, likelihoodComputer, cl: float = 0.95):
@@ -1010,7 +1010,6 @@ class UpperLimitComputer:
     def getCLsRootFunc(
         self,
         evaluationType: NllEvalType=observed,
-        trylasttime: Optional[bool] = False,
         nSigma : int = 0
     ) -> Tuple:
         """
@@ -1019,7 +1018,6 @@ class UpperLimitComputer:
 
         :param model: statistical model
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param trylasttime: if True, then dont try extra
         :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
@@ -1079,7 +1077,7 @@ class UpperLimitComputer:
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, evaluationType : NllEvalType=observed, trylasttime : bool =False,
+        self, evaluationType : NllEvalType=observed,
         nSigma : int = 0 ) -> Union[None,float]:
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
@@ -1087,14 +1085,13 @@ class UpperLimitComputer:
         the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :param evaluationType: one of: observed, apriori, aposteriori.
-        :param trylasttime: if True, then dont try extra.
         :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
-            evaluationType = evaluationType, trylasttime = trylasttime,
+            evaluationType = evaluationType,
             nSigma = nSigma )
         if mu_hat == None:
             return None
@@ -1111,7 +1108,6 @@ class UpperLimitComputer:
         self,
         mu : float = 1.0,
         evaluationType: NllEvalType=observed,
-        trylasttime: bool = False,
         return_type: Text = "CLs",
     ) -> float:
         """
@@ -1119,13 +1115,12 @@ class UpperLimitComputer:
 
         :param model: statistical model
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param trylasttime: if True, then dont try extra
         :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs"
                             CLs-alpha: returns CLs - 0.05 (alpha)
                             1-CLs: returns 1-CLs value
                             CLs: returns CLs value
         """
-        _, _, clsRoot = self.getCLsRootFunc( evaluationType, trylasttime )
+        _, _, clsRoot = self.getCLsRootFunc( evaluationType )
         ret = clsRoot(mu, return_type=return_type)
         # its not an uppser limit on mu, its on nsig
         # print ( f"@@SL0 been asked to compute CLs mu={mu} asimov={self.likelihoodComputer.model.asimov}: {ret}" )
@@ -1209,7 +1204,7 @@ if __name__ == "__main__":
         nsignal=nsignal,
         name="CMS-NOTE-2017-001 model",
     )
-    ulComp = UpperLimitComputer( LikelihoodComputer(m), cl=0.95)
+    ulComp = SLUpperLimitComputer( LikelihoodComputer(m), cl=0.95)
 
     ul = ulComp.getUpperLimitOnMu( )
     cls = ulComp.CLs( 1. )
