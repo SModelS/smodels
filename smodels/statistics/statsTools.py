@@ -12,7 +12,7 @@
 
 __all__ = [ "StatsComputer", "getCompRetrieverModule" ]
 
-from typing import Union, Text, Dict, List, Optional
+from typing import Union, Dict, Optional
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
@@ -22,10 +22,8 @@ from smodels.statistics.basicStats import observed, apriori, NllEvalType, \
          exponentiateNLL
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
-from smodels.experiment.datasetObj import DataSet,CombinedDataSet
 from smodels.base.physicsUnits import UnitXSec
-from smodels.tools.caching import roundCache, lru_cache
-from typing import Union, Text, Optional
+from smodels.tools.caching import lru_cache
 
 def getCompRetrieverModule():
     """ very single convenience function to centralize
@@ -52,7 +50,6 @@ class CompRetriever:
 
         :returns: a subcomputer
         """
-        dataType = "SL"
         covs = dataset.globalInfo.cachedModels
         offset = 0
         subComputers = []
@@ -85,14 +82,14 @@ class CompRetriever:
                          name = covname )
             likelihoodComputer = LikelihoodComputer ( data )
             computer = UpperLimitComputer ( likelihoodComputer )
+            computer.dataType = "SL"
             computer.allowNegativeSignals = False
-            computer.dataType = dataType
             subComputers.append ( computer )
             offset += n
         return subComputers
 
     @classmethod
-    def forSingleBin( cls, dataset, nsig, deltas_rel : Optional[float],
+    def forSingleBin( cls, dataset, nsig, deltas_rel : float = 0.2,
                       lumi : Optional[UnitLumi]=None ) -> list:
         """ get a sub computer for an efficiency map (single bin).
 

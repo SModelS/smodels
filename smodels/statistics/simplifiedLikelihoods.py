@@ -993,6 +993,8 @@ class UpperLimitComputer:
         self.likelihoodComputer = likelihoodComputer
         self.cl = cl
         self.name = likelihoodComputer.model.name
+        self.allowNegativeSignals = False
+        self.dataType = "SL"
 
     def nll_min(self,**kwargs) -> float:
         return self.likelihoodComputer.nll_min ( **kwargs )
