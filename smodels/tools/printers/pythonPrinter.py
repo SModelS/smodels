@@ -318,7 +318,7 @@ class PyPrinter(BasicPrinter):
                        'Width (GeV)' : widths})
             if hasattr ( self, "addstatmodel" ) and self.addstatmodel and dataType == "combined":
                 model = theoryPrediction.statsComputer.getMostSensitiveModel()
-                resDict["StatModel"]=model["name"]
+                resDict["StatModel"]=model.name
 
             if self.errorsforr and theoryPrediction.dataType() != "upperLimit":
                 # the errors on R values feature is used only for SR-combinations
