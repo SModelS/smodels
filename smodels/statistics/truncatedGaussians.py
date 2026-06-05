@@ -27,7 +27,7 @@ class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
          arXiv:1202.3415 """
     __slots__ = [ "upperLimitOnMu", "expectedUpperLimitOnMu", "corr",
-                  "sigma_mu", "denominator", "cl" ]
+                  "sigma_mu", "denominator", "cl", "allowNegativeSignals" ]
 
     # the correction we introduced a long time ago was have exclusions
     # in mind only. for discovery mode we need to correct differently
