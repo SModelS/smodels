@@ -109,7 +109,7 @@ class CompRetriever:
         return [ computer ]
 
     @classmethod
-    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> List[NNUpperLimitComputer]:
+    def forNNs(cls, dataset, nsig ) -> List[NNUpperLimitComputer]:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -128,10 +128,8 @@ class CompRetriever:
                 labelToONNX [ sr["label"] ] = sr["onnx"]
                 labelToSModelS [ sr["label"] ] = sr["smodels"]
 
-        ## translate the signal from smodels names to pyhf names
-        #for smname,onnxname in translator.items():
-        #    nsignals[onnxname] = self.nsig[smname]
-        subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
+        
+        subComputers = []
         for srSetName, model_tuples in globalInfo.statModels.items():
             f_signals = {}
             for sr in globalInfo.srMappings:
@@ -155,12 +153,11 @@ class CompRetriever:
         return subComputers
 
     @classmethod
-    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> List[PyhfUpperLimitComputer]:
+    def forPyhf(cls, dataset, nsig) -> List[PyhfUpperLimitComputer]:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
@@ -368,7 +365,7 @@ class StatsComputer:
         # print ( f"@@ST0 getMostSensitiveModel eType {evaluationType} ret {ret}" )
         if msm is None:
             return None
-        # self.transform ( evaluationType )
+
         if hasattr ( msm , "CLs" ):
             return msm.CLs ( poi_test,
                     evaluationType = evaluationType, **kwargs )
@@ -423,7 +420,6 @@ class StatsComputer:
         most_sensitive_computer = None
         for i,computer in enumerate ( self.subComputers ):
             ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
-            # print ( f"@@0 getMostSensitiveModel {i} {computer.name} {ul}" )
             if ul is not None and ul < ul_min:
                 ul_min = ul
                 most_sensitive_computer = computer
@@ -463,7 +459,7 @@ class SimpleStatsDataSet:
     """ a very simple data class that can replace a smodels.dataset,
     for 1d SL data only. used for testing and in dataPreparation """
     class SimpleInfo:
-        def __init__ ( self, observedN : float, evaluationTypeBG : float,
+        def __init__ ( self, observedN : float, expectedBG : float,
                        bgError : float ):
             self.observedN = observedN
             self.expectedBG = expectedBG
@@ -474,10 +470,10 @@ class SimpleStatsDataSet:
             self.id = "SimpleStatsDataSet"
             self.lumi = lumi
 
-    def __init__ ( self, observedN : float, evaluationTypeBG : float,
-                   bgError : float, lumi : fb ):
+    def __init__ ( self, observedN : float, expectedBG : float,
+                   bgError : float, lumi = 1.0*fb ):
         """ initialise the dataset with all relevant stats """
-        self.dataInfo = self.SimpleInfo ( observedN, evaluationTypeBG, bgError )
+        self.dataInfo = self.SimpleInfo ( observedN, expectedBG, bgError )
         self.globalInfo = self.GlobalInfo( lumi )
 
     def getLumi ( self ):

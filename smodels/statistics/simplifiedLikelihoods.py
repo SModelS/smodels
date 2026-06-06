@@ -732,7 +732,7 @@ class LikelihoodComputer:
                     return thetamax
         return thetamax
 
-    def findThetaHat(self, mu : float ):
+    def findThetaHat(self, mu : float ) -> Union[None,tuple]:
         """Compute nuisance parameters theta that maximize our likelihood
         (poisson*gauss).
         """
@@ -749,14 +749,10 @@ class LikelihoodComputer:
         ini = self.getThetaHat(
             model.observed, model.backgrounds, mu, model.covariance, 0)
         self.cov_tot = model.V
-        # if model.n == 1:
-        #    self.cov_tot = model.totalCovariance ( nsig )
-        # if not model.isLinear():
-        # self.cov_tot = model.V + model.var_s(nsig)
-        # self.cov_tot = model.totalCovariance (nsig)
+        
+        
         self.weight = model.weight # np.linalg.inv(self.cov_tot)
-        # self.coeff = 1.
-
+        
         ## to catch slogdet warnings on Mac, numpy 2.3.2
         ## added by WW&SK, 14/08/2025
         with warnings.catch_warnings():
@@ -778,15 +774,14 @@ class LikelihoodComputer:
             logdet = np.linalg.slogdet(self.cov_tot)
 
         self.logcoeff = -model.n / 2 * np.log(2 * np.pi) - 0.5 * logdet[1]
-        # self.coeff = (2*np.pi)**(-model.n/2) * np.exp(-.5* logdet[1] )
-        # print ( "coeff", self.coeff, "n", model.n, "det", np.linalg.slogdet ( self.cov_tot ) )
-        # print ( "cov_tot", self.cov_tot[:10] )
+        
+        
         self.ones = 1.0
         if type(model.observed) in [list, ndarray]:
             self.ones = np.ones(len(model.observed))
         self.gammaln = special.gammaln(model.observed + 1)
         try:
-            ret_c = optimize.fmin_ncg(
+            theta_hat,*_ = optimize.fmin_ncg(
                 self.nllOfTheta,
                 ini,
                 fprime=self.dNLLdTheta,
@@ -799,23 +794,18 @@ class LikelihoodComputer:
                 bounds = [(-10 * model.observed, 10 * model.observed)]
             else:
                 bounds = [(-10 * x, 10 * x) for x in model.observed]
-            ini = ret_c
-            ret_c = optimize.fmin_tnc(
-                self.nllOfTheta, ret_c[0], fprime=self.dNLLdTheta, disp=0,
+            theta_hat,_,rc = optimize.fmin_tnc(
+                self.nllOfTheta, theta_hat, fprime=self.dNLLdTheta, disp=0,
                     bounds=bounds
             )
-            if ret_c[-1] not in [0, 1, 2]:
-                return ret_c[0], ret_c[-1]
+            if rc not in [0, 1, 2]: # Check if optimization converged
+                return theta_hat, rc
             else:
-                return ret_c[0], 0
-                logger.debug("tnc worked.")
+                return theta_hat, 0
 
-            ret = ret_c[0]
-            return ret, -2
         except (IndexError, ValueError) as e:
-            logger.error( f"exception: {e}. ini[-3:]={ini[-3:]}" )
+            logger.error( f"exception: {e}." )
             raise Exception( f"cov-1={model.covariance + model.var_s(nsig)**(-1)}")
-        return ini, -1
 
     def nll(self, mu : float, evaluationType : NllEvalType=observed,
            asimov : Union[None,float] = None  ):
@@ -881,7 +871,7 @@ class LikelihoodComputer:
         self,
         allowNegativeSignals : bool = False,
         extended_output : bool = False,
-    ):
+    ) -> Union[float, dict]:
         """
         Find the most likely signal strength mu via gradient descent
         given the relative signal strengths in each dataset (signal region).
@@ -906,8 +896,6 @@ class LikelihoodComputer:
             ret = self.nll( mu = mu )
             return ret
 
-        import scipy.optimize
-        ominr = minr
         if minr > 0.:
             minr = .5 * minr
         if minr < 0.:
@@ -921,7 +909,7 @@ class LikelihoodComputer:
         if not allowNegativeSignals:
             bounds = [(0, max(maxr,1e-5))]
         assert bounds[0][1] > bounds[0][0], f"bounds are in wrong order: {bounds}"
-        o = scipy.optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
+        o = optimize.minimize( myllhd, x0=avgr, bounds=bounds, jac = self.dNLLdMu )
         nll = o.fun
         mu_hat = float(o.x[0])
         if extended_output:
@@ -1048,14 +1036,9 @@ class SLUpperLimitComputer:
         sigma_mu = computer.getSigmaMu(mu_hat, compA.theta_hat)
         nll0 = computer.nll( mu_hat )
 
-        theta_hat0 = compA.theta_hat
-        # theta_hat0, _ = computer.findThetaHat( 0. )
 
-        #aModel = model.generateAsimovData( theta_hat0, 0. )
-        # compA = LikelihoodComputer(aModel )
-        ## compute
         mu_hatA = compA.findMuHat()
-        # TODO convert rel_signals to signals
+
         nll0A = compA.nll( mu=mu_hatA )
         # return 1.
 

@@ -10,12 +10,11 @@ from smodels.base.physicsUnits import TeV, fb, UnitXSec
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, \
-         NllEvalType
+from smodels.statistics.basicStats import observed, apriori, NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
-from typing import Union, Text, Dict, Callable, Optional
+from typing import Union, Dict, Callable, Optional
 import numpy as np
 
 # number of digits for rounding the mu argument when computing likelihoods
@@ -45,6 +44,9 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
         self.totalwidth = None
+        self.dataset = None
+        self.txnames = []
+        self.smsList = []
         if deltas_rel is None:
             from smodels.base.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
@@ -59,7 +61,9 @@ class TheoryPrediction(object):
         """
         Return ID of dataset
         """
-
+        if self.dataset is None:
+            return None
+        
         return self.dataset.getID()
 
     def analysisId(self):
@@ -67,15 +71,21 @@ class TheoryPrediction(object):
         Return experimental analysis ID
         """
 
+        if self.dataset is None:
+            return None
+        
         return self.dataset.globalInfo.id
 
-    def dataType(self, short : bool = False ) -> str:
+    def dataType(self, short : bool = False ) -> Union[None,str]:
         """
         Return the type of dataset
         :param: short, if True, return abbreviation (ul,em,comb)
 
         :returns: data type, as a string, e.g. "efficiencyMap"
         """
+        if self.dataset is None:
+            return None
+
         if short:
             t = self.dataset.getType()
             D = {"upperLimit": "ul", "efficiencyMap": "em",
@@ -181,11 +191,13 @@ class TheoryPrediction(object):
         from smodels.statistics.statsTools import getCompRetrieverModule
         CompRetriever = getCompRetrieverModule()
 
-        if self.dataType() == "upperLimit":
+        computers =  'N/A'
+        if self.dataset is None:
+            logger.error('Can not define stats computer for theory prediction with no dataset')
+
+        elif self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
-            if not experimentalFeature( "truncatedGaussians" ):
-                computers = 'N/A'
-            else:
+            if experimentalFeature( "truncatedGaussians" ):
                 computers = CompRetriever.forTruncatedGaussian(self)
                 if computers is None: # No evaluationType UL available
                     computers = 'N/A'
@@ -193,8 +205,7 @@ class TheoryPrediction(object):
         elif self.dataType() == "efficiencyMap":
             nsig = (self.xsection * self.dataset.getLumi()).asNumber()
             computers = CompRetriever.forSingleBin(dataset=self.dataset,
-                                                  nsig=nsig,
-                                                  deltas_rel=self.deltas_rel )
+                                                  nsig=nsig)
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
@@ -204,34 +215,25 @@ class TheoryPrediction(object):
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
 
-            if hasattr(self.dataset.globalInfo, "statModels"):
-                # Get computer
-                hasSL = False
-                hasOnnx = False
-                for srSetName, model_tuples in self.dataset.globalInfo.statModels.items():
-                    model_tuple = model_tuples[0]
-                    model_type = model_tuple[0]
-                    if model_type == "onnx":
-                        hasOnnx = True
-                    if model_type == "sl":
-                        hasSL = True
-                if hasSL:
+            if hasattr(self.dataset.globalInfo, "statModels") and len(self.dataset.globalInfo.statModels) > 0:
+                # Always use the first model:
+                model_type,_ = list(self.dataset.globalInfo.statModels.values())[0][0]
+                if model_type == "sl":
                     datasetList = []
-                    for srSetName,regions in self.dataset.globalInfo.srSets.items():
+                    for regions in self.dataset.globalInfo.srSets.values():
                         datasetList += regions
                     # datasetList = self.dataset.globalInfo.datasetOrder[:]
                     # Get list of signal yields corresponding to the dataset order:
                     srNsigs = [srNsigDict[dataID] for dataID in datasetList]
                     computers = CompRetriever.forMultiBinSL(dataset=self.dataset,
-                        nsig=srNsigs, deltas_rel = self.deltas_rel )
-                elif hasOnnx:
+                                                            nsig=srNsigs, 
+                                                            deltas_rel = self.deltas_rel )
+                elif model_type == "onnx":
                     computers = CompRetriever.forNNs(dataset=self.dataset,
-                                              nsig=srNsigDict,
-                                              deltas_rel = self.deltas_rel)
-                else:
+                                                     nsig=srNsigDict)
+                elif model_type == "pyhf":
                     computers = CompRetriever.forPyhf(dataset=self.dataset,
-                                              nsig=srNsigDict,
-                                              deltas_rel = self.deltas_rel)
+                                                      nsig=srNsigDict)
 
         if computers == "N/A":
             self._statsComputer = computers
@@ -274,7 +276,7 @@ class TheoryPrediction(object):
         return ul
 
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
-            nSigma : int = 0, **kwargs ) -> float:
+            nSigma : int = 0, **kwargs ) -> Union[None,float]:
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit

@@ -14,14 +14,11 @@ __all__ = [ "TruncatedGaussians" ]
 
 from scipy import stats, optimize
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, \
-    NllEvalType
-from typing import Text, Optional, Union, Dict
-from smodels.statistics.basicStats import deltaChi2FromLlhd
+from smodels.statistics.basicStats import observed, NllEvalType
+from typing import  Optional, Union, Dict
 
 class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
@@ -85,7 +82,6 @@ class TruncatedGaussians:
 
         :returns: nll (float)
         """
-        muhat, sigma_mu = float("inf"), float("inf")
         dsig = self._nllOfMu ( mu, allowNegativeSignals = allowNegativeSignals,
                 corr = corr, evaluationType = evaluationType )
         ret = dsig["nll"]
@@ -207,18 +203,17 @@ class TruncatedGaussians:
                 rb = self._root_func ( xb )
 
         try:
-            muhat = optimize.toms748( self._root_func, xa, xb, rtol=1e-07,
+            muhat,*_ = optimize.toms748( self._root_func, xa, xb, rtol=1e-07,
                                       xtol=1e-07 )
         except ValueError as e:
             logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
             logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
-            muhat = optimize.toms748( self._root_func, xa, xb, rtol=1e-02,
+            muhat,rootResults = optimize.toms748( self._root_func, xa, xb, rtol=1e-02,
                                       xtol=1e-02, full_output = True )
-            if muhat[1].converged:
-                muhat = muhat[0]
+            if rootResults.converged:
                 logger.error ( f"retry with tol=1e-2 seemed to have worked" )
             else:
-                muhat = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
+                muhat,*_ = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
                 logger.error ( f"retry with brentq seemed to have worked" )
         return muhat
 
@@ -227,7 +222,7 @@ class TruncatedGaussians:
             mu = muhat
         sigma_mu = self.sigma_mu
         ## we could also correct here
-        if self.newCorrectionType:
+        if self.newCorrectionType and self.corr is not None:
             sigma_mu = self.sigma_mu / ( 1. - self.corr / 2. )
 
         # need to account for the truncation!
@@ -239,9 +234,12 @@ class TruncatedGaussians:
         return float ( np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu) )
         #return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
 
-    def getUpperLimitOnMu(self, **kwargs) -> Optional[float]:
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, **kwargs) -> Optional[float]:
         """
         Get the upper limit on the signal strength mu directly from its definition.
         """
         
-        return self.upperLimitOnMu
+        if evaluationType == observed:
+            return self.upperLimitOnMu
+        else:
+            return self.expectedUpperLimitOnMu

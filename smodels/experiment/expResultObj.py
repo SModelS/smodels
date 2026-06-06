@@ -36,15 +36,15 @@ class ExpResult(object):
         :param databaseParticles: the model, i.e. the particle content
         """
 
-        if path in [None, "<transient>"]:
+        if path is None or path == "<transient>":
             self.path = "<transient>"
             return
-        if not os.path.isdir(path):
+        elif not os.path.isdir(path):
             raise SModelSExperimentError(f"{path} is not a path")
 
         self.path = path
         if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
-            logger.error("globalInfo.txt file not found in " + path)
+            logger.error(f"globalInfo.txt file not found in {path}")
             raise TypeError
         self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
         # Add type of experimental result (if not defined)

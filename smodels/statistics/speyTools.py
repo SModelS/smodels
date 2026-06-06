@@ -35,7 +35,7 @@ _debug = { "writePoint": False } # for debugging only
 
 class SpeyRetriever:
     @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> list:
+    def forMultiBinSL(cls,dataset, nsig, deltas_rel : Optional[float] = 0.0 ) -> list:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -68,7 +68,6 @@ class SpeyRetriever:
             if len(cov) < 1:
                 raise SModelSError( f"covariance matrix has length {len(cov)}." )
             n = len(cov)
-            nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
             bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
             nsig = nsig[offset:offset+n]
             third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
@@ -129,8 +128,7 @@ class SpeyRetriever:
         return subComputers
 
     @classmethod
-    def forSingleBin( cls, dataset, nsig, deltas_rel : Optional[float],
-                      lumi : Optional[UnitLumi]=None ) -> list:
+    def forSingleBin( cls, dataset, nsig ) -> list:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -161,7 +159,7 @@ class SpeyRetriever:
         return [ facade ]
 
     @classmethod
-    def forNNs(cls, dataset, nsig, deltas_rel : Optional[float] ) -> list:
+    def forNNs(cls, dataset, nsig ) -> list:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -184,7 +182,7 @@ class SpeyRetriever:
                 labelToONNX [ sr["label"] ] = sr["onnx"]
                 labelToSModelS [ sr["label"] ] = sr["smodels"]
 
-        subComputers = cls.forPyhf ( dataset, nsig, deltas_rel )
+        subComputers = cls.forPyhf ( dataset, nsig )
 
         for srSetName, model_tuples in globalInfo.statModels.items():
             f_signals = {}
@@ -219,12 +217,11 @@ class SpeyRetriever:
         return subComputers
 
     @classmethod
-    def forPyhf(cls, dataset, nsig, deltas_rel : Optional[float]) -> list:
+    def forPyhf(cls, dataset, nsig) -> list:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
         :param nsig: Number of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
