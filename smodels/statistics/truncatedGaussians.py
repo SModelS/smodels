@@ -203,8 +203,8 @@ class TruncatedGaussians:
                 rb = self._root_func ( xb )
 
         try:
-            muhat,*_ = optimize.toms748( self._root_func, xa, xb, rtol=1e-07,
-                                      xtol=1e-07 )
+            muhat,rootResults = optimize.toms748( self._root_func, xa, xb, rtol=1e-07,
+                                                  xtol=1e-07, full_output = True  )
         except ValueError as e:
             logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
             logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
