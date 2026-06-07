@@ -40,12 +40,14 @@ class CompRetriever:
     """ simple class that retrieves and constructs the sub computers,
     in StatsComputer """
 
+
+
     @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel : float ) -> List[SLUpperLimitComputer]:
+    def forMultiBinSL(cls,dataset, nsigDict, deltas_rel : float ) -> List[SLUpperLimitComputer]:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a subcomputer
@@ -53,6 +55,7 @@ class CompRetriever:
         covs = dataset.globalInfo.cachedModels
         offset = 0
         subComputers = []
+        nsig = list(nsigDict.values())
         for covname,cov in covs.items():
             if not covname.endswith ( ".cov" ):
                 continue
@@ -89,19 +92,19 @@ class CompRetriever:
         return subComputers
 
     @classmethod
-    def forSingleBin( cls, dataset, nsig, deltas_rel : float = 0.2,
+    def forSingleBin( cls, dataset, nsigDict, deltas_rel : float = 0.2,
                       lumi : Optional[UnitLumi]=None ) ->  List[SLUpperLimitComputer]:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
-                     nsignal = nsig, lumi = lumi )
+                     nsignal = list(nsigDict.values()), lumi = lumi )
         likelihoodComputer = LikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
@@ -109,11 +112,11 @@ class CompRetriever:
         return [ computer ]
 
     @classmethod
-    def forNNs(cls, dataset, nsig ) -> List[NNUpperLimitComputer]:
+    def forNNs(cls, dataset, nsigDict ) -> List[NNUpperLimitComputer]:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
@@ -136,9 +139,9 @@ class CompRetriever:
                 f_signals[ sr["onnx"] ] = 0.
             for label in globalInfo.srSets[srSetName]:
                 smodelsName = labelToSModelS[label]
-                if smodelsName in nsig:
+                if smodelsName in nsigDict:
                     f_signals[ labelToONNX[label] ] = \
-                        nsig[ smodelsName ]
+                        nsigDict[ smodelsName ]
             model_tuple = model_tuples[0]
             modelfilename = model_tuple[1]
             model_type = model_tuple[0]
@@ -153,11 +156,11 @@ class CompRetriever:
         return subComputers
 
     @classmethod
-    def forPyhf(cls, dataset, nsig) -> List[PyhfUpperLimitComputer]:
+    def forPyhf(cls, dataset, nsigDict) -> List[PyhfUpperLimitComputer]:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary with signal yields for each SR
 
         :returns: a sub computer
         """
@@ -182,7 +185,7 @@ class CompRetriever:
         nsignals = {}
         for jsName in jsonFiles:
             nsignals.update( { jsName: {} } )
-        for name, nsig in nsig.items():
+        for name, nsig in nsigDict.items():
             for jsName in nsignals.keys():
                 if name in jsonDictNames[jsName]:
                     nsignals[jsName].update( { name: nsig } )

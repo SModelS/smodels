@@ -57,7 +57,7 @@ class TheoryPrediction(object):
         ret = f"{self.analysisId()}:{self.totalXsection()}"
         return ret
 
-    def dataId(self):
+    def dataId(self) -> Union[None,str]:
         """
         Return ID of dataset
         """
@@ -66,7 +66,7 @@ class TheoryPrediction(object):
         
         return self.dataset.getID()
 
-    def analysisId(self):
+    def analysisId(self) -> Union[None,str]:
         """
         Return experimental analysis ID
         """
@@ -203,15 +203,15 @@ class TheoryPrediction(object):
                     computers = 'N/A'
 
         elif self.dataType() == "efficiencyMap":
-            nsig = (self.xsection * self.dataset.getLumi()).asNumber()
+            nsigDict = {self.dataset.getID() : (self.xsection * self.dataset.getLumi()).asNumber()}
             computers = CompRetriever.forSingleBin(dataset=self.dataset,
-                                                  nsig=nsig)
+                                                   nsigDict=nsigDict)
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {ds.getID() : 0.0 for ds in self.dataset.origdatasets}
+            srNsigDictAll = {ds.getID() : 0.0 for ds in self.dataset.origdatasets}
             # Update with theory predictions
-            srNsigDict.update({pred.dataset.getID() :
+            srNsigDictAll.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
 
@@ -222,26 +222,23 @@ class TheoryPrediction(object):
                     raise ValueError(f"no statistical model defined for srSet {srSet} in dataset {self.dataset}")
                 
                 modelList = self.dataset.globalInfo.statModels[srSet]
-                if not modelList:
-                    continue             
+                if not modelList or len(modelList) == 0:
+                    continue
+                
+                # Get the dict of signal yields for the given set of SRs:
+                srNsigDict = {sr: srNsigDictAll[sr] for sr in self.dataset.globalInfo.srSets[srSet]}
                 # Always use the first model:
                 model_type,_ = modelList[0]
                 if model_type == "sl":
-                    datasetList = []
-                    for regions in self.dataset.globalInfo.srSets.values():
-                        datasetList += regions
-                    # datasetList = self.dataset.globalInfo.datasetOrder[:]
-                    # Get list of signal yields corresponding to the dataset order:
-                    srNsigs = [srNsigDict[dataID] for dataID in datasetList]
                     computers += CompRetriever.forMultiBinSL(dataset=self.dataset,
-                                                            nsig=srNsigs, 
+                                                            nsigDict=srNsigDict, 
                                                             deltas_rel = self.deltas_rel )
                 elif model_type == "onnx":
                     computers += CompRetriever.forNNs(dataset=self.dataset,
-                                                    nsig=srNsigDict)
+                                                    nsigDict=srNsigDict)
                 elif model_type == "pyhf":
                     computers += CompRetriever.forPyhf(dataset=self.dataset,
-                                                    nsig=srNsigDict)
+                                                    nsigDict=srNsigDict)
 
         if computers == "N/A":
             self._statsComputer = computers
@@ -832,20 +829,9 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                     if gD.dataInfo.dataId in gI.srMappingsDict:
                         region = gI.srMappingsDict[gD.dataInfo.dataId]
                         tpe = region["type"]
-#                if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
-#                    for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
-#                        for region in regionSet:
-#                            if region["smodels"] == theoPred.dataset.dataInfo.dataId:
-#                                tpe = region["type"]
-#                                break
                 else:
                     tpe = "SR"
-
-                #if tpe is None:
-                #    this probably just means that the signal region is not mentioned in the jsonFiles. thats allowed.
-                #    logger.debug(f"Could not find type of region {theoPred.dataset.dataInfo.dataId} from {theoPred.analysisId()}")
-                    # raise SModelSError()
-
+                
                 if tpe == "SR":
                     theoPred.upperLimit = theoPred.getUpperLimit()
                 else:

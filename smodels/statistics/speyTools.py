@@ -12,10 +12,11 @@
 __all__ = [ "SpeyRetriever", "SpeyAnalysesCombosComputer" ]
 
 from typing import Union, Text, Tuple, Dict, List, Optional
-import sys
+import os
 from spey import ExpectationType, StatisticalModel, get_backend
 from smodels.statistics.basicStats import exponentiateNLL
 from smodels.base.physicsUnits import UnitXSec
+from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 import spey
 # spey.set_optimiser( "iminuit" )
 
@@ -35,7 +36,7 @@ _debug = { "writePoint": False } # for debugging only
 
 class SpeyRetriever:
     @classmethod
-    def forMultiBinSL(cls,dataset, nsig, deltas_rel : Optional[float] = 0.0 ) -> list:
+    def forMultiBinSL(cls,dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> list:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -59,7 +60,7 @@ class SpeyRetriever:
         for ds in dataset._datasets:
             if hasattr ( ds.dataInfo, "thirdMoment" ):
                 thirdmomenta.append ( ds.dataInfo.thirdMoment )
-
+        nsig = list(nsigDict.values())
         for covname,cov in covs.items():
             if not covname.endswith ( ".cov" ):
                 continue
@@ -128,11 +129,11 @@ class SpeyRetriever:
         return subComputers
 
     @classmethod
-    def forSingleBin( cls, dataset, nsig ) -> list:
+    def forSingleBin( cls, dataset, nsigDict ) -> list:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary with signal yields for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
@@ -143,7 +144,7 @@ class SpeyRetriever:
         except spey.PluginError as e: ## older spey?
             stat_wrapper = get_backend("default_pdf.uncorrelated_background")
         id = f"{dataset.globalInfo.id}:{dataset.dataInfo.dataId}"
-
+        nsig = nsigDict.get(dataset.getID(), 0)
         speyModel = stat_wrapper(
                         data = [float(dataset.dataInfo.observedN)],
                         background_yields = [float(dataset.dataInfo.expectedBG)],
@@ -159,11 +160,11 @@ class SpeyRetriever:
         return [ facade ]
 
     @classmethod
-    def forNNs(cls, dataset, nsig ) -> list:
+    def forNNs(cls, dataset, nsigDict ) -> list:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary with signal yields for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
@@ -171,10 +172,8 @@ class SpeyRetriever:
         import spey
         stat_wrapper = spey.get_backend('ml.likelihoods')
         globalInfo = dataset.globalInfo
-        statModels = globalInfo.statModels
         labelToONNX = {}
         labelToSModelS = {}
-        hasJsonsWithoutMLModels = False
 
         for sr in globalInfo.srMappings:
            # nsignals[ sr["onnx"] ] = 0.
@@ -182,7 +181,7 @@ class SpeyRetriever:
                 labelToONNX [ sr["label"] ] = sr["onnx"]
                 labelToSModelS [ sr["label"] ] = sr["smodels"]
 
-        subComputers = cls.forPyhf ( dataset, nsig )
+        subComputers = cls.forPyhf ( dataset, nsigDict )
 
         for srSetName, model_tuples in globalInfo.statModels.items():
             f_signals = {}
@@ -190,9 +189,9 @@ class SpeyRetriever:
                 f_signals[ sr["onnx"] ] = 0.
             for label in globalInfo.srSets[srSetName]:
                 smodelsName = labelToSModelS[label]
-                if smodelsName in nsig:
+                if smodelsName in nsigDict:
                     f_signals[ labelToONNX[label] ] = \
-                        nsig[ smodelsName ]
+                        nsigDict[ smodelsName ]
             model_tuple = model_tuples[0]
             modelfilename = model_tuple[1]
             if "pyhf" in model_tuple[0]:
@@ -207,27 +206,27 @@ class SpeyRetriever:
             import onnx
             onnx.save ( onnxBlob, f )
             f.close()
-            speyModel = stat_wrapper(nsig,tempf)
+            speyModel = stat_wrapper(nsigDict,tempf)
             if os.path.exists ( tempf ):
                 os.unlink ( tempf )
-                xsec = sum(nsig) / dataset.globalInfo.lumi
+                xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
                 facade = speyModelFacade ( upperLimitComputer, "nn", 
                                            modelfilename, xsec )
                 subComputers.append ( facade )
         return subComputers
 
     @classmethod
-    def forPyhf(cls, dataset, nsig) -> list:
+    def forPyhf(cls, dataset, nsigDict) -> list:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
-        :param nsig: Number of signal events for each SR
+        :param nsigDict: Dictionary with signal yields for each SR
 
         :returns: a sub computer
         """
         stat_wrapper = get_backend("pyhf")
         from smodels.statistics.speyPyhf import SpeyPyhfData
-        data = SpeyPyhfData.createDataObject ( dataset, nsig )
+        data = SpeyPyhfData.createDataObject ( dataset, nsigDict )
         models = []
         patches = data.patchMaker()
         for i in range( len(data.inputJsons ) ):
@@ -241,7 +240,7 @@ class SpeyRetriever:
             speyModel = stat_wrapper( analysis = analysis,
                             signal_patch = signal_patch,
                             background_only_model = inputJson )
-            xsec = sum (nsig ) / dataset.globalInfo.lumi
+            xsec = sum (list(nsigDict.values())) / dataset.globalInfo.lumi
             facade = SpeyModelFacade ( speyModel, "pyhf", mname, xsec )
             models.append ( facade )
         return models
