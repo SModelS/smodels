@@ -215,9 +215,17 @@ class TheoryPrediction(object):
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
                           for pred in self.datasetPredictions})
 
-            if hasattr(self.dataset.globalInfo, "statModels") and len(self.dataset.globalInfo.statModels) > 0:
+            computers = []
+            for srSet in self.dataset.globalInfo.srSets:
+                if not srSet in self.dataset.globalInfo.statModels:
+                    logger.error(f"no statistical model defined for srSet {srSet} in dataset {self.dataset}")
+                    raise ValueError(f"no statistical model defined for srSet {srSet} in dataset {self.dataset}")
+                
+                modelList = self.dataset.globalInfo.statModels[srSet]
+                if not modelList:
+                    continue             
                 # Always use the first model:
-                model_type,_ = list(self.dataset.globalInfo.statModels.values())[0][0]
+                model_type,_ = modelList[0]
                 if model_type == "sl":
                     datasetList = []
                     for regions in self.dataset.globalInfo.srSets.values():
@@ -225,15 +233,15 @@ class TheoryPrediction(object):
                     # datasetList = self.dataset.globalInfo.datasetOrder[:]
                     # Get list of signal yields corresponding to the dataset order:
                     srNsigs = [srNsigDict[dataID] for dataID in datasetList]
-                    computers = CompRetriever.forMultiBinSL(dataset=self.dataset,
+                    computers += CompRetriever.forMultiBinSL(dataset=self.dataset,
                                                             nsig=srNsigs, 
                                                             deltas_rel = self.deltas_rel )
                 elif model_type == "onnx":
-                    computers = CompRetriever.forNNs(dataset=self.dataset,
-                                                     nsig=srNsigDict)
+                    computers += CompRetriever.forNNs(dataset=self.dataset,
+                                                    nsig=srNsigDict)
                 elif model_type == "pyhf":
-                    computers = CompRetriever.forPyhf(dataset=self.dataset,
-                                                      nsig=srNsigDict)
+                    computers += CompRetriever.forPyhf(dataset=self.dataset,
+                                                    nsig=srNsigDict)
 
         if computers == "N/A":
             self._statsComputer = computers
