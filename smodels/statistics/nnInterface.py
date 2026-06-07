@@ -35,66 +35,6 @@ nnSettings = {
 }
 
 
-def writeOutYields ( theoryPred,
-        filename : Union[os.PathLike,None] = None ):
-    """ a function for debugging only: writes the actual NN input
-    into a file called filename
-
-    :param filename: output file name, if None, then it is
-    yields_<massparams>.json
-    """
-
-    from smodels.base.physicsUnits import GeV
-    masses = []
-    for node in theoryPred.smsList[0].nodes:
-        if node.particle.isSM:
-            continue
-        masses.append ( float(node.particle.mass.asNumber(GeV)) )
-    if filename == None:
-        filename = f"yields_{'_'.join(map(str,map(int,masses)))}.json"
-    gI = theoryPred.dataset.globalInfo
-    if "-orig" in gI.id:
-        return
-    print ( f"[nnInterface] writing yields for {gI.id} to {filename}" )
-    dicts = []
-    Dict = { "anaId": gI.id, "masses": masses,
-             "txnames":list( set(map(str,theoryPred.txnames))) }
-    ms = theoryPred.statsComputer.getMostSensitiveModel()
-    Dict["most_sensitive"]=ms["name"]
-    Dict["ul_min"]=ms["ul_min"]
-    Dict["nll"]=theoryPred.nll ( mu=1. )
-    Dict["nllE"]=theoryPred.nll ( mu=1., evaluationType = aposteriori )
-    dicts.append ( Dict )
-
-    def removeZeros ( nsig : dict ) -> dict:
-        newD = {}
-        for k,v in nsig.items():
-            if v > 0.:
-                newD[k]=v
-        return newD
-
-    for computer in theoryPred.statsComputer.subComputers:
-        if not hasattr ( computer, "totalYieldsFromSignals" ):
-            continue
-        Dict = {}
-        # m = computer.data
-        yields_0 = computer.totalYieldsFromSignals( 0. )
-        yields = computer.totalYieldsFromSignals( 1. )
-        # scaled_yields = computer.scaleYields ( yields, m )
-        # nn_input = scaled_yields.tolist()
-        Dict["model"]=computer.name
-        Dict["nsignals"]=removeZeros ( computer.nsignals )
-        Dict["yields"]= yields
-        Dict["yields_0"]= yields_0
-        # Dict["nn_input"]=nn_input
-        dicts.append ( Dict )
-
-    with open ( filename, "wt" ) as f:
-        import json
-        d = json.dumps ( dicts, indent=4 )
-        f.write ( d )
-        f.close()
-
 def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         evaluationType : NllEvalType, nll_min : float, nll_minA : float,
         mu_hat : float, nSigma : int, pmSigma : int,

@@ -23,7 +23,6 @@ mu_digits = 8
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor",
             "TheoryPredictionsCombiner" ]
 
-writeYields = [ False ]
 
 class TheoryPrediction(object):
     """
@@ -263,10 +262,7 @@ class TheoryPrediction(object):
         For error bands.
         :return: upper limit (Unum object)
         """
-        if writeYields[0]:
-            from smodels.statistics.nnInterface import writeOutYields
-            writeOutYields ( self )
-
+        
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType,
                     nSigma = nSigma )
@@ -815,30 +811,23 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             else:
                 expResults = TheoryPredictionList()
                 bestRes = _getBestResult(dataSetResults)
-                if not bestRes is None:
+                if bestRes is not None:
                     expResults.append(bestRes) # Best result = combination if available
 
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            tpe = None
-            if isinstance(theoPred.dataset,CombinedDataSet): # Individual CRs shouldn't give results
-                theoPred.upperLimit = theoPred.getUpperLimit()
-                continue
-            else:
-                gD = theoPred.dataset
-                gI = gD.globalInfo
-                if hasattr( gI, "srMappingsDict" ):
-                    if gD.dataInfo.dataId in gI.srMappingsDict:
-                        region = gI.srMappingsDict[gD.dataInfo.dataId]
-                        tpe = region["type"]
-                else:
-                    tpe = "SR"
+            srType = 'SR' # By default assume it is a SR
+            # Check if SR corresponds to a CR or VR, in which case we do not report the upper limit
+            if hasattr(expResult.globalInfo, "srMappingsDict"):
+                srType = expResult.globalInfo.srMappingsDict.get(theoPred.dataId(),None)
+                if srType is not None:
+                    srType = srType["type"]
                 
-                if tpe == "SR":
-                    theoPred.upperLimit = theoPred.getUpperLimit()
-                else:
-                    theoPred.upperLimit = None
+            if srType == "SR":
+                theoPred.upperLimit = theoPred.getUpperLimit()
+            else:
+                theoPred.upperLimit = None
 
         expResults.sortTheoryPredictions()
 
@@ -859,7 +848,7 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     """
     assert hasattr ( dataset, "dataInfo" ), \
         "why does the dataset here not have a dataInfo?"
-    dataId = dataset.dataInfo.dataId
+    dataId = dataset.getID()
     if not dataId in expResult.globalInfo.srMappingsDict:
         return False
     region = expResult.globalInfo.srMappingsDict[dataId]
@@ -875,8 +864,8 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
 
 def _getCombinedResultFor(dataSetResults, expResult):
     """
-    Compute the combined result for all datasets, if covariance
-    matrices or json files are available. Return a TheoryPrediction object
+    Compute the combined result for all datasets, if a statistical model is]
+    available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
 
@@ -886,30 +875,25 @@ def _getCombinedResultFor(dataSetResults, expResult):
 
     :return: TheoryPrediction object
     """
-    # Don't give combined result if all regions are CRs
-    isNotSR = []
-    for predList in dataSetResults:
-        gI = expResult.globalInfo
-        if hasattr ( gI, "statModels" ):
-            for srSetName,models in gI.statModels.items():
-                for regionName in gI.srSets[ srSetName ]:
-                    region = gI.srMappingsDict[regionName]
-                    if region['smodels'] == predList[0].dataset.dataInfo.dataId:
-                        if region['type'] == 'SR':
-                            isNotSR.append(False)
-                        else:
-                            isNotSR.append(True)
-        else:
-            isNotSR = [ False ]
-
-    if all(isNotSR):
-        return None
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
     elif not expResult.hasStatsModel():
         return None
-
+    
+    # Don't give combined result if all regions are CRs
+    srTypeDict = {}
+    globalInfo = expResult.globalInfo
+    for predList in dataSetResults:
+        for tpred in predList:
+            dataId = tpred.dataId()
+            srTypeDict[dataId] = 'SR'
+            if dataId in globalInfo.srMappingsDict:
+                srTypeDict[dataId] = globalInfo.srMappingsDict[dataId]['type']
+    
+    if all(srType != 'SR' for srType in srTypeDict.values()):
+        return None
+    
     txnameList = []
     smsList = []
     totalXsec = None
