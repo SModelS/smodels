@@ -226,19 +226,22 @@ class TheoryPrediction(object):
                     continue
                 
                 # Get the dict of signal yields for the given set of SRs:
-                srNsigDict = {sr: srNsigDictAll[sr] for sr in self.dataset.globalInfo.srSets[srSet]}
+                # (if the SR does not appear in theory predictions, set its signal yield to 0)
+                srNsigDict = {sr: srNsigDictAll.get(sr, 0.0) 
+                              for sr in self.dataset.globalInfo.srSets[srSet]}
+                
                 # Always use the first model:
                 model_type,_ = modelList[0]
                 if model_type == "sl":
                     computers += CompRetriever.forMultiBinSL(dataset=self.dataset,
-                                                            nsigDict=srNsigDict, 
-                                                            deltas_rel = self.deltas_rel )
+                                                             nsigDict=srNsigDict, 
+                                                             deltas_rel = self.deltas_rel )
                 elif model_type == "onnx":
                     computers += CompRetriever.forNNs(dataset=self.dataset,
-                                                    nsigDict=srNsigDict)
+                                                      nsigDict=srNsigDict)
                 elif model_type == "pyhf":
                     computers += CompRetriever.forPyhf(dataset=self.dataset,
-                                                    nsigDict=srNsigDict)
+                                                       nsigDict=srNsigDict)
 
         if computers == "N/A":
             self._statsComputer = computers
