@@ -215,12 +215,11 @@ class TheoryPrediction(object):
                           for pred in self.datasetPredictions})
 
             computers = []
-            for srSet in self.dataset.globalInfo.srSets:
-                if not srSet in self.dataset.globalInfo.statModels:
-                    logger.error(f"no statistical model defined for srSet {srSet} in dataset {self.dataset}")
-                    raise ValueError(f"no statistical model defined for srSet {srSet} in dataset {self.dataset}")
+            for srSet,modelList in self.dataset.globalInfo.statModels.items():
+                if srSet not in self.dataset.globalInfo.srSets:
+                    logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
+                    raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
                 
-                modelList = self.dataset.globalInfo.statModels[srSet]
                 if not modelList or len(modelList) == 0:
                     continue
                 
@@ -241,6 +240,9 @@ class TheoryPrediction(object):
                 elif model_type == "pyhf":
                     computers += CompRetriever.forPyhf(dataset=self.dataset,
                                                        nsigDict=srNsigDict)
+                else:
+                    logger.error(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
+                    raise SModelSError(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
 
         if computers == "N/A":
             self._statsComputer = computers
@@ -311,7 +313,7 @@ class TheoryPrediction(object):
 
     @lru_cache
     def getRValue( self, evaluationType : NllEvalType = observed,
-                   nSigma : int = 0, **kwargs ) -> float:
+                   nSigma : int = 0, **kwargs ) -> Union[float,None]:
         """
         Get the r value = theory prediction / experimental upper limit
 

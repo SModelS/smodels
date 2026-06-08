@@ -64,11 +64,7 @@ class CompRetriever:
             if len(cov) < 1:
                 raise SModelSError( f"covariance matrix has length {len(cov)}." )
             n = len(cov)
-
-            # FIXME are we sure thats right, its not the one below?
-            #nobs = [ x.dataInfo.observedN for x in dataset.origdatasets[offset:offset+n] ]
-            #bg = [ x.dataInfo.expectedBG for x in dataset.origdatasets[offset:offset+n] ]
-            #third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset.origdatasets[offset:offset+n] ]
+            
             nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
             bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
             nsig = nsig[offset:offset+n]
