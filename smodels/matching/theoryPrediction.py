@@ -199,10 +199,8 @@ class TheoryPrediction(object):
         CompRetriever = getCompRetrieverModule()
 
         computers =  []
-        if self.dataset is None:
-            logger.error('Can not define stats computer for theory prediction with no dataset')
-
-        elif self.dataType() == "upperLimit":
+        
+        if self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
             if experimentalFeature( "truncatedGaussians" ):
                 computer = CompRetriever.forTruncatedGaussian(self)
