@@ -13,7 +13,7 @@ __all__ = [ "SpeyRetriever"]
 
 from typing import Union, Text, Tuple, Dict, List, Optional
 import os
-from spey import ExpectationType, StatisticalModel, get_backend
+from spey import ExpectationType, get_backend
 from smodels.statistics.basicStats import exponentiateNLL
 from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
@@ -26,7 +26,6 @@ except ImportError: # comes only with newer versions of spey
     AsimovTestStatZero = Exception # a dummy so we can still try
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
-from smodels.experiment.datasetObj import DataSet
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
@@ -114,6 +113,8 @@ class SpeyModelFacade:
 
 
 class SpeyRetriever:
+    """ simple class that retrieves and constructs the sub computers using the Spey interface."""
+
     @classmethod
     def forMultiBinSL(cls, srSet: str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> SpeyModelFacade:
         """ get a subcomputer for simplified likelihood sr-combination.
@@ -323,7 +324,7 @@ class SpeyRetriever:
         return models[0] ## [!AL!]: Again I'm forcing it to return a single computer. FIX it!
 
     @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> None:
+    def forTruncatedGaussian(cls, theorypred, corr : float =0.6 ) -> None:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
@@ -335,8 +336,7 @@ class SpeyRetriever:
         return None
 
     @classmethod
-    def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
-            -> AnaCombLikelihoodComputer:
+    def forAnalysesComb(cls,theoryPredictions, deltas_rel : float = 0.0) -> AnaCombLikelihoodComputer:
         """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
         :param deltas_rel: relative error for the signal
@@ -345,10 +345,6 @@ class SpeyRetriever:
 
         computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
                                               deltas_rel=deltas_rel )
-        computer.dataType = "analysesComb"
-        computer.allowNegativeSignals = False
-        #computer.dataType = "analysesComb"
-        #computer.allowNegativeSignals = allowNegativeSignals
         return computer
 
 class SimpleSpeyDataSet:

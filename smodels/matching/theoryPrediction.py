@@ -195,77 +195,13 @@ class TheoryPrediction(object):
         upper limits), set the computer to 'N/A'.
         """
         from smodels.statistics.statsTools import StatsComputer
-        from smodels.statistics.statsTools import getCompRetrieverModule
-        CompRetriever = getCompRetrieverModule()
 
-        computers =  []
-        
-        if self.dataType() == "upperLimit":
-            from smodels.base.runtime import experimentalFeature
-            if experimentalFeature( "truncatedGaussians" ):
-                computer = CompRetriever.forTruncatedGaussian(self)
-                if computer is not None:
-                    computers.append(computer)
+        statsComputer = StatsComputer.forTheoryPrediction(self)
 
-        elif self.dataType() == "efficiencyMap":
-            nsigDict = {self.dataset.getID() : (self.xsection * self.dataset.getLumi()).asNumber()}
-            computer = CompRetriever.forSingleBin(srSet=self.dataset.getID(),dataset=self.dataset,
-                                                   nsigDict=nsigDict)
-            computers.append(computer)
-
-        elif self.dataType() == "combined" and self.type() == "TheoryPredictionsCombiner":
-           # First make sure all theory predictions in the combiner have well-defined stats models
-            if all(tp.statsComputer != 'N/A' for tp in self.theoryPredictions):
-                computer = CompRetriever.forAnalysesComb(self.theoryPredictions,
-                                                            self.deltas_rel)
-                computers.append(computer)
-
-        elif self.dataType() == "combined" and self.type() == "TheoryPrediction":
-            # Get dictionary with dataset IDs and signal yields
-            # [!AL!]: We still have to remove origdatasets and check the behaviour if just a subset of datasets is selected through parameters.ini. We agreed on setting the signal for "missing SRs" to zero
-            srNsigDictAll = {ds.getID() : 0.0 for ds in self.dataset.origdatasets} 
-            # Update with theory predictions
-            srNsigDictAll.update({pred.dataset.getID() :
-                          (pred.xsection*pred.dataset.getLumi()).asNumber()
-                          for pred in self.datasetPredictions})
-
-            computers = []
-            for srSet,modelList in self.dataset.globalInfo.statModels.items():
-                if srSet not in self.dataset.globalInfo.srSets:
-                    logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
-                    raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
-                
-                if not modelList or len(modelList) == 0:
-                    continue
-                
-                # Get the dict of signal yields for the given set of SRs:
-                # (if the SR does not appear in theory predictions, set its signal yield to 0)
-                srNsigDict = {sr: srNsigDictAll.get(sr, 0.0) 
-                              for sr in self.dataset.globalInfo.srSets[srSet]}
-                
-                # Always use the first model:
-                model_type,_ = modelList[0]
-                if model_type == "sl":
-                    computers.append(CompRetriever.forMultiBinSL(srSet=srSet,dataset=self.dataset,
-                                                             nsigDict=srNsigDict, 
-                                                             deltas_rel = self.deltas_rel ))
-                elif model_type == "onnx":
-                    computers.append(CompRetriever.forNNs(srSet=srSet,dataset=self.dataset,
-                                                      nsigDict=srNsigDict))
-                elif model_type == "pyhf":
-                    computers.append(CompRetriever.forPyhf(srSet=srSet,dataset=self.dataset,
-                                                       nsigDict=srNsigDict))
-                else:
-                    logger.error(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
-                    raise SModelSError(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
-        else:
-            logger.error(f"Unknown data type {self.dataType()} and type {self.type()} for theory prediction {self}")
-            raise SModelSError(f"Unknown data type {self.dataType()} and type {self.type()} for theory prediction {self}")
-
-        if len(computers) == 0:
+        if statsComputer is None:
             self._statsComputer = "N/A"
         else:
-            self._statsComputer = StatsComputer ( computers )
+            self._statsComputer = statsComputer
 
     @lru_cache
     def getUpperLimit( self, evaluationType : NllEvalType = observed,

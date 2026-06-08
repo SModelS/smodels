@@ -37,8 +37,7 @@ def getCompRetrieverModule():
         return CompRetriever
 
 class CompRetriever:
-    """ simple class that retrieves and constructs the sub computers,
-    in StatsComputer """
+    """ simple class that retrieves and constructs the sub computers required by StatsComputer """
 
 
     @classmethod
@@ -277,6 +276,85 @@ class StatsComputer:
         self.allowNegativeSignals = allowNegativeSignals
         for computer in self.subComputers:
             computer.allowNegativeSignals = self.allowNegativeSignals
+        
+    @classmethod
+    def forTheoryPrediction(cls, theoryPrediction) -> Union[None,'StatsComputer']:
+            
+        CompRetriever = getCompRetrieverModule()
+        
+        dataType = theoryPrediction.dataType()
+        tpType = theoryPrediction.type()
+        computers = []
+
+        if dataType == "upperLimit":
+            from smodels.base.runtime import experimentalFeature
+            if experimentalFeature( "truncatedGaussians" ):
+                computer = CompRetriever.forTruncatedGaussian(theoryPrediction)
+                if computer is not None:
+                    computers.append(computer)
+
+        elif dataType == "efficiencyMap":
+            dataset = theoryPrediction.dataset
+            nsigDict = {dataset.getID() : (theoryPrediction.xsection * dataset.getLumi()).asNumber()}
+            computer = CompRetriever.forSingleBin(srSet=theoryPrediction.dataset.getID(),dataset=theoryPrediction.dataset,
+                                                nsigDict=nsigDict)
+            computers.append(computer)
+
+        elif dataType == "combined" and tpType == "TheoryPredictionsCombiner":
+            print("Calling forAnalysesComb in CompRetriever for combined theory prediction")
+           # First make sure all theory predictions in the combiner have well-defined stats models
+            if all(tp.statsComputer != 'N/A' for tp in theoryPrediction.theoryPredictions):
+                computer = CompRetriever.forAnalysesComb(theoryPrediction.theoryPredictions,
+                                                            theoryPrediction.deltas_rel)
+                computers.append(computer)
+
+        elif dataType == "combined" and tpType == "TheoryPrediction":
+            dataset = theoryPrediction.dataset
+            # Get dictionary with dataset IDs and signal yields
+            # [!AL!]: We still have to remove origdatasets and check the behaviour if just a subset of datasets is selected through parameters.ini. We agreed on setting the signal for "missing SRs" to zero
+            srNsigDictAll = {ds.getID() : 0.0 for ds in dataset.origdatasets} 
+            # Update with theory predictions
+            srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
+                                    for pred in theoryPrediction.datasetPredictions})
+
+            for srSet,modelList in dataset.globalInfo.statModels.items():
+                if srSet not in dataset.globalInfo.srSets:
+                    logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
+                    raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
+                
+                if not modelList or len(modelList) == 0:
+                    continue
+                
+                # Get the dict of signal yields for the given set of SRs:
+                # (if the SR does not appear in theory predictions, set its signal yield to 0)
+                srNsigDict = {sr: srNsigDictAll.get(sr, 0.0) 
+                            for sr in dataset.globalInfo.srSets[srSet]}
+                
+                # Always use the first model:
+                model_type,_ = modelList[0]
+                if model_type == "sl":
+                    computers.append(CompRetriever.forMultiBinSL(srSet=srSet,dataset=dataset,
+                                                            nsigDict=srNsigDict, 
+                                                            deltas_rel = theoryPrediction.deltas_rel ))
+                elif model_type == "onnx":
+                    computers.append(CompRetriever.forNNs(srSet=srSet,dataset=dataset,
+                                                    nsigDict=srNsigDict))
+                elif model_type == "pyhf":
+                    computers.append(CompRetriever.forPyhf(srSet=srSet,dataset=dataset,
+                                                    nsigDict=srNsigDict))
+                else:
+                    logger.error(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {dataset}")
+                    raise SModelSError(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {dataset}")
+        else:
+            logger.error(f"Unknown data type {dataType} and type {tpType} for theory prediction {theoryPrediction}")
+            raise SModelSError(f"Unknown data type {dataType} and type {tpType} for theory prediction {theoryPrediction}")
+
+
+        if not isinstance(computers,list) or len(computers) == 0:
+            return None
+        else:
+            allowNegativeSignals = all([comp.allowNegativeSignals for comp in computers])
+            return cls(subComputers=computers, allowNegativeSignals=allowNegativeSignals)
 
     def get_five_values ( self, evaluationType : NllEvalType,
                       return_nll : bool = False,
