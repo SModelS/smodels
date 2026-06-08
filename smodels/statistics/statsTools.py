@@ -301,7 +301,6 @@ class StatsComputer:
             computers.append(computer)
 
         elif dataType == "combined" and tpType == "TheoryPredictionsCombiner":
-            print("Calling forAnalysesComb in CompRetriever for combined theory prediction")
            # First make sure all theory predictions in the combiner have well-defined stats models
             if all(tp.statsComputer != 'N/A' for tp in theoryPrediction.theoryPredictions):
                 computer = CompRetriever.forAnalysesComb(theoryPrediction.theoryPredictions,
