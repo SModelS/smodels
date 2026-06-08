@@ -129,7 +129,8 @@ class SpeyRetriever:
         return subComputers
 
     @classmethod
-    def forSingleBin( cls, srSet: str, dataset, nsigDict ) -> list:
+    def forSingleBin( cls, srSet: str, dataset, nsigDict, deltas_rel : float = 0.2,
+                      lumi : Optional[UnitLumi]=None ) -> list:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object

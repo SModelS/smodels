@@ -42,7 +42,7 @@ class CompRetriever:
 
 
     @classmethod
-    def forMultiBinSL(cls,srSet : str, dataset, nsigDict, deltas_rel : float ) -> SLUpperLimitComputer:
+    def forMultiBinSL(cls,srSet : str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0  ) -> SLUpperLimitComputer:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
