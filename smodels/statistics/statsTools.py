@@ -245,7 +245,7 @@ class CompRetriever:
 
     @classmethod
     def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
-            -> List[AnaCombLikelihoodComputer]:
+            -> AnaCombLikelihoodComputer:
         """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
         :param deltas_rel: relative error for the signal
@@ -258,7 +258,7 @@ class CompRetriever:
         computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
                                               deltas_rel=deltas_rel )
         computer.allowNegativeSignals = allowNegativeSignals
-        return [ computer ]
+        return computer
 
 
 

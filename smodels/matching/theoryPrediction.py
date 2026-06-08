@@ -94,6 +94,14 @@ class TheoryPrediction(object):
             return "??"
 
         return self.dataset.getType()
+    
+    def type(self) -> str:
+        """
+        Return the type of theory prediction (single result)
+        """
+
+        return str(type(self).__name__)
+
 
     def computeXSection(self):
         if type(self.xsection) != type(None):
@@ -207,7 +215,14 @@ class TheoryPrediction(object):
                                                    nsigDict=nsigDict)
             computers.append(computer)
 
-        elif self.dataType() == "combined":
+        elif self.dataType() == "combined" and self.type() == "TheoryPredictionsCombiner":
+           # First make sure all theory predictions in the combiner have well-defined stats models
+            if all(tp.statsComputer != 'N/A' for tp in self.theoryPredictions):
+                computer = CompRetriever.forAnalysesComb(self.theoryPredictions,
+                                                            self.deltas_rel)
+                computers.append(computer)
+
+        elif self.dataType() == "combined" and self.type() == "TheoryPrediction":
             # Get dictionary with dataset IDs and signal yields
             # [!AL!]: We still have to remove origdatasets and check the behaviour if just a subset of datasets is selected through parameters.ini. We agreed on setting the signal for "missing SRs" to zero
             srNsigDictAll = {ds.getID() : 0.0 for ds in self.dataset.origdatasets} 
@@ -245,11 +260,14 @@ class TheoryPrediction(object):
                 else:
                     logger.error(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
                     raise SModelSError(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
+        else:
+            logger.error(f"Unknown data type {self.dataType()} and type {self.type()} for theory prediction {self}")
+            raise SModelSError(f"Unknown data type {self.dataType()} and type {self.type()} for theory prediction {self}")
 
         if len(computers) == 0:
             self._statsComputer = "N/A"
-            return
-        self._statsComputer = StatsComputer ( computers )
+        else:
+            self._statsComputer = StatsComputer ( computers )
 
     @lru_cache
     def getUpperLimit( self, evaluationType : NllEvalType = observed,
@@ -574,6 +592,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         else:
             return "combined"
 
+
     def totalXsection(self):
         ret = 0.0 * fb
         if self.theoryPredictions is not None:
@@ -612,29 +631,6 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return txnamesWeightsDict
 
-    def setStatsComputer(self):
-        """
-        Creates and instance of StatsComputer depending on the
-        type of TheoryPrediction/dataset. In case it is not possible
-        to define a statistical computer (upper limit result or no expected
-        upper limits), set the computer to 'N/A'.
-        """
-
-        # First make sure all theory predictions in the combiner
-        # have well-defined stats models
-        if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
-            self._statsComputer = "N/A"
-        else:
-            from smodels.statistics.statsTools import getCompRetrieverModule, StatsComputer
-            CompRetriever = getCompRetrieverModule()
-            computer = CompRetriever.forAnalysesComb(self.theoryPredictions,
-                    self.deltas_rel)
-            self._statsComputer = StatsComputer ( computer )
-
-        if computer == "N/A":
-            self._statsComputer = computer
-        else:
-            self._statsComputer = StatsComputer ( computer )
 
     def getLlhds(self,muvals,evaluationType : bool = False,
                   normalize : bool = True,

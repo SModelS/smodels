@@ -9,7 +9,7 @@
 
 """
 
-__all__ = [ "SpeyRetriever", "SpeyAnalysesCombosComputer" ]
+__all__ = [ "SpeyRetriever"]
 
 from typing import Union, Text, Tuple, Dict, List, Optional
 import os
@@ -28,15 +28,94 @@ from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.experiment.datasetObj import DataSet
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
-from smodels.base.crossSection import XSection
 from smodels.base.physicsUnits import fb, UnitXSec
+from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 import numpy as np
 
 _debug = { "writePoint": False } # for debugging only
 
+
+class SpeyModelFacade:
+    """ very simple container that wraps around spey models,
+    and adapts the API to SModelS """
+
+    def __init__ ( self, speyModel, dataType : str, name : str,
+                   totalXsec: UnitXSec ):
+        self.speyModel = speyModel
+        self.dataType = dataType
+        self.name = name
+        self.likelihoodComputer = self
+        self.allowNegativeSignals = False
+        self.totalXsec = totalXsec
+
+    def nll_min ( self, evaluationType : NllEvalType = observed,
+                  allowNegativeSignals : bool = False,
+                  **kwargs ) -> dict:
+        kwargs["return_nll"]=True
+        kwargs["allow_negative_signal"] = allowNegativeSignals
+        speyret = self.speyModel.maximize_likelihood ( **kwargs )
+        muhat = float(speyret[0])
+        ret = { "muhat": muhat, "nll_min": float(speyret[1]) }
+        ## if we need sigma_mu we need to add it here
+        test_statistic = "q" if self.allowNegativeSignals else "qmutilde"
+        exp = self.translateExpectationType ( evaluationType )
+        #sigma_mu = self.speyModel.sigma_mu( poi_test=muhat,
+        #        expected=exp, test_statistics=test_statistic )
+        sigma_mu = 1.
+        ret[ "sigma_mu" ] = sigma_mu
+        return ret
+
+    def nll ( self, mu : float, evaluationType : NllEvalType = observed,
+              asimov : Optional[float] = None,
+              **kwargs ):
+        exp = self.translateExpectationType ( evaluationType )
+        kwargs["return_nll"]=True
+        ret = self.speyModel.likelihood ( poi_test=mu,
+               expected = exp, **kwargs )
+        return float(ret)
+
+    def getTotalXSec ( self ):
+        return self.totalXsec
+
+    @classmethod
+    def transform ( cls, evaluationType : NllEvalType ):
+        return
+
+    @classmethod
+    def translateExpectationType ( cls, evaluationType : NllEvalType ) -> ExpectationType:
+        """ translate the specification for evaluationType values from smodels
+            lingo to spey convention """
+        if type(evaluationType)==ExpectationType:
+            return expected
+        expectedDict = { observed: ExpectationType.observed,
+                         apriori: ExpectationType.apriori,
+                         aposteriori: ExpectationType.aposteriori}
+        if evaluationType in expectedDict:
+            return expectedDict[evaluationType]
+        logger.error( f'{expected} is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' )
+        return None
+
+    def getUpperLimitOnMu ( self, evaluationType : NllEvalType = observed,
+            nSigma : int = 0, **kwargs ) -> float:
+        exp = self.translateExpectationType ( evaluationType )
+        expected_pvalue = "nominal"
+        if nSigma != 0:
+            expected_pvalue = "1sigma"
+
+        ret = self.speyModel.poi_upper_limit ( expected = exp,
+               expected_pvalue = expected_pvalue )
+        if nSigma == 0:
+            ret = float ( ret )
+        elif nSigma == 1:
+            ret = float(ret[0])
+        elif nSigma == -1:
+            ret = float(ret[-1])
+        return ret
+
+
 class SpeyRetriever:
     @classmethod
-    def forMultiBinSL(cls, srSet: str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> list:
+    def forMultiBinSL(cls, srSet: str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> SpeyModelFacade:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -126,11 +205,11 @@ class SpeyRetriever:
                     f.close()
                 facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
                 subComputers.append ( facade )
-        return subComputers
+        return subComputers[0] ## [!AL!]: Again I'm forcing it to return a single computer. FIX!
 
     @classmethod
     def forSingleBin( cls, srSet: str, dataset, nsigDict, deltas_rel : float = 0.2,
-                      lumi : Optional[UnitLumi]=None ) -> list:
+                      lumi : Optional[UnitLumi]=None ) -> SpeyModelFacade:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -158,10 +237,10 @@ class SpeyRetriever:
         name = dataset.dataInfo.dataId
         xsec = nsig / dataset.globalInfo.lumi
         facade = SpeyModelFacade ( speyModel, "1bin", name, xsec )
-        return [ facade ]
+        return facade
 
     @classmethod
-    def forNNs(cls, srSet: str, dataset, nsigDict ) -> list:
+    def forNNs(cls, srSet: str, dataset, nsigDict ) -> SpeyModelFacade:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -170,54 +249,51 @@ class SpeyRetriever:
 
         :returns: a sub computer
         """
-        import spey
-        stat_wrapper = spey.get_backend('ml.likelihoods')
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        labelToSModelS = {}
+        srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
 
-        for sr in globalInfo.srMappings:
-           # nsignals[ sr["onnx"] ] = 0.
-            if sr["label"] != None:
-                labelToONNX [ sr["label"] ] = sr["onnx"]
-                labelToSModelS [ sr["label"] ] = sr["smodels"]
+        for sr in globalInfo.srSets[srSet]:
+            if sr not in srMappingsDict:
+                logger.error ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
+            labelToONNX[sr] = srMappingsDict[sr]["onnx"]
 
-        subComputers = cls.forPyhf ( dataset, nsigDict )
+        if srSet not in globalInfo.statModels:
+            logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+        
+        modelList = globalInfo.statModels[srSet]
+        if len(modelList) == 0:
+            logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+        
+        model_type, model_filename = modelList[0] # Always use first model
+        if model_type != "onnx":
+            logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+            raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+        
+        # Get dictionary for signal yields using the ONNX labels
+        f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
 
-        for srSetName, model_tuples in globalInfo.statModels.items():
-            f_signals = {}
-            for sr in globalInfo.srMappings:
-                f_signals[ sr["onnx"] ] = 0.
-            for label in globalInfo.srSets[srSetName]:
-                smodelsName = labelToSModelS[label]
-                if smodelsName in nsigDict:
-                    f_signals[ labelToONNX[label] ] = \
-                        nsigDict[ smodelsName ]
-            model_tuple = model_tuples[0]
-            modelfilename = model_tuple[1]
-            if "pyhf" in model_tuple[0]:
-                continue
-            onnxBlob=dataset.globalInfo.cachedModels[srSetName]
-            # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
-            ## the following code is just for now to see if it works in principle
-            import tempfile
-            tempf = tempfile.mktemp ( prefix="/tmp", postfix=".onnx" )
-            # tempf = "/tmp/my.onnx"
-            f = open ( tempf, "wb" )
-            import onnx
-            onnx.save ( onnxBlob, f )
-            f.close()
-            speyModel = stat_wrapper(nsigDict,tempf)
-            if os.path.exists ( tempf ):
-                os.unlink ( tempf )
-                xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
-                facade = speyModelFacade ( upperLimitComputer, "nn", 
-                                           modelfilename, xsec )
-                subComputers.append ( facade )
-        return subComputers
-
+        onnxBlob=dataset.globalInfo.cachedModels[srSet]
+        # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
+        ## the following code is just for now to see if it works in principle
+        import tempfile
+        tempf = tempfile.mktemp ( prefix="/tmp", suffix=".onnx" )
+        # tempf = "/tmp/my.onnx"
+        f = open ( tempf, "wb" )
+        import onnx
+        onnx.save ( onnxBlob, f )
+        f.close()
+        os.unlink ( tempf )
+        xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
+        facade = SpeyModelFacade ( upperLimitComputer, "nn", 
+                                    model_filename, xsec ) ## [!AL!]: This method has to be fixed! It was not working before and I've just cleaned it up a bit.
+        return facade
+    
     @classmethod
-    def forPyhf(cls, srSet: str, dataset, nsigDict) -> list:
+    def forPyhf(cls, srSet: str, dataset, nsigDict) -> SpeyModelFacade:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
@@ -244,10 +320,10 @@ class SpeyRetriever:
             xsec = sum (list(nsigDict.values())) / dataset.globalInfo.lumi
             facade = SpeyModelFacade ( speyModel, "pyhf", mname, xsec )
             models.append ( facade )
-        return models
+        return models[0] ## [!AL!]: Again I'm forcing it to return a single computer. FIX it!
 
     @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> list:
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> None:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
@@ -260,20 +336,20 @@ class SpeyRetriever:
 
     @classmethod
     def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
-            -> list:
+            -> AnaCombLikelihoodComputer:
         """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
         :param deltas_rel: relative error for the signal
         :returns: a sub computer
         """
-        from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
+
         computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
                                               deltas_rel=deltas_rel )
         computer.dataType = "analysesComb"
         computer.allowNegativeSignals = False
         #computer.dataType = "analysesComb"
         #computer.allowNegativeSignals = allowNegativeSignals
-        return [ computer ]
+        return computer
 
 class SimpleSpeyDataSet:
     """ a very simple data class that can replace a smodels.dataset,
@@ -301,83 +377,6 @@ class SimpleSpeyDataSet:
 
     def getType ( self ):
         return "efficiencyMap"
-
-class SpeyModelFacade:
-    """ very simple container that wraps around spey models,
-    and adapts the API to SModelS """
-
-    def __init__ ( self, speyModel, dataType : str, name : str,
-                   totalXsec: UnitXSec ):
-        self.speyModel = speyModel
-        self.dataType = dataType
-        self.name = name
-        self.likelihoodComputer = self
-        self.allowNegativeSignals = False
-        self.totalXsec = totalXsec
-
-    def nll_min ( self, evaluationType : NllEvalType = observed,
-                  allowNegativeSignals : bool = False,
-                  **kwargs ) -> dict:
-        kwargs["return_nll"]=True
-        kwargs["allow_negative_signal"] = allowNegativeSignals
-        speyret = self.speyModel.maximize_likelihood ( **kwargs )
-        muhat = float(speyret[0])
-        ret = { "muhat": muhat, "nll_min": float(speyret[1]) }
-        ## if we need sigma_mu we need to add it here
-        test_statistic = "q" if self.allowNegativeSignals else "qmutilde"
-        exp = self.translateExpectationType ( evaluationType )
-        #sigma_mu = self.speyModel.sigma_mu( poi_test=muhat,
-        #        expected=exp, test_statistics=test_statistic )
-        sigma_mu = 1.
-        ret[ "sigma_mu" ] = sigma_mu
-        return ret
-
-    def nll ( self, mu : float, evaluationType : NllEvalType = observed,
-              asimov : Optional[float] = None,
-              **kwargs ):
-        exp = self.translateExpectationType ( evaluationType )
-        kwargs["return_nll"]=True
-        ret = self.speyModel.likelihood ( poi_test=mu,
-               expected = exp, **kwargs )
-        return float(ret)
-
-    def getTotalXSec ( self ):
-        return self.totalXsec
-
-    @classmethod
-    def transform ( cls, evaluationType : NllEvalType ):
-        return
-
-    @classmethod
-    def translateExpectationType ( cls, evaluationType : NllEvalType ) -> ExpectationType:
-        """ translate the specification for evaluationType values from smodels
-            lingo to spey convention """
-        if type(evaluationType)==ExpectationType:
-            return expected
-        expectedDict = { observed: ExpectationType.observed,
-                         apriori: ExpectationType.apriori,
-                         aposteriori: ExpectationType.aposteriori}
-        if evaluationType in expectedDict:
-            return expectedDict[evaluationType]
-        logger.error( f'{expected} is not a valid expectation type. Possible expectation types are True (observed), False (apriori) and "posteriori".' )
-        return None
-
-    def getUpperLimitOnMu ( self, evaluationType : NllEvalType = observed,
-            nSigma : int = 0, **kwargs ) -> float:
-        exp = self.translateExpectationType ( evaluationType )
-        expected_pvalue = "nominal"
-        if nSigma != 0:
-            expected_pvalue = "1sigma"
-
-        ret = self.speyModel.poi_upper_limit ( expected = exp,
-               expected_pvalue = expected_pvalue )
-        if nSigma == 0:
-            ret = float ( ret )
-        elif nSigma == 1:
-            ret = float(ret[0])
-        elif nSigma == -1:
-            ret = float(ret[-1])
-        return ret
 
 if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 3., 4.1, 0.6533758489567854, 35.9/fb
