@@ -36,7 +36,7 @@ _debug = { "writePoint": False } # for debugging only
 
 class SpeyRetriever:
     @classmethod
-    def forMultiBinSL(cls,dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> list:
+    def forMultiBinSL(cls, srSet: str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> list:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -129,7 +129,7 @@ class SpeyRetriever:
         return subComputers
 
     @classmethod
-    def forSingleBin( cls, dataset, nsigDict ) -> list:
+    def forSingleBin( cls, srSet: str, dataset, nsigDict ) -> list:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -160,7 +160,7 @@ class SpeyRetriever:
         return [ facade ]
 
     @classmethod
-    def forNNs(cls, dataset, nsigDict ) -> list:
+    def forNNs(cls, srSet: str, dataset, nsigDict ) -> list:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -216,7 +216,7 @@ class SpeyRetriever:
         return subComputers
 
     @classmethod
-    def forPyhf(cls, dataset, nsigDict) -> list:
+    def forPyhf(cls, srSet: str, dataset, nsigDict) -> list:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object

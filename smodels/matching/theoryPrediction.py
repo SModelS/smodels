@@ -190,25 +190,27 @@ class TheoryPrediction(object):
         from smodels.statistics.statsTools import getCompRetrieverModule
         CompRetriever = getCompRetrieverModule()
 
-        computers =  'N/A'
+        computers =  []
         if self.dataset is None:
             logger.error('Can not define stats computer for theory prediction with no dataset')
 
         elif self.dataType() == "upperLimit":
             from smodels.base.runtime import experimentalFeature
             if experimentalFeature( "truncatedGaussians" ):
-                computers = CompRetriever.forTruncatedGaussian(self)
-                if computers is None: # No evaluationType UL available
-                    computers = 'N/A'
+                computer = CompRetriever.forTruncatedGaussian(self)
+                if computer is not None:
+                    computers.append(computer)
 
         elif self.dataType() == "efficiencyMap":
             nsigDict = {self.dataset.getID() : (self.xsection * self.dataset.getLumi()).asNumber()}
-            computers = CompRetriever.forSingleBin(dataset=self.dataset,
+            computer = CompRetriever.forSingleBin(srSet=self.dataset.getID(),dataset=self.dataset,
                                                    nsigDict=nsigDict)
+            computers.append(computer)
 
         elif self.dataType() == "combined":
             # Get dictionary with dataset IDs and signal yields
-            srNsigDictAll = {ds.getID() : 0.0 for ds in self.dataset.origdatasets}
+            # [!AL!]: We still have to remove origdatasets and check the behaviour if just a subset of datasets is selected through parameters.ini. We agreed on setting the signal for "missing SRs" to zero
+            srNsigDictAll = {ds.getID() : 0.0 for ds in self.dataset.origdatasets} 
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() :
                           (pred.xsection*pred.dataset.getLumi()).asNumber()
@@ -231,21 +233,21 @@ class TheoryPrediction(object):
                 # Always use the first model:
                 model_type,_ = modelList[0]
                 if model_type == "sl":
-                    computers += CompRetriever.forMultiBinSL(dataset=self.dataset,
+                    computers.append(CompRetriever.forMultiBinSL(srSet=srSet,dataset=self.dataset,
                                                              nsigDict=srNsigDict, 
-                                                             deltas_rel = self.deltas_rel )
+                                                             deltas_rel = self.deltas_rel ))
                 elif model_type == "onnx":
-                    computers += CompRetriever.forNNs(dataset=self.dataset,
-                                                      nsigDict=srNsigDict)
+                    computers.append(CompRetriever.forNNs(srSet=srSet,dataset=self.dataset,
+                                                      nsigDict=srNsigDict))
                 elif model_type == "pyhf":
-                    computers += CompRetriever.forPyhf(dataset=self.dataset,
-                                                       nsigDict=srNsigDict)
+                    computers.append(CompRetriever.forPyhf(srSet=srSet,dataset=self.dataset,
+                                                       nsigDict=srNsigDict))
                 else:
                     logger.error(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
                     raise SModelSError(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {self.dataset}")
 
-        if computers == "N/A":
-            self._statsComputer = computers
+        if len(computers) == 0:
+            self._statsComputer = "N/A"
             return
         self._statsComputer = StatsComputer ( computers )
 

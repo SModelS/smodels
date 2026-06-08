@@ -41,12 +41,12 @@ class CompRetriever:
     in StatsComputer """
 
 
-
     @classmethod
-    def forMultiBinSL(cls,dataset, nsigDict, deltas_rel : float ) -> List[SLUpperLimitComputer]:
+    def forMultiBinSL(cls,srSet : str, dataset, nsigDict, deltas_rel : float ) -> SLUpperLimitComputer:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
+        :param srSet: the srSet defining the SRs for which to construct the computer
         :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
@@ -55,7 +55,9 @@ class CompRetriever:
         covs = dataset.globalInfo.cachedModels
         offset = 0
         subComputers = []
-        nsig = list(nsigDict.values())
+        nsig = [nsigDict.get(sr, 0.0) for sr in dataset.globalInfo.srSets[srSet]]
+        ## [!AL!]: I am not sure what we are looping over here. I assume this method returns a single computer for each SR set,
+        ## so we should restrict it to a subset of SRs (defined by srSet) and return a single computer. I did not modify its behaviour, because I wasn't sure what cachedModels means.
         for covname,cov in covs.items():
             if not covname.endswith ( ".cov" ):
                 continue
@@ -65,7 +67,7 @@ class CompRetriever:
                 raise SModelSError( f"covariance matrix has length {len(cov)}." )
             n = len(cov)
             
-            nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
+            nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]?
             bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
             nsig = nsig[offset:offset+n]
             third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
@@ -85,19 +87,23 @@ class CompRetriever:
             computer.allowNegativeSignals = False
             subComputers.append ( computer )
             offset += n
-        return subComputers
+        return subComputers[0] ## [!AL!]: I've hard-corded the return for the first computer, but we should fix it, so a single computer is returned.
 
     @classmethod
-    def forSingleBin( cls, dataset, nsigDict, deltas_rel : float = 0.2,
-                      lumi : Optional[UnitLumi]=None ) ->  List[SLUpperLimitComputer]:
+    def forSingleBin( cls, srSet :str, dataset, nsigDict, deltas_rel : float = 0.2,
+                      lumi : Optional[UnitLumi]=None ) ->  SLUpperLimitComputer:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
+        :param srSet: the srSet defining the SRs for which to construct the computer
         :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
+        if srSet != dataset.getID():
+            logger.error ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
+            raise SModelSError ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
                      nsignal = list(nsigDict.values()), lumi = lumi )
@@ -105,12 +111,13 @@ class CompRetriever:
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
         computer.allowNegativeSignals = False
-        return [ computer ]
+        return computer
 
     @classmethod
-    def forNNs(cls, dataset, nsigDict ) -> List[NNUpperLimitComputer]:
+    def forNNs(cls, srSet : str, dataset, nsigDict ) -> NNUpperLimitComputer:
         """ get a sub computer for an NN combination.
 
+        :param srSet: the srSet defining the SRs for which to construct the computer
         :param dataset: CombinedDataSet object
         :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
@@ -119,40 +126,39 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        labelToSModelS = {}
+        srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
 
-        for sr in globalInfo.srMappings:
-           # nsignals[ sr["onnx"] ] = 0.
-            if sr["label"] != None:
-                labelToONNX [ sr["label"] ] = sr["onnx"]
-                labelToSModelS [ sr["label"] ] = sr["smodels"]
+        for sr in globalInfo.srSets[srSet]:
+            if sr not in srMappingsDict:
+                logger.error ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
+            labelToONNX[sr] = srMappingsDict[sr]["onnx"]
 
+        if srSet not in globalInfo.statModels:
+            logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
         
-        subComputers = []
-        for srSetName, model_tuples in globalInfo.statModels.items():
-            f_signals = {}
-            for sr in globalInfo.srMappings:
-                f_signals[ sr["onnx"] ] = 0.
-            for label in globalInfo.srSets[srSetName]:
-                smodelsName = labelToSModelS[label]
-                if smodelsName in nsigDict:
-                    f_signals[ labelToONNX[label] ] = \
-                        nsigDict[ smodelsName ]
-            model_tuple = model_tuples[0]
-            modelfilename = model_tuple[1]
-            model_type = model_tuple[0]
-            if "pyhf" in model_type:
-                continue
-            data = NNData( f_signals, dataset )
-            upperLimitComputer = NNUpperLimitComputer(data,
-                    lumi=dataset.getLumi(),
-                    onnxfilename = modelfilename )
-            upperLimitComputer.allowNegativeSignals = False
-            subComputers.append ( upperLimitComputer )
-        return subComputers
+        modelList = globalInfo.statModels[srSet]
+        if len(modelList) == 0:
+            logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+        
+        model_type, model_filename = modelList[0] # Always use first model
+        if model_type != "onnx":
+            logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+            raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+        
+        # Get dictionary for signal yields using the ONNX labels
+        f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
+
+        data = NNData( f_signals, dataset )
+        upperLimitComputer = NNUpperLimitComputer(data, lumi=dataset.getLumi(),
+                                                  onnxfilename = model_filename )
+        
+        return upperLimitComputer
 
     @classmethod
-    def forPyhf(cls, dataset, nsigDict) -> List[PyhfUpperLimitComputer]:
+    def forPyhf(cls, srSet : str, dataset, nsigDict) -> PyhfUpperLimitComputer:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
@@ -160,31 +166,36 @@ class CompRetriever:
 
         :returns: a sub computer
         """
+
         globalInfo = dataset.globalInfo
-        datasets = [ds.getID() for ds in dataset.origdatasets]
-        jsonFiles, jsons = [], []
-        jsonDictNames = {}
-        for srSetName, model_tuples in globalInfo.statModels.items():
-            model_tuple = model_tuples[0]
-            model_type = model_tuple[0]
-            model_name = model_tuple[1]
-            if not "pyhf" in model_type:
-                continue
-            jsonFiles.append ( model_name )
-            jsons.append ( globalInfo.cachedModels[model_name] )
-            jsonDictNames[model_name]=cls.getAll ( \
-                    globalInfo.srSets[srSetName], globalInfo.srMappingsDict )
+        srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
+        labelToPyhf = {}
+        for sr_label in globalInfo.srSets[srSet]:
+            if sr_label not in srMappingsDict:
+                logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
+            labelToPyhf[sr_label] = srMappingsDict[sr_label]["pyhf"]
 
-        logger.debug(f"list of datasets: {datasets}")
+        if srSet not in globalInfo.statModels:
+            logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+        
+        modelList = globalInfo.statModels[srSet]
+        if len(modelList) == 0:
+            logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+        
+        model_type, model_filename = modelList[0] # Always use first model
+        if model_type != "pyhf" and model_type != "full_pyhf":
+            logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
+            raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
 
-        # Constructing the list of signals with subsignals matching each json
-        nsignals = {}
-        for jsName in jsonFiles:
-            nsignals.update( { jsName: {} } )
-        for name, nsig in nsigDict.items():
-            for jsName in nsignals.keys():
-                if name in jsonDictNames[jsName]:
-                    nsignals[jsName].update( { name: nsig } )
+        # Get dictionary for signal yields using the ONNX labels
+        nsignals = {label : nsigDict.get(label,0.0) for label in labelToPyhf.keys()}
+        json = globalInfo.cachedModels[model_filename]
+        regions = [srMappingsDict[label] for label in globalInfo.srSets[srSet]]
+        logger.debug(f"list of datasets: {list(labelToPyhf.keys())}")
+
 
         includeCRs = False
         if hasattr(globalInfo,'includeCRs'):
@@ -193,33 +204,18 @@ class CompRetriever:
         if hasattr(globalInfo,"signalUncertainty"):
             signalUncertainty = globalInfo.signalUncertainty
 
-        r_jsonFiles = {} ## here we reconstruct the old jsonFiles dict
-        ## (for now, maybe we will see that there is a smarter way)
-        for srSetName, model_tuples in globalInfo.statModels.items():
-            model_tuple = model_tuples[0]
-            if not model_tuple[0] in [ "pyhf", "full_pyhf" ]:
-                continue
-            region_names = globalInfo.srSets[srSetName]
-            regions = cls.getRegions ( region_names,
-                    globalInfo.srMappingsDict )
-            if model_tuple[1] in r_jsonFiles:
-                raise SModelSError ( f"model {model_tuple[1]} mentioned more than once in {globalInfo.path}" )
-            r_jsonFiles[model_tuple[1]]=regions
-
-        subComputers = []
-        for nsignal,json,(jsonFileName,r_jsonFile) in zip(nsignals.values(),jsons,r_jsonFiles.items() ):
-            # Loading the jsonFiles, unless we already have them (because we pickled)
-            data = PyhfData(nsignal, json, r_jsonFile,
-                            includeCRs, signalUncertainty, globalInfo,
-                            jsonFileName = jsonFileName )
-            upperLimitComputer = PyhfUpperLimitComputer( data,
-                                                         lumi=dataset.getLumi() )
-            upperLimitComputer.allowNegativeSignals = False
-            subComputers.append ( upperLimitComputer )
-        return subComputers
+        # Loading the jsonFiles, unless we already have them (because we pickled) 
+        # ## [!AL!]: I've tried to simplify the code here, since we should return a single computer. But I am not sure if the input for PyhfData is correct
+        data = PyhfData(nsignals, json, regions,
+                        includeCRs, signalUncertainty, globalInfo,
+                        jsonFileName = model_filename )
+        upperLimitComputer = PyhfUpperLimitComputer( data,
+                                                    lumi=dataset.getLumi() )
+        
+        return upperLimitComputer
 
     @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> List[TruncatedGaussians]:
+    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> Union[None,TruncatedGaussians]:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
@@ -230,13 +226,13 @@ class CompRetriever:
         # marked as experimental feature
         if not hasattr(theorypred, "avgElement"):
             logger.error( f"theory prediction {theorypred.analysisId()} has no average element! why??" )
-            return []
+            return None
 
         eul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, evaluationType=apriori
         )
         if eul is None:
-            return []
+            return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
             element=theorypred.avgElement, txnames=theorypred.txnames, 
@@ -245,7 +241,7 @@ class CompRetriever:
                    "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
         computer = TruncatedGaussians ( **kwargs )
-        return [ computer ]
+        return computer
 
     @classmethod
     def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
@@ -264,28 +260,7 @@ class CompRetriever:
         computer.allowNegativeSignals = allowNegativeSignals
         return [ computer ]
 
-    @classmethod
-    def getAll ( cls, srSet : list, srMappingsDict : dict ) -> list:
-        """ for the srSet, return list only of signal regions,
-        drop others """
-        ret = []
-        for r in srSet:
-            if r in srMappingsDict:
-                m = srMappingsDict[r]
-                if True: # m["type"] == "SR":
-                    ret.append ( r )
-        return ret
 
-    @classmethod
-    def getRegions ( cls, region_labels : list, srMappingsDict : dict ) -> list:
-        """ given a list of the region_labels, return the
-        corresponding list of the region dictionaries """
-        ret = []
-        for label in region_labels:
-            if not label in srMappingsDict:
-                continue
-            ret.append ( srMappingsDict[label] )
-        return ret
 
 class StatsComputer:
     """ this is the stats computer, it takes the subcomputers
@@ -293,17 +268,15 @@ class StatsComputer:
     getting the most sensitive model, etc
     """
 
-    def __init__ ( self, subComputers : list ):
+    def __init__ ( self, subComputers : list, allowNegativeSignals : bool = False ):
         """
          Initialise. allowNegativeSignals is true if its true for all
          subcomputers.
         """
         self.subComputers = subComputers
-        self.allowNegativeSignals = True
-        for computer in subComputers:
-            if not self.allowNegativeSignals:
-                self.allowNegativeSignals = False
-                break
+        self.allowNegativeSignals = allowNegativeSignals
+        for computer in self.subComputers:
+            computer.allowNegativeSignals = self.allowNegativeSignals
 
     def get_five_values ( self, evaluationType : NllEvalType,
                       return_nll : bool = False,

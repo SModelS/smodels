@@ -102,7 +102,7 @@ class TruncatedGaussians:
 
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
-        default = { "muhat": None, "sigma_mu": None, "nll_min": None }
+
         muhat, sigma_mu = float("inf"), float("inf")
         dsig = self._nllOfMu ( 1.,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
@@ -115,7 +115,7 @@ class TruncatedGaussians:
         ret = { "muhat": muhat, "sigma_mu": sigma_mu, "nll_min": nll_min }
         return ret
 
-    def _nllOfMu ( self, mu : Union[float,None],
+    def _nllOfMu ( self, mu : float,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             evaluationType : NllEvalType = observed ) -> Dict:
@@ -234,7 +234,7 @@ class TruncatedGaussians:
         return float ( np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu) )
         #return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
 
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, **kwargs) -> Optional[float]:
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, **kwargs) -> float:
         """
         Get the upper limit on the signal strength mu directly from its definition.
         """
@@ -243,3 +243,10 @@ class TruncatedGaussians:
             return self.upperLimitOnMu
         else:
             return self.expectedUpperLimitOnMu
+
+    def CLs(self, **kwargs) -> None:
+        """
+        Dummy function in case it is needed.
+        """
+
+        return None
