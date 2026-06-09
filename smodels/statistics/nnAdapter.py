@@ -165,7 +165,7 @@ class NNAdapter:
         if len(scaled_yields[0])!=self.regressor["dim"]:
             dim_nn = self.regressor["dim"]
             dim_input = len(scaled_yields[0])
-            line=f"the network wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
+            line=f"the network of {self.onnxfilename} wants {dim_nn} input dimensions, but we supply {dim_input}. fix it!"
             print ( f"[nnAdapter] {line}" )
             print ( f"[nnAdapter] srOrder: {self.srOrder}" )
             sys.exit()
