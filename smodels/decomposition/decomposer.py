@@ -166,6 +166,58 @@ def getDecayNodes(mother):
     return decayTrees
 
 
+def getMaxDecayBR(mother):
+    """
+    Return the maximum BR available for decaying ``mother`` once.
+
+    For stable/final-state-like nodes (or nodes with no available decays), this
+    returns 1.0 because no additional BR suppression is expected.
+    """
+
+    if mother.isFinalState:
+        return 1.0
+    if mother.particle.isStable():
+        return 1.0
+    if not hasattr(mother, 'decays'):
+        return 1.0
+    if not mother.decays:
+        return 1.0
+
+    # Cache per particle, since all nodes of the same species share decay data.
+    if hasattr(mother.particle, '_maxDecayBR'):
+        return mother.particle._maxDecayBR
+
+    decayNodesList = getDecayNodes(mother)
+    if not decayNodesList:
+        maxBR = 1.0
+    else:
+        maxBR = max(decayNodes[2] for decayNodes in decayNodesList)
+
+    mother.particle._maxDecayBR = maxBR
+    return maxBR
+
+
+def getMaxRemainingBRFactor(sms):
+    """
+    Compute an upper bound for additional BR suppression from all undecayed leaves.
+
+    The returned factor is the product of the best one-step BR choices for each
+    unresolved leaf and therefore provides a conservative upper bound for any
+    fully decayed continuation of ``sms``.
+    """
+
+    factor = 1.0
+    for nodeIndex in sms.nodeIndices:
+        if sms.out_degree(nodeIndex) != 0:
+            continue
+        mom = sms.indexToNode(nodeIndex)
+        factor *= getMaxDecayBR(mom)
+        if factor == 0.0:
+            return 0.0
+
+    return factor
+
+
 def addOneStepDecays(sms, sigmacutFB=0.0):
     """
     Given a tree, generates a list of new trees (Tree objects),
@@ -215,6 +267,10 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
             tweight = T.maxWeight
             if tweight < sigmacutFB:
                 break
+            # Branch-and-bound pruning: even in the most optimistic continuation,
+            # this partial tree can not survive the weight cut.
+            if tweight * getMaxRemainingBRFactor(T) < sigmacutFB:
+                continue
             for decayNodes in decayNodesList:
                 br = decayNodes[2]
                 if tweight*br < sigmacutFB:
