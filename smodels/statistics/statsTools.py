@@ -443,9 +443,10 @@ class StatsComputer:
                 continue
             subComputer.model = subComputer.origModel
 
-    def getLlhds(self,muvals,evaluationType : bool = False,
-                  normalize : bool = True,
-                  idx : int = 0 ) -> dict:
+    #def getLlhds(self,muvals,evaluationType : bool = False,
+    #              normalize : bool = True,
+    #              idx : int = 0 ) -> dict:
+    def getLlhds(self, **kwargs ) -> dict:
         """
         Facility to access the likelihoods for the individual analyses and
         the combined likelihood.
@@ -454,13 +455,16 @@ class StatsComputer:
 
         :param muvals: List with values for the signal strenth for which
         the likelihoods must be evaluated.
+        :param idx: index of subcomputer
         :param evaluationType: returns the observed/priori expected/posteriori expected likelihood values.
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
+        idx = 0
+        if "idx" in kwargs:
+            idx = kwargs.pop("idx")
         assert idx < len(self.subComputers), f"only {len(self.subComputers)} computers for prediction but you wanted index {idx}"
-
-        return self.subComputers[idx].getLlhds(muvals,evaluationType,normalize)
+        return self.subComputers[idx].getLlhds( **kwargs )
 
     def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> Union[None,dict]:
         """
