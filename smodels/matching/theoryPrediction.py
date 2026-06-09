@@ -565,10 +565,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return txnamesWeightsDict
 
-
-    def getLlhds(self,muvals,evaluationType : bool = False,
-                  normalize : bool = True,
-                  idx : int = 0 ) -> dict:
+    def getLlhds(self, **kwargs ) -> dict:
         """
         Facility to access the likelihoods for the individual analyses and
         the combined likelihood.
@@ -581,9 +578,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
-        assert idx < len(self.statsComputer.subComputers), f"only {len(self.statsComputer.subComputers)} computers for prediction but you wanted index {idx}"
-
-        return self.statsComputer.subComputers[idx].getLlhds(muvals,evaluationType,normalize)
+        return self.statsComputer.getLlhds( **kwargs )
 
     def describe(self):
         """returns a string containing a list of all analysisId and dataIds"""
