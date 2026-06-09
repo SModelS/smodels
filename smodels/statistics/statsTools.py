@@ -65,7 +65,7 @@ class CompRetriever:
             if len(cov) < 1:
                 raise SModelSError( f"covariance matrix has length {len(cov)}." )
             n = len(cov)
-            
+
             nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]?
             bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
             nsig = nsig[offset:offset+n]
@@ -136,30 +136,32 @@ class CompRetriever:
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
             raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
-        
+
         modelList = globalInfo.statModels[srSet]
         if len(modelList) == 0:
             logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
             raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
-        
+
         model_type, model_filename = modelList[0] # Always use first model
         if model_type != "onnx":
             logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
             raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
-        
+
         # Get dictionary for signal yields using the ONNX labels
         f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
 
         data = NNData( f_signals, dataset )
         upperLimitComputer = NNUpperLimitComputer(data, lumi=dataset.getLumi(),
                                                   onnxfilename = model_filename )
-        
+
         return upperLimitComputer
 
     @classmethod
-    def forPyhf(cls, srSet : str, dataset, nsigDict) -> PyhfUpperLimitComputer:
+    def forPyhf( cls, srSet : str, dataset : CombinedDataSet,
+                 nsigDict : dict ) -> PyhfUpperLimitComputer:
         """ get a sub computer for pyhf combination.
 
+        :param srSet: name of signal region set
         :param dataset: CombinedDataSet object
         :param nsigDict: Dictionary with signal yields for each SR
 
@@ -173,23 +175,24 @@ class CompRetriever:
             if sr_label not in srMappingsDict:
                 logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            labelToPyhf[sr_label] = srMappingsDict[sr_label]["pyhf"]
+            if srMappingsDict[sr_label]["smodels"] is not None:
+                labelToPyhf[sr_label] = srMappingsDict[sr_label]["pyhf"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
             raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
-        
+
         modelList = globalInfo.statModels[srSet]
         if len(modelList) == 0:
             logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
             raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
-        
+
         model_type, model_filename = modelList[0] # Always use first model
         if model_type != "pyhf" and model_type != "full_pyhf":
             logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
             raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
 
-        # Get dictionary for signal yields using the ONNX labels
+        # Get dictionary for signal yields using the pyhf labels
         nsignals = {label : nsigDict.get(label,0.0) for label in labelToPyhf.keys()}
         json = globalInfo.cachedModels[model_filename]
         regions = [srMappingsDict[label] for label in globalInfo.srSets[srSet]]
@@ -203,14 +206,14 @@ class CompRetriever:
         if hasattr(globalInfo,"signalUncertainty"):
             signalUncertainty = globalInfo.signalUncertainty
 
-        # Loading the jsonFiles, unless we already have them (because we pickled) 
+        # Loading the jsonFiles, unless we already have them (because we pickled)
         # ## [!AL!]: I've tried to simplify the code here, since we should return a single computer. But I am not sure if the input for PyhfData is correct
         data = PyhfData(nsignals, json, regions,
                         includeCRs, signalUncertainty, globalInfo,
                         jsonFileName = model_filename )
         upperLimitComputer = PyhfUpperLimitComputer( data,
                                                     lumi=dataset.getLumi() )
-        
+
         return upperLimitComputer
 
     @classmethod
@@ -234,9 +237,9 @@ class CompRetriever:
             return None
         eul = eul / theorypred.xsection
         ul = theorypred.dataset.getUpperLimitFor(
-            element=theorypred.avgElement, txnames=theorypred.txnames, 
+            element=theorypred.avgElement, txnames=theorypred.txnames,
             evaluationType=observed) / theorypred.xsection
-        kwargs = { "upperLimitOnMu": float(ul), 
+        kwargs = { "upperLimitOnMu": float(ul),
                    "expectedUpperLimitOnMu": float(eul),
                    "corr": corr }
         computer = TruncatedGaussians ( **kwargs )
@@ -276,12 +279,12 @@ class StatsComputer:
         self.allowNegativeSignals = allowNegativeSignals
         for computer in self.subComputers:
             computer.allowNegativeSignals = self.allowNegativeSignals
-        
+
     @classmethod
     def forTheoryPrediction(cls, theoryPrediction) -> Union[None,'StatsComputer']:
-            
+
         CompRetriever = getCompRetrieverModule()
-        
+
         dataType = theoryPrediction.dataType()
         tpType = theoryPrediction.type()
         computers = []
@@ -311,7 +314,7 @@ class StatsComputer:
             dataset = theoryPrediction.dataset
             # Get dictionary with dataset IDs and signal yields
             # [!AL!]: We still have to remove origdatasets and check the behaviour if just a subset of datasets is selected through parameters.ini. We agreed on setting the signal for "missing SRs" to zero
-            srNsigDictAll = {ds.getID() : 0.0 for ds in dataset.origdatasets} 
+            srNsigDictAll = {ds.getID() : 0.0 for ds in dataset.origdatasets}
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
                                     for pred in theoryPrediction.datasetPredictions})
@@ -320,20 +323,20 @@ class StatsComputer:
                 if srSet not in dataset.globalInfo.srSets:
                     logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
                     raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
-                
+
                 if not modelList or len(modelList) == 0:
                     continue
-                
+
                 # Get the dict of signal yields for the given set of SRs:
                 # (if the SR does not appear in theory predictions, set its signal yield to 0)
-                srNsigDict = {sr: srNsigDictAll.get(sr, 0.0) 
+                srNsigDict = {sr: srNsigDictAll.get(sr, 0.0)
                             for sr in dataset.globalInfo.srSets[srSet]}
-                
+
                 # Always use the first model:
                 model_type,_ = modelList[0]
                 if model_type == "sl":
                     computers.append(CompRetriever.forMultiBinSL(srSet=srSet,dataset=dataset,
-                                                            nsigDict=srNsigDict, 
+                                                            nsigDict=srNsigDict,
                                                             deltas_rel = theoryPrediction.deltas_rel ))
                 elif model_type == "onnx":
                     computers.append(CompRetriever.forNNs(srSet=srSet,dataset=dataset,

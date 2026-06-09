@@ -353,26 +353,34 @@ class PyhfData:
 
 class PyhfUpperLimitComputer:
     """
-    Class that computes the upper limit using the jsons files and signal informations in the 'data' instance of 'PyhfData'
+    Class that computes the upper limit using the jsons files and
+    signal information in the 'data' instance of 'PyhfData'
     """
 
     def __init__(self, data, cl=0.95, lumi=None ):
         """
 
         :param data: instance of 'PyhfData' holding the signals information
-        :param cl: confdence level at which the upper limit is desired to be computed
+        :param cl: confdence level at which the upper limit is desired to
+        be computed
         :ivar data: created from data
-        :ivar nsignals: signal predictions list divided into sublists, one for each json file
+        :ivar nsignals: signal predictions list divided into sublists,
+        one for each json file
         :ivar inputJsons: list of input json files as python json instances
         :ivar channelsInfo: list of channels information for the json files
-        :ivar zeroSignalsFlag: list boolean flags in case all signals are zero for a specific json
+        :ivar zeroSignalsFlag: list boolean flags in case all signals are zero
+        for a specific json
         :ivar nWS: number of workspaces = number of json files
-        :ivar patches: list of patches to be applied to the inputJsons as python dictionary instances
+        :ivar patches: list of patches to be applied to the inputJsons
+        as python dictionary instances
         :ivar workspaces: list of workspaces resulting from the patched inputJsons
-        :ivar workspaces_expected: list of patched workspaces with observation yields replaced by the expected eones
+        :ivar workspaces_expected: list of patched workspaces
+        with observation yields replaced by the expected eones
         :ivar cl: created from cl
-        :ivar scale: scale that is applied to the signal predictions, dynamically changes throughout the upper limit calculation
-        :ivar alreadyBeenThere: boolean flag that identifies when nsignals accidentally passes twice at two identical values
+        :ivar scale: scale that is applied to the signal predictions,
+        dynamically changes throughout the upper limit calculation
+        :ivar alreadyBeenThere: boolean flag that identifies when nsignals
+        accidentally passes twice at two identical values
         """
 
         self.data = data
