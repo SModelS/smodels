@@ -17,7 +17,7 @@ from smodels.decomposition.theorySMS import TheorySMS
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
-from smodels.decomposition.decomposer import getDecayNodes, addOneStepDecays,cascadeDecay
+from smodels.decomposition.decomposer import getDecayNodes, addOneStepDecays,iterCascadeDecay
 from smodels.base.particleNode import ParticleNode
 from smodels.base.physicsUnits import fb, GeV
 
@@ -177,7 +177,7 @@ class TestDecompositionMethods(unittest.TestCase):
 
 
         # Compute full cascade decay
-        treeList = cascadeDecay(tree)
+        treeList = list(iterCascadeDecay(tree))
         self.assertEqual(len(treeList),63)
         # Count decays:
         nN2 = 0
@@ -233,7 +233,7 @@ class TestDecompositionMethods(unittest.TestCase):
         tree.add_edge(pvIndex,c1pIndex)
         tree.add_edge(pvIndex,c1mIndex)
 
-        treeList = cascadeDecay(tree)
+        treeList = list(iterCascadeDecay(tree))
         nExpected = 2*2 + 1*2 + 2*1 +1
         self.assertEqual(len(treeList),nExpected)
 
@@ -256,7 +256,7 @@ class TestDecompositionMethods(unittest.TestCase):
         tree.add_edge(pvIndex,n2Index)
         tree.add_edge(pvIndex,c2Index)
 
-        treeList = cascadeDecay(tree)
+        treeList = list(iterCascadeDecay(tree))
         nN2tot = 52
         nC2tot = 63
         self.assertEqual(len(treeList),nC2tot*nN2tot)
@@ -274,7 +274,7 @@ class TestDecompositionMethods(unittest.TestCase):
         self.assertAlmostEqual(totalXsec.asNumber(fb),3.5,places=5)
 
         # Now change sigmacut:
-        treeList = cascadeDecay(tree,sigmacutFB=cut.asNumber(fb))
+        treeList = list(iterCascadeDecay(tree, sigmacutFB=cut.asNumber(fb)))
         self.assertEqual(len(treeList),nCut)
 
         totalXsec = 0*fb

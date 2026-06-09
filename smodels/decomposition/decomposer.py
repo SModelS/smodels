@@ -11,6 +11,7 @@
 """
 
 import time
+from typing import Iterator
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.base.particleNode import ParticleNode
@@ -36,7 +37,8 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     :returns: list of topologies (TopologyList object)
 
     """
-    t1 = time.time()
+    t0 = time.time()
+    t1= time.time()
 
     xSectionList = model.xsections
     if massCompress and minmassgap / GeV < 0.:
@@ -73,31 +75,36 @@ def decompose(model, sigmacut=0 * fb, massCompress=True, invisibleCompress=True,
     productionSMS = sorted(productionSMS,
                              key=lambda sms: sms.maxWeight,
                              reverse=True)
-
-    # For each production tree, produce all allowed cascade decays (above sigmacut):
-    allSMS = []
-    for sms in productionSMS:
-        allSMS += cascadeDecay(sms, sigmacutFB=sigmacutFB)
+    logger.debug(f"{len(productionSMS)} primary production trees generated in {time.time() - t1:.2f} s.")
+    t1 = time.time()
 
     # Create elements for each tree and combine equal elements
     smsTopDict = TopologyDict()
+    nCascadeTrees = 0
 
-    for sms in allSMS:
-        sms.ancestors = [sms]  # Set ancestors (before compression)
-        # Sort SMS, compute canonical name and its total weight
-        sms.setGlobalProperties()
-        smsTopDict.addSMS(sms)
-
+    # For each production tree, produce all allowed cascade decays (above sigmacut):
+    for sms in productionSMS:
+        for decayedSMS in iterCascadeDecay(sms, sigmacutFB=sigmacutFB):
+            decayedSMS.setGlobalProperties()  # Set global properties for each tree
+            decayedSMS.ancestors = [decayedSMS]  # Set ancestors (before compression)
+            smsTopDict.addSMS(decayedSMS)
+            nCascadeTrees += 1
+    logger.debug(f"{nCascadeTrees} cascade topologies trees generated and added to TopoDict in {time.time() - t1:.2f} s.")
+    t1 = time.time()
+    
     if massCompress or invisibleCompress:
         smsTopDict.compress(massCompress, invisibleCompress, 
                             minmassgap, minmassgapISR)
+        
+    logger.debug(f"Compression done in {time.time() - t1:.2f} s.")
+    t1 = time.time()
     # Sort the topology dictionary according to the canonical names
     smsTopDict.sort()
     # Set the SMS IDs
     smsTopDict.setSMSIds()
 
 
-    logger.debug(f"decomposer done in {time.time() - t1:.2f} s.")
+    logger.debug(f"decomposer done in {time.time() - t0:.2f} s.")
 
     return smsTopDict
 
@@ -174,11 +181,13 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
     :return: List of trees with all possible 1-step decays added.
     """
 
-    smsList = [sms]
+    if sms.maxWeight < sigmacutFB:
+        return []  # Skip if the original tree is already below sigmacut
     # Get all (current) final states which are the mothers
     # of the decays to be added:
     motherIndices = [n for n in sms.nodeIndices if sms.out_degree(n) == 0]
     mothers = sms.indexToNode(motherIndices)
+    smsList = [sms]
     for motherIndex,mom in zip(motherIndices,mothers):
         # Check if mom should decay:
         if mom.isFinalState:
@@ -205,7 +214,7 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
         for T in smsList:
             tweight = T.maxWeight
             if tweight < sigmacutFB:
-                continue
+                break
             for decayNodes in decayNodesList:
                 br = decayNodes[2]
                 if tweight*br < sigmacutFB:
@@ -227,10 +236,9 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
         return smsList
 
 
-def cascadeDecay(tree, sigmacutFB=0.0):
+def iterCascadeDecay(tree, sigmacutFB=0.0) -> Iterator[TheorySMS]:
     """
-    Given a tree, generates a list of new trees (Tree objects),
-    where all the particles have cascade decayed to stable final states.
+    Yield final trees obtained by fully cascading all allowed decays.
 
     :param tree: Tree (Tree object) for which to add the decays
     :param sigmacutFB: Cut on the tree weight (xsec*BR) inf b. Any tree with weights
@@ -240,7 +248,6 @@ def cascadeDecay(tree, sigmacutFB=0.0):
     """
 
     treeList = [tree]
-    finalTrees = []
     while treeList:
         newTrees = []
         for T in treeList:
@@ -251,10 +258,8 @@ def cascadeDecay(tree, sigmacutFB=0.0):
                 # (newT can be empty if there is no allowed decay above sigmacutFB)
                 if any(T.indexToNode(fn).isFinalState is False for fn in finalNodes):
                     continue
-                finalTrees.append(T)  # It was not possible to add any new decay to the tree
+                yield T  # It was not possible to add any new decay to the tree
             else:
                 newTrees += newT  # Add decayed trees to the next iteration
 
         treeList = newTrees[:]
-
-    return finalTrees

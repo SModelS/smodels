@@ -30,6 +30,7 @@ class GenericSMS(object):
         self._nodesMapping = {}  # Stores the nodeIndex->node object mapping
         self._nodeCanonNames = {}  # Stores the canonical names for the nodes
         self._finalStates = {}  # Stores the final states of each node
+        self._nextNodeIndex = 0  # Cache the next free node index for fast insertions
         self._sorted = False # Tag SMS as sorted or not
 
     def __hash__(self):
@@ -117,14 +118,13 @@ class GenericSMS(object):
         """
 
         if nodeIndex is None:   
-            if not self._successors:
-                nodeIndex = 0
-            else:
-                nodeIndex = max(self.nodeIndices)+1
+            nodeIndex = self._nextNodeIndex
         elif nodeIndex in self._successors:
             raise SModelSError("Trying to add a node with a nodeIndex already in the tree.")
         self._successors[nodeIndex] = []
         self._nodesMapping[nodeIndex] = node
+        if nodeIndex >= self._nextNodeIndex:
+            self._nextNodeIndex = nodeIndex + 1
 
         return nodeIndex
 
@@ -246,6 +246,7 @@ class GenericSMS(object):
         self._nodeCanonNames = {}
         self._finalStates = {}
         self._rootIndex = None
+        self._nextNodeIndex = 0
 
     def indexToNode(self, nodeIndex):
         """
@@ -898,7 +899,8 @@ class GenericSMS(object):
         self._nodeCanonNames = {nodeIndex : cName for nodeIndex,cName
                                 in other._nodeCanonNames.items()}
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
-                             in self._finalStates.items()}
+                             in other._finalStates.items()}
+        self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
 
     def treeToString(self, 
                      removeIndicesFrom='stable'):
@@ -1088,6 +1090,7 @@ class GenericSMS(object):
         self._nodeCanonNames = newCanonNames
         self._finalStates = newFinalStates
         self._rootIndex = nodeIndexDict[self.rootIndex]
+        self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
 
     def updateNodeObjects(self, nodeObjectDict):
         """

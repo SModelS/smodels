@@ -55,7 +55,7 @@ def testPoint(inputFile, outputDir, parser, database):
     :return: dictionary with input filename as key and the MasterPrinter object as value
     """
 
-
+    t0 = time.time()
     """ Set BSM model, if necessary """
     if parser.has_option("particles","model"):
         runtime.modelFile = parser.get( "particles", "model" )
@@ -163,6 +163,8 @@ def testPoint(inputFile, outputDir, parser, database):
         return {os.path.basename(inputFile): masterPrinter}
 
     masterPrinter.addObj(smstoplist)
+    logger.info("Finished decomposition (%i topologies) in %3.2f min" % (len(smstoplist.getSMSList()),(time.time()-t0)/60.))
+    t0 = time.time()
 
     """
     Compute theory predictions
@@ -202,6 +204,9 @@ def testPoint(inputFile, outputDir, parser, database):
     theoryPredictions = theoryPrediction.TheoryPredictionList(
         allPredictions, maxcond)
 
+    logger.info("Finished theory prediction (%i predictions) in %3.2f min" % (len(theoryPredictions),(time.time()-t0)/60.))
+    t0 = time.time() 
+
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
         theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if not "CR" in os.path.basename(tp.dataset.path)] # Do not print CRs "results"
@@ -219,6 +224,7 @@ def testPoint(inputFile, outputDir, parser, database):
             smstoplist, sigmacut=sigmacut, sqrts=sqrts)
         masterPrinter.addObj(uncovered)
 
+    logger.info("Finished coverate in %3.2f min" % ((time.time()-t0)/60.))
     if parser.has_option("options", "combineAnas"):
         """ Combine analyses """
 
