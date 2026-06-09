@@ -230,7 +230,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # Also check if likelihood dict is defined:
         muvals = np.linspace(0.,3.,10)
         dmu = muvals[1]-muvals[0]
-        llhdDict = combiner.getLlhds(muvals,normalize=True)
+        llhdDict = combiner.getLlhds(muvals=muvals,normalize=True)
 
         # Check if keys agree
         keys = sorted(['combined','CMS-SUS-16-050-agg','CMS-SUS-13-012'])
