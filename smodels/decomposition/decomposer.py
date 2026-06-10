@@ -296,26 +296,62 @@ def iterCascadeDecay(tree, sigmacutFB=0.0) -> Iterator[TheorySMS]:
     """
     Yield final trees obtained by fully cascading all allowed decays.
 
-    :param tree: Tree (Tree object) for which to add the decays
-    :param sigmacutFB: Cut on the tree weight (xsec*BR) inf b. Any tree with weights
-                     smaller than sigmacutFB will be ignored.
+    Uses a DFS stack that expands one unstable leaf at a time.  Peak memory
+    scales as O(depth × max_branching) rather than O(max_branching^num_leaves),
+    which avoids the combinatorial blow-up of the previous BFS approach when
+    many leaves have multiple decay channels.
 
-    :return: List of trees with all possible decays added.
+    :param tree: Tree (TheorySMS object) for which to add the decays
+    :param sigmacutFB: Cut on the tree weight (xsec*BR) in fb. Any tree with
+                     weights smaller than sigmacutFB will be ignored.
+
+    :return: Iterator of fully-decayed TheorySMS trees.
     """
 
-    treeList = [tree]
-    while treeList:
-        newTrees = []
-        for T in treeList:
-            newT = addOneStepDecays(T, sigmacutFB)
-            if not newT:
-                finalNodes = [n for n in T.nodeIndices if T.out_degree(n) == 0]
-                # Make sure all the final states have decayed
-                # (newT can be empty if there is no allowed decay above sigmacutFB)
-                if any(T.indexToNode(fn).isFinalState is False for fn in finalNodes):
-                    continue
-                yield T  # It was not possible to add any new decay to the tree
-            else:
-                newTrees += newT  # Add decayed trees to the next iteration
+    stack = [tree]
+    while stack:
+        T = stack.pop()
 
-        treeList = newTrees[:]
+        if T.maxWeight < sigmacutFB:
+            continue
+
+        # Find the first leaf that still needs to be decayed
+        unstableIndex = None
+        for nodeIndex in T.nodeIndices:
+            if T.out_degree(nodeIndex) != 0:
+                continue  # Internal node — skip
+            mom = T.indexToNode(nodeIndex)
+            if mom.isFinalState:
+                continue
+            if mom.particle.isStable():
+                mom.isFinalState = True
+                continue
+            if not hasattr(mom, 'decays') or not mom.decays:
+                mom.isFinalState = True
+                continue
+            unstableIndex = nodeIndex
+            break
+
+        if unstableIndex is None:
+            # Every leaf is a final state — tree is fully decayed
+            yield T
+            continue
+
+        # Branch-and-bound: even taking the best BR at every remaining leaf,
+        # this subtree cannot reach sigmacutFB — prune it.
+        if T.maxWeight * getMaxRemainingBRFactor(T) < sigmacutFB:
+            continue
+
+        mom = T.indexToNode(unstableIndex)
+        decayNodesList = getDecayNodes(mom)
+        if not decayNodesList:
+            mom.isFinalState = True
+            stack.append(T)
+            continue
+
+        for decayNodes in decayNodesList:
+            br = decayNodes[2]
+            if T.maxWeight * br < sigmacutFB:
+                break  # decayNodesList is sorted by BR desc; remainder also fails
+            newT = T.attachDecay(unstableIndex, decayNodes, br=br, copy=True)
+            stack.append(newT)
