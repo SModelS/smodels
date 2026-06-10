@@ -124,10 +124,12 @@ class ModelsTest(unittest.TestCase):
         BSMList = getParticlesFromSLHA("./testFiles/slha/idm_example.slha")
         BSMList = sorted(BSMList, key = lambda p: p.pdg)
 
-        h2 = Particle(isSM=False,label='h2',pdg=35,eCharge=0.0,colordim=1,spin=0.0)
-        h3 = Particle(isSM=False,label='h3',pdg=36,eCharge=0.0,colordim=1,spin=0.0)
-        hp = Particle(isSM=False,label='h+',pdg=37,eCharge=1.0,colordim=1,spin=0.0)
-        hm = Particle(isSM=False,label='h-',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0)
+        # Create the same particles, but with the mass attribute to avoid it returning the
+        # same object
+        h2 = Particle(isSM=False,label='h2',pdg=35,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        h3 = Particle(isSM=False,label='h3',pdg=36,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        hp = Particle(isSM=False,label='h+',pdg=37,eCharge=1.0,colordim=1,spin=0.0,mass=1.0)
+        hm = Particle(isSM=False,label='h-',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0,mass=1.0)
         BSMListDefault = [hm,h2,h3,hp]
 
         self.assertEqual(len(BSMList),len(BSMListDefault))
@@ -135,6 +137,7 @@ class ModelsTest(unittest.TestCase):
             pDict = p.__dict__
             pDict.pop('_comp')
             pDict.pop('_id')
+            pDict.pop('mass')
             pBDict = BSMList[i].__dict__
             pBDict.pop('_comp')
             pBDict.pop('_id')
@@ -148,30 +151,32 @@ class ModelsTest(unittest.TestCase):
         BSMList = getParticlesFromLHE("./testFiles/lhe/alrsm.lhe")
         BSMList = sorted(BSMList, key = lambda p: p.pdg)
 
-        zp = Particle(isSM=False,label='zp',pdg=32,eCharge=0.0,colordim=1,spin=1.0)
-        wp = Particle(isSM=False,label='wp',pdg=34,eCharge=1.0,colordim=1,spin=1.0)
-        wm = Particle(isSM=False,label='wp~',pdg=-34,eCharge=-1.0,colordim=1,spin=1.0)
-        h1 = Particle(isSM=False,label='h1',pdg=35,eCharge=0.0,colordim=1,spin=0.0)
-        h2 = Particle(isSM=False,label='h2',pdg=45,eCharge=0.0,colordim=1,spin=0.0)
-        h3 = Particle(isSM=False,label='h3',pdg=55,eCharge=0.0,colordim=1,spin=0.0)
-        a1 = Particle(isSM=False,label='a1',pdg=36,eCharge=0.0,colordim=1,spin=0.0)
-        a2 = Particle(isSM=False,label='a2',pdg=46,eCharge=0.0,colordim=1,spin=0.0)
-        hp1 = Particle(isSM=False,label='hp1',pdg=37,eCharge=1.0,colordim=1,spin=0.0)
-        hm1 = Particle(isSM=False,label='hp1~',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0)
-        hp2 = Particle(isSM=False,label='hp2',pdg=47,eCharge=1.0,colordim=1,spin=0.0)
-        hm2 = Particle(isSM=False,label='hp2~',pdg=-47,eCharge=-1.0,colordim=1,spin=0.0)
-        ne = Particle(isSM=False,label='~ne',pdg=6000012,eCharge=0.0,colordim=1,spin=0.5)
-        neC = Particle(isSM=False,label='~ne~',pdg=-6000012,eCharge=0.0,colordim=1,spin=0.5)
-        nm = Particle(isSM=False,label='~nm',pdg=6000014,eCharge=0.0,colordim=1,spin=0.5)
-        nmC = Particle(isSM=False,label='~nm~',pdg=-6000014,eCharge=0.0,colordim=1,spin=0.5)
-        nt = Particle(isSM=False,label='~nt',pdg=6000016,eCharge=0.0,colordim=1,spin=0.5)
-        ntC = Particle(isSM=False,label='~nt~',pdg=-6000016,eCharge=0.0,colordim=1,spin=0.5)
-        dp = Particle(isSM=False,label='dp',pdg=6000001,eCharge=-1./3.,colordim=3,spin=0.5)
-        dpC = Particle(isSM=False,label='dp~',pdg=-6000001,eCharge=1./3.,colordim=3,spin=0.5)
-        sp = Particle(isSM=False,label='sp',pdg=6000003,eCharge=-1./3.,colordim=3,spin=0.5)
-        spC = Particle(isSM=False,label='sp~',pdg=-6000003,eCharge=1./3.,colordim=3,spin=0.5)
-        bp = Particle(isSM=False,label='bp',pdg=6000005,eCharge=-1./3.,colordim=3,spin=0.5)
-        bpC = Particle(isSM=False,label='bp~',pdg=-6000005,eCharge=1./3.,colordim=3,spin=0.5)
+        # Create the same particles, but with the mass attribute to avoid it returning the
+        # same object
+        zp = Particle(isSM=False,label='zp',pdg=32,eCharge=0.0,colordim=1,spin=1.0,mass=1.0)
+        wp = Particle(isSM=False,label='wp',pdg=34,eCharge=1.0,colordim=1,spin=1.0,mass=1.0)
+        wm = Particle(isSM=False,label='wp~',pdg=-34,eCharge=-1.0,colordim=1,spin=1.0,mass=1.0)
+        h1 = Particle(isSM=False,label='h1',pdg=35,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        h2 = Particle(isSM=False,label='h2',pdg=45,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        h3 = Particle(isSM=False,label='h3',pdg=55,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        a1 = Particle(isSM=False,label='a1',pdg=36,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        a2 = Particle(isSM=False,label='a2',pdg=46,eCharge=0.0,colordim=1,spin=0.0,mass=1.0)
+        hp1 = Particle(isSM=False,label='hp1',pdg=37,eCharge=1.0,colordim=1,spin=0.0,mass=1.0)
+        hm1 = Particle(isSM=False,label='hp1~',pdg=-37,eCharge=-1.0,colordim=1,spin=0.0,mass=1.0)
+        hp2 = Particle(isSM=False,label='hp2',pdg=47,eCharge=1.0,colordim=1,spin=0.0,mass=1.0)
+        hm2 = Particle(isSM=False,label='hp2~',pdg=-47,eCharge=-1.0,colordim=1,spin=0.0,mass=1.0)
+        ne = Particle(isSM=False,label='~ne',pdg=6000012,eCharge=0.0,colordim=1,spin=0.5,mass=1.0)
+        neC = Particle(isSM=False,label='~ne~',pdg=-6000012,eCharge=0.0,colordim=1,spin=0.5,mass=1.0)
+        nm = Particle(isSM=False,label='~nm',pdg=6000014,eCharge=0.0,colordim=1,spin=0.5,mass=1.0)
+        nmC = Particle(isSM=False,label='~nm~',pdg=-6000014,eCharge=0.0,colordim=1,spin=0.5,mass=1.0)
+        nt = Particle(isSM=False,label='~nt',pdg=6000016,eCharge=0.0,colordim=1,spin=0.5,mass=1.0)
+        ntC = Particle(isSM=False,label='~nt~',pdg=-6000016,eCharge=0.0,colordim=1,spin=0.5,mass=1.0)
+        dp = Particle(isSM=False,label='dp',pdg=6000001,eCharge=-1./3.,colordim=3,spin=0.5,mass=1.0)
+        dpC = Particle(isSM=False,label='dp~',pdg=-6000001,eCharge=1./3.,colordim=3,spin=0.5,mass=1.0)
+        sp = Particle(isSM=False,label='sp',pdg=6000003,eCharge=-1./3.,colordim=3,spin=0.5,mass=1.0)
+        spC = Particle(isSM=False,label='sp~',pdg=-6000003,eCharge=1./3.,colordim=3,spin=0.5,mass=1.0)
+        bp = Particle(isSM=False,label='bp',pdg=6000005,eCharge=-1./3.,colordim=3,spin=0.5,mass=1.0)
+        bpC = Particle(isSM=False,label='bp~',pdg=-6000005,eCharge=1./3.,colordim=3,spin=0.5,mass=1.0)
         BSMListDefault = [zp,wp,h1,h2,h3,a1,a2,hp1,hp2,ne,nm,nt,
                           dp,sp,bp,wm,hm1,hm2,neC,nmC,ntC,dpC,spC,bpC]
         BSMListDefault = sorted(BSMListDefault, key = lambda p: p.pdg)
@@ -181,6 +186,7 @@ class ModelsTest(unittest.TestCase):
             pDict = p.__dict__
             pDict.pop('_comp')
             pDict.pop('_id')
+            pDict.pop('mass')
             pBDict = BSMList[i].__dict__
             pBDict.pop('_comp')
             pBDict.pop('_id')
