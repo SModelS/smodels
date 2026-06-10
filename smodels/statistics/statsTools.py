@@ -313,8 +313,9 @@ class StatsComputer:
         elif dataType == "combined" and tpType == "TheoryPrediction":
             dataset = theoryPrediction.dataset
             # Get dictionary with dataset IDs and signal yields
-            # [!AL!]: We still have to remove origdatasets and check the behaviour if just a subset of datasets is selected through parameters.ini. We agreed on setting the signal for "missing SRs" to zero
-            srNsigDictAll = {ds.getID() : 0.0 for ds in dataset.origdatasets}
+            srNsigDictAll = {}
+            for region in dataset.globalInfo.srMappings:
+                srNsigDictAll[ region["smodels"] ] = 0.
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
                                     for pred in theoryPrediction.datasetPredictions})
