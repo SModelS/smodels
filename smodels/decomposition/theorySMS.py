@@ -10,6 +10,7 @@
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.genericSMS import GenericSMS
 from smodels.base.particle import Particle
+from typing import List
 
 class TheorySMS(GenericSMS):
     """
@@ -327,7 +328,7 @@ class TheorySMS(GenericSMS):
         for ancestor in self.getAncestors():
             ancestor.coveredBy.add(resultType)
 
-    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR):
+    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR) -> List["TheorySMS"]:
         """
         Keep compressing the original SMS and the derived ones till they
         can be compressed no more.
