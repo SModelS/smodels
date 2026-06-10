@@ -113,10 +113,12 @@ class SpeyModelFacade:
 
 
 class SpeyRetriever:
-    """ simple class that retrieves and constructs the sub computers using the Spey interface."""
+    """ simple class that retrieves and constructs the sub computers
+    using the Spey interface."""
 
     @classmethod
-    def forMultiBinSL(cls, srSet: str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0 ) -> SpeyModelFacade:
+    def forMultiBinSL(cls, srSet: str, dataset : CombinedDataSet, nsigDict : dict,
+            deltas_rel : Optional[float] = 0.0 ) -> SpeyModelFacade:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -134,7 +136,6 @@ class SpeyRetriever:
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
         # cov = dataset.globalInfo.covariance
         covs = dataset.globalInfo.cachedModels
-        subComputers = []
         lumi = float ( dataset.getLumi().asNumber(1./fb) )
         thirdmomenta=[]
         for ds in dataset._datasets:
@@ -172,7 +173,6 @@ class SpeyRetriever:
                     f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
                     f.write ( f"lumi={lumi}\n" )
                     f.close()
-    # import sys; sys.exit()
 
                 speyModel = stat_wrapper( data = obsN,
                                 background_yields = bg, covariance_matrix = cov,
@@ -252,7 +252,8 @@ class SpeyRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
+        # srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings }
+        srMappingsDict = globalInfo.srMappingsDict
 
         for sr in globalInfo.srSets[srSet]:
             if sr not in srMappingsDict:
@@ -263,17 +264,17 @@ class SpeyRetriever:
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
             raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
-        
+
         modelList = globalInfo.statModels[srSet]
         if len(modelList) == 0:
             logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
             raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
-        
+
         model_type, model_filename = modelList[0] # Always use first model
         if model_type != "onnx":
             logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
             raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
-        
+
         # Get dictionary for signal yields using the ONNX labels
         f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
 
@@ -289,10 +290,10 @@ class SpeyRetriever:
         f.close()
         os.unlink ( tempf )
         xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
-        facade = SpeyModelFacade ( upperLimitComputer, "nn", 
+        facade = SpeyModelFacade ( upperLimitComputer, "nn",
                                     model_filename, xsec ) ## [!AL!]: This method has to be fixed! It was not working before and I've just cleaned it up a bit.
         return facade
-    
+
     @classmethod
     def forPyhf(cls, srSet: str, dataset, nsigDict) -> SpeyModelFacade:
         """ get a sub computer for pyhf combination.
