@@ -830,15 +830,6 @@ class LikelihoodComputer:
         ret = self.nllOfTheta( theta_hat )
         return ret
 
-    """
-    def likelihood(self, mu : float, return_nll : bool = False,
-           evaluationType : NllEvalType=observed,
-           asimov : Union[None,float] = None  ):
-        # legacy, should slowly phase out
-        nll = self.nll ( mu, evaluationType, asimov )
-        return exponentiateNLL ( nll, doIt = not return_nll )
-    """
-
     def nll_min( self, evaluationType : NllEvalType = observed,
                  allowNegativeSignals : bool = False ) -> dict:
         """ nll_min
