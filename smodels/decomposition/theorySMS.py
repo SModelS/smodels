@@ -9,7 +9,7 @@
 
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.genericSMS import GenericSMS
-from smodels.base.particle import Particle
+from smodels.base.particle import Particle, InvisibleParticle
 from typing import List
 
 class TheorySMS(GenericSMS):
@@ -524,9 +524,8 @@ class TheorySMS(GenericSMS):
                 # Replace mother particle by invisible (generic) particle
                 # with its width equal to the maximum width amongst the daughters
                 maxWidth = max([d.totalwidth for d in daughters])
-                invParticle = Particle(label='inv', mass=mom.mass,
+                invParticle = InvisibleParticle(label='inv', mass=mom.mass,
                                        eCharge=0, colordim=1,
-                                       _isInvisible=True,
                                        totalwidth=maxWidth,
                                        pdg=mom.pdg, isSM=mom.isSM)
                 newmom = mom.copy()

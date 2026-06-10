@@ -6,7 +6,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-import itertools
 import weakref
 
 
@@ -19,6 +18,7 @@ class Particle(object):
     _instances = set()
     _lastID = 0
 
+    
     def __new__(cls, attributesDict={}, **kwargs):
         """
         Creates a particle. If a particle with the exact same attributes have
@@ -45,14 +45,11 @@ class Particle(object):
 
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
-        attrDict.pop('_id', None)
-        attrDict.pop('_comp', None)
-        for obj in Particle.getinstances():
+        attrDict = cls._normalizedAttrDict(attrDict)
+        for obj in cls.getinstances():
             if not isinstance(obj, Particle):
                 continue
-            objAttr = dict(obj.__dict__.items())
-            objAttr.pop('_id', None)
-            objAttr.pop('_comp', None)
+            objAttr = cls._normalizedAttrDict(obj.__dict__)
             if objAttr != attrDict:
                 continue
             return obj
@@ -60,11 +57,11 @@ class Particle(object):
         newParticle = super(Particle, cls).__new__(cls)
         for attr, value in attrDict.items():
             setattr(newParticle, attr, value)
-        newParticle._id = Particle.getID()
+        newParticle._id = cls.getID()
         newParticle._comp = {newParticle._id: 0}
         newParticle._isStable = None
         newParticle._isPrompt = None
-        Particle._instances.add(weakref.ref(newParticle))
+        cls._instances.add(weakref.ref(newParticle))
         return newParticle
 
     def __getnewargs__(self):
@@ -74,10 +71,7 @@ class Particle(object):
         arguments returned by this method.
         """
 
-        attrDict = dict(self.__dict__.items())
-        # Make sure pickled/unpickled objects do no store ID nor comparison dict
-        attrDict.pop('_id', None)
-        attrDict.pop('_comp', None)
+        attrDict = self.__class__._normalizedAttrDict(self.__dict__)
         return (attrDict,)
 
     def __getstate__(self):
@@ -87,10 +81,7 @@ class Particle(object):
         when the pickle file is loaded.
         """
 
-        attrDict = dict(self.__dict__.items())
-        # Make sure pickled objects do no store ID nor comparison dict
-        attrDict.pop('_id', None)
-        attrDict.pop('_comp', None)
+        attrDict = self.__class__._normalizedAttrDict(self.__dict__)
 
         return attrDict
 
@@ -106,6 +97,18 @@ class Particle(object):
         Return the object address. Required for using weakref
         """
         return self._id
+    
+    @classmethod
+    def _normalizedAttrDict(cls, data):
+        """Drop runtime-only cache fields from attribute comparisons."""
+
+        attrDict = dict(data.items())
+        attrDict.pop('_id', None)
+        attrDict.pop('_comp', None)
+        attrDict.pop('_isStable', None)
+        attrDict.pop('_isPrompt', None)
+        return attrDict
+
 
     @classmethod
     def getinstances(cls):
@@ -253,12 +256,13 @@ class Particle(object):
         :return: A Particle object identical to self, except for its ID and comparison dict
         """
 
-        newParticle = object.__new__(Particle)
+        cls = self.__class__
+        newParticle = object.__new__(cls)
         for attr, value in self.__dict__.items():
             setattr(newParticle, attr, value)
-        newParticle._id = Particle.getID()
+        newParticle._id = cls.getID()
         newParticle._comp = {newParticle._id: 0}
-        Particle._instances.add(weakref.ref(newParticle))
+        cls._instances.add(weakref.ref(newParticle))
 
         return newParticle
 
@@ -291,7 +295,7 @@ class Particle(object):
         # Overwrite default labelling
         if label is not None:
             particleAttr['label'] = label
-        pConjugate = Particle(**particleAttr)
+        pConjugate = self.__class__(**particleAttr)
 
         return pConjugate
 
@@ -366,6 +370,49 @@ class Particle(object):
             return False
 
 
+class InvisibleParticle(Particle):
+
+    """
+    An instance of this class represents an invisible particle created by invisible compression,
+    so it does not correspond to a physical BSM particle. 
+    It behaves like Particle, but object de-duplication and ID generation
+    are restricted to InvisibleParticle (or subclasses of it), without looking at
+    Particle._instances, which improves performance.
+    """
+
+    _instances = set()
+    _lastID = 0
+
+    def __new__(cls, attributesDict={}, **kwargs):
+        attrDict = dict(attributesDict.items())
+        attrDict.update(kwargs)
+        # Enforce invisibility for all InvisibleParticle instances.
+        attrDict['_isInvisible'] = True
+        return super(InvisibleParticle, cls).__new__(cls, attrDict)
+
+    @classmethod
+    def getinstances(cls):
+        dead = set()
+        instances = []
+        for ref in cls._instances:
+            obj = ref()
+            if obj is not None:
+                instances.append(obj)
+            else:
+                dead.add(ref)
+        cls._instances -= dead
+        return instances
+
+    @classmethod
+    def getID(cls):
+        if len(cls.getinstances()) == 0:
+            cls._lastID = 0
+        else:
+            cls._lastID += 1
+        return cls._lastID
+
+
+
 class MultiParticle(Particle):
 
     """ An instance of this class represents a list of particle object to allow for inclusive expressions such as jets.
@@ -390,15 +437,12 @@ class MultiParticle(Particle):
             label = "/".join(sorted(list(set([p.label for p in particles]))))
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
-        attrDict.pop('_id', None)
-        attrDict.pop('_comp', None)
+        attrDict = cls._normalizedAttrDict(attrDict)
         for obj in Particle.getinstances()[:]:
             if not isinstance(obj, MultiParticle):
                 continue
             # Directly compare attributes, except for particles,label,id and _comp
-            objAttr = dict(obj.__dict__.items())
-            objAttr.pop('_id', None)
-            objAttr.pop('_comp', None)
+            objAttr = cls._normalizedAttrDict(obj.__dict__)
             objAttr.pop('label', None)
             objAttr.pop('particles', None)
             if objAttr != attrDict:
@@ -428,12 +472,9 @@ class MultiParticle(Particle):
         arguments returned by this method.
         """
 
-        attrDict = dict(self.__dict__.items())
+        attrDict = self.__class__._normalizedAttrDict(self.__dict__)
         attrDict.pop('label', None)
         attrDict.pop('particles', None)
-        # Make sure pickled/unpickled objects do no store ID nor comparison dict
-        attrDict.pop('_id', None)
-        attrDict.pop('_comp', None)
 
         return (self.label, self.particles, attrDict)
 
@@ -444,10 +485,7 @@ class MultiParticle(Particle):
         when the pickle file is loaded.
         """
 
-        attrDict = dict(self.__dict__.items())
-        # Make sure pickled objects do no store ID nor comparison dict
-        attrDict.pop('_id', None)
-        attrDict.pop('_comp', None)
+        attrDict = self.__class__._normalizedAttrDict(self.__dict__)
 
         return attrDict
 
