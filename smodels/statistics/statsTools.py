@@ -67,17 +67,6 @@ class CompRetriever:
         cov = covs[covname]
         assert type(cov)==list, f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}"
         assert len(cov)>0, f"covariance matrix has length {len(cov)}."
-        """
-        ## [!AL!]: I am not sure what we are looping over here. I assume this method returns a single computer for each SR set,
-        ## so we should restrict it to a subset of SRs (defined by srSet) and return a single computer. I did not modify its behaviour, because I wasn't sure what cachedModels means.
-        for covname,cov in covs.items():
-           if not covname.endswith ( ".cov" ):
-                continue
-            if type(cov) != list:
-                raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
-            if len(cov) < 1:
-                raise SModelSError( f"covariance matrix has length {len(cov)}." )
-        """
         n = len(cov)
 
         nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]?
@@ -137,7 +126,6 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        #srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
         srMappingsDict = globalInfo.srMappingsDict
 
         for sr in globalInfo.srSets[srSet]:
@@ -182,7 +170,6 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        # srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
         srMappingsDict = globalInfo.srMappingsDict
         labelToPyhf = {}
         for sr_label in globalInfo.srSets[srSet]:
