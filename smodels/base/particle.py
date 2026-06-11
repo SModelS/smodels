@@ -125,10 +125,7 @@ class Particle(object):
 
     @classmethod
     def getID(cls):
-        if len(Particle.getinstances()) == 0:
-            Particle._lastID = 0
-        else:
-            Particle._lastID += 1
+        Particle._lastID += 1
         return Particle._lastID
 
     def __cmp__(self, other):
@@ -381,8 +378,7 @@ class InvisibleParticle(Particle):
     """
 
     _instances = set()
-    _lastID = 0
-
+    
     def __new__(cls, attributesDict={}, **kwargs):
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
@@ -394,22 +390,15 @@ class InvisibleParticle(Particle):
     def getinstances(cls):
         dead = set()
         instances = []
-        for ref in cls._instances:
+        for ref in InvisibleParticle._instances:
             obj = ref()
             if obj is not None:
                 instances.append(obj)
             else:
                 dead.add(ref)
-        cls._instances -= dead
+        InvisibleParticle._instances -= dead
         return instances
 
-    @classmethod
-    def getID(cls):
-        if len(cls.getinstances()) == 0:
-            cls._lastID = 0
-        else:
-            cls._lastID += 1
-        return cls._lastID
 
 
 
@@ -418,6 +407,8 @@ class MultiParticle(Particle):
     """ An instance of this class represents a list of particle object to allow for inclusive expressions such as jets.
         The properties are: label, pdg, mass, electric charge, color charge, width
     """
+
+    _instances = set()
 
     def __new__(cls, label=None, particles=[], attributesDict={}, **kwargs):
         """
@@ -438,9 +429,7 @@ class MultiParticle(Particle):
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
         attrDict = cls._normalizedAttrDict(attrDict)
-        for obj in Particle.getinstances()[:]:
-            if not isinstance(obj, MultiParticle):
-                continue
+        for obj in MultiParticle.getinstances()[:]:
             # Directly compare attributes, except for particles,label,id and _comp
             objAttr = cls._normalizedAttrDict(obj.__dict__)
             objAttr.pop('label', None)
@@ -462,8 +451,22 @@ class MultiParticle(Particle):
         newMultiParticle._id = Particle.getID()
         newMultiParticle._comp = {newMultiParticle._id: 0}
         newMultiParticle._comp.update(dict([[ptc._id, 0] for ptc in particles]))
-        Particle._instances.add(weakref.ref(newMultiParticle))
+        MultiParticle._instances.add(weakref.ref(newMultiParticle))
         return newMultiParticle
+
+    @classmethod
+    def getinstances(cls):
+        dead = set()
+        instances = []
+        for ref in MultiParticle._instances:
+            obj = ref()
+            if obj is not None:
+                instances.append(obj)
+            else:
+                dead.add(ref)
+        MultiParticle._instances -= dead
+
+        return instances
 
     def __getnewargs__(self):
         """
