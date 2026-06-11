@@ -19,208 +19,174 @@ from smodels.base.physicsUnits import fb, GeV
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.smodelsLogging import logger
 from itertools import product
+from collections import namedtuple
 import numpy as np
 
-
-def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, minmassgapISR):
-
-    xSectionList = model.xsections
-    sigmacutFB = sigmacut.asNumber(fb)  # sigmacut in fb (faster comparison)
-
-    xSectionList.removeLowerOrder()
-    # Order xsections by highest xsec value to improve performance
-    xSectionList.sort()
-
-    productionSMS = []
-    smsTopDict = TopologyDict()
-    for pdgs in xSectionList.getPIDpairs():
-        weight = xSectionList.getXsecsFor(pdgs)
-        maxWeight = weight.getMaxXsec().asNumber(fb)
-        if maxWeight < sigmacutFB:
-            continue
-        pv = ParticleNode(model.getParticle(label='PV'))
-        primaryMothers = [ParticleNode(model.getParticle(pdg=pdg)) for pdg in pdgs]
-        newSMS = TheorySMS()
-        newSMS.maxWeight = maxWeight
-        newSMS.prodXSec = weight
-        pvIndex = newSMS.add_node(pv)
-        motherIndices = newSMS.add_nodes_from(primaryMothers)
-        newSMS.add_edges_from(product([pvIndex], motherIndices))
-        productionSMS.append(newSMS)
-
-    maxXsec = max(sms.maxWeight for sms in productionSMS)
-    minBR = sigmacutFB / maxXsec
-    cache = {}
-    for sms in productionSMS:
-        for particleNode in sms.daughters(sms.rootIndex):
-            if particleNode.particle is None:
-                continue
-            if particleNode.particle in cache:
-                continue
-            _, cache = build_subtree_cache(particleNode, memo=cache, minBR=minBR)
-
-    for sms in productionSMS:
-        all_subtrees = [
-            cache.get(sms.indexToNode(daughterIndex).particle, [])
-            for daughterIndex in sms.daughterIndices(sms.rootIndex)
-        ]
-        daughterIndices = list(sms.daughterIndices(sms.rootIndex))
-        for primary_subtrees in itertools.product(*all_subtrees):
-            totalBR = 1.0
-            for subtree in primary_subtrees:
-                totalBR *= subtree.decayBRs
-            if sms.maxWeight * totalBR < sigmacutFB:
-                continue
-
-            smsDecayed = sms.copy()
-            for idaughter, subtree in enumerate(primary_subtrees):
-                old2newIndexMapping = {0: daughterIndices[idaughter]}
-                for nodeIndex in subtree.nodeIndices:
-                    # Skip subtree root: the primary mother is already present in smsDecayed.
-                    if nodeIndex == subtree.rootIndex:
-                        continue
-                    node = subtree.indexToNode(nodeIndex)
-                    newIndex = smsDecayed.add_node(node)
-                    old2newIndexMapping[nodeIndex] = newIndex
-
-                for edgeA, edgeB in subtree.edgeIndices:
-                    smsDecayed.add_edge(old2newIndexMapping[edgeA], old2newIndexMapping[edgeB])
-
-            smsDecayed.decayBRs = totalBR
-            smsDecayed.maxWeight = sms.maxWeight * totalBR
-            smsDecayed.setGlobalProperties()  # Set global properties for each tree
-            smsDecayed.ancestors = [smsDecayed]  # Set ancestors (before compression)
-            smsTopDict.addSMS(smsDecayed)
+decaySubtreeTuple = namedtuple('decaySubtreeTuple', ['daughterIDs', 'br', 'maxBR'])
+subtreeTuple = namedtuple('subtreeTuple', ['particleIDs', 'edges', 'decayBRs', 'canonName'])
+decayTupleObj = namedtuple('decayTuple', ['mom', 'daughters', 'br'])
+xsecTupleObj = namedtuple('xsecTuple', ['primaryMotherIDs', 'maxWeight', 'xsecList'])
 
 
-
-    if massCompress or invisibleCompress:
-        smsTopDict.compress(massCompress, invisibleCompress, 
-                            minmassgap, minmassgapISR)
-
-    return smsTopDict
-
-def build_subtree_cache(particleNode, memo=None, visiting=None, minBR=0.0):
-    """Return all weighted TheorySMS subtrees rooted at `particle` and cache by particle."""
-
+def build_subtree_cache(particleID, decayDict, memo=None, visiting=None, minBR=0.0):
+    """Build memoized subtree tuples for all descendants of particleID."""
     if memo is None:
         memo = {}
     if visiting is None:
         visiting = set()
-    if particleNode.particle in memo:
-        return memo[particleNode.particle], memo
 
-    if particleNode.particle in visiting:
-        raise ValueError(
-            f"Cycle detected at particle {particleNode.particle}; this DFS cache expects a DAG/tree-like decay graph."
-        )
+    if particleID in memo:
+        return memo
 
-    logger.debug(f"Building subtree cache for particle {particleNode.particle}")
-    visiting.add(particleNode.particle)
+    if particleID in visiting:
+        raise ValueError(f"Cycle detected at particle {particleID}; decay graph must be a DAG.")
+
+    visiting.add(particleID)
+    decays = decayDict.get(particleID, [])
+
     subtrees = []
-    if not hasattr(particleNode.particle, "decays") or not particleNode.particle.decays:
-        decays = None
-    else:
-        decays = getDecayNodes(particleNode)
-    
     if not decays:
-        sms = TheorySMS()
-        sms.add_node(particleNode)
-        sms.decayBRs = 1.0
-        subtrees.append(sms)
+        parent_subtree = subtreeTuple(edges=[], particleIDs=[particleID,], decayBRs=1.0, canonName=10)
+        subtrees.append(parent_subtree)
     else:
         for decay in decays:
-            mom,daughters,br = decay
-            if br < minBR:
+            # Keep parity with decomposerNew.py behavior for direct decay pruning.
+            if decay.br < minBR:
                 continue
+
+            child_ids = tuple(sorted(decay.daughters))
             daughter_choices = []
-            for daughter in daughters:
-                daughter_subtrees, memo = build_subtree_cache(daughter, memo, visiting, minBR)
-                daughter_choices.append(daughter_subtrees)
-            
+            for daughter_id in child_ids:
+                memo = build_subtree_cache(daughter_id, decayDict, memo, visiting, minBR)
+                daughter_subtree = memo[daughter_id]
+                daughter_choices.append(daughter_subtree)
+
             for combo in product(*daughter_choices):
-                sms = TheorySMS()
-                root_index = sms.add_node(mom)
-
-                all_weight = br*np.prod([daughter_sms.decayBRs for daughter_sms in combo])
-                if all_weight < minBR:
+                all_BRs = decay.br*numpy.prod([daughter_subtree.decayBRs for daughter_subtree in combo])
+                if all_BRs < minBR:
                     continue
-                
-                for daughter_sms in combo:
+                combo = sorted(combo, key=lambda s: s.canonName)  # Sort daughter subtrees by canonName for consistent ordering
+                cName = '1'+"".join(f"{daughter_subtree.canonName}" for daughter_subtree in combo) + '0'
+                parent_subtree = subtreeTuple(edges=[], particleIDs=[particleID,], decayBRs=all_BRs, canonName=int(cName))
+                for daughter_subtree in combo:
                     index_map = {}
-                    for node_index in daughter_sms.nodeIndices:
-                        node = daughter_sms.indexToNode(node_index)
-                        node_copy = node.copy() if hasattr(node, "copy") else node
-                        new_index = sms.add_node(node_copy)
-                        index_map[node_index] = new_index
+                    for idx,daughter_id in enumerate(daughter_subtree.particleIDs):
+                        parent_subtree.particleIDs.append(daughter_id)
+                        new_index = len(parent_subtree.particleIDs)-1
+                        index_map[idx] = new_index                                                
 
-                    for edge_a, edge_b in daughter_sms.edgeIndices:
-                        sms.add_edge(index_map[edge_a], index_map[edge_b])
+                    for edge_a, edge_b in daughter_subtree.edges:
+                        parent_subtree.edges.append((index_map[edge_a], index_map[edge_b]))
 
-                    sms.add_edge(root_index, index_map[daughter_sms.rootIndex])
-                    
-                sms.decayBRs = all_weight
-                subtrees.append(sms)
+                    parent_subtree.edges.append((0, index_map[0]))
 
-    visiting.remove(particleNode.particle)
-    # Sort subtrees by decay BRs (descending) to improve performance of later pruning based on sigmacut.
-    subtrees = sorted(subtrees, key=lambda sms: sms.decayBRs, reverse=True)
-    memo[particleNode.particle] = tuple(subtrees)
-    return memo[particleNode.particle], memo
+                subtrees.append(parent_subtree)
+    subtrees.sort(key=lambda s: (s.canonName,s.particleIDs), reverse=False)
+    visiting.remove(particleID)
+    memo[particleID] = tuple(subtrees)
+    return memo
 
 
-def getDecayNodes(mother):
-    """
-    Generates a simple list of trees with all the decay channels
-    for the mother. In each tree the mother appears as the root
-    and each of its decays as daughters.
-    (The node numbering for the root/mother node is kept equal,
-    while the numbering of the daughters is automatically assigned to
-    avoid overlap with any previously created nodes, so the
-    decay tree can be directly merged to any other tree.)
+
+def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, minmassgapISR):
+    # Lightweight decay representation keyed by particle hash.
+    decaysDict = {}
+    idDict = {}
+    for p in model.BSMparticles + model.SMparticles:
+        pid = hash(p)
+        idDict[pid] = p
+        decays = getattr(p, 'decays', [])
+        lightweight_decays = []
+        for decay in decays:
+            if decay is None:
+                lightweight_decays.append(decayTupleObj(mom=pid, daughters=[], br=1.0))
+            else:
+                lightweight_decays.append(
+                    decayTupleObj(
+                        mom=pid,
+                        daughters=[hash(d) for d in decay.daughters],
+                        br=decay.br,
+                    )
+                )
+        decaysDict[pid] = sorted(lightweight_decays, key=lambda d: d.br, reverse=True)
+
+    xSectionList = model.xsections
+    sigmacutFB = sigmacut.asNumber(fb)
+    xSectionList.removeLowerOrder()
+    xSectionList.sort()
+
+    xsecTupleList = []
+    smsTopDict = TopologyDict()
+
+    for pdgs in xSectionList.getPIDpairs():
+        xsecList = xSectionList.getXsecsFor(pdgs)
+        maxWeight = xsecList.getMaxXsec().asNumber(fb)
+        if maxWeight < sigmacutFB:
+            continue
+        primaryMotherIDs = tuple(hash(model.getParticle(pdg=pdg)) for pdg in pdgs)
+        xsecTupleList.append(
+            xsecTupleObj(primaryMotherIDs=primaryMotherIDs, maxWeight=maxWeight, xsecList=xsecList)
+        )
+
+    if not xsecTupleList:
+        return smsTopDict
+
+    maxXsec = max(x.maxWeight for x in xsecTupleList)
+    minBR = sigmacutFB / maxXsec if maxXsec > 0.0 else 0.0
+
+    # Build subtree cache for all primary mothers appearing in production channeprintls.
+    cache = {}
+    for xsecTuple in xsecTupleList:
+        for primaryMotherID in xsecTuple.primaryMotherIDs:
+            if primaryMotherID in cache:
+                continue
+            cache = build_subtree_cache(primaryMotherID, decaysDict, memo=cache, minBR=minBR)
+
+    pv = ParticleNode(model.getParticle(label='PV'))
+    for xsecTuple in xsecTupleList:
+        weight = xsecTuple.maxWeight
+        if weight < sigmacutFB:
+            continue
+
+        primary_ids = xsecTuple.primaryMotherIDs
+        all_subtrees = [cache[pid] for pid in primary_ids]
+        for primary_subtrees in itertools.product(*all_subtrees):
+            totalBR = 1.0
+            for subtree in primary_subtrees:
+                totalBR *= subtree.decayBRs
+            if weight * totalBR < sigmacutFB:
+                continue
+
+            smsDecayed = TheorySMS()
+            smsDecayed.maxWeight = xsecTuple.maxWeight
+            smsDecayed.prodXSec = xsecTuple.xsecList
+            pvIndex = smsDecayed.add_node(pv)
+            primaryMothers = [ParticleNode(idDict[momID]) for momID in primary_ids]
+            motherIndices = smsDecayed.add_nodes_from(primaryMothers)
+            smsDecayed.add_edges_from(product([pvIndex], motherIndices))
+            for idaughter, subtree in enumerate(primary_subtrees):
+                old2newIndexMapping = {0: motherIndices[idaughter]}
+                for nodeIndex,daughter_id in enumerate(subtree.particleIDs):
+                    # Skip subtree root: the primary mother is already present in smsDecayed.
+                    if nodeIndex == 0:
+                        continue
+                    daughter = idDict[daughter_id]
+                    node = ParticleNode(daughter)
+                    newIndex = smsDecayed.add_node(node)
+                    old2newIndexMapping[nodeIndex] = newIndex
+                for edgeA, edgeB in subtree.edges:
+                    smsDecayed.add_edge(old2newIndexMapping[edgeA], old2newIndexMapping[edgeB])
+
+            smsDecayed.decayBRs = totalBR
+            smsDecayed.maxWeight = weight * totalBR 
+            smsDecayed.weightList = smsDecayed.prodXSec*smsDecayed.decayBRs
+            # Speed up here, since the  SMS are already sorted!
+            smsDecayed.setGlobalProperties(sort=False)  # Set global properties for each tree
+            smsDecayed.ancestors = [smsDecayed]  # Set ancestors (before compression)
+            smsTopDict.addSMS(smsDecayed)
 
 
-    :param mother: Mother for which the decay trees will be generated (ParticleNode object)
+    if massCompress or invisibleCompress:
+        smsTopDict.compress(massCompress, invisibleCompress, minmassgap, minmassgapISR)
 
-    :return: A list with simple tuples ((mom,daughters,BRs)) where
-             the first entry is the new mother ParticleNode,
-             the second is a list of daughter ParticleNode objects and
-             the third the corresponding BR.
-    """
-
-
-    # If the trees were already computed, store them in the particle object
-    if hasattr(mother.particle,'_decayTrees'):
-        return mother.particle._decayTrees
-
-    # Otherwise, compute them
-    decayTrees = []
-
-    # Sort decays:
-    decays = []
-    for decay in mother.decays:
-        if decay is not None:
-            decays.append(decay)
-        else:
-            # Include possibility of mother appearing as a final state
-            mom = mother.copy()
-            mom.isFinalState = True  # Forbids further node decays
-            decayTrees.append((mom, [], 1.0))
-
-    decays = sorted(decays, key=lambda dec: dec.br, reverse=True)
-    # Loop over decays of the daughter
-    for decay in decays:
-        if not decay.br:
-            continue  # Skip decays with zero BRs
-        daughters = []
-        mom = mother.copy()
-        for ptc in decay.daughters:
-            ptcNode = ParticleNode(particle=ptc)
-            daughters.append(ptcNode)
-
-        decayTrees.append((mom, daughters, decay.br))
-
-    # Store the decays in the particle object
-    mother.particle._decayTrees = decayTrees
-
-    return decayTrees
+    return smsTopDict

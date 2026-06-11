@@ -57,7 +57,7 @@ class Particle(object):
         newParticle = super(Particle, cls).__new__(cls)
         for attr, value in attrDict.items():
             setattr(newParticle, attr, value)
-        newParticle._id = cls.getID()
+        newParticle._id = Particle.getID()
         newParticle._comp = {newParticle._id: 0}
         newParticle._isStable = None
         newParticle._isPrompt = None
