@@ -41,7 +41,8 @@ class CompRetriever:
 
 
     @classmethod
-    def forMultiBinSL(cls,srSet : str, dataset, nsigDict, deltas_rel : Optional[float] = 0.0  ) -> SLUpperLimitComputer:
+    def forMultiBinSL(cls,srSet : str, dataset, nsigDict, 
+            deltas_rel : Optional[float] = 0.0  ) -> SLUpperLimitComputer:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
@@ -51,42 +52,56 @@ class CompRetriever:
 
         :returns: a subcomputer
         """
+        assert srSet in dataset.globalInfo.statModels, f"{srSet} not in statModels in {dataset.globalInfo.id}"
         covs = dataset.globalInfo.cachedModels
+        type_n_models = dataset.globalInfo.statModels[srSet]
+        type_n_model = type_n_models[0] # get first one
+        mtype = type_n_model[0]
+        assert mtype == "sl", f"expected sl but got {mtype} for type of stats model"
+        covname = type_n_model[1]
+        #assert covname.endswith(".cov"), f"name of covariance matrix file {covname} does not end with .cov in {dataset.globalInfo.id}"
         offset = 0
-        subComputers = []
-        nsig = [nsigDict.get(sr, 0.0) for sr in dataset.globalInfo.srSets[srSet]]
+        #subComputers = []
+        srList = dataset.globalInfo.srSets[srSet]
+        nsig = [nsigDict.get(sr, 0.0) for sr in srList ]
+        cov = covs[covname]
+        assert type(cov)==list, f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}"
+        assert len(cov)>0, f"covariance matrix has length {len(cov)}."
+        """
         ## [!AL!]: I am not sure what we are looping over here. I assume this method returns a single computer for each SR set,
         ## so we should restrict it to a subset of SRs (defined by srSet) and return a single computer. I did not modify its behaviour, because I wasn't sure what cachedModels means.
         for covname,cov in covs.items():
-            if not covname.endswith ( ".cov" ):
+           if not covname.endswith ( ".cov" ):
                 continue
             if type(cov) != list:
                 raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
             if len(cov) < 1:
                 raise SModelSError( f"covariance matrix has length {len(cov)}." )
-            n = len(cov)
+        """
+        n = len(cov)
 
-            nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]?
-            bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
-            nsig = nsig[offset:offset+n]
-            third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
-            c = third_momenta.count ( None )
-            if c > 0:
-                if c < len(third_momenta):
-                    logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
-                third_momenta = None
+        nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]?
+        bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
+        nsig = nsig[offset:offset+n]
+        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
+        c = third_momenta.count ( None )
+        if c > 0:
+            if c < len(third_momenta):
+                logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
+            third_momenta = None
 
-            data = Data( nobs, bg, cov, third_moment=third_momenta,
-                         nsignal = nsig,
-                         deltas_rel = deltas_rel, lumi=dataset.getLumi(),
-                         name = covname )
-            likelihoodComputer = LikelihoodComputer ( data )
-            computer = SLUpperLimitComputer ( likelihoodComputer )
-            computer.dataType = "SL"
-            computer.allowNegativeSignals = False
-            subComputers.append ( computer )
-            offset += n
-        return subComputers[0] ## [!AL!]: I've hard-corded the return for the first computer, but we should fix it, so a single computer is returned.
+        data = Data( nobs, bg, cov, third_moment=third_momenta,
+                     nsignal = nsig,
+                     deltas_rel = deltas_rel, lumi=dataset.getLumi(),
+                     name = covname )
+        likelihoodComputer = LikelihoodComputer ( data )
+        computer = SLUpperLimitComputer ( likelihoodComputer )
+        computer.dataType = "SL"
+        computer.allowNegativeSignals = False
+        return computer
+        #    subComputers.append ( computer )
+        #    offset += n
+        #return subComputers[0] ## [!AL!]: I've hard-corded the return for the first computer, but we should fix it, so a single computer is returned.
 
     @classmethod
     def forSingleBin( cls, srSet :str, dataset, nsigDict, deltas_rel : float = 0.2,
