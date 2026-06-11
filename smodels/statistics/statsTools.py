@@ -99,9 +99,6 @@ class CompRetriever:
         computer.dataType = "SL"
         computer.allowNegativeSignals = False
         return computer
-        #    subComputers.append ( computer )
-        #    offset += n
-        #return subComputers[0] ## [!AL!]: I've hard-corded the return for the first computer, but we should fix it, so a single computer is returned.
 
     @classmethod
     def forSingleBin( cls, srSet :str, dataset, nsigDict, deltas_rel : float = 0.2,
@@ -140,7 +137,8 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
+        #srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
+        srMappingsDict = globalInfo.srMappingsDict
 
         for sr in globalInfo.srSets[srSet]:
             if sr not in srMappingsDict:
@@ -184,7 +182,8 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
+        # srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings } ## [!AL!]: I feel that globalInfo.srMappings should already be this dict. i.e. srMappings = {label : {'smodels' : ,...}}
+        srMappingsDict = globalInfo.srMappingsDict
         labelToPyhf = {}
         for sr_label in globalInfo.srSets[srSet]:
             if sr_label not in srMappingsDict:
