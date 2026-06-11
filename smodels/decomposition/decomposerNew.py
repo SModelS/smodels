@@ -11,7 +11,7 @@
 """
 
 import itertools
-from typing import Iterator
+from typing import Iterator, List, Dict, Tuple, Union
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.base.particleNode import ParticleNode
@@ -20,6 +20,7 @@ from smodels.decomposition.exceptions import SModelSDecompositionError as SModel
 from smodels.base.smodelsLogging import logger
 from itertools import product
 from collections import namedtuple
+from smodels.base.particle import Particle, MultiParticle
 import numpy as np
 
 decaySubtreeTuple = namedtuple('decaySubtreeTuple', ['daughterIDs', 'br', 'maxBR'])
@@ -62,7 +63,7 @@ def build_subtree_cache(particleID, decayDict, memo=None, visiting=None, minBR=0
                 daughter_choices.append(daughter_subtree)
 
             for combo in product(*daughter_choices):
-                all_BRs = decay.br*numpy.prod([daughter_subtree.decayBRs for daughter_subtree in combo])
+                all_BRs = decay.br*np.prod([daughter_subtree.decayBRs for daughter_subtree in combo])
                 if all_BRs < minBR:
                     continue
                 combo = sorted(combo, key=lambda s: s.canonName)  # Sort daughter subtrees by canonName for consistent ordering
@@ -86,15 +87,14 @@ def build_subtree_cache(particleID, decayDict, memo=None, visiting=None, minBR=0
     memo[particleID] = tuple(subtrees)
     return memo
 
+def get_lightweight_decays(model) -> Dict[int, List[decayTupleObj]]:
+    """
+    Build a lightweight decay representation for all particles in the model, keyed by particle hash.
+    """
 
-
-def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, minmassgapISR):
-    # Lightweight decay representation keyed by particle hash.
     decaysDict = {}
-    idDict = {}
     for p in model.BSMparticles + model.SMparticles:
         pid = hash(p)
-        idDict[pid] = p
         decays = getattr(p, 'decays', [])
         lightweight_decays = []
         for decay in decays:
@@ -109,15 +109,17 @@ def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, m
                     )
                 )
         decaysDict[pid] = sorted(lightweight_decays, key=lambda d: d.br, reverse=True)
+    
+    return decaysDict
+
+def get_lightweight_xsecs(model, sigmacutFB):
+
 
     xSectionList = model.xsections
-    sigmacutFB = sigmacut.asNumber(fb)
     xSectionList.removeLowerOrder()
     xSectionList.sort()
-
+    
     xsecTupleList = []
-    smsTopDict = TopologyDict()
-
     for pdgs in xSectionList.getPIDpairs():
         xsecList = xSectionList.getXsecsFor(pdgs)
         maxWeight = xsecList.getMaxXsec().asNumber(fb)
@@ -127,12 +129,57 @@ def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, m
         xsecTupleList.append(
             xsecTupleObj(primaryMotherIDs=primaryMotherIDs, maxWeight=maxWeight, xsecList=xsecList)
         )
+    
+    return xsecTupleList
 
+def simplify_bsm_particles(model) -> Dict[int, Union[MultiParticle, Particle]]:
+    """
+    Simplify BSM particles by merging particles which can be considered as equal.
+    These particles should be used to replaced the original particles in the SMS topologies
+    and reduce the number of physically equivalent SMS generated during decomposition.
+    """
+
+    bsmList = []
+    for bsm_particle in model.BSMparticles:
+        if bsm_particle in bsmList:
+            index = bsmList.index(bsm_particle)
+            bsmList[index] = bsmList[index] + bsm_particle        
+        else:
+            bsmList.append(bsm_particle)
+
+    # For the SM particles, directly used the defined particles/multiparticles without merging
+    particleDict = {hash(p): p for p in model.SMparticles}
+    for bsm_particle in bsmList:
+        if type(bsm_particle) == Particle:
+            particleDict[hash(bsm_particle)] = bsm_particle
+        elif type(bsm_particle) == MultiParticle:
+            for p in bsm_particle.particles:
+                particleDict[hash(p)] = bsm_particle
+        else:
+            raise SModelSError(f"Unexpected particle type {type(bsm_particle)} in BSM particle list.")
+
+    return particleDict
+
+def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, minmassgapISR):
+    
+    
+    # Lightweight decay representation keyed by particle hash.
+    decaysDict = get_lightweight_decays(model)
+
+    # Get BSM dict where equal BSM particles have been merged to be used when building topologies.
+    particleDict = simplify_bsm_particles(model)
+    
+    
+    sigmacutFB = sigmacut.asNumber(fb)
+    xsecTupleList = get_lightweight_xsecs(model, sigmacutFB)
+
+    smsTopDict = TopologyDict()
     if not xsecTupleList:
         return smsTopDict
 
     maxXsec = max(x.maxWeight for x in xsecTupleList)
     minBR = sigmacutFB / maxXsec if maxXsec > 0.0 else 0.0
+
 
     # Build subtree cache for all primary mothers appearing in production channeprintls.
     cache = {}
@@ -144,24 +191,23 @@ def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, m
 
     pv = ParticleNode(model.getParticle(label='PV'))
     for xsecTuple in xsecTupleList:
+        
         weight = xsecTuple.maxWeight
-        if weight < sigmacutFB:
-            continue
-
         primary_ids = xsecTuple.primaryMotherIDs
         all_subtrees = [cache[pid] for pid in primary_ids]
+        
         for primary_subtrees in itertools.product(*all_subtrees):
             totalBR = 1.0
             for subtree in primary_subtrees:
                 totalBR *= subtree.decayBRs
-            if weight * totalBR < sigmacutFB:
+            if weight*totalBR < sigmacutFB:
                 continue
 
             smsDecayed = TheorySMS()
             smsDecayed.maxWeight = xsecTuple.maxWeight
             smsDecayed.prodXSec = xsecTuple.xsecList
             pvIndex = smsDecayed.add_node(pv)
-            primaryMothers = [ParticleNode(idDict[momID]) for momID in primary_ids]
+            primaryMothers = [ParticleNode(particleDict[momID]) for momID in primary_ids]
             motherIndices = smsDecayed.add_nodes_from(primaryMothers)
             smsDecayed.add_edges_from(product([pvIndex], motherIndices))
             for idaughter, subtree in enumerate(primary_subtrees):
@@ -170,7 +216,7 @@ def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, m
                     # Skip subtree root: the primary mother is already present in smsDecayed.
                     if nodeIndex == 0:
                         continue
-                    daughter = idDict[daughter_id]
+                    daughter = particleDict[daughter_id]
                     node = ParticleNode(daughter)
                     newIndex = smsDecayed.add_node(node)
                     old2newIndexMapping[nodeIndex] = newIndex
