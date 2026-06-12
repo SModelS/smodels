@@ -112,20 +112,6 @@ class SpeyPyhfData:
         if not "pyhf" in model_tuple:
             return None # this is not a pyhf model we want here
         jsName = model_tuple[1]
-        """
-        for srSetName,model_tuples in globalInfo.statModels.items():
-            model_tuple = model_tuples[0]
-            if "pyhf" in model_tuple[0]:
-                jsonFiles.append ( model_tuple[1] )
-                srSetNames[ model_tuple[1] ] = srSetName
-                # jsons.append ( globalInfo.cachedModels[srSetName] )
-        # jsonFiles = [js for js in globalInfo.jsonFiles]
-        #jsons = globalInfo.jsons.copy()
-        # datasets = [ds.getID() for ds in dataset._datasets]
-        # datasets = [ds.getID() for ds in dataset.origdatasets]
-        datasets = [ sr["smodels"] for sr in dataset.globalInfo.srMappings ]
-        # Filtering the json files by looking at the available datasets
-        """
         datasets = []
         srSet = globalInfo.srSets [ srSetName ] # srSetNames [ jsName ] ]
         # Constructing the list of signals with subsignals matching each json
