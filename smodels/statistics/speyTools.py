@@ -260,6 +260,8 @@ class SpeyRetriever:
 
         :returns: a sub computer
         """
+        print ( f"FIXME this isnt yet implemented as spey doesnt have that feature yet!" )
+        sys.exit(-1)
         globalInfo = dataset.globalInfo
         labelToONNX = {}
         # srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings }
@@ -288,20 +290,22 @@ class SpeyRetriever:
         # Get dictionary for signal yields using the ONNX labels
         f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
 
-        onnxBlob=dataset.globalInfo.cachedModels[srSet]
+        onnxBlob=dataset.globalInfo.cachedModels[model_filename]
         # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
         ## the following code is just for now to see if it works in principle
         import tempfile
-        tempf = tempfile.mktemp ( prefix="/tmp", suffix=".onnx" )
+        tempf = tempfile.mktemp ( prefix="/tmp/", suffix=".onnx" )
         # tempf = "/tmp/my.onnx"
         f = open ( tempf, "wb" )
         import onnx
         onnx.save ( onnxBlob, f )
         f.close()
-        os.unlink ( tempf )
         xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
-        facade = SpeyModelFacade ( upperLimitComputer, "nn",
+        stat_wrapper = get_backend("onnx")
+        speyModel = stat_wrapper(nsigDict,tempf)
+        facade = SpeyModelFacade ( speyModel, "nn",
                                     model_filename, xsec )
+        # os.unlink ( tempf )
         return facade
 
     @classmethod
