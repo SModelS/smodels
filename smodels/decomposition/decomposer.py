@@ -245,8 +245,13 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
     decaysDict = get_lightweight_decays(model,particleOrderDict)
 
     # Get BSM dict where equal BSM particles have been merged 
-    # (to be used when building topologies)
-    particleDict = simplify_bsm_particles(model)
+    # (if used when building topologies all identical particles will appear as merged.
+    # it can improve performance, but the string representation of the SMS topologies 
+    # can be less intuitive, since the merged particles will be represented as multiparticles, e.g. C1+/C1- instead of C1+ and C1-)
+    # particleDict = simplify_bsm_particles(model)
+
+    # Use the original particles without merging to ensure a more intuitive string representation
+    particleDict = {hash(p): p for p in model.SMparticles+model.BSMparticles}
     
     # Get lightweight cross-section representation above sigmacutFB
     xsecTupleList = get_lightweight_xsecs(model, sigmacutFB)
@@ -322,7 +327,6 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
                     if nodeIndex == 0:
                         continue
                     daughter = particleDict[daughter_id]
-                    # print('mom=',primary_mothers_sorted[idaughter], 'daughter=', daughter)
                     node = ParticleNode(daughter)
                     newIndex = smsDecayed.add_node(node)
                     old2newIndexMapping[nodeIndex] = newIndex
@@ -332,7 +336,10 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
             smsDecayed.decayBRs = totalBR
             smsDecayed.maxWeight = weight * totalBR 
             smsDecayed.weightList = smsDecayed.prodXSec*smsDecayed.decayBRs
-            smsDecayed._sorted = True
+            # Although the trees are built in sorted order, the sorting follows a DFS, while sort() follows BFS
+            # Thus, to preserve the original behaviour, we will use the BFS sort:
+            # smsDecayed._sorted = True 
+            smsDecayed.sort()
             smsDecayed.ancestors = [smsDecayed]  # Set ancestors (before compression)
             smsTopDict.addSMS(smsDecayed)
             nCascadeTrees += 1
