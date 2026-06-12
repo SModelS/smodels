@@ -209,6 +209,7 @@ class CompRetriever:
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
         # ## [!AL!]: I've tried to simplify the code here, since we should return a single computer. But I am not sure if the input for PyhfData is correct
+        ## WW yes it does look fine
         data = PyhfData(nsignals, json, regions,
                         includeCRs, signalUncertainty, globalInfo,
                         jsonFileName = model_filename )
