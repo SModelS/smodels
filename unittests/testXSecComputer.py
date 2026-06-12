@@ -24,7 +24,7 @@ import logging.config
 
 class XSecTest(unittest.TestCase):
     # use different logging config for the unit tests.
-    logging.config.fileConfig( "./logging.conf" )
+    # logging.config.fileConfig( "./logging.conf" )
     
     setLogLevel ( "warn" )
 

@@ -9,7 +9,9 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from __future__ import print_function
+import os, copy
+os.environ["OMP_NUM_THREADS"] = "1"
+
 from smodels import installation
 from smodels.tools import toolBox
 from smodels.base.physicsUnits import pb, TeV, GeV
@@ -18,13 +20,14 @@ from smodels.base.crossSection import LO, NLO, NLL
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
-import os, copy
 import pyslha
 try:
     import cStringIO as io
 except ImportError as e:
     import io
 import sys
+
+
 
 class XSecComputer(XSecBase):
     """ cross section computer class, what else? """
