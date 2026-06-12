@@ -21,7 +21,36 @@ class TopologyDict(OrderedDict):
     def __init__(self):
 
         self.__dict__ = {}
+        self._keysDict = {}
 
+    def appendSMS(self, newSMS):
+
+        if not isinstance(newSMS, TheorySMS):
+            return False
+        
+        canonName = newSMS.canonName
+        key = newSMS.treeToString(removeIndicesFrom='all')
+        if canonName not in self:
+            self[canonName] = [newSMS]
+            self._keysDict[canonName] = [key]
+        else:
+            smsList = self[canonName]
+            keysList = self._keysDict[canonName]
+            if key in keysList:
+                index = keysList.index(key)
+                smsList[index].prodXSec = smsList[index].prodXSec + newSMS.prodXSec
+                smsList[index].ancestors = smsList[index].ancestors[:] + newSMS.ancestors[:]
+                smsList[index].weightList = smsList[index].weightList + newSMS.weightList
+                smsList[index].maxWeight = smsList[index].maxWeight + newSMS.maxWeight
+                smsList[index].decayBRs = None
+            else:
+                smsList.append(newSMS)
+                keysList.append(key)
+            self[canonName] = smsList[:]
+            self._keysDict[canonName] = keysList[:]
+            
+        return True
+        
     def addSMS(self, newSMS):
 
         if isinstance(newSMS, TheorySMS):
@@ -34,6 +63,7 @@ class TopologyDict(OrderedDict):
                 # (using a bisection method)
                 lo = 0
                 hi = len(smsList)
+                cmp = 1
                 while lo < hi:
                     mid = (lo+hi)//2
                     cmp = smsList[mid].compareTo(newSMS)
