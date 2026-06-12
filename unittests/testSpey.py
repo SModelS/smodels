@@ -27,15 +27,17 @@ class SpeyTest(unittest.TestCase):
                 category=DeprecationWarning,
                 message=r".*jsonschema\.RefResolver is deprecated.*"
             )
-            from smodels.statistics.speyTools import SpeyRetriever
             """ see that we can turn on spey mode """
             computer = getCompRetrieverModule()
             self.assertTrue( type(computer) == type(CompRetriever) )
             runtime._experimental["spey"]=True
             computer = getCompRetrieverModule()
+            from smodels.statistics.speyTools import SpeyRetriever
             self.assertTrue( type(computer) == type(SpeyRetriever) )
             ## important! need to set back
             runtime._experimental["spey"]=False
+            computer = getCompRetrieverModule()
+            self.assertTrue( type(computer) == type(CompRetriever) )
 
     def testIniFile(self):
         """ see that we can turn on spey mode """
@@ -56,8 +58,9 @@ class SpeyTest(unittest.TestCase):
             runtime._experimental["spey"]=False
             ignoreFields = ['input file', 'smodels version', 'ncpus', 'Element',
                             'database version', 'model']
-            smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                               key=lambda res: res['r'], reverse=True)
+            smodelsOutputDefault['ExptRes'] = sorted(
+                    smodelsOutputDefault['ExptRes'],
+                    key=lambda res: res['r'], reverse=True )
             equals = equalObjs(smodelsOutput, smodelsOutputDefault,
                                allowedRelDiff=0.02,
                                ignore=ignoreFields, fname=outputfile)
