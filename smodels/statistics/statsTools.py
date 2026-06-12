@@ -69,7 +69,7 @@ class CompRetriever:
         assert len(cov)>0, f"covariance matrix has length {len(cov)}."
         n = len(cov)
 
-        nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]?
+        nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]? WW: we need e.g. observedN, this is the way to get it
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
         nsig = nsig[offset:offset+n]
         third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
