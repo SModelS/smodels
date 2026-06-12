@@ -192,7 +192,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         # Check if the correct predictions were selected:
         for ana in goodIDs:
             diff_rel = abs(goodIDs[ana][0]-selectedIDs[ana][0])/goodIDs[ana][0]
-            if abs ( diff_rel ) > 1e-3:
+            if abs ( diff_rel ) > 2e-3:
                 from smodels.base.smodelsLogging import logger
                 logger.error ( f"r-values differ for {ana}: {goodIDs[ana][0]}!={selectedIDs[ana][0]}" )
             self.assertAlmostEqual(diff_rel,0.,2)
