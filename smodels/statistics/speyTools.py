@@ -132,8 +132,7 @@ class SpeyRetriever:
 
         :returns: a subcomputer
         """
-        obsN = [ x.dataInfo.observedN for x in dataset._datasets ]
-        bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
+        # bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
         # cov = dataset.globalInfo.covariance
         covs = dataset.globalInfo.cachedModels
         lumi = float ( dataset.getLumi().asNumber(1./fb) )
@@ -141,72 +140,83 @@ class SpeyRetriever:
         for ds in dataset._datasets:
             if hasattr ( ds.dataInfo, "thirdMoment" ):
                 thirdmomenta.append ( ds.dataInfo.thirdMoment )
+        type_n_models = dataset.globalInfo.statModels[srSet]
+        type_n_model = type_n_models[0] # get first one
+        mtype = type_n_model[0]
+        assert mtype == "sl", f"expected sl but got {mtype} for type of stats model"
+        covname = type_n_model[1]
         nsig = list(nsigDict.values())
-        for covname,cov in covs.items():
-            if not covname.endswith ( ".cov" ):
-                continue
-            if type(cov) != list:
-                raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
-            if len(cov) < 1:
-                raise SModelSError( f"covariance matrix has length {len(cov)}." )
-            n = len(cov)
-            bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
-            nsig = nsig[offset:offset+n]
-            third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
-            c = third_momenta.count ( None )
-            if c > 0:
-                if c < len(third_momenta):
-                    logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
-                third_momenta = None
-            xsec = sum ( nsig ) / dataset.getLumi()
-            if third_momenta == None:
-                try:
-                    stat_wrapper = get_backend("default.correlated_background")
-                except spey.PluginError as e: ## older spey?
-                    stat_wrapper = get_backend("default_pdf.correlated_background")
-                if _debug["writePoint"]:
-                    f=open ( "data.txt","wt" )
-                    f.write ( f"obsN={obsN}\n" )
-                    f.write ( f"bg={bg}\n" )
-                    f.write ( f"cov={cov}\n" )
-                    f.write ( f"nsig={nsig}\n" )
-                    f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
-                    f.write ( f"lumi={lumi}\n" )
-                    f.close()
+        srList = dataset.globalInfo.srSets[srSet]
+        cov = covs[covname]
+        offset=0
+        assert type(cov)==list, f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}"
+        assert len(cov)>0, f"covariance matrix has length {len(cov)}."
+        # for covname,cov in covs.items():
+        #    if not covname.endswith ( ".cov" ):
+        #        continue
+        #    if type(cov) != list:
+        #        raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
+        #    if len(cov) < 1:
+        #        raise SModelSError( f"covariance matrix has length {len(cov)}." )
+        n = len(cov)
+        obsN = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
+        bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
+        nsig = nsig[offset:offset+n]
+        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
+        c = third_momenta.count ( None )
+        if c > 0:
+            if c < len(third_momenta):
+                logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
+            third_momenta = None
+        xsec = sum ( nsig ) / dataset.getLumi()
+        if third_momenta == None:
+            try:
+                stat_wrapper = get_backend("default.correlated_background")
+            except spey.PluginError as e: ## older spey?
+                stat_wrapper = get_backend("default_pdf.correlated_background")
+            if _debug["writePoint"]:
+                obsN = [ x.dataInfo.observedN for x in dataset._datasets[:n] ]
+                f=open ( "data.txt","wt" )
+                f.write ( f"obsN={obsN}\n" )
+                f.write ( f"bg={bg}\n" )
+                f.write ( f"cov={cov}\n" )
+                f.write ( f"nsig={nsig}\n" )
+                f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
+                f.write ( f"lumi={lumi}\n" )
+                f.close()
 
-                speyModel = stat_wrapper( data = obsN,
-                                background_yields = bg, covariance_matrix = cov,
-                                signal_yields = nsig,
-                                xsection = [ x / lumi for x in nsig ],
-                                analysis = dataset.globalInfo.id,
-                )
-                facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
-                subComputers.append ( facade )
-            else:
-                # SLv2
-                try:
-                    stat_wrapper = get_backend("default.third_moment_expansion")
-                except ImportError as e:
-                    stat_wrapper = get_backend("default_pdf.third_moment_expansion")
-                speyModel = stat_wrapper( data = obsN,
-                                background_yields = bg, covariance_matrix = cov,
-                                signal_yields = nsig,
-                                xsection = [ x / lumi for x in nsig ],
-                                third_moment = thirdmomenta,
-                                analysis = dataset.globalInfo.id,
-                )
-                if _debug["writePoint"]:
-                    f=open ( "data.txt","wt" )
-                    f.write ( f"obsN={obsN}\n" )
-                    f.write ( f"bg={bg}\n" )
-                    f.write ( f"cov={cov}\n" )
-                    f.write ( f"nsig={nsig}\n" )
-                    f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
-                    f.write ( f"lumi={lumi}\n" )
-                    f.close()
-                facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
-                subComputers.append ( facade )
-        return subComputers[0] ## [!AL!]: Again I'm forcing it to return a single computer. FIX!
+            speyModel = stat_wrapper( data = obsN,
+                            background_yields = bg, covariance_matrix = cov,
+                            signal_yields = nsig,
+                            xsection = [ x / lumi for x in nsig ],
+                            analysis = dataset.globalInfo.id,
+            )
+            facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
+            # subComputers.append ( facade )
+            return facade
+        # SLv2
+        try:
+            stat_wrapper = get_backend("default.third_moment_expansion")
+        except ImportError as e:
+            stat_wrapper = get_backend("default_pdf.third_moment_expansion")
+        speyModel = stat_wrapper( data = obsN,
+                        background_yields = bg, covariance_matrix = cov,
+                        signal_yields = nsig,
+                        xsection = [ x / lumi for x in nsig ],
+                        third_moment = thirdmomenta,
+                        analysis = dataset.globalInfo.id,
+        )
+        if _debug["writePoint"]:
+            f=open ( "data.txt","wt" )
+            f.write ( f"obsN={obsN}\n" )
+            f.write ( f"bg={bg}\n" )
+            f.write ( f"cov={cov}\n" )
+            f.write ( f"nsig={nsig}\n" )
+            f.write ( f"analysis='{dataset.globalInfo.id}'\n" )
+            f.write ( f"lumi={lumi}\n" )
+            f.close()
+        facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
+        return facade
 
     @classmethod
     def forSingleBin( cls, srSet: str, dataset, nsigDict, deltas_rel : float = 0.2,
@@ -291,7 +301,7 @@ class SpeyRetriever:
         os.unlink ( tempf )
         xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
         facade = SpeyModelFacade ( upperLimitComputer, "nn",
-                                    model_filename, xsec ) ## [!AL!]: This method has to be fixed! It was not working before and I've just cleaned it up a bit.
+                                    model_filename, xsec )
         return facade
 
     @classmethod
@@ -305,24 +315,24 @@ class SpeyRetriever:
         """
         stat_wrapper = get_backend("pyhf")
         from smodels.statistics.speyPyhf import SpeyPyhfData
-        data = SpeyPyhfData.createDataObject ( dataset, nsigDict )
+        data = SpeyPyhfData.createDataObject ( dataset, nsigDict, srSet )
         models = []
         patches = data.patchMaker()
-        for i in range( len(data.inputJsons ) ):
+        # for i in range( len(data.inputJsons ) ):
             # idx, _ = self.getBestCombinationIndex( data )
-            inputJson = data.inputJsons[i]
-            signal_patch = patches[i]
-            #print ( "inputJsons", inputJson )
-            # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
-            analysis = dataset.globalInfo.id
+        inputJson = data.inputJson # s[i]
+        signal_patch = patches # [i]
+        #print ( "inputJsons", inputJson )
+        # import IPython; IPython.embed( colors = "neutral" ); sys.exit()
+        analysis = dataset.globalInfo.id
 
-            speyModel = stat_wrapper( analysis = analysis,
-                            signal_patch = signal_patch,
-                            background_only_model = inputJson )
-            xsec = sum (list(nsigDict.values())) / dataset.globalInfo.lumi
-            facade = SpeyModelFacade ( speyModel, "pyhf", mname, xsec )
-            models.append ( facade )
-        return models[0] ## [!AL!]: Again I'm forcing it to return a single computer. FIX it!
+        speyModel = stat_wrapper( analysis = analysis,
+                        signal_patch = signal_patch,
+                        background_only_model = inputJson )
+        xsec = sum (list(nsigDict.values())) / dataset.globalInfo.lumi
+        mname = data.jsonFile# s[i]
+        facade = SpeyModelFacade ( speyModel, "pyhf", mname, xsec )
+        return facade
 
     @classmethod
     def forTruncatedGaussian(cls, theorypred, corr : float =0.6 ) -> None:

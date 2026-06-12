@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testSpey
-   :synopsis: Test spey against the numbers we got from CMS-SUS-21-002
+.. module:: testMoreSL
+   :synopsis: Test more simplified likelihoods
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 

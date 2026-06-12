@@ -11,6 +11,7 @@ smodelsOutputDefault = {
     'testcoverage' : True,
     'computestatistics' : True,
     'combineanas' : 'CMS-SUS-16-050-agg,CMS-SUS-13-012',
+    'combinesrs' : True,
     'file status' : 1,
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
@@ -132,6 +133,28 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.004140203,
+        'upper limit (fb)' : 0.04531092,
+        'expected upper limit (fb)' : 0.07675983,
+        'TxNames' : ['T6bbHH'],
+        'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
+        'AnalysisID' : 'ATLAS-SUSY-2018-31',
+        'DataSetID' : '(combined)',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 139.0,
+        'dataType' : 'combined',
+        'r' : 0.0913732,
+        'r_expected' : 0.05393711,
+        'Width (GeV)' : [
+            [13.4903869, 0.00112364506, 'stable'],
+            [13.4903869, 0.00112364506, 'stable']
+        ],
+        'nll' : 48.54424,
+        'nll_min' : 48.38229,
+        'nll_SM' : 48.38229
+    },
+    {
+        'maxcond' : 0.0,
         'theory prediction (fb)' : 39.90113,
         'upper limit (fb)' : 467.97,
         'expected upper limit (fb)' : None,
@@ -148,28 +171,6 @@ smodelsOutputDefault = {
             [0.00138466665, 'stable'],
             [0.00112364506, 'stable']
         ]
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.002050205,
-        'upper limit (fb)' : 0.0299,
-        'expected upper limit (fb)' : 0.0511,
-        'TxNames' : ['T6bbHH'],
-        'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
-        'AnalysisID' : 'ATLAS-SUSY-2018-31',
-        'DataSetID' : 'SRA_M',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'efficiencyMap',
-        'r' : 0.06856872,
-        'r_expected' : 0.04012143,
-        'Width (GeV)' : [
-            [13.4903869, 0.00112364506, 'stable'],
-            [13.4903869, 0.00112364506, 'stable']
-        ],
-        'nll' : 3.252503,
-        'nll_min' : 3.121636,
-        'nll_SM' : 3.121637
     },
     {
         'maxcond' : 0.0,
@@ -211,28 +212,6 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.0001382733,
-        'upper limit (fb)' : 0.05351,
-        'expected upper limit (fb)' : 0.05351,
-        'TxNames' : ['T1tttt'],
-        'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
-        'AnalysisID' : 'CMS-SUS-16-050-agg',
-        'DataSetID' : 'ar56',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 35.9,
-        'dataType' : 'efficiencyMap',
-        'r' : 0.002584066,
-        'r_expected' : 0.002584066,
-        'Width (GeV)' : [
-            [0.0456539663, 'stable'],
-            [0.0456539663, 'stable']
-        ],
-        'nll' : 0.9239025,
-        'nll_min' : 0.9189385,
-        'nll_SM' : 0.9189385
-    },
-    {
-        'maxcond' : 0.0,
         'theory prediction (fb)' : 0.0007318257,
         'upper limit (fb)' : 0.4,
         'expected upper limit (fb)' : 0.35,
@@ -271,6 +250,28 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.003947952,
+        'upper limit (fb)' : 32.47149,
+        'expected upper limit (fb)' : 0.7914109,
+        'TxNames' : ['T1tttt'],
+        'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
+        'AnalysisID' : 'CMS-SUS-16-050-agg',
+        'DataSetID' : '(combined)',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 35.9,
+        'dataType' : 'combined',
+        'r' : 0.0001215821,
+        'r_expected' : 0.004988498,
+        'Width (GeV)' : [
+            [0.0456539663, 'stable'],
+            [0.0456539663, 'stable']
+        ],
+        'nll' : 147.9699,
+        'nll_min' : 147.9563,
+        'nll_SM' : 148.0373
+    },
+    {
+        'maxcond' : 0.0,
         'theory prediction (fb)' : 0.003073679,
         'upper limit (fb)' : 43.074,
         'expected upper limit (fb)' : 55.9236,
@@ -292,11 +293,11 @@ smodelsOutputDefault = {
 'CombinedRes' : [
     {
         'AnalysisID' : 'CMS-SUS-13-012,CMS-SUS-16-050-agg',
-        'r' : 0.1209729,
-        'r_expected' : 0.2114212,
-        'nll' : 4.830161,
-        'nll_min' : 4.507204,
-        'nll_SM' : 5.249701,
+        'r' : 0.1183885,
+        'r_expected' : 0.2081383,
+        'nll' : 151.8762,
+        'nll_min' : 151.572,
+        'nll_SM' : 152.3681,
         'Txnames' : ['T2', 'T1', 'T1tttt']
     }
 ],

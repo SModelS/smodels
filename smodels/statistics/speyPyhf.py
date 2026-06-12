@@ -23,28 +23,30 @@ class SpeyPyhfData:
     :ivar jsonFiles: optional list of json files
     :ivar nWS: number of workspaces = number of json files
     """
-    __slots__ = [ "includeCRs", "nsignals", "inputJsons", "jsonFiles", "nWS",
+    __slots__ = [ "includeCRs", "nsignals", "inputJson", "jsonFile",
                   "errorFlag", "totalYield", "channelsInfo", "zeroSignalsFlag" ]
 
-    def __init__(self, nsignals : list, inputJsons, jsonFiles=None,
-                 includeCRs : bool = False ):
+    def __init__( self, nsignals : list,
+                  inputJson : dict,
+                  jsonFile : Optional[str] = None,
+                  includeCRs : bool = False ):
         # we dont want to be warned about deprecations within the pyhf code
         import warnings
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         self.includeCRs = includeCRs
         self.nsignals = nsignals  # fb
         self.getTotalYield()
-        self.inputJsons = inputJsons
-        self.jsonFiles = jsonFiles
+        self.inputJson = inputJson
+        self.jsonFile = jsonFile
 
-        self.nWS = len(inputJsons)
         self.errorFlag = False
         self.getWSInfo()
         self.checkConsistency()
 
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
-        S = sum ( [ sum(x) for x in self.nsignals ] )
+        S = sum ( self.nsignals )
+        # S = sum ( [ sum(x) for x in self.nsignals ] )
         self.totalYield = S
 
     def getWSInfo(self):
@@ -53,58 +55,66 @@ class SpeyPyhfData:
 
         :ivar channelsInfo: list of dictionaries (one dictionary for each json
         file) containing useful information about the json files
-            - :key signalRegions: list of dictonaries with 'json path' and 
-              'size' (number of bins) of the 'signal regions' channels in 
+            - :key signalRegions: list of dictonaries with 'json path' and
+              'size' (number of bins) of the 'signal regions' channels in
               the json files
-            - :key otherRegions: list of strings indicating the path to the 
+            - :key otherRegions: list of strings indicating the path to the
               control and validation region channels
         """
         # Identifying the path to the SR and VR channels in the main workspace files
-        self.channelsInfo = []  # workspace specifications
-        if not isinstance(self.inputJsons, list):
-            logger.error("The `inputJsons` parameter must be of type list")
+        self.channelsInfo = None  # workspace specifications
+        if not isinstance(self.inputJson, dict):
+            logger.error("The `inputJson` parameter must be of type dict")
             self.errorFlag = True
             return
-        for ws in self.inputJsons:
-            wsChannelsInfo = {}
-            wsChannelsInfo["signalRegions"] = []
-            wsChannelsInfo["otherRegions"] = []
-            if not "channels" in ws.keys():
-                idx = self.inputJsons.index(ws)
-                logger.error (
-                    f"Json file number {idx} is corrupted (channels are missing)"
-                )
-                self.channelsInfo = None
-                return
-            for i_ch, ch in enumerate(ws["channels"]):
-                if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
-                    wsChannelsInfo["signalRegions"].append(
-                        {
-                            "path": "/channels/"
-                            + str(i_ch)
-                            + "/samples/0",  
-                            # Path of the new sample to add (signal prediction)
-                            "size": len(ch["samples"][0]["data"]),
-                        }
-                    )  # Number of bins
-                else:
-                    wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
-            wsChannelsInfo["otherRegions"].sort(
-                key=lambda path: path.split("/")[-1], reverse=True
-            )  # Need to sort correctly the paths to the channels to be removed
-            self.channelsInfo.append(wsChannelsInfo)
+        ws = self.inputJson
+        #for ws in self.inputJsons:
+        wsChannelsInfo = {}
+        wsChannelsInfo["signalRegions"] = []
+        wsChannelsInfo["otherRegions"] = []
+        if not "channels" in ws.keys():
+            idx = self.inputJsons.index(ws)
+            logger.error (
+                f"Json file number {idx} is corrupted (channels are missing)"
+            )
+            self.channelsInfo = None
+            return
+        for i_ch, ch in enumerate(ws["channels"]):
+            if ch["name"][:2] == "SR":  # if channel name starts with 'SR'
+                wsChannelsInfo["signalRegions"].append(
+                    {
+                        "path": "/channels/"
+                        + str(i_ch)
+                        + "/samples/0",
+                        # Path of the new sample to add (signal prediction)
+                        "size": len(ch["samples"][0]["data"]),
+                    }
+                )  # Number of bins
+            else:
+                wsChannelsInfo["otherRegions"].append("/channels/" + str(i_ch))
+        wsChannelsInfo["otherRegions"].sort(
+            key=lambda path: path.split("/")[-1], reverse=True
+        )  # Need to sort correctly the paths to the channels to be removed
+        self.channelsInfo = wsChannelsInfo
 
     @classmethod
-    def createDataObject ( cls, dataset, nsig : list ):
+    def createDataObject ( cls, dataset : CombinedDataSet, nsig : list,
+           srSetName : str ):
         """ an object creator method """
         # jsonFiles = dataset.globalInfo.jsonFiles
 
         globalInfo = dataset.globalInfo
-        jsonFiles = []
-        srSetNames = {} # set names for jsonFiles
+        #jsonFiles = []
+        #srSetNames = {} # set names for jsonFiles
         # jsons = []
+        model_tuples = globalInfo.statModels[srSetName]
+        model_tuple = model_tuples[0]
+        if not "pyhf" in model_tuple:
+            return None # this is not a pyhf model we want here
+        jsName = model_tuple[1]
+        """
         for srSetName,model_tuples in globalInfo.statModels.items():
-            model_tuple = models[0]
+            model_tuple = model_tuples[0]
             if "pyhf" in model_tuple[0]:
                 jsonFiles.append ( model_tuple[1] )
                 srSetNames[ model_tuple[1] ] = srSetName
@@ -113,62 +123,70 @@ class SpeyPyhfData:
         #jsons = globalInfo.jsons.copy()
         # datasets = [ds.getID() for ds in dataset._datasets]
         # datasets = [ds.getID() for ds in dataset.origdatasets]
-        datasets = [ sr["smodels"] for sr in dataset.srMappings ]
+        datasets = [ sr["smodels"] for sr in dataset.globalInfo.srMappings ]
         # Filtering the json files by looking at the available datasets
-
-        logger.error( f"list of datasets: {datasets}" )
-        logger.error( f"jsonFiles after filtering: {jsonFiles}" )
+        """
+        datasets = []
+        srSet = globalInfo.srSets [ srSetName ] # srSetNames [ jsName ] ]
         # Constructing the list of signals with subsignals matching each json
-        nsignals = list()
-        for jsName in jsonFiles:
-            subSig = list()
-            srSet = globalInfo.srSets [ srSetNames [ jsName ] ]
-            for sr in srSet:
-                srName = sr["smodels"]
-                if srName == None:
-                    continue
-                if not srName in nsig:
-                    logger.error ( f"sr name {srName} is not found in {nsig}" )
-                    sys.exit(-1)
-                sig = nsig[ srName ]
-                subSig.append(sig)
-            nsignals.append(subSig)
+        # jsons = []
+        #for jsName in jsonFiles:
+        nsignals = []
+        for sr in srSet:
+            datasets.append ( globalInfo.srMappingsDict[sr]["smodels"] )
+            # srName = sr["smodels"]
+            srName = globalInfo.srMappingsDict[sr]["smodels"]
+            if srName == None:
+                continue
+            if not srName in nsig:
+                logger.debug ( f"sr name {srName} is not found in {nsig}" )
+                continue
+                #sys.exit(-1)
+            sig = nsig[ srName ]
+            nsignals.append(sig)
+        logger.error( f"list of datasets: {datasets}" )
+        logger.error( f"jsonFile after filtering: {jsName}" )
+        #nsignals.append(subSig)
+        #jsons.append ( dataset.globalInfo.cachedModels[jsName] )
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        return cls(nsignals, jsons, jsonFiles)
+        json = globalInfo.cachedModels[jsName]
+        return cls( nsignals , json, jsName)
 
     def checkConsistency(self):
         """
         Check various inconsistencies of the PyhfData attributes
 
-        :param zeroSignalsFlag: boolean identifying if all SRs of a 
+        :param zeroSignalsFlag: boolean identifying if all SRs of a
             single json are empty
         """
         if not isinstance(self.nsignals, list):
             logger.error("The `nsignals` parameter must be of type list")
             self.errorFlag = True
-        if self.nWS != len(self.nsignals):
-            logger.error(
-                "The number of subsignals provided is different from the number of json files"
-            )
-            self.errorFlag = True
+        #if self.nWS != len(self.nsignals):
+        #    logger.error(
+        #        "The number of subsignals provided is different from the number of json files"
+        #    )
+        #    self.errorFlag = True
         self.zeroSignalsFlag = list()
         if self.channelsInfo == None:
             return
-        for wsInfo, subSig in zip(self.channelsInfo, self.nsignals):
-            if not isinstance(subSig, list):
-                logger.error("The `nsignals` parameter must be a two dimensional list")
-                self.errorFlag = True
-            nBinsJson = 0
-            for sr in wsInfo["signalRegions"]:
-                nBinsJson += sr["size"]
-            if nBinsJson != len(subSig):
-                logger.error(
-                    f"The number of signals provided is different from the number of bins for json number {self.channelsInfo.index(wsInfo)} and channel number {self.nsignals.index(subSig)}"
-                )
-                self.errorFlag = True
-            allZero = all([s == 0 for s in subSig])
-            # Checking if all signals matching this json are zero
-            self.zeroSignalsFlag.append(allZero)
+        wsInfo = self.channelsInfo
+        subSig = self.nsignals
+        #for wsInfo, subSig in zip(self.channelsInfo, self.nsignals):
+        if not isinstance(subSig, list):
+            logger.error("The `nsignals` parameter must be a two dimensional list")
+            self.errorFlag = True
+        nBinsJson = 0
+        for sr in wsInfo["signalRegions"]:
+            nBinsJson += sr["size"]
+        if nBinsJson != len(subSig):
+            logger.error(
+                f"The number of signals provided is different from the number of bins for json number {self.channelsInfo.index(wsInfo)} and channel number {self.nsignals.index(subSig)}"
+            )
+            self.errorFlag = True
+        allZero = all([s == 0 for s in subSig])
+        # Checking if all signals matching this json are zero
+        self.zeroSignalsFlag.append(allZero)
 
     def patchMaker(self):
         """
@@ -184,41 +202,45 @@ class SpeyPyhfData:
             return None
         nsignals = self.nsignals
         # Constructing the patches to be applied on the main workspace files
-        patches = []
-        for ws, info, subSig in zip(self.inputJsons, self.channelsInfo, self.nsignals):
-            patch = []
-            for srInfo in info["signalRegions"]:
-                nBins = srInfo["size"]
-                operator = {}
-                operator["op"] = "add"
-                operator["path"] = srInfo["path"]
-                value = {}
-                value["data"] = subSig[:nBins]
-                subSig = subSig[nBins:]
-                value["modifiers"] = []
-                value["modifiers"].append({"data": None, "type": "normfactor", 
-                                           "name": "mu_SIG"})
-                value["modifiers"].append({"data": None, "type": "lumi", 
-                                           "name": "lumi"})
-                value["name"] = "bsm"
-                operator["value"] = value
-                patch.append(operator)
-            if self.includeCRs:
-                logger.debug("keeping the CRs")
-            else:
-                for path in info["otherRegions"]:
-                    patch.append({"op": "remove", "path": path})
-            patches.append(patch)
-        return patches
+        # patches = []
+        ws = self.inputJson
+        info = self.channelsInfo
+        subSig = self.nsignals
+        # for ws, info, subSig in zip(self.inputJsons, self.channelsInfo, self.nsignals):
+        patch = []
+        for srInfo in info["signalRegions"]:
+            nBins = srInfo["size"]
+            operator = {}
+            operator["op"] = "add"
+            operator["path"] = srInfo["path"]
+            value = {}
+            value["data"] = subSig[:nBins]
+            subSig = subSig[nBins:]
+            value["modifiers"] = []
+            value["modifiers"].append({"data": None, "type": "normfactor",
+                                       "name": "mu_SIG"})
+            value["modifiers"].append({"data": None, "type": "lumi",
+                                       "name": "lumi"})
+            value["name"] = "bsm"
+            operator["value"] = value
+            patch.append(operator)
+        if self.includeCRs:
+            logger.debug("keeping the CRs")
+        else:
+            for path in info["otherRegions"]:
+                patch.append({"op": "remove", "path": path})
+        return patch
+        #patches.append(patch)
+        #return patches
 
     def wsMaker(self, apriori=False):
         """
-        Apply each region patch (self.patches) to his associated json 
+        Apply each region patch (self.patches) to his associated json
             (self.inputJsons) to obtain the complete workspaces
-        :param apriori: - If set to `True`: Replace the observation data 
-            entries of each workspace by the corresponding sum of the 
+        :param apriori: - If set to `True`: Replace the observation data
+            entries of each workspace by the corresponding sum of the
             expected yields \
-            - Else: The observed yields put in the workspace are the ones 
+            - Else: The observed yields put in the workspace are the ones
             written in the corresponfing json dictionary
 
         :returns: the list of patched workspaces
@@ -229,7 +251,7 @@ class SpeyPyhfData:
             try:
                 wsDict = jsonpatch.apply_patch(self.inputJsons[0], self.patches[0])
                 if apriori == True:
-                    # Replace the observation data entries by the 
+                    # Replace the observation data entries by the
                     # corresponding sum of the expected yields
                     for obs in wsDict["observations"]:
                         for ch in wsDict["channels"]:
@@ -253,7 +275,7 @@ class SpeyPyhfData:
             for js, patch in zip(self.inputJsons, self.patches):
                 wsDict = jsonpatch.apply_patch(js, patch)
                 if apriori == True:
-                    # Replace the observation data entries by the 
+                    # Replace the observation data entries by the
                     # corresponding sum of the expected yields
                     for obs in wsDict["observations"]:
                         for ch in wsDict["channels"]:
