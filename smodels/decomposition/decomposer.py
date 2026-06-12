@@ -221,11 +221,10 @@ def simplify_bsm_particles(model: Model) -> Dict[int, Union[MultiParticle, Parti
 
     return particleDict
 
-def decompose(model: Model, sigmacut: Union[float,int,UnitXSec], 
-                 massCompress: bool, invisibleCompress: bool, 
-                 minmassgap: UnitEnergy, minmassgapISR: UnitEnergy) -> TopologyDict:
-    
-
+def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb, 
+                 massCompress: bool = True, invisibleCompress: bool = True, 
+                 minmassgap: UnitEnergy = 0.0*GeV, minmassgapISR: UnitEnergy = 0.0*GeV) -> TopologyDict:
+     
     t0 = time.time()
     t1= time.time()
 
