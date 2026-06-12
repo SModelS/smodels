@@ -11,16 +11,18 @@
 """
 
 import itertools
-from typing import Iterator, List, Dict, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.base.particleNode import ParticleNode
-from smodels.base.physicsUnits import fb, GeV
+from smodels.base.physicsUnits import fb
+from smodels.base.model import Model
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.smodelsLogging import logger
 from itertools import product
 from collections import namedtuple
 from smodels.base.particle import Particle, MultiParticle
+from smodels.base.physicsUnits import UnitXSec,UnitEnergy
 import numpy as np
 
 decaySubtreeTuple = namedtuple('decaySubtreeTuple', ['daughterIDs', 'br', 'maxBR'])
@@ -29,18 +31,21 @@ decayTupleObj = namedtuple('decayTuple', ['mom', 'daughters', 'br'])
 xsecTupleObj = namedtuple('xsecTuple', ['primaryMotherIDs', 'maxWeight', 'xsecList'])
 
 
-def lightweight_sortTrees(subtreeList, particleOrderDict : Dict[int,int]):
+def lightweight_sortTrees(subtreeList: Iterable[subtreeTuple], 
+                          particleOrderDict: Dict[int, int],) -> List[subtreeTuple]:
     """
     Sort a list of subtree tuples first by canonName, then by order of the particles appearing in it.
     It assumes the sub-subtrees are arleady sorted by the same criteria.
     """
 
     sorted_list = sorted(subtreeList, 
-                         key=lambda s: (s.canonName,tuple(particleOrderDict.get(pid, 0) for pid in s.particleIDs)))
+                         key=lambda s: (s.canonName,tuple(particleOrderDict.get(pid, 0) 
+                                                          for pid in s.particleIDs)))
     
     return sorted_list
 
-def lightweight_sortParticleIDs(particleIDs, particleOrderDict : Dict[int,int]):
+def lightweight_sortParticleIDs( particleIDs: List[int], 
+                                particleOrderDict: Dict[int, int]) -> List[int]:
     """
     Sort a list of particle IDs based on their order in the model.
     """
@@ -51,7 +56,7 @@ def lightweight_sortParticleIDs(particleIDs, particleOrderDict : Dict[int,int]):
     return sorted_list
 
 
-def get_particle_order_dict(model):
+def get_particle_order_dict(model: Model) -> Dict[int, int]:
     """
     Get a dictionary mapping particle hash to an integer representing the order of the particle in the model.
     This is used for sorting leaves and trees.
@@ -64,7 +69,8 @@ def get_particle_order_dict(model):
     return particle_order_dict
 
 
-def get_lightweight_decays(model, particleOrderDict : Dict[int,int]) -> Dict[int, List[decayTupleObj]]:
+def get_lightweight_decays(model: Model, 
+                           particleOrderDict: Dict[int, int]) -> Dict[int, List[decayTupleObj]]:
     """
     Build a lightweight decay representation for all particles in the model, keyed by particle hash.
     The daughters in a given decay are sorted by their order from particleOrderDict to ensure consistent ordering when building subtrees.
@@ -92,7 +98,8 @@ def get_lightweight_decays(model, particleOrderDict : Dict[int,int]) -> Dict[int
     
     return decaysDict
 
-def get_lightweight_xsecs(model, sigmacutFB, particleOrderDict : Dict[int,int]):
+def get_lightweight_xsecs(model: Model, sigmacutFB: float, 
+                          particleOrderDict: Dict[int, int]) -> List[xsecTupleObj]:
     """
     Build a lightweight cross-section representation for all particle pairs in the model.
     The primary mothers in a given production channel are sorted by their order from particleOrderDict to ensure consistent ordering when building subtrees.
@@ -117,7 +124,7 @@ def get_lightweight_xsecs(model, sigmacutFB, particleOrderDict : Dict[int,int]):
     
     return xsecTupleList
 
-def get_lightweight_canonName(sorted_subtrees) -> int:
+def get_lightweight_canonName(sorted_subtrees: List[subtreeTuple]) -> int:
     """
     Get a canonical name for a subtree based on the canonNames of its daughter subtrees.
     The canonName is constructed as '1' + concatenation of sorted daughter canonNames + '0'.
@@ -127,8 +134,10 @@ def get_lightweight_canonName(sorted_subtrees) -> int:
     cName = '1'+"".join(f"{subtree.canonName}" for subtree in sorted_subtrees) + '0'
     return int(cName)
 
-def build_subtree_cache(particleID, decayDict, particleOrderDict : Dict[int,int],
-                         memo=None, visiting=None, minBR=0.0):
+def build_subtree_cache(particleID: int, decayDict: Dict[int, List[decayTupleObj]], 
+                        particleOrderDict: Dict[int, int],  
+                        memo: Optional[Dict[int, Tuple[subtreeTuple, ...]]] = None,
+                        visiting: Optional[Set[int]] = None, minBR: float = 0.0) -> Dict[int, Tuple[subtreeTuple,...]]:
     """
     Build memoized subtree tuples for all descendants of particleID.
     """
@@ -190,7 +199,7 @@ def build_subtree_cache(particleID, decayDict, particleOrderDict : Dict[int,int]
     return memo
 
 
-def simplify_bsm_particles(model) -> Dict[int, Union[MultiParticle, Particle]]:
+def simplify_bsm_particles(model: Model) -> Dict[int, Union[MultiParticle, Particle]]:
     """
     Simplify BSM particles by merging particles which can be considered as equal.
     These particles should be used to replaced the original particles in the SMS topologies
@@ -218,7 +227,9 @@ def simplify_bsm_particles(model) -> Dict[int, Union[MultiParticle, Particle]]:
 
     return particleDict
 
-def decomposeNew(model, sigmacut, massCompress, invisibleCompress, minmassgap, minmassgapISR):
+def decomposeNew(model: Model, sigmacut: UnitXSec, 
+                 massCompress: bool, invisibleCompress: bool, 
+                 minmassgap: UnitEnergy, minmassgapISR: UnitEnergy) -> TopologyDict:
     
     # Define particle ordering for building sorted subtrees and topologies.
     particleOrderDict = get_particle_order_dict(model)
