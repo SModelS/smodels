@@ -11,14 +11,16 @@
 """
 import os, copy
 os.environ["OMP_NUM_THREADS"] = "1"
+from typing import Optional
 
 from smodels import installation
 from smodels.tools import toolBox
-from smodels.base.physicsUnits import pb, TeV, GeV
+from smodels.base.physicsUnits import pb, TeV, GeV, UnitEnergy
 from smodels.base import crossSection, runtime
-from smodels.base.crossSection import LO, NLO, NLL
+from smodels.base.crossSection import LO, NLO, NLL, XSectionList
 from smodels.base.smodelsLogging import logger, setLogLevel
-from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
+from smodels.decomposition.exceptions import SModelSDecompositionError \
+         as SModelSError
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
 import pyslha
 try:
@@ -27,17 +29,16 @@ except ImportError as e:
     import io
 import sys
 
-
-
 class XSecComputer(XSecBase):
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder, nevents, pythiaVersion, maycompile=True,
-                   defaulttempdir : str = "/tmp/" ):
+    def __init__ ( self, maxOrder, nevents : int, pythiaVersion : str,
+            maycompile : bool = True, defaulttempdir : str = "/tmp/" ):
         """
-        :param maxOrder: maximum order to compute the cross section, given as an integer
-                    if maxOrder == LO, compute only LO pythia xsecs
-                    if maxOrder == NLO, apply NLO K-factors from NLLfast (if available)
-                    if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
+        :param maxOrder: maximum order to compute the cross section,
+        given as an integer
+        if maxOrder == LO, compute only LO pythia xsecs
+        if maxOrder == NLO, apply NLO K-factors from NLLfast (if available)
+        if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
         :param nevents: number of events for pythia run
         :param pythiaVersion: pythia6 or pythia8 (integer)
         :param maycompile: if True, then tools can get compiled on-the-fly
@@ -67,7 +68,7 @@ class XSecComputer(XSecBase):
             logger.error( f"File {slhafile} cannot be parsed as SLHA file: {e}" )
             raise SModelSError()
 
-    def _checkSqrts ( self, sqrts ):
+    def _checkSqrts ( self, sqrts ) -> UnitEnergy:
         if type(sqrts)==type(float) or type(sqrts)==type(int):
             logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
             sqrts=float(sqrts)*TeV
@@ -140,7 +141,7 @@ class XSecComputer(XSecBase):
         #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
         return xsecs
 
-    def match ( self, pids, theorypid ):
+    def match ( self, pids, theorypid ) -> bool:
         """ do the pids given by the user match the
             pids of the theorypred? """
         spids = list(pids)
@@ -182,8 +183,7 @@ class XSecComputer(XSecBase):
         #print ( "tpid", theorypid, "matched", pids )
         return True
 
-
-    def applyMultipliers ( self, xsecs, ssmultipliers ):
+    def applyMultipliers ( self, xsecs, ssmultipliers : dict ) -> XSectionList:
         """
         apply the given multipliers to the cross sections """
         for pids in ssmultipliers.keys():
@@ -340,7 +340,8 @@ class XSecComputer(XSecBase):
             self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
 
-    def addCommentToFile ( self, comment, slhaFile ):
+    def addCommentToFile ( self, comment : Optional[str],
+                           slhaFile : os.PathLike ):
         """ add the optional comment to file """
         if comment in [ None, "" ]:
             return
