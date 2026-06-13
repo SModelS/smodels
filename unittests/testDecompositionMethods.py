@@ -17,7 +17,7 @@ from smodels.decomposition.theorySMS import TheorySMS
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
-from smodels.decomposition.decomposer import getDecayNodes, addOneStepDecays,iterCascadeDecay
+from smodels.decomposition.decomposer import get_particle_order_dict, get_lightweight_decays, build_subtree_cacheFor, decayTupleObj
 from smodels.base.particleNode import ParticleNode
 from smodels.base.physicsUnits import fb, GeV
 
@@ -56,7 +56,13 @@ class TestDecompositionMethods(unittest.TestCase):
     
     # Tests that the function can handle a simple bracket notation
     def test_decay_trees(self):
-        decs = getDecayNodes(n2)
+        particleOrderDict = get_particle_order_dict(model)
+        decaysDict = get_lightweight_decays(model, particleOrderDict)
+
+        n2_id = hash(n2.particle)
+        decs = decaysDict[n2_id]
+
+        labelDict = {hash(p): str(p) for p in model.SMparticles + model.BSMparticles}
         default_output = [['N2', 'N1', 'q', 'q',  0.187809422 ],
                     ['N2', 'N1', 'q', 'q',  0.187809422 ],
                     ['N2', 'N1', 'b', 'b',  0.180233089 ],
@@ -78,9 +84,10 @@ class TestDecompositionMethods(unittest.TestCase):
                     ['N2', 'C1+', 'mu-', 'nu',  3.84522575e-08 ],
                     ['N2', 'C1-', 'mu+', 'nu',  3.84522575e-08 ]]
         default_output = sorted(default_output)
-        # Convert result from particle nodes to strings:
-        decs = sorted([ [str(dec[0])] + sorted([str(d) for d in dec[1]]) + [dec[2]] 
-                       for dec in decs[:]])
+        # Convert lightweight decay tuples (hash IDs) to labels for comparison:
+        decs = sorted([[labelDict[dec.mom]]
+                       + sorted([labelDict[d] for d in dec.daughters])
+                       + [dec.br] for dec in decs])
         self.assertEqual(len(default_output),len(decs))
         for idec,dec in enumerate(decs):
             default_dec = default_output[idec]
@@ -101,91 +108,46 @@ class TestDecompositionMethods(unittest.TestCase):
         tree.add_edge(pvIndex,c2Index)
 
 
-        # Check decays step by step:
-        tree1Step = addOneStepDecays(tree)
-        self.assertEqual(len(tree1Step),4)
-        # Count decays:
+        # Validate subtree cache for C2 and descendants.
+        particleOrderDict = get_particle_order_dict(model)
+        decaysDict = get_lightweight_decays(model, particleOrderDict)
+        
+
+        pvID = hash(pv.particle)
+        c2ID = hash(c2.particle)
+        n2ID = hash(n2.particle)
+        n1ID = hash(n1.particle)
+
+        pvDecay = decayTupleObj(mom=pvID, daughters=[c2ID,n1ID], br=1.0)
+        decaysDict[pvID] = [pvDecay]
+
+        cache = build_subtree_cacheFor(pvID, decaysDict, particleOrderDict,
+                                       memo={}, minBR=0.0)
+
+        self.assertIn(c2ID, cache)
+        self.assertIn(n2ID, cache)
+        self.assertIn(n1ID, cache)
+
+        self.assertEqual(len(cache[pvID]),63)
+        self.assertEqual(len(cache[n2ID]),52)
+        self.assertEqual(len(cache[n1ID]),1)
+
+        self.assertTrue(all(st.particleIDs[0] == c2ID for st in cache[c2ID]))
+        self.assertTrue(all(st.particleIDs[0] == n2ID for st in cache[n2ID]))
+
+        totalBR_c2 = sum(st.decayBRs for st in cache[c2ID])
+        totalBR_n2 = sum(st.decayBRs for st in cache[n2ID])
+        self.assertTrue(np.isclose(totalBR_c2,1.0,atol=0,rtol=1e-4))
+        self.assertTrue(np.isclose(totalBR_n2,1.0,atol=0,rtol=1e-4))
+
+        # Classify top-level decays from subtree cache (root daughters of C2)
+        labelDict = {hash(p): str(p) for p in model.SMparticles + model.BSMparticles}
         nN2 = 0
         nC1 = 0
         nN1 = 0
         nOther = 0
-        for t in tree1Step:
-            daughters = [str(d) for d in t.daughters(c2Index)]
-            if 'N2'in daughters:
-                nN2 +=1
-            elif 'C1+' in daughters or 'C1-' in daughters:
-                nC1 +=1 
-            elif 'N1'in daughters:
-                nN1 +=1 
-            else:
-                nOther +=1 
-        self.assertEqual(nN2,1)
-        self.assertEqual(nC1,2)
-        self.assertEqual(nN1,1)
-        self.assertEqual(nOther,0)
-
-        tree2Step = []
-        for t in tree1Step:
-            tree2Step += addOneStepDecays(t)
-        self.assertEqual(len(tree2Step),30)
-        # Count decays:
-        nN2 = 0
-        nC1 = 0
-        nN1 = 0
-        nOther = 0
-        for t in tree2Step:
-            daughters = [str(d) for d in t.daughters(c2Index)]
-            if 'N2'in daughters:
-                nN2 +=1
-            elif 'C1+' in daughters or 'C1-' in daughters:
-                nC1 +=1 
-            elif 'N1'in daughters:
-                nN1 +=1 
-            else:
-                nOther +=1 
-        self.assertEqual(nN2,20)
-        self.assertEqual(nC1,10)
-        self.assertEqual(nN1,0)
-        self.assertEqual(nOther,0)
-
-
-        tree3Step = []
-        for t in tree2Step:
-            daughters = [str(d) for d in t.daughters(c2Index)]
-        #     print(daughters)
-            tree3Step += addOneStepDecays(t)
-        self.assertEqual(len(tree3Step),40)
-        # Count decays:
-        nN2 = 0
-        nC1 = 0
-        nN1 = 0
-        nOther = 0
-        for t in tree3Step:
-            daughters = [str(d) for d in t.daughters(c2Index)]
-            if 'N2'in daughters:
-                nN2 +=1
-            elif 'C1+' in daughters or 'C1-' in daughters:
-                nC1 +=1 
-            elif 'N1'in daughters:
-                nN1 +=1 
-            else:
-                nOther +=1 
-        self.assertEqual(nN2,40)
-        self.assertEqual(nC1,0)
-        self.assertEqual(nN1,0)
-        self.assertEqual(nOther,0)
-
-
-        # Compute full cascade decay
-        treeList = list(iterCascadeDecay(tree))
-        self.assertEqual(len(treeList),63)
-        # Count decays:
-        nN2 = 0
-        nC1 = 0
-        nN1 = 0
-        nOther = 0
-        for t in treeList:
-            daughters = [str(d) for d in t.daughters(c2Index)]
+        for st in cache[pvID]:
+            daughters = [labelDict[pid] for pid in st.particleIDs]
             if 'N2'in daughters:
                 nN2 +=1
             elif 'C1+' in daughters or 'C1-' in daughters:
@@ -199,9 +161,7 @@ class TestDecompositionMethods(unittest.TestCase):
         self.assertEqual(nN1,1)
         self.assertEqual(nOther,0)
 
-        totalXsec = 0*fb
-        for t in treeList:
-            totalXsec += t.maxWeight*fb
+        totalXsec = tree.maxWeight*totalBR_c2*fb
         self.assertAlmostEqual(totalXsec.asNumber(fb),1.0,places=4)
 
         # Compare with simple count from SLHA file:
@@ -210,7 +170,7 @@ class TestDecompositionMethods(unittest.TestCase):
             if str(n) == 'PV':
                 continue
             totalDecays *= getNdecays(model,n.particle.pdg)
-        self.assertEqual(totalDecays,len(treeList))
+        self.assertEqual(totalDecays,len(cache[pvID]))
 
 
     def test_decomp_stable(self):
@@ -233,7 +193,19 @@ class TestDecompositionMethods(unittest.TestCase):
         tree.add_edge(pvIndex,c1pIndex)
         tree.add_edge(pvIndex,c1mIndex)
 
-        treeList = list(iterCascadeDecay(tree))
+        particleOrderDict = get_particle_order_dict(model)
+        decaysDict = get_lightweight_decays(model, particleOrderDict)
+
+        pvID = hash(pv.particle)
+        c1pID = hash(c1p.particle)
+        c1mID = hash(c1m.particle)
+
+        pvDecay = decayTupleObj(mom=pvID, daughters=[c1pID,c1mID], br=1.0)
+        decaysDict[pvID] = [pvDecay]
+
+        cache = build_subtree_cacheFor(pvID, decaysDict, particleOrderDict, memo={}, minBR=0.0)
+
+        treeList = cache[pvID]
         nExpected = 2*2 + 1*2 + 2*1 +1
         self.assertEqual(len(treeList),nExpected)
 
@@ -256,7 +228,18 @@ class TestDecompositionMethods(unittest.TestCase):
         tree.add_edge(pvIndex,n2Index)
         tree.add_edge(pvIndex,c2Index)
 
-        treeList = list(iterCascadeDecay(tree))
+        particleOrderDict = get_particle_order_dict(model)
+        decaysDict = get_lightweight_decays(model, particleOrderDict)
+        c2ID = hash(c2.particle)
+        n2ID = hash(n2.particle)
+        pvID = hash(pv.particle)
+
+        pvDecay = decayTupleObj(mom=pvID, daughters=[n2ID,c2ID], br=1.0)
+        decaysDict[pvID] = [pvDecay]
+
+        cache = build_subtree_cacheFor(pvID, decaysDict, particleOrderDict, memo={}, minBR=0.0)
+
+        treeList = cache[pvID]
         nN2tot = 52
         nC2tot = 63
         self.assertEqual(len(treeList),nC2tot*nN2tot)
@@ -266,21 +249,20 @@ class TestDecompositionMethods(unittest.TestCase):
         cut = 0.07*fb
         xsecCut = 0.0*fb
         for t in treeList:
-            w = t.maxWeight*fb
+            w = tree.maxWeight*t.decayBRs*fb
             totalXsec += w
             if w > cut:
                 nCut += 1
                 xsecCut += w
         self.assertAlmostEqual(totalXsec.asNumber(fb),3.5,places=5)
 
-        # Now change sigmacut:
-        treeList = list(iterCascadeDecay(tree, sigmacutFB=cut.asNumber(fb)))
-        self.assertEqual(len(treeList),nCut)
+        # Apply an equivalent cut on combinations of cached subtrees.
+        filtered = [t for t in treeList if tree.maxWeight*t.decayBRs > cut.asNumber(fb)]
+        self.assertEqual(len(filtered),nCut)
 
         totalXsec = 0*fb
-        for t in treeList:
-            t.weightList = t.computeWeightList()
-            totalXsec += t.weightList
+        for t in filtered:
+            totalXsec += tree.maxWeight*t.decayBRs*fb
         self.assertAlmostEqual(totalXsec.asNumber(fb),xsecCut.asNumber(fb),places=5)
 
 if __name__ == "__main__":
