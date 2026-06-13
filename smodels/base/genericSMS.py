@@ -32,6 +32,12 @@ class GenericSMS(object):
         self._finalStates = {}  # Stores the final states of each node
         self._nextNodeIndex = 0  # Cache the next free node index for fast insertions
         self._sorted = False # Tag SMS as sorted or not
+        self._genIndexIteratorCache = {} # Cache for genIndexIterator results
+
+    def _clearGenIndexIteratorCache(self):
+        """Clear cached breadth-first traversal results."""
+
+        self._genIndexIteratorCache = {}
 
     def __hash__(self):
         return object.__hash__(self)
@@ -125,6 +131,7 @@ class GenericSMS(object):
         self._nodesMapping[nodeIndex] = node
         if nodeIndex >= self._nextNodeIndex:
             self._nextNodeIndex = nodeIndex + 1
+        self._clearGenIndexIteratorCache()
 
         return nodeIndex
 
@@ -174,6 +181,8 @@ class GenericSMS(object):
         if nodeIndex in self._finalStates:
             self._finalStates.pop(nodeIndex)
 
+        self._clearGenIndexIteratorCache()
+
     def remove_nodes_from(self, nodeIndices):
         """
         Removes a list of nodes from the Tree.
@@ -194,6 +203,7 @@ class GenericSMS(object):
 
         self._successors[nodeIndexA].append(nodeIndexB)
         self._predecessors[nodeIndexB] = nodeIndexA
+        self._clearGenIndexIteratorCache()
 
     def add_edges_from(self, edges):
         """
@@ -224,6 +234,8 @@ class GenericSMS(object):
             if self._predecessors[nodeIndexB] == nodeIndexA:
                 self._predecessors.pop(nodeIndexB)
 
+        self._clearGenIndexIteratorCache()
+
     def remove_edges(self, edges):
         """
         Removes edges from the tree if they appear in the tree.
@@ -247,6 +259,7 @@ class GenericSMS(object):
         self._finalStates = {}
         self._rootIndex = None
         self._nextNodeIndex = 0
+        self._clearGenIndexIteratorCache()
 
     def indexToNode(self, nodeIndex):
         """
@@ -380,6 +393,7 @@ class GenericSMS(object):
         # Re-compute canonical name and sort the tree
         smsComp._sorted = False
         smsComp._canonName = smsComp.computeCanonName()
+        smsComp._clearGenIndexIteratorCache()
         return smsComp
 
     @property
@@ -589,9 +603,16 @@ class GenericSMS(object):
         :return: Iterator over nodes.
         """
 
+    
         if nodeIndex is None:
             nodeIndex = self.rootIndex
 
+        if (nodeIndex, includeLeaves, ignoreInclusiveNodes) in self._genIndexIteratorCache:
+            for pair in self._genIndexIteratorCache[(nodeIndex, includeLeaves, ignoreInclusiveNodes)]:
+                yield pair
+            return
+
+        self._genIndexIteratorCache[(nodeIndex, includeLeaves, ignoreInclusiveNodes)] = []
         mom = nodeIndex
         if ignoreInclusiveNodes:
             if self.indexToNode(mom).isInclusive:
@@ -602,6 +623,7 @@ class GenericSMS(object):
         generation = [(mom, daughters)]
         while generation:
             for pair in generation:
+                self._genIndexIteratorCache[(nodeIndex, includeLeaves, ignoreInclusiveNodes)].append(pair)
                 yield pair
             next_generation = []
             for pair in generation:
@@ -683,6 +705,7 @@ class GenericSMS(object):
             # Define dummy dict
             indexDict = {n : n for n in self.nodeIndices}
 
+        self._clearGenIndexIteratorCache()
         return indexDict
 
     def sortAccordingTo(self,indicesList):
@@ -709,6 +732,7 @@ class GenericSMS(object):
             sortedDaughters = sorted(daughters, key = lambda n: sortList.index(n))
             newSuccessors[nodeIndex] = sortedDaughters[:]
         self._successors = newSuccessors
+        self._clearGenIndexIteratorCache()
 
     def sort(self, nodeIndex=None, force=False):
         """
@@ -756,6 +780,8 @@ class GenericSMS(object):
             # Tag the tree as sorted
             self._sorted = True
             return nodeIndexMap
+        
+        self._clearGenIndexIteratorCache()
 
     def sortSubTrees(self, subtreeList):
         """
@@ -901,6 +927,7 @@ class GenericSMS(object):
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
                              in other._finalStates.items()}
         self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
+        self._clearGenIndexIteratorCache()
 
     def treeToString(self, 
                      removeIndicesFrom='stable'):
@@ -1091,6 +1118,7 @@ class GenericSMS(object):
         self._finalStates = newFinalStates
         self._rootIndex = nodeIndexDict[self.rootIndex]
         self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
+        self._clearGenIndexIteratorCache()
 
     def updateNodeObjects(self, nodeObjectDict):
         """
@@ -1103,6 +1131,7 @@ class GenericSMS(object):
 
         for nodeIndex, newObj in nodeObjectDict.items():
             self._nodesMapping[nodeIndex] = newObj
+        self._clearGenIndexIteratorCache()
 
     def checkConsistency(self):
         """
