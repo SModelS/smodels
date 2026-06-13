@@ -14,7 +14,7 @@ import unittest
 
 # from smodels.tools import statistics
 from smodels.statistics.statsTools import getStatsComputerModule, StatsComputer
-from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
+from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs, sortMissingTopologyLists
 from smodels.base import runtime
 
 class SpeyTest(unittest.TestCase):
@@ -41,6 +41,9 @@ class SpeyTest(unittest.TestCase):
                         'database version', 'model']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                            key=lambda res: res['r'], reverse=True)
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+        
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
                            allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
