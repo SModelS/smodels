@@ -20,7 +20,7 @@ from smodels.base import runtime
 import warnings
 
 class SpeyTest(unittest.TestCase):
-    import logging
+    import logging.config
     logging.config.fileConfig( "./spey.conf" )
     def testSwitch(self):
         with warnings.catch_warnings():
