@@ -34,7 +34,6 @@ from collections import OrderedDict
 import os
 import sys
 import time
-import gc
 try:
     from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
 except ImportError:
@@ -204,7 +203,7 @@ def testPoint(inputFile, outputDir, parser, database):
 
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
-        theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if not "CR" in os.path.basename(tp.dataset.path)] # Do not print CRs "results"
+        theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if "CR" not in os.path.basename(tp.dataset.path)] # Do not print CRs "results"
         masterPrinter.addObj(theoryPredictions)
     else:
         outputStatus.updateStatus(0)  # no results after enforcing maxcond
@@ -554,7 +553,7 @@ def setExperimentalFeatures(featuresDict):
     """ set the experimental features flats, if experimentalFeatures:* = True """
 
     for feature in featuresDict.keys():
-        if not feature in runtime._experimental:
+        if feature not in runtime._experimental:
             logger.warning ( f"'{feature}' is not a known experimental feature. will ignore." )
             continue
         flag = False

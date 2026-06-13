@@ -778,10 +778,10 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     assert hasattr ( dataset, "dataInfo" ), \
         "why does the dataset here not have a dataInfo?"
     dataId = dataset.getID()
-    if not dataId in expResult.globalInfo.srMappingsDict:
+    if dataId not in expResult.globalInfo.srMappingsDict:
         return False
     region = expResult.globalInfo.srMappingsDict[dataId]
-    if not "sl" in region:
+    if "sl" not in region:
         region["sl"]=region["smodels"] ## FIXME should disappear
     for srSetName in expResult.globalInfo.statModels.keys():
         dType = expResult.typeOfStatsModel ( srSetName )

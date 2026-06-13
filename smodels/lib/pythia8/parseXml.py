@@ -52,7 +52,7 @@ def create():
     f.close()
     pids = {}
     for line in lines:
-            if not "<particle" in line: continue
+            if "<particle" not in line: continue
             pos = line.find ( "spin" )
             line = line[:pos]
             deletes = [ '<particle id="', '"', '=', 'name', 'antiName' ]
