@@ -9,8 +9,9 @@
 
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.genericSMS import GenericSMS
-from smodels.base.particle import Particle, InvisibleParticle
-from typing import List
+from smodels.base.particleNode import ParticleNode
+from smodels.base.particle import Particle,InvisibleParticle
+from typing import List, Tuple, Dict
 
 class TheorySMS(GenericSMS):
     """
@@ -39,6 +40,33 @@ class TheorySMS(GenericSMS):
         # Type of analyses which have SMS matching self and for
         # which the physical parameters are covered
         self.testedBy = set()
+
+    @classmethod
+    def from_treeTuple(cls, tree, particleDict : Dict[int, Particle], sort : bool = True) -> "TheorySMS":
+        """
+        Create a TheorySMS object from a named subtree tuple.
+
+        :param treetuple: treetuple describing the SMS topology and particles
+        :param particleDict: dictionary mapping particle IDs to particle objects
+
+        :return: TheorySMS object
+        """
+
+        sms = TheorySMS()
+        sms._canonName = tree.canonName
+        sms.decayBRs = tree.decayBRs
+        old2newIndexMapping = {}
+        for nodeIndex,particle_id in enumerate(tree.particleIDs):
+            particle = particleDict[particle_id]
+            node = ParticleNode(particle)
+            newIndex = sms.add_node(node)
+            old2newIndexMapping[nodeIndex] = newIndex
+        for edgeA, edgeB in tree.edges:
+            sms.add_edge(old2newIndexMapping[edgeA], old2newIndexMapping[edgeB])
+
+        if sort:
+            sms.sort()
+        return sms
 
     def __cmp__(self,other):
         """

@@ -22,7 +22,7 @@ from itertools import product
 from collections import namedtuple
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.physicsUnits import UnitXSec,UnitEnergy
-import numpy as np
+
 
 # Auxiliary tuples for a lightweight representation of decays, subtrees and cross-sections during the decomposition process.
 subtreeTuple = namedtuple('subtreeTuple', ['particleIDs', 'edges', 'decayBRs', 'canonName'])
@@ -129,12 +129,15 @@ def get_lightweight_canonName(sorted_subtrees: List[subtreeTuple]) -> int:
     cName = '1'+"".join(f"{subtree.canonName}" for subtree in sorted_subtrees) + '0'
     return int(cName)
 
+
 def build_subtree_cacheFor(particleID: int, decayDict: Dict[int, List[decayTupleObj]], 
                         particleOrderDict: Dict[int, int],  
                         memo: Optional[Dict[int, Tuple[subtreeTuple, ...]]] = None,
-                        visiting: Optional[Set[int]] = None, minBR: float = 0.0) -> Dict[int, Tuple[subtreeTuple,...]]:
+                        visiting: Optional[Set[int]] = None, minBR: float = 0.0, sort : bool = True) -> Dict[int, Tuple[subtreeTuple,...]]:
     """
     Build memoized subtree tuples for all descendants of particleID.
+
+    :param sort: If False, do not sort the subtrees generated for particleID. However, all the other subtrees generated for the descendants of particleID will always be sorted.
     """
 
     if memo is None:
@@ -161,7 +164,7 @@ def build_subtree_cacheFor(particleID: int, decayDict: Dict[int, List[decayTuple
             if decay.br < minBR:
                 continue
 
-            child_ids = tuple(sorted(decay.daughters))
+            child_ids = tuple(decay.daughters)
             daughter_choices = []
             for daughter_id in child_ids:
                 memo = build_subtree_cacheFor(daughter_id, decayDict, particleOrderDict, memo, visiting, minBR)
@@ -169,7 +172,9 @@ def build_subtree_cacheFor(particleID: int, decayDict: Dict[int, List[decayTuple
                 daughter_choices.append(daughter_subtree)
 
             for combo in product(*daughter_choices):
-                all_BRs = decay.br*np.prod([daughter_subtree.decayBRs for daughter_subtree in combo])
+                all_BRs = decay.br
+                for daughter_subtree in combo:
+                    all_BRs = all_BRs*daughter_subtree.decayBRs
                 if all_BRs < minBR:
                     continue
                 combo = lightweight_sortTrees(combo,particleOrderDict)  # Sort daughter subtrees by canonName and particle ordering
@@ -188,7 +193,8 @@ def build_subtree_cacheFor(particleID: int, decayDict: Dict[int, List[decayTuple
                     parent_subtree.edges.append((0, index_map[0]))
 
                 subtrees.append(parent_subtree)
-    subtrees = lightweight_sortTrees(subtrees, particleOrderDict)
+    if sort:
+        subtrees = lightweight_sortTrees(subtrees, particleOrderDict)
     visiting.remove(particleID)
     memo[particleID] = tuple(subtrees)
     return memo
@@ -272,78 +278,45 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
 
 
     # Build subtree cache for all primary mothers appearing in production channeprintls.
-    cache = {}
-    for xsecTuple in sorted(xsecTupleList, key=lambda x: x.maxWeight, reverse=True):
-        # Define a minimum BR for building the subtrees.
-        # Since the cross-sections are ordered, minBR increases as we go down the list, allowing more aggressive pruning of the subtree cache for subtrees which
-        # are only needed for production channels with smaller cross-sections.
-        minBR = sigmacutFB/xsecTuple.maxWeight
-        for primaryMotherID in xsecTuple.primaryMotherIDs:
-            if primaryMotherID in cache:
-                continue
-            cache = build_subtree_cacheFor(primaryMotherID, decaysDict, particleOrderDict, 
-                                        memo=cache, minBR=minBR)
-            
-    
-    pv = ParticleNode(model.getParticle(label='PV'))
+    pv = model.getParticle(label='PV')
+    particleOrderDict[hash(pv)] = -1  # Set PV as the first particle in the ordering to ensure it appears as root in the trees.
+    particleDict[hash(pv)] = pv  # Add PV to particleDict to ensure it can be accessed when building the trees.
+    pv_id = hash(pv)
     cache = {}
     nCascadeTrees = 0
-    for xsecTuple in xsecTupleList:
-        minBR = sigmacutFB/xsecTuple.maxWeight
-        # Build subtree cache for primary mothers of the current production channel
-        # (if not already built for a previous channel with larger cross-section)
-        for primaryMotherID in xsecTuple.primaryMotherIDs:
-            cache = build_subtree_cacheFor(primaryMotherID, decaysDict, particleOrderDict, 
-                                            memo=cache, minBR=minBR)
-        
+    # Make a copy of the decay dict to avoid modifying the original one during subtree cache building with different minBR values for different production channels.
+    decaysDict_tmp = dict(decaysDict.items())
+    for xsecTuple in sorted(xsecTupleList, key=lambda x: x.maxWeight, reverse=True):
+
         weight = xsecTuple.maxWeight
-        all_subtrees = [cache[pid] for pid in xsecTuple.primaryMotherIDs]
+
+        if weight < sigmacutFB:
+            break
         
-        for primary_subtrees in itertools.product(*all_subtrees):
-            totalBR = 1.0
-            for subtree in primary_subtrees:
-                totalBR *= subtree.decayBRs
-            if weight*totalBR < sigmacutFB:
-                continue
+        # Build "fake" decay for PV -> primary mothers to build the subtree 
+        # cache for the current production channel.
+        pvDecay = decayTupleObj(mom=pv_id, daughters=xsecTuple.primaryMotherIDs, br=1.0)
+        decaysDict_tmp[pv_id] = [pvDecay]
 
-            # Sort the primary subtrees by canonName and particle ordering to ensure the 
-            # tree is sorted
-            primary_subtrees_sorted = lightweight_sortTrees(primary_subtrees, particleOrderDict)
-            # Reorder the mother IDs in the same order as the sorted subtrees
-            primary_mothers_sorted = [particleDict[s.particleIDs[0]] for s in primary_subtrees_sorted]
-                        
-            smsDecayed = TheorySMS()
-            smsDecayed.maxWeight = xsecTuple.maxWeight
-            smsDecayed.prodXSec = xsecTuple.xsecList
-            smsDecayed._canonName = get_lightweight_canonName(primary_subtrees_sorted)
-            pvIndex = smsDecayed.add_node(pv)
-            primaryMothers = [ParticleNode(mother) for mother in primary_mothers_sorted]
-            motherIndices = smsDecayed.add_nodes_from(primaryMothers)
-            smsDecayed.add_edges_from(product([pvIndex], motherIndices))
-            for idaughter, subtree in enumerate(primary_subtrees_sorted):
-                old2newIndexMapping = {0: motherIndices[idaughter]}
-                for nodeIndex,daughter_id in enumerate(subtree.particleIDs):
-                    # Skip subtree root: the primary mother is already present in smsDecayed.
-                    if nodeIndex == 0:
-                        continue
-                    daughter = particleDict[daughter_id]
-                    node = ParticleNode(daughter)
-                    newIndex = smsDecayed.add_node(node)
-                    old2newIndexMapping[nodeIndex] = newIndex
-                for edgeA, edgeB in subtree.edges:
-                    smsDecayed.add_edge(old2newIndexMapping[edgeA], old2newIndexMapping[edgeB])
-
-            smsDecayed.decayBRs = totalBR
-            smsDecayed.maxWeight = weight * totalBR 
-            smsDecayed.weightList = smsDecayed.prodXSec*smsDecayed.decayBRs
+        # Define a minimum BR for building the subtrees.
+        # Since the cross-sections are ordered, minBR increases as we go down the list, 
+        # allowing more aggressive pruning of the subtree cache for subtrees which
+        # are only needed for production channels with smaller cross-sections.
+        minBR = sigmacutFB/weight
+        cache = build_subtree_cacheFor(pv_id, decaysDict_tmp, particleOrderDict, 
+                                            memo=cache, minBR=minBR, sort=False)
+        
+        all_trees = cache.pop(pv_id) # Make to remove the pv_id from cache for the next iteration
+        for tree in all_trees:                        
             # Although the trees are built in sorted order, the sorting follows a DFS, while sort() follows BFS
-            # Thus, to preserve the original behaviour, we will use the BFS sort:
-            # smsDecayed._sorted = True 
-            smsDecayed.sort()
+            # Thus, to preserve the original behaviour, we will use the BFS sort implemented in TheorySMS.sort():
+            smsDecayed = TheorySMS.from_treeTuple(tree, particleDict, sort=True)
+            smsDecayed.maxWeight = xsecTuple.maxWeight*tree.decayBRs
+            smsDecayed.prodXSec = xsecTuple.xsecList
+            smsDecayed.weightList = smsDecayed.prodXSec*smsDecayed.decayBRs            
             smsDecayed.ancestors = [smsDecayed]  # Set ancestors (before compression)
             smsTopDict.addSMS(smsDecayed)
             nCascadeTrees += 1
-
 
     logger.debug(f"{nCascadeTrees} cascade topologies trees generated and added to TopoDict in {time.time() - t1:.2f} s.")
     t1 = time.time()
@@ -360,7 +333,7 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
     smsTopDict.setSMSIds()
 
 
-    logger.debug(f"decomposer done in {time.time() - t0:.2f} s.")
+    logger.info(f"Decomposition done in {time.time() - t0:.2f} s.")
     
 
     return smsTopDict
