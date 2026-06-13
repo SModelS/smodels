@@ -224,7 +224,7 @@ def testPoint(inputFile, outputDir, parser, database):
             smstoplist, sigmacut=sigmacut, sqrts=sqrts)
         masterPrinter.addObj(uncovered)
 
-    logger.info("Finished coverate in %3.2f min" % ((time.time()-t0)/60.))
+    logger.info("Finished coverage in %3.2f min" % ((time.time()-t0)/60.))
     if parser.has_option("options", "combineAnas"):
         """ Combine analyses """
 
