@@ -12,7 +12,12 @@
 
 __all__ = [ "NNAdapter" ]
 
-import os, onnx, json, math, onnxruntime, sys
+import os
+import onnx
+import json
+import math
+import onnxruntime
+import sys
 import numpy as np
 from typing import Union
 
@@ -33,14 +38,14 @@ class NNAdapter:
         e.g. { "inter_op_num_threads": 1 }
         """
         assert type(mlModel) in [ bytes, str, onnx.ModelProto,os.PathLike],\
-            f"mlModel needs to be one of: bytes, str, onnx.ModelProto, os.PathLike"
+            "mlModel needs to be one of: bytes, str, onnx.ModelProto, os.PathLike"
         if type(mlModel) == str and mlModel.endswith ( "onnx") and \
                 os.path.exists ( mlModel ):
             self.mlModel = onnx.load ( mlModel )
         elif type(mlModel) in [ bytes, str ]:
             try:
                 self.mlModel = onnx.load_model_from_string ( mlModel )
-            except Exception as e:
+            except Exception:
                 print( f"[nnAdapter] could not load model {onnxfilename}" )
                 sys.exit(-1)
         self.onnxfilename = onnxfilename
@@ -114,7 +119,7 @@ class NNAdapter:
         data["nllMeans"]= []
         data["nllErrors"]= []
         remove_channels=[]
-        import json, math
+        import json
         for em in self.mlModel.metadata_props:
             if em.key == "remove_channels":
                 # remove these channels at the end, so that order does not matter
@@ -305,4 +310,4 @@ if __name__ == "__main__":
         yields[ region ] = 0.
     ret = adapter.predict ( yields )
     print ("\n".join( f"{key:10s}: {value:.1f}" for key,value in ret.items()))
-    import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+    import sys; import IPython; IPython.embed( colors = "neutral" ); sys.exit()

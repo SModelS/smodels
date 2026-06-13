@@ -9,20 +9,17 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 """
 
-from scipy import stats, optimize, integrate, special, linalg
-from numpy import sqrt, exp, log, sign, array, ndarray
+from scipy import stats, optimize, special
+from numpy import sqrt, sign, array, ndarray
 from functools import reduce
-from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, apriori, aposteriori, \
-         NllEvalType, exponentiateNLL
-from typing import Text, Optional, Union, Tuple
+         NllEvalType
+from typing import Text, Union, Tuple
 from smodels.statistics.basicStats import findRoot
-from smodels.tools.caching import roundCache, lru_cache
 
 import numpy as np
-import math
 import copy
 import warnings
 
@@ -1072,7 +1069,7 @@ class SLUpperLimitComputer:
         try:
             a, b = determineBrentBracket( mu_hat, sigma_mu, clsRoot,
                                           allowNegative=False )
-        except SModelSError as e:
+        except SModelSError:
             return None
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         logger.debug ( f"muhat={mu_hat}+-{sigma_mu} a,b={a,b} mu_lim={mu_lim}" )

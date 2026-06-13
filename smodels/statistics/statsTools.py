@@ -12,7 +12,7 @@
 
 __all__ = [ "StatsComputer", "getCompRetrieverModule" ]
 
-from typing import Union, Dict, Optional, List
+from typing import Union, Dict, Optional
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi

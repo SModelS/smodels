@@ -11,10 +11,8 @@
 
 __all__ = [ "SpeyRetriever"]
 
-from typing import Union, Text, Tuple, Dict, List, Optional
-import os
+from typing import Optional
 from spey import ExpectationType, get_backend
-from smodels.statistics.basicStats import exponentiateNLL
 from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 import spey
@@ -27,9 +25,7 @@ except ImportError: # comes only with newer versions of spey
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
-from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
-import numpy as np
 
 _debug = { "writePoint": False } # for debugging only
 
@@ -172,7 +168,7 @@ class SpeyRetriever:
         if third_momenta == None:
             try:
                 stat_wrapper = get_backend("default.correlated_background")
-            except spey.PluginError as e: ## older spey?
+            except spey.PluginError: ## older spey?
                 stat_wrapper = get_backend("default_pdf.correlated_background")
             if _debug["writePoint"]:
                 obsN = [ x.dataInfo.observedN for x in dataset._datasets[:n] ]
@@ -197,7 +193,7 @@ class SpeyRetriever:
         # SLv2
         try:
             stat_wrapper = get_backend("default.third_moment_expansion")
-        except ImportError as e:
+        except ImportError:
             stat_wrapper = get_backend("default_pdf.third_moment_expansion")
         speyModel = stat_wrapper( data = obsN,
                         background_yields = bg, covariance_matrix = cov,
@@ -232,7 +228,7 @@ class SpeyRetriever:
         """
         try:
             stat_wrapper = get_backend("default.uncorrelated_background")
-        except spey.PluginError as e: ## older spey?
+        except spey.PluginError: ## older spey?
             stat_wrapper = get_backend("default_pdf.uncorrelated_background")
         id = f"{dataset.globalInfo.id}:{dataset.dataInfo.dataId}"
         nsig = nsigDict.get(dataset.getID(), 0)
@@ -260,7 +256,7 @@ class SpeyRetriever:
 
         :returns: a sub computer
         """
-        print ( f"FIXME this isnt yet implemented as spey doesnt have that feature yet!" )
+        print ( "FIXME this isnt yet implemented as spey doesnt have that feature yet!" )
         sys.exit(-1)
         globalInfo = dataset.globalInfo
         labelToONNX = {}
@@ -347,7 +343,7 @@ class SpeyRetriever:
                 a factor of corr = 0.6 is proposed.
         :returns: list of subComputers (with a single entry)
         """
-        logger.error ( f"speyTools no truncated Gaussian backend exists" )
+        logger.error ( "speyTools no truncated Gaussian backend exists" )
         return None
 
     @classmethod

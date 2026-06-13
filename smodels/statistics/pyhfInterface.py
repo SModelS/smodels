@@ -16,7 +16,7 @@ import jsonschema
 import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import findRoot, clsType, exponentiateNLL
+from smodels.statistics.basicStats import findRoot, clsType
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -24,7 +24,7 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
-from typing import Dict, List, Union, Text, Tuple, Optional
+from typing import Dict, List, Union, Text, Optional
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 
 jsonver = ""
@@ -32,17 +32,19 @@ try:
     import importlib.metadata
 
     jsonver = int(importlib.metadata.version("jsonschema")[0])
-except Exception as e:
+except Exception:
     try:
         from jsonschema import __version__ as jsonver
-    except Exception as e:
+    except Exception:
         pass
 if jsonver < 3:
     # if jsonschema.__version__[0] == "2": ## deprecated
     print( f"[SModelS:pyhfInterface] jsonschema is version {jsonschema.__version__}, we need > 3.x.x" )
     sys.exit()
 
-import time, sys, os
+import time
+import sys
+import os
 
 try:
     import pyhf
@@ -154,7 +156,7 @@ class PyhfData:
             else:
                 try:
                     S += signal
-                except TypeError as e:
+                except TypeError:
                     raise SModelSError ( f"type {self.nsignals} is {type(signal)}" )
         self.totalYield = S
 
@@ -165,7 +167,7 @@ class PyhfData:
     def createPatchForRegion ( self, region, i_ch, ch, jsName ):
         chname = ch['name']
         chname2 = f'{ch["name"]}[0]' ## binned SRs
-        if not region["pyhf"] in [ chname, chname2 ]:
+        if region["pyhf"] not in [ chname, chname2 ]:
             return None, None
         if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
             if region['smodels'] not in self.nsignals:
@@ -282,7 +284,7 @@ class PyhfData:
         wsChannelsInfo = {}
         wsChannelsInfo["signalRegions"] = []
         wsChannelsInfo["otherRegions"] = []
-        if not "channels" in ws.keys():
+        if "channels" not in ws.keys():
             logger.error(
                 f"Json {self.inputJson} is corrupted (channels are missing)" )
             self.channelsInfo = None
@@ -833,7 +835,7 @@ class PyhfUpperLimitComputer:
                             return_fitted_val=True, par_bounds = bounds, return_result_obj = True )
                     #removed jacobain way of computing sigma_mu
 
-                except (pyhf.exceptions.FailedMinimization,ValueError) as e:
+                except (pyhf.exceptions.FailedMinimization,ValueError):
                     pass
 
                 if hasattr ( o, "hess_inv" ): # maybe the backend gets changed
@@ -845,7 +847,7 @@ class PyhfUpperLimitComputer:
                         _1, _2, o = pyhf.infer.mle.fit(workspace.data(model), model,
                                 return_fitted_val=True, return_result_obj = True, init_pars = list(muhat), method="BFGS" )
                         sigma_mu_temp = float ( np.sqrt ( o.hess_inv[model.config.poi_index][model.config.poi_index] ) )
-                    except (pyhf.exceptions.FailedMinimization,ValueError) as e:
+                    except (pyhf.exceptions.FailedMinimization,ValueError):
                         pass
                     if abs ( sigma_mu_temp - 1.0 ) > 1e-5:
                         sigma_mu = sigma_mu_temp * self.scale
@@ -1057,7 +1059,7 @@ class PyhfUpperLimitComputer:
             logger.debug(f"result for {mu_rel} {result}")
             try:
                 CLs = float(result)
-            except TypeError as e:
+            except TypeError:
                 if return_expected_set:
                     idx = 2 + nSigma
                     CLs = float(result[-1][idx])

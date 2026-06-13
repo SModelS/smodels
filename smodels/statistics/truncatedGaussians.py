@@ -16,7 +16,6 @@ from scipy import stats, optimize
 from smodels.base.smodelsLogging import logger
 from scipy.special import erf
 import numpy as np
-from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, NllEvalType
 from typing import  Optional, Union, Dict
 
@@ -211,10 +210,10 @@ class TruncatedGaussians:
             muhat,rootResults = optimize.toms748( self._root_func, xa, xb, rtol=1e-02,
                                       xtol=1e-02, full_output = True )
             if rootResults.converged:
-                logger.error ( f"retry with tol=1e-2 seemed to have worked" )
+                logger.error ( "retry with tol=1e-2 seemed to have worked" )
             else:
                 muhat,*_ = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
-                logger.error ( f"retry with brentq seemed to have worked" )
+                logger.error ( "retry with brentq seemed to have worked" )
         return muhat
 
     def _computeNLL( self, mu : float, muhat : float ) -> float:

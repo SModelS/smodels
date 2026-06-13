@@ -9,15 +9,15 @@
 
 """
 
-from typing import Union, Text, Tuple, Callable, Dict, Optional
-import copy, os
+from typing import Union, Text, Tuple, Callable, Optional
+import copy
 import numpy as np
 import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import UnitXSec, UnitLumi
+from smodels.base.physicsUnits import UnitLumi
 from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
-         exponentiateNLL, observed, apriori, aposteriori, NllEvalType, \
+         observed, apriori, aposteriori, NllEvalType, \
          CLsWithErrorsfromNLL
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from scipy import optimize, differentiate
@@ -148,7 +148,7 @@ class NNUpperLimitComputer:
         if int(version[0])<=1 and int(version[1])<=20:
             session_options={ "inter_op_num_threads": 1,
                               "intra_op_num_threads": 1 }
-        if not onnxfilename in self.data.globalInfo.cachedModels:
+        if onnxfilename not in self.data.globalInfo.cachedModels:
             logger.error ( f"could not find {onnxfilename} among cached models")
             sys.exit(-1)
         onnxb = data.globalInfo.cachedModels[onnxfilename]
@@ -244,9 +244,9 @@ class NNUpperLimitComputer:
         for srname,smyield in self.adaptor.onnxMeta["bkg_yields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
-            if not realname in self.nsignals:
+            if realname not in self.nsignals:
                 realname = f"{realname}[{srname[p1+1:]}]"
-                if not realname in self.nsignals:
+                if realname not in self.nsignals:
                     continue
                 assert realname in self.nsignals, \
                   f"nnInterface: cannot find sr name {realname} in '{' '.join(self.nsignals.keys())}'"
@@ -273,7 +273,7 @@ class NNUpperLimitComputer:
         """
         try:
             poi_test = poi_test[0]
-        except (TypeError,IndexError) as e:
+        except (TypeError,IndexError):
             pass
 
         # from signal yields compute total yields
@@ -347,7 +347,7 @@ class NNUpperLimitComputer:
         if abs(mu)<1e-6:
             poi_test = 0
         # evaluationType == observed and \
-        if pmSigma != 0 and not "sigma_obs" in ret:
+        if pmSigma != 0 and "sigma_obs" not in ret:
             ## probably we fell back to pyhf likelihoods,
             # so we return Nones
             return None
@@ -374,7 +374,7 @@ class NNUpperLimitComputer:
         if pmSigma != 0:
             nll += pmSigma * ret[ s_label ]
 
-        logger.debug( f"Calling likelihood")
+        logger.debug( "Calling likelihood")
         return nll
 
     @lru_cache
@@ -437,7 +437,7 @@ class NNUpperLimitComputer:
                 return ret
             if x0 == initx0s:
                 method = "L-BFGS-B"
-        logger.warning ( f"could not find nll_min!" )
+        logger.warning ( "could not find nll_min!" )
         return None
 
 

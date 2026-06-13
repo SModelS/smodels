@@ -12,7 +12,6 @@
 __all__ = [ "SpeyPyhfData" ]
 
 from smodels.base.smodelsLogging import logger
-import os
 
 class SpeyPyhfData:
     """
@@ -72,7 +71,7 @@ class SpeyPyhfData:
         wsChannelsInfo = {}
         wsChannelsInfo["signalRegions"] = []
         wsChannelsInfo["otherRegions"] = []
-        if not "channels" in ws.keys():
+        if "channels" not in ws.keys():
             idx = self.inputJsons.index(ws)
             logger.error (
                 f"Json file number {idx} is corrupted (channels are missing)"
@@ -109,7 +108,7 @@ class SpeyPyhfData:
         # jsons = []
         model_tuples = globalInfo.statModels[srSetName]
         model_tuple = model_tuples[0]
-        if not "pyhf" in model_tuple:
+        if "pyhf" not in model_tuple:
             return None # this is not a pyhf model we want here
         jsName = model_tuple[1]
         datasets = []
@@ -124,7 +123,7 @@ class SpeyPyhfData:
             srName = globalInfo.srMappingsDict[sr]["smodels"]
             if srName == None:
                 continue
-            if not srName in nsig:
+            if srName not in nsig:
                 logger.debug ( f"sr name {srName} is not found in {nsig}" )
                 continue
                 #sys.exit(-1)

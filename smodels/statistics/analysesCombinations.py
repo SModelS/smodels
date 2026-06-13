@@ -12,7 +12,7 @@
 """
 
 import numpy as np
-from smodels.base.physicsUnits import fb, UnitXSec
+from smodels.base.physicsUnits import fb
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
      findRoot, exponentiateNLL
@@ -20,8 +20,7 @@ import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict
 from smodels.tools.caching import roundCache, lru_cache
-from smodels.statistics.basicStats import observed, apriori, aposteriori, \
-     NllEvalType
+from smodels.statistics.basicStats import observed, NllEvalType
 from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
@@ -118,7 +117,7 @@ class AnaCombLikelihoodComputer(object):
             return ret
 
         if len(muhats) == 0:
-            logger.error(f"asked to compute muhat for combination, but no individual values")
+            logger.error("asked to compute muhat for combination, but no individual values")
             ret = {"muhat": None, "sigma_mu": None, "nll_min": None }
             return ret
 
@@ -171,7 +170,7 @@ class AnaCombLikelihoodComputer(object):
             invh = o.hess_inv
             try:
                 invh = invh.todense()
-            except AttributeError as e:
+            except AttributeError:
                 pass
             hessian = invh[0][0]
             nll_ = o.fun
