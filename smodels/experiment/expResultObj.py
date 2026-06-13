@@ -18,7 +18,7 @@ from typing import Union, Optional, Set
 
 try:
     import cPickle as serializer
-except ImportError as e:
+except ImportError:
     import pickle as serializer
 
 
@@ -64,7 +64,7 @@ class ExpResult(object):
                 if not isinstance(SR,dict):
                     raise SModelSExperimentError(f"The SRs in the srMappings should be a dictionary and not {type(SR)}")
                 # In case the smodels label is not defined, ignore SR
-                if not "smodels" in SR:
+                if "smodels" not in SR:
                     continue
                 smodelsLabel = SR["smodels"]
                 if smodelsLabel is None or smodelsLabel in dsOrder:
@@ -151,7 +151,7 @@ class ExpResult(object):
         for dataset in self.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames:
+                if tx not in txnames:
 
                     txnames.append(tx)
         if isinstance(txnames, list):
@@ -227,7 +227,7 @@ class ExpResult(object):
         if srSetName == None:
             ret = set()
             for name in self.globalInfo.srSets.keys():
-                if not name in self.globalInfo.statModels:
+                if name not in self.globalInfo.statModels:
                     raise SModelSError ( f"{name} does not appear in {self.globalInfo.id}'s stats models" )
                 n = len ( self.globalInfo.statModels[name] )
                 for i in range(n):

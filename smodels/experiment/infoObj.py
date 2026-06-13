@@ -42,17 +42,17 @@ class Info(object):
         for region in regions:
             if type(region)==str:
                 region={"smodels": region}
-            if not "type" in region:
+            if "type" not in region:
                 region["type"]="SR"
-            if not "smodels" in region:
+            if "smodels" not in region:
                 region["smodels"]=None
-            if not "pyhf" in region:
+            if "pyhf" not in region:
                 region["pyhf"]=region["smodels"]
-            if not "onnx" in region:
+            if "onnx" not in region:
                 region["onnx"]=region["pyhf"]
-            if not "sl" in region:
+            if "sl" not in region:
                 region["sl"]=region["smodels"]
-            if not "label" in region:
+            if "label" not in region:
                 # if there isnt a label, we take
                 # the smodels as the label
                 if region["smodels"] is not None:

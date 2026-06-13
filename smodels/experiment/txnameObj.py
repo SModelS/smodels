@@ -16,7 +16,7 @@ import os
 from smodels.base import physicsUnits
 from smodels.base.genericSMS import GenericSMS
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, NllEvalType
 
 from smodels.experiment.expAuxiliaryFuncs import (smsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth,

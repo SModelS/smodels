@@ -7,7 +7,6 @@
 """
 
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.base.smodelsLogging import logger
 
 from collections import deque
 

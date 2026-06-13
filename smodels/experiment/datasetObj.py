@@ -10,13 +10,12 @@
 
 import os
 import glob
-import numpy as np
 from typing import Union
 from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, NllEvalType
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
@@ -571,7 +570,7 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "srMappings"):
         ## datasetOrder goes by srMappings
             for region in self.globalInfo.srMappings:
-                if not "sl" in region or region["sl"]!=None:
+                if "sl" not in region or region["sl"]!=None:
                     datasetOrder.append ( region["smodels"] )
         elif hasattr(self.globalInfo, "srSets" ):
             for srSetName,regions in self.globalInfo.srSets.items():

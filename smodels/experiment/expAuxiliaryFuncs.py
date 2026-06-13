@@ -13,7 +13,6 @@ from smodels.base.smodelsLogging import logger
 import unum
 import re
 import numpy as np
-from collections import OrderedDict, deque
 import os
 
 try:
@@ -516,7 +515,7 @@ def removeInclusives(massArray, shapeArray):
                                % (len(shapeArray), len(massArray)))
         else:
             return [removeInclusives(xi, shapeArray[i]) for i, xi in enumerate(massArray)
-                    if not removeInclusives(xi, shapeArray[i]) is None]
+                    if removeInclusives(xi, shapeArray[i]) is not None]
     else:
         return massArray
 
