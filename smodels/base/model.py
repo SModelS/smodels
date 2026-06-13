@@ -141,7 +141,7 @@ class Model(object):
                 continue
             if any(particle is ptc for ptc in cleanList):
                 continue
-            if any((particle.contains(p) and not particle is p) for p in particleList):
+            if any((particle.contains(p) and particle is not p) for p in particleList):
                 continue
             cleanList.append(particle)
 
@@ -166,7 +166,7 @@ class Model(object):
             value = getattr(particle, attributeStr)
             if isinstance(particle, MultiParticle) and isinstance(value, list):
                 for v in value:
-                    if not v in valueList:
+                    if v not in valueList:
                         valueList.append(v)
             else:
                 valueList.append(value)
@@ -211,7 +211,7 @@ class Model(object):
             massDict = res.blocks['MASS']
             #  Make sure both PDG signs appear in massDict
             for pdg, mass in massDict.items():
-                if not -pdg in massDict:
+                if -pdg not in massDict:
                     massDict[-pdg] = abs(mass)
             decaysDict = res.decays
             xsections = crossSection.getXsecFromSLHAFile(inputFile)

@@ -10,7 +10,6 @@
 
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.particle import Particle
-from smodels.base.inclusiveObjects import InclusiveValue
 
 # Define a common inclusive particle object
 # to be used with the inclusive node

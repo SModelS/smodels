@@ -71,7 +71,8 @@ def printEnvironmentInfo( args : Dict ):
     """
     from smodels.base.smodelsLogging import colors
     colors.on = True if "colors" in args and args["colors"] == True else False
-    import importlib, platform
+    import importlib
+    import platform
 
     modules = [ "scipy", "sympy", "numpy",
         "pyslha", "unum", "pyhf" ]
@@ -137,7 +138,7 @@ def experimentalFeature( feature : str ) -> Union[None,bool]:
 
     :returns: None if feature does not exist, else boolean
     """
-    if not feature in _experimental:
+    if feature not in _experimental:
         return None
     return _experimental[feature]
 
