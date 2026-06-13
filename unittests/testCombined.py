@@ -55,7 +55,7 @@ class CombinedTest(unittest.TestCase):
         filename = "./testFiles/slha/gluino_squarks.slha"
         from smodels.base.smodelsLogging import logger, setLogLevel
         setLogLevel ( "fatal" )
-        outputfile = runMain(filename, inifile="testParameters_agg.ini", suppressStdout=False)
+        outputfile = runMain(filename, inifile="testParameters_agg.ini", suppressStdout=True)
         smodelsOutput = importModule(outputfile)
         from gluino_squarks_default_agg import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version',

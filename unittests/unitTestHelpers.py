@@ -137,6 +137,32 @@ def flattenElement(elStr):
     return newElStr
 
 
+def sortMissingTopologyLists(outputDict):
+    """
+    Sort missing-topology lists deterministically for robust comparisons.
+    If two entries have the same weight, sort by element label to ensure a deterministic order. 
+    This is important for regression tests comparing printed outputs, 
+    as the order of tied entries can otherwise fluctuate due to tiny floating-point differences.
+    """
+
+    keys = [
+        'missing topologies',
+        'missing topologies with prompt decays',
+        'missing topologies with displaced decays',
+    ]
+    for key in keys:
+        if key not in outputDict:
+            continue
+        entries = outputDict[key]
+        if not isinstance(entries, list):
+            continue
+        outputDict[key] = sorted(
+            entries,
+            key=lambda d: (-(d.get('weight (fb)', 0.0)), d.get('element', '')),
+        )
+
+
+
 def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
               fname2=None, checkBothOrders=True):
     """

@@ -961,18 +961,18 @@
         <SMS_Decomposition>
             <ID>44</ID>
             <Masses_GeV_List>
-                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
                 <Masses_GeV>('C1+', 134.4)</Masses_GeV>
-                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
                 <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
             </Masses_GeV_List>
             <PIDs_List>
-                <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('C1+', 1000024)</PIDs>
-                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,q,q), (C1+(2) &gt; N1,q,q)</SMS>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,q,q), (C1-(2) &gt; N1~,q,q)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>247.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>132.0</xsec_8.0_TeV>
@@ -1141,18 +1141,18 @@
         <SMS_Decomposition>
             <ID>53</ID>
             <Masses_GeV_List>
-                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
                 <Masses_GeV>('C1+', 134.4)</Masses_GeV>
-                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
+                <Masses_GeV>('C1-', 134.4)</Masses_GeV>
                 <Masses_GeV>('N1', 68.1)</Masses_GeV>
+                <Masses_GeV>('N1~', 68.1)</Masses_GeV>
             </Masses_GeV_List>
             <PIDs_List>
-                <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('C1+', 1000024)</PIDs>
-                <PIDs>('N1~', -1000022)</PIDs>
+                <PIDs>('C1-', -1000024)</PIDs>
                 <PIDs>('N1', 1000022)</PIDs>
+                <PIDs>('N1~', -1000022)</PIDs>
             </PIDs_List>
-            <SMS>(PV &gt; C1-(1),C1+(2)), (C1-(1) &gt; N1~,q,c), (C1+(2) &gt; N1,q,c)</SMS>
+            <SMS>(PV &gt; C1+(1),C1-(2)), (C1+(1) &gt; N1,q,c), (C1-(2) &gt; N1~,q,c)</SMS>
             <Weights_fb>
                 <xsec_13.0_TeV>247.0</xsec_13.0_TeV>
                 <xsec_8.0_TeV>132.0</xsec_8.0_TeV>

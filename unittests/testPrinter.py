@@ -14,9 +14,10 @@ import subprocess
 sys.path.insert(0, "../")
 import unittest
 from xml.etree import ElementTree
-from unitTestHelpers import equalObjs, Summary, runMain, importModule, sortXML,compareXML,compareSLHA
+from unitTestHelpers import equalObjs, Summary, runMain, importModule, sortXML,compareXML,compareSLHA,sortMissingTopologyLists
 from smodels.base.smodelsLogging import logger
 inf = float("inf")
+
 
 
 
@@ -55,6 +56,11 @@ class RunPrinterTest(unittest.TestCase):
                                                  key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
                                           key=lambda res: res['r'], reverse=True)
+
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+
+
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top",
                            fname=out,fname2="gluino_squarks_default.py")
@@ -171,6 +177,8 @@ class RunPrinterTest(unittest.TestCase):
                                                  key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
                                           key=lambda res: res['r'], reverse=True)
+        
+        
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
                            ignore=ignoreFields, where="top")
         if not equals:

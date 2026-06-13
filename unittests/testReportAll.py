@@ -11,7 +11,7 @@ import sys
 sys.path.append('../')
 import os
 import unittest
-from unitTestHelpers import equalObjs, runMain, importModule, sortSModelSOutput
+from unitTestHelpers import equalObjs, runMain, importModule, sortSModelSOutput, sortMissingTopologyLists
 
 
 class TestReportAll(unittest.TestCase):
@@ -38,6 +38,11 @@ class TestReportAll(unittest.TestCase):
                         'database version']
         smodelsOutput = sortSModelSOutput ( smodelsOutput )
         smodelsOutputDefault = sortSModelSOutput ( smodelsOutputDefault )
+
+
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.03,
                            ignore=ignoreFields, fname=outputfile,
                            fname2="default_reportAll.py")
