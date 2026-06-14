@@ -11,7 +11,6 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.base.crossSection import XSection,XSectionInfo,XSectionList
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
