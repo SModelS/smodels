@@ -445,9 +445,10 @@ class Model(object):
         #  Set particle decays
         self.setDecays(decaysDict, promptWidth, stableWidth, ignorePromptQNumbers)
 
-        #  Reset particle equality from all particles:
-        for p in Particle.getinstances():
-            p._comp = {p._id: 0}
-            if isinstance(p, MultiParticle):
-                for ptc in p.particles:
-                    p._comp[ptc._id] = 0
+        #  Reset all particle equalities through all particle classes:
+        for ptc in Particle.getinstances():
+            ptc._comp = {ptc._id : 0}
+        for pcls in Particle.__subclasses__():
+            for ptc in pcls.getinstances():
+                ptc._comp = {ptc._id : 0}
+        

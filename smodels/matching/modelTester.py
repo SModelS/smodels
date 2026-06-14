@@ -411,23 +411,6 @@ def testPoints(fileList, inDir, outputDir, parser, database,
                 if ctr % nsteps == 10:
                     t=(time.time()-t0)/60.
                     logger.info ( f"{ctr} of {len(children)} processes done in {t:.2f} min" )
-            """
-            iprint, nprint = 5, 5  # Define when to start printing and the percentage step
-            # Check process progress until they are all finished
-            while True:
-                done = sum([p.ready() for p in children])
-                fracDone = 100*float(done)/len(children)
-                if fracDone >= iprint:
-                    while fracDone >= iprint:
-                        iprint += nprint
-                    logger.info('%i%% of processes done in %1.2f min' %
-                                (iprint-nprint, (time.time()-t0)/60.))
-                if done == len(children):
-                    break
-                time.sleep(2)
-
-            logger.debug("All children terminated")
-            """
 
         # Collect output to build global summary:
         scanSummaryFile = os.path.join(outputDir, 'summary.txt')
