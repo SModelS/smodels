@@ -15,13 +15,12 @@ from typing import Optional
 from spey import ExpectationType, get_backend
 from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-import spey
 # spey.set_optimiser( "iminuit" )
 
-try:
-    from spey.system.exceptions import AsimovTestStatZero
-except ImportError: # comes only with newer versions of spey
-    AsimovTestStatZero = Exception # a dummy so we can still try
+#try:
+#    from spey.system.exceptions import AsimovTestStatZero
+#except ImportError: # comes only with newer versions of spey
+#    AsimovTestStatZero = Exception # a dummy so we can still try
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -111,6 +110,7 @@ class SpeyModelFacade:
 class SpeyRetriever:
     """ simple class that retrieves and constructs the sub computers
     using the Spey interface."""
+    import spey
 
     @classmethod
     def forMultiBinSL(cls, srSet: str, dataset : CombinedDataSet, nsigDict : dict,
