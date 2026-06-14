@@ -9,7 +9,8 @@
 
 """
 
-import sys, subprocess, os
+import sys
+import os
 sys.path.insert(0,"../")
 from smodels.base.smodelsLogging import colors
 from typing import Optional
@@ -21,7 +22,7 @@ if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):
 if v[0]==2 and v[1] < 7 and v[1] > 3:
     try:
         import unittest2 as unittest
-    except ImportError as e:
+    except ImportError:
         print ( f"Error: python v{sys.version} needs unittest2. Please install." )
         sys.exit()
 from smodels.base.smodelsLogging import setLogLevel
@@ -44,8 +45,8 @@ def run(filter : Optional[str] = None, testNotebooks : bool = False,
     checkPythonRequirements( allow_violations = allow_python_req_violations )
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
-        tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
-        tests._tests = [t for t in tests._tests[:] if not 'recipes' in str(t).lower()]
+        tests._tests = [t for t in tests._tests[:] if 'notebook' not in str(t).lower()]
+        tests._tests = [t for t in tests._tests[:] if 'recipes' not in str(t).lower()]
     if reduced:
         tests._tests = [t for t in tests._tests[:] if isInReducedSet(t) ]
     if filter is not None:
@@ -60,8 +61,8 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
     alltests = unittest.TestLoader().discover("./")
 
     if not testNotebooks:
-        alltests._tests = [t for t in alltests._tests[:] if not 'notebook' in str(t).lower()]
-        alltests._tests = [t for t in alltests._tests[:] if not 'recipes' in str(t).lower()]
+        alltests._tests = [t for t in alltests._tests[:] if 'notebook' not in str(t).lower()]
+        alltests._tests = [t for t in alltests._tests[:] if 'recipes' not in str(t).lower()]
     if reduced:
         alltests._tests = [t for t in alltests._tests[:] if isInReducedSet(t) ]
 
@@ -77,7 +78,7 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
                 n_test += 1 
                 # if n_test < 190: # we can speed things up here
                 #    continue
-                if filter and (not filter in str(t)):
+                if filter and (filter not in str(t)):
                     continue
                 n_tests += 1
                 print ( f"[#{int(n_tests):3}] {t.id()} ... ", end="" )
@@ -104,7 +105,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
         return
     try:
         from concurrencytest import ConcurrentTestSuite, fork_for_tests
-    except ImportError as e:
+    except ImportError:
         print ( "Need to install the module concurrencytest." )
         print ( "pip install concurrencytest" )
         return
@@ -113,7 +114,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
     alltests = unittest.TestLoader().discover("./")
 
     if not testNotebooks:
-        alltests._tests = [t for t in alltests._tests[:] if not 'notebook' in str(t).lower()]
+        alltests._tests = [t for t in alltests._tests[:] if 'notebook' not in str(t).lower()]
     if reduced:
         alltests._tests = [t for t in alltests._tests[:] if isInReducedSet(t) ]
 
