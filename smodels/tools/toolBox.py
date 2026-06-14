@@ -133,7 +133,7 @@ class ToolBox(object):
         Gets instance of tool from the toolbox.
         
         """
-        if not tool in self.tools:
+        if tool not in self.tools:
             if verbose:
                 logger.error(f"Asking for non-existent tool ``{tool}''")
             return None

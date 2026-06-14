@@ -16,11 +16,9 @@ sys.path.append(current)
 
 
 from smodels import installation
-from smodels.base.physicsUnits import pb, TeV, GeV
+from smodels.base.physicsUnits import pb, TeV
 from smodels.base import crossSection
-from smodels.base.crossSection import LO, NLO, NLL
 from smodels.base.smodelsLogging import logger, setLogLevel
-from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 import subprocess
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
@@ -587,7 +585,7 @@ class XSecResummino(XSecBase):
                     with tarfile.open(f"{pdf_lo}.tar.gz", "r:gz") as tar:
                         tar.extractall(path=lhapdf_folder)
 
-                except requests.exceptions.HTTPError as e:
+                except requests.exceptions.HTTPError:
                     logger.error("pdf name is wrong for LO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
                     raise RuntimeError(f"Failed during HTTP request for {pdf_lo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check. You may also check if resummino is installed.")
                 finally:
@@ -608,7 +606,7 @@ class XSecResummino(XSecBase):
                     with tarfile.open(f"{pdf_nlo}.tar.gz", "r:gz") as tar:
                         tar.extractall(path=lhapdf_folder)
 
-                except requests.exceptions.HTTPError as e:
+                except requests.exceptions.HTTPError:
                     logger.error("pdf name is wrong for NLO, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check")
                     raise RuntimeError(f"Failed during HTTP request for {pdf_nlo}, see http://lhapdfsets.web.cern.ch/lhapdfsets/current to check.")
                 finally:
@@ -636,10 +634,10 @@ class XSecResummino(XSecBase):
                     line = f"slha = {slha_file}\n"
                 if self.sqrt == '8.0':
                     if line.startswith("center_of_mass_energy ="):
-                        line = f"center_of_mass_energy = 8000"
+                        line = "center_of_mass_energy = 8000"
                 if self.sqrt == '13.6':
                     if line.startswith("center_of_mass_energy ="):
-                        line = f"center_of_mass_energy = 13600"
+                        line = "center_of_mass_energy = 13600"
                 f.write(line)
 
 
@@ -807,7 +805,7 @@ def main ( args : argparse.Namespace ):
     if ncpus == 1:
         scpu = "cpu"
     logger.info(f"we are currently running on {ncpus} {scpu}" )
-    logger.debug(f"In this calculation, we'll write out the cross section at "+ str(type_writing) +" order of perturbation theory below "+ orders_dic[order])
+    logger.debug("In this calculation, we'll write out the cross section at "+ str(type_writing) +" order of perturbation theory below "+ orders_dic[order])
     
     for sqrt in sqrtses:
         logger.debug('Current energy considered is '+ str(sqrt)+ ' TeV')

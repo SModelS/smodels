@@ -12,12 +12,13 @@ from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
 from smodels.base.smodelsLogging import logger, setLogLevel
-from smodels.base.physicsUnits import fb, pb, TeV, mb
 from smodels.base.crossSection import XSectionList, getXsecFromLHEFile
 from smodels import installation
-from smodels.tools.pythia8particles import particles
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import os, sys, io, shutil
+import os
+import sys
+import io
+import shutil
 from typing import Union
 
 try:
@@ -208,7 +209,7 @@ class Pythia8Wrapper(WrapperBase):
         lhedata = lheF.read()
         lheF.close()
         os.remove(lhefile)
-        if not "<LesHouchesEvents" in lhedata:
+        if "<LesHouchesEvents" not in lhedata:
             raise SModelSError("No LHE events found in pythia output")
         if not unlink:
             tempfile = self.tempDirectory() + "/log"

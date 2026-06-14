@@ -19,15 +19,14 @@ try:
     warnings.filterwarnings("ignore", message="numpy.dtype size changed")
     import plotly.graph_objs as go
     import plotly
-except ImportError as e:
+except ImportError:
     logger.error ( "could not import plotly. Please try to install it, e.g. via:\npip install --user plotly" )
     sys.exit()
 try:
     import pandas as pd
-except ImportError as e:
+except ImportError:
     logger.error ( "could not import pandas. Please try to install it, e.g. via:\npip install --user pandas" )
     sys.exit()
-import os
 import pyslha
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 
@@ -78,7 +77,7 @@ def getEntry(inputDict,*keys):
         return inputDict
 
     key = keys.pop(0)
-    if not key in inputDict:
+    if key not in inputDict:
         logger.debug(f'Key {key} not found in input dictionary')
         return False
     else:
@@ -212,7 +211,7 @@ class Filler:
         #    self.data_dict['chi2'].append(chi_2)
         if 'Analysis' in self.data_dict.keys():
             self.data_dict['Analysis'].append(analysis_id)
-        return self.data_dict;
+        return self.data_dict
 
 
     def getTotalMissingXsec(self):
@@ -639,19 +638,19 @@ class PlotlyBackend:
         if 'file' in self.SModelS_hover_information:
             data_frame_provisional.loc[data_frame_provisional['file'] =='False', 'file'] = 'Not-available'
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+'file'+': '+data_frame_provisional['file']+'<br>'
-        return self.data_frame_all;
+        return self.data_frame_all
 
     def DataFrameExcludedNonexcluded(self):
         """ Generate sub data frames for excluded and non-excluded points """
         self.data_frame_excluded=self.data_frame_all.loc[self.data_frame_all['SModelS_status']=='Excluded']
         self.data_frame_nonexcluded=self.data_frame_all.loc[self.data_frame_all['SModelS_status']=='Non-excluded']
-        return self.data_frame_excluded, self.data_frame_nonexcluded;
+        return self.data_frame_excluded, self.data_frame_nonexcluded
 
     def GetXyAxis(self):
         """ Retrieves the names of the x and y axis variables. """
         self.x_axis=list(self.variable_x.keys())[0]
         self.y_axis=list(self.variable_y.keys())[0]
-        return self.x_axis,self.y_axis;
+        return self.x_axis,self.y_axis
 
 
     def SeparateContDiscPlots(self):
@@ -664,7 +663,7 @@ class PlotlyBackend:
                 self.disc_plots.append(plot)
             else:
                 self.cont_plots.append(plot)
-        return self.cont_plots, self.disc_plots;
+        return self.cont_plots, self.disc_plots
 
     def plotDescription(self):
         ''' Generate a description for each plot.'''
@@ -679,7 +678,7 @@ class PlotlyBackend:
               'MT_prompt_xsec':'Extracts the total cross section from missing prompt topologies',
               'MT_displaced_xsec':'Extracts the total cross section from missing displaced topologies',
               'MT_outgrid_xsec':'Missing cross section outside the mass grids of the experimental results.'}
-        return self.plot_descriptions;
+        return self.plot_descriptions
 
 #####continuous plots##############
     def makeContinuousPlots(self,data_frame,data_selection):
@@ -797,7 +796,7 @@ class PlotlyBackend:
 
                 fig = go.Figure(data=data, layout=layout)
                 plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_'+data_selection+'.html', auto_open=False)
-            return;
+            return
 
     #########Discrete_plots############
     def makeDiscretePlots(self,data_frame,data_selection):
@@ -891,7 +890,7 @@ class PlotlyBackend:
 
 
             plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_'+data_selection+'.html', auto_open=False)
-        return;
+        return
 
     def createIndexHtml(self):
         """

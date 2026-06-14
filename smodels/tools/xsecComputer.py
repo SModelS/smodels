@@ -9,14 +9,14 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-import os, copy
+import os
+import copy
 os.environ["OMP_NUM_THREADS"] = "1"
 from typing import Optional
 
-from smodels import installation
 from smodels.tools import toolBox
-from smodels.base.physicsUnits import pb, TeV, GeV, UnitEnergy
-from smodels.base import crossSection, runtime
+from smodels.base.physicsUnits import pb, TeV, UnitEnergy
+from smodels.base import crossSection
 from smodels.base.crossSection import LO, NLO, NLL, XSectionList
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError \
@@ -25,7 +25,7 @@ from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
 import pyslha
 try:
     import cStringIO as io
-except ImportError as e:
+except ImportError:
     import io
 import sys
 
@@ -151,7 +151,7 @@ class XSecComputer(XSecBase):
         jokerpids = []
         for spid in spids:
             if type(spid)==int:
-                if not spid in stpids:
+                if spid not in stpids:
                     return False
                 else:
                     stpids.remove(spid)
@@ -376,7 +376,7 @@ class XSecComputer(XSecBase):
                     logger.error ( "Different signal strength multipliers have alread been applied!!!" )
                     rewrite.append ( line+" ERROR inconsistent!" )
             else:
-                if not "produced at step" in line:
+                if "produced at step" not in line:
                     rewrite.append ( line )
         outfile = open(slhaFile, 'w')
         for line in rewrite:

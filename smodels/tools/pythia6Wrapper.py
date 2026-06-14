@@ -17,7 +17,9 @@ from smodels.base import crossSection
 from smodels.base.crossSection import LO
 from smodels import installation
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import os, sys, io
+import os
+import sys
+import io
 
 try:
     import commands as executor
@@ -147,7 +149,7 @@ class Pythia6Wrapper(WrapperBase):
         f.close()
         f = open(self.tempdir + "/temp.cfg", "w")
         for line in lines:  # # copy all but lines with "param"
-            if not param in line:
+            if param not in line:
                 f.write(line)
         f.write(f"{param}={str(value)}\n")
         f.close()
@@ -196,7 +198,7 @@ class Pythia6Wrapper(WrapperBase):
         self.replaceInCfgFile({"NEVENTS": self.nevents, "SQRTS":1000 * self.sqrts})
         self.setParameter("MSTP(163)", "6")
         lhedata = self._run(slhafile, unlink=unlink )
-        if not "<LesHouchesEvents" in lhedata:
+        if "<LesHouchesEvents" not in lhedata:
             pythiadir = f"{self.tempDirectory()}/log"
             logger.error( f"No LHE events found in pythia output {pythiadir}" )
             if not os.path.exists ( pythiadir ):

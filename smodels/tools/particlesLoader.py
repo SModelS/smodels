@@ -93,7 +93,7 @@ def getParticlesFromSLHA(slhaData):
         qnumberBlocks[-1].append(l)
 
     if not qnumberBlocks:
-        logger.error(f"No QNUMBERS blocks were found")
+        logger.error("No QNUMBERS blocks were found")
         raise SModelSError()
 
     #Build list of BSM particles:
@@ -123,7 +123,7 @@ def getParticlesFromSLHA(slhaData):
         except:
             logger.error(f"Error reading quantum numbers from block: \n {b} \n")
             continue
-        if any(not x in numbers for x in [1,2,3]):
+        if any(x not in numbers for x in [1,2,3]):
             logger.error(f"Missing quantum numbers in block:\n {b}\n")
             continue
 

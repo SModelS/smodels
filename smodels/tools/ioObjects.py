@@ -268,7 +268,7 @@ class SlhaStatus(object):
         :returns: True if the decay block is missing or if it is empty, None otherwise
 
         """
-        if not abs(pid) in self.slha.decays: return True  # consider missing decay block as empty
+        if abs(pid) not in self.slha.decays: return True  # consider missing decay block as empty
         if not self.slha.decays[abs(pid)].decays: return True
         return None
 
@@ -288,7 +288,7 @@ class SlhaStatus(object):
         for pid in pids:
             if pid in SMpdgs:
                 continue
-            if not pid in self.slha.decays:
+            if pid not in self.slha.decays:
                 missing.append(pid)
                 st = -1
         if st == 1:
@@ -311,7 +311,7 @@ class SlhaStatus(object):
         badDecay = "Illegal decay for PIDs "
         for particle, block in self.slha.decays.items():
             if particle in SMpdgs : continue
-            if not particle in self.slha.blocks["MASS"].keys(): continue
+            if particle not in self.slha.blocks["MASS"].keys(): continue
             mMom = abs(self.slha.blocks["MASS"][particle])
             for dcy in block.decays:
                 mDau = 0.
@@ -332,7 +332,7 @@ class SlhaStatus(object):
                         return -2, f"Unknown PID {str(ptc)} in decay of {str(particle) + '. Add ' + str(ptc) + ' to smodels/particle.py'}"
                 if mDau > mMom:
                     st = -1
-                    if not str(particle) in badDecay: badDecay += str(particle) + " "
+                    if str(particle) not in badDecay: badDecay += str(particle) + " "
         if st == 1:
             badDecay = "No illegal decay blocks"
 

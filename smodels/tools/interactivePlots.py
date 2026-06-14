@@ -12,7 +12,8 @@ from __future__ import print_function
 
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import os,glob
+import os
+import glob
 import importlib.util
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
@@ -348,7 +349,7 @@ class Plotter(object):
                 
                     try:
                         tar.extractall(path,filter="data") # , members, numeric_owner
-                    except TypeError as e: ## perhaps an older version of tarfile
+                    except TypeError: ## perhaps an older version of tarfile
                         tar.extractall(path) # , members, numeric_owner
                     
                 
@@ -383,7 +384,7 @@ class Plotter(object):
                 
                     try:
                         tar.extractall(path,filter="data") # , members, numeric_owner
-                    except TypeError as e:
+                    except TypeError:
                         ## for older versions of tarfile
                         tar.extractall(path) # , members, numeric_owner
                     
@@ -430,7 +431,7 @@ class Plotter(object):
         """ display the pages, works in jupyter notebooks only """
         try:
             from IPython.display import display,HTML
-        except Exception as e:
+        except Exception:
             from IPython.core.display import display,HTML
         mainFile = open( self.outFolder + self.indexfile,'r')
         display(HTML(mainFile.read()))

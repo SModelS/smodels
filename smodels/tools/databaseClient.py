@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-import socket, sys, time, random, multiprocessing, random, os
-from smodels.base.physicsUnits import fb, pb
+import socket
+import sys
+import time
+import multiprocessing
+import random
+import os
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
@@ -121,7 +125,7 @@ class DatabaseClient:
                     self.log ( f'received "{data}"' )
                     return data
 
-                except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+                except (ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError):
                     dt = self.getWaitingTime()
                     self.ntries += 1
                     self.log ( f'could not connect to {self.nameAndPort()}. trying again in {dt} seconds' )
@@ -194,7 +198,7 @@ class DatabaseClient:
             try:
                 self.sock.connect( self.server_address )
                 return
-            except (socket.timeout,OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError) as e:
+            except (socket.timeout,OSError,ConnectionRefusedError,ConnectionResetError,BrokenPipeError,ConnectionAbortedError):
                 dt = self.getWaitingTime()
                 self.ntries += 1
                 self.log ( f'could not connect to {self.nameAndPort()} after {self.ntries} times. trying again in {dt} seconds' )
