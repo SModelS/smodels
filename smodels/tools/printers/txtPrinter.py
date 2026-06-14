@@ -12,11 +12,10 @@ from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPredict
 from smodels.experiment.databaseObj import Database
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.physicsUnits import TeV
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed
 import numpy as np
-from itertools import groupby
 import time
 
 class TxTPrinter(BasicPrinter):
@@ -204,7 +203,7 @@ class TxTPrinter(BasicPrinter):
             output += "\t\t SMS ID: %i\n" %obj.smsID
             output += f"\t\t SMS: {str(obj)}\n"
             output += "\t\t Masses: %s\n" %str([(node,mass) for node,mass in zip(obj.nodes,obj.mass)
-                                                if not node.isSM and not node is obj.root])
+                                                if not node.isSM and node is not obj.root])
             output += "\t\t Cross-Sections:\n \t\t "+obj.weightList.niceStr().replace("\n", "\n \t\t ")
 
         return output

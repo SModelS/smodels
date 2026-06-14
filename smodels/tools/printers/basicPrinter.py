@@ -8,7 +8,7 @@
 import sys
 import os
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import apriori, aposteriori
 import numpy as np
 import time
 

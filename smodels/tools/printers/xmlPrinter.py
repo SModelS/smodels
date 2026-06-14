@@ -13,10 +13,8 @@ from smodels.decomposition.topologyDict import TopologyDict
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.pythonPrinter import PyPrinter
-from collections import OrderedDict
 from xml.dom import minidom
 from xml.etree import ElementTree
 

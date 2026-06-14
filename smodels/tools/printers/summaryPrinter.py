@@ -152,7 +152,7 @@ class SummaryPrinter(TxTPrinter):
                 else:
                     output += f" Likelihoods: nll, nll_min, nll_SM = {nll}, {nllmin}, {nllsm}\n"
 
-            if not (theoPred is obj[-1]):
+            if theoPred is not obj[-1]:
                 output += 80 * "-" + "\n"
 
         output += "\n \n"
@@ -204,11 +204,11 @@ class SummaryPrinter(TxTPrinter):
         if r is not None:
             output += f"combined r-value: {r:10.3E}\n"
         else:
-            output += f"combined r-value: NaN (failed to compute r-value)\n"
+            output += "combined r-value: NaN (failed to compute r-value)\n"
         if r_expected is not None:
             output += f"combined r-value (expected): {r_expected:10.3E}\n"
         else:
-            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
+            output += "combined r-value (expected): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

@@ -17,7 +17,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed
 from collections import OrderedDict
 import unum
 import time
