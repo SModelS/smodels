@@ -21,8 +21,28 @@ class TopologyDict(OrderedDict):
     def __init__(self):
 
         self.__dict__ = {}
-        self._keysDict = {}
-        
+
+    def numberOfSMS(self, canonName=None):
+        """
+        Return the number of SMS in the dict. 
+        If canonName is not None, return the number of SMS with the corresponding canonName.
+
+        :param canonName: if None, return the total number of SMS, otherwise return only the number of SMS with the corresponding canonical name.
+
+        :return: Number of SMS in the dict.
+        """
+
+        if canonName is not None:
+            if canonName not in self:
+                return 0
+            else:
+                return len(self[canonName])
+        else:
+            nSMS = 0
+            for smsList in self.values():
+                nSMS += len(smsList)
+            return nSMS
+
     def addSMS(self, newSMS):
 
         if isinstance(newSMS, TheorySMS):

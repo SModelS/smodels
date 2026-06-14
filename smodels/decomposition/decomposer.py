@@ -8,7 +8,6 @@
 
 """
 
-import itertools
 import time
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 from smodels.decomposition.theorySMS import TheorySMS
@@ -22,6 +21,8 @@ from itertools import product
 from collections import namedtuple
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.physicsUnits import UnitXSec,UnitEnergy
+
+maxSMSsize_warning = 50000
 
 
 # Auxiliary tuples for a lightweight representation of decays, subtrees and cross-sections during the decomposition process.
@@ -282,10 +283,11 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
     particleOrderDict[hash(pv)] = -1  # Set PV as the first particle in the ordering to ensure it appears as root in the trees.
     particleDict[hash(pv)] = pv  # Add PV to particleDict to ensure it can be accessed when building the trees.
     pv_id = hash(pv)
-    cache = {}
+    cache = {}  # Cache for storing the subtrees for each particle ID to avoid redundant calculations. Keyed by particle ID, values are lists of subtreeTuples.
     nCascadeTrees = 0
     # Make a copy of the decay dict to avoid modifying the original one during subtree cache building with different minBR values for different production channels.
     decaysDict_tmp = dict(decaysDict.items())
+    sizeWarningLogged = False  # To log the warning about large number of topologies
     for xsecTuple in sorted(xsecTupleList, key=lambda x: x.maxWeight, reverse=True):
 
         weight = xsecTuple.maxWeight
@@ -318,11 +320,25 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
             smsTopDict.addSMS(smsDecayed)
             nCascadeTrees += 1
 
+        # Warn user about large memory usage
+        if not sizeWarningLogged:
+            if smsTopDict.numberOfSMS() > maxSMSsize_warning:
+                logger.warning(f"A large number of topologies is being generated and can result in large memory usage."
+                               f" To reduce the number of topologies try increasing the sigmacut parameter.")
+                sizeWarningLogged = True
+
     logger.debug(f"{nCascadeTrees} cascade topologies trees generated and added to TopoDict in {time.time() - t1:.2f} s.")
     t1 = time.time()
     
     if massCompress or invisibleCompress:
         smsTopDict.compress(massCompress, invisibleCompress, minmassgap, minmassgapISR)
+
+    # Warn user about large memory usage
+    if not sizeWarningLogged:
+        if smsTopDict.numberOfSMS() > maxSMSsize_warning:
+            logger.warning(f"A large number of topologies is being generated and can result in large memory usage."
+                            f" To reduce the number of topologies try increasing the sigmacut parameter.")
+            sizeWarningLogged = True
     
     logger.debug(f"Compression done in {time.time() - t1:.2f} s.")
     t1 = time.time()
