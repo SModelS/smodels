@@ -152,7 +152,7 @@ class CoverageTest(unittest.TestCase):
         smsA.label = 'A0'
         smsA.testedBy = ['prompt','displaced']
         smsA.coveredBy = ['prompt','displaced']
-        smsA.ancestors = [smsA]
+        smsA._ancestors = [smsA]
 
         # Daughters:
         smsA1 = fromString('(PV > p1,p1)',prodXSec=xsecA,
@@ -160,21 +160,21 @@ class CoverageTest(unittest.TestCase):
         smsA1.label = 'A1'
         smsA1.testedBy = []
         smsA1.coveredBy = []
-        smsA1.ancestors = [smsA1,smsA]
+        smsA1._ancestors = [smsA1,smsA]
 
         smsB1 = fromString('(PV > p2(1),p1), (p2(1)>p1)',prodXSec=xsecA,
                           maxWeight=xsecA.getMaxXsec(),model=model)
         smsB1.label = 'B1'
         smsB1.testedBy = []
         smsB1.coveredBy = []
-        smsB1.ancestors = [smsB1,smsA]
+        smsB1._ancestors = [smsB1,smsA]
 
         smsA2 = fromString('(PV > p1,p1)',prodXSec=xsecA,
                           maxWeight=xsecA.getMaxXsec(),model=model)
         smsA2.label = 'A2'
         smsA2.testedBy = []
         smsA2.coveredBy = []
-        smsA2.ancestors = [smsA2,smsA1]
+        smsA2._ancestors = [smsA2,smsA1]
 
         # SMS family-tree: a0->a1+b1
         # Mother B
@@ -185,21 +185,21 @@ class CoverageTest(unittest.TestCase):
         smsa.label = 'a0'
         smsa.testedBy = []
         smsa.coveredBy = []
-        smsa.ancestors = [smsa]
+        smsa._ancestors = [smsa]
         #Daughters:
         smsa1 = fromString('(PV > p1,p2(1)), (p2(1)>p1)',prodXSec=xsecB,
                           maxWeight=xsecB.getMaxXsec(),model=model)
         smsa1.label = 'a1'
         smsa1.testedBy = []
         smsa1.coveredBy = []
-        smsa1.ancestors = [smsa1,smsa]
+        smsa1._ancestors = [smsa1,smsa]
 
         smsb1 = fromString('(PV > p1,p2(1)), (p2(1)>p1)',prodXSec=xsecB,
                           maxWeight=xsecB.getMaxXsec(),model=model)
         smsb1.label = 'b1'
         smsb1.testedBy = []
         smsb1.coveredBy = []
-        smsb1.ancestors = [smsb1,smsa]
+        smsb1._ancestors = [smsb1,smsa]
 
 
         # Merged element = (A2+b1)
@@ -208,7 +208,7 @@ class CoverageTest(unittest.TestCase):
         smsCombined.label = 'A2+b1'
         smsCombined.testedBy = []
         smsCombined.coveredBy = []
-        smsCombined.ancestors = [smsCombined,smsA2,smsb1]
+        smsCombined._ancestors = [smsCombined,smsA2,smsb1]
 
 
         smsList = [smsA,smsA1,smsA2,smsB1,smsa,smsb1,smsa1,smsCombined]

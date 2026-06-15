@@ -316,7 +316,7 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
             smsDecayed.maxWeight = xsecTuple.maxWeight*tree.decayBRs
             smsDecayed.prodXSec = xsecTuple.xsecList
             smsDecayed.weightList = smsDecayed.prodXSec*smsDecayed.decayBRs            
-            smsDecayed.ancestors = [smsDecayed]  # Set ancestors (before compression)
+            smsDecayed._ancestors = [smsDecayed]  # Set ancestors (before compression)
             smsTopDict.addSMS(smsDecayed)
             nCascadeTrees += 1
 
@@ -347,6 +347,7 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
     smsTopDict.sort()
     # Set the SMS IDs
     smsTopDict.setSMSIds()
+    smsTopDict.setSMSAncestors()
 
 
     logger.info(f"Decomposition done in {time.time() - t0:.2f} s.")

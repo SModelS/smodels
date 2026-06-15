@@ -145,6 +145,19 @@ class TopologyDict(OrderedDict):
             sms.smsID = smsID
             smsID += 1
 
+    def setSMSAncestors(self):
+        """
+        Set the list of ancestors for each SMS in the Topology list
+        keeping only the SMS which belongs to self (remove intermediate ancestors).
+        """
+
+        keepIDs = set([sms.smsID for sms in self.getSMSList()])
+        for sms in self.getSMSList():
+            sms.setAncestors(keepIDs)
+        for sms in self.getSMSList():
+            sms._ancestors = None # Clear ancestors to save memory
+
+
     def getTotalWeight(self, canonName=None):
         """
         Compute the summed cross-section over all the SMS.

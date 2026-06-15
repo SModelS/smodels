@@ -94,7 +94,6 @@ class DecomposerTest(unittest.TestCase):
                             ignorePromptQNumbers=['spin','eCharge','colordim']) #Force charginos/neutralinos to be considered as prompt
 
 
-        tested = False
         topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=False, invisibleCompress=False, 
                                      minmassgap=5.*GeV, minmassgapISR=5.*GeV )
         toposExpected = {'[][1]' : 1,'[][2]' : 14,'[1][1]' : 1,'[1][2]' : 25,'[2][2]' : 72,
@@ -114,7 +113,7 @@ class DecomposerTest(unittest.TestCase):
             evenParticles = sms.treeToBrackets()[0]
             evenParticles = str(evenParticles).replace("'","").replace(' ', '')
             self.assertEqual(evenParticles,"[[[t+],[t-]],[[q],[W+]]]")
-            self.assertEqual(len(sms.ancestors),1)
+            self.assertEqual(len(sms.getAncestors()),0) # the SMS should have no ancestors, since it did not come from compression
 
         topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=False, invisibleCompress=True, 
                                      minmassgap=5.*GeV, minmassgapISR=5*GeV )
@@ -132,14 +131,14 @@ class DecomposerTest(unittest.TestCase):
             sms = topos[topo][0]
             evenParticles = sms.treeToBrackets()[0]
             evenParticles = str(evenParticles).replace("'","").replace(' ', '')
-            smsMom = sms.ancestors[0]
+            smsMom = sms.getAncestors()[0]
             evenParticles = smsMom.treeToBrackets()[0]
             evenParticles = str(evenParticles).replace("'","").replace(' ', '')
             self.assertEqual(evenParticles,"[[],[[nu,nu]]]")
             bsmLabels = sorted([str(node) for node in sms.nodes if node.isSM is False])
             self.assertEqual(bsmLabels,['N1','inv'])
             ## all neutrinos are considered as equal, so there should be a single mother:
-            self.assertEqual(len(sms.ancestors), 1)
+            self.assertEqual(len(sms.getAncestors()), 1)
 
 
         topos = decomposer.decompose(model, sigmacut=0.1*fb, massCompress=True, invisibleCompress=False, 
@@ -159,9 +158,9 @@ class DecomposerTest(unittest.TestCase):
             evenParticles = sms.treeToBrackets()[0]
             evenParticles = str(evenParticles).replace("'","").replace(' ', '')
             self.assertEqual(evenParticles,"[[[b]],[[b]]]")
-            masses = [node.mass for node in sms.ancestors[0].nodes if node.isSM is False]
+            masses = [node.mass for node in sms.getAncestors()[0].nodes if node.isSM is False]
             dm = abs(masses[2]-masses[4])/GeV
-            self.assertEqual(len(sms.ancestors),24)
+            self.assertEqual(len(sms.getAncestors()),24)
             self.assertTrue(dm < 5.0)
 
 

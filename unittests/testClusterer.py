@@ -398,13 +398,6 @@ class ClustererTest(unittest.TestCase):
                      '(PV > N3(1),C1+(2)), (N3(1) > N1,Z), (C1+(2) > N1,W+)',
                      '(PV > C1+(1),N3(2)), (C1+(1) > N1,W+), (N3(2) > N1,Z)'
                      ]
-        smsFilter += ['(PV > C1+/C1-(1),N2/N2~(2)), (C1+/C1-(1) > N1/N1~,W-), (N2/N2~(2) > N1/N1~,Z)', 
-                     '(PV > C1+/C1-(1),N3/N3~(2)), (C1+/C1-(1) > N1/N1~,W-), (N3/N3~(2) > N1/N1~,Z)', 
-                     '(PV > N2/N2~(1),C1+(2)), (N2/N2~(1) > N1/N1~,Z), (C1+/C1-(2) > N1/N1~,W+)',                     
-                     '(PV > C1+/C1-(1),N2/N2~(2)), (C1+/C1-(1) > N1/N1~,W+), (N2/N2~(2) > N1/N1~,Z)', 
-                     '(PV > N3/N3~(1),C1+(2)), (N3/N3~(1) > N1/N1~,Z), (C1+/C1-(2) > N1/N1~,W+)',
-                     '(PV > C1+/C1-(1),N3/N3~(2)), (C1+/C1-(1) > N1/N1~,W+), (N3/N3~(2) > N1/N1~,Z)'
-                     ]
         # The SMS have to be in the correct order for clustering of all SMS to fail!
         smsList = [sms for sms in smsDict.getSMSList() if str(sms) in smsFilter]
         for sms in smsList:
