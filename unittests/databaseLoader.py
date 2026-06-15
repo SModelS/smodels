@@ -17,8 +17,8 @@ from smodels.experiment.databaseObj import Database
 # dbpath = "../../smodels-database"
 dbpath = "unittest"
 
-# dbextra = "unittestextra"
-dbpathextra = "./database_extra"
+dbpathextra = "unittestextra"
+# dbpathextra = "./database_extra"
 
 database = Database( dbpath)
 
