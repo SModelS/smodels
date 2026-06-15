@@ -370,7 +370,6 @@ class PyhfTest(unittest.TestCase):
 
         """
         from smodels.base.physicsUnits import GeV
-        from smodels.experiment.databaseObj import Database
         from smodels.base import runtime
         from smodels.tools.particlesLoader import load
         from smodels.base.model import Model
@@ -378,7 +377,7 @@ class PyhfTest(unittest.TestCase):
         import os
         from smodels.decomposition import decomposer
         from smodels.matching.theoryPrediction import _getDataSetPredictions, \
-            _getCombinedResultFor, TheoryPredictionList
+            _getCombinedResultFor
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         from databaseLoader import database
@@ -420,7 +419,7 @@ class PyhfTest(unittest.TestCase):
 
         equals = patch == patch_ref
         if not equals:
-            logger.error ( f"patch_2018-16.json != debug.json" )
+            logger.error ( "patch_2018-16.json != debug.json" )
             with open('debug.json','w') as f:
                 json.dump(patch,f,indent=4)
             

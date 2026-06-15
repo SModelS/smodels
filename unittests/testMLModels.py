@@ -12,7 +12,6 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.statistics.nnAdapter import NNAdapter
-from smodels.base.smodelsLogging import logger
 import warnings
 
 class MLModelsTest(unittest.TestCase):
@@ -50,7 +49,6 @@ class MLModelsTest(unittest.TestCase):
             self.assertAlmostEqual ( ret[name], value )
 
     def testRunMLModels(self):
-        import warnings
 
         warnings.filterwarnings(
             "ignore",
@@ -68,7 +66,7 @@ class MLModelsTest(unittest.TestCase):
         import os
         from smodels.share.models.SMparticles import SMList
         from smodels.matching.theoryPrediction import theoryPredictionsFor
-        from smodels.statistics.basicStats import observed, apriori, aposteriori
+        from smodels.statistics.basicStats import apriori, aposteriori
         db = Database ( "./mlmodels_db/" ) ## a small database with mlmodels
         db.getExpResults()
         slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')

@@ -12,7 +12,6 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from databaseLoader import database
-from smodels.experiment.databaseObj import Database
 
 class ExpSMSDictTest(unittest.TestCase):
 

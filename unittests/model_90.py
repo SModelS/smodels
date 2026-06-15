@@ -1,4 +1,3 @@
-import numpy as np
 import array
 name = 'Generated Model' 
 nbins = 90

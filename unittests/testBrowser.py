@@ -8,7 +8,7 @@
  
 """
  
-import sys,os,shutil
+import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.base.physicsUnits import GeV, fb, pb

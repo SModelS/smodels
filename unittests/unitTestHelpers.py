@@ -377,7 +377,6 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         level = 'fatal'
         to = os.devnull
     database = None
-    from smodels.base import runtime
     if overridedatabase is not None:
         database = overridedatabase
     else:
@@ -648,7 +647,7 @@ class Summary():
                         r = float("nan")
                     else:
                         r = eval( rl )
-                except SyntaxError as e:
+                except SyntaxError:
                     print ( f"[unitTestOutput] couldnt parse '{rl}'" )
                 self.rComb = r
 

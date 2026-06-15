@@ -13,10 +13,7 @@ import unittest
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
-from collections import OrderedDict
-from smodels.base.physicsUnits import fb, GeV, TeV
-from smodels.share.models import SMparticles
-from smodels.experiment.defaultFinalStates import finalStates
+from smodels.base.physicsUnits import fb
 from unitTestHelpers import theorySMSFromString as fromString
 from smodels.tools.coverage import FinalStateSMS
 from smodels.experiment.defaultFinalStates import lList, tList, MET

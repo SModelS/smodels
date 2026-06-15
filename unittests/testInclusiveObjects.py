@@ -11,7 +11,6 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.experiment.txnameObj import TxName
-from smodels.base.physicsUnits import GeV
 from smodels.experiment import infoObj
 from smodels.base.inclusiveObjects import InclusiveValue, InclusiveList
 from smodels.experiment.defaultFinalStates import finalStates

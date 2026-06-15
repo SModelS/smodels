@@ -12,7 +12,7 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.base.physicsUnits import GeV, fb
+from smodels.base.physicsUnits import fb
 from databaseLoader import database
 import numpy as np
 

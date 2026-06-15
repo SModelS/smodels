@@ -17,9 +17,8 @@ from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 from smodels.decomposition import decomposer
 from smodels.matching.theoryPrediction import theoryPredictionsFor
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import apriori
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
 import numpy as np
 
 import time

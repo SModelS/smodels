@@ -9,14 +9,11 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.coverage import Uncovered
-from smodels.decomposition.theorySMS import TheorySMS
 from smodels.decomposition.topologyDict import TopologyDict
 from smodels.base.physicsUnits import GeV, TeV, fb
 from smodels.base.crossSection import XSectionList, XSection, XSectionInfo
-from smodels.share.models import SMparticles, mssm
 from smodels.experiment.reweighting import reweightFactorFor
 from smodels.base.particle import Particle
-from smodels.base.particleNode import ParticleNode
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
@@ -43,8 +40,8 @@ gluino.totalwidth = 1.*10**(-30)*GeV
 ##Element filters for each group:
 ##(it should be a function which takes an Element object as input
 ##and returns True if the element belongs to the group and False otherwise)
-filters = {'missing (prompt)': lambda sms: not ('prompt' in sms.coveredBy),
-                  'missing (displaced)': lambda sms: not ('displaced' in sms.coveredBy),
+filters = {'missing (prompt)': lambda sms: 'prompt' not in sms.coveredBy,
+                  'missing (displaced)': lambda sms: 'displaced' not in sms.coveredBy,
                   # 'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3,
                   'missing (all)': lambda sms: (not sms.coveredBy),
                   'outsideGrid (all)': lambda sms: (sms.coveredBy and not sms.testedBy)}

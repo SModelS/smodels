@@ -8,16 +8,14 @@
 
 """
 
-import sys,time
+import sys
 sys.path.append('../')
-from smodels.base.particleNode import InclusiveParticleNode
 from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
-from smodels.base.physicsUnits import fb, GeV
-from smodels.decomposition.theorySMS import TheorySMS
+from smodels.base.physicsUnits import GeV
 from smodels.experiment.expSMS import ExpSMS
 from smodels.base.inclusiveObjects import InclusiveValue
 from unitTestHelpers import theorySMSFromString as fromString

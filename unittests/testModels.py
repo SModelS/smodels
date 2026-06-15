@@ -9,7 +9,8 @@
 
 """
 
-import sys,os
+import sys
+import os
 sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
