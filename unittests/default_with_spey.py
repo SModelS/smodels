@@ -212,6 +212,28 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.003947952,
+        'upper limit (fb)' : 0.4605506,
+        'expected upper limit (fb)' : 0.7914102,
+        'TxNames' : ['T1tttt'],
+        'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
+        'AnalysisID' : 'CMS-SUS-16-050-agg',
+        'DataSetID' : '(combined)',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 35.9,
+        'dataType' : 'combined',
+        'r' : 0.008572244,
+        'r_expected' : 0.004988503,
+        'Width (GeV)' : [
+            [0.0456539663, 'stable'],
+            [0.0456539663, 'stable']
+        ],
+        'nll' : 147.9699,
+        'nll_min' : 147.9585,
+        'nll_SM' : 147.9585
+    },
+    {
+        'maxcond' : 0.0,
         'theory prediction (fb)' : 0.0007318257,
         'upper limit (fb)' : 0.4,
         'expected upper limit (fb)' : 0.35,
@@ -250,28 +272,6 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.003947952,
-        'upper limit (fb)' : 32.47149,
-        'expected upper limit (fb)' : 0.7914109,
-        'TxNames' : ['T1tttt'],
-        'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
-        'AnalysisID' : 'CMS-SUS-16-050-agg',
-        'DataSetID' : '(combined)',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 35.9,
-        'dataType' : 'combined',
-        'r' : 0.0001215821,
-        'r_expected' : 0.004988498,
-        'Width (GeV)' : [
-            [0.0456539663, 'stable'],
-            [0.0456539663, 'stable']
-        ],
-        'nll' : 147.9699,
-        'nll_min' : 147.9563,
-        'nll_SM' : 148.0373
-    },
-    {
-        'maxcond' : 0.0,
         'theory prediction (fb)' : 0.003073679,
         'upper limit (fb)' : 43.074,
         'expected upper limit (fb)' : 55.9236,
@@ -293,11 +293,11 @@ smodelsOutputDefault = {
 'CombinedRes' : [
     {
         'AnalysisID' : 'CMS-SUS-13-012,CMS-SUS-16-050-agg',
-        'r' : 0.1183885,
-        'r_expected' : 0.2081383,
+        'r' : 0.1168307,
+        'r_expected' : 0.2034797,
         'nll' : 151.8762,
-        'nll_min' : 151.572,
-        'nll_SM' : 152.3681,
+        'nll_min' : 151.7009,
+        'nll_SM' : 152.2893,
         'Txnames' : ['T2', 'T1', 'T1tttt']
     }
 ],
