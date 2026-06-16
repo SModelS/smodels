@@ -184,11 +184,10 @@ class SpeyRetriever:
             speyModel = stat_wrapper( data = obsN,
                             background_yields = bg, covariance_matrix = cov,
                             signal_yields = nsig,
-                            xsection = [ x / lumi for x in nsig ],
+            #                xsection = [ x / lumi for x in nsig ],
                             analysis = dataset.globalInfo.id,
             )
             facade = SpeyModelFacade ( speyModel, "SL", covname, xsec )
-            # subComputers.append ( facade )
             return facade
         # SLv2
         try:
@@ -198,7 +197,7 @@ class SpeyRetriever:
         speyModel = stat_wrapper( data = obsN,
                         background_yields = bg, covariance_matrix = cov,
                         signal_yields = nsig,
-                        xsection = [ x / lumi for x in nsig ],
+        #                xsection = [ x / lumi for x in nsig ],
                         third_moment = thirdmomenta,
                         analysis = dataset.globalInfo.id,
         )
