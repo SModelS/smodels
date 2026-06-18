@@ -102,6 +102,7 @@ class SpeyModelFacade:
         # optimiser_arguments = None
         # optimiser_arguments = { "method": "SLSQP" }
         optimiser_arguments = { "method": "L-BFGS-B" }
+        optimiser_arguments.update ( kwargs )
         ret = self.speyModel.poi_upper_limit ( expected = exp,
                expected_pvalue = expected_pvalue,
                optimiser_arguments = optimiser_arguments )
