@@ -96,8 +96,18 @@ class SpeyModelFacade:
         if nSigma != 0:
             expected_pvalue = "1sigma"
 
+        # print ( f"@@speyTools getUL {exp} {expected_pvalue} {kwargs}" )
+        ## optimiser: slsqp is the default, but it exhibits platform-dependent
+        ## behavior, so lets try with L-BFGS-B for now
+        # optimiser_arguments = None
+        # optimiser_arguments = { "method": "SLSQP" }
+        optimiser_arguments = { "method": "L-BFGS-B" }
         ret = self.speyModel.poi_upper_limit ( expected = exp,
-               expected_pvalue = expected_pvalue )
+               expected_pvalue = expected_pvalue,
+               optimiser_arguments = optimiser_arguments )
+        # print ( f" returns {ret}" )
+        #if evaluationType == observed:
+        #    import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
         if nSigma == 0:
             ret = float ( ret )
         elif nSigma == 1:

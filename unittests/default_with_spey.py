@@ -88,10 +88,7 @@ smodelsOutputDefault = {
         'dataType' : 'efficiencyMap',
         'r' : 0.1296154,
         'r_expected' : 0.2078608,
-        'Width (GeV)' : None,
-        'nll' : 3.906258,
-        'nll_min' : 3.573349,
-        'nll_SM' : 4.330763
+        'Width (GeV)' : None
     },
     {
         'maxcond' : 0.0,
@@ -130,28 +127,6 @@ smodelsOutputDefault = {
             [0.00138466665, 'stable'],
             [0.00112364506, 'stable']
         ]
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.004140203,
-        'upper limit (fb)' : 0.04531092,
-        'expected upper limit (fb)' : 0.07675983,
-        'TxNames' : ['T6bbHH'],
-        'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
-        'AnalysisID' : 'ATLAS-SUSY-2018-31',
-        'DataSetID' : '(combined)',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'combined',
-        'r' : 0.0913732,
-        'r_expected' : 0.05393711,
-        'Width (GeV)' : [
-            [13.4903869, 0.00112364506, 'stable'],
-            [13.4903869, 0.00112364506, 'stable']
-        ],
-        'nll' : 48.54424,
-        'nll_min' : 48.38229,
-        'nll_SM' : 48.38229
     },
     {
         'maxcond' : 0.0,
@@ -213,8 +188,8 @@ smodelsOutputDefault = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.003947952,
-        'upper limit (fb)' : 0.4605506,
-        'expected upper limit (fb)' : 0.7914102,
+        'upper limit (fb)' : 0.6423534,
+        'expected upper limit (fb)' : 0.8006946,
         'TxNames' : ['T1tttt'],
         'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
         'AnalysisID' : 'CMS-SUS-16-050-agg',
@@ -222,8 +197,8 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 35.9,
         'dataType' : 'combined',
-        'r' : 0.008572244,
-        'r_expected' : 0.004988503,
+        'r' : 0.006146074,
+        'r_expected' : 0.004930659,
         'Width (GeV)' : [
             [0.0456539663, 'stable'],
             [0.0456539663, 'stable']
@@ -246,10 +221,29 @@ smodelsOutputDefault = {
         'dataType' : 'efficiencyMap',
         'r' : 0.001829564,
         'r_expected' : 0.002090931,
-        'Width (GeV)' : None,
-        'nll' : 3.015969,
-        'nll_min' : 2.989467,
-        'nll_SM' : 3.019043
+        'Width (GeV)' : None
+    },
+    {
+        'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.004140203,
+        'upper limit (fb)' : 4.827492,
+        'expected upper limit (fb)' : 5.244436,
+        'TxNames' : ['T6bbHH'],
+        'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
+        'AnalysisID' : 'ATLAS-SUSY-2018-31',
+        'DataSetID' : '(combined)',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 139.0,
+        'dataType' : 'combined',
+        'r' : 0.0008576303,
+        'r_expected' : 0.0007894469,
+        'Width (GeV)' : [
+            [13.4903869, 0.00112364506, 'stable'],
+            [13.4903869, 0.00112364506, 'stable']
+        ],
+        'nll' : 46.76432,
+        'nll_min' : 46.76432,
+        'nll_SM' : 46.76432
     },
     {
         'maxcond' : 0.0,
@@ -292,13 +286,13 @@ smodelsOutputDefault = {
 ],
 'CombinedRes' : [
     {
-        'AnalysisID' : 'CMS-SUS-13-012,CMS-SUS-16-050-agg',
-        'r' : 0.1168307,
-        'r_expected' : 0.2034797,
-        'nll' : 151.8762,
-        'nll_min' : 151.7009,
-        'nll_SM' : 152.2893,
-        'Txnames' : ['T2', 'T1', 'T1tttt']
+        'AnalysisID' : 'CMS-SUS-16-050-agg',
+        'r' : 0.006146074,
+        'r_expected' : 0.004930659,
+        'nll' : 147.9699,
+        'nll_min' : 147.9585,
+        'nll_SM' : 147.9585,
+        'Txnames' : ['T1tttt']
     }
 ],
 'Total xsec for missing topologies (fb)' : 3067.167,
