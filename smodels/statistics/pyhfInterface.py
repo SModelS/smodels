@@ -652,7 +652,7 @@ class PyhfUpperLimitComputer:
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def nll ( self, mu : float = 1.0,
             evaluationType : NllEvalType=observed,
-            asimov : Union[None,float] = None ):
+            asimov : Optional[float] = None ) -> Optional[float]:
         """
         Returns the value of the likelihood. \
         Inspired by the 'pyhf.infer.mle' module but for non-log likelihood
@@ -675,16 +675,25 @@ class PyhfUpperLimitComputer:
                 self.__init__(self.data, self.cl, self.lumi)
                 model,data,workspace = self.generateAsimovData ( asimov,
                        evaluationType = evaluationType )
-
+            except (pyhf.exceptions.FailedMinimization, ValueError) as e:
+                logger.info(f"asimov data generation failed: {e}" )
+                return None
+            try:
                 _, nllh2 = pyhf.infer.mle.fixed_poi_fit(
                     1.0, data, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
                 logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{self.data.jsonFile} for mu={mu:.3f}: {e}")
                 # lets try with different initialisation
-                init, n_ = pyhf.infer.mle.fixed_poi_fit(
-                    0.0, data, model, return_fitted_val=True, maxiter=200
-                )
+
+                try:
+                    init, n_ = pyhf.infer.mle.fixed_poi_fit(
+                        0.0, data, model, return_fitted_val=True, maxiter=200
+                    )
+                except (pyhf.exceptions.FailedMinimization, ValueError) as e:
+                    logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{self.data.jsonFile} for mu=0: {e}")
+                    return None
+                # lets try with different initialisation
                 initpars = init.tolist()
                 initpars[model.config.poi_index] = 1.
                 # Try to turn positive all the negative total yields (mu*signal + background) evaluated with the initial parameters
