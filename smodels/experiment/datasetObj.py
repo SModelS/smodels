@@ -367,7 +367,7 @@ class DataSet(object):
                         If False, the value listed in the database will be used
                         instead.
         :param nSigma: the upper limit for central value (0),
-                        + 1 sigma, - 1 sigma for error bands. 
+                        + 1 sigma, - 1 sigma for error bands.
                         Only for efficiency-map results, and only if compute=True.
         :return: upper limit (Unum object)
         """
@@ -447,10 +447,13 @@ class DataSet(object):
                 StatsComputer
             mod = getCompRetrieverModule()
             # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
-            nsig = 1
-            m = mod.forSingleBin ( dataset=self,
-                    nsig=nsig, deltas_rel = deltas_rel, lumi = self.getLumi() )
-            comp = StatsComputer ( m )
+            # nsig = 1
+            nsigDict = { "SR": 1 }
+            m = mod.forSingleBin ( srSet=self.getID(), dataset=self,
+                                   nsigDict = nsigDict,
+                                   # nsig=nsig,
+                                   deltas_rel = deltas_rel, lumi = self.getLumi() )
+            comp = StatsComputer ( [ m ] )
             # we dont even cache, not like this will be used much
             ul = comp.getUpperLimit (
                 evaluationType = evaluationType,
@@ -525,7 +528,7 @@ class CombinedDataSet(object):
 
     def getIndex(self, dId, datasetOrder):
         """
-        Get the index of dataset within the datasetOrder, 
+        Get the index of dataset within the datasetOrder,
         but allow for abbreviated names.
 
         :param dId: id of dataset to search for, may be abbreviated

@@ -41,7 +41,7 @@ class CompRetriever:
 
 
     @classmethod
-    def forMultiBinSL(cls,srSet : str, dataset, nsigDict, 
+    def forMultiBinSL(cls,srSet : str, dataset, nsigDict,
             deltas_rel : Optional[float] = 0.0  ) -> SLUpperLimitComputer:
         """ get a subcomputer for simplified likelihood sr-combination.
 
@@ -90,7 +90,8 @@ class CompRetriever:
         return computer
 
     @classmethod
-    def forSingleBin( cls, srSet :str, dataset, nsigDict, deltas_rel : float = 0.2,
+    def forSingleBin( cls, srSet : str, dataset : DataSet, nsigDict : dict,
+                      deltas_rel : float = 0.2,
                       lumi : Optional[UnitLumi]=None ) ->  SLUpperLimitComputer:
         """ get a sub computer for an efficiency map (single bin).
 
