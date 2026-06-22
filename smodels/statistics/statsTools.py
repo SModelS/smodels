@@ -24,6 +24,7 @@ from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.base.physicsUnits import UnitXSec
 from smodels.tools.caching import lru_cache
+from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 
 def getCompRetrieverModule():
     """ very single convenience function to centralize
