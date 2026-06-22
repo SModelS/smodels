@@ -15,6 +15,7 @@ from typing import Optional
 from spey import ExpectationType, get_backend
 from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
+from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 # spey.set_optimiser( "iminuit" )
 
 #try:

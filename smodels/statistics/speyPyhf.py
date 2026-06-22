@@ -12,6 +12,7 @@
 __all__ = [ "SpeyPyhfData" ]
 
 from smodels.base.smodelsLogging import logger
+from typing import Optional
 
 class SpeyPyhfData:
     """
