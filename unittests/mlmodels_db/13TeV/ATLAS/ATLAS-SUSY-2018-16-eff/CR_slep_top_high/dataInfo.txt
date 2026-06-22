@@ -1,0 +1,7 @@
+dataId: CR_slep_top_high
+dataType: efficiencyMap
+observedN: 2053
+expectedBG: 2053.2
+bgError: 45.3
+upperLimit: 0.9068*fb
+expectedUpperLimit: 0.9074*fb

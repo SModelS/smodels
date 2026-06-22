@@ -69,43 +69,53 @@ class MLModelsTest(unittest.TestCase):
         from smodels.statistics.basicStats import apriori, aposteriori
         db = Database ( "./mlmodels_db/" ) ## a small database with mlmodels
         db.getExpResults()
-        slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
-        slhafile = os.path.abspath('./testFiles/mlmodels/ewkinos.slha')
-        runtime.modelFile = "smodels.share.models.mssm"
-        BSMList = load()
-        model = Model(BSMparticles=BSMList, SMparticles=SMList)
-        model.updateParticles(inputFile=slhafile,
-                ignorePromptQNumbers = ['eCharge','colordim','spin'])
-
-        topDict = decomposer.decompose(model, sigmacut=0.001,
-                               massCompress=True, invisibleCompress=True,
-                               minmassgap=5*GeV)
-        allPredictions = theoryPredictionsFor( db, topDict,
-                combinedResults=True )
-        nlls = { 'ATLAS-SUSY-2019-09': {
+        # slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
+        slhafiles = [ "ewkinos.slha", "ewkinos_off.slha" ]
+        nlls = { 'ewkinos.slha': { 'ATLAS-SUSY-2019-09': {
             'obs': 109.2548744617272, 'exp': 99.14532271766798 },
                  'ATLAS-SUSY-2018-32': {
-            'obs': 93.80734619587368, 'exp': 82.58896814755686 } }
-        uls = { 'ATLAS-SUSY-2019-09': {
+            'obs': 93.80734619587368, 'exp': 82.58896814755686 } } }
+        uls = { 'ewkinos.slha': { 'ATLAS-SUSY-2019-09': {
             'obs': 0.25807115669714714, 'exp': 0.3350494117797231,
             'p1': 0.266992266053015 },
                  'ATLAS-SUSY-2018-32': {
             'obs': 1.3192072615224657, 'exp': 1.585071956798914,
-            'p1': 1.330402764063578 } }
-        for p in allPredictions:
-            if p.nll() != nlls[p.analysisId()]["obs"]:
-                print ( f"[testMLModels] for {p.analysisId()}:" )
-            self.assertAlmostEqual ( p.nll(),
-                    nlls[p.analysisId()]["obs"], 5 )
-            self.assertAlmostEqual ( p.nll( evaluationType = apriori),
-                    nlls[p.analysisId()]["exp"], 5 )
-            self.assertAlmostEqual ( p.getUpperLimitOnMu(),
-                    uls[p.analysisId()]["obs"], 5 )
-            self.assertAlmostEqual ( \
-                    p.getUpperLimitOnMu( evaluationType = aposteriori ),
-                    uls[p.analysisId()]["exp"], 5 )
-            self.assertAlmostEqual ( p.getUpperLimitOnMu( pmSigma = 1 ),
-                    uls[p.analysisId()]["p1"], 5 )
+            'p1': 1.330402764063578 } } }
+        nlls['ewkinos_off.slha']= { 'ATLAS-SUSY-2018-16': {
+                'obs': 299.5023181876453, 'exp': 261.66487588845627 } }
+        uls['ewkinos_off.slha'] = { 'ATLAS-SUSY-2018-16': {
+                'obs': 0.24917556169220006, 'exp': 0.3874108842668479,
+                'p1':  0.26087901105926187 } }
+        for basename in slhafiles:
+            slhafile = os.path.abspath( f'./testFiles/mlmodels/{basename}')
+            runtime.modelFile = "smodels.share.models.mssm"
+            BSMList = load()
+            model = Model(BSMparticles=BSMList, SMparticles=SMList)
+            model.updateParticles(inputFile=slhafile,
+                    ignorePromptQNumbers = ['eCharge','colordim','spin'])
+
+            topDict = decomposer.decompose(model, sigmacut=0.001,
+                                   massCompress=True, invisibleCompress=True,
+                                   minmassgap=5*GeV)
+            allPredictions = theoryPredictionsFor( db, topDict,
+                    combinedResults=True )
+            for p in allPredictions:
+                anaId = p.analysisId()
+                my_nll = nlls[basename][anaId]
+                my_ul = uls[basename][anaId]
+                if p.nll() != my_nll["obs"]:
+                    print ( f"[testMLModels] for {p.analysisId()}:" )
+                self.assertAlmostEqual ( p.nll(),
+                        my_nll["obs"], 5 )
+                self.assertAlmostEqual ( p.nll( evaluationType = apriori),
+                        my_nll["exp"], 5 )
+                self.assertAlmostEqual ( p.getUpperLimitOnMu(),
+                        my_ul["obs"], 5 )
+                self.assertAlmostEqual ( \
+                        p.getUpperLimitOnMu( evaluationType = aposteriori ),
+                        my_ul["exp"], 5 )
+                self.assertAlmostEqual ( p.getUpperLimitOnMu( pmSigma = 1 ),
+                        my_ul["p1"], 5 )
 
 if __name__ == "__main__":
     unittest.main()
