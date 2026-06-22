@@ -117,7 +117,7 @@ class PyhfData:
     """
 
     def __init__( self, nsignals : Dict, inputJson, jsonFile=None,
-                  includeCRs=False, signalUncertainty=None,
+                  includeCRs=False, signalUncertainty : Optional[float] = None,
                   globalInfo = None, jsonFileName : Optional[str] = None ):
         self.globalInfo = globalInfo
         self.nsignals = nsignals
