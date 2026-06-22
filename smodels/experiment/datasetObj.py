@@ -446,12 +446,9 @@ class DataSet(object):
             from smodels.statistics.statsTools import getCompRetrieverModule,\
                 StatsComputer
             mod = getCompRetrieverModule()
-            # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
-            # nsig = 1
-            nsigDict = { "SR": 1 }
+            nsigDict = { self.getID() : 1 } ## [!AL!] I've replaced 'SR' by the dataset ID, since it seems that this is what should be used. Check!
             m = mod.forSingleBin ( srSet=self.getID(), dataset=self,
                                    nsigDict = nsigDict,
-                                   # nsig=nsig,
                                    deltas_rel = deltas_rel, lumi = self.getLumi() )
             comp = StatsComputer ( [ m ] )
             # we dont even cache, not like this will be used much

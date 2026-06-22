@@ -53,27 +53,41 @@ class CompRetriever:
 
         :returns: a subcomputer
         """
-        assert srSet in dataset.globalInfo.statModels, f"{srSet} not in statModels in {dataset.globalInfo.id}"
-        covs = dataset.globalInfo.cachedModels
-        type_n_models = dataset.globalInfo.statModels[srSet]
-        type_n_model = type_n_models[0] # get first one
-        mtype = type_n_model[0]
-        assert mtype == "sl", f"expected sl but got {mtype} for type of stats model"
-        covname = type_n_model[1]
-        #assert covname.endswith(".cov"), f"name of covariance matrix file {covname} does not end with .cov in {dataset.globalInfo.id}"
-        offset = 0
-        #subComputers = []
-        srList = dataset.globalInfo.srSets[srSet]
-        nsig = [nsigDict.get(sr, 0.0) for sr in srList ]
-        cov = covs[covname]
-        assert type(cov)==list, f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}"
-        assert len(cov)>0, f"covariance matrix has length {len(cov)}."
-        n = len(cov)
 
-        nobs = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ] ## [!AL!]: do we need _datasets? Can't we just loop over the SRs defined in srSets[seSet]? WW: we need e.g. observedN, this is the way to get it
-        bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
-        nsig = nsig[offset:offset+n]
-        third_momenta = [ getattr ( x.dataInfo, "thirdMoment", None ) for x in dataset._datasets[offset:offset+n] ]
+        if deltas_rel is None:
+            deltas_rel = 0.0
+
+        if  srSet not in dataset.globalInfo.statModels:
+            raise SModelSError( f"{srSet} not in statModels in {dataset.globalInfo.id}" )
+        covs = dataset.globalInfo.cachedModels
+        type_n_models = dataset.globalInfo.statModels[srSet]        
+        mtype,covname = type_n_models[0] # get first statistical model
+        if mtype != "sl":
+            raise SModelSError(f"expected sl but got {mtype} for type of stats model in {dataset.globalInfo.id}")
+        
+        srList = dataset.globalInfo.srSets[srSet]
+        cov = covs[covname]
+        if not isinstance(cov, list):
+            logger.error(f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}")
+            raise SModelSError(f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}")
+        if len(cov) == 0:
+            logger.error(f"covariance matrix has length {len(cov)} but srSet {srSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
+            raise SModelSError(f"covariance matrix has length {len(cov)} but srSet {srSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
+        
+        # Collect relevant data: ## [!AL!] I have completely changed the code below. Before you were using "offset" and looping over ._datasets, which felt unnecessary. Check!
+        nobs = []
+        bg = []
+        nsig = []
+        third_momenta = []
+        for sr in srList:
+            ds = dataset.getDataSet(sr)            
+            if ds is None:
+                raise SModelSError(f"SR {sr} defined in srSet {srSet} not found in dataset {dataset.globalInfo.id}")
+            nobs.append(ds.dataInfo.observedN)
+            bg.append(ds.dataInfo.expectedBG)
+            nsig.append(nsigDict.get(sr, 0.0))
+            third_momenta.append(getattr(ds.dataInfo, "thirdMoment", None ))
+
         c = third_momenta.count ( None )
         if c > 0:
             if c < len(third_momenta):
@@ -128,7 +142,7 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappingsDict = globalInfo.srMappingsDict
+        srMappingsDict = globalInfo.srMappingsDict ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappingsDict[sr] to get the mapping dict for a given sr.
 
         for sr in globalInfo.srSets[srSet]:
             if sr not in srMappingsDict:
@@ -172,7 +186,7 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        srMappingsDict = globalInfo.srMappingsDict
+        srMappingsDict = globalInfo.srMappingsDict ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappingsDict[sr] to get the mapping dict for a given sr.
         labelToPyhf = {}
         for sr_label in globalInfo.srSets[srSet]:
             if sr_label not in srMappingsDict:
@@ -210,8 +224,6 @@ class CompRetriever:
             signalUncertainty = globalInfo.signalUncertainty
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        # ## [!AL!]: I've tried to simplify the code here, since we should return a single computer. But I am not sure if the input for PyhfData is correct
-        ## WW yes it does look fine
         data = PyhfData(nsignals, json, regions,
                         includeCRs, signalUncertainty, globalInfo,
                         jsonFileName = model_filename )
@@ -318,7 +330,7 @@ class StatsComputer:
             dataset = theoryPrediction.dataset
             # Get dictionary with dataset IDs and signal yields
             srNsigDictAll = {}
-            for region in dataset.globalInfo.srMappings:
+            for region in dataset.globalInfo.srMappings: ## [!AL!] This is clearly inconsistent with what was assumed for srMappings before! Here you are assuming it is a list.
                 srNsigDictAll[ region["smodels"] ] = 0.
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
@@ -448,9 +460,6 @@ class StatsComputer:
                 continue
             subComputer.model = subComputer.origModel
 
-    #def getLlhds(self,muvals,evaluationType : bool = False,
-    #              normalize : bool = True,
-    #              idx : int = 0 ) -> dict:
     def getLlhds(self, **kwargs ) -> dict:
         """
         Facility to access the likelihoods for the individual analyses and
@@ -465,10 +474,11 @@ class StatsComputer:
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
-        idx = 0
-        if "idx" in kwargs:
-            idx = kwargs.pop("idx")
-        assert idx < len(self.subComputers), f"only {len(self.subComputers)} computers for prediction but you wanted index {idx}"
+        idx = kwargs.pop("idx",0)
+        if idx >= len(self.subComputers):
+             logger.error(f"only {len(self.subComputers)} computers for prediction but index {idx} was requested")
+             raise SModelSError(f"only {len(self.subComputers)} computers for prediction index {idx} was requested")
+        
         return self.subComputers[idx].getLlhds( **kwargs )
 
     def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> Union[None,dict]:

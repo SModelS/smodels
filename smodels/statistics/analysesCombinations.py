@@ -103,13 +103,14 @@ class AnaCombLikelihoodComputer(object):
             sigma_mu = tp.sigma_mu(evaluationType=evaluationType)
             if sigma_mu in [None, 0.0]:
                 sigma_mu = 1.0  # unity weights if no weights
-            if muhat != None:
+            if muhat is not None:
                 muhats.append(muhat)
                 w = 1.0 / sigma_mu**2
                 weighted.append(w * muhat)
                 totweight += w
         # for a single theory prediction, we return just that
         if len(muhats)==1:
+            muhat = muhats[0]
             if muhat < 0. and not allowNegativeSignals:
                 muhat = 0.
             retnllh = self.theoryPredictions[0].nll ( muhat, evaluationType = evaluationType, asimov=asimov )
@@ -117,7 +118,7 @@ class AnaCombLikelihoodComputer(object):
             return ret
 
         if len(muhats) == 0:
-            logger.error("asked to compute muhat for combination, but no individual values")
+            logger.error("Asked to compute muhat for the combination, but could not find muhat for the individual analyses")
             ret = {"muhat": None, "sigma_mu": None, "nll_min": None }
             return ret
 

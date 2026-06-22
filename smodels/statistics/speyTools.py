@@ -18,10 +18,6 @@ from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 # spey.set_optimiser( "iminuit" )
 
-#try:
-#    from spey.system.exceptions import AsimovTestStatZero
-#except ImportError: # comes only with newer versions of spey
-#    AsimovTestStatZero = Exception # a dummy so we can still try
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -97,9 +93,6 @@ class SpeyModelFacade:
         if nSigma != 0:
             expected_pvalue = "1sigma"
 
-        # print ( f"@@speyTools getUL {exp} {expected_pvalue} {kwargs}" )
-        ## optimiser: slsqp is the default, but it exhibits platform-dependent
-        ## behavior, so lets try with L-BFGS-B for now
         # optimiser_arguments = None
         # optimiser_arguments = { "method": "SLSQP" }
         optimiser_arguments = { "method": "L-BFGS-B" }
@@ -107,9 +100,6 @@ class SpeyModelFacade:
         ret = self.speyModel.poi_upper_limit ( expected = exp,
                expected_pvalue = expected_pvalue,
                optimiser_arguments = optimiser_arguments )
-        # print ( f" returns {ret}" )
-        #if evaluationType == observed:
-        #    import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
         if nSigma == 0:
             ret = float ( ret )
         elif nSigma == 1:
@@ -122,7 +112,7 @@ class SpeyModelFacade:
 class SpeyRetriever:
     """ simple class that retrieves and constructs the sub computers
     using the Spey interface."""
-    import spey
+    
 
     @classmethod
     def forMultiBinSL(cls, srSet: str, dataset : CombinedDataSet, nsigDict : dict,
@@ -140,8 +130,8 @@ class SpeyRetriever:
 
         :returns: a subcomputer
         """
-        # bg = [ x.dataInfo.expectedBG for x in dataset._datasets ]
-        # cov = dataset.globalInfo.covariance
+
+        import spey
         covs = dataset.globalInfo.cachedModels
         lumi = float ( dataset.getLumi().asNumber(1./fb) )
         thirdmomenta=[]
@@ -154,18 +144,11 @@ class SpeyRetriever:
         assert mtype == "sl", f"expected sl but got {mtype} for type of stats model"
         covname = type_n_model[1]
         nsig = list(nsigDict.values())
-        srList = dataset.globalInfo.srSets[srSet]
         cov = covs[covname]
         offset=0
         assert type(cov)==list, f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}"
         assert len(cov)>0, f"covariance matrix has length {len(cov)}."
-        # for covname,cov in covs.items():
-        #    if not covname.endswith ( ".cov" ):
-        #        continue
-        #    if type(cov) != list:
-        #        raise SModelSError( f"covariance field has wrong type: {type(cov)}" )
-        #    if len(cov) < 1:
-        #        raise SModelSError( f"covariance matrix has length {len(cov)}." )
+
         n = len(cov)
         obsN = [ x.dataInfo.observedN for x in dataset._datasets[offset:offset+n] ]
         bg = [ x.dataInfo.expectedBG for x in dataset._datasets[offset:offset+n] ]
@@ -237,12 +220,15 @@ class SpeyRetriever:
         :returns: a sub computer
         :raises NotImplementedError: If requested backend has not been recognised.
         """
+
+        import spey
+
         try:
             stat_wrapper = get_backend("default.uncorrelated_background")
         except spey.PluginError: ## older spey?
             stat_wrapper = get_backend("default_pdf.uncorrelated_background")
         id = f"{dataset.globalInfo.id}:{dataset.dataInfo.dataId}"
-        nsig = nsigDict.get(dataset.getID(), 0)
+        nsig = nsigDict.get(srSet, 0)
         speyModel = stat_wrapper(
                         data = [float(dataset.dataInfo.observedN)],
                         background_yields = [float(dataset.dataInfo.expectedBG)],
@@ -267,8 +253,10 @@ class SpeyRetriever:
 
         :returns: a sub computer
         """
-        print ( "FIXME this isnt yet implemented as spey doesnt have that feature yet!" )
-        sys.exit(-1)
+
+        logger.error ("speyTools backend to NN is not implemented yet!" )
+        raise SModelSError ("speyTools backend to NN is not implemented yet!" )
+    
         globalInfo = dataset.globalInfo
         labelToONNX = {}
         # srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings }

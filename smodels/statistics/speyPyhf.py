@@ -47,7 +47,6 @@ class SpeyPyhfData:
     def getTotalYield ( self ):
         """ the total yield in all signal regions """
         S = sum ( self.nsignals )
-        # S = sum ( [ sum(x) for x in self.nsignals ] )
         self.totalYield = S
 
     def getWSInfo(self):
@@ -69,7 +68,7 @@ class SpeyPyhfData:
             self.errorFlag = True
             return
         ws = self.inputJson
-        #for ws in self.inputJsons:
+
         wsChannelsInfo = {}
         wsChannelsInfo["signalRegions"] = []
         wsChannelsInfo["otherRegions"] = []
@@ -102,12 +101,8 @@ class SpeyPyhfData:
     def createDataObject ( cls, dataset : CombinedDataSet, nsig : list,
            srSetName : str ):
         """ an object creator method """
-        # jsonFiles = dataset.globalInfo.jsonFiles
 
         globalInfo = dataset.globalInfo
-        #jsonFiles = []
-        #srSetNames = {} # set names for jsonFiles
-        # jsons = []
         model_tuples = globalInfo.statModels[srSetName]
         model_tuple = model_tuples[0]
         if "pyhf" not in model_tuple:
@@ -116,8 +111,6 @@ class SpeyPyhfData:
         datasets = []
         srSet = globalInfo.srSets [ srSetName ] # srSetNames [ jsName ] ]
         # Constructing the list of signals with subsignals matching each json
-        # jsons = []
-        #for jsName in jsonFiles:
         nsignals = []
         for sr in srSet:
             datasets.append ( globalInfo.srMappingsDict[sr]["smodels"] )
@@ -133,8 +126,6 @@ class SpeyPyhfData:
             nsignals.append(sig)
         logger.error( f"list of datasets: {datasets}" )
         logger.error( f"jsonFile after filtering: {jsName}" )
-        #nsignals.append(subSig)
-        #jsons.append ( dataset.globalInfo.cachedModels[jsName] )
         # Loading the jsonFiles, unless we already have them (because we pickled)
         json = globalInfo.cachedModels[jsName]
         return cls( nsignals , json, jsName)
@@ -149,17 +140,12 @@ class SpeyPyhfData:
         if not isinstance(self.nsignals, list):
             logger.error("The `nsignals` parameter must be of type list")
             self.errorFlag = True
-        #if self.nWS != len(self.nsignals):
-        #    logger.error(
-        #        "The number of subsignals provided is different from the number of json files"
-        #    )
-        #    self.errorFlag = True
+
         self.zeroSignalsFlag = list()
         if self.channelsInfo == None:
             return
         wsInfo = self.channelsInfo
         subSig = self.nsignals
-        #for wsInfo, subSig in zip(self.channelsInfo, self.nsignals):
         if not isinstance(subSig, list):
             logger.error("The `nsignals` parameter must be a two dimensional list")
             self.errorFlag = True
@@ -187,13 +173,8 @@ class SpeyPyhfData:
         """
         if self.channelsInfo == None:
             return None
-        nsignals = self.nsignals
-        # Constructing the patches to be applied on the main workspace files
-        # patches = []
-        ws = self.inputJson
         info = self.channelsInfo
         subSig = self.nsignals
-        # for ws, info, subSig in zip(self.inputJsons, self.channelsInfo, self.nsignals):
         patch = []
         for srInfo in info["signalRegions"]:
             nBins = srInfo["size"]
@@ -217,9 +198,7 @@ class SpeyPyhfData:
             for path in info["otherRegions"]:
                 patch.append({"op": "remove", "path": path})
         return patch
-        #patches.append(patch)
-        #return patches
-
+    
     def wsMaker(self, apriori=False):
         """
         Apply each region patch (self.patches) to his associated json
