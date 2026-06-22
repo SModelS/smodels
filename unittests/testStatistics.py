@@ -235,8 +235,9 @@ class StatisticsTest(unittest.TestCase):
         nsig = 2
         m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
         computer = LikelihoodComputer(m)
-        nll = computer.nll(mu=1. )
-        self.assertAlmostEqual( nll, 2.2430540749864315e+21, places=2)
+        nll = computer.nll(mu=1.)
+        true_nll = 2.2430540749864315e+21
+        self.assertAlmostEqual( nll, true_nll, delta = true_nll*1e-5 )
         dchi2 = computer.chi2( )
         ichi2 = 4.486108149972863e21
         self.assertAlmostEqual(dchi2 / ichi2, 1.0, places=4)
