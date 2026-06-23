@@ -967,6 +967,8 @@ class PyhfUpperLimitComputer:
         alpha-CLs: return 0.05 - CLs
         1-CLs: returns 1-CLs value
         CLs: returns CLs value
+
+        :returns: whatever return_type asks for, possibly nan.
         """
         if reset_data:
             self.__init__(self.data, self.cl, self.lumi)
@@ -1009,7 +1011,7 @@ class PyhfUpperLimitComputer:
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
-             nSigma : int = 0 ) -> Optional[float]:
+             nSigma : int = 0 ) -> float:
         """
         This is our internal method to compute CLs.
 
