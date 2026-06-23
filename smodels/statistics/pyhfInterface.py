@@ -1009,7 +1009,7 @@ class PyhfUpperLimitComputer:
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,
              return_type: Text = "CLs",
-             nSigma : int = 0 ) -> float:
+             nSigma : int = 0 ) -> Optional[float]:
         """
         This is our internal method to compute CLs.
 
@@ -1020,7 +1020,7 @@ class PyhfUpperLimitComputer:
         CLs-alpha: returns CLs - 0.05
         alpha-CLs: return 0.05 - CLs
         1-CLs: returns 1-CLs value
-        CLs: returns CLs value
+        CLs: returns CLs value, or None in case of error
         """
         assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
             f"Unknown return type: {return_type}."
@@ -1068,9 +1068,11 @@ class PyhfUpperLimitComputer:
             logger.debug(f"result for {mu_rel} {result}")
             try:
                 CLs = float(result)
-            except TypeError:
+            except TypeError as e:
                 if return_expected_set:
                     idx = 2 + nSigma
+                    if type(result[-1]) == float and nSigma != 0:
+                        return None
                     CLs = float(result[-1][idx])
                 else:
                     CLs = float(result[1])
