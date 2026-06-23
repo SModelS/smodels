@@ -1073,6 +1073,8 @@ class PyhfUpperLimitComputer:
                     idx = 2 + nSigma
                     if type(result[-1]) == float and nSigma != 0:
                         return None
+                    if type(result[-1]) == float and nSigma == 0:
+                        return result[-1]
                     CLs = float(result[-1][idx])
                 else:
                     CLs = float(result[1])
