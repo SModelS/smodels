@@ -24,6 +24,12 @@ import logging
 logging.getLogger("pyhf").setLevel(logging.CRITICAL)
 # warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", r"invalid value encountered in log")
+from scipy.optimize import OptimizeWarning
+warnings.filterwarnings(
+    "ignore",
+    message="Unknown solver options: disp",
+    category=OptimizeWarning,
+)
 from typing import Dict, List, Union, Text, Optional
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 
