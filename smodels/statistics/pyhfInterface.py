@@ -1070,11 +1070,12 @@ class PyhfUpperLimitComputer:
                 CLs = float(result)
             except TypeError as e:
                 if return_expected_set:
+                    if type(result[-1]) == float:
+                        if nSigma == 0:
+                            return result[-1]
+                        else:
+                            return float("nan")
                     idx = 2 + nSigma
-                    if type(result[-1]) == float and nSigma != 0:
-                        return None
-                    if type(result[-1]) == float and nSigma == 0:
-                        return result[-1]
                     CLs = float(result[-1][idx])
                 else:
                     CLs = float(result[1])
