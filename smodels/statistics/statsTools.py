@@ -96,7 +96,7 @@ class CompRetriever:
         data = SLData( nobs, bg, cov, third_moment=third_momenta,
                      nsignal = nsig,
                      deltas_rel = deltas_rel, lumi=dataset.getLumi(),
-                     name = covname )
+                     name = srSet )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "SL"
@@ -121,7 +121,8 @@ class CompRetriever:
             raise SModelSError ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
         data = SLData( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
-                     nsignal = list(nsigDict.values()), lumi = lumi )
+                     nsignal = list(nsigDict.values()), lumi = lumi,
+                     name = srSet )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
