@@ -213,7 +213,7 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         slhafile = "./testFiles/slha/gluino_squarks.slha"
         parfile = "./testParameters_comb.ini"
 
-        combiner = getCombiner(slhafile, parfile)
+        combiner = getCombiner(slhafile, parfile, database = database )
         nll_min = combiner.nll_min()
         nllsm = combiner.nllsm()
         nllbsm = combiner.nll(mu=1.0)
@@ -222,10 +222,10 @@ class CombinedTheoryPredsTest(unittest.TestCase):
         nllbsm = combiner.nll( mu=1.0)
         nllbsmE = combiner.nll( mu=1.0, evaluationType=apriori)
 
-        self.assertAlmostEqual(nllsm, 2.2936253516225737, 2)
-        self.assertAlmostEqual(nllbsm, 1.8736639088495401, 2)
-        self.assertAlmostEqual(nll_min, 1.5506974174115002, 2)
-        self.assertAlmostEqual(combiner.getRValue(), 0.1209701850476386, 4)
+        self.assertAlmostEqual(nllsm, 2.293189355862929, 2)
+        self.assertAlmostEqual(nllbsm, 1.8787336722875243, 2)
+        self.assertAlmostEqual(nll_min, 1.550852032050606, 2)
+        self.assertAlmostEqual(combiner.getRValue(), 0.11910627080455084, 4)
 
         # Also check if likelihood dict is defined:
         muvals = np.linspace(0.,3.,10)
