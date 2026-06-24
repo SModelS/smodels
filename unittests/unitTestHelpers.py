@@ -139,22 +139,21 @@ def sortExptRes ( exptRes ):
     exptRes.sort ( key = lambda x: x["AnalysisID"]+str(x["DataSetID"])+str(x["TxNames"] ) )
     return exptRes
 
-def sortSModelSOutput ( smodelsOutput ):
+def sortSModelSOutput ( smodelsOutput : dict ) ->  dict:
     smodelsOutput["ExptRes"] = sortExptRes ( smodelsOutput["ExptRes"] )
     return smodelsOutput
 
-def flattenElement(elStr):
-
+def flattenElement( elStr : str ) -> str:
     oldStr = elStr[elStr.find('[')+1:elStr.rfind(']')]
     newStr = oldStr.replace('[','').replace(']','')
     newStr = ','.join(sorted([x for x in newStr.split(',') if x.strip()]))
     newElStr = elStr.replace(oldStr,newStr)
     return newElStr
 
-
 def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [], 
         where : Optional[str] = None, fname : Optional[str] = None,
-        fname2 : Optional[str] = None, checkBothOrders : bool = True) -> bool:
+        fname2 : Optional[str] = None, checkBothOrders : bool = True,
+        ignoreSorting : list[str] = [] ) -> bool:
     """
     Compare two objects.
     The numerical values are compared up to the precision defined by 
@@ -170,8 +169,9 @@ def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [],
     :param checkBothOrders: If True, check if obj1 == obj2 and obj2 == obj1.
     :param version3: If True, tries to take into account differences of output
     between version 2 and version 3
-    :param allowedAbsDiff: If the relative difference is larger than allowedRelDiff,
-    check if the absolute difference is within allowedAbsDiff
+    :param allowedAbsDiff: If the relative difference is larger than 
+    allowedRelDiff, check if the absolute difference is within allowedAbsDiff
+    :param ignoreSorting: ignore the sorting for these lists
 
     :return: True/False
     """
@@ -228,7 +228,8 @@ def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [],
                 logger.warning(f"Key ``{key}'' missing in {str(where)[:100]} :{fname}{deffile}. Its value should be ``{obj1[key]}'")
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
-                             where=key, fname=fname, fname2=fname2):
+                             where=key, fname=fname, fname2=fname2,
+                             ignoreSorting = ignoreSorting ):
                 comment = ""
                 if type(obj1) == dict:
                     if "AnalysisID" in obj1:
@@ -241,9 +242,13 @@ def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [],
         if len(obj1) != len(obj2):
             logger.warning( f'Lists for {where} differ in length:\n   {len(obj1)} (this run)\n and\n   {len(obj2)} (default)' )
             return False
+        if where in ignoreSorting:
+            obj1.sort()
+            obj2.sort()
         for ival, val in enumerate(obj1):
             if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname,
-                    ignore=ignore, where=f"{obj1}:{obj2}", fname2=fname2 ):
+                    ignore=ignore, where=f"{obj1}:{obj2}", fname2=fname2,
+                    ignoreSorting = ignoreSorting ):
                 return False
     else:
         return obj1 == obj2
@@ -251,7 +256,8 @@ def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [],
     # Now check for the opposite order of the objects
     if checkBothOrders:
         if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
-                         fname2, fname, checkBothOrders=False):
+                         fname2, fname, checkBothOrders=False,
+                         ignoreSorting = ignoreSorting ):
             logger.error(f"Objects ``{str(obj1)[:100]}'' and ``{str(obj2)[:100]}'' differ in {str(where)[:100]}: {fname} != {fname2}")
             return False
     return True
