@@ -152,11 +152,13 @@ def flattenElement(elStr):
     return newElStr
 
 
-def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
-              fname2=None, checkBothOrders=True):
+def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [], 
+        where : Optional[str] = None, fname : Optional[str] = None,
+        fname2 : Optional[str] = None, checkBothOrders : bool = True) -> bool:
     """
     Compare two objects.
-    The numerical values are compared up to the precision defined by allowedRelDiff.
+    The numerical values are compared up to the precision defined by 
+    allowedRelDiff.
 
     :param obj1: First python object to be compared
     :param obj2: Second python object to be compared
@@ -167,9 +169,9 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     :param fname2: the filename of obj2
     :param checkBothOrders: If True, check if obj1 == obj2 and obj2 == obj1.
     :param version3: If True, tries to take into account differences of output
-                     between version 2 and version 3
+    between version 2 and version 3
     :param allowedAbsDiff: If the relative difference is larger than allowedRelDiff,
-                           check if the absolute difference is within allowedAbsDiff
+    check if the absolute difference is within allowedAbsDiff
 
     :return: True/False
     """
@@ -227,7 +229,13 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
                              where=key, fname=fname, fname2=fname2):
-                logger.warning(f"Objects differ for {key}")
+                comment = ""
+                if type(obj1) == dict:
+                    if "AnalysisID" in obj1:
+                        comment=": "+obj1["AnalysisID"]
+                    if "DataSetID" in obj1:
+                        comment+=f":{obj1['DataSetID']}"
+                logger.warning(f"Objects differ for {key}{comment}")
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
