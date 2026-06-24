@@ -14,7 +14,7 @@ sys.path.insert(0, "../")
 import unittest
 
 # from smodels.tools import statistics
-from smodels.statistics.simplifiedLikelihoods import SLUpperLimitComputer, LikelihoodComputer, Data
+from smodels.statistics.simplifiedLikelihoods import SLUpperLimitComputer, SLLikelihoodComputer, SLData
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from smodels.share.models.mssm import BSMList
@@ -33,7 +33,7 @@ class StatisticsTest(unittest.TestCase):
         """to do some statistics on the chi2"""
         nsig = 1.0
         nobs, nbg = 100, 100.0
-        m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
+        m = SLData(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
         ulcomp = SLUpperLimitComputer()
         ulobs = ulcomp.getUpperLimitOnMu(m)
         ulexp = ulcomp.getUpperLimitOnMu(m, evaluationType=apriori)
@@ -45,8 +45,8 @@ class StatisticsTest(unittest.TestCase):
         for nsig in np.arange(0.1, 100.0, dx):
             print()
             print("nsig=", nsig)
-            m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
-            llhdcomp = LikelihoodComputer(m)
+            m = SLData(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0)
+            llhdcomp = SLLikelihoodComputer(m)
             llhddir = math.exp ( - llhdcomp.nll(nsig) )
             chi2dir = llhdcomp.chi2()
             print("llhd direct", llhddir, chi2dir)
@@ -66,8 +66,8 @@ class StatisticsTest(unittest.TestCase):
         """test the likelihoods from limits allowing for underfluctuations"""
         nsig = 3.0
         nobs, nbg = 35, 30
-        m = Data(nobs, nbg, 0.001, None, nsig )
-        ulcomp = SLUpperLimitComputer( LikelihoodComputer(m) )
+        m = SLData(nobs, nbg, 0.001, None, nsig )
+        ulcomp = SLUpperLimitComputer( SLLikelihoodComputer(m) )
         ulobs = ulcomp.getUpperLimitOnMu()
         ulexp = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         computer = TruncatedGaussians ( ulobs, ulexp, corr = 0. )
@@ -121,15 +121,15 @@ class StatisticsTest(unittest.TestCase):
         """test the chi2 value that we obtain from limits"""
         nsig = 35.0
         nobs, nbg = 110, 100.0
-        m = Data(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
-        ulcomp = SLUpperLimitComputer( LikelihoodComputer(m) )
+        m = SLData(nobs, nbg, 0.001, None, nsig, deltas_rel=0.0, lumi = 1.)
+        ulcomp = SLUpperLimitComputer( SLLikelihoodComputer(m) )
         ulexpmu = ulcomp.getUpperLimitOnMu( evaluationType=apriori )
         # ulexpmu should roughly equal sqrt(100)*2 / 35. = 0.57
         self.assertAlmostEqual ( ulexpmu, 0.59716846, 3 )
         ulobsmu = ulcomp.getUpperLimitOnMu()
         # ulobsmu should roughly equal sqrt(100*2 / 35. + ( 110 -100 ) / 35. = 85
         self.assertAlmostEqual ( ulobsmu, 0.834560746, 3 )
-        llhdcomp = LikelihoodComputer(m)
+        llhdcomp = SLLikelihoodComputer(m)
         llhddir = math.exp ( - llhdcomp.nll(mu=1.) )
         computer = TruncatedGaussians ( ulobsmu, ulexpmu )
         llhdlim = math.exp ( - computer.nll ( mu=1. ) )
@@ -157,8 +157,8 @@ class StatisticsTest(unittest.TestCase):
         # self.assertAlmostEqual(llhdlim,0.119734,5)
 
     def testUpperLimit(self):
-        m = Data(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
-        comp = SLUpperLimitComputer( LikelihoodComputer(m) )
+        m = SLData(100.0, 100.0, 0.001, None, 1.0, deltas_rel=0.0)
+        comp = SLUpperLimitComputer( SLLikelihoodComputer(m) )
         re = comp.getUpperLimitOnMu()
         self.assertAlmostEqual(re/(1.06*20.), 1., 1)
 
@@ -225,16 +225,16 @@ class StatisticsTest(unittest.TestCase):
         nllE = prediction.nll(evaluationType = aposteriori )
         self.assertAlmostEqual(nllE,29.17639764242797,6)
         nsig = (pred_signal_strength * expRes.globalInfo.lumi).asNumber()
-        m = Data(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
-        computer = LikelihoodComputer(m)
+        m = SLData(4, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
+        computer = SLLikelihoodComputer(m)
         dll =computer.nll(mu=1.)
         self.assertAlmostEqual(dll, 25.091652032938583, places=2)
 
     def testZeroLikelihood(self):
         """A test to check if a llhd of 0 is being tolerated"""
         nsig = 2
-        m = Data(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
-        computer = LikelihoodComputer(m)
+        m = SLData(1e20, 2.2, 1.1**2, None, nsignal=nsig, deltas_rel=0.2)
+        computer = SLLikelihoodComputer(m)
         nll = computer.nll(mu=1.)
         true_nll = 2.2430540749864315e+21
         self.assertAlmostEqual( nll, true_nll, delta = true_nll*1e-5 )
@@ -772,8 +772,8 @@ class StatisticsTest(unittest.TestCase):
             nsig = d["nsig"]
             nb = d["nb"]
             deltab = d["deltab"]
-            m = Data(nobs, nb, deltab**2, deltas_rel=0.2, nsignal = nsig )
-            computer = LikelihoodComputer(m)
+            m = SLData(nobs, nb, deltab**2, deltas_rel=0.2, nsignal = nsig )
+            computer = SLLikelihoodComputer(m)
 
             # likelihood as computed by statistics module:
             likelihood_actual = math.exp ( - computer.nll(mu=1. ) )
