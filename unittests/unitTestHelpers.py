@@ -196,7 +196,7 @@ def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [],
         # For numbers with units, do not check for absolute difference
         ret = (rel_diff.asNumber() < allowedRelDiff)
         if not ret:
-            logger.error( f"values {obj1} and {obj2} differ by {rel_diff}" )
+            logger.error( f"values {obj1} and {obj2} differ by {rel_diff:.3g}" )
         return ret
     elif isinstance(obj1, float):
         if obj1 == obj2:
@@ -205,7 +205,7 @@ def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [],
         rel_diff = 2.*abs_diff/abs(obj1+obj2)
         ret = (rel_diff < allowedRelDiff)
         if not ret:
-            logger.error(f"values {obj1} and {obj2} differ by {rel_diff} in ''{where}'': {fname} != {fname2}")
+            logger.error(f"values {obj1} and {obj2} differ by {rel_diff:.3g} in ''{where}'': {fname} != {fname2}")
         return ret
     elif isinstance(obj1, str):
         obj1 = obj1.replace(" ","")  # Remove blanks
@@ -438,7 +438,7 @@ def compareScanSummary(outA, outB, allowedRelDiff):
             elif isinstance(ptA[col], (float, int)):
                 diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
                 if diff > allowedRelDiff:
-                    logger.error( f"values for {col} differ by {diff} ({ptA[col]} vs {ptB[col]}) in {fname}" )
+                    logger.error( f"values for {col} differ by {diff:.3g} ({ptA[col]} vs {ptB[col]}) in {fname}" )
                     return False
             else:
                 logger.error(f"values for {col} differ in {fname}" )
