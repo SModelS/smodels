@@ -46,7 +46,7 @@ except ModuleNotFoundError:
     logger = getLogger()
 
 
-class Data:
+class SLData:
     """A very simple observed container to collect all the data
     needed to fully define a specific statistical model"""
 
@@ -212,10 +212,14 @@ class Data:
             if m3 == 0.0:
                 m3 = 1e-30
             k = -np.sign(m3) * sqrt(2.0 * m2)
-            dm = sqrt(8.0 * m2**3 / m3**2 - 1.0)
+            r = 8.0 * m2**3 / m3**2 - 1.0
+            if r < 0.:
+                logger.error ( f"negative radicand {r:.2f}: m2={m2:.2f} m3={m3:.2f} in {self.name}" )
+            dm = sqrt( r )
             C.append(k * np.cos(4.0 * np.pi / 3.0 + np.arctan(dm) / 3.0))
 
-        self.C = np.array(C)  ## C, as define in Eq. 1.27 (?) in the second paper
+        ## C, as defined in Eq. 1.27 (Eq 2.9 in preprint) in the second paper
+        self.C = np.array(C)
         self.B = sqrt(covD - 2 * self.C**2)  ## B, as defined in Eq. 1.28(?)
         self.A = self.backgrounds - self.C  ## A, Eq. 1.30(?)
         self.rho = np.array([[0.0] * self.n] * self.n)  ## Eq. 1.29 (?)
@@ -298,7 +302,7 @@ class Data:
         return mu * self.nsignal
 
 
-class LikelihoodComputer:
+class SLLikelihoodComputer:
 
     debug_mode = False
 
@@ -915,14 +919,14 @@ class LikelihoodComputer:
         generate a model with asimov data for a given mu.
         :param mu: signal strength to create Asimov data for.
 
-        :returns: LikelihoodComputer, with theta_hat as data member
+        :returns: SLLikelihoodComputer, with theta_hat as data member
         """
         theta_hat, _ = self.findThetaHat( mu )
         # sigma_mu = self.getSigmaMu(mu_hat, theta_hat0)
 
         # nll0 = computer.likelihood( mu_hat, return_nll=True)
         aModel = self.model.generateAsimovData( theta_hat, mu )
-        newComputer = LikelihoodComputer(aModel )
+        newComputer = SLLikelihoodComputer(aModel )
         newComputer.theta_hat = theta_hat
         return newComputer
 
@@ -1008,7 +1012,7 @@ class SLUpperLimitComputer:
             model = copy.deepcopy(oldmodel)
             model.observed = copy.deepcopy ( model.backgrounds )
             if evaluationType == aposteriori:
-                tempc = LikelihoodComputer(oldmodel )
+                tempc = SLLikelihoodComputer(oldmodel )
                 theta_hat_, _ = tempc.findThetaHat(0 )
                 if model.isLinear():
                     model.observed = model.backgrounds + theta_hat_
@@ -1017,7 +1021,7 @@ class SLUpperLimitComputer:
                 #for i, d in enumerate(model.backgrounds):
                 #    d += theta_hat_[i]
                 ### FIXME!
-        computer = LikelihoodComputer(model )
+        computer = SLLikelihoodComputer(model )
         mu_hat = computer.findMuHat( allowNegativeSignals=False, 
                                      extended_output=False)
         compA = computer.generateAsimovComputer ( 0. )
@@ -1166,7 +1170,7 @@ if __name__ == "__main__":
         11.5732,
     ]
     nsignal = [x / 100.0 for x in [47, 29.4, 21.1, 14.3, 9.4, 7.1, 4.7, 4.3]]
-    m = Data(
+    m = SLData(
         observed=[1964, 877, 354, 182, 82, 36, 15, 11],
         backgrounds=[2006.4, 836.4, 350.0, 147.1, 62.0, 26.2, 11.1, 4.7],
         covariance=C,
@@ -1175,7 +1179,7 @@ if __name__ == "__main__":
         nsignal=nsignal,
         name="CMS-NOTE-2017-001 model",
     )
-    ulComp = SLUpperLimitComputer( LikelihoodComputer(m), cl=0.95)
+    ulComp = SLUpperLimitComputer( SLLikelihoodComputer(m), cl=0.95)
 
     ul = ulComp.getUpperLimitOnMu( )
     cls = ulComp.CLs( 1. )

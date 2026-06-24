@@ -16,7 +16,7 @@ from typing import Union, Dict, Optional
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
-from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, SLUpperLimitComputer, Data
+from smodels.statistics.simplifiedLikelihoods import SLLikelihoodComputer, SLUpperLimitComputer, SLData
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
 from smodels.statistics.nnInterface import NNData, NNUpperLimitComputer
 from smodels.statistics.basicStats import observed, apriori, NllEvalType, exponentiateNLL
@@ -39,7 +39,6 @@ def getCompRetrieverModule():
 
 class CompRetriever:
     """ simple class that retrieves and constructs the sub computers required by StatsComputer """
-
 
     @classmethod
     def forMultiBinSL(cls,srSet : str, dataset, nsigDict,
@@ -94,11 +93,11 @@ class CompRetriever:
                 logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
             third_momenta = None
 
-        data = Data( nobs, bg, cov, third_moment=third_momenta,
+        data = SLData( nobs, bg, cov, third_moment=third_momenta,
                      nsignal = nsig,
                      deltas_rel = deltas_rel, lumi=dataset.getLumi(),
                      name = covname )
-        likelihoodComputer = LikelihoodComputer ( data )
+        likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "SL"
         computer.allowNegativeSignals = False
@@ -120,10 +119,10 @@ class CompRetriever:
         if srSet != dataset.getID():
             logger.error ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
             raise SModelSError ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
-        data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
+        data = SLData( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
                      nsignal = list(nsigDict.values()), lumi = lumi )
-        likelihoodComputer = LikelihoodComputer ( data )
+        likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
         computer.allowNegativeSignals = False
