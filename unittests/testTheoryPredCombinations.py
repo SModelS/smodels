@@ -10,8 +10,8 @@
 import sys
 sys.path.insert(0, "../")
 
-from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer
-LikelihoodComputer.debug_mode = True
+from smodels.statistics.simplifiedLikelihoods import SLLikelihoodComputer
+SLLikelihoodComputer.debug_mode = True
 from smodels.matching.theoryPrediction import theoryPredictionsFor, \
      TheoryPredictionsCombiner
 from smodels.base.smodelsLogging import setLogLevel
