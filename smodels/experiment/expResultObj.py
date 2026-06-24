@@ -228,7 +228,7 @@ class ExpResult(object):
             ret = set()
             for name in self.globalInfo.srSets.keys():
                 if name not in self.globalInfo.statModels:
-                    raise SModelSError ( f"{name} does not appear in {self.globalInfo.id}'s stats models" )
+                    raise SModelSExperimentError ( f"{name} does not appear in {self.globalInfo.id}'s stats models" )
                 n = len ( self.globalInfo.statModels[name] )
                 for i in range(n):
                     tp = self.typeOfStatsModel ( name, i, specifySL )
