@@ -446,7 +446,7 @@ class DataSet(object):
             from smodels.statistics.statsTools import getCompRetrieverModule,\
                 StatsComputer
             mod = getCompRetrieverModule()
-            nsigDict = { self.getID() : 1 } ## [!AL!] I've replaced 'SR' by the dataset ID, since it seems that this is what should be used. Check! WW: yes you are right, I think I changed this but forgot to push
+            nsigDict = { self.getID() : 1 }
             m = mod.forSingleBin ( srSet=self.getID(), dataset=self,
                                    nsigDict = nsigDict,
                                    deltas_rel = deltas_rel, lumi = self.getLumi() )

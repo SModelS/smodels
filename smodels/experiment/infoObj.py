@@ -24,7 +24,7 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
-    def canonizeRegions ( self, regions : Optional[dict] ) -> Optional[dict]:
+    def canonizeRegions ( self, regions : Optional[dict] = None ) -> Union[None,dict]:
         """ given a list of regions in globalInfo.txt in the
         srMappings field,
         return a canonical version of that list: strings in
@@ -40,27 +40,31 @@ class Info(object):
         if regions is None:
             return regions
         newregions={}
+        ## [!AL!] I've simplified a bit the code below and removed some of the debug messages. Check!
         for label,region in regions.items():
+            regionDict = {}
             if type(region)==str:
                 logger.debug ( f"exploding {region} to a dictionary" )
-                region={"smodels": region}
-            if "type" not in region:
-                logger.debug ( f"no type specified for {region}, will assume SR" )
-                region["type"]="SR"
-            if "smodels" not in region:
-                if region["type"]=="SR":
-                    region["smodels"]=label
-                    logger.debug ( f"no 'smodels' specified in {region}, will assume {label}" )
-                else:
-                    region["smodels"]=None
-                    logger.debug ( f"no 'smodels' specified in {region}, will assume None" )
-            if "pyhf" not in region:
-                region["pyhf"]=region["smodels"]
-            if "onnx" not in region:
-                region["onnx"]=region["pyhf"]
-            if "sl" not in region:
-                region["sl"]=region["smodels"]
-            newregions[label] = region
+                regionDict["smodels"] = region
+            elif type(region)==dict:
+                regionDict.update(region)
+            else:
+                raise SModelSError ( f"region {region} is neither a string nor a dictionary" )
+            for key in [ "type", "smodels", "pyhf", "sl", "onnx" ]:
+                if key not in regionDict:
+                    logger.debug ( f"region {label} has no {key} defined, setting to default value.")
+            # Set defaults (if they were not defined)
+            regionDict.setdefault("type", "SR")
+            if regionDict["type"]=="SR":
+                regionDict.setdefault("smodels", label)
+            else:
+                regionDict.setdefault("smodels", None)
+            
+            regionDict.setdefault("pyhf", regionDict["smodels"])
+            regionDict.setdefault("sl", regionDict["smodels"])
+            regionDict.setdefault("onnx", regionDict["pyhf"])
+            
+            newregions[label] = regionDict
         return newregions
 
     def __init__(self, path=None):
@@ -90,51 +94,71 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
-                if tag in [ "srMappings" ]:
+                if tag == "srMappings":
                     try:
                         regions = eval(value)
                     except Exception as e:
                         try:
                             from pygments import highlight
-                            from pygments.lexers import PythonLexer, JsonLexer
+                            from pygments.lexers import JsonLexer
                             from pygments.formatters import TerminalFormatter
                             print(highlight(value, JsonLexer(), TerminalFormatter()))
                         finally:
                             raise e
-                    regions = self.canonizeRegions ( regions )
+                    regions = self.canonizeRegions( regions )
                     value = str(regions)
                 if tags.count(tag) == 1:
                     self.addInfo(tag, value)
                 else:
                     logger.info(f"tag {tag} given multiple times in {self.path}" )
                     continue
-            # self.createSRMappingsDict()
-            self.checkConsistencyOfStatsModels()
+            ## [!AL!] I've  rewrriten the methods below to check consistency of srSets and statModels. Check if it is ok.
+            self.checkConsistencyOfSRsets()
+            self.checkConsistencyOfStatModels()
             self.cacheStatsModels()
 
-    def isInSRMapping ( self, region ):
-        if hasattr ( self, "srMappings" ):
-            for label,m in self.srMappings.items():
-                if region == label:
-                    return True
-            return False
-        ## if there is no srMappings, we look directly
-        ## in srSets
-        for regions in self.srSets.values():
-            if region in regions:
-                return True
-        return False
-
-    def checkConsistencyOfStatsModels( self ):
-        """ check that all SRs mentioned in srSets are indeed in srMappings """
+    def checkConsistencyOfSRsets( self ):
+        """ check that all SRs mentioned in srSets are included in srMappings """
+        if not hasattr ( self, "srMappings" ):
+            return
         if not hasattr ( self, "srSets" ):
             return
         elif not isinstance ( self.srSets, dict ):
             raise SModelSError ( f"srSets has to be a dict, but is {type(self.srSets)}" )
-        for regions in self.srSets.values():
-            for region in regions:
-                if not self.isInSRMapping ( region ):
-                    raise SModelSError ( f"region {region} not mentioned in srMapping" )
+        
+        for regionList in self.srSets.values():
+            if not isinstance ( regionList, list ):
+                raise SModelSError ( f"srSets has to be a dict of lists, but its values are of type {type(regionList)}" )
+            for region in regionList:
+                if region not in  self.srMappings:
+                    raise SModelSError ( f"region label {region} not mentioned in srMappings" )
+                
+    def checkConsistencyOfStatModels( self ):
+        """ check that all stat models mentioned in statModels are included in srSets """
+        if not hasattr ( self, "statModels" ):
+            return
+        if not hasattr ( self, "srSets" ):
+            raise SModelSError ( f"statModels is defined, but srSets is not. This is inconsistent." )
+        elif not isinstance ( self.statModels, dict ):
+            raise SModelSError ( f"statModels has to be a dict, but is {type(self.statModels)}" )
+        
+        for regionSet, model_tuples in self.statModels.items():
+            if regionSet not in self.srSets:
+                raise SModelSError ( f"region set {regionSet} mentioned in statModels is not defined in srSets" )
+            if not isinstance ( model_tuples, list ):
+                raise SModelSError ( f"statModels has to be a dict of lists, but its values are of type {type(model_tuples)}" )
+            for model_tuple in model_tuples:
+                if not isinstance ( model_tuple, tuple ):
+                    raise SModelSError ( f"statModels has to be a dict of lists of tuples, but its values are of type {type(model_tuple)}" )
+                if len(model_tuple) != 2:
+                    raise SModelSError ( f"statModels has to be a dict of lists of tuples of length 2, but its values are of length {len(model_tuple)}" )
+                model_type,model = model_tuple
+                if model_type not in [ "sl", "full_pyhf", "pyhf", "onnx" ]:
+                    raise SModelSError ( f"model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, sl" )
+                if not isinstance ( model, str ):
+                    raise SModelSError ( f"model has to be a string, but is {type(model)}" )
+                if not os.path.isfile ( os.path.join(os.path.dirname(self.path), model) ):
+                    raise SModelSError ( f"model file {model} does not exist in the same directory as {self.path}" )
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:
@@ -152,17 +176,13 @@ class Info(object):
             return
         import json
         self.cachedModels = {}
-        dirp = os.path.dirname(self.path)
-        if type ( self.statModels ) == str:
-            raise SModelSError ( f"in {self.id}: could not parse {self.statModels}" )
-        for setName, model_tuples in self.statModels.items():
+        dirp = os.path.dirname(self.path)        
+        for model_tuples in self.statModels.values():
             for model_tuple in model_tuples:
-                if type(model_tuple)==str:
-                    raise SModelSError ( f"in {self.id}: statModels have to be tuples" )
-                model_type = model_tuple[0]
-                model = model_tuple[1]
+                model_type, model = model_tuple
                 fullPath = os.path.join(dirp, model )
                 with open ( fullPath, "rb" ) as f:
+                    txt = None
                     if model_type == "sl":
                         with open(fullPath,"rt") as f:
                             txt = eval ( f.read() )

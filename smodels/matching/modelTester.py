@@ -27,7 +27,7 @@ from smodels.tools.printerTools import printScanSummary
 from smodels.base.smodelsLogging import logger
 from smodels.tools import ioObjects
 from smodels.tools import coverage
-from typing import Optional
+from typing import Optional, Union
 
 from collections import OrderedDict
 import os
@@ -311,7 +311,8 @@ def _determineNCPus(cpus_wanted : int, n_files : int ) -> int:
     """
 
     ncpusAll = runtime.nCPUs()
-    # ncpus = parser.getint("parameters", "ncpus")
+    if ncpusAll is None:
+        ncpusAll = 1
     ncpus = cpus_wanted
     if ncpus <= 0:
         ncpus = ncpusAll + ncpus
@@ -422,7 +423,7 @@ def checkForSemicolon( strng : str, section, var ):
         logger.warning(
             f"A semicolon(;) has been found in [{section}] {var}, in your config file. If this was meant as comment, then please a space before it.")
 
-def loadDatabase(parser, db : Optional[Database] ) -> Database:
+def loadDatabase(parser, db : Optional[Database] ) -> Union[None,Database]:
     """
     Load database
 
@@ -578,6 +579,10 @@ def getCombiner( inputFile : str , parameterFile : str,
     # Load database and results
     if database == None:
         database = loadDatabase(parser, None)
+    if database is None:
+        logger.error(f"Error loading database")
+        raise SModelSError(f"Error loading database")
+    
     loadDatabaseResults(parser, database)
 
     # Run SModelS for a single file and get the printer

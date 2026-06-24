@@ -73,7 +73,7 @@ class CompRetriever:
             logger.error(f"covariance matrix has length {len(cov)} but srSet {srSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
             raise SModelSError(f"covariance matrix has length {len(cov)} but srSet {srSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
         
-        # Collect relevant data: ## [!AL!] I have completely changed the code below. Before you were using "offset" and looping over ._datasets, which felt unnecessary. Check!
+        # Collect relevant data:
         nobs = []
         bg = []
         nsig = []
@@ -142,7 +142,7 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappings = globalInfo.srMappings ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappings[sr] to get the mapping dict for a given sr.
+        srMappings = globalInfo.srMappings
 
         for sr in globalInfo.srSets[srSet]:
             if sr not in srMappings:
@@ -186,7 +186,7 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        srMappings = globalInfo.srMappings ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappings[sr] to get the mapping dict for a given sr.
+        srMappings = globalInfo.srMappings
         labelToPyhf = {}
         for sr_label in globalInfo.srSets[srSet]:
             if sr_label not in srMappings:
@@ -224,7 +224,7 @@ class CompRetriever:
             signalUncertainty = globalInfo.signalUncertainty
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        data = PyhfData(nsignals, json, regions,
+        data = PyhfData(nsignals, json, regions,  ## [!AL!] Is this correct? the 3rd argument of PyhfData should be "jsonFile", but we are passing a list of dicts
                         includeCRs, signalUncertainty, globalInfo,
                         jsonFileName = model_filename )
         upperLimitComputer = PyhfUpperLimitComputer( data,
@@ -335,7 +335,7 @@ class StatsComputer:
                 # raise SModelSError ( f"{dataset.globalInfo.id} is defined as a combined dataset but no srMappings defined" )
             else:
                 # Get dictionary with dataset IDs and signal yields
-                for label,region in dataset.globalInfo.srMappings.items(): ## [!AL!] This is clearly inconsistent with what was assumed for srMappings before! Here you are assuming it is a list.
+                for label,region in dataset.globalInfo.srMappings.items(): ## [!AL!] Shouldn't we be using srSets here, since they define the combination?
                     srNsigDictAll[ region["smodels"] ] = 0.
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()

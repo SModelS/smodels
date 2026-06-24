@@ -23,7 +23,7 @@ from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
 from smodels.base.physicsUnits import fb
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
-
+from typing import Optional
 import sys
 
 def removeCruftOutputs( filename : str ):

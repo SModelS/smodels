@@ -9,7 +9,7 @@
 
 import os
 from smodels.experiment import infoObj
-from smodels.experiment import datasetObj
+from smodels.experiment.datasetObj import DataSet
 from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
@@ -51,63 +51,22 @@ class ExpResult(object):
         if not hasattr(self.globalInfo, 'type'):
             self.globalInfo.type = 'prompt'
 
-        datasets = {}
         folders = []
         for root, _, files in cleanWalk(path):
             folders.append((root, files))
         folders.sort()
         self.datasets = []
-        hasModels = hasattr(self.globalInfo, "srMappings" )
-        if hasModels:
-            dsOrder = []
-            for label,SR in self.globalInfo.srMappings.items():
-                if not isinstance(SR,dict):
-                    raise SModelSExperimentError(f"The SRs in the srMappings should be a dictionary and not {type(SR)}")
-                # In case the smodels label is not defined, ignore SR
-                if "smodels" not in SR:
-                    continue
-                smodelsLabel = SR["smodels"]
-                if smodelsLabel is None or smodelsLabel in dsOrder:
-                    continue
-                # Store the dataset following the order defined in globalInfo.srMappings
-                dsOrder.append ( smodelsLabel )
-            self.globalInfo.datasetOrder = dsOrder
-        hasOrder = hasattr(self.globalInfo, "datasetOrder")
+        ## [!AL!] I've removed a bunch of code below, which seemed unnecessary. I've removed datasetOrder altogether. Check if it is ok
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
                 # Build data set
                 try:
-                    dataset = datasetObj.DataSet(root, self.globalInfo,
+                    dataset = DataSet(root, self.globalInfo,
                                                  databaseParticles=databaseParticles)
-                    if hasOrder:
-                        datasets[dataset.dataInfo.dataId] = dataset
-                    else:
-                        self.datasets.append(dataset)
+                    self.datasets.append(dataset)
                 except TypeError as e:
                     logger.warning(f"Error creating dataset from dir {root}:\n {e}")
                     continue
-        if not hasOrder:
-            return
-        dsOrder = self.globalInfo.datasetOrder
-        if type(dsOrder) == str:
-            ## for debugging only, we allow a single dataset
-            dsOrder = [dsOrder]
-        for dsname in dsOrder:
-            if dsname in datasets:
-                self.datasets.append(datasets[dsname])
-        if type(self.globalInfo.datasetOrder)==tuple:
-            self.globalInfo.datasetOrder = list ( self.globalInfo.datasetOrder )
-        # now append the rest -- but only for json file case
-        if hasModels:
-            for dsName,ds in datasets.items():
-                if dsName not in self.globalInfo.srMappings:
-                    # if it does not appear in srMappings, we dont add
-                    continue
-                if dsName not in dsOrder: #  and self.globalInfo.srMappings["sl"]!=None:
-                    self.datasets.append ( ds )
-                    self.globalInfo.datasetOrder.append ( dsName )
-        #if len(self.datasets) != len(dsOrder):
-        #    raise SModelSExperimentError( f"lengths of datasets ({len(self.datasets)}) and datasetOrder ({len(dsOrder)}) mismatch in {self.globalInfo.id}")
 
     def writePickle(self, dbVersion : str ):
         """ write the pickle file """
@@ -162,7 +121,7 @@ class ExpResult(object):
             label += txnames + ','
         return label[:-1]
 
-    def getDataset(self, dataId : str ) -> datasetObj.DataSet:
+    def getDataset(self, dataId : str ) -> Union[DataSet,None]:
         """
         retrieve dataset by dataId
         """
@@ -198,7 +157,8 @@ class ExpResult(object):
         :return: efficiency (float)
         """
 
-
+        if dataID is None:
+            return None
         dataset = self.getDataset(dataID)
         if dataset:
             return dataset.getEfficiencyFor(txname, sms=sms, mass=mass)

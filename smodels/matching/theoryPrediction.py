@@ -14,7 +14,7 @@ from smodels.statistics.basicStats import observed, apriori, NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
-from typing import Union, Dict, Callable, Optional
+from typing import Union, Dict, Callable, Optional, List
 import numpy as np
 
 # number of digits for rounding the mu argument when computing likelihoods
@@ -407,6 +407,93 @@ class TheoryPrediction(object):
         return llhdDict
 
 
+class TheoryPredictionList(object):
+    """
+    An instance of this class represents a collection of theory prediction
+    objects.
+    """
+
+    def __init__(self, theoryPredictions=None, maxCond=None):
+        """
+        Initializes the list.
+
+        :parameter theoryPredictions: list of TheoryPrediction objects
+        :parameter maxCond: maximum relative violation of conditions for valid
+        results. If defined, it will keep only the theory predictions with
+        condition violation < maxCond.
+        """
+        self._theoryPredictions = []
+        if theoryPredictions and isinstance(theoryPredictions,
+                                            (TheoryPredictionList,list)):
+
+            if not maxCond:
+                self._theoryPredictions = theoryPredictions
+            else:
+                newPredictions = []
+                for theoPred in theoryPredictions:
+                    mCond = theoPred.getmaxCondition()
+                    if mCond != "N/A" and round(mCond/maxCond, 2) > 1.0:
+                        continue
+                    else:
+                        newPredictions.append(theoPred)
+                self._theoryPredictions = newPredictions
+
+    def append(self, theoryPred):
+        self._theoryPredictions.append(theoryPred)
+
+    def __str__(self):
+        if len(self._theoryPredictions) == 0:
+            return "no predictions."
+        ret = f"{len(self._theoryPredictions)} predictions: "
+        ret += ", ".join([str(s) for s in self._theoryPredictions])
+        return ret
+
+    def __iter__(self):
+        for theoryPrediction in self._theoryPredictions:
+            yield theoryPrediction
+
+    def __getitem__(self, index):
+        return self._theoryPredictions[index]
+
+    def __len__(self):
+        return len(self._theoryPredictions)
+
+    def __add__(self, theoPredList):
+        if isinstance(theoPredList, TheoryPredictionList):
+            res = TheoryPredictionList()
+            res._theoryPredictions = self._theoryPredictions + theoPredList._theoryPredictions
+            return res
+        else:
+            return None
+
+    def __radd__(self, theoPredList):
+        if theoPredList == 0:
+            return self
+        else:
+            return self.__add__(theoPredList)
+
+    def removeRNone(self):
+        """
+        Remove predictions for which r-value = None
+        (such as when the UL computer fails due to convergence issues).
+        """
+
+        tpList = [tp for tp in self._theoryPredictions
+                  if tp.getRValue() is not None]
+        self._theoryPredictions = tpList[:]
+
+    def sortTheoryPredictions(self):
+        """
+        Reverse sort theoryPredictions by R value.
+        Used for printer.
+        """
+        self._theoryPredictions = sorted(
+            self._theoryPredictions,
+            key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()),
+            reverse=True,
+        )
+
+
 class TheoryPredictionsCombiner(TheoryPrediction):
     """
     Facility used to combine theory predictions from different analyes.
@@ -453,7 +540,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         self._statsComputer = None
 
     @classmethod
-    def selectResultsFrom(cls, theoryPredictions : list, anaIDs : list ):
+    def selectResultsFrom(cls, theoryPredictions : Union[List[TheoryPrediction],TheoryPredictionList], 
+                          anaIDs : List[str] ):
         """
         Select the results from theoryPrediction list which match one
         of the IDs in anaIDs. If there are multiple predictions for the
@@ -588,93 +676,6 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         return f"SRs: {', '.join(ids)}"
 
 
-class TheoryPredictionList(object):
-    """
-    An instance of this class represents a collection of theory prediction
-    objects.
-    """
-
-    def __init__(self, theoryPredictions=None, maxCond=None):
-        """
-        Initializes the list.
-
-        :parameter theoryPredictions: list of TheoryPrediction objects
-        :parameter maxCond: maximum relative violation of conditions for valid
-        results. If defined, it will keep only the theory predictions with
-        condition violation < maxCond.
-        """
-        self._theoryPredictions = []
-        if theoryPredictions and isinstance(theoryPredictions,
-                                            (TheoryPredictionList,list)):
-
-            if not maxCond:
-                self._theoryPredictions = theoryPredictions
-            else:
-                newPredictions = []
-                for theoPred in theoryPredictions:
-                    mCond = theoPred.getmaxCondition()
-                    if mCond != "N/A" and round(mCond/maxCond, 2) > 1.0:
-                        continue
-                    else:
-                        newPredictions.append(theoPred)
-                self._theoryPredictions = newPredictions
-
-    def append(self, theoryPred):
-        self._theoryPredictions.append(theoryPred)
-
-    def __str__(self):
-        if len(self._theoryPredictions) == 0:
-            return "no predictions."
-        ret = f"{len(self._theoryPredictions)} predictions: "
-        ret += ", ".join([str(s) for s in self._theoryPredictions])
-        return ret
-
-    def __iter__(self):
-        for theoryPrediction in self._theoryPredictions:
-            yield theoryPrediction
-
-    def __getitem__(self, index):
-        return self._theoryPredictions[index]
-
-    def __len__(self):
-        return len(self._theoryPredictions)
-
-    def __add__(self, theoPredList):
-        if isinstance(theoPredList, TheoryPredictionList):
-            res = TheoryPredictionList()
-            res._theoryPredictions = self._theoryPredictions + theoPredList._theoryPredictions
-            return res
-        else:
-            return None
-
-    def __radd__(self, theoPredList):
-        if theoPredList == 0:
-            return self
-        else:
-            return self.__add__(theoPredList)
-
-    def removeRNone(self):
-        """
-        Remove predictions for which r-value = None
-        (such as when the UL computer fails due to convergence issues).
-        """
-
-        tpList = [tp for tp in self._theoryPredictions
-                  if tp.getRValue() is not None]
-        self._theoryPredictions = tpList[:]
-
-    def sortTheoryPredictions(self):
-        """
-        Reverse sort theoryPredictions by R value.
-        Used for printer.
-        """
-        self._theoryPredictions = sorted(
-            self._theoryPredictions,
-            key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()),
-            reverse=True,
-        )
-
-
 def theoryPredictionsFor(database : Database, smsTopDict : Dict,
         maxMassDist : float = 0.2, useBestDataset : bool = True,
         combinedResults : bool = True,
@@ -783,16 +784,14 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
         return False
     if not hasattr ( expResult.globalInfo, "srSets" ):
         raise SModelSError ( f"{expResult.globalInfo.id} has srMappings but no srSets" )
-    if dataId not in expResult.globalInfo.srMappings:
-        return False
-    region = expResult.globalInfo.srMappings[dataId]
-    if "sl" not in region:
-        region["sl"]=region["smodels"] ## FIXME should disappear
+    # if dataId not in expResult.globalInfo.srMappings:  ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of srMappings, which corresponds to the label
+        # return False
+    
     for srSetName in expResult.globalInfo.statModels.keys():
-        dType = expResult.typeOfStatsModel ( srSetName )
-        assert dType != None, "dont know which model type"
-        for regions in expResult.globalInfo.srSets [ srSetName ]:
-            if dataId in regions and region[dType]!=None:
+        regionList = expResult.globalInfo.srSets[srSetName] # List of labels for the signal regions
+        for region in regionList:
+            regionDict = expResult.globalInfo.srMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+            if dataId in regionDict['smodels']:
                 return True
     return False
 
@@ -822,9 +821,10 @@ def _getCombinedResultFor(dataSetResults, expResult):
         for tpred in predList:
             dataId = tpred.dataId()
             srTypeDict[dataId] = 'SR'
-            if hasattr ( globalInfo, "srMappings" ) and \
-                    dataId in globalInfo.srMappings:
-                srTypeDict[dataId] = globalInfo.srMappings[dataId]['type']
+            if hasattr ( globalInfo, "srMappings" ): ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of srMappings, which corresponds to the label
+                    for regionDict in globalInfo.srMappings.values():
+                        if dataId == regionDict['smodels']:
+                            srTypeDict[dataId] = regionDict['type']
     
     if all(srType != 'SR' for srType in srTypeDict.values()):
         return None
@@ -909,8 +909,12 @@ def _getBestResult(dataSetResults):
 
         # Only a SR can be the best SR
         if hasattr(globalInfo,"srMappings"):
-            region = globalInfo.srMappings[dataset.dataInfo.dataId]
-            if region["type"] != "SR":
+            regionType = "SR" # Assume it is a SR by default
+            for regionDict in globalInfo.srMappings.values():
+                if dataset.dataInfo.dataId == regionDict["smodels"]:
+                    regionType = regionDict["type"]
+            
+            if regionType != "SR":
                 continue
 
         if dataset.getType() != "efficiencyMap":
