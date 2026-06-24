@@ -19,7 +19,8 @@ from typing import Optional,Union
 class Info(object):
     """
     Holds the meta data information contained in a .txt file
-    (luminosity, sqrts, experimentID,...). Its attributes are generated according to the lines in the
+    (luminosity, sqrts, experimentID,...).
+    Its attributes are generated according to the lines in the
     .txt file which contain "info_tag: value".
     """
 
