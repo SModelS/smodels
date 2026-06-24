@@ -57,7 +57,7 @@ class SLData:
         covariance,
         third_moment=None,
         nsignal=None,
-        name : str = "model",
+        name : Union[list,str] = "model",
         deltas_rel : float = 0.2,
         lumi=None,
         asimov : Union[None,float] = None
@@ -67,7 +67,8 @@ class SLData:
         :param backgrounds: evaluationType bg per dataset
         :param covariance: uncertainty in background, as a covariance matrix
         :param nsignal: number of signal events in each dataset
-        :param name: give the model a name, just for convenience
+        :param name: give the model a name, just for convenience.
+        If its a list, then it names the SRs
         :param deltas_rel: the assumed relative error on the signal hypotheses.
                            The default is 20%.
         :param lumi: luminosity of dataset in 1/fb, or None
