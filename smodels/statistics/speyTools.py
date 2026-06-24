@@ -259,14 +259,13 @@ class SpeyRetriever:
     
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        # srMappingsDict = { sr["label"]: sr for sr in globalInfo.srMappings }
-        srMappingsDict = globalInfo.srMappingsDict
+        srMappings = globalInfo.srMappings
 
         for sr in globalInfo.srSets[srSet]:
-            if sr not in srMappingsDict:
+            if sr not in srMappings:
                 logger.error ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            labelToONNX[sr] = srMappingsDict[sr]["onnx"]
+            labelToONNX[sr] = srMappings[sr]["onnx"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )

@@ -748,8 +748,9 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             theoPred.deltas_rel = deltas_rel
             srType = 'SR' # By default assume it is a SR
             # Check if SR corresponds to a CR or VR, in which case we do not report the upper limit
-            if hasattr(expResult.globalInfo, "srMappingsDict"):
-                srType = expResult.globalInfo.srMappingsDict.get(theoPred.dataId(),None)
+            if hasattr(expResult.globalInfo, "srMappings"):
+                assert type ( expResult.globalInfo.srMappings) == dict, f"{expResult.globalInfo.id} srMappings are not a dict"
+                srType = expResult.globalInfo.srMappings.get(theoPred.dataId(),None)
                 if srType is not None:
                     srType = srType["type"]
                 
@@ -778,9 +779,13 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     assert hasattr ( dataset, "dataInfo" ), \
         "why does the dataset here not have a dataInfo?"
     dataId = dataset.getID()
-    if dataId not in expResult.globalInfo.srMappingsDict:
+    if not hasattr ( expResult.globalInfo, "srMappings" ):
         return False
-    region = expResult.globalInfo.srMappingsDict[dataId]
+    if not hasattr ( expResult.globalInfo, "srSets" ):
+        raise SModelSError ( f"{expResult.globalInfo.id} has srMappings but no srSets" )
+    if dataId not in expResult.globalInfo.srMappings:
+        return False
+    region = expResult.globalInfo.srMappings[dataId]
     if "sl" not in region:
         region["sl"]=region["smodels"] ## FIXME should disappear
     for srSetName in expResult.globalInfo.statModels.keys():
@@ -817,8 +822,9 @@ def _getCombinedResultFor(dataSetResults, expResult):
         for tpred in predList:
             dataId = tpred.dataId()
             srTypeDict[dataId] = 'SR'
-            if dataId in globalInfo.srMappingsDict:
-                srTypeDict[dataId] = globalInfo.srMappingsDict[dataId]['type']
+            if hasattr ( globalInfo, "srMappings" ) and \
+                    dataId in globalInfo.srMappings:
+                srTypeDict[dataId] = globalInfo.srMappings[dataId]['type']
     
     if all(srType != 'SR' for srType in srTypeDict.values()):
         return None
@@ -902,8 +908,8 @@ def _getBestResult(dataSetResults):
         globalInfo = dataset.globalInfo
 
         # Only a SR can be the best SR
-        if hasattr(globalInfo,"srMappingsDict"):
-            region = globalInfo.srMappingsDict[dataset.dataInfo.dataId]
+        if hasattr(globalInfo,"srMappings"):
+            region = globalInfo.srMappings[dataset.dataInfo.dataId]
             if region["type"] != "SR":
                 continue
 

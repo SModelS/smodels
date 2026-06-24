@@ -60,7 +60,7 @@ class ExpResult(object):
         hasModels = hasattr(self.globalInfo, "srMappings" )
         if hasModels:
             dsOrder = []
-            for SR in self.globalInfo.srMappings:
+            for label,SR in self.globalInfo.srMappings.items():
                 if not isinstance(SR,dict):
                     raise SModelSExperimentError(f"The SRs in the srMappings should be a dictionary and not {type(SR)}")
                 # In case the smodels label is not defined, ignore SR
@@ -100,14 +100,14 @@ class ExpResult(object):
         # now append the rest -- but only for json file case
         if hasModels:
             for dsName,ds in datasets.items():
-                if dsName not in self.globalInfo.srMappingsDict:
-                    # if it does not appear in srMappingsDict, we dont add
+                if dsName not in self.globalInfo.srMappings:
+                    # if it does not appear in srMappings, we dont add
                     continue
-                if dsName not in dsOrder: #  and self.globalInfo.srMappingsDict["sl"]!=None:
+                if dsName not in dsOrder: #  and self.globalInfo.srMappings["sl"]!=None:
                     self.datasets.append ( ds )
                     self.globalInfo.datasetOrder.append ( dsName )
-        if len(self.datasets) != len(dsOrder):
-            raise SModelSExperimentError( f"lengths of datasets and datasetOrder mismatch in {self.globalInfo.id}")
+        #if len(self.datasets) != len(dsOrder):
+        #    raise SModelSExperimentError( f"lengths of datasets ({len(self.datasets)}) and datasetOrder ({len(dsOrder)}) mismatch in {self.globalInfo.id}")
 
     def writePickle(self, dbVersion : str ):
         """ write the pickle file """

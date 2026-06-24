@@ -23,7 +23,7 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
-    def canonizeRegions ( self, regions : Optional[Union[list, None]] ) -> Union[list,None]:
+    def canonizeRegions ( self, regions : Optional[dict] ) -> Optional[dict]:
         """ given a list of regions in globalInfo.txt in the
         srMappings field,
         return a canonical version of that list: strings in
@@ -38,28 +38,28 @@ class Info(object):
         """
         if regions is None:
             return regions
-        newregions = []
-        for region in regions:
+        newregions={}
+        for label,region in regions.items():
             if type(region)==str:
+                logger.debug ( f"exploding {region} to a dictionary" )
                 region={"smodels": region}
             if "type" not in region:
+                logger.debug ( f"no type specified for {region}, will assume SR" )
                 region["type"]="SR"
             if "smodels" not in region:
-                region["smodels"]=None
+                if region["type"]=="SR":
+                    region["smodels"]=label
+                    logger.debug ( f"no 'smodels' specified in {region}, will assume {label}" )
+                else:
+                    region["smodels"]=None
+                    logger.debug ( f"no 'smodels' specified in {region}, will assume None" )
             if "pyhf" not in region:
                 region["pyhf"]=region["smodels"]
             if "onnx" not in region:
                 region["onnx"]=region["pyhf"]
             if "sl" not in region:
                 region["sl"]=region["smodels"]
-            if "label" not in region:
-                # if there isnt a label, we take
-                # the smodels as the label
-                if region["smodels"] is not None:
-                    region["label"]=region["smodels"]
-                else:
-                    region["label"]=region["pyhf"]
-            newregions.append ( region )
+            newregions[label] = region
         return newregions
 
     def __init__(self, path=None):
@@ -90,7 +90,16 @@ class Info(object):
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
                 if tag in [ "srMappings" ]:
-                    regions = eval(value)
+                    try:
+                        regions = eval(value)
+                    except Exception as e:
+                        try:
+                            from pygments import highlight
+                            from pygments.lexers import PythonLexer, JsonLexer
+                            from pygments.formatters import TerminalFormatter
+                            print(highlight(value, JsonLexer(), TerminalFormatter()))
+                        finally:
+                            raise e
                     regions = self.canonizeRegions ( regions )
                     value = str(regions)
                 if tags.count(tag) == 1:
@@ -98,14 +107,14 @@ class Info(object):
                 else:
                     logger.info(f"tag {tag} given multiple times in {self.path}" )
                     continue
-            self.createSRMappingsDict()
+            # self.createSRMappingsDict()
             self.checkConsistencyOfStatsModels()
             self.cacheStatsModels()
 
     def isInSRMapping ( self, region ):
         if hasattr ( self, "srMappings" ):
-            for m in self.srMappings:
-                if region == m["label"]:
+            for label,m in self.srMappings.items():
+                if region == label:
                     return True
             return False
         ## if there is no srMappings, we look directly
@@ -114,28 +123,6 @@ class Info(object):
             if region in regions:
                 return True
         return False
-
-    def createSRMappingsDict ( self ):
-        """ we have srMappings, create srMappingsDict from it """
-        if not hasattr ( self, "srMappings" ):
-            if hasattr ( self, "srSets" ):
-                self.srMappingsDict = {}
-                self.srMappings = []
-                for regions in self.srSets.values():
-                    for region in regions:
-                        d = { "smodels": region, "label": region, "onnx": region,
-                              "pyhf": region, "type": "SR" }
-                        self.srMappingsDict[region] = d
-                        self.srMappings.append ( d )
-
-                return
-            else:
-                return
-        self.srMappingsDict = {}
-        for region in self.srMappings:
-            if region["label"] in self.srMappingsDict:
-                raise SModelSError ( f"label {region['label']} appearing twice in srMappings" )
-            self.srMappingsDict[ region["label"] ] = region
 
     def checkConsistencyOfStatsModels( self ):
         """ check that all SRs mentioned in srSets are indeed in srMappings """

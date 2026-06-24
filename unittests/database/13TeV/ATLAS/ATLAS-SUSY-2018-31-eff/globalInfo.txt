@@ -10,16 +10,16 @@ contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2026/5/8
-srMappings: [
-    {'smodels': 'SRA_L', 'pyhf': 'SR_meff[0]'},
-    {'smodels': 'SRA_M', 'pyhf': 'SR_meff[1]'},
-    {'smodels': 'SRA_H', 'pyhf': 'SR_meff[2]'},
-    {'smodels': 'SRB', 'pyhf': 'SR_cuts'},
-    {'smodels': 'SRC_22', 'pyhf': 'SR_metsigST[0]'},
-    {'smodels': 'SRC_24', 'pyhf': 'SR_metsigST[1]'},
-    {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
-    {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'},
-    {'smodels': 'SRC_incl', 'pyhf': None }]
+srMappings: {
+    'SRA_L': {'smodels': 'SRA_L', 'pyhf': 'SR_meff[0]'},
+    'SRA_M': {'smodels': 'SRA_M', 'pyhf': 'SR_meff[1]'},
+    'SRA_H': {'smodels': 'SRA_H', 'pyhf': 'SR_meff[2]'},
+    'SRB': {'smodels': 'SRB', 'pyhf': 'SR_cuts'},
+    'SRC_22': {'smodels': 'SRC_22', 'pyhf': 'SR_metsigST[0]'},
+    'SRC_24': {'smodels': 'SRC_24', 'pyhf': 'SR_metsigST[1]'},
+    'SRC_26': {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
+    'SRC_28': {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'},
+    'SRC_incl': {'smodels': 'SRC_incl', 'pyhf': None }}
 srSets: { 'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'],
 			    'C': ['SRC_22', 'SRC_24', 'SRC_26', 'SRC_28']}
 statModels: { 'A': [( 'pyhf', 'BkgOnlyA.json' ) ],

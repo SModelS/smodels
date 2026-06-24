@@ -142,13 +142,13 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappingsDict = globalInfo.srMappingsDict ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappingsDict[sr] to get the mapping dict for a given sr.
+        srMappings = globalInfo.srMappings ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappings[sr] to get the mapping dict for a given sr.
 
         for sr in globalInfo.srSets[srSet]:
-            if sr not in srMappingsDict:
+            if sr not in srMappings:
                 logger.error ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            labelToONNX[sr] = srMappingsDict[sr]["onnx"]
+            labelToONNX[sr] = srMappings[sr]["onnx"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
@@ -186,14 +186,14 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        srMappingsDict = globalInfo.srMappingsDict ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappingsDict[sr] to get the mapping dict for a given sr.
+        srMappings = globalInfo.srMappings ## [!AL!] I think this is wrong! You are setting a dict to a list of dicts! What I meant before is that we should redefine the entry srMappings in globalInfo to be a dict with the sr label as key and the mapping dict as value, instead of a list of dicts. Then we can simply do srMappings[sr] to get the mapping dict for a given sr.
         labelToPyhf = {}
         for sr_label in globalInfo.srSets[srSet]:
-            if sr_label not in srMappingsDict:
+            if sr_label not in srMappings:
                 logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            if srMappingsDict[sr_label]["smodels"] is not None:
-                labelToPyhf[sr_label] = srMappingsDict[sr_label]["pyhf"]
+            if srMappings[sr_label]["smodels"] is not None:
+                labelToPyhf[sr_label] = srMappings[sr_label]["pyhf"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
@@ -212,7 +212,7 @@ class CompRetriever:
         # Get dictionary for signal yields using the pyhf labels
         nsignals = {label : nsigDict.get(label,0.0) for label in labelToPyhf.keys()}
         json = globalInfo.cachedModels[model_filename]
-        regions = [srMappingsDict[label] for label in globalInfo.srSets[srSet]]
+        regions = [srMappings[label] for label in globalInfo.srSets[srSet]]
         logger.debug(f"list of datasets: {list(labelToPyhf.keys())}")
 
 
@@ -328,10 +328,15 @@ class StatsComputer:
 
         elif dataType == "combined" and tpType == "TheoryPrediction":
             dataset = theoryPrediction.dataset
-            # Get dictionary with dataset IDs and signal yields
             srNsigDictAll = {}
-            for region in dataset.globalInfo.srMappings: ## [!AL!] This is clearly inconsistent with what was assumed for srMappings before! Here you are assuming it is a list.
-                srNsigDictAll[ region["smodels"] ] = 0.
+            if not hasattr ( dataset.globalInfo, "srMappings" ):
+                ## well for cov matrices we dont necessarily need srMappings
+                pass
+                # raise SModelSError ( f"{dataset.globalInfo.id} is defined as a combined dataset but no srMappings defined" )
+            else:
+                # Get dictionary with dataset IDs and signal yields
+                for label,region in dataset.globalInfo.srMappings.items(): ## [!AL!] This is clearly inconsistent with what was assumed for srMappings before! Here you are assuming it is a list.
+                    srNsigDictAll[ region["smodels"] ] = 0.
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
                                     for pred in theoryPrediction.datasetPredictions})
