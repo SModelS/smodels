@@ -16,6 +16,7 @@ import jsonschema
 import copy
 import numpy as np
 from smodels.base.smodelsLogging import logger
+from smodels.base.physicsUnits import UnitXSec, UnitLumi
 from smodels.statistics.basicStats import findRoot, clsType
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
@@ -116,21 +117,25 @@ class PyhfData:
     Holds data for use in pyhf
     :ivar nsignals: signal predictions dictionary of dictionaries,
     one for each json file, one entry per signal region
-    :ivar inputJson: json instance
-    :ivar jsonFile: json file
+    :ivar inputJson: json instance (as a dict)
+    :ivar regions: the SModelS regions
     :ivar globalInfo: None, or link to globalInfo (for debugging)
     :ivar jsonFileName: name of json file (optional)
     """
 
-    def __init__( self, nsignals : Dict, inputJson, jsonFile=None,
-                  includeCRs=False, signalUncertainty : Optional[float] = None,
-                  globalInfo = None, jsonFileName : Optional[str] = None ):
+    def __init__( self, nsignals : Dict, inputJson : dict,
+            regions : Optional[list] = None, includeCRs : bool = False,
+            signalUncertainty : Optional[float] = None,
+            globalInfo  = None, jsonFileName : Optional[str] = None ):
         self.globalInfo = globalInfo
         self.nsignals = nsignals
         self.getTotalYield()
         self.jsonFileName = jsonFileName
+        self.regions = regions
         self.inputJson = inputJson
-        if jsonFile is None:   # If no name has been provided for the json file(s) and the channels, use fake ones
+        if regions is None:
+            # If no name has been provided for the json file(s)
+            # and the channels, use fake ones
             regions = []
             srname = "SR1"
             if len(nsignals)==1:
@@ -140,8 +145,7 @@ class PyhfData:
                     srname = f"SR1[{j}]"
                     regions.append ( { "smodels": srname, "type": "SR",
                                        "pyhf": srname } )
-            jsonFile = regions
-        self.jsonFile = jsonFile
+        self.regions = regions
         self.includeCRs = includeCRs
         self.signalUncertainty = signalUncertainty
         self.combinations = None
@@ -152,7 +156,7 @@ class PyhfData:
         self.checkConsistency()
         self.getWSInfo()
 
-    def getTotalYield ( self ):
+    def getTotalYield ( self ) -> float:
         """ the total yield in all signal regions """
         S = 0
         for signal in self.nsignals.values():
@@ -166,11 +170,16 @@ class PyhfData:
                     raise SModelSError ( f"type {self.nsignals} is {type(signal)}" )
         self.totalYield = S
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         """ the total fiducial xsec for this computer """
         return self.totalYield / self.globalInfo.lumi
 
-    def createPatchForRegion ( self, region, i_ch, ch, jsName ):
+    def createPatchForRegion ( self, region : dict, i_ch : int,
+            ch : dict, jsName : list ) -> tuple:
+        """ create the json patch for region
+        :param region: dictionary of region
+        :returns: tuple[json patch, region type]
+        """
         chname = ch['name']
         chname2 = f'{ch["name"]}[0]' ## binned SRs
         if region["pyhf"] not in [ chname, chname2 ]:
@@ -190,7 +199,7 @@ class PyhfData:
                 hasAdded = True
                 while hasAdded:
                     hasAdded = False
-                    for rregion in self.jsonFile:
+                    for rregion in self.regions:
                         if rregion["pyhf"] == f'{ch["name"]}[{ctr}]':
                             smodelsName.append(rregion['smodels'])
                             ctr+=1
@@ -220,13 +229,13 @@ class PyhfData:
     def updatePyhfNames ( self, observations : List ):
         """ if no pyhf names are given, get them from the ws,
         in the order of the ws """
-        if "pyhf" in self.jsonFile[0]:
+        if "pyhf" in self.regions[0]:
             return
 
         ## we dont have the mapping smodels<->pyhf
         ctr = 0
         #ic ( "---" )
-        nJsonFiles = len(self.jsonFile)
+        nJsonFiles = len(self.regions)
 
         nSRs = 0
         for observation in observations:
@@ -241,31 +250,31 @@ class PyhfData:
             if regionType in [ "VR" ]:
                 region = { "pyhf": observation["name"], "smodels": None,
                            "type": regionType }
-                self.jsonFile.append ( region )
+                self.regions.append ( region )
                 continue
             if not self.includeCRs and regionType in [ "CR" ]:
                 region = { "pyhf": observation["name"], "smodels": None,
                            "type": regionType }
-                self.jsonFile.append ( region )
+                self.regions.append ( region )
                 continue
             if self.includeCRs and regionType in [ "CR" ]:
                 if nSRs == nJsonFiles: # and nSRs+nCRs == nObs:
                     ## the signal regions alone do it
                     region = { "pyhf": observation["name"], "smodels": None,
                                "type": regionType }
-                    self.jsonFile.append ( region )
+                    self.regions.append ( region )
                     continue
 
             if len(observation["data"])==1:
-                if ctr < len(self.jsonFile):
-                   self.jsonFile[ctr]["pyhf"]=f"{name}"
-                   self.jsonFile[ctr]["type"]=regionType
+                if ctr < len(self.regions):
+                   self.regions[ctr]["pyhf"]=f"{name}"
+                   self.regions[ctr]["type"]=regionType
                 ctr += 1
             else:
                 for i in range(len(observation["data"])):
-                    if ctr < len(self.jsonFile):
-                        self.jsonFile[ctr]["pyhf"]=f"{name}[{i}]"
-                        self.jsonFile[ctr]["type"]=regionType
+                    if ctr < len(self.regions):
+                        self.regions[ctr]["pyhf"]=f"{name}[{i}]"
+                        self.regions[ctr]["type"]=regionType
                     ctr += 1
 
 
@@ -286,7 +295,7 @@ class PyhfData:
             self.errorFlag = True
             return
 
-        ws, jsName = self.inputJson, self.jsonFile
+        ws, jsName = self.inputJson, self.regions
         wsChannelsInfo = {}
         wsChannelsInfo["signalRegions"] = []
         wsChannelsInfo["otherRegions"] = []
@@ -299,19 +308,19 @@ class PyhfData:
         sigInCRs = False
         signalNames = self.nsignals.keys()
         for signalName in signalNames:
-            for region in self.jsonFile:
+            for region in self.regions:
                 if signalName == region['smodels'] and region['type'] == 'CR':
                     sigInCRs = True
         if sigInCRs and not self.includeCRs:
             logger.warning("Signal in CRs but includeCRs = False. CRs will still be removed.")
 
-        smodelsRegions = self.jsonFile
+        smodelsRegions = self.regions
         #import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
         if "observations" in ws:
             self.updatePyhfNames ( ws["observations"] )
             patchedChannels = set()
             allChannels = set ( [ x["name"] for x in ws["observations"] ] )
-            for i_r, region in enumerate ( self.jsonFile ):
+            for i_r, region in enumerate ( self.regions ):
                 for i_ch, ch in enumerate(ws["observations"]):
                     ## create a patch for the region, but only if channel matches
                     patch, patchType = self.createPatchForRegion ( region, i_ch, ch, jsName )
@@ -342,13 +351,13 @@ class PyhfData:
 
         self.zeroSignalsFlag = False
 
-        jsName, subSig = self.jsonFile, self.nsignals
+        jsName, subSig = self.regions, self.nsignals
         if not isinstance(subSig, dict):
             logger.error("The 'nsignals' parameter must be a dictionary of dictionary")
             self.errorFlag = True
             return
         nBinsJson = 0
-        for region in self.jsonFile:
+        for region in self.regions:
             if (region['type'] == 'SR') or (region['type'] == 'CR' and self.includeCRs and region['smodels'] is not None):
                 nBinsJson += 1
         if nBinsJson != len(subSig):
@@ -365,7 +374,7 @@ class PyhfUpperLimitComputer:
     signal information in the 'data' instance of 'PyhfData'
     """
 
-    def __init__(self, data, cl=0.95, lumi=None ):
+    def __init__(self, data, cl : float =0.95, lumi : Optional[UnitLumi]= None ):
         """
 
         :param data: instance of 'PyhfData' holding the signals information
@@ -417,7 +426,7 @@ class PyhfUpperLimitComputer:
         # self.checkPyhfVersion()
         self.welcome()
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         return self.data.getTotalXSec()
 
     def welcome(self):
@@ -442,9 +451,10 @@ class PyhfUpperLimitComputer:
                 f"pyhf version is {str(pyhfinfo['ver'])}. SModelS currently requires pyhf>={str(pyhfinfo['required'])}. You have been warned."
             )
 
-    def rescale(self, factor):
+    def rescale(self, factor : float ):
         """
-        Rescales the signal predictions (self.nsignals) and processes again the patches and workspaces updates patch and workspaces
+        Rescales the signal predictions (self.nsignals) and processes
+        again the patches and workspaces updates patch and workspaces
         (self.patch, self.workspace and self.workspace_expected)
         """
 
@@ -500,8 +510,8 @@ class PyhfUpperLimitComputer:
         if self.channelsInfo == None:
             return None
         # Constructing the patch to be applied on the main workspace files
-        ws,info,jsFileName,jsFile = self.inputJson, self.channelsInfo,\
-                                    self.data.jsonFileName, self.data.jsonFile
+        ws,info,jsFileName = self.inputJson, self.channelsInfo,\
+                                    self.data.jsonFileName
         patch = []
         for srInfo in info["signalRegions"]:
             operator = {} # Operator for patching the signal
@@ -689,7 +699,7 @@ class PyhfUpperLimitComputer:
                     1.0, data, model, return_fitted_val=True, maxiter=200
                 )
             except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{self.data.jsonFile} for mu={mu:.3f}: {e}")
+                logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{self.data.regions} for mu={mu:.3f}: {e}")
                 # lets try with different initialisation
 
                 try:
@@ -697,7 +707,7 @@ class PyhfUpperLimitComputer:
                         0.0, data, model, return_fitted_val=True, maxiter=200
                     )
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{self.data.jsonFile} for mu=0: {e}")
+                    logger.info(f"pyhf fixed_poi_fit failed for {self.data.globalInfo.id}:{self.data.regions} for mu=0: {e}")
                     return None
                 # lets try with different initialisation
                 initpars = init.tolist()
@@ -726,9 +736,9 @@ class PyhfUpperLimitComputer:
                         self.restore()
                         return None
                 except (pyhf.exceptions.FailedMinimization, ValueError) as e:
-                    jFile = self.data.jsonFile
+                    jRegions = self.data.regions
                     anaId = self.data.globalInfo.id
-                    line = f"pyhf fixed_poi_fit failed twice for {anaId}:{jFile} for mu={mu:.3f}: {e}"
+                    line = f"pyhf fixed_poi_fit failed twice for {anaId}:{jRegions} for mu={mu:.3f}: {e}"
                     if negYields:
                         line += " -- some yields were negative"
                     else:
@@ -746,7 +756,8 @@ class PyhfUpperLimitComputer:
             self.restore()
             return ret / 2.
 
-    def compute_invhess(self, x, data, model, index, epsilon=1e-05):
+    def compute_invhess(self, x, data, model,
+            index : int, epsilon : float = 1e-05 ):
         """
         if inv_hess is not given by the optimiser, calculate numerically by
         evaluating second order partial derivatives using 2 point central

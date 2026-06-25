@@ -224,7 +224,7 @@ class CompRetriever:
             signalUncertainty = globalInfo.signalUncertainty
 
         # Loading the jsonFiles, unless we already have them (because we pickled)
-        data = PyhfData(nsignals, json, regions,  ## [!AL!] Is this correct? the 3rd argument of PyhfData should be "jsonFile", but we are passing a list of dicts
+        data = PyhfData(nsignals, json, regions,
                         includeCRs, signalUncertainty, globalInfo,
                         jsonFileName = model_filename )
         upperLimitComputer = PyhfUpperLimitComputer( data,
