@@ -328,6 +328,7 @@ class StatsComputer:
 
         elif dataType == "combined" and tpType == "TheoryPrediction":
             dataset = theoryPrediction.dataset
+            """
             srNsigDictAll = {}
             if not hasattr ( dataset.globalInfo, "srMappings" ):
                 ## well for cov matrices we dont necessarily need srMappings
@@ -340,6 +341,10 @@ class StatsComputer:
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
                                     for pred in theoryPrediction.datasetPredictions})
+            """
+            srNsigDictAll = { p.dataset.getID() : \
+                (p.xsection*dataset.getLumi()).asNumber() \
+                for p in theoryPrediction.datasetPredictions }
 
             for srSet,modelList in dataset.globalInfo.statModels.items():
                 if srSet not in dataset.globalInfo.srSets:
