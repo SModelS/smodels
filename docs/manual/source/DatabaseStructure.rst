@@ -151,7 +151,7 @@ The following case, taken from ATLAS-SUSY-2018-32 has control regions
 that are used for the ML surrogate model, but not in the pyhf model:
 
 .. literalinclude:: /literals/globalInfo201832.txt
-   :lines: 15-40
+   :lines: 15-54
 
 Machine-learned models can be mixed with full models. In this case
 of ATLAS-SUSY-2019-09, by default surrogate models are used for the

@@ -10,12 +10,12 @@ contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2020/1/26
-srMappings: [
-    {'pyhf': 'QCR1cut_cuts', 'type': 'CR', 'label': 'QCR1'},
-    {'pyhf': 'QCR2cut_cuts', 'type': 'CR', 'label': 'QCR2' },
-    {'smodels': 'SRlow', 'pyhf': 'SR1cut_cuts'},
-    {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'},
-    {'pyhf': 'WCRcut_cuts', 'type': 'CR', 'label': 'WCR' } ]
+srMappings: {
+    'QCR1': {'pyhf': 'QCR1cut_cuts', 'type': 'CR' },
+    'QCR2': {'pyhf': 'QCR2cut_cuts', 'type': 'CR' },
+    'SRlow': {'smodels': 'SRlow', 'pyhf': 'SR1cut_cuts'},
+    'SRhigh': {'smodels': 'SRhigh', 'pyhf': 'SR2cut_cuts'},
+    'WCR': {'pyhf': 'WCRcut_cuts', 'type': 'CR' } }
 srSets: { "all": [ 'QCR1', 'QCR2', 'SRlow', 'SRhigh', 'WCR' ] }
 statModels: { "all": [ ( 'onnx', 'SUSY-2018-04.onnx' ), ( 'pyhf', 'SRcombined.json' ) ] }
 
