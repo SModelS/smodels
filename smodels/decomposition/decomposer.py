@@ -322,8 +322,9 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
 
         # Warn user about large memory usage
         if not sizeWarningLogged:
-            if smsTopDict.numberOfSMS() > maxSMSsize_warning:
-                logger.warning(f"A large number of topologies is being generated and can result in large memory usage."
+            nSMS = smsTopDict.numberOfSMS()
+            if nSMS > maxSMSsize_warning:
+                logger.warning(f"A large number of topologies ({nSMS}) is being generated and can result in large memory usage."
                                f" To reduce the number of topologies try increasing the sigmacut parameter.")
                 sizeWarningLogged = True
 
@@ -335,8 +336,9 @@ def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb,
 
     # Warn user about large memory usage
     if not sizeWarningLogged:
-        if smsTopDict.numberOfSMS() > maxSMSsize_warning:
-            logger.warning(f"A large number of topologies is being generated and can result in large memory usage."
+        nSMS = smsTopDict.numberOfSMS()
+        if nSMS > maxSMSsize_warning:
+            logger.warning(f"A large number of topologies ({nSMS}) has been generated and can result in large memory usage."
                             f" To reduce the number of topologies try increasing the sigmacut parameter.")
             sizeWarningLogged = True
     
