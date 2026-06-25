@@ -791,7 +791,7 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
         regionList = expResult.globalInfo.srSets[srSetName] # List of labels for the signal regions
         for region in regionList:
             regionDict = expResult.globalInfo.srMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
-            if dataId in regionDict['smodels']:
+            if dataId == regionDict['smodels']:
                 return True
     return False
 
