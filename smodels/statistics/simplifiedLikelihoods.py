@@ -209,13 +209,16 @@ class SLData:
 
         covD = self.diagCov()
         C = []
-        for m2, m3 in zip(covD, self.third_moment):
+        for i, (m2, m3) in enumerate ( zip(covD, self.third_moment) ):
             if m3 == 0.0:
                 m3 = 1e-30
             k = -np.sign(m3) * sqrt(2.0 * m2)
             r = 8.0 * m2**3 / m3**2 - 1.0
             if r < 0.:
-                logger.error ( f"negative radicand {r:.2f}: m2={m2:.2f} m3={m3:.2f} in {self.name}" )
+                mname = self.name
+                if type(mname) == list and i<len(mname):
+                    mname = self.name[i]
+                logger.error ( f"negative radicand {r:.2f}: m2={m2:.2f} m3={m3:.2f} in {mname}" )
             dm = sqrt( r )
             C.append(k * np.cos(4.0 * np.pi / 3.0 + np.arctan(dm) / 3.0))
 
