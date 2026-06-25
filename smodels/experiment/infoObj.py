@@ -40,7 +40,6 @@ class Info(object):
         if regions is None:
             return regions
         newregions={}
-        ## [!AL!] I've simplified a bit the code below and removed some of the debug messages. Check!
         for label,region in regions.items():
             regionDict = {}
             if type(region)==str:
@@ -113,11 +112,11 @@ class Info(object):
                     logger.info(f"tag {tag} given multiple times in {self.path}" )
                     continue
             ## [!AL!] I've  rewrriten the methods below to check consistency of srSets and statModels. Check if it is ok.
-            self.checkConsistencyOfSRsets()
+            self.checkConsistencyOfSRSets()
             self.checkConsistencyOfStatModels()
             self.cacheStatsModels()
 
-    def checkConsistencyOfSRsets( self ):
+    def checkConsistencyOfSRSets( self ):
         """ check that all SRs mentioned in srSets are included in srMappings """
         if not hasattr ( self, "srMappings" ):
             return
