@@ -97,9 +97,7 @@ The following (optional) fields are defined for each SR:
 
 
 If any of the fields above is not given, the following default values are assumed:
-```
-type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels, label = smodels if smodels is not None, otherwise label = pyhf
-```
+``type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels, label = smodels if smodels is not None, otherwise label = pyhf``
 
 In case ``smodels`` is ``None``, the region is not used for computing signal contributions, but it can still be used for other purposes, such as nuisance fits.
 Finally, if ``srMappings`` is not given, it is assumed that all regions appearing in ``srSets`` (see below) are included in the mapping, with the SModelS name used for all fields and ``type = SR``.
@@ -126,7 +124,7 @@ Some shorthand notations are possible. For example, in the
 case of the ATLAS-SUSY-2018-41 simplified likelihood listed below, 
 ``srMappings`` is not given.
 In this case it is assumed that all regions named in ``srSets`` should
-appear in ``srMapping`` with all the region names being the same
+appear in ``srMappings`` with all the region names being the same
 as the SModelS name and ``type`` being always **SR**:
 
 .. literalinclude:: /literals/globalInfo201841.txt
