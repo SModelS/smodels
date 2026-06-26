@@ -146,6 +146,11 @@ def nCPUs():
     """ obtain the number of *available* CPU cores on the machine, for several
         platforms and python versions. """
     try:
+        import os
+        return os.cpu_count()
+    except AttributeError as e:
+        pass
+    try:
         # next few lines taken from
         # https://stackoverflow.comhttps//stackoverflow.com/questions/1006289/how-to-find-out-the-number-of-cpus-using-python/questions/1006289/how-to-find-out-the-number-of-cpus-using-python
         import re

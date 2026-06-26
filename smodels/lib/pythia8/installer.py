@@ -99,6 +99,11 @@ def getNCPUs():
     """ get the number of CPUs to compile pythia8 with """
     ncpus = 4
     try:
+        import os
+        ncpus = os.cpu_count()
+    except Exception as e:
+        pass
+    try:
         from smodels.base.runtime import nCPUs
         ncpus = nCPUs()
     except Exception as e:
