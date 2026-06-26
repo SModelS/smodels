@@ -49,6 +49,7 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
     nllA = obj.nll(mu, asimov = 0, pmSigma = 0, evaluationType = observed )
+    # nllA = obj.nll(mu, asimov = 0, pmSigma = 0, evaluationType = evaluationType )
     s_nllA, s_nll = None, None
     if pmSigma != 0:
         # s_nllA = 0. # abs ( obj.nll( mu, asimov = 0,
@@ -70,8 +71,8 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         if nll is not None and nllA is not None:
             ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
                               return_type=return_type, nSigma = nSigma )
-        if False and abs(mu-1)<1e-5 and evaluationType == aposteriori:
-            print ( f"@@NNI0 CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} {ret}" )
+        if False: #  and evaluationType == aposteriori:
+            print ( f"@@NNIa CLs({mu:3g}) for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} {ret}" )
         return ret
     if nll is None or nllA is None:
         ret = None, None
@@ -79,8 +80,8 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         ret = CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
                    s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
                    return_type=return_type, nSigma = nSigma )
-    if False:
-        print ( f"@@NNI1 CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} return_type {return_type} pmSigma {pmSigma} {ret}" )
+    if False and evaluationType == aposteriori:
+        print ( f"@@NNIa CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} return_type {return_type} pmSigma {pmSigma} {ret}" )
     return ret[0]+pmSigma*ret[1]
 
 class NNData:
@@ -322,6 +323,8 @@ class NNUpperLimitComputer:
             "nSigma": nSigma, "pmSigma": pmSigma,
             "s_nll_min": s_nll_min, "s_nll_minA": s_nll_minA }
         ret = float ( clsRoot ( **clsRootArgs ) )
+        if False and evaluationType == aposteriori:
+            print ( f"@@NNI1 CLs({mu:.2g})={ret:.3f} nll_min {nll_min} nll_minA {nll_minA}" )
         return ret
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -361,8 +364,8 @@ class NNUpperLimitComputer:
                 s_label = "sigma_obs"
         elif evaluationType == aposteriori:
             ## when asked for a posteriori, we return nllA_obs_1
-            c_label = f'nll_obs_{poi_test}'
-            s_label = "sigma_obs"
+            c_label = f'nllA_obs_{poi_test}'
+            s_label = "sigma_obsA"
         else: # evaluationType = apriori
             if asimov not in [ None ]:
                 c_label = f'nllA_exp_{poi_test}'
@@ -507,18 +510,24 @@ class NNUpperLimitComputer:
         mu_hatA = 0
         nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
         sigma_muA = 1
+        #fmin = self.nll_min ( evaluationType=evaluationType,
+        #                      allowNegativeSignals=allowNegativeSignals )
+        #if fmin == None:
+        #    return None, None, None, None, None, None, None
+        mu_hat = 0. # fmin["muhat"]
 
         if evaluationType == aposteriori:
             # this is not true, right?
             nll_min = nll_minA
-            mu_hat = mu_hatA
+            #mu hat = 0.
+            # mu_hat = fmin["muhat"]
             sigma_mu = sigma_muA
         else:
             fmin = self.nll_min ( evaluationType=evaluationType,
                                   allowNegativeSignals=allowNegativeSignals )
 
-            if fmin == None:
-                return None, None, None, None, None, None, None
+            #if fmin == None:
+            #    return None, None, None, None, None, None, None
 
             mu_hat, sigma_mu, nll_min = \
                     ( fmin[x] for x in ["muhat", "sigma_mu", "nll_min"] )
