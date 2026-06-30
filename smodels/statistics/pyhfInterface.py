@@ -1040,7 +1040,10 @@ class PyhfUpperLimitComputer:
             print ( f"@@PI2 nll {nll} nllA {nllA} nll_min {nll_min} nll_minA {nll_minA} evalType {evaluationType} muhat {muhat} mu {mu}" )
             print ( f"@@PI2 ret {ret}" )
             # print ( f"@@PI2 CLsb {CLsb} CLb {CLb} sqmu {sqmu} sqA {sqA}" )
-            print ( f"@@PI2 my CLs: {CLs:.5f} evaluationType {evaluationType}" )
+            t = CLs
+            if return_type == "CLs-alpha":
+                t = CLs - .05
+            print ( f"@@PI2 my CLs: {t:.5f} evaluationType {evaluationType}" )
         return CLs
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,
