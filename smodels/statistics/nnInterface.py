@@ -34,6 +34,71 @@ nnSettings = {
     "errs_on_min": True
 }
 
+def writeOutYields ( theoryPred,
+        filename : Optional[os.PathLike] = None ):
+    """ a function for debugging only: writes the actual NN input
+    into a file called filename
+
+    :param filename: output file name, if None, then it is
+    yields_<massparams>.json
+    """
+
+    from smodels.base.physicsUnits import GeV
+    masses = []
+    for node in theoryPred.smsList[0].nodes:
+        if node.particle.isSM:
+            continue
+        masses.append ( float(node.particle.mass.asNumber(GeV)) )
+    if filename == None:
+        filename = f"yields_{'_'.join(map(str,map(int,masses)))}.json"
+    gI = theoryPred.dataset.globalInfo
+    if "-orig" in gI.id:
+        return
+    print ( f"[nnInterface] writing yields for {gI.id} to {filename}" )
+    dicts = []
+    Dict = { "anaId": gI.id, "masses": masses,
+             "txnames":list( set(map(str,theoryPred.txnames))) }
+    ms = theoryPred.statsComputer.getMostSensitiveModel()
+    # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+    Dict["most_sensitive"]=ms.name
+    Dict["ul_min"]=ms.getUpperLimitOnMu()
+    Dict["nll"]=theoryPred.nll ( mu=1., writeYields = False )
+    Dict["nll_posteriori"]=theoryPred.nll ( mu=1., evaluationType = aposteriori )
+    Dict["nll5"]=theoryPred.nll ( mu=5., writeYields = False )
+    Dict["nll5_posteriori"]=theoryPred.nll ( mu=5., evaluationType = aposteriori, writeYields = False )
+    dicts.append ( Dict )
+
+    def removeZeros ( nsig : dict ) -> dict:
+        newD = {}
+        for k,v in nsig.items():
+            if v > 0.:
+                newD[k]=v
+        return newD
+
+    for computer in theoryPred.statsComputer.subComputers:
+        if not hasattr ( computer, "totalYieldsFromSignals" ):
+            continue
+        Dict = {}
+        # m = computer.data
+        yields_0 = computer.totalYieldsFromSignals( 0. )
+        yields_1 = computer.totalYieldsFromSignals( 1. )
+        yields_5 = computer.totalYieldsFromSignals( 5. )
+        # scaled_yields = computer.scaleYields ( yields, m )
+        # nn_input = scaled_yields.tolist()
+        Dict["model"]=computer.name
+        Dict["nsignals"]=removeZeros ( computer.nsignals )
+        Dict["yields_mu0"]= yields_0
+        Dict["yields_mu1"]= yields_1
+        Dict["yields_mu5"]= yields_5
+        # Dict["nn_input"]=nn_input
+        dicts.append ( Dict )
+
+    with open ( filename, "wt" ) as f:
+        import json
+        d = json.dumps ( dicts, indent=4 )
+        f.write ( d )
+        f.close()
+
 
 def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         evaluationType : NllEvalType, nll_min : float, nll_minA : float,
@@ -71,8 +136,11 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         if nll is not None and nllA is not None:
             ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
                               return_type=return_type, nSigma = nSigma )
-        if False: #  and evaluationType == aposteriori:
-            print ( f"@@NNIa CLs({mu:3g}) for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} {ret}" )
+        if True and evaluationType == aposteriori: # and abs(mu-1)<.01:
+            CLs = ret
+            if return_type == "CLs-alpha":
+                CLs += 0.05
+            print ( f"@@NNIa CLs({mu:.3g}) for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} CLs {CLs}" )
         return ret
     if nll is None or nllA is None:
         ret = None, None
@@ -80,7 +148,7 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         ret = CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
                    s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
                    return_type=return_type, nSigma = nSigma )
-    if False and evaluationType == aposteriori:
+    if True and evaluationType == aposteriori:
         print ( f"@@NNIa CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} return_type {return_type} pmSigma {pmSigma} {ret}" )
     return ret[0]+pmSigma*ret[1]
 
@@ -393,6 +461,10 @@ class NNUpperLimitComputer:
         :param asimov: if true, compute for asimov data
         If None compute for most sensitive analysis.
         """
+        if evaluationType == aposteriori:
+            nll_min = self.nll ( 0., evaluationType = observed, asimov = 0 )
+            ret = { "muhat": 0., "nll_min":  nll_min, "sigma_mu": 1. }
+            return ret
         obs_v_exp = "obs"
         if evaluationType == apriori:
         # if evaluationType != observed:
@@ -481,7 +553,11 @@ class NNUpperLimitComputer:
             return float("inf")
         mu_lim = optimize.brentq(clsRoot, a, b,
                 args = tuple(clsRootArgs.values()), rtol=1e-03, xtol=1e-06 )
-        # print ( f"@@NNI get UL {mu_lim} {self.name} allowN {allowNegativeSignals}" )
+        if False and evaluationType == aposteriori:
+            print ()
+            print ( f"@@NNI0 UL: {self.name} allowN {allowNegativeSignals}" )
+            print ( f"@@NNI1 UL: mu_hat {mu_hat} nll_min {nll_min} nll_minA {nll_minA}" )
+            print ( f"@@NNI3 get UL {mu_lim}" )
         return float ( mu_lim )
 
     def getCLsRootFunc(self, evaluationType: NllEvalType = observed,
@@ -509,6 +585,9 @@ class NNUpperLimitComputer:
         s_nll_minA, s_nll_min = 0., 0.
         mu_hatA = 0
         nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
+        if evaluationType == aposteriori:
+            n2 = self.nll_min ( evaluationType = observed, asimov = 0 )
+            print ( f"@@min_A nll0A {nll_minA} n2 {n2}" )
         sigma_muA = 1
         #fmin = self.nll_min ( evaluationType=evaluationType,
         #                      allowNegativeSignals=allowNegativeSignals )

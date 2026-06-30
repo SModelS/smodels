@@ -10,7 +10,8 @@ from smodels.base.physicsUnits import TeV, fb, UnitXSec
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, NllEvalType, \
+         aposteriori
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
@@ -359,6 +360,12 @@ class TheoryPrediction(object):
         if asimov != None and abs(asimov)>1e-8 and abs(asimov-1)>1e-8:
             raise SModelSError (
                "currently we only handle asimov data for 0. or 1." )
+        if not "writeYields" in kwargs or kwargs["writeYields"]==True:
+            if abs(mu-5)<1e-5 and evaluationType == aposteriori:
+                from smodels.statistics.nnInterface import writeOutYields
+                writeOutYields ( self )
+        if "writeYields" in kwargs:
+            kwargs.pop ( "writeYields" )
         if "expected" in kwargs:
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
