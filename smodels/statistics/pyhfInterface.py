@@ -1246,12 +1246,12 @@ class PyhfUpperLimitComputer:
                 hi_mu = 10 * hi_mu
                 if self.getSign ( lo_mu, hi_mu, evaluationType ) > 0:
                     logger.warning ( f"couldnt bracket the root for getUpperLimitOnMu" )
-                    return float("nan")
+                    return None
 
             try:
                 ul = findRoot ( self.CLs, lo_mu * self.scale, hi_mu * self.scale, args=(evaluationType, "alpha-CLs", nSigma, False), rtol=1e-3, xtol=1e-3 )
             except ValueError:
-                return float("nan")
+                return None
 
             endUL = time.time()
             logger.debug( f"getUpperLimitOnMu elapsed time : {endUL-startUL:1.4f} secs" )
