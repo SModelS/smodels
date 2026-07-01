@@ -998,21 +998,6 @@ class PyhfUpperLimitComputer:
         if "pmSigma" in kwargs:
             assert kwargs["pmSigma"] == 0, f"no CLs with pmSigma {pmSigma} for pyhf"
         ret = self._CLs ( mu / self.scale, evaluationType, return_type, nSigma )
-        if False and nSigma == 0 and evaluationType == aposteriori:
-            print ( )
-            print ( f"mu={mu:.2f}" )
-            print ( f"@@PI1 true CLs({mu:.2f}): ret={ret:.5f} evaluationType {evaluationType} return_type {return_type} scale {self.scale}" )
-            fN = self.clsFromNLLs ( mu, evaluationType, return_type )
-            print ( )
-            print ( "mu=1" )
-            ret1 = self._CLs ( 1 / self.scale, evaluationType, return_type, nSigma )
-            print ( f"@@PI1 true CLs({1:.2f}): ret1={ret1:.5f} evaluationType {evaluationType} return_type {return_type} scale {self.scale}" )
-            fN = self.clsFromNLLs ( 1, evaluationType, return_type )
-            print ( )
-            print ( "mu=0" )
-            ret0 = self._CLs ( 0 / self.scale, evaluationType, return_type, nSigma )
-            print ( f"@@PI1 true CLs({0:.2f}): ret0={ret0:.5f} evaluationType {evaluationType} return_type {return_type} scale {self.scale}" )
-            fN = self.clsFromNLLs ( 0, evaluationType, return_type )
         return ret
 
     def clsFromNLLs ( self, mu : float,
@@ -1034,16 +1019,6 @@ class PyhfUpperLimitComputer:
         ret = CLsfromNLL ( nllA, nll_minA, nll, nll_min,
                            muhat > mu, return_type, report_all = True )
         CLs = ret["returns"]
-        #CLs = CLsfromNLL ( nllA, nll_minA, nll, nll_min,
-        #        muhat > mu, return_type ) # , report_all = True )
-        if False: #  and abs(mu-1)<.01 and evaluationType == aposteriori:
-            print ( f"@@PI2 nll {nll} nllA {nllA} nll_min {nll_min} nll_minA {nll_minA} evalType {evaluationType} muhat {muhat} mu {mu}" )
-            print ( f"@@PI2 ret {ret}" )
-            # print ( f"@@PI2 CLsb {CLsb} CLb {CLb} sqmu {sqmu} sqA {sqA}" )
-            t = CLs
-            if return_type == "CLs-alpha":
-                t = CLs - .05
-            print ( f"@@PI2 my CLs: {t:.5f} evaluationType {evaluationType}" )
         return CLs
 
     def _CLs( self, mu_rel : float, evaluationType : NllEvalType,

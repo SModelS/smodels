@@ -71,8 +71,6 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         if nll is not None and nllA is not None:
             ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
                               return_type=return_type, nSigma = nSigma )
-        if False: #  and evaluationType == aposteriori:
-            print ( f"@@NNIa CLs({mu:3g}) for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} eType {evaluationType} return_type {return_type} pmSigma {pmSigma} {ret}" )
         return ret
     if nll is None or nllA is None:
         ret = None, None
@@ -80,8 +78,6 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         ret = CLsWithErrorsfromNLL(nllA, nll_minA, nll, nll_min, \
                    s_nllA, s_nll_minA, s_nll, s_nll_min, (mu_hat > mu), \
                    return_type=return_type, nSigma = nSigma )
-    if False and evaluationType == aposteriori:
-        print ( f"@@NNIa CLs for nllA {nllA} nll {nll} nll_minA {nll_minA} nll_min {nll_min} mu {mu} mu_hat {mu_hat} nSigma {nSigma} return_type {return_type} pmSigma {pmSigma} {ret}" )
     return ret[0]+pmSigma*ret[1]
 
 class NNData:
@@ -228,10 +224,6 @@ class NNUpperLimitComputer:
             errors[label]=err
             if err > tolerance:
                 raise SModelSError ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
-        if False:
-            print ( f"[nnInterface] consistency check for {self.name}: max relative error={max(errors.values()):.3g}" )
-            print ( f"[nnInterface] consistency check for {self.name}: errors: {errors}" )
-            print ( f"[nnInterface] consistency check for {self.name}: nlls: {nlls}" )
 
     def totalYieldsFromSignals ( self, poi_test : float ) -> list :
         """ given the signal yields self.nsignals, return the total
@@ -280,9 +272,6 @@ class NNUpperLimitComputer:
         # from signal yields compute total yields
         yields = self.totalYieldsFromSignals( poi_test )
         ret = self.adaptor.predict(yields)
-        if False and poi_test == 0.0:
-            print ( f"@@X yields {yields} ret {ret}" )
-            print ( f"@@name {self.name}" )
 
         if outputType == None:
             return ret
@@ -323,8 +312,6 @@ class NNUpperLimitComputer:
             "nSigma": nSigma, "pmSigma": pmSigma,
             "s_nll_min": s_nll_min, "s_nll_minA": s_nll_minA }
         ret = float ( clsRoot ( **clsRootArgs ) )
-        if False and evaluationType == aposteriori:
-            print ( f"@@NNI1 CLs({mu:.2g})={ret:.3f} nll_min {nll_min} nll_minA {nll_minA}" )
         return ret
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
