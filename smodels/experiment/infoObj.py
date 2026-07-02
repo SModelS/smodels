@@ -137,27 +137,27 @@ class Info(object):
         if not hasattr ( self, "statModels" ):
             return
         if not hasattr ( self, "regionSets" ):
-            raise SModelSError ( f"statModels is defined, but regionSets is not. This is inconsistent." )
+            raise SModelSError ( f"In {self.path}: statModels is defined, but regionSets is not. This is inconsistent." )
         elif not isinstance ( self.statModels, dict ):
-            raise SModelSError ( f"statModels has to be a dict, but is {type(self.statModels)}" )
+            raise SModelSError ( f"In {self.path}: statModels has to be a dict, but is {type(self.statModels)}" )
         
         for regionSet, model_tuples in self.statModels.items():
             if regionSet not in self.regionSets:
-                raise SModelSError ( f"region set {regionSet} mentioned in statModels is not defined in regionSets" )
+                raise SModelSError ( f"In {self.path}: region set {regionSet} mentioned in statModels is not defined in regionSets" )
             if not isinstance ( model_tuples, list ):
-                raise SModelSError ( f"statModels has to be a dict of lists, but its values are of type {type(model_tuples)}" )
+                raise SModelSError ( f"In {self.path}: statModels has to be a dict of lists, but its values are of type {type(model_tuples)}" )
             for model_tuple in model_tuples:
                 if not isinstance ( model_tuple, tuple ):
-                    raise SModelSError ( f"statModels has to be a dict of lists of tuples, but its values are of type {type(model_tuple)}" )
+                    raise SModelSError ( f"In {self.path}: statModels has to be a dict of lists of tuples, but its values are of type {type(model_tuple)}" )
                 if len(model_tuple) != 2:
-                    raise SModelSError ( f"statModels has to be a dict of lists of tuples of length 2, but its values are of length {len(model_tuple)}" )
+                    raise SModelSError ( f"In {self.path}: statModels has to be a dict of lists of tuples of length 2, but its values are of length {len(model_tuple)}" )
                 model_type,model = model_tuple
                 if model_type not in [ "sl", "full_pyhf", "pyhf", "onnx" ]:
-                    raise SModelSError ( f"model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, sl" )
+                    raise SModelSError ( f"In {self.path}: model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, sl" )
                 if not isinstance ( model, str ):
-                    raise SModelSError ( f"model has to be a string, but is {type(model)}" )
+                    raise SModelSError ( f"In {self.path}: model has to be a string, but is {type(model)}" )
                 if not os.path.isfile ( os.path.join(os.path.dirname(self.path), model) ):
-                    raise SModelSError ( f"model file {model} does not exist in the same directory as {self.path}" )
+                    raise SModelSError ( f"In {self.path}: model file {model} does not exist in the same directory as {self.path}" )
 
     def __eq__(self, other):
         if self.__dict__ != other.__dict__:

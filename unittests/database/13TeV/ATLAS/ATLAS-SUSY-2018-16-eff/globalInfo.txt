@@ -100,7 +100,7 @@ regionMappings: {
     'SR_ewk_2l_high' : {'smodels': 'SR_ewk_2l_high', 'pyhf': None},
     'SR_ewk_2l_med' : {'smodels': 'SR_ewk_2l_med', 'pyhf': None},
     'SR_ewk_2l_low' : {'smodels': 'SR_ewk_2l_low', 'pyhf': None} }
-srSets: { 'EWKinos_SR2lOnly': ['CR_ewk_VV_high',
+regionSets: { 'EWKinos_SR2lOnly': ['CR_ewk_VV_high',
           'CR_ewk_VV_low',
           'CR_ewk_tau_high',
           'CR_ewk_tau_low',

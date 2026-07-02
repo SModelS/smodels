@@ -26,7 +26,7 @@ regionMappings: {
     'SR_LM_Low_MCT': {'pyhf': 'SRLMEM_mct2[0]', 'smodels': 'SR_LM_Low_MCT'},
     'SR_LM_Med_MCT': {'pyhf': 'SRLMEM_mct2[1]', 'smodels': 'SR_LM_Med_MCT'},
     'SR_LM_High_MCT': {'pyhf': 'SRLMEM_mct2[2]', 'smodels': 'SR_LM_High_MCT'} }
-srSets: { 'bkgonly': ['STCREM_cuts', 'WREM_cuts', 'TRHMEM_cuts',
+regionSets: { 'bkgonly': ['STCREM_cuts', 'WREM_cuts', 'TRHMEM_cuts',
           'TRMMEM_cuts', 'TRLMEM_cuts',
           'SR_HM_Med_MCT',
           'SR_HM_High_MCT',
