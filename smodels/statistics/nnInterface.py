@@ -62,10 +62,12 @@ def writeOutYields ( theoryPred,
     # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
     Dict["most_sensitive"]=ms.name
     Dict["ul_min"]=ms.getUpperLimitOnMu()
+    Dict["nll0"]=theoryPred.nll ( mu=0., writeYields = False )
+    Dict["nll0A"]=theoryPred.nll ( mu=0., evaluationType = observed, asimov = 0 )
     Dict["nll"]=theoryPred.nll ( mu=1., writeYields = False )
-    Dict["nll_posteriori"]=theoryPred.nll ( mu=1., evaluationType = aposteriori )
-    Dict["nll5"]=theoryPred.nll ( mu=5., writeYields = False )
-    Dict["nll5_posteriori"]=theoryPred.nll ( mu=5., evaluationType = aposteriori, writeYields = False )
+    Dict["nllA"]=theoryPred.nll ( mu=1., evaluationType = observed, asimov = 0 )
+    Dict["nll_mu5"]=theoryPred.nll ( mu=5., writeYields = False )
+    Dict["nllA_mu5"]=theoryPred.nll ( mu=5., evaluationType = observed, asimov = 0, writeYields = False )
     dicts.append ( Dict )
 
     def removeZeros ( nsig : dict ) -> dict:
