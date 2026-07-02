@@ -362,7 +362,7 @@ class TheoryPrediction(object):
                "currently we only handle asimov data for 0. or 1." )
         if not "writeYields" in kwargs or kwargs["writeYields"]==True:
             if abs(mu-5)<1e-5 and evaluationType == aposteriori:
-                from smodels.statistics.nnInterface import writeOutYields
+                from stats_ml.yieldWriter import writeOutYields
                 writeOutYields ( self )
         if "writeYields" in kwargs:
             kwargs.pop ( "writeYields" )

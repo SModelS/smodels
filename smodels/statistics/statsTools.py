@@ -142,7 +142,7 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        regionMappings = globalInfo.srMappings
+        regionMappings = globalInfo.regionMappings
 
         for sr in globalInfo.regionSets[srSet]:
             if sr not in regionMappings:
@@ -186,7 +186,7 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        regionMappings = globalInfo.srMappings
+        regionMappings = globalInfo.regionMappings
         labelToPyhf = {}
         for sr_label in globalInfo.regionSets[srSet]:
             if sr_label not in regionMappings:
