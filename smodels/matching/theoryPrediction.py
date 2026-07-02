@@ -749,9 +749,9 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             theoPred.deltas_rel = deltas_rel
             srType = 'SR' # By default assume it is a SR
             # Check if SR corresponds to a CR or VR, in which case we do not report the upper limit
-            if hasattr(expResult.globalInfo, "srMappings"):
-                assert type ( expResult.globalInfo.srMappings) == dict, f"{expResult.globalInfo.id} srMappings are not a dict"
-                srType = expResult.globalInfo.srMappings.get(theoPred.dataId(),None)
+            if hasattr(expResult.globalInfo, "regionMappings"):
+                assert type ( expResult.globalInfo.regionMappings) == dict, f"{expResult.globalInfo.id} regionMappings are not a dict"
+                srType = expResult.globalInfo.regionMappings.get(theoPred.dataId(),None)
                 if srType is not None:
                     srType = srType["type"]
                 
@@ -780,17 +780,17 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     assert hasattr ( dataset, "dataInfo" ), \
         "why does the dataset here not have a dataInfo?"
     dataId = dataset.getID()
-    if not hasattr ( expResult.globalInfo, "srMappings" ):
+    if not hasattr ( expResult.globalInfo, "regionMappings" ):
         return False
     if not hasattr ( expResult.globalInfo, "regionSets" ):
-        raise SModelSError ( f"{expResult.globalInfo.id} has srMappings but no regionSets" )
-    # if dataId not in expResult.globalInfo.srMappings:  ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of srMappings, which corresponds to the label
+        raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
+    # if dataId not in expResult.globalInfo.regionMappings:  ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of regionMappings, which corresponds to the label
         # return False
     
     for srSetName in expResult.globalInfo.statModels.keys():
         regionList = expResult.globalInfo.regionSets[srSetName] # List of labels for the signal regions
         for region in regionList:
-            regionDict = expResult.globalInfo.srMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+            regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
             if dataId == regionDict['smodels']:
                 return True
     return False
@@ -821,8 +821,8 @@ def _getCombinedResultFor(dataSetResults, expResult):
         for tpred in predList:
             dataId = tpred.dataId()
             srTypeDict[dataId] = 'SR'
-            if hasattr ( globalInfo, "srMappings" ): ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of srMappings, which corresponds to the label
-                    for regionDict in globalInfo.srMappings.values():
+            if hasattr ( globalInfo, "regionMappings" ): ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of regionMappings, which corresponds to the label
+                    for regionDict in globalInfo.regionMappings.values():
                         if dataId == regionDict['smodels']:
                             srTypeDict[dataId] = regionDict['type']
     
@@ -908,9 +908,9 @@ def _getBestResult(dataSetResults):
         globalInfo = dataset.globalInfo
 
         # Only a SR can be the best SR
-        if hasattr(globalInfo,"srMappings"):
+        if hasattr(globalInfo,"regionMappings"):
             regionType = "SR" # Assume it is a SR by default
-            for regionDict in globalInfo.srMappings.values():
+            for regionDict in globalInfo.regionMappings.values():
                 if dataset.dataInfo.dataId == regionDict["smodels"]:
                     regionType = regionDict["type"]
             

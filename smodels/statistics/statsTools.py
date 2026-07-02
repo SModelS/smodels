@@ -142,13 +142,13 @@ class CompRetriever:
         """
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappings = globalInfo.srMappings
+        regionMappings = globalInfo.regionMappings
 
         for sr in globalInfo.regionSets[srSet]:
-            if sr not in srMappings:
-                logger.error ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            labelToONNX[sr] = srMappings[sr]["onnx"]
+            if sr not in regionMappings:
+                logger.error ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+            labelToONNX[sr] = regionMappings[sr]["onnx"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
@@ -186,14 +186,14 @@ class CompRetriever:
         """
 
         globalInfo = dataset.globalInfo
-        srMappings = globalInfo.srMappings
+        regionMappings = globalInfo.regionMappings
         labelToPyhf = {}
         for sr_label in globalInfo.regionSets[srSet]:
-            if sr_label not in srMappings:
-                logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-                raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            if srMappings[sr_label]["smodels"] is not None:
-                labelToPyhf[sr_label] = srMappings[sr_label]["pyhf"]
+            if sr_label not in regionMappings:
+                logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+            if regionMappings[sr_label]["smodels"] is not None:
+                labelToPyhf[sr_label] = regionMappings[sr_label]["pyhf"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
@@ -212,7 +212,7 @@ class CompRetriever:
         # Get dictionary for signal yields using the pyhf labels
         nsignals = {label : nsigDict.get(label,0.0) for label in labelToPyhf.keys()}
         json = globalInfo.cachedModels[model_filename]
-        regions = [srMappings[label] for label in globalInfo.regionSets[srSet]]
+        regions = [regionMappings[label] for label in globalInfo.regionSets[srSet]]
         logger.debug(f"list of datasets: {list(labelToPyhf.keys())}")
 
 
@@ -330,13 +330,13 @@ class StatsComputer:
             dataset = theoryPrediction.dataset
             """
             srNsigDictAll = {}
-            if not hasattr ( dataset.globalInfo, "srMappings" ):
-                ## well for cov matrices we dont necessarily need srMappings
+            if not hasattr ( dataset.globalInfo, "regionMappings" ):
+                ## well for cov matrices we dont necessarily need regionMappings
                 pass
-                # raise SModelSError ( f"{dataset.globalInfo.id} is defined as a combined dataset but no srMappings defined" )
+                # raise SModelSError ( f"{dataset.globalInfo.id} is defined as a combined dataset but no regionMappings defined" )
             else:
                 # Get dictionary with dataset IDs and signal yields
-                for label,region in dataset.globalInfo.srMappings.items(): ## [!AL!] Shouldn't we be using regionSets here, since they define the combination?
+                for label,region in dataset.globalInfo.regionMappings.items(): ## [!AL!] Shouldn't we be using regionSets here, since they define the combination?
                     srNsigDictAll[ region["smodels"] ] = 0.
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()

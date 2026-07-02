@@ -550,7 +550,7 @@ class CombinedDataSet(object):
 
     def sortDataSets(self):
         """
-        Sort datasets according to globalInfo.srMappings / regionSets.
+        Sort datasets according to globalInfo.regionMappings / regionSets.
         Needs to be done only for cov matrices
         """
         if not hasattr ( self.globalInfo, "statModels" ):
@@ -567,9 +567,9 @@ class CombinedDataSet(object):
         # if hasattr(self.globalInfo, "covariances"):
         datasets = self.origdatasets[:]
         datasetOrder = []
-        if hasattr(self.globalInfo, "srMappings"):
-        ## datasetOrder goes by srMappings
-            for region in self.globalInfo.srMappings:
+        if hasattr(self.globalInfo, "regionMappings"):
+        ## datasetOrder goes by regionMappings
+            for region in self.globalInfo.regionMappings:
                 if "sl" not in region or region["sl"]!=None:
                     datasetOrder.append ( region["smodels"] )
         elif hasattr(self.globalInfo, "regionSets" ):
@@ -583,7 +583,7 @@ class CombinedDataSet(object):
 
         if len(datasetOrder) != dim_covs:
             # pass
-            raise SModelSError( f"Number of datasets with sl entry in the srMappings field {len(datasetOrder)} does not match the dimensions of the cov matrices {dim_covs} for {self.globalInfo.id}" )
+            raise SModelSError( f"Number of datasets with sl entry in the regionMappings field {len(datasetOrder)} does not match the dimensions of the cov matrices {dim_covs} for {self.globalInfo.id}" )
         ## need to reinitialise, we might have lost some datasets when filtering
         tmp = [ None ] * len(datasets)
         for dataset in datasets:
