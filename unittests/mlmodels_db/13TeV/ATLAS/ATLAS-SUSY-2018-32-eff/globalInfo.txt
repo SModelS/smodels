@@ -12,7 +12,7 @@ private: False
 implementedBy: Philipp Neuhuber, Timothée Pascal
 lastUpdate: 2022/11/10
 includeCRs: True
-srMappings: {
+regionMappings: {
     'SRDF_0a_cuts': {'smodels': 'SRDF_0a_cuts', 'pyhf': 'SRDF_0a_cuts'},
     'SRDF_0b_cuts': {'smodels': 'SRDF_0b_cuts', 'pyhf': 'SRDF_0b_cuts'},
     'SRDF_0c_cuts': {'smodels': 'SRDF_0c_cuts', 'pyhf': 'SRDF_0c_cuts'},

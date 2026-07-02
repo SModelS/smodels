@@ -26,7 +26,7 @@ class Info(object):
 
     def canonizeRegions ( self, regions : Optional[dict] = None ) -> Union[None,dict]:
         """ given a list of regions in globalInfo.txt in the
-        srMappings field,
+        regionMappings field,
         return a canonical version of that list: strings in
         that list get transformed into dictionaries, if region type is
         missing, "SR" is assumed. if the "smodels" counterpart is not
@@ -34,7 +34,7 @@ class Info(object):
         If no pyhf name is given, we assume it to be the smodels name.
         if no onnx name is given, we assume it to be the pyhf name.
         if no label is given, we assume it to be the smodels name.
-        :param regions: list of regions in srMappings globalInfo.txt
+        :param regions: list of regions in regionMappings globalInfo.txt
         :returns: canonical list of regions
         """
         if regions is None:
@@ -93,7 +93,7 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
-                if tag == "srMappings":
+                if tag == "regionMappings":
                     try:
                         regions = eval(value)
                     except Exception as e:
@@ -117,8 +117,8 @@ class Info(object):
             self.cacheStatsModels()
 
     def checkConsistencyOfSRSets( self ):
-        """ check that all SRs mentioned in srSets are included in srMappings """
-        if not hasattr ( self, "srMappings" ):
+        """ check that all SRs mentioned in srSets are included in regionMappings """
+        if not hasattr ( self, "regionMappings" ):
             return
         if not hasattr ( self, "srSets" ):
             return
@@ -129,8 +129,8 @@ class Info(object):
             if not isinstance ( regionList, list ):
                 raise SModelSError ( f"srSets has to be a dict of lists, but its values are of type {type(regionList)}" )
             for region in regionList:
-                if region not in  self.srMappings:
-                    raise SModelSError ( f"region label {region} not mentioned in srMappings" )
+                if region not in  self.regionMappings:
+                    raise SModelSError ( f"region label {region} not mentioned in regionMappings" )
                 
     def checkConsistencyOfStatModels( self ):
         """ check that all stat models mentioned in statModels are included in srSets """

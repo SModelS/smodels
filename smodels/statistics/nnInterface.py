@@ -278,7 +278,7 @@ class NNUpperLimitComputer:
         srname0 = srname
         if srname.endswith ( "-0" ):
             srname0 = srname[:-2]
-        for region in self.data.globalInfo.srMappings.values():
+        for region in self.data.globalInfo.regionMappings.values():
             if srname == region["onnx"]:
                 ret = region["type"]=="CR"
                 return ret

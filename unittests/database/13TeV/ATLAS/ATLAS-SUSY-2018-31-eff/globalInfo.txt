@@ -10,7 +10,7 @@ contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2026/5/8
-srMappings: {
+regionMappings: {
     'SRA_L': {'smodels': 'SRA_L', 'pyhf': 'SR_meff[0]'},
     'SRA_M': {'smodels': 'SRA_M', 'pyhf': 'SR_meff[1]'},
     'SRA_H': {'smodels': 'SRA_H', 'pyhf': 'SR_meff[2]'},

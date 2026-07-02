@@ -113,9 +113,9 @@ class SpeyPyhfData:
         # Constructing the list of signals with subsignals matching each json
         nsignals = []
         for sr in srSet:
-            datasets.append ( globalInfo.srMappings[sr]["smodels"] )
+            datasets.append ( globalInfo.regionMappings[sr]["smodels"] )
             # srName = sr["smodels"]
-            srName = globalInfo.srMappings[sr]["smodels"]
+            srName = globalInfo.regionMappings[sr]["smodels"]
             if srName == None:
                 continue
             if srName not in nsig:

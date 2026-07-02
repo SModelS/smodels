@@ -259,13 +259,13 @@ class SpeyRetriever:
     
         globalInfo = dataset.globalInfo
         labelToONNX = {}
-        srMappings = globalInfo.srMappings
+        regionMappings = globalInfo.srMappings
 
         for sr in globalInfo.srSets[srSet]:
-            if sr not in srMappings:
-                logger.error ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in srMappings for dataset {dataset.globalInfo.id}" )
-            labelToONNX[sr] = srMappings[sr]["onnx"]
+            if sr not in regionMappings:
+                logger.error ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+            labelToONNX[sr] = regionMappings[sr]["onnx"]
 
         if srSet not in globalInfo.statModels:
             logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
