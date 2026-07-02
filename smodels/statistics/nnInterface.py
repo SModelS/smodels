@@ -62,10 +62,12 @@ def writeOutYields ( theoryPred,
     # import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
     Dict["most_sensitive"]=ms.name
     Dict["ul_min"]=ms.getUpperLimitOnMu()
-    Dict["nll0"]=theoryPred.nll ( mu=0., writeYields = False )
-    Dict["nll0A"]=theoryPred.nll ( mu=0., evaluationType = observed, asimov = 0 )
-    Dict["nll"]=theoryPred.nll ( mu=1., writeYields = False )
-    Dict["nllA"]=theoryPred.nll ( mu=1., evaluationType = observed, asimov = 0 )
+    Dict["nll_mu0"]=theoryPred.nll ( mu=0., writeYields = False )
+    Dict["nllA_mu0"]=theoryPred.nll ( mu=0., evaluationType = observed, asimov = 0 )
+    Dict["nll_mu02"]=theoryPred.nll ( mu=.2, writeYields = False )
+    Dict["nllA_mu02"]=theoryPred.nll ( mu=.2, evaluationType = observed, asimov = 0 )
+    Dict["nll_mu1"]=theoryPred.nll ( mu=1., writeYields = False )
+    Dict["nllA_mu1"]=theoryPred.nll ( mu=1., evaluationType = observed, asimov = 0 )
     Dict["nll_mu5"]=theoryPred.nll ( mu=5., writeYields = False )
     Dict["nllA_mu5"]=theoryPred.nll ( mu=5., evaluationType = observed, asimov = 0, writeYields = False )
     dicts.append ( Dict )
@@ -311,7 +313,7 @@ class NNUpperLimitComputer:
         :returns: list of total yields
         """
 
-        yields = []
+        yields = {}
         for srname,smyield in self.adaptor.onnxMeta["bkg_yields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -330,7 +332,8 @@ class NNUpperLimitComputer:
                 ## seems like a CR! replaced bkgexpected with observed (postfit)
                 smyield = obsyield
             tot = smyield + signal
-            yields.append ( tot )
+            # yields.append ( tot )
+            yields[srname] = tot
         return yields
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
