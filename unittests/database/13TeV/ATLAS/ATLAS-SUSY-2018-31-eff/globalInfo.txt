@@ -20,7 +20,7 @@ regionMappings: {
     'SRC_26': {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
     'SRC_28': {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'},
     'SRC_incl': {'smodels': 'SRC_incl', 'pyhf': None }}
-srSets: { 'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'],
+regionSets: { 'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'],
 			    'C': ['SRC_22', 'SRC_24', 'SRC_26', 'SRC_28']}
 statModels: { 'A': [( 'pyhf', 'BkgOnlyA.json' ) ],
 				      'B': [( 'pyhf', 'BkgOnlyB.json' ) ],

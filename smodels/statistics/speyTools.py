@@ -261,7 +261,7 @@ class SpeyRetriever:
         labelToONNX = {}
         regionMappings = globalInfo.srMappings
 
-        for sr in globalInfo.srSets[srSet]:
+        for sr in globalInfo.regionSets[srSet]:
             if sr not in regionMappings:
                 logger.error ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )

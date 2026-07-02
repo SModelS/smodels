@@ -111,39 +111,39 @@ class Info(object):
                 else:
                     logger.info(f"tag {tag} given multiple times in {self.path}" )
                     continue
-            ## [!AL!] I've  rewrriten the methods below to check consistency of srSets and statModels. Check if it is ok.
+            ## [!AL!] I've  rewrriten the methods below to check consistency of regionSets and statModels. Check if it is ok.
             self.checkConsistencyOfSRSets()
             self.checkConsistencyOfStatModels()
             self.cacheStatsModels()
 
     def checkConsistencyOfSRSets( self ):
-        """ check that all SRs mentioned in srSets are included in regionMappings """
+        """ check that all SRs mentioned in regionSets are included in regionMappings """
         if not hasattr ( self, "regionMappings" ):
             return
-        if not hasattr ( self, "srSets" ):
+        if not hasattr ( self, "regionSets" ):
             return
-        elif not isinstance ( self.srSets, dict ):
-            raise SModelSError ( f"srSets has to be a dict, but is {type(self.srSets)}" )
+        elif not isinstance ( self.regionSets, dict ):
+            raise SModelSError ( f"regionSets has to be a dict, but is {type(self.srSets)}" )
         
-        for regionList in self.srSets.values():
+        for regionList in self.regionSets.values():
             if not isinstance ( regionList, list ):
-                raise SModelSError ( f"srSets has to be a dict of lists, but its values are of type {type(regionList)}" )
+                raise SModelSError ( f"regionSets has to be a dict of lists, but its values are of type {type(regionList)}" )
             for region in regionList:
                 if region not in  self.regionMappings:
                     raise SModelSError ( f"region label {region} not mentioned in regionMappings" )
                 
     def checkConsistencyOfStatModels( self ):
-        """ check that all stat models mentioned in statModels are included in srSets """
+        """ check that all stat models mentioned in statModels are included in regionSets """
         if not hasattr ( self, "statModels" ):
             return
-        if not hasattr ( self, "srSets" ):
-            raise SModelSError ( f"statModels is defined, but srSets is not. This is inconsistent." )
+        if not hasattr ( self, "regionSets" ):
+            raise SModelSError ( f"statModels is defined, but regionSets is not. This is inconsistent." )
         elif not isinstance ( self.statModels, dict ):
             raise SModelSError ( f"statModels has to be a dict, but is {type(self.statModels)}" )
         
         for regionSet, model_tuples in self.statModels.items():
-            if regionSet not in self.srSets:
-                raise SModelSError ( f"region set {regionSet} mentioned in statModels is not defined in srSets" )
+            if regionSet not in self.regionSets:
+                raise SModelSError ( f"region set {regionSet} mentioned in statModels is not defined in regionSets" )
             if not isinstance ( model_tuples, list ):
                 raise SModelSError ( f"statModels has to be a dict of lists, but its values are of type {type(model_tuples)}" )
             for model_tuple in model_tuples:

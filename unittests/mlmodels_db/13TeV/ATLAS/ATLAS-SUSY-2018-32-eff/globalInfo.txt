@@ -52,7 +52,7 @@ regionMappings: {
     'CRVZ_cuts': { 'onnx': 'CRVZ_cuts', 'type': 'CR', 'smodels': None },
     'CRWW_cuts': { 'onnx': 'CRWW_cuts', 'type': 'CR', 'smodels': None },
     'CRtop_cuts': { 'onnx': 'CRtop_cuts', 'type': 'CR', 'smodels': None } }
-srSets: { 'bkgonly': ['SRDF_0a_cuts',
+regionSets: { 'bkgonly': ['SRDF_0a_cuts',
           'SRDF_0b_cuts',
           'SRDF_0c_cuts',
           'SRDF_0d_cuts',

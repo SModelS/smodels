@@ -64,7 +64,7 @@ class CompRetriever:
         if mtype != "sl":
             raise SModelSError(f"expected sl but got {mtype} for type of stats model in {dataset.globalInfo.id}")
         
-        srList = dataset.globalInfo.srSets[srSet]
+        srList = dataset.globalInfo.regionSets[srSet]
         cov = covs[covname]
         if not isinstance(cov, list):
             logger.error(f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}")
@@ -144,7 +144,7 @@ class CompRetriever:
         labelToONNX = {}
         regionMappings = globalInfo.srMappings
 
-        for sr in globalInfo.srSets[srSet]:
+        for sr in globalInfo.regionSets[srSet]:
             if sr not in regionMappings:
                 logger.error ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
@@ -188,7 +188,7 @@ class CompRetriever:
         globalInfo = dataset.globalInfo
         regionMappings = globalInfo.srMappings
         labelToPyhf = {}
-        for sr_label in globalInfo.srSets[srSet]:
+        for sr_label in globalInfo.regionSets[srSet]:
             if sr_label not in regionMappings:
                 logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
                 raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
@@ -212,7 +212,7 @@ class CompRetriever:
         # Get dictionary for signal yields using the pyhf labels
         nsignals = {label : nsigDict.get(label,0.0) for label in labelToPyhf.keys()}
         json = globalInfo.cachedModels[model_filename]
-        regions = [regionMappings[label] for label in globalInfo.srSets[srSet]]
+        regions = [regionMappings[label] for label in globalInfo.regionSets[srSet]]
         logger.debug(f"list of datasets: {list(labelToPyhf.keys())}")
 
 
@@ -336,7 +336,7 @@ class StatsComputer:
                 # raise SModelSError ( f"{dataset.globalInfo.id} is defined as a combined dataset but no regionMappings defined" )
             else:
                 # Get dictionary with dataset IDs and signal yields
-                for label,region in dataset.globalInfo.regionMappings.items(): ## [!AL!] Shouldn't we be using srSets here, since they define the combination?
+                for label,region in dataset.globalInfo.regionMappings.items(): ## [!AL!] Shouldn't we be using regionSets here, since they define the combination?
                     srNsigDictAll[ region["smodels"] ] = 0.
             # Update with theory predictions
             srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
@@ -347,9 +347,9 @@ class StatsComputer:
                 for p in theoryPrediction.datasetPredictions }
 
             for srSet,modelList in dataset.globalInfo.statModels.items():
-                if srSet not in dataset.globalInfo.srSets:
-                    logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
-                    raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in srSets")
+                if srSet not in dataset.globalInfo.regionSets:
+                    logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in regionSets")
+                    raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in regionSets")
 
                 if not modelList or len(modelList) == 0:
                     continue
@@ -357,7 +357,7 @@ class StatsComputer:
                 # Get the dict of signal yields for the given set of SRs:
                 # (if the SR does not appear in theory predictions, set its signal yield to 0)
                 srNsigDict = {sr: srNsigDictAll.get(sr, 0.0)
-                            for sr in dataset.globalInfo.srSets[srSet]}
+                            for sr in dataset.globalInfo.regionSets[srSet]}
 
                 # Always use the first model:
                 model_type,_ = modelList[0]

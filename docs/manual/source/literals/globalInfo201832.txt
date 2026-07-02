@@ -52,7 +52,7 @@ regionMappings: {
     'CRVZ_cuts': { 'onnx': 'CRVZ_cuts', 'type': 'CR', 'smodels': None },
     'CRWW_cuts': { 'onnx': 'CRWW_cuts', 'type': 'CR', 'smodels': None },
     'CRtop_cuts': { 'onnx': 'CRtop_cuts', 'type': 'CR', 'smodels': None } }
-srSets: { 'bkgonly': ['SRDF_0a_cuts', 'SRDF_0b_cuts', 'SRDF_0c_cuts', 'SRDF_0d_cuts', 'SRDF_0e_cuts','SRDF_0f_cuts',
+regionSets: { 'bkgonly': ['SRDF_0a_cuts', 'SRDF_0b_cuts', 'SRDF_0c_cuts', 'SRDF_0d_cuts', 'SRDF_0e_cuts','SRDF_0f_cuts',
                       'SRDF_0g_cuts','SRDF_0h_cuts','SRDF_0i_cuts', 'SRDF_1a_cuts', 'SRDF_1b_cuts', 'SRDF_1c_cuts',
                       'SRDF_1d_cuts', 'SRDF_1e_cuts','SRDF_1f_cuts', 'SRDF_1g_cuts', 'SRDF_1h_cuts','SRDF_1i_cuts',
                       'SRSF_0a_cuts', 'SRSF_0b_cuts','SRSF_0c_cuts', 'SRSF_0d_cuts', 'SRSF_0e_cuts', 'SRSF_0f_cuts',

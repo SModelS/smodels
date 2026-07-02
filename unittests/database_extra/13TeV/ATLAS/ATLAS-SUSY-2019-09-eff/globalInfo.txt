@@ -72,7 +72,7 @@ regionMappings: {
   'SR_WH_0j': {'smodels': 'SR_WH_0j', 'pyhf': 'SR_WH_0j'},
   'SR_WH_nj': {'smodels': 'SR_WH_nj', 'pyhf': 'SR_WH_nj'},
   'SR_WH_DFOS': {'smodels': 'SR_WH_DFOS', 'pyhf': 'SR_WH_DFOS'} }
-srSets: { 'bkg_onshell': ['SRWZ_1',
+regionSets: { 'bkg_onshell': ['SRWZ_1',
           'SRWZ_2',
           'SRWZ_3',
           'SRWZ_4',
