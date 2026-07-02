@@ -550,7 +550,7 @@ class CombinedDataSet(object):
 
     def sortDataSets(self):
         """
-        Sort datasets according to globalInfo.srMappings / srSets.
+        Sort datasets according to globalInfo.srMappings / regionSets.
         Needs to be done only for cov matrices
         """
         if not hasattr ( self.globalInfo, "statModels" ):
@@ -572,14 +572,14 @@ class CombinedDataSet(object):
             for region in self.globalInfo.srMappings:
                 if "sl" not in region or region["sl"]!=None:
                     datasetOrder.append ( region["smodels"] )
-        elif hasattr(self.globalInfo, "srSets" ):
-            for srSetName,regions in self.globalInfo.srSets.items():
+        elif hasattr(self.globalInfo, "regionSets" ):
+            for srSetName,regions in self.globalInfo.regionSets.items():
                 datasetOrder += regions
         dim_covs = 0
         for srSetName,_ in self.globalInfo.statModels.items():
-            assert srSetName in self.globalInfo.srSets, \
-                f"{srSetName} does not appear in srSets"
-            dim_covs += len ( self.globalInfo.srSets[srSetName] )
+            assert srSetName in self.globalInfo.regionSets, \
+                f"{srSetName} does not appear in regionSets"
+            dim_covs += len ( self.globalInfo.regionSets[srSetName] )
 
         if len(datasetOrder) != dim_covs:
             # pass

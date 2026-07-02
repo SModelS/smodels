@@ -12,7 +12,7 @@ private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2025/6/18
 includeCRs: True
-srMappings: {
+regionMappings: {
   'SRWZ_1': {'smodels': 'SRWZ_1', 'pyhf': 'SR1_WZ_cuts', 'onnx': 'SR1_WZ_cuts'},
   'SRWZ_2': {'smodels': 'SRWZ_2', 'pyhf': 'SR2_WZ_cuts', 'onnx': 'SR2_WZ_cuts'},
   'SRWZ_3': {'smodels': 'SRWZ_3', 'pyhf': 'SR3_WZ_cuts', 'onnx': 'SR3_WZ_cuts'},

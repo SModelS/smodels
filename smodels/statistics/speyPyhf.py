@@ -109,7 +109,7 @@ class SpeyPyhfData:
             return None # this is not a pyhf model we want here
         jsName = model_tuple[1]
         datasets = []
-        srSet = globalInfo.srSets [ srSetName ] # srSetNames [ jsName ] ]
+        srSet = globalInfo.regionSets [ srSetName ] # srSetNames [ jsName ] ]
         # Constructing the list of signals with subsignals matching each json
         nsignals = []
         for sr in srSet:

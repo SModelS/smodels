@@ -782,13 +782,13 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     dataId = dataset.getID()
     if not hasattr ( expResult.globalInfo, "srMappings" ):
         return False
-    if not hasattr ( expResult.globalInfo, "srSets" ):
-        raise SModelSError ( f"{expResult.globalInfo.id} has srMappings but no srSets" )
+    if not hasattr ( expResult.globalInfo, "regionSets" ):
+        raise SModelSError ( f"{expResult.globalInfo.id} has srMappings but no regionSets" )
     # if dataId not in expResult.globalInfo.srMappings:  ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of srMappings, which corresponds to the label
         # return False
     
     for srSetName in expResult.globalInfo.statModels.keys():
-        regionList = expResult.globalInfo.srSets[srSetName] # List of labels for the signal regions
+        regionList = expResult.globalInfo.regionSets[srSetName] # List of labels for the signal regions
         for region in regionList:
             regionDict = expResult.globalInfo.srMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
             if dataId == regionDict['smodels']:

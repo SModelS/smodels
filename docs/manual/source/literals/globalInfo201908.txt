@@ -11,7 +11,7 @@ private: False
 implementedBy: Wolfgang Waltenberger
 lastUpdate: 2024/7/30
 includeCRs: True
-srMappings: {
+regionMappings: {
     'STCREM_cuts': {'pyhf': 'STCREM_cuts', 'smodels': None, 'type': 'CR'},
     'WREM_cuts': {'pyhf': 'WREM_cuts', 'smodels': None, 'type': 'CR'},
     'TRHMEM_cuts': {'pyhf': 'TRHMEM_cuts', 'smodels': None, 'type': 'CR'},

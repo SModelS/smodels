@@ -13,7 +13,7 @@ implementedBy: Wolfgang Waltenberger
 lastUpdate: 2026/5/12
 includeCRs: True
 signalUncertainty: 0.22
-srMappings: {
+regionMappings: {
     'CR_ewk_VV_high': { 'pyhf': 'CRVV_MLL_hghmet_cuts', 'smodels': 'CR_ewk_VV_high', 'type': 'CR'},
     'CR_ewk_VV_low': { 'pyhf': 'CRVV_MLL_lowmet_cuts', 'smodels': 'CR_ewk_VV_low', 'type': 'CR'},
     'CR_ewk_tau_high': { 'pyhf': 'CRtau_MLL_hghmet_cuts', 'smodels': 'CR_ewk_tau_high', 'type': 'CR'},

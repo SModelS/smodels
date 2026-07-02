@@ -186,7 +186,7 @@ class ExpResult(object):
             return None
         if srSetName == None:
             ret = set()
-            for name in self.globalInfo.srSets.keys():
+            for name in self.globalInfo.regionSets.keys():
                 if name not in self.globalInfo.statModels:
                     raise SModelSExperimentError ( f"{name} does not appear in {self.globalInfo.id}'s stats models" )
                 n = len ( self.globalInfo.statModels[name] )

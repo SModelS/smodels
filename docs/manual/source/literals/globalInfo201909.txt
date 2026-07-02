@@ -8,7 +8,7 @@ publication: Eur. Phys. J. C 81 (2021) 1118
 publicationDOI: https://doi.org/10.1140/epjc/s10052-021-09749-7
 contact: atlas-phys-susy-conveners@cern.ch
 comment: We created fake jsons files for individual WH SRs in order for TChiWH to compete with TChiWZ(off) when combineSRs=True.
-srMappings: { 'SRWZ_1': {'smodels': 'SRWZ_1', 'pyhf': 'SR1_WZ_cuts', 'onnx': 'SR1_WZ_cuts'},
+regionMappings: { 'SRWZ_1': {'smodels': 'SRWZ_1', 'pyhf': 'SR1_WZ_cuts', 'onnx': 'SR1_WZ_cuts'},
   'SRWZ_2': {'smodels': 'SRWZ_2', 'pyhf': 'SR2_WZ_cuts', 'onnx': 'SR2_WZ_cuts'},
   'SRWZ_3': {'smodels': 'SRWZ_3', 'pyhf': 'SR3_WZ_cuts', 'onnx': 'SR3_WZ_cuts'},
   'SRWZ_4': {'smodels': 'SRWZ_4', 'pyhf': 'SR4_WZ_cuts', 'onnx': 'SR4_WZ_cuts'},
