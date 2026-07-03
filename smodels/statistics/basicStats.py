@@ -256,7 +256,7 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
     sigma_mu = max(sigma_mu, 0.5)  # there is a minimum on sigma_mu
     sigma_mu = min(sigma_mu, 100.) # there is a maximum on sigma_mu
     # the root should be roughly at mu_hat + 2*sigma_mu
-    if True:
+    if False:
         rc = rootfinder(1.,**args)
         if args["return_type"]=="CLs-alpha":
             rc += 0.05

@@ -70,7 +70,7 @@ def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         if nll is not None and nllA is not None:
             ret = CLsfromNLL( nllA, nll_minA, nll, nll_min, (mu_hat > mu), \
                               return_type=return_type, nSigma = nSigma )
-        if True and evaluationType == aposteriori: # and abs(mu-1)<.01:
+        if False and evaluationType == aposteriori: # and abs(mu-1)<.01:
             CLs = ret
             if return_type == "CLs-alpha":
                 CLs += 0.05
@@ -520,7 +520,7 @@ class NNUpperLimitComputer:
         s_nll_minA, s_nll_min = 0., 0.
         mu_hatA = 0
         nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
-        if evaluationType == aposteriori:
+        if False and evaluationType == aposteriori:
             n2 = self.nll_min ( evaluationType = observed, asimov = 0 )
             print ( f"@@min_A nll0A {nll_minA} n2 {n2}" )
         sigma_muA = 1
