@@ -556,7 +556,7 @@ class CombinedDataSet(object):
         if not hasattr ( self.globalInfo, "statModels" ):
             return
         hasSL = False
-        for srSetName,model_tuples in self.globalInfo.statModels.items():
+        for regionSetName,model_tuples in self.globalInfo.statModels.items():
             model_tuple = model_tuples[0]
             # if models[0].endswith ( ".cov" ):
             if model_tuple[0] == "sl":
@@ -573,13 +573,13 @@ class CombinedDataSet(object):
                 if "sl" not in region or region["sl"]!=None:
                     datasetOrder.append ( region["smodels"] )
         elif hasattr(self.globalInfo, "regionSets" ):
-            for srSetName,regions in self.globalInfo.regionSets.items():
+            for regionSetName,regions in self.globalInfo.regionSets.items():
                 datasetOrder += regions
         dim_covs = 0
-        for srSetName,_ in self.globalInfo.statModels.items():
-            assert srSetName in self.globalInfo.regionSets, \
-                f"{srSetName} does not appear in regionSets"
-            dim_covs += len ( self.globalInfo.regionSets[srSetName] )
+        for regionSetName,_ in self.globalInfo.statModels.items():
+            assert regionSetName in self.globalInfo.regionSets, \
+                f"{regionSetName} does not appear in regionSets"
+            dim_covs += len ( self.globalInfo.regionSets[regionSetName] )
 
         if len(datasetOrder) != dim_covs:
             # pass

@@ -118,7 +118,7 @@ class SpeyPyhfData:
             if regionName == None:
                 continue
             if regionName not in nsig:
-                logger.debug ( f"sr name {regionName} is not found in {nsig}" )
+                logger.debug ( f"region name {regionName} is not found in {nsig}" )
                 continue
                 #sys.exit(-1)
             sig = nsig[ regionName ]
