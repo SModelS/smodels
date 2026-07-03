@@ -115,7 +115,7 @@ class SpeyRetriever:
     
 
     @classmethod
-    def forMultiBinSL(cls, srSet: str, dataset : CombinedDataSet, nsigDict : dict,
+    def forMultiBinSL(cls, regionSet: str, dataset : CombinedDataSet, nsigDict : dict,
             deltas_rel : Optional[float] = 0.0 ) -> SpeyModelFacade:
         """ get a subcomputer for simplified likelihood sr-combination.
 
@@ -138,7 +138,7 @@ class SpeyRetriever:
         for ds in dataset._datasets:
             if hasattr ( ds.dataInfo, "thirdMoment" ):
                 thirdmomenta.append ( ds.dataInfo.thirdMoment )
-        type_n_models = dataset.globalInfo.statModels[srSet]
+        type_n_models = dataset.globalInfo.statModels[regionSet]
         type_n_model = type_n_models[0] # get first one
         mtype = type_n_model[0]
         assert mtype == "sl", f"expected sl but got {mtype} for type of stats model"
@@ -209,7 +209,7 @@ class SpeyRetriever:
         return facade
 
     @classmethod
-    def forSingleBin( cls, srSet: str, dataset, nsigDict, deltas_rel : float = 0.2,
+    def forSingleBin( cls, regionSet: str, dataset, nsigDict, deltas_rel : float = 0.2,
                       lumi : Optional[UnitLumi]=None ) -> SpeyModelFacade:
         """ get a sub computer for an efficiency map (single bin).
 
@@ -228,7 +228,7 @@ class SpeyRetriever:
         except spey.PluginError: ## older spey?
             stat_wrapper = get_backend("default_pdf.uncorrelated_background")
         id = f"{dataset.globalInfo.id}:{dataset.dataInfo.dataId}"
-        nsig = nsigDict.get(srSet, 0)
+        nsig = nsigDict.get(regionSet, 0)
         speyModel = stat_wrapper(
                         data = [float(dataset.dataInfo.observedN)],
                         background_yields = [float(dataset.dataInfo.expectedBG)],
@@ -244,7 +244,7 @@ class SpeyRetriever:
         return facade
 
     @classmethod
-    def forNNs(cls, srSet: str, dataset, nsigDict ) -> SpeyModelFacade:
+    def forNNs(cls, regionSet: str, dataset, nsigDict ) -> SpeyModelFacade:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -257,53 +257,53 @@ class SpeyRetriever:
         logger.error ("speyTools backend to NN is not implemented yet!" )
         raise SModelSError ("speyTools backend to NN is not implemented yet!" )
     
-        globalInfo = dataset.globalInfo
-        labelToONNX = {}
-        regionMappings = globalInfo.regionMappings
+        # globalInfo = dataset.globalInfo
+        # labelToONNX = {}
+        # regionMappings = globalInfo.regionMappings
 
-        for sr in globalInfo.regionSets[srSet]:
-            if sr not in regionMappings:
-                logger.error ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
-                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
-            labelToONNX[sr] = regionMappings[sr]["onnx"]
+        # for sr in globalInfo.regionSets[regionSet]:
+        #     if sr not in regionMappings:
+        #         logger.error ( f"SR {sr} defined in srSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+        #         raise SModelSError ( f"SR {sr} defined in srSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+        #     labelToONNX[sr] = regionMappings[sr]["onnx"]
 
-        if srSet not in globalInfo.statModels:
-            logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
-            raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+        # if regionSet not in globalInfo.statModels:
+        #     logger.error ( f"srSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+        #     raise SModelSError ( f"srSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
 
-        modelList = globalInfo.statModels[srSet]
-        if len(modelList) == 0:
-            logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
-            raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+        # modelList = globalInfo.statModels[regionSet]
+        # if len(modelList) == 0:
+        #     logger.error ( f"no model defined for srSet {regionSet} in dataset {dataset.globalInfo.id}" )
+        #     raise SModelSError ( f"no model defined for srSet {regionSet} in dataset {dataset.globalInfo.id}" )
 
-        model_type, model_filename = modelList[0] # Always use first model
-        if model_type != "onnx":
-            logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
-            raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+        # model_type, model_filename = modelList[0] # Always use first model
+        # if model_type != "onnx":
+        #     logger.error ( f"model type {model_type} for srSet {regionSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+        #     raise SModelSError ( f"model type {model_type} for srSet {regionSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
 
-        # Get dictionary for signal yields using the ONNX labels
-        f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
+        # # Get dictionary for signal yields using the ONNX labels
+        # f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
 
-        onnxBlob=dataset.globalInfo.cachedModels[model_filename]
-        # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
-        ## the following code is just for now to see if it works in principle
-        import tempfile
-        tempf = tempfile.mktemp ( prefix="/tmp/", suffix=".onnx" )
-        # tempf = "/tmp/my.onnx"
-        f = open ( tempf, "wb" )
-        import onnx
-        onnx.save ( onnxBlob, f )
-        f.close()
-        xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
-        stat_wrapper = get_backend("onnx")
-        speyModel = stat_wrapper(nsigDict,tempf)
-        facade = SpeyModelFacade ( speyModel, "nn",
-                                    model_filename, xsec )
-        # os.unlink ( tempf )
-        return facade
+        # onnxBlob=dataset.globalInfo.cachedModels[model_filename]
+        # # self.speyModel = stat_wrapper(nsig,onnxBlob) # this is how i want it long run
+        # ## the following code is just for now to see if it works in principle
+        # import tempfile
+        # tempf = tempfile.mktemp ( prefix="/tmp/", suffix=".onnx" )
+        # # tempf = "/tmp/my.onnx"
+        # f = open ( tempf, "wb" )
+        # import onnx
+        # onnx.save ( onnxBlob, f )
+        # f.close()
+        # xsec = sum(list(nsigDict.values())) / dataset.globalInfo.lumi
+        # stat_wrapper = get_backend("onnx")
+        # speyModel = stat_wrapper(nsigDict,tempf)
+        # facade = SpeyModelFacade ( speyModel, "nn",
+        #                             model_filename, xsec )
+        # # os.unlink ( tempf )
+        # return facade
 
     @classmethod
-    def forPyhf(cls, srSet: str, dataset, nsigDict) -> SpeyModelFacade:
+    def forPyhf(cls, regionSet: str, dataset, nsigDict) -> SpeyModelFacade:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
@@ -313,7 +313,7 @@ class SpeyRetriever:
         """
         stat_wrapper = get_backend("pyhf")
         from smodels.statistics.speyPyhf import SpeyPyhfData
-        data = SpeyPyhfData.createDataObject ( dataset, nsigDict, srSet )
+        data = SpeyPyhfData.createDataObject ( dataset, nsigDict, regionSet )
         models = []
         patches = data.patchMaker()
         # for i in range( len(data.inputJsons ) ):

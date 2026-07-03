@@ -785,8 +785,8 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     if not hasattr ( expResult.globalInfo, "regionSets" ):
         raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
     
-    for srSetName in expResult.globalInfo.statModels.keys():
-        regionList = expResult.globalInfo.regionSets[srSetName] # List of labels for the signal regions
+    for regionSetName in expResult.globalInfo.statModels.keys():
+        regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
         for region in regionList:
             regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
             if dataId == regionDict['smodels']:
@@ -813,18 +813,18 @@ def _getCombinedResultFor(dataSetResults, expResult):
         return None
     
     # Don't give combined result if all regions are CRs
-    srTypeDict = {}
+    regionTypeDict = {}
     globalInfo = expResult.globalInfo
     for predList in dataSetResults:
         for tpred in predList:
             dataId = tpred.dataId()
-            srTypeDict[dataId] = 'SR'
+            regionTypeDict[dataId] = 'SR'
             if hasattr ( globalInfo, "regionMappings" ):
                     for regionDict in globalInfo.regionMappings.values():
                         if dataId == regionDict['smodels']:
-                            srTypeDict[dataId] = regionDict['type']
+                            regionTypeDict[dataId] = regionDict['type']
     
-    if all(srType != 'SR' for srType in srTypeDict.values()):
+    if all(regionType != 'SR' for regionType in regionTypeDict.values()):
         return None
     
     txnameList = []

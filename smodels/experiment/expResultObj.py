@@ -170,20 +170,20 @@ class ExpResult(object):
             return True
         return False
 
-    def typeOfStatsModel(self, srSetName : Optional[str], idx : int = 0,
+    def typeOfStatsModel(self, regionSetName : Optional[str], idx : int = 0,
                 specifySL : bool = False ) -> Union[None,str,Set]:
         """ what type of statistics model do we have for
-        srSetName?
-        :param srSetName: the name of the signal region set.
+        regionSetName?
+        :param regionSetName: the name of the signal region set.
         If None, return for all
-        :param idx: which index in a list (ignored if srSetName==None)
+        :param idx: which index in a list (ignored if regionSetName==None)
         :param specifySL: if true, then say "slv1" or "slv2", not "sl"
 
         :returns: one of: onnx, cov, json
         """
         if not self.hasStatsModel():
             return None
-        if srSetName == None:
+        if regionSetName == None:
             ret = set()
             for name in self.globalInfo.regionSets.keys():
                 if name not in self.globalInfo.statModels:
@@ -194,7 +194,7 @@ class ExpResult(object):
                 if tp != None:
                     ret.add ( tp )
             return ret
-        for srSetName, model_tuples in self.globalInfo.statModels.items():
+        for regionSetName, model_tuples in self.globalInfo.statModels.items():
             if idx >= len(model_tuples):
                 return None
             model_tuple = model_tuples[idx]

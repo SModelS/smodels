@@ -99,30 +99,29 @@ class SpeyPyhfData:
 
     @classmethod
     def createDataObject ( cls, dataset : CombinedDataSet, nsig : list,
-           srSetName : str ):
+           regionSetName : str ):
         """ an object creator method """
 
         globalInfo = dataset.globalInfo
-        model_tuples = globalInfo.statModels[srSetName]
+        model_tuples = globalInfo.statModels[regionSetName]
         model_tuple = model_tuples[0]
         if "pyhf" not in model_tuple:
             return None # this is not a pyhf model we want here
         jsName = model_tuple[1]
         datasets = []
-        srSet = globalInfo.regionSets [ srSetName ] # srSetNames [ jsName ] ]
+        regionSet = globalInfo.regionSets [ regionSetName ] # regionSetNames [ jsName ] ]
         # Constructing the list of signals with subsignals matching each json
         nsignals = []
-        for sr in srSet:
-            datasets.append ( globalInfo.regionMappings[sr]["smodels"] )
-            # srName = sr["smodels"]
-            srName = globalInfo.regionMappings[sr]["smodels"]
-            if srName == None:
+        for region in regionSet:
+            datasets.append ( globalInfo.regionMappings[region]["smodels"] )
+            regionName = globalInfo.regionMappings[region]["smodels"]
+            if regionName == None:
                 continue
-            if srName not in nsig:
-                logger.debug ( f"sr name {srName} is not found in {nsig}" )
+            if regionName not in nsig:
+                logger.debug ( f"sr name {regionName} is not found in {nsig}" )
                 continue
                 #sys.exit(-1)
-            sig = nsig[ srName ]
+            sig = nsig[ regionName ]
             nsignals.append(sig)
         logger.error( f"list of datasets: {datasets}" )
         logger.error( f"jsonFile after filtering: {jsName}" )

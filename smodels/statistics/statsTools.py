@@ -41,12 +41,12 @@ class CompRetriever:
     """ simple class that retrieves and constructs the sub computers required by StatsComputer """
 
     @classmethod
-    def forMultiBinSL(cls,srSet : str, dataset, nsigDict,
+    def forMultiBinSL(cls,regionSet : str, dataset, nsigDict,
             deltas_rel : Optional[float] = 0.0  ) -> SLUpperLimitComputer:
         """ get a subcomputer for simplified likelihood sr-combination.
 
         :param dataset: CombinedDataSet object
-        :param srSet: the srSet defining the SRs for which to construct the computer
+        :param regionSet: the regionSet defining the SRs for which to construct the computer
         :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
@@ -56,22 +56,22 @@ class CompRetriever:
         if deltas_rel is None:
             deltas_rel = 0.0
 
-        if  srSet not in dataset.globalInfo.statModels:
-            raise SModelSError( f"{srSet} not in statModels in {dataset.globalInfo.id}" )
+        if  regionSet not in dataset.globalInfo.statModels:
+            raise SModelSError( f"{regionSet} not in statModels in {dataset.globalInfo.id}" )
         covs = dataset.globalInfo.cachedModels
-        type_n_models = dataset.globalInfo.statModels[srSet]        
+        type_n_models = dataset.globalInfo.statModels[regionSet]        
         mtype,covname = type_n_models[0] # get first statistical model
         if mtype != "sl":
             raise SModelSError(f"expected sl but got {mtype} for type of stats model in {dataset.globalInfo.id}")
         
-        srList = dataset.globalInfo.regionSets[srSet]
+        srList = dataset.globalInfo.regionSets[regionSet]
         cov = covs[covname]
         if not isinstance(cov, list):
             logger.error(f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}")
             raise SModelSError(f"covariance field has wrong type: {type(cov)} in {dataset.globalInfo.id}")
         if len(cov) == 0:
-            logger.error(f"covariance matrix has length {len(cov)} but srSet {srSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
-            raise SModelSError(f"covariance matrix has length {len(cov)} but srSet {srSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
+            logger.error(f"covariance matrix has length {len(cov)} but regionSet {regionSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
+            raise SModelSError(f"covariance matrix has length {len(cov)} but regionSet {regionSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
         
         # Collect relevant data:
         nobs = []
@@ -81,7 +81,7 @@ class CompRetriever:
         for sr in srList:
             ds = dataset.getDataSet(sr)            
             if ds is None:
-                raise SModelSError(f"SR {sr} defined in srSet {srSet} not found in dataset {dataset.globalInfo.id}")
+                raise SModelSError(f"SR {sr} defined in regionSet {regionSet} not found in dataset {dataset.globalInfo.id}")
             nobs.append(ds.dataInfo.observedN)
             bg.append(ds.dataInfo.expectedBG)
             nsig.append(nsigDict.get(sr, 0.0))
@@ -96,7 +96,7 @@ class CompRetriever:
         data = SLData( nobs, bg, cov, third_moment=third_momenta,
                      nsignal = nsig,
                      deltas_rel = deltas_rel, lumi=dataset.getLumi(),
-                     name = srSet )
+                     name = regionSet )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "SL"
@@ -104,25 +104,25 @@ class CompRetriever:
         return computer
 
     @classmethod
-    def forSingleBin( cls, srSet : str, dataset : DataSet, nsigDict : dict,
+    def forSingleBin( cls, regionSet : str, dataset : DataSet, nsigDict : dict,
                       deltas_rel : float = 0.2,
                       lumi : Optional[UnitLumi]=None ) ->  SLUpperLimitComputer:
         """ get a sub computer for an efficiency map (single bin).
 
         :param dataset: DataSet object
-        :param srSet: the srSet defining the SRs for which to construct the computer
+        :param regionSet: the regionSet defining the SRs for which to construct the computer
         :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
-        if srSet != dataset.getID():
-            logger.error ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
-            raise SModelSError ( f"srSet {srSet} does not match dataset id {dataset.getID()}" )
+        if regionSet != dataset.getID():
+            logger.error ( f"regionSet {regionSet} does not match dataset id {dataset.getID()}" )
+            raise SModelSError ( f"regionSet {regionSet} does not match dataset id {dataset.getID()}" )
         data = SLData( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
                      nsignal = list(nsigDict.values()), lumi = lumi,
-                     name = srSet )
+                     name = regionSet )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
@@ -130,10 +130,10 @@ class CompRetriever:
         return computer
 
     @classmethod
-    def forNNs(cls, srSet : str, dataset, nsigDict ) -> NNUpperLimitComputer:
+    def forNNs(cls, regionSet : str, dataset, nsigDict ) -> NNUpperLimitComputer:
         """ get a sub computer for an NN combination.
 
-        :param srSet: the srSet defining the SRs for which to construct the computer
+        :param regionSet: the regionSet defining the SRs for which to construct the computer
         :param dataset: CombinedDataSet object
         :param nsigDict: Dictionary of signal events for each SR
         :deltas_rel: Relative uncertainty for the signal
@@ -144,25 +144,25 @@ class CompRetriever:
         labelToONNX = {}
         regionMappings = globalInfo.regionMappings
 
-        for sr in globalInfo.regionSets[srSet]:
+        for sr in globalInfo.regionSets[regionSet]:
             if sr not in regionMappings:
-                logger.error ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
-                raise SModelSError ( f"SR {sr} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                logger.error ( f"SR {sr} defined in regionSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr} defined in regionSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
             labelToONNX[sr] = regionMappings[sr]["onnx"]
 
-        if srSet not in globalInfo.statModels:
-            logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
-            raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+        if regionSet not in globalInfo.statModels:
+            logger.error ( f"regionSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"regionSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
 
-        modelList = globalInfo.statModels[srSet]
+        modelList = globalInfo.statModels[regionSet]
         if len(modelList) == 0:
-            logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
-            raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+            logger.error ( f"no model defined for regionSet {regionSet} in dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"no model defined for regionSet {regionSet} in dataset {dataset.globalInfo.id}" )
 
         model_type, model_filename = modelList[0] # Always use first model
         if model_type != "onnx":
-            logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
-            raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+            logger.error ( f"model type {model_type} for regionSet {regionSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
+            raise SModelSError ( f"model type {model_type} for regionSet {regionSet} in dataset {dataset.globalInfo.id} is not 'onnx'" )
 
         # Get dictionary for signal yields using the ONNX labels
         f_signals = {onnx_sr : nsigDict.get(label,0.0) for label,onnx_sr in labelToONNX.items()}
@@ -174,11 +174,11 @@ class CompRetriever:
         return upperLimitComputer
 
     @classmethod
-    def forPyhf( cls, srSet : str, dataset : CombinedDataSet,
+    def forPyhf( cls, regionSet : str, dataset : CombinedDataSet,
                  nsigDict : dict ) -> PyhfUpperLimitComputer:
         """ get a sub computer for pyhf combination.
 
-        :param srSet: name of signal region set
+        :param regionSet: name of signal region set
         :param dataset: CombinedDataSet object
         :param nsigDict: Dictionary with signal yields for each SR
 
@@ -188,31 +188,31 @@ class CompRetriever:
         globalInfo = dataset.globalInfo
         regionMappings = globalInfo.regionMappings
         labelToPyhf = {}
-        for sr_label in globalInfo.regionSets[srSet]:
+        for sr_label in globalInfo.regionSets[regionSet]:
             if sr_label not in regionMappings:
-                logger.error ( f"SR {sr_label} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
-                raise SModelSError ( f"SR {sr_label} defined in srSet {srSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                logger.error ( f"SR {sr_label} defined in regionSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr_label} defined in regionSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
             if regionMappings[sr_label]["smodels"] is not None:
                 labelToPyhf[sr_label] = regionMappings[sr_label]["pyhf"]
 
-        if srSet not in globalInfo.statModels:
-            logger.error ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
-            raise SModelSError ( f"srSet {srSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+        if regionSet not in globalInfo.statModels:
+            logger.error ( f"regionSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"regionSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
 
-        modelList = globalInfo.statModels[srSet]
+        modelList = globalInfo.statModels[regionSet]
         if len(modelList) == 0:
-            logger.error ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
-            raise SModelSError ( f"no model defined for srSet {srSet} in dataset {dataset.globalInfo.id}" )
+            logger.error ( f"no model defined for regionSet {regionSet} in dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"no model defined for regionSet {regionSet} in dataset {dataset.globalInfo.id}" )
 
         model_type, model_filename = modelList[0] # Always use first model
         if model_type != "pyhf" and model_type != "full_pyhf":
-            logger.error ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
-            raise SModelSError ( f"model type {model_type} for srSet {srSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
+            logger.error ( f"model type {model_type} for regionSet {regionSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
+            raise SModelSError ( f"model type {model_type} for regionSet {regionSet} in dataset {dataset.globalInfo.id} is not 'pyhf/full_pyhf'" )
 
         # Get dictionary for signal yields using the pyhf labels
         nsignals = {label : nsigDict.get(label,0.0) for label in labelToPyhf.keys()}
         json = globalInfo.cachedModels[model_filename]
-        regions = [regionMappings[label] for label in globalInfo.regionSets[srSet]]
+        regions = [regionMappings[label] for label in globalInfo.regionSets[regionSet]]
         logger.debug(f"list of datasets: {list(labelToPyhf.keys())}")
 
 
@@ -315,7 +315,7 @@ class StatsComputer:
         elif dataType == "efficiencyMap":
             dataset = theoryPrediction.dataset
             nsigDict = {dataset.getID() : (theoryPrediction.xsection * dataset.getLumi()).asNumber()}
-            computer = CompRetriever.forSingleBin(srSet=theoryPrediction.dataset.getID(),dataset=theoryPrediction.dataset,
+            computer = CompRetriever.forSingleBin(regionSet=theoryPrediction.dataset.getID(),dataset=theoryPrediction.dataset,
                                                 nsigDict=nsigDict)
             computers.append(computer)
 
@@ -332,10 +332,10 @@ class StatsComputer:
                 (p.xsection*dataset.getLumi()).asNumber() \
                 for p in theoryPrediction.datasetPredictions }
 
-            for srSet,modelList in dataset.globalInfo.statModels.items():
-                if srSet not in dataset.globalInfo.regionSets:
-                    logger.error(f"A statistical model has been defined for {srSet}, but it has not been found in regionSets")
-                    raise ValueError(f"A statistical model has been defined for {srSet}, but it has not been found in regionSets")
+            for regionSet,modelList in dataset.globalInfo.statModels.items():
+                if regionSet not in dataset.globalInfo.regionSets:
+                    logger.error(f"A statistical model has been defined for {regionSet}, but it has not been found in regionSets")
+                    raise ValueError(f"A statistical model has been defined for {regionSet}, but it has not been found in regionSets")
 
                 if not modelList or len(modelList) == 0:
                     continue
@@ -343,23 +343,23 @@ class StatsComputer:
                 # Get the dict of signal yields for the given set of SRs:
                 # (if the SR does not appear in theory predictions, set its signal yield to 0)
                 srNsigDict = {sr: srNsigDictAll.get(sr, 0.0)
-                            for sr in dataset.globalInfo.regionSets[srSet]}
+                            for sr in dataset.globalInfo.regionSets[regionSet]}
 
                 # Always use the first model:
                 model_type,_ = modelList[0]
                 if model_type == "sl":
-                    computers.append(CompRetriever.forMultiBinSL(srSet=srSet,dataset=dataset,
+                    computers.append(CompRetriever.forMultiBinSL(regionSet=regionSet,dataset=dataset,
                                                             nsigDict=srNsigDict,
                                                             deltas_rel = theoryPrediction.deltas_rel ))
                 elif model_type == "onnx":
-                    computers.append(CompRetriever.forNNs(srSet=srSet,dataset=dataset,
+                    computers.append(CompRetriever.forNNs(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 elif model_type == "pyhf":
-                    computers.append(CompRetriever.forPyhf(srSet=srSet,dataset=dataset,
+                    computers.append(CompRetriever.forPyhf(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 else:
-                    logger.error(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {dataset}")
-                    raise SModelSError(f"Unknown statistical model type {model_type} for srSet {srSet} in dataset {dataset}")
+                    logger.error(f"Unknown statistical model type {model_type} for regionSet {regionSet} in dataset {dataset}")
+                    raise SModelSError(f"Unknown statistical model type {model_type} for regionSet {regionSet} in dataset {dataset}")
         else:
             logger.error(f"Unknown data type {dataType} and type {tpType} for theory prediction {theoryPrediction}")
             raise SModelSError(f"Unknown data type {dataType} and type {tpType} for theory prediction {theoryPrediction}")
