@@ -56,7 +56,6 @@ class ExpResult(object):
             folders.append((root, files))
         folders.sort()
         self.datasets = []
-        ## [!AL!] I've removed a bunch of code below, which seemed unnecessary. I've removed datasetOrder altogether. Check if it is ok
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
                 # Build data set

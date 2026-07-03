@@ -784,8 +784,6 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
         return False
     if not hasattr ( expResult.globalInfo, "regionSets" ):
         raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
-    # if dataId not in expResult.globalInfo.regionMappings:  ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of regionMappings, which corresponds to the label
-        # return False
     
     for srSetName in expResult.globalInfo.statModels.keys():
         regionList = expResult.globalInfo.regionSets[srSetName] # List of labels for the signal regions
@@ -821,7 +819,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
         for tpred in predList:
             dataId = tpred.dataId()
             srTypeDict[dataId] = 'SR'
-            if hasattr ( globalInfo, "regionMappings" ): ## [!AL!] dataId refers to the smodels name, no? So it should not be in a key of regionMappings, which corresponds to the label
+            if hasattr ( globalInfo, "regionMappings" ):
                     for regionDict in globalInfo.regionMappings.values():
                         if dataId == regionDict['smodels']:
                             srTypeDict[dataId] = regionDict['type']

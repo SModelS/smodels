@@ -85,46 +85,46 @@ example:
 .. literalinclude:: /literals/globalInfo201804.txt
    :lines: 1-22
 
-Here, ``srMappings`` describes the mapping between the SR names used within the
+Here, ``regionMappings`` describes the mapping between the SR (or CR) names used within the
 statistical models and the names used in the SModelS database.
-All SRs used by the statistical model must be included in this list.
-The following (optional) fields are defined for each SR: 
+The dictionary keys correspond to the labels used within globalInfo.txt to describe the regions
+and it can often be the same as the SModelS name.
+All regions used by the statistical model must be included in this dictionary.
+The following (optional) fields are defined for each region: 
+
 * the name of the region as known to SModelS (``smodels``),
-* the ``type`` of region (SR or CR), 
-* the name of the region as known to pyhf (``pyhf``), if there is a pyhf implementation of thestatistical model,
+* the region ``type`` (SR or CR), 
+* the name of the region as known to pyhf (``pyhf``), if there is a pyhf implementation of the statistical model,
 * the name of the region as known by the surrogate ML model (``onnx``), if there is a onnx surrogate model for the statistical model and
 * the name of the region as known to the simplified likelihood (``sl``), if the statistical model corresponds to a simplified likelihood.
 
 
 If any of the fields above is not given, the following default values are assumed:
-``type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels, label = smodels if smodels is not None, otherwise label = pyhf``
+``type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels``
 
 In case ``smodels`` is ``None``, the region is not used for computing signal contributions, but it can still be used for other purposes, such as nuisance fits.
-Finally, if ``srMappings`` is not given, it is assumed that all regions appearing in ``srSets`` (see below) are included in the mapping, with the SModelS name used for all fields and ``type = SR``.
+Finally, if ``regionMappings`` is not given, it is assumed that all regions appearing in ``regionSets`` (see below) are included in the mapping, with the SModelS name used for all fields and ``type = SR``.
 
 
-The ``srSets`` field groups the regions defined in ``srMappings`` into groups which can be combined with
-the available statistical model(s). Each entry in ``srSets`` is composed of a name and a list of region names (as defined in ``srMappings``). 
-The region names appearing in the list must be defined in ``srMappings``. 
+The ``regionSets`` field groups the regions defined in ``regionMappings`` into groups which can be combined with
+the available statistical model(s). Each entry in ``regionSets`` is composed of a name and a list of region names.
+The region names appearing in the list must correspond to the keys in ``regionMappings``. 
 In the example above a combination **all** is defined, which combines all 5 regions.
 
-Finally, ``statModels`` maps the aforementioned ``srSets`` to lists of
+Finally, ``statModels`` maps the aforementioned ``regionSets`` to lists of
 statistical models. Each entry in that list is composed of a tuple
 with the model type as the first entry, and the model's file name
-as the second entry. For model types, we currently have: ``sl`` for simplified
+as the second entry. For model types, we currently allow for: ``sl`` for simplified
 likelihoods (both v1 and v2), ``pyhf``, ``full_pyhf`` (for the full stastical pyhf
 models in case there is also a simplified version),  and ``onnx`` for machine learned
 surrogate models.  By default, for each region set, SModelS uses the first
-model given in the list. Every region used by a given statistical model 
-must thus appear in ``srMappings``. If we do not compute signal contributions
-but use it for e.g. nuisance fits, the region must still appear in 
-``srMappings``, with ``None`` as the ``smodels`` name.
+model given in the list.
 
 Some shorthand notations are possible. For example, in the 
 case of the ATLAS-SUSY-2018-41 simplified likelihood listed below, 
-``srMappings`` is not given.
-In this case it is assumed that all regions named in ``srSets`` should
-appear in ``srMappings`` with all the region names being the same
+``regionMappings`` is not given.
+In this case it is assumed that all regions named in ``regionSets`` should
+appear in ``regionMappings`` with all the region names being the same
 as the SModelS name and ``type`` being always **SR**:
 
 .. literalinclude:: /literals/globalInfo201841.txt

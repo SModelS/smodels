@@ -30,7 +30,7 @@ class PyPrinter(BasicPrinter):
     """
 
     def __init__(self, output : str= 'stdout',
-            filename : Optional[os.PathLiker]=None,
+            filename : Optional[os.PathLike]=None,
             outputFormat : str = 'version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "py"

@@ -327,21 +327,7 @@ class StatsComputer:
                 computers.append(computer)
 
         elif dataType == "combined" and tpType == "TheoryPrediction":
-            dataset = theoryPrediction.dataset
-            """
-            srNsigDictAll = {}
-            if not hasattr ( dataset.globalInfo, "regionMappings" ):
-                ## well for cov matrices we dont necessarily need regionMappings
-                pass
-                # raise SModelSError ( f"{dataset.globalInfo.id} is defined as a combined dataset but no regionMappings defined" )
-            else:
-                # Get dictionary with dataset IDs and signal yields
-                for label,region in dataset.globalInfo.regionMappings.items(): ## [!AL!] Shouldn't we be using regionSets here, since they define the combination?
-                    srNsigDictAll[ region["smodels"] ] = 0.
-            # Update with theory predictions
-            srNsigDictAll.update({pred.dataset.getID() : (pred.xsection*dataset.getLumi()).asNumber()
-                                    for pred in theoryPrediction.datasetPredictions})
-            """
+            dataset = theoryPrediction.dataset            
             srNsigDictAll = { p.dataset.getID() : \
                 (p.xsection*dataset.getLumi()).asNumber() \
                 for p in theoryPrediction.datasetPredictions }

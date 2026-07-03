@@ -111,19 +111,19 @@ class Info(object):
                 else:
                     logger.info(f"tag {tag} given multiple times in {self.path}" )
                     continue
-            ## [!AL!] I've  rewrriten the methods below to check consistency of regionSets and statModels. Check if it is ok.
-            self.checkConsistencyOfSRSets()
+            
+            self.checkConsistencyOfRegionSets()
             self.checkConsistencyOfStatModels()
             self.cacheStatsModels()
 
-    def checkConsistencyOfSRSets( self ):
+    def checkConsistencyOfRegionSets( self ):
         """ check that all SRs mentioned in regionSets are included in regionMappings """
         if not hasattr ( self, "regionMappings" ):
             return
         if not hasattr ( self, "regionSets" ):
             return
         elif not isinstance ( self.regionSets, dict ):
-            raise SModelSError ( f"regionSets has to be a dict, but is {type(self.srSets)}" )
+            raise SModelSError ( f"regionSets has to be a dict, but is {type(self.regionSets)}" )
         
         for regionList in self.regionSets.values():
             if not isinstance ( regionList, list ):
