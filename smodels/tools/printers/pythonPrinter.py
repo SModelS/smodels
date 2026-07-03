@@ -19,6 +19,7 @@ from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
 from smodels.statistics.basicStats import observed
 from collections import OrderedDict
+from typing import Optional
 import unum
 import time
 
@@ -28,7 +29,9 @@ class PyPrinter(BasicPrinter):
     Printer class to handle the printing of one single pythonic output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
+    def __init__(self, output : str= 'stdout',
+            filename : Optional[os.PathLiker]=None,
+            outputFormat : str = 'version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "py"
         self.printtimespent = False
@@ -41,6 +44,7 @@ class PyPrinter(BasicPrinter):
     def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
+
         filename.py.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
