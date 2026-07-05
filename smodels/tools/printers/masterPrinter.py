@@ -83,7 +83,7 @@ class MPrinter(object):
         for prt in self.Printers.values():
             prt.addObj(obj)
 
-    def setOutPutFiles(self, filename, silent=False):
+    def setOutPutFiles(self, filename : os.PathLike, silent : bool = False ):
         """
         Set the basename for the output files. Each printer will
         use this file name appended of the respective extension
@@ -96,7 +96,7 @@ class MPrinter(object):
         for printer in self.Printers.values():
             printer.setOutPutFile(filename, silent=silent)
 
-    def flush(self):
+    def flush(self) -> dict:
         """
         Ask all printers to write the output and clear their cache.
         If the printers return anything other than None,
