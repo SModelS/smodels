@@ -33,7 +33,7 @@ from unitTestHelpers import checkPythonRequirements
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
     t = str(t).lower()
-    keywords = [ "cpp", "nllfast", "pythia", "xsec", "interactiveplot",
+    keywords = [ "cpp", "nllfast", "pythia", "xsec", "interactiveplot", "spey",
                  "server", "loadlatest", "notebook", "recipes", "resummino", "toolbox" ]
     for keyword in keywords:
         if keyword in t:
