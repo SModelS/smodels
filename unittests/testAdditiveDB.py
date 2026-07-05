@@ -12,11 +12,10 @@ import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 import unittest
-import logging.config
-import os
 
 class AdditiveDBTest(unittest.TestCase):
     # use different logging config for the unit tests.
+    import logging.config
     logging.config.fileConfig( "./logging.conf" )
     from smodels.base.smodelsLogging import logger
 

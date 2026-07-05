@@ -158,10 +158,10 @@ class SLHAPrinter(TxTPrinter):
             output += f" {cter} 3 {theoPred.getmaxCondition():<30.2f} #condition violation\n"
             output += f" {cter} 4 {expResult.globalInfo.id:<30} #analysis\n"
             output += f" {cter} 5 {signalRegion.replace(' ', '_'):<30} #signal region \n"
-            nll = theoPred.likelihood( return_nll  = True )
+            nll = theoPred.nll( )
             if nll is not None:
-                nllmin = theoPred.lmax(return_nll=True)
-                nllsm = theoPred.lsm( return_nll=True )
+                nllmin = theoPred.nll_min( )
+                nllsm = theoPred.nllsm( )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.floating)):
@@ -219,9 +219,9 @@ class SLHAPrinter(TxTPrinter):
             r = self._round(cRes.getRValue(evaluationType=observed))
             r_expected = self._round(cRes.getRValue(evaluationType=self.getTypeOfExpected()))
 
-            nll = cRes.likelihood(return_nll=True)
-            nllmin = cRes.lmax(return_nll=True)
-            nllsm = cRes.lsm(return_nll=True)
+            nll = cRes.nll()
+            nllmin = cRes.nll_min()
+            nllsm = cRes.nllsm( )
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.floating)):

@@ -135,10 +135,10 @@ class SummaryPrinter(TxTPrinter):
             if self.outputFormat != 'version2':
                 output += " Final States: " + fStates_str + "\n"
 
-            nll = theoPred.likelihood( return_nll = True )
+            nll = theoPred.nll ( )
             if nll is not None:
-                nllmin = theoPred.lmax( return_nll = True )
-                nllsm = theoPred.lsm( return_nll = True )
+                nllmin = theoPred.nll_min( )
+                nllsm = theoPred.nllsm( )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.floating)):
@@ -152,7 +152,7 @@ class SummaryPrinter(TxTPrinter):
                 else:
                     output += f" Likelihoods: nll, nll_min, nll_SM = {nll}, {nllmin}, {nllsm}\n"
 
-            if not (theoPred is obj[-1]):
+            if theoPred is not obj[-1]:
                 output += 80 * "-" + "\n"
 
         output += "\n \n"
@@ -189,9 +189,9 @@ class SummaryPrinter(TxTPrinter):
         r = obj.getRValue()
         r_expected = obj.getRValue(evaluationType=self.getTypeOfExpected())
         # Get likelihoods:
-        nllsm = obj.lsm( return_nll = True )
-        nll = obj.likelihood( return_nll = True )
-        nllmin = obj.lmax( return_nll = True )
+        nllsm = obj.nllsm( )
+        nll = obj.nll( )
+        nllmin = obj.nll_min( )
         # Get sorted txnames
         txnames = []
         for tx in obj.getTxNamesWeights(sort=True):
@@ -204,11 +204,11 @@ class SummaryPrinter(TxTPrinter):
         if r is not None:
             output += f"combined r-value: {r:10.3E}\n"
         else:
-            output += f"combined r-value: NaN (failed to compute r-value)\n"
+            output += "combined r-value: NaN (failed to compute r-value)\n"
         if r_expected is not None:
             output += f"combined r-value (expected): {r_expected:10.3E}\n"
         else:
-            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
+            output += "combined r-value (expected): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

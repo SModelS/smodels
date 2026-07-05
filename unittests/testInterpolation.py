@@ -17,7 +17,7 @@ from databaseLoader import database
 from unitTestHelpers import theorySMSFromString as fromString
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed, apriori
 from smodels.base.model import Model
 import numpy as np
 

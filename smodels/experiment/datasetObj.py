@@ -10,13 +10,12 @@
 
 import os
 import glob
-import numpy as np
 from typing import Union
 from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, NllEvalType
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
@@ -368,7 +367,7 @@ class DataSet(object):
                         If False, the value listed in the database will be used
                         instead.
         :param nSigma: the upper limit for central value (0),
-                        + 1 sigma, - 1 sigma for error bands. 
+                        + 1 sigma, - 1 sigma for error bands.
                         Only for efficiency-map results, and only if compute=True.
         :return: upper limit (Unum object)
         """
@@ -437,19 +436,23 @@ class DataSet(object):
             line = "getSRUpperLimit can only be used for efficiency map results!"
             logger.error( line )
             raise SModelSError( line )
+        """
         if nSigma != 0 and evaluationType == observed:
             line = f"nSigma={nSigma} but evaluationType={evaluationType}: not implemented"
             raise SModelSError ( line )
+        """
 
         if nSigma != 0:
-            from smodels.statistics.statsTools import getStatsComputerModule
-            mod = getStatsComputerModule()
-            # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
-            nsig = 1
-            comp = mod.forSingleBin ( dataset=self,
-                    nsig=nsig, deltas_rel = deltas_rel, lumi = self.getLumi() )
+            from smodels.statistics.statsTools import getCompRetrieverModule,\
+                StatsComputer
+            mod = getCompRetrieverModule()
+            nsigDict = { self.getID() : 1 }
+            m = mod.forSingleBin ( srSet=self.getID(), dataset=self,
+                                   nsigDict = nsigDict,
+                                   deltas_rel = deltas_rel, lumi = self.getLumi() )
+            comp = StatsComputer ( [ m ] )
             # we dont even cache, not like this will be used much
-            ul = comp.poi_upper_limit (
+            ul = comp.getUpperLimit (
                 evaluationType = evaluationType,
                 nSigma = nSigma, limit_on_xsec = True )
             return ul
@@ -496,10 +499,21 @@ class CombinedDataSet(object):
     def findType(self):
         """ find the type of the combined dataset """
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
-        if hasattr(self.globalInfo, "covariance"):
-            self.type = "simplified"
-        if hasattr(self.globalInfo, "jsonFiles"):
-            self.type = "pyhf"
+        if hasattr(self.globalInfo, "statModels"):
+            self.type = ""
+            types = set()
+            for model_tuples in self.globalInfo.statModels.values():
+                ### models is e.g. [ ( "onnx", "bla.onnx" ), ... ]
+                if len(model_tuples)==0:
+                    continue
+                model_type = model_tuples[0][0]
+                if model_type == "onnx":
+                    types.add ( "nn" )
+                elif model_type == "sl":
+                    types.add ( "simplified" )
+                elif model_type in [ "full_pyhf", "pyhf" ]:
+                    types.add ( "pyhf" )
+            return "+".join ( types )
 
     def __str__(self):
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
@@ -511,7 +525,8 @@ class CombinedDataSet(object):
 
     def getIndex(self, dId, datasetOrder):
         """
-        Get the index of dataset within the datasetOrder, but allow for abbreviated names.
+        Get the index of dataset within the datasetOrder,
+        but allow for abbreviated names.
 
         :param dId: id of dataset to search for, may be abbreviated
         :param datasetOrder: the ordered list of datasetIds, long form
@@ -535,27 +550,55 @@ class CombinedDataSet(object):
 
     def sortDataSets(self):
         """
-        Sort datasets according to globalInfo.datasetOrder.
+        Sort datasets according to globalInfo.regionMappings / regionSets.
+        Needs to be done only for cov matrices
         """
-        if hasattr(self.globalInfo, "covariance"):
-            datasets = self.origdatasets[:]
-            if not hasattr(self.globalInfo, "datasetOrder"):
-                raise SModelSError(f"datasetOrder not given in globalInfo.txt for {self.globalInfo.id}")
-            datasetOrder = self.globalInfo.datasetOrder
-            if isinstance(datasetOrder, str):
-                datasetOrder = [datasetOrder]
+        if not hasattr ( self.globalInfo, "statModels" ):
+            return
+        hasSL = False
+        for regionSetName,model_tuples in self.globalInfo.statModels.items():
+            model_tuple = model_tuples[0]
+            # if models[0].endswith ( ".cov" ):
+            if model_tuple[0] == "sl":
+                hasSL = True
+            break
+        if not hasSL:
+            return
+        # if hasattr(self.globalInfo, "covariances"):
+        datasets = self.origdatasets[:]
+        datasetOrder = []
+        if hasattr(self.globalInfo, "regionMappings"):
+        ## datasetOrder goes by regionMappings
+            for region in self.globalInfo.regionMappings:
+                if "sl" not in region or region["sl"]!=None:
+                    datasetOrder.append ( region["smodels"] )
+        elif hasattr(self.globalInfo, "regionSets" ):
+            for regionSetName,regions in self.globalInfo.regionSets.items():
+                datasetOrder += regions
+        dim_covs = 0
+        for regionSetName,_ in self.globalInfo.statModels.items():
+            assert regionSetName in self.globalInfo.regionSets, \
+                f"{regionSetName} does not appear in regionSets"
+            dim_covs += len ( self.globalInfo.regionSets[regionSetName] )
 
-            if len(datasetOrder) != len(datasets):
-                raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
-            ## need to reinitialise, we might have lost some datasets when filtering
-            self._datasets = [ None ] * len(datasets)
-            for dataset in datasets:
-                idx = self.getIndex(dataset.getID(), datasetOrder)
-                if idx == -1:
-                    raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
-                self._datasets[idx] = dataset
-                # dsIndex = datasetOrder.index(dataset.getID())
-                # self._datasets[dsIndex] = dataset
+        if len(datasetOrder) != dim_covs:
+            # pass
+            raise SModelSError( f"Number of datasets with sl entry in the regionMappings field {len(datasetOrder)} does not match the dimensions of the cov matrices {dim_covs} for {self.globalInfo.id}" )
+        ## need to reinitialise, we might have lost some datasets when filtering
+        tmp = [ None ] * len(datasets)
+        for dataset in datasets:
+            idx = self.getIndex(dataset.getID(), datasetOrder)
+            if idx == -1:
+                continue
+                # raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
+            tmp[idx] = dataset
+            # dsIndex = datasetOrder.index(dataset.getID())
+            # self._datasets[dsIndex] = dataset
+        newds = []
+        for ds in tmp:
+            if ds != None:
+                newds.append ( ds )
+        self._datasets = newds
 
     def getType(self):
         """

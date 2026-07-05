@@ -8,16 +8,12 @@
 
 
 import unum
-import re
 import numpy as np
 try:
     from collections.abc import Iterable
 except (ImportError, ModuleNotFoundError):
     from collections import Iterable
-
-from smodels.base.physicsUnits import standardUnits, GeV
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
-from smodels.base.smodelsLogging import logger
 
 
 

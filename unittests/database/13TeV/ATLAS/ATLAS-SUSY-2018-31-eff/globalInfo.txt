@@ -1,25 +1,27 @@
 id: ATLAS-SUSY-2018-31
 sqrts: 13*TeV
 lumi: 139.0/fb
-prettyName: higgs + b-jets + MET
+prettyName: 2 b-jets + 2 h(tau tau)
 url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-31/
-arxiv: arXiv:1908.03122
+arxiv: https://arxiv.org/abs/1908.03122
+publication: JHEP 12 (2019) 060
+publicationDOI: https://doi.org/10.1007/JHEP12(2019)060
 contact: atlas-phys-susy-conveners@cern.ch
 private: False
 implementedBy: Wolfgang Waltenberger
-lastUpdate: 2019/12/6
-# datasetOrder: "SRA_L", "SRA_M", "SRA_H", "SRB", "SRC_22", "SRC_24", "SRC_26", "SRC_28"
-# jsonFiles: {"BkgOnlyA.json": ["SRA_L", "SRA_M", "SRA_H"], "BkgOnlyB.json": ["SRB"], "BkgOnlyC.json": ["SRC_22", "SRC_24", "SRC_26", "SRC_28"]}
-jsonFiles: {
-  'BkgOnlyA.json': [
-    {'smodels': 'SRA_L', 'pyhf': 'SR_meff[0]'},
-    {'smodels': 'SRA_M', 'pyhf': 'SR_meff[1]'},
-    {'smodels': 'SRA_H', 'pyhf': 'SR_meff[2]'}],
-  'BkgOnlyB.json': [
-    {'smodels': 'SRB', 'pyhf': 'SR_cuts'}],
-  'BkgOnlyC.json': [
-    {'smodels': 'SRC_22', 'pyhf': 'SR_metsigST[0]'},
-    {'smodels': 'SRC_24', 'pyhf': 'SR_metsigST[1]'},
-    {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
-    {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'}]
-  }
+lastUpdate: 2026/5/8
+regionMappings: {
+    'SRA_L': {'smodels': 'SRA_L', 'pyhf': 'SR_meff[0]'},
+    'SRA_M': {'smodels': 'SRA_M', 'pyhf': 'SR_meff[1]'},
+    'SRA_H': {'smodels': 'SRA_H', 'pyhf': 'SR_meff[2]'},
+    'SRB': {'smodels': 'SRB', 'pyhf': 'SR_cuts'},
+    'SRC_22': {'smodels': 'SRC_22', 'pyhf': 'SR_metsigST[0]'},
+    'SRC_24': {'smodels': 'SRC_24', 'pyhf': 'SR_metsigST[1]'},
+    'SRC_26': {'smodels': 'SRC_26', 'pyhf': 'SR_metsigST[2]'},
+    'SRC_28': {'smodels': 'SRC_28', 'pyhf': 'SR_metsigST[3]'},
+    'SRC_incl': {'smodels': 'SRC_incl', 'pyhf': None }}
+regionSets: { 'A': ['SRA_L', 'SRA_M', 'SRA_H'], 'B': ['SRB'],
+			    'C': ['SRC_22', 'SRC_24', 'SRC_26', 'SRC_28']}
+statModels: { 'A': [( 'pyhf', 'BkgOnlyA.json' ) ],
+				      'B': [( 'pyhf', 'BkgOnlyB.json' ) ],
+				      'C': [( 'pyhf', 'BkgOnlyC.json' ) ] }

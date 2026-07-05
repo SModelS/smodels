@@ -12,21 +12,17 @@ from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 import unittest
-import os
-from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.experiment.databaseObj import Database
-from smodels.experiment.txnameObj import TxName,TxNameData
 from smodels.experiment.expSMS import ExpSMS
-from smodels.experiment.infoObj import Info
 from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
-from smodels.base.physicsUnits import fb, GeV
+from smodels.base.physicsUnits import GeV
 from databaseLoader import database as db
+from databaseLoader import dbpathextra
 from smodels.base.inclusiveObjects import InclusiveValue
 from unitTestHelpers import getNodesIndices, getEdges
-db_extra = Database('unittestextra')
-
+db_extra = Database( dbpathextra )
 
 class TestInclusiveExpRes(unittest.TestCase):
 

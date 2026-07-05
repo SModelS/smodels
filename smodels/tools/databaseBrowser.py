@@ -8,7 +8,8 @@
 """
 
 
-import numpy, unum
+import numpy
+import unum
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom,getValuesForObj
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
@@ -235,7 +236,7 @@ class Browser(object):
             expAttributes = expRes.getAttributes()
             for tag in restrDict:
                 #Check if the restriction tag appears in the experimental result
-                if not tag in expAttributes:
+                if tag not in expAttributes:
                     results.remove(expRes)
                     break
                 vals = expRes.getValuesFor(tag)
@@ -275,7 +276,6 @@ def main(args):
 
 
     from smodels.tools import databaseBrowser
-    from smodels.base.physicsUnits import fb, pb, GeV, TeV
 
     def getHeader ():
         from smodels.installation import installDirectory

@@ -635,7 +635,7 @@ class XSectionList(object):
         if type(newXsecs) == type(XSection()):
             newList = [newXsecs]
         for newXsec in newList:
-            if not newXsec.info in self.getInfo():
+            if newXsec.info not in self.getInfo():
                 self.add(newXsec)
             else:
                 for oldXsec in self:
@@ -770,7 +770,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
             xsec.value = pxsec.value * pb
             xsec.pid = production[2:]
             # Do not add xsecs which do not match the user required ones:
-            if (useXSecs and not xsec.info in useXSecs):
+            if (useXSecs and xsec.info not in useXSecs):
                 continue
             else:
                 xSecsInFile.add(xsec)

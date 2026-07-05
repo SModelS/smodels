@@ -17,8 +17,9 @@ from smodels.base.physicsUnits import GeV, fb, TeV
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.tools.printerTools import formatNestedDict
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed
 from collections import OrderedDict
+from typing import Optional
 import unum
 import time
 
@@ -28,7 +29,9 @@ class PyPrinter(BasicPrinter):
     Printer class to handle the printing of one single pythonic output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
+    def __init__(self, output : str= 'stdout',
+            filename : Optional[os.PathLike]=None,
+            outputFormat : str = 'version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "py"
         self.printtimespent = False
@@ -41,6 +44,7 @@ class PyPrinter(BasicPrinter):
     def setOutPutFile(self, filename, overwrite=True, silent=False):
         """
         Set the basename for the text printer. The output filename will be
+
         filename.py.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
@@ -194,14 +198,14 @@ class PyPrinter(BasicPrinter):
 
     def addErrorsForRValues(self, obj, resDict : dict ):
         """ for obj add the errors on the r values to resDict """
-        ul_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
+        r_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
                 nSigma = 1 )
-        if ul_e_p1 != None:
-            resDict['r_expected_p1'] = self._round ( ul_e_p1 )
-        ul_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
+        if r_e_p1 != None:
+            resDict['r_expected_p1'] = self._round ( r_e_p1 )
+        r_e_m1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
                 nSigma = -1 )
-        if ul_e_m1 != None:
-            resDict['r_expected_m1'] = self._round ( ul_e_m1 )
+        if r_e_m1 != None:
+            resDict['r_expected_m1'] = self._round ( r_e_m1 )
         # add only for expected
         # ul_p1 = obj.getRValue ( evaluationType = observed, nSigma = 1 )
         # ul_m1 = obj.getRValue ( evaluationType = observed, nSigma = -1 )
@@ -316,6 +320,10 @@ class PyPrinter(BasicPrinter):
                        'dataType': dataType,
                        'r': r, 'r_expected': r_expected,
                        'Width (GeV)' : widths})
+            if hasattr ( self, "addstatmodel" ) and self.addstatmodel and dataType == "combined":
+                model = theoryPrediction.statsComputer.getMostSensitiveModel()
+                resDict["StatModel"]=model.name
+
             if self.errorsforr and theoryPrediction.dataType() != "upperLimit":
                 # the errors on R values feature is used only for SR-combinations
                 self.addErrorsForRValues ( theoryPrediction, resDict )
@@ -326,12 +334,12 @@ class PyPrinter(BasicPrinter):
             if hasattr(self, "addnodesmap") and self.addnodesmap:
                 resDict['Nodes Map'] = nodesDict
 
-            nll = theoryPrediction.likelihood( return_nll = True )
+            nll = theoryPrediction.nll ( )
             if nll is not None:
                 # resDict['chi2'] = self._round ( theoryPrediction.chi2 )
                 resDict['nll'] = self._round(nll)
-                resDict['nll_min'] = self._round(theoryPrediction.lmax(return_nll = True ))
-                resDict['nll_SM'] = self._round(theoryPrediction.lsm( return_nll = True ))
+                resDict['nll_min'] = self._round(theoryPrediction.nll_min())
+                resDict['nll_SM'] = self._round(theoryPrediction.nllsm( ))
             ExptRes.append(resDict)
 
         return {'ExptRes': ExptRes}
@@ -442,9 +450,9 @@ class PyPrinter(BasicPrinter):
         r = self._round(obj.getRValue(evaluationType=observed ))
         r_expected = self._round(obj.getRValue(evaluationType=self.getTypeOfExpected()))
 
-        nll = self._round(obj.likelihood( return_nll = True ))
-        nllmin = self._round(obj.lmax( return_nll = True ))
-        nllsm = self._round(obj.lsm( return_nll = True ))
+        nll = self._round(obj.nll( ) )
+        nllmin = self._round(obj.nll_min( ) )
+        nllsm = self._round(obj.nllsm( ) )
 
         # Get sorted txnames
         txnames = []

@@ -147,9 +147,10 @@ class RunPrinterTest(unittest.TestCase):
 
 
     def testPrinters(self):
-
         slhafile = "./testFiles/slha/lightEWinos.slha"
+        from databaseLoader import database
         out = runMain(slhafile,inifile="testPrinters_parameters.ini",
+                overridedatabase = database,
                 suppressStdout = True )
 
         # Check Summary output

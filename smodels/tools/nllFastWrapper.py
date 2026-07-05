@@ -104,7 +104,7 @@ class NllFastWrapper(WrapperBase):
             il = 0
             line = lines[il]
             process = False
-            while not "K_NLO" in line and il < len(lines) - 2:
+            while "K_NLO" not in line and il < len(lines) - 2:
                 if "process" in line:
                     process = line[line.find("process:") + 8:].replace(" ", "")
                 il += 1
@@ -230,7 +230,7 @@ class NllFastWrapper(WrapperBase):
         masses=readfile.blocks['MASS']
         check_pids=squarks+gluinos+third
         for check in check_pids:
-            if not check in masses.entries:
+            if check not in masses.entries:
                 logger.error ( "cannot compute k factor for pdgid %d: " \
                   " no particle mass given. will set mass to inf." % check )
                 masses.entries[check]=1.e10
@@ -265,7 +265,7 @@ class NllFastWrapper(WrapperBase):
             else:
                 return kFacs
         # If run was not successful, check for decoupling error messages:
-        elif not "too low/high" in nll_output.lower():
+        elif "too low/high" not in nll_output.lower():
             logger.warning("Error running NLLfast")
             return (None, None)
 

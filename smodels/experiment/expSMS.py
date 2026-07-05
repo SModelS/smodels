@@ -196,7 +196,7 @@ class ExpSMS(GenericSMS):
         # following the ordering of self
         invMapDict = OrderedDict()
         for n1 in self.nodeIndices:
-            if not n1 in mapDict:  # For InclusiveNodes the match is partial
+            if n1 not in mapDict:  # For InclusiveNodes the match is partial
                 continue
             n2 = mapDict[n1]
             # For inclusiveLists, set the firt match
@@ -301,7 +301,7 @@ class ExpSMS(GenericSMS):
             if not self.indexToNode(d1).inclusiveList:
                 continue
             left_nodes.remove(d1)
-            if not d1 in edges:
+            if d1 not in edges:
                 continue
             for d2 in edges[d1]:
                 right_nodes.remove(d2)

@@ -53,7 +53,7 @@ def resolve_dependencies( as_user = True, verbose = True ):
     req = f"{installDirectory()}/smodels/share/requirements.txt"
     try:
         import pip
-    except (ModuleNotFoundError,ImportError) as e:
+    except (ModuleNotFoundError,ImportError):
         if verbose:
             print ( "warning: pip not found. cannot install requirements. Maybe try easy_install pip" )
         return
@@ -62,7 +62,7 @@ def resolve_dependencies( as_user = True, verbose = True ):
     if as_user:
         o = subprocess.getoutput ( " ".join ( [ sys.executable, '-m', 'pip', 'install', '--user', '--dry-run', 'pyslha' ] ) )
         #o = subprocess.getoutput ( f"{p} install --user --dry-run pyslha" )
-        if not "Can not perform a '--user' install" in o:
+        if "Can not perform a '--user' install" not in o:
             cmd.insert( 4, '--user' )
 
     out = subprocess.call ( cmd )
@@ -158,7 +158,7 @@ def version( return_tuple : bool = False ) -> Union[str,Tuple]:
     for i,r in enumerate(ret):
         try:
             ret[i]=int(r)
-        except ValueError as e:
+        except ValueError:
             pass
     return tuple(ret)
 
@@ -209,7 +209,7 @@ def databasePath ( label ):
     :param label: one of: official, latest, fastlim, backup
     :returns: URL, e.g. https://smodels.github.io/database/official
     """
-    if not label in __dblabels__:
+    if label not in __dblabels__:
         from smodels.base.smodelsLogging import logger
         logger.warning ( f"cannot identify label {label}" )
         return label

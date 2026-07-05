@@ -17,7 +17,6 @@ import pathlib
 import sys
 import time
 import copy
-import io
 from smodels.experiment import datasetObj
 from smodels.installation import cacheDirectory
 from smodels.experiment.metaObj import Meta
@@ -35,10 +34,10 @@ scipyver = ""
 try:
     from importlib.metadata import version
     scipyver = version("scipy")
-except Exception as e:
+except Exception:
     try:
         from scipy import __version__ as scipyver
-    except Exception as e:
+    except Exception:
         pass
 if scipyver not in ["1.8.", "1.9.", "1.10.", "2.0.", "2.1."]:
     # fix for pickling different scipy versions (1.7.x vs 1.8.x)
@@ -49,7 +48,7 @@ if scipyver not in ["1.8.", "1.9.", "1.10.", "2.0.", "2.1."]:
 
 try:
     import cPickle as serializer
-except ImportError as e:
+except ImportError:
     import pickle as serializer
 
 
@@ -66,7 +65,7 @@ def removeLockFiles( lockfiles : list ):
         if os.path.exists ( l ):
             try:
                 os.unlink ( l )
-            except FileNotFoundError as e:
+            except FileNotFoundError:
                 pass
     lockfiles = set()
 
@@ -135,7 +134,7 @@ class Database(object):
         for tmp in lists:
             for t in tmp:
                 if len(t.datasets) == 0:  # skip empty entries
-                    logger.warning(f"Analysis {t.globalInfo.id} has no datasets. Will remove it.")
+                    logger.warning(f"Analysis {t.globalInfo.id} in {t.globalInfo.path} has no datasets. Will remove it.")
                     continue
                 anaid = t.globalInfo.id + t.datasets[0].getType()
                 if anaid not in D:
@@ -153,7 +152,7 @@ class Database(object):
         r1.globalInfo = r2.globalInfo
         dids = [x.getID() for x in o1.datasets]
         for ds in r2.datasets:
-            if not ds.getID() in dids:  # completely new dataset
+            if ds.getID() not in dids:  # completely new dataset
                 r1.datasets.append(ds)
             else:  # just overwrite the old txnames
                 idx = dids.index(ds.getID())  # ds index
@@ -202,7 +201,7 @@ class Database(object):
         for expRes in self.expResultList:
             Id = expRes.globalInfo.getInfo('id')
             sqrts = expRes.globalInfo.getInfo('sqrts').asNumber(TeV)
-            if not sqrts in s.keys():
+            if sqrts not in s.keys():
                 s[sqrts] = 0
             s[sqrts] += 1
             datasets += len(expRes.datasets)
@@ -405,7 +404,7 @@ class SubDatabase(object):
                 import progressbar as P
                 self.progressbar = P.ProgressBar(widgets=["Building Database ", P.Percentage(),
                          P.Bar(marker=P.RotatingMarker()), P.ETA()])
-            except ImportError as e:
+            except ImportError:
                 logger.warning("progressbar requested, but python-progressbar is not installed.")
 
         if self.force_load == "txt":
@@ -574,7 +573,7 @@ class SubDatabase(object):
                     self.databaseParticles = None
                     try:
                         self.databaseParticles = serializer.load(f)
-                    except EOFError as e:
+                    except EOFError:
                         pass  # a model does not *have* to be defined
                     self.createLinksToModel()
                     self.createLinksToCombinationsMatrix()
@@ -690,7 +689,7 @@ class SubDatabase(object):
             if not os.path.exists ( lockfile ):
                 f=open ( lockfile, "wt" )
                 f.write ( f"# this is a temporary lockfile created {time.asctime()}\n" )
-                f.write ( f"# meant to prevent multiple, parallel downloads of\n" )
+                f.write ( "# meant to prevent multiple, parallel downloads of\n" )
                 f.write ( f"# {filename}\n" )
                 f.close()
                 lockfiles.add ( lockfile )
@@ -720,7 +719,7 @@ class SubDatabase(object):
         if os.path.exists ( lockfile ):
             try:
                 os.unlink ( lockfile )
-            except FileNotFoundError as e:
+            except FileNotFoundError:
                 pass
         #import fcntl # does not work on all filesystems
         #fcntl.lockf(handle, fcntl.LOCK_UN)
@@ -751,7 +750,7 @@ class SubDatabase(object):
         ## its new so store the description
         with open(store, "w") as f:
             f.write(r.text)
-        if not "url" in r.json().keys():
+        if "url" not in r.json().keys():
             logger.error(f"cannot parse json file {path}.")
             raise SModelSError()
         size = r.json()["size"]
@@ -802,7 +801,6 @@ class SubDatabase(object):
 
     def fetchFromServer(self, path: str) -> Tuple[str, str]:
         import requests
-        import time
         import json
         self.source = "http"
         if "ftp://" in path:
@@ -822,7 +820,7 @@ class SubDatabase(object):
         r = _()
         try:
             r = requests.get(path, timeout=2)
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             pass
         if r.status_code != 200:
             logger.warning("Error %d: could not fetch %s from server." %
@@ -883,8 +881,8 @@ class SubDatabase(object):
             self.source = "pcl"
             if not os.path.exists(tmp):
                 if self.force_load == "pcl":
-                    logger.error(f"File not found: {tmp}")
-                    raise SModelSError()
+                    # logger.error(f"File not found: {tmp}")
+                    raise SModelSError( f"File not found: {tmp}" )
                 logger.info(f"File not found: {tmp}. Will generate.")
                 base = os.path.dirname(tmp)
                 return (base, tmp)
@@ -914,7 +912,7 @@ class SubDatabase(object):
         for expRes in self.expResultList:
             Id = expRes.globalInfo.getInfo('id')
             sqrts = expRes.globalInfo.getInfo('sqrts').asNumber(TeV)
-            if not sqrts in s.keys():
+            if sqrts not in s.keys():
                 s[sqrts] = 0
             s[sqrts] += 1
             datasets += len(expRes.datasets)
@@ -1004,7 +1002,7 @@ class SubDatabase(object):
                 continue
             if root[-5:] == "/orig":
                 continue
-            if not 'globalInfo.txt' in files:
+            if 'globalInfo.txt' not in files:
                 continue
             else:
                 roots.append(root)
@@ -1035,9 +1033,7 @@ class SubDatabase(object):
         logger.debug(f"Creating {root}, pcl={pclfile}")
         expres = None
         try:
-            # logger.info( "%s exists? %d" % ( pclfile,os.path.exists( pclfile ) ) )
             if not self.force_load == "txt" and os.path.exists(pclfile):
-                # logger.info( "%s exists" % ( pclfile ) )
                 with open(pclfile, "rb") as f:
                     logger.debug(f"Loading: {pclfile}")
                     ## read meta from pickle
@@ -1053,8 +1049,14 @@ class SubDatabase(object):
         except IOError as e:
             logger.error(f"exception {e}")
         if not expres:  # create from text file
-            expres = ExpResult(root,
-                databaseParticles=self.databaseParticles)
+            try:
+                expres = ExpResult(root,
+                    databaseParticles=self.databaseParticles)
+            except SyntaxError as e:
+                logger.error ( f"when parsing {root}: {e}" )
+                import traceback
+                logger.error ( f"{traceback.format_exc()}")
+                sys.exit(-1)
             if self.subpickle and expres:
                 expres.writePickle(self.databaseVersion)
         if expres:

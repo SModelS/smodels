@@ -10,13 +10,11 @@
 """
 
 from functools import wraps
-from unum import IncompatibleUnitsError
-from smodels.base.physicsUnits import GeV, fb
 
 import numpy as np
 from collections.abc import Iterable
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
-from functools import lru_cache, wraps
+from functools import lru_cache
 
 def roundObj(obj, digits : int):
     """ round <obj> to <digits> digits """
@@ -59,7 +57,7 @@ def roundCache(argname = None, argpos : int = 0, digits : int = 8,
     return roundCacheDec
 
 if __name__ == "__main__":
-    from typing import Union, Text
+    from typing import Union
     class TestCase:
         def __init__ ( self ):
             self.bla = 0

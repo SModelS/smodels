@@ -8,7 +8,9 @@
  
 """
  
-import sys,os,shutil
+import sys
+import os
+import shutil
 sys.path.insert(0,"../")
 import unittest
 from smodels.tools.interactivePlots import main

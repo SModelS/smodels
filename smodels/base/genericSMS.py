@@ -1273,5 +1273,5 @@ class GenericSMS(object):
                         fname, _ = os.path.splitext(filename)
                     dot.view(filename=fname) # for terminals
                 except (RuntimeError, graphviz.ExecutableNotFound,\
-                        graphviz.CalledProcessError) as e:
+                        graphviz.CalledProcessError):
                     pass

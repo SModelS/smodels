@@ -2,8 +2,13 @@
 
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
-import socket, atexit, time, os, sys, copy
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+import socket
+import atexit
+import time
+import os
+import sys
+import copy
+from smodels.statistics.basicStats import observed, apriori
 import unum
 from typing import Union
 

@@ -9,10 +9,11 @@
 
 """
 
-from __future__ import print_function
-import sys, subprocess, os
+import sys
+import os
 sys.path.insert(0,"../")
 from smodels.base.smodelsLogging import colors
+from typing import Optional
 colors.on = True
 
 v=sys.version_info
@@ -21,14 +22,13 @@ if v[0] > 2 or ( v[0]==2 and v[1] > 6 ):
 if v[0]==2 and v[1] < 7 and v[1] > 3:
     try:
         import unittest2 as unittest
-    except ImportError as e:
-        print ( "Error: python v",sys.version,"needs unittest2. Please install." )
+    except ImportError:
+        print ( f"Error: python v{sys.version} needs unittest2. Please install." )
         sys.exit()
 from smodels.base.smodelsLogging import setLogLevel
 setLogLevel ( "fatal" )
 
 from unitTestHelpers import checkPythonRequirements
-checkPythonRequirements()
 
 def isInReducedSet ( t ):
     """ is t in the reduced set of unit tests? """
@@ -40,12 +40,13 @@ def isInReducedSet ( t ):
             return False
     return True
 
-def run(filter=None, testNotebooks=False, reduced=False ):
-
+def run(filter : Optional[str] = None, testNotebooks : bool = False, 
+            reduced : bool = False, allow_python_req_violations : bool = False ):
+    checkPythonRequirements( allow_violations = allow_python_req_violations )
     tests = unittest.TestLoader().discover("./")
     if not testNotebooks:
-        tests._tests = [t for t in tests._tests[:] if not 'notebook' in str(t).lower()]
-        tests._tests = [t for t in tests._tests[:] if not 'recipes' in str(t).lower()]
+        tests._tests = [t for t in tests._tests[:] if 'notebook' not in str(t).lower()]
+        tests._tests = [t for t in tests._tests[:] if 'recipes' not in str(t).lower()]
     if reduced:
         tests._tests = [t for t in tests._tests[:] if isInReducedSet(t) ]
     if filter is not None:
@@ -60,8 +61,8 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
     alltests = unittest.TestLoader().discover("./")
 
     if not testNotebooks:
-        alltests._tests = [t for t in alltests._tests[:] if not 'notebook' in str(t).lower()]
-        alltests._tests = [t for t in alltests._tests[:] if not 'recipes' in str(t).lower()]
+        alltests._tests = [t for t in alltests._tests[:] if 'notebook' not in str(t).lower()]
+        alltests._tests = [t for t in alltests._tests[:] if 'recipes' not in str(t).lower()]
     if reduced:
         alltests._tests = [t for t in alltests._tests[:] if isInReducedSet(t) ]
 
@@ -77,7 +78,7 @@ def verbose_run( filter=None, testNotebooks=False, reduced=False ):
                 n_test += 1 
                 # if n_test < 190: # we can speed things up here
                 #    continue
-                if filter and (not filter in str(t)):
+                if filter and (filter not in str(t)):
                     continue
                 n_tests += 1
                 print ( f"[#{int(n_tests):3}] {t.id()} ... ", end="" )
@@ -104,7 +105,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
         return
     try:
         from concurrencytest import ConcurrentTestSuite, fork_for_tests
-    except ImportError as e:
+    except ImportError:
         print ( "Need to install the module concurrencytest." )
         print ( "pip install concurrencytest" )
         return
@@ -113,7 +114,7 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
     alltests = unittest.TestLoader().discover("./")
 
     if not testNotebooks:
-        alltests._tests = [t for t in alltests._tests[:] if not 'notebook' in str(t).lower()]
+        alltests._tests = [t for t in alltests._tests[:] if 'notebook' not in str(t).lower()]
     if reduced:
         alltests._tests = [t for t in alltests._tests[:] if isInReducedSet(t) ]
 
@@ -147,13 +148,16 @@ if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser('runs the complete test suite')
     ap.add_argument('-c','--clean_database', help='remove database pickle files',
-                    action='store_true')
+            action='store_true')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
+    ap.add_argument('-a','--allow_failed_reqs', 
+            help='allow python requirements to fail',action='store_true')
     ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
     ap.add_argument('-p','--parallel', help='run in parallel',action='store_true')
-    ap.add_argument('-n','--notebooks', help='also test notebooks',action='store_true',default=False)
+    ap.add_argument('-n','--notebooks', help='also test notebooks',
+            action='store_true',default=False )
     ap.add_argument('-r','--reduced', help='run reduced set of tests (no C++ interface, no xsec computation or notebook tests)',
-                    action='store_true', default = False)
+            action='store_true', default = False)
     args = ap.parse_args()
 
     if args.clean_database:
@@ -172,4 +176,5 @@ if __name__ == "__main__":
             verbose_run(args.filter, args.notebooks, args.reduced)
             sys.exit()
         else:
-            run(args.filter, args.notebooks, args.reduced)
+            run(args.filter, args.notebooks, args.reduced,
+                    args.allow_failed_reqs )

@@ -9,7 +9,8 @@
 
 """
 
-import sys,os
+import sys
+import os
 sys.path.insert(0,"../")
 import unittest
 from unitTestHelpers import equalObjs, runMain, importModule
@@ -98,6 +99,7 @@ class ModelsTest(unittest.TestCase):
 
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
+        self.removeOutputs(os.path.basename ( filename ) )
 
     def testModelFromLHE(self):
         filename = "./testFiles/lhe/alrsm.lhe"
@@ -115,6 +117,7 @@ class ModelsTest(unittest.TestCase):
 
         self.assertTrue(equals)
         self.removeOutputs(outputfile)
+        self.removeOutputs("alrsm.lhe")
 
     def testParticlesFromSLHA(self):
 

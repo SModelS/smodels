@@ -6,7 +6,6 @@
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 """
 
-import itertools
 import weakref
 
 

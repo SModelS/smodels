@@ -18,7 +18,6 @@ from smodels.base.model import Model
 from smodels.decomposition import decomposer
 from smodels.base.physicsUnits import GeV,pb,TeV,fb
 from smodels.experiment.defaultFinalStates import finalStates
-from unitTestHelpers import theorySMSFromString as fromString
 from unitTestHelpers import canonNameToVertNumb
 
 

@@ -13,27 +13,22 @@
 
 from __future__ import print_function
 import sys
-import os, copy
+import os
 current = os.getcwd()
 sys.path.append(current)
 
 
 from smodels import installation
-from smodels.tools import toolBox
 from smodels.base import runtime
-from smodels.base.physicsUnits import pb, TeV, GeV
+from smodels.base.physicsUnits import pb, GeV
 from smodels.base import crossSection
 from smodels.base.crossSection import LO, NLO, NLL
-from smodels.base.smodelsLogging import logger, setLogLevel
+from smodels.base.smodelsLogging import logger
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import subprocess
-from concurrent.futures import ProcessPoolExecutor
 
-import pyslha
-import math
 try:
     import cStringIO as io
-except ImportError as e:
+except ImportError:
     import io
 
 
@@ -180,7 +175,7 @@ class ArgsStandardizer:
         if order == 0: return
         allowedsqrtses=[7, 8, 13, 13.6]
         for sqrts in sqrtses:
-            if not sqrts in allowedsqrtses:
+            if sqrts not in allowedsqrtses:
                 logger.error("Cannot compute NLO or NLL xsecs for sqrts = %d "
                         "TeV! Available are: %s TeV." % (sqrts, allowedsqrtses ))
                 sys.exit(-2)

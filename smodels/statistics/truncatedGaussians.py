@@ -14,19 +14,16 @@ __all__ = [ "TruncatedGaussians" ]
 
 from scipy import stats, optimize
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
 from scipy.special import erf
 import numpy as np
-from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
-from typing import Text, Optional, Union, Dict
-from smodels.statistics.basicStats import deltaChi2FromLlhd
+from smodels.statistics.basicStats import observed, NllEvalType
+from typing import  Optional, Union, Dict
 
 class TruncatedGaussians:
     """ likelihood computer based on the trunacated Gaussian approximation, see
          arXiv:1202.3415 """
     __slots__ = [ "upperLimitOnMu", "expectedUpperLimitOnMu", "corr",
-                  "sigma_mu", "denominator", "cl" ]
+                  "sigma_mu", "denominator", "cl", "allowNegativeSignals" ]
 
     # the correction we introduced a long time ago was have exclusions
     # in mind only. for discovery mode we need to correct differently
@@ -36,11 +33,13 @@ class TruncatedGaussians:
                     corr : Optional[float] = 0.6, cl=.95 ):
         """
         :param upperLimitOnMu: observed upper limit on signal strength mu
-        :param expectedUpperLimitOnMu: evaluationType upper limit on signal strength mu
+        :param expectedUpperLimitOnMu: evaluationType upper limit
+        on signal strength mu
         :param corr: correction factor:
-           ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
-           When comparing with likelihoods constructed from efficiency maps,
-           a factor of corr = 0.6 has been found to result in the best approximations.
+        ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+        When comparing with likelihoods constructed from efficiency maps,
+        a factor of corr = 0.6 has been found to result
+        in the best approximations.
         :param cl: confidence level
         """
         assert type(upperLimitOnMu) in [ float, np.float64, np.float32 ], f"the upper limits must be given as floats not {type(upperLimitOnMu)}, are you providing upper limits on xsecs?"
@@ -53,88 +52,85 @@ class TruncatedGaussians:
         self.corr = corr
         self.sigma_mu = self._getSigmaMu()  # the evaluationType scale, eq 3.24 in arXiv:1202.3415
         self.denominator = np.sqrt(2.0) * self.sigma_mu
+        self.allowNegativeSignals = False
         self.cl = cl
 
+    """
     def likelihood ( self, mu : Union[float,None], return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             evaluationType : NllEvalType = observed ) -> Union[None,float]:
-        """ return the likelihood, as a function of mu
+        ret = self.nll( mu, allowNegativeSignals,
+                corr, evaluationType )
+        if return_nll:
+            return ret
+        return math.exp ( - ret )
+    """
+
+    def nll( self, mu : Union[float,None],
+            allowNegativeSignals : Optional[bool] = True,
+            corr : Optional[float] = 0.6,
+            evaluationType : NllEvalType = observed ) -> Union[None,float]:
+        """ return the nll, as a function of mu
 
         :param mu: number of signal events, if None then mu = muhat
-        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,\
                else demand that muhat >= 0. In the presence of underfluctuations\
                in the data, setting this to True results in more realistic\
                approximate likelihoods.
 
-        :returns: likelihood (float)
+        :returns: nll (float)
         """
-        sllhd = "llhd"
-        if return_nll:
-            sllhd = "nll"
-        muhat, sigma_mu = float("inf"), float("inf")
-        dsig = self._likelihoodOfMu ( mu, return_nll=return_nll,
-                allowNegativeSignals = allowNegativeSignals, corr = corr,
-                evaluationType = evaluationType )
-        ret = dsig[sllhd]
+        dsig = self._nllOfMu ( mu, allowNegativeSignals = allowNegativeSignals,
+                corr = corr, evaluationType = evaluationType )
+        ret = dsig["nll"]
         return ret
 
-    def lmax ( self, return_nll : Optional[bool]=False,
+    def nll_min( self, return_nll : Optional[bool]=False,
             allowNegativeSignals : Optional[bool] = True,
             corr : Optional[float] = 0.6,
             evaluationType : NllEvalType = observed ) -> Dict:
         """
-        Return the likelihood, as a function of mu
+        Return the nll at muhat
 
         :param mu: number of signal events, if None then mu = muhat
-        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
-                                     else demand that muhat >= 0. In the presence of underfluctuations
-                                     in the data, setting this to True results in more realistic
-                                     approximate likelihoods.
+        else demand that muhat >= 0. In the presence of underfluctuations
+        in the data, setting this to True results in more realistic
+        approximate likelihoods.
 
         :returns: dictionary with likelihood (float), muhat, and sigma_mu
         """
-        default = { "muhat": None, "sigma_mu": None, "lmax": None }
-        sllhd = "llhd"
-        if return_nll:
-            sllhd = "nll"
+
         muhat, sigma_mu = float("inf"), float("inf")
-        dsig = self._likelihoodOfMu ( 1., return_nll=return_nll,
+        dsig = self._nllOfMu ( 1.,
                 allowNegativeSignals = allowNegativeSignals, corr = corr )
         muhat, sigma_mu =  dsig["muhat"], dsig["sigma_mu"]
-        # llhd evaluated at mu_hat 
+        # llhd evaluated at mu_hat
         if evaluationType != observed:
             muhat = 0.
-        lmax = self.likelihood ( muhat, return_nll=return_nll )
+        nll_min = self.nll ( muhat )
 
-        ret = { "muhat": muhat, "sigma_mu": sigma_mu, "lmax": lmax }
+        ret = { "muhat": muhat, "sigma_mu": sigma_mu, "nll_min": nll_min }
         return ret
 
-    def _likelihoodOfMu ( self, mu : Union[float,None], 
-            return_nll : Optional[bool] = False,
+    def _nllOfMu ( self, mu : float,
             allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6, 
-            evaluationType : NllEvalType = observed ) -> float:
-        """ return the likelihood, as a function of nsig
+            corr : Optional[float] = 0.6,
+            evaluationType : NllEvalType = observed ) -> Dict:
+        """ return the nll, as a function of nsig
 
         :param mu: signal strength
-        :param return_nll: if True, return negative log likelihood
         :param allowNegativeSignals: if True, then allow muhat to become negative,
-               else demand that muhat >= 0. In the presence of underfluctuations
-               in the data, setting this to True results in more realistic
-               approximate likelihoods.
+        else demand that muhat >= 0. In the presence of underfluctuations
+        in the data, setting this to True results in more realistic
+        approximate likelihoods.
         :param corr: correction factor:
-                     ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
-                     When comparing with likelihoods constructed from efficiency maps,
-                     a factor of corr = 0.6 has been found to result in the best approximations.
-        :returns: likelihood (float), muhat, and sigma_mu
+        ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
+        When comparing with likelihoods constructed from efficiency maps,
+        a factor of corr = 0.6 has been found to result in the best approximations.
+        :returns: nll (float), muhat, and sigma_mu
         """
-        sllhd = "llhd"
-        if return_nll:
-            sllhd = "nll"
-
         if self.upperLimitOnMu < self.expectedUpperLimitOnMu:
             ## underfluctuation. muhat = 0.
             if allowNegativeSignals:
@@ -143,25 +139,24 @@ class TruncatedGaussians:
                 muhat = 0.
                 if evaluationType == observed:
                     muhat = self._findMuhat( xa, xb )
-                ret = self._computeLlhd(mu, muhat, return_nll = return_nll )
-                return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
+                ret = self._computeNLL(mu, muhat )
+                return { "nll": ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
             else:
-                ret = self._computeLlhd(mu, 0.0, return_nll = return_nll )
-                return { sllhd: ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
+                ret = self._computeNLL(mu, 0.0 )
+                return { "nll": ret, "muhat": 0.0, "sigma_mu": self.sigma_mu }
 
         muhat = 0.
         if evaluationType == observed:
             xa = -self.expectedUpperLimitOnMu
             xb = self.expectedUpperLimitOnMu
             muhat = self._findMuhat(xa,xb)
-        ret = self._computeLlhd(mu, muhat, return_nll = False )
-        if return_nll:
-            ret = -np.log(ret)
-        return { sllhd: ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
+        ret = self._computeNLL(mu, muhat )
+        return { "nll": ret, "muhat": muhat, "sigma_mu": self.sigma_mu }
 
-    def _getSigmaMu( self ):
+    def _getSigmaMu( self ) -> float :
         """ get the standard deviation sigma on the signal strength mu, given
-        an upper limit and a central value. assumes a truncated Gaussian likelihood
+        an upper limit and a central value.
+        assumes a truncated Gaussian likelihood
         """
         # the evaluationType scale, eq 3.24 in arXiv:1202.3415
         sigma_mu = self.expectedUpperLimitOnMu / 1.96
@@ -169,7 +164,7 @@ class TruncatedGaussians:
         #    sigma_mu = sigma_mu / ( 1. - self.corr/2.)
         return sigma_mu
 
-    def _root_func( self, mu : float ):
+    def _root_func( self, mu : float ) -> float:
         """ the root of this one should determine muhat """
         numerator = erf((self.upperLimitOnMu - mu) / self.denominator) + \
                     erf( mu / self.denominator)
@@ -180,9 +175,9 @@ class TruncatedGaussians:
         ret = numerator / denominator - self.cl
         return ret
 
-    def _findMuhat( self, xa : float = 0., 
-                        xb : Union[float,None] = None ):
-        """ find muhat, in [xa,xb] 
+    def _findMuhat( self, xa : float = 0.,
+                        xb : Optional[float] = None ) -> float:
+        """ find muhat, in [xa,xb]
 
         :param xa: lower limit of initial bracket
         :param xb: upper limit of initial bracket. if none, then max(ul,eul)
@@ -207,25 +202,26 @@ class TruncatedGaussians:
                 rb = self._root_func ( xb )
 
         try:
-            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-07, xtol=1e-07)
+            muhat,rootResults = optimize.toms748( self._root_func, xa, xb, rtol=1e-07,
+                                                  xtol=1e-07, full_output = True  )
         except ValueError as e:
             logger.error ( f"truncated gaussian got ValueError {e}: rf({xa:.2f})={self._root_func(xa):.2f}, rf({xb:.2f})={self._root_func(xb):.2f}" )
             logger.error ( f"ul={self.upperLimitOnMu:.2f}, eul={self.expectedUpperLimitOnMu:.2f}" )
-            muhat = optimize.toms748(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02, full_output = True )
-            if muhat[1].converged:
-                muhat = muhat[0]
-                logger.error ( f"retry with tol=1e-2 seemed to have worked" )
+            muhat,rootResults = optimize.toms748( self._root_func, xa, xb, rtol=1e-02,
+                                      xtol=1e-02, full_output = True )
+            if rootResults.converged:
+                logger.error ( "retry with tol=1e-2 seemed to have worked" )
             else:
-                muhat = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
-                logger.error ( f"retry with brentq seemed to have worked" )
+                muhat,*_ = optimize.brentq(self._root_func, xa, xb, rtol=1e-02, xtol=1e-02 )
+                logger.error ( "retry with brentq seemed to have worked" )
         return muhat
 
-    def _computeLlhd( self, mu, muhat, return_nll):
+    def _computeNLL( self, mu : float, muhat : float ) -> float:
         if mu is None:
             mu = muhat
         sigma_mu = self.sigma_mu
         ## we could also correct here
-        if self.newCorrectionType:
+        if self.newCorrectionType and self.corr is not None:
             sigma_mu = self.sigma_mu / ( 1. - self.corr / 2. )
 
         # need to account for the truncation!
@@ -233,6 +229,23 @@ class TruncatedGaussians:
         Zprime = muhat / sigma_mu
         # now compute the area of the truncated gaussian
         A = stats.norm.cdf(Zprime)
-        if return_nll:
-            return np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu)
-        return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
+        # if return_nll:
+        return float ( np.log(A) - stats.norm.logpdf(mu, muhat, sigma_mu) )
+        #return float(stats.norm.pdf(mu, muhat, sigma_mu) / A)
+
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, **kwargs) -> float:
+        """
+        Get the upper limit on the signal strength mu directly from its definition.
+        """
+        
+        if evaluationType == observed:
+            return self.upperLimitOnMu
+        else:
+            return self.expectedUpperLimitOnMu
+
+    def CLs(self, **kwargs) -> None:
+        """
+        Dummy function in case it is needed.
+        """
+
+        return None

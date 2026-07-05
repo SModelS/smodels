@@ -12,8 +12,8 @@ import sys
 
 sys.path.insert(0, "../")
 import unittest
-from smodels.statistics.simplifiedLikelihoods import Data, UpperLimitComputer, \
-      LikelihoodComputer
+from smodels.statistics.simplifiedLikelihoods import SLData, \
+         SLUpperLimitComputer, SLLikelihoodComputer
 from smodels.base.physicsUnits import fb
 from numpy import sqrt
 import numpy as np
@@ -22,7 +22,7 @@ import numpy as np
 class SLTest(unittest.TestCase):
     def testPathologicalModel(self):
         C = [1.0]
-        m = Data(
+        m = SLData(
             observed=[0],
             backgrounds=[0.0],
             covariance=C,
@@ -33,13 +33,13 @@ class SLTest(unittest.TestCase):
         )
         m.zeroSignal()
 
-        ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
+        ulComp = SLUpperLimitComputer( SLLikelihoodComputer ( m ) , cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu ( )
         self.assertEqual(ulProf, None )
 
     def testPathologicalModel2(self):
         C = [1.0]
-        m = Data(
+        m = SLData(
             observed=[0],
             backgrounds=[0.0],
             covariance=C,
@@ -50,7 +50,7 @@ class SLTest(unittest.TestCase):
         )
         m.zeroSignal()
 
-        ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
+        ulComp = SLUpperLimitComputer( SLLikelihoodComputer ( m ) , cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu( )
         self.assertAlmostEqual(ulProf, 1920.7547785412298, 1 )
 
@@ -64,13 +64,13 @@ class SLTest(unittest.TestCase):
            -846.653, 116.779, 258.92, 203.967, 129.55, 74.7665, 40.9423, 21.7285,
            -442.531, 59.5958, 134.975, 106.926, 68.2075, 39.5247, 21.7285, 11.5732]
         nsignal = [ x/100. for x in [47,29.4,21.1,14.3,9.4,7.1,4.7,4.3] ]
-        m=Data ( observed=[1964,877,354,182,82,36,15,11],
+        m=SLData ( observed=[1964,877,354,182,82,36,15,11],
                   backgrounds=[2006.4,836.4,350.,147.1,62.0,26.2,11.1,4.7],
                   covariance= C,
                   third_moment = [ 0. ] * 8,
                   nsignal= nsignal,
                   name="CMS-NOTE-2017-001 model",deltas_rel=0. )
-        ulComp = UpperLimitComputer ( LikelihoodComputer ( m ) , cl=.95 )
+        ulComp = SLUpperLimitComputer ( SLLikelihoodComputer ( m ) , cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu ( )
         self.assertAlmostEqual( ulProf / 131.58637474312224, 1.0, 2 )
 
@@ -86,7 +86,7 @@ class SLTest(unittest.TestCase):
         C = []
         for i in range(n):
             C.append(C_[ncov * i : ncov * i + n])
-        m = Data( observed=D, backgrounds=B, covariance=C, third_moment=S,
+        m = SLData( observed=D, backgrounds=B, covariance=C, third_moment=S,
             nsignal=sig, name=f"model{int(n)}", deltas_rel=0.0,)
         return m
 
@@ -94,24 +94,24 @@ class SLTest(unittest.TestCase):
 
         """ take first n SRs of model-90 """
         m = self.createModel ( 3 )
-        lComp = LikelihoodComputer( m )
-        ulComp = UpperLimitComputer( lComp, cl=.95 )
+        lComp = SLLikelihoodComputer( m )
+        ulComp = SLUpperLimitComputer( lComp, cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu(  )
         self.assertAlmostEqual( ulProf / 2163.1435825822646, 1.0, 3 )
         ## Nick's profiling code gets for n=3 ul=2135.66
-        ret = lComp.lmax ( )
-        lmax = ret["lmax"]
+        ret = lComp.nll_min ( )
+        nll_min = ret["nll_min"]
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
-        self.assertAlmostEqual( lmax, 2.1722054152e-09, 7 )
+        self.assertAlmostEqual( nll_min, 19.947522865110603, 7 )
         self.assertAlmostEqual( muhat, 0. )
         # self.assertAlmostEqual( lComp.sigma_mu, 798.9887891147, 2 )
         self.assertAlmostEqual( sigma_mu, 800.1380826235132, 2 )
-        ret = lComp.lmax ( allowNegativeSignals=True )
-        lmax = ret["lmax"]
+        ret = lComp.nll_min ( allowNegativeSignals=True )
+        nll_min = ret["nll_min"]
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
-        self.assertAlmostEqual( lmax, 2.1708552631256182e-09, 8 )
+        self.assertAlmostEqual( nll_min, 19.948188270790936, 8 )
         #self.assertAlmostEqual( lComp.muhat, -71.523083468, 7 )
         self.assertAlmostEqual( muhat, -72.63852360245156, 7 )
         #self.assertAlmostEqual( lComp.sigma_mu, 795.0121298843319 )
@@ -121,7 +121,7 @@ class SLTest(unittest.TestCase):
         """ take first SR of model-90 """
         m = self.createModel ( 1 )
         m.nsignal[0]=1.
-        lComp = LikelihoodComputer( m )
+        lComp = SLLikelihoodComputer( m )
         ret = lComp.lmax ( )
         lmax = ret["lmax"]
         muhat = ret["muhat"]
@@ -138,7 +138,7 @@ class SLTest(unittest.TestCase):
         self.assertAlmostEqual( muhat, 1. )
         self.assertAlmostEqual( sigma_mu, 32.31764780503341 )
 
-        ulComp = UpperLimitComputer( LikelihoodComputer ( m ), cl=.95 )
+        ulComp = SLUpperLimitComputer( SLLikelihoodComputer ( m ), cl=.95 )
         ul = ulComp.getUpperLimitOnMu( )
         ## Nick's profiling code gets for n=3 ul=2135.66
         self.assertAlmostEqual(ul / 61.26914, 1.0, 1)
@@ -147,7 +147,7 @@ class SLTest(unittest.TestCase):
 
         """ take first 10 SRs of model-90 """
         m = self.createModel ( 10 )
-        ulComp = UpperLimitComputer( LikelihoodComputer ( m ), cl=.95 )
+        ulComp = SLUpperLimitComputer( SLLikelihoodComputer ( m ), cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu( )
         self.assertAlmostEqual( ulProf / 365.6091713369213, 1.0, 2 )
         ## Nick's profiling code gets for n=10 ul=357.568
@@ -156,7 +156,7 @@ class SLTest(unittest.TestCase):
         m = self.createModel(40)
         import time
 
-        ulComp = UpperLimitComputer( LikelihoodComputer(m), cl=.95 )
+        ulComp = SLUpperLimitComputer( SLLikelihoodComputer(m), cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu ( )
         self.assertAlmostEqual( ulProf / 61.03436726595563, 1.0, 2 )
 
@@ -170,18 +170,18 @@ class SLTest(unittest.TestCase):
         covariance = [[ 1., 0. ], [ 0., 1. ] ]
         signal = [ 2., 2. ]
         pprint ( "nsignal", sum(signal) )
-        m=Data ( observed=observed,
+        m=SLData ( observed=observed,
                   backgrounds=background,
                   covariance= covariance,
                   third_moment = [ 0. ] * 2,
                   nsignal= signal,
                   name="trivial model",deltas_rel=0., lumi = 100./fb )
-        lComp = LikelihoodComputer( m )
+        lComp = SLLikelihoodComputer( m )
         theta_hat = lComp.findThetaHat( 1. )
         pprint ( "theta_hat", theta_hat )
-        ret = lComp.lmax()
-        lmax = ret["lmax"]
-        lm = lComp.likelihood ( 1. )
+        ret = lComp.nll_min()
+        nll_min = ret["nll_min"]
+        nll = lComp.nll ( 1. )
         muhat = ret["muhat"]
         sigma_mu = ret["sigma_mu"]
         pprint ( "muhat", muhat, "sigma_mu", sigma_mu )
@@ -190,10 +190,10 @@ class SLTest(unittest.TestCase):
         # mu_hat is (observed - background) / signal
         # (as it's the same for all regions)
         # it's 1.0
-        ulComp = UpperLimitComputer( LikelihoodComputer ( m ) , cl=.95 )
+        ulComp = SLUpperLimitComputer( SLLikelihoodComputer ( m ) , cl=.95 )
         ulProf = ulComp.getUpperLimitOnMu ( )
         pprint ( "ulProf", ulProf )
-        self.assertAlmostEqual ( lmax, lm, 3 )
+        self.assertAlmostEqual ( nll_min, nll, 3 )
         self.assertAlmostEqual ( muhat, 1., 5 )
         self.assertAlmostEqual ( sigma_mu, 0.655333438756686, 5 )
         # self.assertAlmostEqual ( lComp.sigma_mu, 0.6123724356957945 )

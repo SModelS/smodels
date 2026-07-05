@@ -10,7 +10,9 @@
 from smodels.base.physicsUnits import TeV, pb
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.smodelsLogging import logger
-import pyslha, os, io
+import pyslha
+import os
+import io
 from typing import Union, Dict, Tuple
 
 class LheReader(object):
@@ -209,7 +211,7 @@ class SmsEvent(object):
         Return the meta information of 'key', None if info does not exist.
 
         """
-        if not key in self.metainfo:
+        if key not in self.metainfo:
             return None
         return self.metainfo[key]
 
@@ -289,13 +291,13 @@ def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
     for event in reader:
         eventMass,eventDecays = getDictionariesFromEvent(event)
         for pdg,mass in eventMass.items():
-            if not pdg in massDict:
+            if pdg not in massDict:
                 massDict[pdg] = mass
             else:
                 massDict[pdg] += mass
 
         for pdg,decays in eventDecays.items():
-            if not pdg in decaysDict:
+            if pdg not in decaysDict:
                 decaysDict[pdg] = decays
             else:
                 decaysDict[pdg] += decays
@@ -304,7 +306,7 @@ def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
     #Use averaged mass over all events:
     for pdg,masses in massDict.items():
         massDict[pdg] = sum(masses)/len(masses)
-        if not pdg in decaysDict:
+        if pdg not in decaysDict:
             decaysDict[pdg] = [] #Make sure all particles appear in decaysDict
 
     #Compute the decay dictionaries:
@@ -312,7 +314,7 @@ def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
         daughterIDs = []
         for eventDec in eventDecays:
             pids = sorted(eventDec.ids)
-            if not pids in daughterIDs:
+            if pids not in daughterIDs:
                 daughterIDs.append(pids)
         n = len(eventDecays) #Number of times the particle appears in all events
         combinedDecays = []
@@ -376,7 +378,7 @@ def getDictionariesFromEvent( event : SmsEvent ) -> Tuple[Dict,Dict]:
         if particle.status == -1: #Ignore incoming particles
             continue
 
-        if not particle.pdg in masses:
+        if particle.pdg not in masses:
             masses[particle.pdg] = [particle.mass]
             decays[particle.pdg] = []
 
@@ -386,7 +388,7 @@ def getDictionariesFromEvent( event : SmsEvent ) -> Tuple[Dict,Dict]:
         for ipn,newparticle in enumerate(particles):
             if ipn == ip:
                 continue
-            if not ip+1 in newparticle.moms:
+            if ip+1 not in newparticle.moms:
                 # newparticle is not a daughter of particle
                 continue
 

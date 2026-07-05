@@ -33,6 +33,16 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 3.2.0:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Updated lheReader to properly deal with MG5 LHE files (fixes github issue #54, see also discussion #53)
+  * First support for NN surrogate statistical models
+  * Modified the syntax for describing statistical models in the database (breaks backward compatibility). The fields datasetOrder and jsonFiles have been replaced by regionMappings, regionSets and statModels.
+  * Moved all interfaces from .likelihoods to .nlls
+  * Database extension: added TSlepSlep to ATLAS-SUSY-2019-02, added surrogate models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09
+  * Small fixes in likelihood calculations and pyhf interface
+
 New in Version 3.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -210,7 +220,7 @@ New in Version 2.1.1:
   * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
   * small fixes in unit tests
   * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
-  * :ref:`experimental features <parameterExperimentalFeatures>` can now be turned on via ini file
+  * experimental features can now be turned on via ini file
 
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^

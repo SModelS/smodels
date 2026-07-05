@@ -8,7 +8,6 @@
 """
 
 from bisect import bisect
-from itertools import product
 from smodels.base.physicsUnits import fb
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.experiment.reweighting import reweightFactorFor
@@ -21,8 +20,8 @@ from smodels.experiment.defaultFinalStates import (WList, lList, tList, taList, 
 #  SMS filters for each group:
 #  (it should be a function which takes an SMS object as input
 #  and returns True if the SMS belongs to the group and False otherwise)
-filtersDefault = {'missing (prompt)': lambda sms: not ('prompt' in sms.coveredBy),
-                  'missing (displaced)': lambda sms: not ('displaced' in sms.coveredBy),
+filtersDefault = {'missing (prompt)': lambda sms: 'prompt' not in sms.coveredBy,
+                  'missing (displaced)': lambda sms: 'displaced' not in sms.coveredBy,
                   # 'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3,
                   'missing (all)': lambda sms: (not sms.coveredBy),
                   'outsideGrid (all)': lambda sms: (sms.coveredBy and not sms.testedBy)}

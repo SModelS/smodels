@@ -23,23 +23,26 @@ from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
 from smodels.base.physicsUnits import fb
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
-
+from typing import Optional
 import sys
 
 def removeCruftOutputs( filename : str ):
     """ remove cruft outputfiles
 		:param filename: filename, remove it and its variants
 		"""
+    if os.path.exists ( filename ):
+        os.remove ( filename )
+        return
     f = os.path.splitext(filename)[0]
-    extList = ['py','pyc','smodels','smodelsslha','xml']
+    extList = [ 'py','pyc','smodels','smodelsslha','xml' ]
     for ext in extList:
         fname= f"{f}.{ext}"
         if os.path.exists(fname):
             os.remove(fname)
 
-
-def checkPythonRequirements(requirements_path:
-            os.PathLike = "../smodels/share/requirements.txt"):
+def checkPythonRequirements(
+        allow_violations : bool = False,
+        requirements_path: os.PathLike = "../smodels/share/requirements.txt"):
     """ Simple function to check if the Python requirements
       are met using importlib and packaging."""
     from pathlib import Path
@@ -47,9 +50,12 @@ def checkPythonRequirements(requirements_path:
     from packaging.requirements import Requirement
     from packaging.version import Version
     req_path = Path(requirements_path)
+    passed = True
     if not req_path.exists():
         print(f"❌ Requirements file not found: {requirements_path}")
-        sys.exit(1)
+        passed = False
+        if not allow_violations:
+            sys.exit(1)
 
     with req_path.open() as f:
         requirements = f.read().splitlines()
@@ -67,15 +73,24 @@ def checkPythonRequirements(requirements_path:
             installed_version = version(dist_name)
             if Version(installed_version) not in req.specifier:
                 print(f"\n❌ Version conflict: {req_line} -> installed: {installed_version}")
-                sys.exit(1)
+                passed = False
+                if not allow_violations:
+                    sys.exit(1)
         except PackageNotFoundError:
             print(f"\n❌ Missing package: {req_line}")
-            sys.exit(1)
+            passed = False
+            if not allow_violations:
+                sys.exit(1)
         except Exception as e:
             print(f"\n❌ Error checking {req_line}: {e}")
-            sys.exit(1)
+            passed = False
+            if not allow_violations:
+                sys.exit(1)
 
-    print("all requirements are met.")
+    if passed:
+        print("[unitTestHelpers] all requirements are met.")
+    else:
+        print("[unitTestHelpers] not all requirements are met but asked for lenience")
 
 def canonNameToVertNumb(topoDict,cName):
     """
@@ -124,24 +139,25 @@ def sortExptRes ( exptRes ):
     exptRes.sort ( key = lambda x: x["AnalysisID"]+str(x["DataSetID"])+str(x["TxNames"] ) )
     return exptRes
 
-def sortSModelSOutput ( smodelsOutput ):
+def sortSModelSOutput ( smodelsOutput : dict ) ->  dict:
     smodelsOutput["ExptRes"] = sortExptRes ( smodelsOutput["ExptRes"] )
     return smodelsOutput
 
-def flattenElement(elStr):
-
+def flattenElement( elStr : str ) -> str:
     oldStr = elStr[elStr.find('[')+1:elStr.rfind(']')]
     newStr = oldStr.replace('[','').replace(']','')
     newStr = ','.join(sorted([x for x in newStr.split(',') if x.strip()]))
     newElStr = elStr.replace(oldStr,newStr)
     return newElStr
 
-
-def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
-              fname2=None, checkBothOrders=True):
+def equalObjs(obj1, obj2, allowedRelDiff : float, ignore : list = [], 
+        where : Optional[str] = None, fname : Optional[str] = None,
+        fname2 : Optional[str] = None, checkBothOrders : bool = True,
+        ignoreSorting : list[str] = [] ) -> bool:
     """
     Compare two objects.
-    The numerical values are compared up to the precision defined by allowedRelDiff.
+    The numerical values are compared up to the precision defined by 
+    allowedRelDiff.
 
     :param obj1: First python object to be compared
     :param obj2: Second python object to be compared
@@ -152,9 +168,10 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     :param fname2: the filename of obj2
     :param checkBothOrders: If True, check if obj1 == obj2 and obj2 == obj1.
     :param version3: If True, tries to take into account differences of output
-                     between version 2 and version 3
-    :param allowedAbsDiff: If the relative difference is larger than allowedRelDiff,
-                           check if the absolute difference is within allowedAbsDiff
+    between version 2 and version 3
+    :param allowedAbsDiff: If the relative difference is larger than 
+    allowedRelDiff, check if the absolute difference is within allowedAbsDiff
+    :param ignoreSorting: ignore the sorting for these lists
 
     :return: True/False
     """
@@ -179,7 +196,7 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         # For numbers with units, do not check for absolute difference
         ret = (rel_diff.asNumber() < allowedRelDiff)
         if not ret:
-            logger.error( f"values {obj1} and {obj2} differ by {rel_diff}" )
+            logger.error( f"values {obj1} and {obj2} differ by {rel_diff:.3g}" )
         return ret
     elif isinstance(obj1, float):
         if obj1 == obj2:
@@ -188,13 +205,13 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
         rel_diff = 2.*abs_diff/abs(obj1+obj2)
         ret = (rel_diff < allowedRelDiff)
         if not ret:
-            logger.error(f"values {obj1} and {obj2} differ by {rel_diff} in ''{where}'': {fname} != {fname2}")
+            logger.error(f"values {obj1} and {obj2} differ by {rel_diff:.3g} in ''{where}'': {fname} != {fname2}")
         return ret
     elif isinstance(obj1, str):
         obj1 = obj1.replace(" ","")  # Remove blanks
         obj2 = obj2.replace(" ","")  # Remove blanks
         if obj1 != obj2:
-            logger.error(f"strings ``{obj1}'' and ``{obj2}'' differ in {where}:{fname}")
+            logger.error(f"strings ``{obj1}'' and ``{obj2}'' differ in {where}: {fname} != {fname2}")
         return obj1 == obj2
     elif isinstance(obj1, dict):
         for key in obj1:
@@ -208,22 +225,30 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
                 deffile = f" (default file {fname2})"
                 if fname2 == "unspecified":
                     deffile = ""
-                logger.warning(f"Key ``{key}'' missing in {where}:{fname}{deffile}. Its value should be ``{obj1[key]}'")
+                logger.warning(f"Key ``{key}'' missing in {str(where)[:100]} :{fname}{deffile}. Its value should be ``{obj1[key]}'")
                 return False
             if not equalObjs(obj1[key], obj2[key], allowedRelDiff, ignore=ignore,
-                             where=key, fname=fname, fname2=fname2):
-                logger.warning(f"Objects differ for {key}")
+                             where=key, fname=fname, fname2=fname2,
+                             ignoreSorting = ignoreSorting ):
+                comment = ""
+                if type(obj1) == dict:
+                    if "AnalysisID" in obj1:
+                        comment=": "+obj1["AnalysisID"]
+                    if "DataSetID" in obj1:
+                        comment+=f":{obj1['DataSetID']}"
+                logger.warning(f"Objects differ for {key}{comment}")
                 return False
     elif isinstance(obj1, list):
         if len(obj1) != len(obj2):
-            logger.warning('Lists for %s differ in length:\n   %i (this run)\n and\n   %i (default)' %
-                           (where,len(obj1), len(obj2)))
+            logger.warning( f'Lists for {where} differ in length:\n   {len(obj1)} (this run)\n and\n   {len(obj2)} (default)' )
             return False
+        if where in ignoreSorting:
+            obj1.sort()
+            obj2.sort()
         for ival, val in enumerate(obj1):
-            if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname, ignore=ignore,
-                             fname2=fname2):
-                # logger.warning('Lists differ:\n   %s (this run)\n and\n   %s (default)' %\
-                #                (str(val),str(obj2[ival])))
+            if not equalObjs(val, obj2[ival], allowedRelDiff, fname=fname,
+                    ignore=ignore, where=f"{obj1}:{obj2}", fname2=fname2,
+                    ignoreSorting = ignoreSorting ):
                 return False
     else:
         return obj1 == obj2
@@ -231,8 +256,9 @@ def equalObjs(obj1, obj2, allowedRelDiff, ignore=[], where=None, fname=None,
     # Now check for the opposite order of the objects
     if checkBothOrders:
         if not equalObjs(obj2, obj1, allowedRelDiff, ignore, where,
-                         fname2, fname, checkBothOrders=False):
-            logger.error(f"Objects ``{str(obj1)[:100]}'' and ``{str(obj2)[:100]}'' differ in {where}: {fname} != {fname2}")
+                         fname2, fname, checkBothOrders=False,
+                         ignoreSorting = ignoreSorting ):
+            logger.error(f"Objects ``{str(obj1)[:100]}'' and ``{str(obj2)[:100]}'' differ in {str(where)[:100]}: {fname} != {fname2}")
             return False
     return True
 
@@ -365,7 +391,6 @@ def runMain(filename, timeout=0, suppressStdout=True, development=False,
         level = 'fatal'
         to = os.devnull
     database = None
-    from smodels.base import runtime
     if overridedatabase is not None:
         database = overridedatabase
     else:
@@ -413,7 +438,7 @@ def compareScanSummary(outA, outB, allowedRelDiff):
             elif isinstance(ptA[col], (float, int)):
                 diff = 2.*abs(ptA[col]-ptB[col])/abs(ptA[col]+ptB[col])
                 if diff > allowedRelDiff:
-                    logger.error( f"values for {col} differ by {diff} ({ptA[col]} vs {ptB[col]}) in {fname}" )
+                    logger.error( f"values for {col} differ by {diff:.3g} ({ptA[col]} vs {ptB[col]}) in {fname}" )
                     return False
             else:
                 logger.error(f"values for {col} differ in {fname}" )
@@ -622,10 +647,22 @@ class Summary():
                 for i, label in enumerate(lkeys):
                     setattr(self, f"comb{label.strip()}", lvals[i])
             elif 'combined r-value (expected)' in line:
-                rexp = eval(line.split(':')[1])
-                self.rexpComb = rexp
+                rl = line.split(':')[1].strip()
+                if "NaN" in rl:
+                    self.rexpComb = float("nan")
+                else:
+                    rexp = eval( rl )
+                    self.rexpComb = rexp
             elif 'combined r-value' in line:
-                r = eval(line.split(':')[1])
+                try:
+                    rl = line.split(":")[1]
+                    rl = rl.strip()
+                    if "NaN" in rl:
+                        r = float("nan")
+                    else:
+                        r = eval( rl )
+                except SyntaxError:
+                    print ( f"[unitTestOutput] couldnt parse '{rl}'" )
                 self.rComb = r
 
     def _getMissingSummary(self, inputLines):

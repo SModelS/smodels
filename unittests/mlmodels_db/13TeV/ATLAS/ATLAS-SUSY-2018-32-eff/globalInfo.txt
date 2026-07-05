@@ -1,0 +1,95 @@
+id: ATLAS-SUSY-2018-32
+sqrts: 13*TeV
+lumi: 139/fb
+prettyName: 2 OS l
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-32/
+arxiv: https://arxiv.org/abs/1908.08215
+publication: Eur. Phys. J. C 80 (2020) 123
+publicationDOI: https://doi.org/10.1140/epjc/s10052-019-7594-6
+contact: atlas-phys-susy-conveners@cern.ch
+comment: Must keep CRs in HistFactory json file for good validation.
+private: False
+implementedBy: Philipp Neuhuber, Timothée Pascal
+lastUpdate: 2022/11/10
+includeCRs: True
+regionMappings: {
+    'SRDF_0a_cuts': {'smodels': 'SRDF_0a_cuts', 'pyhf': 'SRDF_0a_cuts'},
+    'SRDF_0b_cuts': {'smodels': 'SRDF_0b_cuts', 'pyhf': 'SRDF_0b_cuts'},
+    'SRDF_0c_cuts': {'smodels': 'SRDF_0c_cuts', 'pyhf': 'SRDF_0c_cuts'},
+    'SRDF_0d_cuts': {'smodels': 'SRDF_0d_cuts', 'pyhf': 'SRDF_0d_cuts'},
+    'SRDF_0e_cuts': {'smodels': 'SRDF_0e_cuts', 'pyhf': 'SRDF_0e_cuts'},
+    'SRDF_0f_cuts': {'smodels': 'SRDF_0f_cuts', 'pyhf': 'SRDF_0f_cuts'},
+    'SRDF_0g_cuts': {'smodels': 'SRDF_0g_cuts', 'pyhf': 'SRDF_0g_cuts'},
+    'SRDF_0h_cuts': {'smodels': 'SRDF_0h_cuts', 'pyhf': 'SRDF_0h_cuts'},
+    'SRDF_0i_cuts': {'smodels': 'SRDF_0i_cuts', 'pyhf': 'SRDF_0i_cuts'},
+    'SRDF_1a_cuts': {'smodels': 'SRDF_1a_cuts', 'pyhf': 'SRDF_1a_cuts'},
+    'SRDF_1b_cuts': {'smodels': 'SRDF_1b_cuts', 'pyhf': 'SRDF_1b_cuts'},
+    'SRDF_1c_cuts': {'smodels': 'SRDF_1c_cuts', 'pyhf': 'SRDF_1c_cuts'},
+    'SRDF_1d_cuts': {'smodels': 'SRDF_1d_cuts', 'pyhf': 'SRDF_1d_cuts'},
+    'SRDF_1e_cuts': {'smodels': 'SRDF_1e_cuts', 'pyhf': 'SRDF_1e_cuts'},
+    'SRDF_1f_cuts': {'smodels': 'SRDF_1f_cuts', 'pyhf': 'SRDF_1f_cuts'},
+    'SRDF_1g_cuts': {'smodels': 'SRDF_1g_cuts', 'pyhf': 'SRDF_1g_cuts'},
+    'SRDF_1h_cuts': {'smodels': 'SRDF_1h_cuts', 'pyhf': 'SRDF_1h_cuts'},
+    'SRDF_1i_cuts': {'smodels': 'SRDF_1i_cuts', 'pyhf': 'SRDF_1i_cuts'},
+    'SRSF_0a_cuts': {'smodels': 'SRSF_0a_cuts', 'pyhf': 'SRSF_0a_cuts'},
+    'SRSF_0b_cuts': {'smodels': 'SRSF_0b_cuts', 'pyhf': 'SRSF_0b_cuts'},
+    'SRSF_0c_cuts': {'smodels': 'SRSF_0c_cuts', 'pyhf': 'SRSF_0c_cuts'},
+    'SRSF_0d_cuts': {'smodels': 'SRSF_0d_cuts', 'pyhf': 'SRSF_0d_cuts'},
+    'SRSF_0e_cuts': {'smodels': 'SRSF_0e_cuts', 'pyhf': 'SRSF_0e_cuts'},
+    'SRSF_0f_cuts': {'smodels': 'SRSF_0f_cuts', 'pyhf': 'SRSF_0f_cuts'},
+    'SRSF_0g_cuts': {'smodels': 'SRSF_0g_cuts', 'pyhf': 'SRSF_0g_cuts'},
+    'SRSF_0h_cuts': {'smodels': 'SRSF_0h_cuts', 'pyhf': 'SRSF_0h_cuts'},
+    'SRSF_0i_cuts': {'smodels': 'SRSF_0i_cuts', 'pyhf': 'SRSF_0i_cuts'},
+    'SRSF_1a_cuts': {'smodels': 'SRSF_1a_cuts', 'pyhf': 'SRSF_1a_cuts'},
+    'SRSF_1b_cuts': {'smodels': 'SRSF_1b_cuts', 'pyhf': 'SRSF_1b_cuts'},
+    'SRSF_1c_cuts': {'smodels': 'SRSF_1c_cuts', 'pyhf': 'SRSF_1c_cuts'},
+    'SRSF_1d_cuts': {'smodels': 'SRSF_1d_cuts', 'pyhf': 'SRSF_1d_cuts'},
+    'SRSF_1e_cuts': {'smodels': 'SRSF_1e_cuts', 'pyhf': 'SRSF_1e_cuts'},
+    'SRSF_1f_cuts': {'smodels': 'SRSF_1f_cuts', 'pyhf': 'SRSF_1f_cuts'},
+    'SRSF_1g_cuts': {'smodels': 'SRSF_1g_cuts', 'pyhf': 'SRSF_1g_cuts'},
+    'SRSF_1h_cuts': {'smodels': 'SRSF_1h_cuts', 'pyhf': 'SRSF_1h_cuts'},
+    'SRSF_1i_cuts': {'smodels': 'SRSF_1i_cuts', 'pyhf': 'SRSF_1i_cuts'},
+    'CRVZ_cuts': { 'onnx': 'CRVZ_cuts', 'type': 'CR', 'smodels': None },
+    'CRWW_cuts': { 'onnx': 'CRWW_cuts', 'type': 'CR', 'smodels': None },
+    'CRtop_cuts': { 'onnx': 'CRtop_cuts', 'type': 'CR', 'smodels': None } }
+regionSets: { 'bkgonly': ['SRDF_0a_cuts',
+          'SRDF_0b_cuts',
+          'SRDF_0c_cuts',
+          'SRDF_0d_cuts',
+          'SRDF_0e_cuts',
+          'SRDF_0f_cuts',
+          'SRDF_0g_cuts',
+          'SRDF_0h_cuts',
+          'SRDF_0i_cuts',
+          'SRDF_1a_cuts',
+          'SRDF_1b_cuts',
+          'SRDF_1c_cuts',
+          'SRDF_1d_cuts',
+          'SRDF_1e_cuts',
+          'SRDF_1f_cuts',
+          'SRDF_1g_cuts',
+          'SRDF_1h_cuts',
+          'SRDF_1i_cuts',
+          'SRSF_0a_cuts',
+          'SRSF_0b_cuts',
+          'SRSF_0c_cuts',
+          'SRSF_0d_cuts',
+          'SRSF_0e_cuts',
+          'SRSF_0f_cuts',
+          'SRSF_0g_cuts',
+          'SRSF_0h_cuts',
+          'SRSF_0i_cuts',
+          'SRSF_1a_cuts',
+          'SRSF_1b_cuts',
+          'SRSF_1c_cuts',
+          'SRSF_1d_cuts',
+          'SRSF_1e_cuts',
+          'SRSF_1f_cuts',
+          'SRSF_1g_cuts',
+          'SRSF_1h_cuts',
+          'SRSF_1i_cuts',
+          'CRVZ_cuts',
+          'CRWW_cuts',
+          'CRtop_cuts'
+          ]}
+statModels: { 'bkgonly': [ ( 'onnx', 'combined.onnx' ) ] }

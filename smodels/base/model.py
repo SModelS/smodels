@@ -8,7 +8,7 @@
 import pyslha
 import os
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV, TeV
 from smodels.base import lheReader, crossSection
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.exceptions import SModelSBaseError as SModelSError
@@ -141,7 +141,7 @@ class Model(object):
                 continue
             if any(particle is ptc for ptc in cleanList):
                 continue
-            if any((particle.contains(p) and not particle is p) for p in particleList):
+            if any((particle.contains(p) and particle is not p) for p in particleList):
                 continue
             cleanList.append(particle)
 
@@ -166,7 +166,7 @@ class Model(object):
             value = getattr(particle, attributeStr)
             if isinstance(particle, MultiParticle) and isinstance(value, list):
                 for v in value:
-                    if not v in valueList:
+                    if v not in valueList:
                         valueList.append(v)
             else:
                 valueList.append(value)
@@ -211,7 +211,7 @@ class Model(object):
             massDict = res.blocks['MASS']
             #  Make sure both PDG signs appear in massDict
             for pdg, mass in massDict.items():
-                if not -pdg in massDict:
+                if -pdg not in massDict:
                     massDict[-pdg] = abs(mass)
             decaysDict = res.decays
             xsections = crossSection.getXsecFromSLHAFile(inputFile)
@@ -371,7 +371,7 @@ class Model(object):
                 continue
             ndecays = len([dec for dec in p.decays if dec is not None])
             if ndecays == 0:
-                if not p.isSM:
+                if not p.isSM and p.mass < 20*TeV:
                     logger.warning(f"No valid decay found for {p}. It will be considered stable.")
                 p.totalwidth = 0.*GeV
 

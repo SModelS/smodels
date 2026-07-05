@@ -71,7 +71,8 @@ def printEnvironmentInfo( args : Dict ):
     """
     from smodels.base.smodelsLogging import colors
     colors.on = True if "colors" in args and args["colors"] == True else False
-    import importlib, platform
+    import importlib
+    import platform
 
     modules = [ "scipy", "sympy", "numpy",
         "pyslha", "unum", "pyhf" ]
@@ -137,13 +138,18 @@ def experimentalFeature( feature : str ) -> Union[None,bool]:
 
     :returns: None if feature does not exist, else boolean
     """
-    if not feature in _experimental:
+    if feature not in _experimental:
         return None
     return _experimental[feature]
 
 def nCPUs():
     """ obtain the number of *available* CPU cores on the machine, for several
         platforms and python versions. """
+    try:
+        import os
+        return os.cpu_count()
+    except AttributeError as e:
+        pass
     try:
         # next few lines taken from
         # https://stackoverflow.comhttps//stackoverflow.com/questions/1006289/how-to-find-out-the-number-of-cpus-using-python/questions/1006289/how-to-find-out-the-number-of-cpus-using-python

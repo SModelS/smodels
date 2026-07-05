@@ -10,7 +10,7 @@
 
 import os
 import sys
-from setuptools import setup, Extension
+from setuptools import setup
 from setuptools.command.install import install
 sys.path.insert ( 0, "./" )
 from smodels.installation import version, authors, requirements, resolve_dependencies, fixpermissions
@@ -27,7 +27,7 @@ class OverrideInstall(install):
             import getpass
             if getpass.getuser() == "root":
                 install_as_user = False
-        except Exception as e:
+        except Exception:
             pass
         enableStupidMacFix=False
         if enableStupidMacFix:
@@ -36,7 +36,7 @@ class OverrideInstall(install):
                 # setup.py doesnt resolve the requirements!
                 try:
                     self.do_egg_install()
-                except Exception as e:
+                except Exception:
                     pass
         # so the installation does not break!
         # here we start with doing our overriding and private magic ..

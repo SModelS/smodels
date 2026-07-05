@@ -21,6 +21,7 @@ from smodels.base.physicsUnits import fb, GeV, pb
 from smodels.base.smodelsLogging import setLogLevel
 from smodels.matching.theoryPrediction import theoryPredictionsFor
 from databaseLoader import database
+from unitTestHelpers import removeCruftOutputs
 setLogLevel("error")
 
 
@@ -59,8 +60,7 @@ class RunNonZ2Test(unittest.TestCase):
         p = allPredictions[0]
         self.assertAlmostEqual(p.xsection.asNumber(pb),0.39,places=2)
         self.assertAlmostEqual(p.getRValue(),1.744,places=2)
-
-
+        removeCruftOutputs ( os.path.basename ( slhafile ) )
 
 if __name__ == "__main__":
     unittest.main()

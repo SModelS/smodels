@@ -31,16 +31,18 @@ class TestReportAll(unittest.TestCase):
     def testReportAll(self):
         filename = "./testFiles/slha/gluino_squarks.slha"
         inifile = "testReportAll.ini"
-        outputfile = runMain(filename, inifile=inifile, suppressStdout=True)
+        from databaseLoader import database
+        outputfile = runMain(filename, inifile=inifile,
+                overridedatabase = database, suppressStdout=True)
         smodelsOutput = importModule(outputfile)
         from default_reportAll import smodelsOutputDefault
         ignoreFields = ['input file', 'smodels version', 'ncpus',
                         'database version']
         smodelsOutput = sortSModelSOutput ( smodelsOutput )
         smodelsOutputDefault = sortSModelSOutput ( smodelsOutputDefault )
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.03,
-                           ignore=ignoreFields, fname=outputfile,
-                           fname2="default_reportAll.py")
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault,
+                allowedRelDiff=0.03, ignore=ignoreFields, fname=outputfile,
+                fname2="default_reportAll.py", ignoreSorting = [ "TxNames" ] )
         self.assertTrue(equals)
         if equals:
             self.removeOutputs(outputfile)

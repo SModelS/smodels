@@ -8,7 +8,7 @@
 import sys
 import os
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import apriori, aposteriori
 import numpy as np
 import time
 
@@ -144,7 +144,7 @@ class BasicPrinter(object):
             # print ( " `-", len(ret))
             return ret
         except AttributeError as e:
-            logger.warning(f'Error formating object {typeStr}: \n {e}')
+            logger.warning(f'Error formating object {typeStr} for {type(self).__name__}: \n {e}')
             return False
 
     def _round(self, number, n=6):
