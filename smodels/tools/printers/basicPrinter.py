@@ -8,20 +8,20 @@
 import sys
 import os
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import apriori, aposteriori
+from smodels.statistics.basicStats import apriori, aposteriori, NllEvalType
 import numpy as np
 import time
-
 
 class BasicPrinter(object):
     """
     Super class to handle the basic printing methods
     """
 
-    def __init__(self, output, filename, outputFormat = 'version3'):
+    def __init__(self, output : str, filename : str, outputFormat : str = 'version3' ):
         """
         :ivar str typeofexpectedvalues: what type of evaluationType values to print,
               apriori or posteriori
+        :param output: one of: file, stdout
         """
 
         self.name = "basic"
@@ -39,7 +39,7 @@ class BasicPrinter(object):
             logger.warning( f"Removing file {filename}" )
             os.remove(filename)
 
-    def getTypeOfExpected(self):
+    def getTypeOfExpected(self) -> NllEvalType:
         """ tiny convenience function for what evaluationType values to print,
             apriori (True) or posteriori """
         evaluationType = apriori
@@ -48,11 +48,11 @@ class BasicPrinter(object):
         return evaluationType
 
     @property
-    def filename(self):
+    def filename(self) -> str :
         return self._filename
 
     @filename.setter
-    def filename(self, fn):
+    def filename(self, fn : str ):
         self._filename = fn
         self.mkdir()
 
@@ -64,7 +64,7 @@ class BasicPrinter(object):
         if dirname != "" and not os.path.exists(dirname):
             os.makedirs(dirname)
 
-    def setOptions(self, options):
+    def setOptions(self, options : list ):
         """
         Store the printer specific options to control the output of each printer.
         Each option is stored as a printer attribute.
@@ -75,7 +75,7 @@ class BasicPrinter(object):
         for opt, value in options:
             setattr(self, opt, eval(value))
 
-    def addObj(self, obj):
+    def addObj(self, obj) -> bool:
         """
         Adds object to the Printer.
 
@@ -91,7 +91,7 @@ class BasicPrinter(object):
                 return True
         return False
 
-    def openOutFile(self, filename, mode):
+    def openOutFile(self, filename : os.PathLike, mode : str ):
         """ creates and opens a data sink,
             creates path if needed """
         d = os.path.dirname(filename)
@@ -100,7 +100,7 @@ class BasicPrinter(object):
             logger.info(f"creating directory {d}")
         return open(filename, mode)
 
-    def flush(self):
+    def flush(self) -> str:
         """
         Format the objects added to the output, print them to the screen
         or file and remove them from the printer.
@@ -147,7 +147,7 @@ class BasicPrinter(object):
             logger.warning(f'Error formating object {typeStr} for {type(self).__name__}: \n {e}')
             return False
 
-    def _round(self, number, n=6):
+    def _round(self, number : float, n : int = 6 ) -> float:
         """ round a number to n significant digits, if it *is* a number """
         if type(number) not in [float, np.float64]:
             return number
