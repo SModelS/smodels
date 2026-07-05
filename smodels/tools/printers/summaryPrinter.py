@@ -6,9 +6,9 @@
 
 """
 
-from __future__ import print_function
 import os
-from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,\
+         TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import fb, TeV
@@ -16,7 +16,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
 import unum
-
+from typing import Optional
 
 class SummaryPrinter(TxTPrinter):
     """
@@ -24,7 +24,12 @@ class SummaryPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
+    def __init__( self, output : str = 'stdout', 
+                  filename : Optional[os.PathLike] = None, 
+                  outputFormat : str = 'version3' ):
+        """
+        :param output: one of: stdout, file
+        """
         TxTPrinter.__init__(self, output, filename, outputFormat)
         self.name = "summary"
         self.printingOrder = [
@@ -33,7 +38,8 @@ class SummaryPrinter(TxTPrinter):
             TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-    def setOutPutFile(self, filename, overwrite=True, silent=False):
+    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True, 
+                       silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
@@ -48,7 +54,7 @@ class SummaryPrinter(TxTPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatTheoryPredictionList(self, obj) -> str:
         """
         Format data of the TheoryPredictionList object.
 
@@ -171,10 +177,10 @@ class SummaryPrinter(TxTPrinter):
 
         return output
 
-    def _formatTheoryPrediction(self,obj):
+    def _formatTheoryPrediction(self,obj) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj):
+    def _formatTheoryPredictionsCombiner(self, obj) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 
