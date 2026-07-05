@@ -7,6 +7,7 @@
 
 """
 
+import os
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.pythonPrinter import PyPrinter
 from smodels.tools.printers.xmlPrinter import XmlPrinter
