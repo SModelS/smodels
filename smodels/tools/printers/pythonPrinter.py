@@ -43,8 +43,7 @@ class PyPrinter(BasicPrinter):
     def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True, 
                        silent : bool = False ):
         """
-        Set the basename for the text printer. The output filename will be
-
+        Set the basename for the python printer. The output filename will be
         filename.py.
         :param filename: Base filename
         :param overwrite: If True and the file already exists, it will be removed.
@@ -54,7 +53,7 @@ class PyPrinter(BasicPrinter):
         self.filename = filename + '.py'
         if overwrite and os.path.isfile(self.filename):
             if not silent:
-                logger.warning("Removing old output file " + self.filename)
+                logger.warning( f"Removing old output file {self.filename}" )
             os.remove(self.filename)
 
     def flush(self) -> dict:
