@@ -48,13 +48,14 @@ def fetch():
         url="https://smodels.github.io/downloads/tarballs/"
         print ( f"[installer.py] trying to fetch {tarball} from {url}" )
         path = os.path.join ( url, tarball )
-        r = requests.get ( path, stream=True )
+        r = requests.get ( path, stream=True, verify=True )
         if r.status_code != 200:
             print ( f"[installer.py] could not fetch tarball: {r.reason}." )
             rmTarball()
             sys.exit(-1)
     with open ( tarball, "wb" ) as f:
-        shutil.copyfileobj( r.raw, f )
+        for chunk in r.iter_content(chunk_size=1024 * 1024):
+            if chunk: f.write ( chunk )
         f.close()
 
 def unzip():
