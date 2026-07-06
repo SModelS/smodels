@@ -6,11 +6,11 @@
 
 """
 
-from __future__ import print_function
 import sys
 import os
 from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,\
+         TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.smodelsLogging import logger
@@ -18,13 +18,17 @@ from smodels.tools.printers.pythonPrinter import PyPrinter
 from xml.dom import minidom
 from xml.etree import ElementTree
 
-
 class XmlPrinter(PyPrinter):
     """
     Printer class to handle the printing of one single XML output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
+    def __init__( self, output : str = 'stdout', 
+                  filename : Optional[os.PathLike]=None, 
+                  outputFormat : str = 'version3' ):
+        """
+        :param output: one of: file, stdout
+        """
         PyPrinter.__init__(self, output, filename, outputFormat)
         self.name = "xml"
         self.printingOrder = [OutputStatus, TopologyDict,
@@ -32,7 +36,8 @@ class XmlPrinter(PyPrinter):
                               TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-    def setOutPutFile(self, filename, overwrite=True, silent=False):
+    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True, 
+                       silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be
         filename.xml.
@@ -47,7 +52,7 @@ class XmlPrinter(PyPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def convertToElement(self, pyObj, parent, tag=""):
+    def convertToElement(self, pyObj, parent, tag : str = "" ):
         """
         Convert a python object (list,dict,string,...)
         to a nested XML element tree.
