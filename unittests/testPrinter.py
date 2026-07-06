@@ -14,11 +14,10 @@ import subprocess
 sys.path.insert(0, "../")
 import unittest
 from xml.etree import ElementTree
-from unitTestHelpers import equalObjs, Summary, runMain, importModule, sortXML,compareXML,compareSLHA
+from unitTestHelpers import equalObjs, Summary, runMain, importModule, \
+                            sortXML, compareXML, compareSLHA
 from smodels.base.smodelsLogging import logger
 inf = float("inf")
-
-
 
 class RunPrinterTest(unittest.TestCase):
     definingRun = False  # meant only to adapt to changes in output format
@@ -50,14 +49,15 @@ class RunPrinterTest(unittest.TestCase):
         smodelsOutput = importModule(out)
         # Test python output
         from gluino_squarks_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
+        ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
+                         'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
+                         key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
-                           ignore=ignoreFields, where="top",
-                           fname=out,fname2="gluino_squarks_default.py")
+                         key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+                allowedRelDiff=0.05, ignore=ignoreFields, where="top",
+                fname=out,fname2="gluino_squarks_default.py")
         if not equals:
             logger.error ( f"{out} and gluino_squarks_default.py differ!" )
 
@@ -73,9 +73,9 @@ class RunPrinterTest(unittest.TestCase):
         xmlNew = ElementTree.parse(outputfile).getroot()
         sortXML(xmlDefault)
         sortXML(xmlNew)
-        comp = compareXML(xmlDefault, xmlNew,
-                      allowedRelDiff=0.05,
-                      ignore=['input_file', 'smodels_version', 'database_version', 'ncpus'])
+        ignores = ['input_file', 'smodels_version', 'database_version', 'ncpus']
+        comp = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05,
+                      ignore=ignores )
         if not comp:
             logger.error ( f"{outputfile} and {defFile} differ!" )
         self.assertTrue(comp)
@@ -110,14 +110,16 @@ class RunPrinterTest(unittest.TestCase):
             subprocess.getoutput(cmd)
         from simplyGluino_default_extended import smodelsOutputDefault
 
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version', 'model', 'checkinput',
-                        'doinvisible', 'docompress', 'computestatistics', 'testcoverage']
+        ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
+                         'database version', 'model', 'checkinput',
+                         'doinvisible', 'docompress', 'computestatistics', 
+                         'testcoverage' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
+                         key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
-                           ignore=ignoreFields)
+                         key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+                allowedRelDiff=0.05, ignore=ignoreFields )
         from smodels.base.smodelsLogging import logger
 
         if equals == False:
@@ -151,7 +153,7 @@ class RunPrinterTest(unittest.TestCase):
         from databaseLoader import database
         out = runMain(slhafile,inifile="testPrinters_parameters.ini",
                 overridedatabase = database,
-                suppressStdout = True )
+                suppressStdout = False )
 
         # Check Summary output
         outputfile = out.replace('.py', '.smodels')
@@ -167,13 +169,14 @@ class RunPrinterTest(unittest.TestCase):
         # Check Python output
         smodelsOutput = importModule(out)
         from lightEWinos_default import smodelsOutputDefault
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version']
+        ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
+                         'database version' ]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
+            key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
-                           ignore=ignoreFields, where="top")
+            key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+            allowedRelDiff=0.05, ignore=ignoreFields, where="top")
         if not equals:
             logger.error ( f"{out} differs from lightEWinos_default.py" )
 
@@ -190,8 +193,9 @@ class RunPrinterTest(unittest.TestCase):
         xmlNew = ElementTree.parse(outputfile).getroot()
         sortXML(xmlDefault)
         sortXML(xmlNew)
-        equals = compareXML(xmlDefault, xmlNew, allowedRelDiff=0.05,
-                            ignore=['input_file', 'smodels_version', 'database_version', 'ncpus'])
+        ignores = ['input_file', 'smodels_version', 'database_version', 'ncpus']
+        equals = compareXML( xmlDefault, xmlNew, allowedRelDiff=0.05,
+                            ignore=ignores )
         if not equals:
             logger.error ( f"{outputfile}!={defaultfile}" )
 
@@ -218,27 +222,28 @@ class RunPrinterTest(unittest.TestCase):
         slhafile = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(slhafile,
                 inifile='testPrinters_parameters_nodeMap.ini',
-                suppressStdout = True )
+                suppressStdout = False )
         smodelsOutput = importModule(outputfile)
         from simplyGluino_default_nodesMap import smodelsOutputDefault
 
-        ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version', 'model', 'checkinput',
-                        'doinvisible', 'docompress', 'computestatistics', 'testcoverage']
+        ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
+                         'database version', 'model', 'checkinput',
+                         'doinvisible', 'docompress', 'computestatistics', 
+                         'testcoverage']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
-                                                 key=lambda res: res['r'], reverse=True)
+                key=lambda res: res['r'], reverse=True)
         smodelsOutput['ExptRes'] = sorted(smodelsOutput['ExptRes'],
-                                          key=lambda res: res['r'], reverse=True)
-        equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.05,
-                           ignore=ignoreFields)
+                key=lambda res: res['r'], reverse=True)
+        equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
+                allowedRelDiff=0.05, ignore=ignoreFields )
         
         if equals:
             self.removeOutputs(outputfile)
         else:
-            logger.error(f"{outputfile} differs from simplyGluino_default_nodesMap.py")
+            default_f = "simplyGluino_default_nodesMap.py"
+            logger.error(f"{outputfile} differs from {default_f}")
 
         self.assertTrue(equals)
         
-
-
 if __name__ == "__main__":
     unittest.main()

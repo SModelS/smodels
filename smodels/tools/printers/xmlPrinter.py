@@ -17,6 +17,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.pythonPrinter import PyPrinter
 from xml.dom import minidom
 from xml.etree import ElementTree
+from typing import Optional
 
 class XmlPrinter(PyPrinter):
     """

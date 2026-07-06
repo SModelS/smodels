@@ -15,6 +15,13 @@ from smodels.tools.printers.summaryPrinter import SummaryPrinter
 from smodels.tools.printers.txtPrinter import TxTPrinter
 from smodels.tools.printers.slhaPrinter import SLHAPrinter
 
+from smodels.tools.printers.printerRegistry import PrinterRegistry
+PrinterRegistry.register ( PyPrinter, "python" )
+PrinterRegistry.register ( XmlPrinter, "xml" )
+PrinterRegistry.register ( SummaryPrinter, "summary" )
+PrinterRegistry.register ( TxTPrinter, "log" )
+PrinterRegistry.register ( TxTPrinter, "stdout" )
+PrinterRegistry.register ( SLHAPrinter, "slha" )
 
 class MPrinter(object):
     """
@@ -33,41 +40,55 @@ class MPrinter(object):
 
         :param parser: ConfigParser storing information from the parameters file
         """
-
         # Define the printer types and the printer-specific options:
         printerTypes = [prt.strip() for prt in parser.get(
             "printer", "outputType").split(",")]
+
+        # Copy stdout options to log options:
+        if 'log' in printerTypes:
+            if parser.has_section('stdout-printer') and not \
+                    parser.has_section('log-printer'):
+                parser.add_section('log-printer')
+                for option, val in parser.items('stdout-printer'):
+                    parser.set('log-printer', option, val)
+
         if parser.has_option("printer","outputFormat"):
             self.outputFormat = parser.get("printer","outputFormat")
         for prt in printerTypes:
-            if prt == 'python':
-                newPrinter = PyPrinter(output='file', outputFormat=self.outputFormat)
-            elif prt == 'summary':
-                newPrinter = SummaryPrinter(output='file', outputFormat=self.outputFormat)
-            elif prt == 'stdout':
-                newPrinter = TxTPrinter(output='stdout', outputFormat=self.outputFormat)
-            elif prt == 'log':
-                newPrinter = TxTPrinter(output='file', outputFormat=self.outputFormat)
-            elif prt == 'xml':
-                newPrinter = XmlPrinter(output='file', outputFormat=self.outputFormat)
-            elif prt == 'slha':
-                newPrinter = SLHAPrinter(output='file', outputFormat=self.outputFormat)
-                if parser.getboolean("options", "doCompress") or parser.getboolean("options", "doInvisible"):
-                    newPrinter.docompress = 1
-                if parser.has_option("options", "combineSRs") and parser.getboolean("options", "combineSRs"):
-                    newPrinter.combinesr = 1
-                if parser.has_option("options", "combineAnas") and parser.get("options", "combineAnas"):
-                    newPrinter.combineanas = 1
-            else:
+            if not PrinterRegistry.has ( prt ):
                 logger.warning(f"Unknown printer format: {str(prt)}")
                 continue
+            PrinterClass = PrinterRegistry.get(prt)
 
-            # Copy stdout options to log options:
-            if 'log' in printerTypes:
-                if parser.has_section('stdout-printer') and not parser.has_section('log-printer'):
-                    parser.add_section('log-printer')
-                    for option, val in parser.items('stdout-printer'):
-                        parser.set('log-printer', option, val)
+            if prt == 'python':
+                newPrinter = PrinterClass(output='file', 
+                                          outputFormat=self.outputFormat)
+            elif prt == 'summary':
+                newPrinter = PrinterClass(output='file', 
+                                          outputFormat=self.outputFormat)
+            elif prt == 'stdout':
+                newPrinter = PrinterClass(output='stdout', 
+                                          outputFormat=self.outputFormat)
+            elif prt == 'log':
+                newPrinter = PrinterClass(output='file', 
+                                          outputFormat=self.outputFormat)
+            elif prt == 'xml':
+                newPrinter = PrinterClass(output='file', 
+                                          outputFormat=self.outputFormat)
+            elif prt == 'slha':
+                newPrinter = PrinterClass(output='file', 
+                                          outputFormat=self.outputFormat)
+                if parser.getboolean("options", "doCompress") or \
+                        parser.getboolean("options", "doInvisible"):
+                    newPrinter.docompress = 1
+                if parser.has_option("options", "combineSRs") and \
+                        parser.getboolean("options", "combineSRs"):
+                    newPrinter.combinesr = 1
+                if parser.has_option("options", "combineAnas") and \
+                        parser.get("options", "combineAnas"):
+                    newPrinter.combineanas = 1
+            else:
+                newPrinter = PrinterClass()
 
             # Set printer-specific options:
             if parser.has_section(prt+'-printer'):
@@ -80,7 +101,6 @@ class MPrinter(object):
 
         :param obj: An object which can be handled by the Printers.
         """
-
         for prt in self.Printers.values():
             prt.addObj(obj)
 

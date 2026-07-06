@@ -17,10 +17,11 @@ class BasicPrinter(object):
     Super class to handle the basic printing methods
     """
 
-    def __init__(self, output : str, filename : str, outputFormat : str = 'version3' ):
+    def __init__( self, output : str, filename : str, 
+                  outputFormat : str = 'version3' ):
         """
-        :ivar str typeofexpectedvalues: what type of evaluationType values to print,
-              apriori or posteriori
+        :ivar str typeofexpectedvalues: what type of evaluationType values to 
+        print, apriori or posteriori
         :param output: one of: file, stdout
         """
 
