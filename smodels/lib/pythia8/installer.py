@@ -36,7 +36,7 @@ def fetch():
         else:
             rmTarball()
     import requests
-    url=f"https://pythia.org/download/pythia{ver[:2]}/"
+    url=f"https://pythia.org/releases/pythia{ver[:2]}/"
     print ( f"[installer.py] fetching {tarball} from {url}" )
     path = os.path.join ( url, tarball )
     # URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
