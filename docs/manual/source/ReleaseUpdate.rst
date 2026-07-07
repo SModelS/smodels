@@ -5,6 +5,7 @@
 .. |constraints| replace:: :ref:`constraints <ULconstraint>`
 .. |runSModelS| replace:: :ref:`runSModelS.py <runSModelS>`
 .. |database| replace:: :ref:`database<databaseDefs>`
+.. |Database| replace:: :ref:`Database<databaseDefs>`
 .. |Fastlim| replace:: :ref:`Fastlim <addingFastlim>`
 .. |output| replace:: :ref:`output <smodelsOutput>`
 .. |results| replace:: :ref:`experimental results <ExpResult>`
@@ -36,12 +37,13 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Updated lheReader to properly deal with MG5 LHE files (fixes github issue #54, see also discussion #53)
+  * Updated `lheReader <base.html#module-base.lheReader>`_ to properly deal with MG5 LHE files (fixes github issue #54, see also discussion #53)
   * First support for NN surrogate statistical models
-  * Modified the syntax for describing statistical models in the database (breaks backward compatibility). The fields datasetOrder and jsonFiles have been replaced by regionMappings, regionSets and statModels.
+  * Modified the syntax for describing statistical models in the database (breaks backward compatibility). The fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels, see
+  `DatabaseStructure <DatabaseStructure.html#experimental-result-folder>`_.
   * Moved all interfaces from .likelihoods to .nlls
-  * Database extension: added TSlepSlep to ATLAS-SUSY-2019-02, added surrogate models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09
-  * Small fixes in likelihood calculations and pyhf interface
+  * |Database| extension: added TSlepSlep to ATLAS-SUSY-2019-02, added surrogate models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09
+  * Small fixes in likelihood calculations and `pyhf interface <statistics.html#module-statistics.pyhfInterface>`_
 
 New in Version 3.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -55,7 +57,7 @@ New in Version 3.1.1:
   * Fixed bug preventing the extended output to be printed  
   * Fix for pyslha 3.3.1
   * Small fixes in `slha printer <tools.printers.html#module-tools.printers.slhaPrinter>`_, `pyhf interface <statistics.html#module-statistics.pyhfInterface>`_
-  * |database| extension: ATLAS-SUSY-2019-04 (UL), ATLAS-SUSY-2018-19 (EM), TRV1nunu added to CMS-EXO-20-004, ATLAS-SUSY-2018-22-multibin, ATLAS-SUSY-2018-22, ATLAS-EXOT-2018-06
+  * |Database| extension: ATLAS-SUSY-2019-04 (UL), ATLAS-SUSY-2018-19 (EM), TRV1nunu added to CMS-EXO-20-004, ATLAS-SUSY-2018-22-multibin, ATLAS-SUSY-2018-22, ATLAS-EXOT-2018-06
 
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -68,7 +70,7 @@ New in Version 3.1.0:
   * renamed 'expected' flag to an 'evaluationType' enum throughout the code
   * Bumped up pythia8 from 8308 to 8315
   * Bumped up lhapdf used in resummino from 6.5.4 to 6.5.5
-  * |database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM).
+  * |Database| extension: ATLAS-EXOT-2018-06 (EM), additional topologies for CMS-EXO-20-004 (EM).
   * Small fixes in |database|: ATLAS-SUSY-2018-14 (UL), ATLAS-SUSY-2018-31 (EM), CMS-SUS-20-004 (UL)
     -- results for these analyses may vary with respect to the previous version!
   * Fixed bug preventing the extended output to be printed
@@ -120,7 +122,7 @@ New in Version 3.0.0:
   * Added CITATION.cff file, closes `#38 <https://github.com/SModelS/smodels/issues/38>`_
   * Added smodels-analyses.json in database
 
-  * |database| extension: added results from 11 ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
+  * |Database| extension: added results from 11 ATLAS and 6 CMS analyses (hfm=HistFactory model, cov=covariance matrix for SR combination):
 
      * results from ATLAS: ATLAS-SUSY-2018-33 (EM), ATLAS-SUSY-2018-16 (EM+hfm), ATLAS-SUSY-2018-13 (EM), ATLAS-SUSY-2018-09 (UL), ATLAS-EXOT-2019-03 (UL), ATLAS-EXOT-2018-48 (UL), ATLAS-EXOT-2018-06 (UL), ATLAS-EXOT-2013-11 (UL)
      * results from CMS: CMS-SUS-21-007 (UL), CMS-EXO-20-008 (UL), CMS-EXO-19-012 (UL), CMS-EXO-16-057 (UL), CMS-EXO-12-059 (UL)
@@ -195,17 +197,17 @@ New in Version 2.2.0.post1:
 New in Version 2.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * introduced (user-defined) :ref:`combinations of analyses <analysesCombination>`
-  * changed expected limits computed with pyhf from post-fit to pre-fit
-  * a few smaller changes around expected likelihoods and limits
-  * changed default value of :ref:`promptWidth parameter <parameterFileModel>` from 1e-8 to 1e-11 GeV
-  * allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
+  * Introduced (user-defined) :ref:`combinations of analyses <analysesCombination>`
+  * Changed expected limits computed with pyhf from post-fit to pre-fit
+  * A few smaller changes around expected likelihoods and limits
+  * Changed default value of :ref:`promptWidth parameter <parameterFileModel>` from 1e-8 to 1e-11 GeV
+  * Allow :ref:`ncpus <parameterFileNcpus>` to take on zero and negative values in
     ini file [meaning use all but this (absolute) number of CPU cores]
-  * notion of "nonaggregated" databases introduced
-  * small fixes in the :ref:`Howto's <Examples>`
-  * updates in references.bib, installation notes
-  * more small fixes in unit tests
-  * |database| extension, added new results from 4 ATLAS and 11 CMS analyses:
+  * Notion of "nonaggregated" databases introduced
+  * Small fixes in the :ref:`Howto's <Examples>`
+  * Updates in references.bib, installation notes
+  * More small fixes in unit tests
+  * |Database| extension, added new results from 4 ATLAS and 11 CMS analyses:
 
      * results from ATLAS: ATLAS-SUSY-2018-08 (UL+EM), ATLAS-SUSY-2018-40 (UL+EM), ATLAS-SUSY-2018-41 (UL+EM), ATLAS-SUSY-2019-09 (UL+EM, full likelihood)
      * results from CMS: CMS-SUS-16-050 (EM), CMS-SUS-18-004 (UL), CMS-SUS-18-007 (UL), CMS-SUS-19-008 (UL), CMS-SUS-19-011 (UL), CMS-SUS-19-013 (UL), CMS-SUS-20-001 (UL), CMS-SUS-20-002 (UL)
@@ -214,13 +216,13 @@ New in Version 2.2.0:
 New in Version 2.1.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * caching weight matrix in simplified :ref:`likelihoods <likelihoodCalc>`
-  * notion of "debug" databases introduced
-  * introduced :ref:`reportAllSRs <parameterFileReportAllSRs>` option
-  * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
-  * small fixes in unit tests
-  * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
-  * experimental features can now be turned on via ini file
+  * Caching weight matrix in simplified :ref:`likelihoods <likelihoodCalc>`
+  * Notion of "debug" databases introduced
+  * Introduced :ref:`reportAllSRs <parameterFileReportAllSRs>` option
+  * Tiny fix in mybinder link (see https://pypi.org/project/smodels/)
+  * Small fixes in unit tests
+  * Improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
+  * Experimental features can now be turned on via ini file
 
 New in Version 2.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -236,7 +238,7 @@ New in Version 2.1.0:
     in the computation of L_max
   * Pythia8 version in :ref:`xsecComputer <xsecCalc>` updated from 8226 to 8306
   * Improved :ref:`interactive plots <interactivePlots>`
-  * |database| updated with results from 5 new ATLAS and 1 new CMS analyses: CMS-EXO-19-010 (disappearing tracks) UL,  ATLAS-SUSY-2016-08 (displaced leptons) EM,      ATLAS-SUSY-2018-10 (1l+jets) UL+EM, ATLAS-SUSY-2018-12 (0l+jets) UL+EM, ATLAS-SUSY-2018-22 (0l+jets) UL+EM, ATLAS-SUSY-2018-23 (EWino, WH) UL
+  * |Database| updated with results from 5 new ATLAS and 1 new CMS analyses: CMS-EXO-19-010 (disappearing tracks) UL,  ATLAS-SUSY-2016-08 (displaced leptons) EM,      ATLAS-SUSY-2018-10 (1l+jets) UL+EM, ATLAS-SUSY-2018-12 (0l+jets) UL+EM, ATLAS-SUSY-2018-22 (0l+jets) UL+EM, ATLAS-SUSY-2018-23 (EWino, WH) UL
   * added EM results for  ATLAS-SUSY-2017-03 (EWino, WZ), ATLAS-SUSY-2018-06 (EWino, WZ),  ATLAS-SUSY-2018-14 (sleptons),  CMS-SUSY-14-021 (stops)
   * created and added THSCPM10 and THSCPM11 EMs for ATLAS-SUSY-2016-32;
   * replaced some 8 TeV ATLAS conf notes with the published results:   (ATLAS-CONF-2013-007 -> ATLAS-SUSY-2013-09, ATLAS-CONF-2013-061 -> ATLAS-SUSY-2013-18, ATLAS-CONF-2013-089  -> ATLAS-SUSY-2013-20)
@@ -268,19 +270,19 @@ New in Version 2.0.0:
 
 New in Version 1.2.4:
 ^^^^^^^^^^^^^^^^^^^^^
-  * added pyhf support
-  * pickle path bug fix
-  * bug fix for parallel xseccomputers
+  * Added pyhf support
+  * Pickle path bug fix
+  * Bug fix for parallel xseccomputers
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
     location of the cached database file
-  * fixed dataId bug in datasets
+  * Fixed dataId bug in datasets
 
 New in Version 1.2.3:
 ^^^^^^^^^^^^^^^^^^^^^
-  * |database| updated with results from more than 20 new analyses
-  * server for databases is now smodels.github.io, not smodels.hephy.at
-  * small bug fix for displaced topologies
-  * small fix in slha printer, r_expected was r_observed
+  * |Database| updated with results from more than 20 new analyses
+  * Server for databases is now smodels.github.io, not smodels.hephy.at
+  * Small bug fix for displaced topologies
+  * Small fix in slha printer, r_expected was r_observed
   * :ref:`Downloaded database files <parameterFilePath>` now stored in $HOME/.cache/smodels
 
 New in Version 1.2.2:
@@ -338,8 +340,8 @@ New in Version 1.1.1:
 
   * |Cpp|
   * Support for pythia8 (see :ref:`Cross Section Calculator <xsecCalc>`)
-  * improved binary database
-  * automated SLHA and LHE file detection
+  * Improved binary database
+  * Automated SLHA and LHE file detection
   * Fix and improvements for missing topologies
   * Added SLHA-type output
   * Small improvements in interpolation and clustering
@@ -348,14 +350,14 @@ New in Version 1.1.1:
 New in Version 1.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * the inclusion of efficiency maps (see |EMrs|)
-  * a new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
-  * inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
+  * The inclusion of efficiency maps (see |EMrs|)
+  * A new and more flexible database format (see :ref:`Database structure <databaseStruct>`)
+  * Inclusion of likelihood and :math:`\chi^2` calculation for |EMrs|
     (see :ref:`likelihood calculation <likelihoodCalc>`)
-  * extended information on the :ref:`topology coverage <topCoverage>`
-  * inclusion of a database broswer tool for easy access to the information
+  * Extended information on the :ref:`topology coverage <topCoverage>`
+  * Inclusion of a database broswer tool for easy access to the information
     stored in the database (see :ref:`database browser <databaseBrowser>`)
-  * the database now supports also a more efficient :ref:`binary format <databasePickle>`
-  * performance improvement for the |decomposition| of the input model
-  * inclusion of new simplified results to the |database| (including a few 13 TeV results)
+  * The database now supports also a more efficient :ref:`binary format <databasePickle>`
+  * Performance improvement for the |decomposition| of the input model
+  * Inclusion of new simplified results to the |database| (including a few 13 TeV results)
   * |Fastlim| efficiency maps can now also be used in SModelS
