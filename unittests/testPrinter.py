@@ -153,7 +153,7 @@ class RunPrinterTest(unittest.TestCase):
         from databaseLoader import database
         out = runMain(slhafile,inifile="testPrinters_parameters.ini",
                 overridedatabase = database,
-                suppressStdout = False )
+                suppressStdout = True )
 
         # Check Summary output
         outputfile = out.replace('.py', '.smodels')
@@ -222,7 +222,7 @@ class RunPrinterTest(unittest.TestCase):
         slhafile = "./testFiles/slha/simplyGluino.slha"
         outputfile = runMain(slhafile,
                 inifile='testPrinters_parameters_nodeMap.ini',
-                suppressStdout = False )
+                suppressStdout = True )
         smodelsOutput = importModule(outputfile)
         from simplyGluino_default_nodesMap import smodelsOutputDefault
 
