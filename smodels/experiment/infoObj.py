@@ -94,7 +94,8 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
-                if tag in [ "covariance", "jsonFile", "datasetOrder" ]:
+                if tag in [ "covariance", "jsonFiles", \
+                            "jsonFiles_FullLikelihood", "datasetOrder" ]:
                     from smodels import installation
                     logger.warning ( f"Tag '{tag}' in {self.path} was used in the old format of the database. This version {installation.version()} of SModelS ignores this tag. Use 'regionMappings', 'regionSets', 'statModels' instead. See the documentation -> 'Detailed Guide to SModelS' -> 'Database of Experimental Results' for more info." )
                 if tag == "regionMappings":
