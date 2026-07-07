@@ -29,6 +29,16 @@ class RunPrinterTest(unittest.TestCase):
             if os.path.exists(i):
                 os.remove(i)
 
+    def testOutOfRepoPrinter(self):
+        from smodels.tools.printers.printerRegistry import PrinterRegistry
+        from smodels.tools.printers.basicPrinter import BasicPrinter
+        class NewPrinter(BasicPrinter):
+            def __init__ ( self ):
+                pass
+        PrinterRegistry.register ( NewPrinter, "dummy" )
+        printer = PrinterRegistry.get ( "dummy" )
+        self.assertEqual ( printer, NewPrinter )
+
     def testPrintersV2(self):
 
         slhafile = "./testFiles/slha/gluino_squarks.slha"
