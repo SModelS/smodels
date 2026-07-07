@@ -30,7 +30,7 @@ class TruncatedGaussians:
     newCorrectionType = False
 
     def __init__  ( self, upperLimitOnMu : float, expectedUpperLimitOnMu : float,
-                    corr : Optional[float] = 0.6, cl=.95 ):
+                    corr : Optional[float] = 0.6, cl : float = .95 ):
         """
         :param upperLimitOnMu: observed upper limit on signal strength mu
         :param expectedUpperLimitOnMu: evaluationType upper limit
@@ -50,22 +50,11 @@ class TruncatedGaussians:
         self.upperLimitOnMu = upperLimitOnMu
         self.expectedUpperLimitOnMu = expectedUpperLimitOnMu
         self.corr = corr
-        self.sigma_mu = self._getSigmaMu()  # the evaluationType scale, eq 3.24 in arXiv:1202.3415
+        # the evaluationType scale, eq 3.24 in arXiv:1202.3415
+        self.sigma_mu = self._getSigmaMu()  
         self.denominator = np.sqrt(2.0) * self.sigma_mu
         self.allowNegativeSignals = False
         self.cl = cl
-
-    """
-    def likelihood ( self, mu : Union[float,None], return_nll : Optional[bool]=False,
-            allowNegativeSignals : Optional[bool] = True,
-            corr : Optional[float] = 0.6,
-            evaluationType : NllEvalType = observed ) -> Union[None,float]:
-        ret = self.nll( mu, allowNegativeSignals,
-                corr, evaluationType )
-        if return_nll:
-            return ret
-        return math.exp ( - ret )
-    """
 
     def nll( self, mu : Union[float,None],
             allowNegativeSignals : Optional[bool] = True,
@@ -247,5 +236,4 @@ class TruncatedGaussians:
         """
         Dummy function in case it is needed.
         """
-
         return None
