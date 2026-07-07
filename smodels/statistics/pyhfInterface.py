@@ -717,7 +717,7 @@ class PyhfUpperLimitComputer:
                 # If the a total yield is still negative with the increased initial parameters, print a message
                 negYields = False
                 args = {}
-                args["return_expected"] = evaluationType == aposteriori
+                # args["return_expected"] = evaluationType == aposteriori
 
                 if not all([True if yld >= 0 else False for yld in model.expected_actualdata(initpars)]):
                     negYields = True
