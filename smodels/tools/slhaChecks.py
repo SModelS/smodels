@@ -10,7 +10,6 @@
 
 """
 
-from __future__ import print_function
 from smodels.tools.ioObjects import SlhaStatus
 
 def main(args):   

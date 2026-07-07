@@ -10,7 +10,6 @@
 .. moduleauthor:: Matthias Wolf <matthias.wolf@wot.at>
 """
 
-from __future__ import print_function
 import os
 import hashlib
 import pathlib

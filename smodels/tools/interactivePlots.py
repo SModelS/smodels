@@ -8,7 +8,6 @@
 
 """
 
-from __future__ import print_function
 
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError

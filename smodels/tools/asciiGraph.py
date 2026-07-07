@@ -8,7 +8,6 @@
 
 """
 
-from __future__ import print_function
 import sys
 import argparse
 from smodels.decomposition import decomposer

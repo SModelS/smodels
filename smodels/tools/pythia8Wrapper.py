@@ -8,7 +8,6 @@
 
 """
 
-from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
 from smodels.base.smodelsLogging import logger, setLogLevel

@@ -11,7 +11,6 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from __future__ import print_function
 import operator
 import pyslha
 

@@ -6,7 +6,6 @@
 
 """
 
-from __future__ import print_function
 import os
 from smodels.installation import installDirectory, version
 from smodels.base import smodelsLogging

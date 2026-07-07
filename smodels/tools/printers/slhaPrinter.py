@@ -6,7 +6,6 @@
 
 """
 
-from __future__ import print_function
 import os
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus

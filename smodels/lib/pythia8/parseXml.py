@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
 import os
 
 substitutes = { "~u_L": "~u_1", "~u_R": "~u_2", "~c_L": "~u_3", "~c_R": "~u_4",
