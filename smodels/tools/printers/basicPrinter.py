@@ -11,13 +11,14 @@ from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import apriori, aposteriori, NllEvalType
 import numpy as np
 import time
+from typing import Union
 
 class BasicPrinter(object):
     """
     Super class to handle the basic printing methods
     """
 
-    def __init__( self, output : str, filename : str, 
+    def __init__( self, output : str, filename : Union[None,str,os.PathLike], 
                   outputFormat : str = 'version3' ):
         """
         :ivar str typeofexpectedvalues: what type of evaluationType values to 

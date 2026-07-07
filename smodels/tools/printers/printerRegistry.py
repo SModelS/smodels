@@ -18,7 +18,7 @@ class PrinterRegistry:
     printers = {}
 
     @classmethod
-    def register(cls, printer : BasicPrinter, extension : str ) -> bool:
+    def register(cls, printer : type[BasicPrinter], extension : str ) -> bool:
         """
         register this printer
         :param printer: Printer object to register

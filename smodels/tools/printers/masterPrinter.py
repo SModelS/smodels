@@ -60,36 +60,25 @@ class MPrinter(object):
                 continue
             PrinterClass = PrinterRegistry.get(prt)
 
-            if prt == 'python':
-                newPrinter = PrinterClass(output='file', 
-                                          outputFormat=self.outputFormat)
-            elif prt == 'summary':
+            if prt in ['python', 'summary', 'log', 'xml', 'slha']:
                 newPrinter = PrinterClass(output='file', 
                                           outputFormat=self.outputFormat)
             elif prt == 'stdout':
                 newPrinter = PrinterClass(output='stdout', 
                                           outputFormat=self.outputFormat)
-            elif prt == 'log':
-                newPrinter = PrinterClass(output='file', 
-                                          outputFormat=self.outputFormat)
-            elif prt == 'xml':
-                newPrinter = PrinterClass(output='file', 
-                                          outputFormat=self.outputFormat)
-            elif prt == 'slha':
-                newPrinter = PrinterClass(output='file', 
-                                          outputFormat=self.outputFormat)
-                if parser.getboolean("options", "doCompress") or \
-                        parser.getboolean("options", "doInvisible"):
-                    newPrinter.docompress = 1
-                if parser.has_option("options", "combineSRs") and \
-                        parser.getboolean("options", "combineSRs"):
-                    newPrinter.combinesr = 1
-                if parser.has_option("options", "combineAnas") and \
-                        parser.get("options", "combineAnas"):
-                    newPrinter.combineanas = 1
             else:
                 newPrinter = PrinterClass()
-
+            
+            if parser.getboolean("options", "doCompress") or \
+                    parser.getboolean("options", "doInvisible"):
+                newPrinter.docompress = 1
+            if parser.has_option("options", "combineSRs") and \
+                    parser.getboolean("options", "combineSRs"):
+                newPrinter.combinesr = 1
+            if parser.has_option("options", "combineAnas") and \
+                    parser.get("options", "combineAnas"):
+                newPrinter.combineanas = 1
+            
             # Set printer-specific options:
             if parser.has_section(prt+'-printer'):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
