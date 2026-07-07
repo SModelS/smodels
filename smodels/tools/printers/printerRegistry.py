@@ -9,6 +9,7 @@
 """
 
 from smodels.tools.printers.basicPrinter import BasicPrinter
+from typing import Optional
 
 class PrinterRegistry:
     """
