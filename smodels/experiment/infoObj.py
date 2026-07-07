@@ -24,7 +24,8 @@ class Info(object):
     .txt file which contain "info_tag: value".
     """
 
-    def canonizeRegions ( self, regions : Optional[dict] = None ) -> Union[None,dict]:
+    def canonizeRegions ( self, regions : Optional[dict] = None ) \
+            -> Union[None,dict]:
         """ given a list of regions in globalInfo.txt in the
         regionMappings field,
         return a canonical version of that list: strings in
@@ -43,15 +44,15 @@ class Info(object):
         for label,region in regions.items():
             regionDict = {}
             if type(region)==str:
-                logger.debug ( f"exploding {region} to a dictionary" )
+                logger.debug ( f"exploding {region} to a dictionary in {self.path}" )
                 regionDict["smodels"] = region
             elif type(region)==dict:
                 regionDict.update(region)
             else:
-                raise SModelSError ( f"region {region} is neither a string nor a dictionary" )
+                raise SModelSError ( f"region {region} is neither a string nor a dictionary in {self.path}" )
             for key in [ "type", "smodels", "pyhf", "sl", "onnx" ]:
                 if key not in regionDict:
-                    logger.debug ( f"region {label} has no {key} defined, setting to default value.")
+                    logger.debug ( f"region {label} has no {key} defined, setting to default value in {self.path}.")
             # Set defaults (if they were not defined)
             regionDict.setdefault("type", "SR")
             if regionDict["type"]=="SR":
@@ -93,6 +94,9 @@ class Info(object):
                     continue
                 line = content[i]
                 value = line.split(':', 1)[1].strip()
+                if tag in [ "covariance", "jsonFile", "datasetOrder" ]:
+                    from smodels import installation
+                    logger.warning ( f"Tag '{tag}' in {self.path} was used in the old format of the database. This version {installation.version()} of SModelS ignores this tag. Use 'regionMappings', 'regionSets', 'statModels' instead. See the documentation -> 'Detailed Guide to SModelS' -> 'Database of Experimental Results' for more info." )
                 if tag == "regionMappings":
                     try:
                         regions = eval(value)
