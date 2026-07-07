@@ -567,8 +567,7 @@ class SubDatabase(object):
                     else:
                         self.expResultList = serializer.load(f, encoding="latin1")
                     t1 = time.time()-t0
-                    logger.info("Loaded database from %s in %.1f secs." %
-                            (self.pcl_meta.pathname, t1))
+                    logger.info( f"Loaded database from {self.pcl_meta.pathname} in {t1:.1f} secs." )
                     self.databaseParticles = None
                     try:
                         self.databaseParticles = serializer.load(f)
@@ -787,13 +786,13 @@ class SubDatabase(object):
             else:
                 print("")
             dump.close()
-            self.unlockFile ( filename )
-            sha = _getSHA1(filename)
-            testsha = r.json()["sha1"]
-            if sha != testsha:
-                logger.error(f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>")
-                # sys.exit()
-        logger.info("fetched %s in %d secs." % (r2.url, time.time()-t0))
+        sha = _getSHA1(filename)
+        testsha = r.json()["sha1"]
+        if sha != testsha:
+            logger.error(f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>")
+            # sys.exit()
+        self.unlockFile ( filename )
+        logger.info( f"fetched {r2.url} in {time.time()-t0} secs." )
         logger.debug(f"store as {filename}")
         self.force_load = "pcl"
         return ("./", f"{filename}")
@@ -822,8 +821,7 @@ class SubDatabase(object):
         except requests.exceptions.RequestException:
             pass
         if r.status_code != 200:
-            logger.warning("Error %d: could not fetch %s from server." %
-                           (r.status_code, path))
+            logger.warning( f"Error {r.status_code}: could not fetch {path} from server." )
             if not os.path.isfile(filename):
                 logger.error("Cant find a local copy of the pickle file. Exit.")
                 sys.exit()
@@ -865,7 +863,7 @@ class SubDatabase(object):
         and the database.
         returns the base directory and the pickle file name
         """
-        logger.debug('Try to set the path for the database to: %s', path)
+        logger.debug( f'Try to set the path for the database to: {path}' )
         if path.startswith(("http://", "https://", "ftp://")):
             return self.fetchFromServer(path)
         if path.startswith(("file://")):
@@ -1210,8 +1208,7 @@ class SubDatabase(object):
                     if (validated not in [True, False, "true", "false", "n/a", "tbd", None, "none"]):
                         logger.error(f"value of validated field '{validated}' in {expResult} unknown.")
                     if validated in [None, "none"]:  # FIXME after 1.1.1 this becomes a warning msg?
-                        logger.debug("validated is None in %s/%s/%s. Please set to True, False, N/A, or tbd." %
-                            (expResult.globalInfo.id, dataset.dataInfo.dataId, txname))
+                        logger.debug( f"validated is None in {expResult.globalInfo.id}/{dataset.dataInfo.dataId}/{txname}. Please set to True, False, N/A, or tbd." )
                     if validated not in [None, True, "true", "n/a", "tbd"] and (not useNonValidated):
                         continue
                     if txnames != ['all']:
