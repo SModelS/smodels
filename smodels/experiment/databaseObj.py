@@ -175,7 +175,7 @@ class Database(object):
         with open(filename, "wb") as f:
             logger.debug(" * load text database")
             logger.debug(f" * write {filename} db version {self.databaseVersion}")
-            ptcl = min(4, serializer.HIGHEST_PROTOCOL)
+            ptcl = min(5, serializer.HIGHEST_PROTOCOL)
             ## 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
@@ -628,7 +628,7 @@ class SubDatabase(object):
             self.loadTextDatabase()
             logger.debug( f" * write {binfile} db version {self.txt_meta.databaseVersion}, format version {self.txt_meta.format_version}, {self.txt_meta.cTime()}" )
             # ptcl = serializer.HIGHEST_PROTOCOL
-            ptcl = min(4, serializer.HIGHEST_PROTOCOL)  # 4 is default protocol in python3.8, and highest protocol in 3.7
+            ptcl = min(5, serializer.HIGHEST_PROTOCOL)  # 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
             serializer.dump(self.expResultList, f, protocol=ptcl)
             serializer.dump(self.databaseParticles, f, protocol=ptcl)
