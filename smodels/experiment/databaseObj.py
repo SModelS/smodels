@@ -212,10 +212,9 @@ class Database(object):
                 cms.append(expRes)
         idList += f"{len(cms)} CMS, {len(atlas)} ATLAS, "
         for sqrts in s.keys():
-            idList += "%d @ %d TeV, " % (s[sqrts], sqrts)
-            # idList += expRes.globalInfo.getInfo('id') + ', '
+            idList += f"{s[sqrts]} @ {sqrts} TeV, "
         idList = idList[:-2] + '\n'
-        idList += "%d datasets, %d txnames.\n" % (datasets, txnames)
+        idList += f"{datasets} datasets, {txnames} txnames.\n"
         return idList
 
     def __eq__(self, other: "Database" ):
@@ -560,8 +559,7 @@ class SubDatabase(object):
                                        "Regenerating.")
                         self.createBinaryFile()
                         return self
-                    logger.info("loading binary db file %s format version %s" %
-                           (self.pcl_meta.pathname, self.pcl_meta.format_version))
+                    logger.info(f"loading binary db file {self.pcl_meta.pathname} format version {self.pcl_meta.format_version}" )
                     if sys.version[0] == "2":
                         self.expResultList = serializer.load(f)
                     else:
@@ -592,10 +590,8 @@ class SubDatabase(object):
     def checkBinaryFile(self):
         nu = self.needsUpdate()
         logger.debug("Checking binary db file.")
-        logger.debug("Binary file dates to %s(%d)" %
-                     (time.ctime(self.pcl_meta.mtime), self.pcl_meta.filecount))
-        logger.debug("Database dates to %s(%d)" %
-                     (time.ctime(self.txt_meta.mtime), self.txt_meta.filecount))
+        logger.debug( f"Binary file dates to {time.ctime(self.pcl_meta.mtime)}({self.pcl_meta.filecount})" )
+        logger.debug( f"Database dates to {time.ctime(self.txt_meta.mtime)}({self.txt_meta.filecount})" )
         if nu:
             logger.info("Binary db file needs an update.")
         else:
@@ -619,8 +615,7 @@ class SubDatabase(object):
         if self.txt_meta == None:
             logger.error("Trying to create database pickle, but no txt_meta defined.")
             raise SModelSError()
-        logger.debug("database timestamp: %s, filecount: %s" %
-                     (time.ctime(self.txt_meta.mtime), self.txt_meta.filecount))
+        logger.debug( f"database timestamp: {time.ctime(self.txt_meta.mtime)}, filecount: {self.txt_meta.filecount}" )
         binfile = filename
         if binfile == None:
             binfile = self.pcl_meta.pathname
@@ -631,9 +626,7 @@ class SubDatabase(object):
         with open(binfile, "wb") as f:
             logger.debug(" * load text database")
             self.loadTextDatabase()
-            logger.debug(" * write %s db version %s, format version %s, %s" %
-                    (binfile, self.txt_meta.databaseVersion,
-                     self.txt_meta.format_version, self.txt_meta.cTime()))
+            logger.debug( f" * write {binfile} db version {self.txt_meta.databaseVersion}, format version {self.txt_meta.format_version}, {self.txt_meta.cTime()}" )
             # ptcl = serializer.HIGHEST_PROTOCOL
             ptcl = min(4, serializer.HIGHEST_PROTOCOL)  # 4 is default protocol in python3.8, and highest protocol in 3.7
             serializer.dump(self.txt_meta, f, protocol=ptcl)
@@ -769,8 +762,7 @@ class SubDatabase(object):
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
         logger.warning(msg)
-        logger.info("need to fetch %s and store in %s. size is %s." %
-                    (r.json()["url"], filename, sizeof_fmt(size)))
+        logger.info("need to fetch {r.json()['url']} and store in {filename}. size is {sizeof_fmt(size)}." )
         self.lockFile ( filename )
         with open(filename, "wb") as dump:
             if not self.inNotebook():  # \r doesnt work in notebook
@@ -921,10 +913,9 @@ class SubDatabase(object):
                 cms.append(expRes)
         idList += f"{len(cms)} CMS, {len(atlas)} ATLAS, "
         for sqrts in s.keys():
-            idList += "%d @ %d TeV, " % (s[sqrts], sqrts)
-            # idList += expRes.globalInfo.getInfo('id') + ', '
+            idList += f"{s[sqrts]} @ {sqrts} TeV, "
         idList = idList[:-2] + '\n'
-        idList += "%d datasets, %d txnames.\n" % (datasets, txnames)
+        idList += f"{datasets} datasets, {txnames} txnames.\n"
         return idList
 
     def _setParticles(self, databaseParticles=None):
@@ -967,7 +958,7 @@ class SubDatabase(object):
             logger.debug(f"Loading database particles from: {fulldir}")
             modelFile = import_module(pFile, package='smodels')
             if not hasattr(modelFile, 'finalStates'):
-                logger.error("Model definition (finalStates) not found in" % fulldir)
+                logger.error(f"Model definition (finalStates) not found in {fulldir}")
             else:
                 #set model name to file location:
                 modelFile.finalStates.label = os.path.basename(fulldir)
