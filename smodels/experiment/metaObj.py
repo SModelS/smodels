@@ -76,11 +76,11 @@ class Meta(object):
             # return 'unknown version'
 
     def __str__ ( self ):
-        ret  = f"Meta: path ={self.pathname}\n"
+        ret  = f"Meta: path={self.pathname}\n"
         ret += f"      mtime={time.ctime(self.mtime)}"
-        ret += ", filecount=%d" % self.filecount
-        ret += f", fl={self.hasFastLim}"
-        ret += ", format_version=%d" % self.format_version
+        ret += f", filecount={self.filecount}"
+        ret += f", fastlim={self.hasFastLim},\n"
+        ret += f"      format_version={self.format_version}"
         ret += f", dbVersion={self.databaseVersion}"
         return ret
 
