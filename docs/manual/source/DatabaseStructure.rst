@@ -132,7 +132,8 @@ as the SModelS name and ``type`` being always **SR**:
 
 The matrix.cov file must contain a python list of lists, e.g.
 ``[[v_11, v_12],[v_12,v_22]]``; the content of the file gets
-``eval``'ed.
+``eval``'ed. The order of the signal regions in the matrix.cov file
+must match the order given in ``regionSets``.
 
 In what follows, ATLAS-SUSY-2019-08 is given as another example,
 this time with a machine learned surrogate model. It is used by default,
