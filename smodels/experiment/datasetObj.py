@@ -555,8 +555,9 @@ class CombinedDataSet(object):
         """
         if not hasattr ( self.globalInfo, "statModels" ):
             return
+        
         hasSL = False
-        for regionSetName,model_tuples in self.globalInfo.statModels.items():
+        for regionSetName, model_tuples in self.globalInfo.statModels.items():
             model_tuple = model_tuples[0]
             # if models[0].endswith ( ".cov" ):
             if model_tuple[0] == "sl":
@@ -564,26 +565,38 @@ class CombinedDataSet(object):
             break
         if not hasSL:
             return
+        
         # if hasattr(self.globalInfo, "covariances"):
         datasets = self.origdatasets[:]
         datasetOrder = []
+        datasetOrder_sl = []
+        
         if hasattr(self.globalInfo, "regionMappings"):
         ## datasetOrder goes by regionMappings
-            for region in self.globalInfo.regionMappings:
-                if "sl" not in region or region["sl"]!=None:
-                    datasetOrder.append ( region["smodels"] )
-        elif hasattr(self.globalInfo, "regionSets" ):
-            for regionSetName,regions in self.globalInfo.regionSets.items():
-                datasetOrder += regions
-        dim_covs = 0
-        for regionSetName,_ in self.globalInfo.statModels.items():
-            assert regionSetName in self.globalInfo.regionSets, \
-                f"{regionSetName} does not appear in regionSets"
-            dim_covs += len ( self.globalInfo.regionSets[regionSetName] )
+            for region in self.globalInfo.regionMappings.values():
+                if "sl" in region and region["sl"] != None: datasetOrder_sl.append ( region["smodels"] )
+                datasetOrder.append ( region["smodels"] )
+            if len(datasetOrder_sl) == 0: logger.warning( f"No region of type 'sl' found in the regionMappings of {self.globalInfo.id}. Will try with all the regions of regionMappings then, but are you sure you want to use a simplified likelihood?" )
+            if len(datasetOrder_sl) == 1: logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
+            if len(datasetOrder_sl) >= 1: datasetOrder = datasetOrder_sl
+        
+        dim_region_set = 0
+        for regionSetName, statModels in self.globalInfo.statModels.items():
+            for statFramework, statFile in statModels:
+                if statFramework == 'sl':
+                    assert regionSetName in self.globalInfo.regionSets, \
+                        f"{regionSetName} does not appear in regionSets"
+                    if dim_region_set == 0:
+                        regionSetNameUsed = regionSetName
+                        dim_region_set += len ( self.globalInfo.regionSets[regionSetName] )
+                    else:
+                        logger.error( f"Multiple SL framework for {self.globalInfo.id}. Don't know how to handle that. Will use the region set '{regionSetNameUsed}' and not '{regionSetName}'." )
 
-        if len(datasetOrder) != dim_covs:
-            # pass
-            raise SModelSError( f"Number of datasets with sl entry in the regionMappings field {len(datasetOrder)} does not match the dimensions of the cov matrices {dim_covs} for {self.globalInfo.id}" )
+        if len(datasetOrder) != dim_region_set:
+            with_sl_str = " with 'sl' entry " if len(datasetOrder_sl) >= 1 else " "
+            logger.info( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
+            datasetOrder = self.globalInfo.regionSets[regionSetNameUsed]
+        
         ## need to reinitialise, we might have lost some datasets when filtering
         tmp = [ None ] * len(datasets)
         for dataset in datasets:
@@ -599,6 +612,7 @@ class CombinedDataSet(object):
             if ds != None:
                 newds.append ( ds )
         self._datasets = newds
+
 
     def getType(self):
         """
