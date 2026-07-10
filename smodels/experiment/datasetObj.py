@@ -574,11 +574,15 @@ class CombinedDataSet(object):
         if hasattr(self.globalInfo, "regionMappings"):
         ## datasetOrder goes by regionMappings
             for region in self.globalInfo.regionMappings.values():
-                if "sl" in region and region["sl"] != None: datasetOrder_sl.append ( region["smodels"] )
+                if "sl" in region and region["sl"] != None: 
+                    datasetOrder_sl.append ( region["smodels"] )
                 datasetOrder.append ( region["smodels"] )
-            if len(datasetOrder_sl) == 0: logger.warning( f"No region of type 'sl' found in the regionMappings of {self.globalInfo.id}. Will try with all the regions of regionMappings then, but are you sure you want to use a simplified likelihood?" )
-            if len(datasetOrder_sl) == 1: logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
-            if len(datasetOrder_sl) >= 1: datasetOrder = datasetOrder_sl
+            if len(datasetOrder_sl) == 0: 
+                logger.warning( f"No region of type 'sl' found in the regionMappings of {self.globalInfo.id}. Will try with all the regions of regionMappings then, but are you sure you want to use a simplified likelihood?" )
+            elif len(datasetOrder_sl) == 1: 
+                logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
+            else:
+                datasetOrder = datasetOrder_sl
         
         dim_region_set = 0
         for regionSetName, statModels in self.globalInfo.statModels.items():
