@@ -86,8 +86,7 @@ example:
 
 Here, ``regionMappings`` describes the mapping between the SR (or CR) names used within the
 statistical models and the names used in the SModelS database.
-The dictionary keys correspond to the labels used within globalInfo.txt to describe the regions
-and it can often be the same as the SModelS name.
+The dictionary keys correspond to the region names used within globalInfo.txt; they are usually (though not always) the same as the SModelS names. 
 All regions used by the statistical model must be included in this dictionary.
 The following (optional) fields are defined for each region: 
 
