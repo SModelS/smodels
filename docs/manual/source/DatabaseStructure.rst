@@ -77,9 +77,8 @@ Each |ExpRes| folder contains:
 The ``globalInfo.txt`` file contains the meta information about the |ExpRes|.
 It defines the center-of-mass energy |sqrts|, the integrated luminosity, the id
 used to identify the result and additional information about the source of the
-data. In case a statistical model is given (either a :ref:`simplified likelihood <simplifiedllhd>`, 
-a :ref:`full pyhf likelihood <pyhfllhd>`, or a :ref:`ml surrogate model <surrogateMLModels>`), it is also
-referenced here. Here is the content of ATLAS-SUSY-2018-04/globalInfo.txt as an
+data. If a statistical model (a :ref:`simplified likelihood <simplifiedllhd>`, a 
+:ref:`full pyhf likelihood <pyhfllhd>`, and/or a :ref:`machine-learned (ML) surrogate model <surrogateMLModels>` is used, the details are also specified here. Below we show the content of ATLAS-SUSY-2018-04/globalInfo.txt as an
 example:
 
 .. literalinclude:: /literals/globalInfo201804.txt
@@ -94,8 +93,8 @@ The following (optional) fields are defined for each region:
 
 * the name of the region as known to SModelS (``smodels``),
 * the region ``type`` (SR or CR), 
-* the name of the region as known to pyhf (``pyhf``), if there is a pyhf implementation of the statistical model,
-* the name of the region as known by the surrogate ML model (``onnx``), if there is a onnx surrogate model for the statistical model and
+* the name of the region as known to pyhf (``pyhf``), if the statistical model is a pyhf json file,
+* the name of the region as known by the surrogate ML model (``onnx``), if one exists, and
 * the name of the region as known to the simplified likelihood (``sl``), if the statistical model corresponds to a simplified likelihood.
 
 
