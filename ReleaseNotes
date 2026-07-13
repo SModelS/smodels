@@ -2,7 +2,7 @@ Release v3.2.0, xxx
 =======================================================
 
   * First support for NN surrogate statistical models (ONNX format)
-  * Modified the syntax for statistical models in the database: in the globalInfo.txt files, the fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels. Note that this BREAKS BACKWARDS COMPATIBILITY.
+  * Modified the syntax for statistical models in the database: in the globalInfo.txt files, the fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels. Note that this BREAKS BACKWARDS COMPATIBILITY
   * Small fixes in likelihood calculations and pyhf interface
   * Moved all interfaces from .likelihoods to .nlls
   * Updated lheReader to properly deal with MG5 LHE files (fixes github issue #53, see also discussion #54)
