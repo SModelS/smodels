@@ -61,7 +61,7 @@ class ExpResult(object):
                 # Build data set
                 try:
                     dataset = DataSet(root, self.globalInfo,
-                                                 databaseParticles=databaseParticles)
+                                      databaseParticles=databaseParticles)
                     self.datasets.append(dataset)
                 except TypeError as e:
                     logger.warning(f"Error creating dataset from dir {root}:\n {e}")

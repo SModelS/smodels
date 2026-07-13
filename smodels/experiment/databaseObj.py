@@ -1218,11 +1218,13 @@ class SubDatabase(object):
                     newDataSet.txnameList.append(txname)
                 # Skip data set not containing any of the required txnames:
                 if not newDataSet.txnameList or newDataSet.txnameList == []:
-                    continue
+                    logger.debug ( f"dataset {newDataSet.dataInfo.dataId} has no txnames" )
+                    # continue
                 newExpResult.datasets.append(newDataSet)
             # Skip analysis not containing any of the required txnames:
             if not newExpResult.getTxNames():
-                continue
+                logger.debug ( f"{newExpResult.globalInfo.id} has no txnames" )
+                # continue
             expResultList.append(newExpResult)
         return expResultList
 

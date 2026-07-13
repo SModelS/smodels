@@ -30,13 +30,14 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__(self, path=None, info=None, createInfo=True, databaseParticles=None):
+    def __init__( self, path=None, info=None, createInfo=True,
+                  databaseParticles=None ):
         """
         :param path: Path to the dataset folder
         :param info: globalInfo (from the ExptResult obj)
         :param createInfo: If True, create object from dataset folder
         :param databaseParticles: Model object holding Particle objects to be
-                                  used when creating the SMS topologies in the TxNames.
+        used when creating the SMS topologies in the TxNames.
         """
 
         self.path = path
@@ -555,7 +556,7 @@ class CombinedDataSet(object):
         """
         if not hasattr ( self.globalInfo, "statModels" ):
             return
-        
+
         hasSL = False
         for regionSetName, model_tuples in self.globalInfo.statModels.items():
             model_tuple = model_tuples[0]
@@ -565,25 +566,25 @@ class CombinedDataSet(object):
             break
         if not hasSL:
             return
-        
+
         # if hasattr(self.globalInfo, "covariances"):
         datasets = self.origdatasets[:]
         datasetOrder = []
         datasetOrder_sl = []
-        
+
         if hasattr(self.globalInfo, "regionMappings"):
         ## datasetOrder goes by regionMappings
             for region in self.globalInfo.regionMappings.values():
-                if "sl" in region and region["sl"] != None: 
+                if "sl" in region and region["sl"] != None:
                     datasetOrder_sl.append ( region["smodels"] )
                 datasetOrder.append ( region["smodels"] )
-            if len(datasetOrder_sl) == 0: 
+            if len(datasetOrder_sl) == 0:
                 logger.warning( f"No region of type 'sl' found in the regionMappings of {self.globalInfo.id}. Will try with all the regions of regionMappings then, but are you sure you want to use a simplified likelihood?" )
-            elif len(datasetOrder_sl) == 1: 
+            elif len(datasetOrder_sl) == 1:
                 logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
             else:
                 datasetOrder = datasetOrder_sl
-        
+
         dim_region_set = 0
         for regionSetName, statModels in self.globalInfo.statModels.items():
             for statFramework, statFile in statModels:
@@ -600,7 +601,7 @@ class CombinedDataSet(object):
             with_sl_str = " with 'sl' entry " if len(datasetOrder_sl) >= 1 else " "
             logger.info( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
             datasetOrder = self.globalInfo.regionSets[regionSetNameUsed]
-        
+
         ## need to reinitialise, we might have lost some datasets when filtering
         tmp = [ None ] * len(datasets)
         for dataset in datasets:

@@ -22,13 +22,19 @@ class AdditiveDBTest(unittest.TestCase):
     def testAddingSubset(self):
         """ tests adding same dataset """
         db1 = Database ( "./database/" )
-        db2 = Database ( "./tinydb/+./database/" ) ## tinydb is subset of database
-        self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
+        ## tinydb has an overlap with database
+        db2 = Database ( "./tinydb/+./database/" )
+        self.assertTrue ( len(db2.expResultList)-1 == len(db1.expResultList) )
         tx1, tx2 = [], []
         for er1, er2 in zip ( db1.expResultList, db2.expResultList ):
             tx1.append ( er1.getTxNames() )
             tx2.append ( er2.getTxNames() )
         self.assertTrue ( len(tx1) == len(tx2) )
+
+    def testEmptyResult(self):
+        """ checks if empty result stays in """
+        db = Database ( "./tinydb/" )
+        self.assertTrue ( len(db.getExpResults())==2 )
 
     def testAddingTxname(self):
         """ tests adding same dataset """
