@@ -37,14 +37,15 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * First support for NN surrogate statistical models
-  * Modified the syntax for describing statistical models in the database (breaks backward compatibility). The fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels, see `DatabaseStructure <DatabaseStructure.html#experimental-result-folder>`_
-  * Updated `lheReader <base.html#module-base.lheReader>`_ to properly deal with MG5 LHE files (fixes github issue `#54 <https://github.com/SModelS/smodels/issues/54>`_, see also discussion `#53 <https://github.com/SModelS/smodels/issues/53>`_)
-  * Fixed pythia8 paths in automatic downloader
-  * Moved all interfaces from .likelihoods to .nlls
-  * Introduced a printer registry for out-of-repo printers
-  * |Database| extension: added TSlepSlep to ATLAS-SUSY-2019-02, added surrogate models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09
+  * First support for NN surrogate statistical models (ONNX format)
+  * Modified the syntax for describing statistical models in the database: in the globalInfo.txt files, the fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels, see `DatabaseStructure <DatabaseStructure.html#experimental-result-folder>`_. Note that this BREAKS BACKWARDS COMPATIBILITY.
   * Small fixes in likelihood calculations and `pyhf interface <statistics.html#module-statistics.pyhfInterface>`_
+  * Moved all interfaces from .likelihoods to .nlls
+  * Updated `lheReader <base.html#module-base.lheReader>`_ to properly deal with MG5 LHE files (fixes github issue `#53 <https://github.com/SModelS/smodels/issues/53>`_, see also discussion `#54 <https://github.com/SModelS/smodels/issues/54>`_)
+  * Fixed pythia8 paths in automatic downloader
+  * Introduced a printer registry for out-of-repo printers
+  * |Database| extension (stat models): added ONNX models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09 
+  * |Database| extension (new results): added TSlepSlep to ATLAS-SUSY-2019-02 (UL), ....
   * Pickle now uses protocol 5 instead of protocol 4
 
 New in Version 3.1.1:
