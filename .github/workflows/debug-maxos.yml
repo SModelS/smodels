@@ -1,0 +1,14 @@
+name: Debug macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Start SSH session
+        uses: owenthereal/action-upterm@v1
