@@ -21,9 +21,11 @@ class AdditiveDBTest(unittest.TestCase):
 
     def testAddingSubset(self):
         """ tests adding same dataset """
-        db1 = Database ( "./database/" )
+        from databaseLoader import dbpath, database
+        # db1 = Database ( "./database/" )
+        db1 = database
         ## tinydb has an overlap with database
-        db2 = Database ( "./tinydb/+./database/" )
+        db2 = Database ( f"./tinydb/+{dbpath}" )
         self.assertTrue ( len(db2.expResultList)-1 == len(db1.expResultList) )
         tx1, tx2 = [], []
         for er1, er2 in zip ( db1.expResultList, db2.expResultList ):
