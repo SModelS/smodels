@@ -19,8 +19,8 @@ dbpath = "unittest"
 
 dbpathextra = "unittestextra"
 # dbpathextra = "./database_extra"
-# dbpathtiny = "unittesttiny"
-dbpathtiny = "./tinydb/"
+dbpathtiny = "unittesttiny"
+# dbpathtiny = "./tinydb/"
 
 database = Database( dbpath)
 
