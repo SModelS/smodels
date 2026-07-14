@@ -10,9 +10,9 @@
 
 import sys
 import os
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
 
-def installDirectory():
+def installDirectory() -> os.PathLike:
     """
     Return the software installation directory, by looking at location of this
     method.
@@ -25,9 +25,10 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
-def test_requirements():
+def test_requirements() -> bool:
     """ checks if all requirements are installed.
-    Returns true if that is the case. """
+    :returns: true if that is the case.
+    """
     import importlib.util
     for i in requirements():
         pos = i.find(">" )
@@ -39,10 +40,12 @@ def test_requirements():
             return False
     return True
 
-def resolve_dependencies( as_user = True, verbose = True ):
+def resolve_dependencies( as_user : bool = True,
+        verbose : bool = True ) -> Optional[int]:
     """ method that is meant to resolve the SModelS dependencies,
     via pip install --user. Warns you if pip cannot be found.
     :params as_user: if False, try system-wide install.
+    :returns: None, if dependencies met, else an integer
     """
     ck = test_requirements()
     if ck == True: ## nothing to be done
@@ -72,7 +75,8 @@ def resolve_dependencies( as_user = True, verbose = True ):
         print ( "an error has occurred when resolving the dependencies." )
         return -1
 
-def cacheDirectory ( create=False, reportIfDefault=False ):
+def cacheDirectory ( create : bool = False,
+        reportIfDefault : bool = False ) -> os.PathLike:
     """
     Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
     :params create: if True, create the directory if it doesnt exist.
@@ -99,7 +103,7 @@ def cacheDirectory ( create=False, reportIfDefault=False ):
         return smodelsDir,True
     return smodelsDir
 
-def pythonDirectory():
+def pythonDirectory() -> os.PathLike:
     """
     Return the python installation directory, by looking at location of this
     method. Same as installDirectory(), but trailing "smodels/" removed.
@@ -110,7 +114,7 @@ def pythonDirectory():
     return path
 
 
-def authors():
+def authors() -> str:
     """ return the author list, taken from BANNER """
     copying_file = open(f'{installDirectory()}/smodels/share/BANNER', 'r')
     lines = copying_file.readlines()
@@ -130,7 +134,7 @@ def authors():
         authors += to_add
     return authors
 
-def requirements():
+def requirements() -> list:
     ret=[]
     f = open( f"{installDirectory()}/smodels/share/requirements.txt")
     lines=f.readlines()
@@ -161,7 +165,7 @@ def version( return_tuple : bool = False ) -> Union[str,Tuple]:
             pass
     return tuple(ret)
 
-def license():
+def license() -> str:
     """
     Print license information of the SModelS framework.
 
@@ -172,7 +176,7 @@ def license():
     return "".join(lines)
 
 
-def banner():
+def banner() -> str:
     """
     Returns SModelS banner.
 
@@ -200,10 +204,11 @@ def fixpermissions():
         print ( "sudo smodelsTools.py fixpermissions" )
 
 __dbServer__ = "https://smodels.github.io/database"
-__dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded", "unittest",
-                 "debug", "nonaggregated", "full_llhds", "unittestextra", None ]
+__dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded",
+    "unittest", "debug", "nonaggregated", "full_llhds", "unittestextra",
+    "yieldsonly", None ]
 
-def databasePath ( label ):
+def databasePath ( label : str ) -> str:
     """ construct the path to the database json file
     :param label: one of: official, latest, fastlim, backup
     :returns: URL, e.g. https://smodels.github.io/database/official
