@@ -465,8 +465,7 @@ def compareObjs(obj1, obj2, allowedRelDiff=0.05):
             if isinstance(attr1, (float, int)):
                 rel_diff = abs(attr1-attr2)/(attr1+attr2)
                 if rel_diff > allowedRelDiff:
-                    logger.warning('Attribute %s value differ more than %s:\n %s \n and \n %s'
-                                   % (key, allowedRelDiff, attr1, attr2))
+                    logger.warning( f'Attribute {key} value differ more than {allowedRelDiff}:\n {attr1} \n and \n {attr2}' )
                     return False
             else:
                 logger.warning(f'Attribute {key} value differ:\n {attr1} \n and \n {attr2}')
