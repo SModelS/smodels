@@ -9,8 +9,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-# uses: actions/checkout@v7
+      # - uses: actions/checkout@v7
 
       - name: Start SSH session
-        uses: owenthereal/action-upterm@v1
-# uses: mxschmitt/action-tmate@v3
+      - uses: owenthereal/action-upterm@v1
+      # - uses: mxschmitt/action-tmate@v3
