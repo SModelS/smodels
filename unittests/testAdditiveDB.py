@@ -21,11 +21,11 @@ class AdditiveDBTest(unittest.TestCase):
 
     def testAddingSubset(self):
         """ tests adding same dataset """
-        from databaseLoader import dbpath, database
+        from databaseLoader import dbpath, database, dbpathtiny
         # db1 = Database ( "./database/" )
         db1 = database
         ## tinydb has an overlap with database
-        db2 = Database ( f"./tinydb/+{dbpath}" )
+        db2 = Database ( f"{dbpathtiny}+{dbpath}" )
         self.assertTrue ( len(db2.expResultList)-1 == len(db1.expResultList) )
         tx1, tx2 = [], []
         for er1, er2 in zip ( db1.expResultList, db2.expResultList ):
@@ -35,7 +35,8 @@ class AdditiveDBTest(unittest.TestCase):
 
     def testEmptyResult(self):
         """ checks if empty result stays in """
-        db = Database ( "./tinydb/" )
+        from databaseLoader import dbpathtiny
+        db = Database ( dbpathtiny )
         ers = db.getExpResults()
         nres = len(ers)
         if nres != 2:

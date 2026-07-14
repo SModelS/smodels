@@ -206,7 +206,7 @@ def fixpermissions():
 __dbServer__ = "https://smodels.github.io/database"
 __dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded",
     "unittest", "debug", "nonaggregated", "full_llhds", "unittestextra",
-    "yieldsonly", None ]
+    "yieldsonly", "unittesttiny", None ]
 
 def databasePath ( label : str ) -> str:
     """ construct the path to the database json file
