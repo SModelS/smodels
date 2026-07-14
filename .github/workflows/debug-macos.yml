@@ -1,4 +1,4 @@
-name: Debug macOS-14
+name: Interactive macOS-14 Shell
 
 on:
   workflow_dispatch:
@@ -6,10 +6,10 @@ on:
 jobs:
   debug:
     runs-on: macos-14
+    timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Start SSH session
-        uses: owenthereal/action-upterm@v1
-        # uses: mxschmitt/action-tmate@v3
+        uses: mxschmitt/action-tmate@v3
