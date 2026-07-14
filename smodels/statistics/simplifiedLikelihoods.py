@@ -16,7 +16,7 @@ from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, apriori, aposteriori, \
          NllEvalType
-from typing import Text, Union, Tuple
+from typing import Text, Union, Tuple, Optional
 from smodels.statistics.basicStats import findRoot
 
 import numpy as np
@@ -969,11 +969,20 @@ class SLLikelihoodComputer:
 class SLUpperLimitComputer:
     debug_mode = False
 
-    def __init__(self, likelihoodComputer, cl: float = 0.95):
+    def __init__( self, 
+            likelihoodComputer : Optional[SLLikelihoodComputer] = None, 
+            data : Optional[SLData] = None, cl: float = 0.95 ):
 
         """
+        :param likelihoodComputer: supply
         :param cl: desired quantile for limits
         """
+        assert likelihoodComputer is None or data is None, \
+            "both a likelihoodComputer and data are specified, pls specify only one"
+        assert likelihoodComputer is not None or data is not None, \
+            "neither a likelihoodComputer and data are specified, pls specify one and one only"
+        if likelihoodComputer == None:
+            likelihoodComputer = SLLikelihoodComputer ( data )
         self.likelihoodComputer = likelihoodComputer
         self.cl = cl
         self.name = likelihoodComputer.model.name
