@@ -36,18 +36,24 @@ class AdditiveDBTest(unittest.TestCase):
     def testEmptyResult(self):
         """ checks if empty result stays in """
         db = Database ( "./tinydb/" )
-        self.assertTrue ( len(db.getExpResults())==2 )
+        ers = db.getExpResults()
+        nres = len(ers)
+        if nres != 2:
+            print ( f"[testAdditiveDB] number of results in tinydb is {nres}: {[ x.globalInfo.id for x in ers ]}" )
+        self.assertTrue ( nres==2 )
 
     def testAddingTxname(self):
         """ tests adding same dataset """
         sel = "CMS-PAS-SUS-15-002"
         tx1, tx2 = [], []
-        db1 = Database ( "./database/" )
+        from databaseLoader import dbpath, database
+        db1 = database
+        # db1 = Database ( "./database/" )
         for er1 in db1.expResultList: 
             if er1.globalInfo.id == sel:
                 tx1.append ( er1.getTxNames() )
         tx1 = tx1[0]
-        db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname
+        db2 = Database ( f"{dbpath}+./dbadd1/" ) ## adds a t1 txname
         self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
         for er2 in db2.expResultList:
             if er2.globalInfo.id == sel:
