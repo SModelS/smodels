@@ -12,13 +12,14 @@ from smodels.statistics.basicStats import apriori, aposteriori, NllEvalType
 import numpy as np
 import time
 from typing import Union
+from smodels.base.types import PathType
 
 class BasicPrinter(object):
     """
     Super class to handle the basic printing methods
     """
 
-    def __init__( self, output : str, filename : Union[None,str,os.PathLike], 
+    def __init__( self, output : str, filename : Union[None,str,PathType], 
                   outputFormat : str = 'version3' ):
         """
         :ivar str typeofexpectedvalues: what type of evaluationType values to 
@@ -93,7 +94,7 @@ class BasicPrinter(object):
                 return True
         return False
 
-    def openOutFile(self, filename : os.PathLike, mode : str ):
+    def openOutFile(self, filename : PathType, mode : str ):
         """ creates and opens a data sink,
             creates path if needed """
         d = os.path.dirname(filename)

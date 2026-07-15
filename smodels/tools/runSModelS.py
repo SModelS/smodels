@@ -13,6 +13,7 @@ from smodels.matching import modelTester
 from smodels.tools import crashReport
 from smodels.experiment.databaseObj import Database
 from typing import Optional
+from smodels.base.types import PathType
 
 def main():
     import argparse
@@ -73,8 +74,8 @@ def main():
         run(args.filename, args.parameterFile, args.outputDir,
               db, args.timeout, args.development)
 
-def run( inFile : os.PathLike, parameterFile : os.PathLike,
-         outputDir : os.PathLike, db : Optional[Database],
+def run( inFile : PathType, parameterFile : os.PathLike,
+         outputDir : PathType, db : Optional[Database],
          timeout : int, development : bool ):
     """
     Provides a command line interface to basic SModelS functionalities.

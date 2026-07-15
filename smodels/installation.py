@@ -12,7 +12,7 @@ import sys
 import os
 from typing import Union, Tuple, Optional
 
-def installDirectory() -> os.PathLike:
+def installDirectory() -> str
     """
     Return the software installation directory, by looking at location of this
     method.
@@ -76,7 +76,7 @@ def resolve_dependencies( as_user : bool = True,
         return -1
 
 def cacheDirectory ( create : bool = False,
-        reportIfDefault : bool = False ) -> os.PathLike:
+        reportIfDefault : bool = False ) -> str:
     """
     Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
     :params create: if True, create the directory if it doesnt exist.
@@ -103,7 +103,7 @@ def cacheDirectory ( create : bool = False,
         return smodelsDir,True
     return smodelsDir
 
-def pythonDirectory() -> os.PathLike:
+def pythonDirectory() -> str:
     """
     Return the python installation directory, by looking at location of this
     method. Same as installDirectory(), but trailing "smodels/" removed.

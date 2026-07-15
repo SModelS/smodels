@@ -13,8 +13,8 @@ import os
 from smodels.base.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
-from typing import Optional,Union
-
+from typing import Optional, Union
+from smodels.base.types import PathType
 
 class Info(object):
     """
@@ -25,7 +25,7 @@ class Info(object):
     """
 
     def canonizeRegions ( self, regions : Optional[dict] = None ) \
-            -> Union[None,dict]:
+            -> Optional[dict]:
         """ given a list of regions in globalInfo.txt in the
         regionMappings field,
         return a canonical version of that list: strings in
@@ -67,7 +67,7 @@ class Info(object):
             newregions[label] = regionDict
         return newregions
 
-    def __init__(self, path=None):
+    def __init__(self, path : Optional [ PathType ] = None ):
         """
         :param path: path to the .txt file
         """
@@ -181,7 +181,9 @@ class Info(object):
         import json
         self.cachedModels = {}
         dirp = os.path.dirname(self.path)        
-        for model_tuples in self.statModels.values():
+        for regionSetName, model_tuples in self.statModels.items():
+            assert regionSetName in self.regionSets, f"{regionSetName} is not in {self.regionSets}"
+            n_regionset = len( self.regionSets[regionSetName] )
             for model_tuple in model_tuples:
                 model_type, model = model_tuple
                 fullPath = os.path.join(dirp, model )
@@ -190,6 +192,12 @@ class Info(object):
                     if model_type == "sl":
                         with open(fullPath,"rt") as f:
                             txt = eval ( f.read() )
+                            n_rows = len(txt)
+                            if n_regionset != n_rows:
+                                raise SModelSError ( f"dimension({n_regionset}) of region set {regionSetName} does not match number of rows({n_rows}) of covariance matrix {model} in {self.path}" )
+                            n_cols = len(txt[0])
+                            if n_regionset != n_cols:
+                                raise SModelSError ( f"dimension({n_regionset}) of region set {regionSetName} does not match number of columns({n_columns}) of covariance matrix {model} in {self.path}" )
                     elif model_type in [ "full_pyhf", "pyhf" ]:
                         with open(fullPath,"rt") as f:
                             txt = json.load(f)
@@ -200,7 +208,7 @@ class Info(object):
                     self.cachedModels[model] = txt
                     f.close()
 
-    def dirName(self, up=0):
+    def dirName(self, up : int = 0 ) -> str:
         """ directory name of path. If up>0,
             we step up 'up' directory levels.
         """
@@ -211,7 +219,7 @@ class Info(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def addInfo(self, tag, value):
+    def addInfo(self, tag : str, value : str ):
         """
         Adds the info field labeled by tag with value value to the object.
 
@@ -227,12 +235,12 @@ class Info(object):
         except (SyntaxError,NameError,TypeError):
             setattr(self, tag, value)
 
-    def getInfo(self, infoLabel):
+    def getInfo(self, infoLabel : str ) -> bool | str:
         """
         Returns the value of info field.
 
-        :param infoLabel: label of the info field (string). It must be an attribute
-                          of the GlobalInfo object
+        :param infoLabel: label of the info field (string). 
+        It must be an attribute of the GlobalInfo object
         """
 
         if hasattr(self, infoLabel):

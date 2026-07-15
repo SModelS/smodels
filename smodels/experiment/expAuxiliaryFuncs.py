@@ -14,6 +14,7 @@ import unum
 import re
 import numpy as np
 import os
+from smodels.base.types import PathType
 
 try:
     from collections.abc import Iterable
@@ -553,7 +554,7 @@ def sortParticleList(ptcList):
     return newPtcList
 
 
-def cleanWalk ( topdir : os.PathLike ) -> list:
+def cleanWalk ( topdir : PathType ) -> list:
     """ perform os.walk, but ignore all hidden files and directories """
     import os
     ret = []

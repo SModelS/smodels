@@ -17,6 +17,7 @@ from smodels.statistics.basicStats import observed
 import numpy as np
 import unum
 from typing import Optional
+from smodels.base.types import PathType
 
 class SLHAPrinter(TxTPrinter):
     """
@@ -25,7 +26,7 @@ class SLHAPrinter(TxTPrinter):
     """
 
     def __init__( self, output : str ='file', 
-                  filename : Optional[os.PathLike] = None, 
+                  filename : Optional[PathType] = None, 
                   outputFormat : str = 'version3' ):
         """
         :param output: one of: file, stdout
@@ -40,7 +41,7 @@ class SLHAPrinter(TxTPrinter):
                               TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True, 
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be

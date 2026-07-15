@@ -21,6 +21,7 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
 from smodels.base.physicsUnits import fb
+from smodels.base.types import PathType
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from typing import Optional
@@ -42,7 +43,7 @@ def removeCruftOutputs( filename : str ):
 
 def checkPythonRequirements(
         allow_violations : bool = False,
-        requirements_path: os.PathLike = "../smodels/share/requirements.txt"):
+        requirements_path: PathType = "../smodels/share/requirements.txt"):
     """ Simple function to check if the Python requirements
       are met using importlib and packaging."""
     from pathlib import Path

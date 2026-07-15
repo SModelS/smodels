@@ -15,6 +15,7 @@ from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, cleanWalk
 from typing import Union, Optional, Set
+from smodels.base.types import PathType
 
 try:
     import cPickle as serializer
@@ -28,7 +29,7 @@ class ExpResult(object):
     experimental result (experimental conference note or publication).
     """
 
-    def __init__( self, path : Union[None,os.PathLike]=None, 
+    def __init__( self, path : Union[None,PathType]=None, 
                   databaseParticles=None):
         """
         :param path: Path to the experimental result folder, None means

@@ -29,6 +29,7 @@ import requests
 import tarfile
 from itertools import combinations
 from typing import Tuple
+from smodels.base.types import PathType
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
@@ -333,7 +334,7 @@ class XSecResummino(XSecBase):
             
         return 0
 
-    def extract_m1_m2_mu(self, file_path : os.PathLike ) -> dict:
+    def extract_m1_m2_mu(self, file_path : PathType ) -> dict:
         """
         function to extract the breaking term of the electrowikino part (SUSY) in
         an slha file.

@@ -27,6 +27,7 @@ from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
 from typing import List, Tuple, Union
+from smodels.base.types import PathType
 os.environ["OMP_NUM_THREADS"] = "2"
 
 scipyver = ""
@@ -51,7 +52,7 @@ except ImportError:
     import pickle as serializer
 
 
-def _getSHA1( filename : os.PathLike ) -> str:
+def _getSHA1( filename : PathType ) -> str:
     return hashlib.sha1(pathlib.Path(filename).read_bytes()).hexdigest()
 
 # some mechanism to remove lock files if the download got interrupted
@@ -166,7 +167,7 @@ class Database(object):
                         r1.datasets[idx].txnameList.append(txn)
         return r1
 
-    def createBinaryFile(self, filename : Union[None,os.PathLike] = None ):
+    def createBinaryFile(self, filename : Union[None,PathType] = None ):
         """ create a pcl file from all the subs """
         ## make sure we have a model to pickle with the database!
         logger.debug(f" * create {filename}")
@@ -608,7 +609,7 @@ class SubDatabase(object):
             # if we encounter a problem, we rebuild the database.
             return True
 
-    def createBinaryFile(self, filename : Union[None,os.PathLike] = None ):
+    def createBinaryFile(self, filename : Union[None,PathType] = None ):
         """ create a pcl file from the text database,
             potentially overwriting an old pcl file. """
         ## make sure we have a model to pickle with the database!
@@ -669,7 +670,7 @@ class SubDatabase(object):
         """
         return self.txt_meta.pathname
 
-    def lockFile ( self, filename : os.PathLike ) -> bool:
+    def lockFile ( self, filename : PathType ) -> bool:
         """ lock the file <filename>
         """
         lockfile = os.path.join ( os.path.dirname ( filename ),
@@ -700,7 +701,7 @@ class SubDatabase(object):
         fcntl.lockf( handle, fcntl.LOCK_EX)
         """
 
-    def unlockFile ( self, filename : os.PathLike ):
+    def unlockFile ( self, filename : PathType ):
         """ unlock the file <filename>
         """
         lockfile = os.path.join ( os.path.dirname ( filename ),

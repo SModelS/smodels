@@ -14,6 +14,7 @@ import sys
 import time
 from smodels.base.smodelsLogging import logger
 from typing import Optional
+from smodels.base.types import PathType
 
 class Meta(object):
     current_version = 221 ## the current format version
@@ -22,7 +23,7 @@ class Meta(object):
         database, like number of analyses, last time of modification, ...
         This info is needed to understand if we have to re-pickle. """
 
-    def __init__(self, pathname : os.PathLike, mtime : Optional[str]=None,
+    def __init__(self, pathname : PathType, mtime : Optional[str]=None,
             filecount : Optional[int] = None, hasFastLim : Optional[bool]=None,
             databaseVersion : Optional[str] = None,
             format_version : int = current_version,
@@ -114,7 +115,7 @@ class Meta(object):
         # (self.mtime,self.filecount) = self.lastModifiedSubDir ( self.pathname, lastm )
         # return self.mtime, self.filecount
 
-    def lastModifiedSubDir ( self, subdir : os.PathLike ):
+    def lastModifiedSubDir ( self, subdir : PathType ):
         """
         Return the last modified timestamp of subdir (working recursively)
         plus the number of files.

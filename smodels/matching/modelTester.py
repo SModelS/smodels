@@ -28,6 +28,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.tools import ioObjects
 from smodels.tools import coverage
 from typing import Optional, Union
+from smodels.base.types import PathType
 
 from collections import OrderedDict
 import os
@@ -39,7 +40,7 @@ except ImportError:
     from configparser import ConfigParser, NoSectionError, NoOptionError
 import logging
 
-def testPoint( inputFile : os.PathLike, outputDir : os.PathLike,
+def testPoint( inputFile : PathType, outputDir : os.PathLike,
         parser, database : Database ) -> dict:
     """
     Test model point defined in input file (running decomposition, check
@@ -236,9 +237,9 @@ def testPoint( inputFile : os.PathLike, outputDir : os.PathLike,
     return {os.path.basename(inputFile): masterPrinter}
 
 
-def runSingleFile(inputFile : os.PathLike, outputDir : os.PathLike,
+def runSingleFile(inputFile : PathType, outputDir : os.PathLike,
         parser, database : Database, timeout : int, development : bool,
-        parameterFile : os.PathLike) -> dict:
+        parameterFile : PathType) -> dict:
     """
     Call testPoint on inputFile, write crash report in case of problems
 
@@ -271,9 +272,9 @@ def runSingleFile(inputFile : os.PathLike, outputDir : os.PathLike,
     return {inputFile: None}
 
 
-def runSetOfFiles(inputFiles : list, outputDir : os.PathLike, parser,
+def runSetOfFiles(inputFiles : list, outputDir : PathType, parser,
         database : Database, timeout : int , development : bool,
-        parameterFile : os.PathLike, return_dict : dict ):
+        parameterFile : PathType, return_dict : dict ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -291,7 +292,7 @@ def runSetOfFiles(inputFiles : list, outputDir : os.PathLike, parser,
                           timeout, development, parameterFile)
         return_dict.update ( tmp )
 
-def _cleanList(fileList : list, inDir : os.PathLike) -> list:
+def _cleanList(fileList : list, inDir : PathType) -> list:
     """ clean up list of files """
     cleanedList = []
     for f in fileList:
@@ -321,9 +322,9 @@ def _determineNCPus(cpus_wanted : int, n_files : int ) -> int:
         ncpus = 1
     return ncpus
 
-def testPoints(fileList : list, inDir : os.PathLike, outputDir : os.PathLike,
+def testPoints(fileList : list, inDir : PathType, outputDir : os.PathLike,
         parser, database : Database, timeout : int,
-        development : bool, parameterFile : os.PathLike ):
+        development : bool, parameterFile : PathType ):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
     defined in parser
@@ -496,7 +497,7 @@ def loadDatabaseResults(parser, database : Database ):
                                  useNonValidated=useNonValidated)
 
 
-def getParameters(parameterFile : os.PathLike ):
+def getParameters(parameterFile : PathType ):
     """
     Read parameter file, exit in case of errors
 
@@ -542,7 +543,7 @@ def setExperimentalFeatures( featuresDict : dict ):
            flag = True
         runtime._experimental[feature]=flag
 
-def getAllInputFiles(inFile : os.PathLike ) -> tuple:
+def getAllInputFiles(inFile : PathType ) -> tuple:
     """
     Given inFile, return list of all input files
 

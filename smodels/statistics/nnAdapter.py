@@ -38,7 +38,7 @@ class NNAdapter:
         e.g. { "inter_op_num_threads": 1 }
         """
         assert type(mlModel) in [ bytes, str, onnx.ModelProto,os.PathLike],\
-            "mlModel needs to be one of: bytes, str, onnx.ModelProto, os.PathLike"
+            "mlModel needs to be one of: bytes, str, onnx.ModelProto, PathType"
         if type(mlModel) == str and mlModel.endswith ( "onnx") and \
                 os.path.exists ( mlModel ):
             self.mlModel = onnx.load ( mlModel )

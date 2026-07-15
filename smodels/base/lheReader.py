@@ -11,15 +11,15 @@ from smodels.base.physicsUnits import TeV, pb
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.smodelsLogging import logger
 import pyslha
-import os
 import io
 from typing import Union, Dict, Tuple
+from smodels.base.types import PathType
 
 class LheReader(object):
     """
     An instance of this class represents a reader for LHE files.
     """
-    def __init__( self, filename : Union[os.PathLike,io.FileIO],
+    def __init__( self, filename : Union[PathType,io.FileIO],
                   nmax : Union[int,None] = None ):
         """
         Constructor.

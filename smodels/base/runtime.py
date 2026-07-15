@@ -11,7 +11,7 @@
 """
 
 from typing import Union, Text, Dict
-import os
+from smodels.base.types import PathType
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
@@ -98,7 +98,7 @@ def printEnvironmentInfo( args : Dict ):
         print ( f"\ngit commit: {gitId}" )
     return depsMet
 
-def filetype ( filename : os.PathLike ) -> Union[Text,None]:
+def filetype ( filename : PathType ) -> Union[Text,None]:
     """ obtain information about the filetype of an input file,
         currently only used to discriminate between slha and lhe
         files.

@@ -18,6 +18,7 @@ from smodels.tools.printers.pythonPrinter import PyPrinter
 from xml.dom import minidom
 from xml.etree import ElementTree
 from typing import Optional
+from smodels.base.types import PathType
 
 class XmlPrinter(PyPrinter):
     """
@@ -25,7 +26,7 @@ class XmlPrinter(PyPrinter):
     """
 
     def __init__( self, output : str = 'stdout', 
-                  filename : Optional[os.PathLike]=None, 
+                  filename : Optional[PathType]=None, 
                   outputFormat : str = 'version3' ):
         """
         :param output: one of: file, stdout
@@ -37,7 +38,7 @@ class XmlPrinter(PyPrinter):
                               TheoryPrediction, Uncovered]
         self.toPrint = [None]*len(self.printingOrder)
 
-    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True, 
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be

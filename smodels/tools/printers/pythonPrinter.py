@@ -21,6 +21,7 @@ from collections import OrderedDict
 from typing import Optional
 import unum
 import time
+from smodels.base.types import PathType
 
 
 class PyPrinter(BasicPrinter):
@@ -29,7 +30,7 @@ class PyPrinter(BasicPrinter):
     """
 
     def __init__(self, output : str= 'stdout',
-            filename : Optional[os.PathLike]=None,
+            filename : Optional[PathType]=None,
             outputFormat : str = 'version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
         self.name = "py"
@@ -40,7 +41,7 @@ class PyPrinter(BasicPrinter):
         self.errorsforr = False
         self.toPrint = [None]*len(self.printingOrder)
 
-    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True, 
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
         """
         Set the basename for the python printer. The output filename will be

@@ -22,6 +22,7 @@ from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError \
          as SModelSError
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
+from smodels.base.types import PathType
 import pyslha
 try:
     import cStringIO as io
@@ -341,7 +342,7 @@ class XSecComputer(XSecBase):
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
 
     def addCommentToFile ( self, comment : Optional[str],
-                           slhaFile : os.PathLike ):
+                           slhaFile : PathType ):
         """ add the optional comment to file """
         if comment in [ None, "" ]:
             return
