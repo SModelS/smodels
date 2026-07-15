@@ -12,7 +12,7 @@ import sys
 import os
 from typing import Union, Tuple, Optional
 
-def installDirectory() -> str
+def installDirectory() -> str:
     """
     Return the software installation directory, by looking at location of this
     method.
