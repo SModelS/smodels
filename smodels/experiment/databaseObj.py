@@ -787,7 +787,10 @@ class SubDatabase(object):
         sha = _getSHA1(filename)
         testsha = r.json()["sha1"]
         if r2.status_code != 200:
-            logger.error(f"error: download reported {r2.status_code}: {r2.reason}.")
+            logger.error(f"error {r2.status_code}: {r2.reason}. Removing {filename} and aborting.")
+            pathlib.Path( filename ).unlink ( missing_ok = True )
+            sys.exit()
+
         if sha != testsha:
             logger.error(f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>")
             # sys.exit()
