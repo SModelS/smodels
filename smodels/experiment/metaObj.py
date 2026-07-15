@@ -13,6 +13,7 @@ import os
 import sys
 import time
 from smodels.base.smodelsLogging import logger
+from typing import Optional
 
 class Meta(object):
     current_version = 221 ## the current format version
@@ -21,9 +22,11 @@ class Meta(object):
         database, like number of analyses, last time of modification, ...
         This info is needed to understand if we have to re-pickle. """
 
-    def __init__(self, pathname, mtime=None, filecount=None,
-                   hasFastLim=None, databaseVersion=None, format_version=current_version,
-                   python=sys.version):
+    def __init__(self, pathname : os.PathLike, mtime : Optional[str]=None,
+            filecount : Optional[int] = None, hasFastLim : Optional[bool]=None,
+            databaseVersion : Optional[str] = None,
+            format_version : int = current_version,
+            python : str = sys.version ):
         """
         :param pathname: filename of pickle file, or dirname of text files
         :param mtime: last modification time stamps
@@ -43,7 +46,7 @@ class Meta(object):
         self.versionFromFile()
         self.determineLastModified()
 
-    def getPickleFileName ( self ):
+    def getPickleFileName ( self ) -> str:
         """ get canonical pickle file name """
         hfl=""
         if self.hasFastLim:
@@ -84,15 +87,16 @@ class Meta(object):
         ret += f", dbVersion={self.databaseVersion}"
         return ret
 
-    def isPickle ( self ):
+    def isPickle ( self ) -> bool:
         """ is this meta info from a pickle file? """
         if not os.path.isdir ( self.pathname ):
             return True
+        return False
 
-    def cTime ( self ):
+    def cTime ( self ) -> str:
         return time.ctime ( self.mtime )
 
-    def determineLastModified ( self, force=False ):
+    def determineLastModified ( self, force : bool = False ):
         """ compute the last modified timestamp, plus count
             number of files. Only if text db """
         if self.isPickle():
@@ -110,7 +114,7 @@ class Meta(object):
         # (self.mtime,self.filecount) = self.lastModifiedSubDir ( self.pathname, lastm )
         # return self.mtime, self.filecount
 
-    def lastModifiedSubDir ( self, subdir ):
+    def lastModifiedSubDir ( self, subdir : os.PathLike ):
         """
         Return the last modified timestamp of subdir (working recursively)
         plus the number of files.
@@ -122,7 +126,8 @@ class Meta(object):
         #ret = lastm
         #ctr=0
         for f in os.listdir ( subdir ):
-            if f in [ "orig", "sms.root", "validation", ".git", "exclusion_lines.json" ]:
+            if f in [ "orig", "sms.root", "validation", ".git",
+                      "exclusion_lines.json" ]:
                 continue
             if f[-1:]=="~":
                 continue
@@ -145,10 +150,10 @@ class Meta(object):
                 if tmp > self.mtime:
                     self.mtime = tmp
                 #    ret = tmp
-                
+
         #return (ret,ctr)
 
-    def sameAs ( self, other ):
+    def sameAs ( self, other ) -> bool:
         """ check if it is the same database version """
         if type(self) != type(other):
             return False
@@ -179,7 +184,7 @@ class Meta(object):
             return False
         return True
 
-    def needsUpdate ( self, current ):
+    def needsUpdate ( self, current : Meta ) -> bool:
         """ do we need an update, with respect to <current>.
             so <current> is the text database, <self> the pcl.
         """
