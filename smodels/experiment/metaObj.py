@@ -184,7 +184,7 @@ class Meta(object):
             return False
         return True
 
-    def needsUpdate ( self, current : Meta ) -> bool:
+    def needsUpdate ( self, current ) -> bool:
         """ do we need an update, with respect to <current>.
             so <current> is the text database, <self> the pcl.
         """
