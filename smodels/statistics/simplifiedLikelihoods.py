@@ -970,22 +970,19 @@ class SLUpperLimitComputer:
     debug_mode = False
 
     def __init__( self, 
-            likelihoodComputer : Optional[SLLikelihoodComputer] = None, 
-            data : Optional[SLData] = None, cl: float = 0.95 ):
+            llhdComputer_or_data : Optional[SLLikelihoodComputer,SLData],
+            cl: float = 0.95 ):
 
         """
-        :param likelihoodComputer: supply
+        :param llhdComputer_or_data: an SLLikelihoodComputer or SLData
         :param cl: desired quantile for limits
         """
-        assert likelihoodComputer is None or data is None, \
-            "both a likelihoodComputer and data are specified, pls specify only one"
-        assert likelihoodComputer is not None or data is not None, \
-            "neither a likelihoodComputer and data are specified, pls specify one and one only"
-        if likelihoodComputer == None:
-            likelihoodComputer = SLLikelihoodComputer ( data )
-        self.likelihoodComputer = likelihoodComputer
+        if type(llhdComputer_or_data) == SLData:
+            data = llhdComputer_or_data
+            llhdComputer_or_data = SLLikelihoodComputer ( data )
+        self.likelihoodComputer = llhdComputer_or_data
         self.cl = cl
-        self.name = likelihoodComputer.model.name
+        self.name = self.likelihoodComputer.model.name
         self.allowNegativeSignals = False
         self.dataType = "SL"
 
