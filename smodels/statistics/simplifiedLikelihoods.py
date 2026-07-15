@@ -970,7 +970,7 @@ class SLUpperLimitComputer:
     debug_mode = False
 
     def __init__( self, 
-            llhdComputer_or_data : Optional[SLLikelihoodComputer,SLData],
+            llhdComputer_or_data : SLLikelihoodComputer | SLData,
             cl: float = 0.95 ):
 
         """
