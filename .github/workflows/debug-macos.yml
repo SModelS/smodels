@@ -2,6 +2,7 @@ name: Interactive macOS-14 Shell
 
 on:
   workflow_dispatch:
+    branches: [ develop ]
 
 jobs:
   debug:
