@@ -48,9 +48,10 @@ if scipyver not in ["1.8.", "1.9.", "1.10.", "2.0.", "2.1."]:
 
 try:
     import cPickle as serializer
+    from cPickle import UnpicklingError
 except ImportError:
     import pickle as serializer
-
+    from pickle import UnpicklingError
 
 def _getSHA1( filename : PathType ) -> str:
     return hashlib.sha1(pathlib.Path(filename).read_bytes()).hexdigest()
@@ -550,7 +551,11 @@ class SubDatabase(object):
             with open(self.pcl_meta.pathname, "rb") as f:
                 t0 = time.time()
                 pclfilename = self.pcl_meta.pathname
-                self.pcl_meta = serializer.load(f)
+                try:
+                    self.pcl_meta = serializer.load(f)
+                except UnpicklingError as e:
+                    raise SModelSError ( f"could not unpickle {self.pcl_meta.pathname}. Maybe delete it and try again." )
+
                 self.pcl_meta.pathname = pclfilename
                 if self.force_load == "pcl":
                     self.txt_meta = self.pcl_meta
@@ -781,6 +786,8 @@ class SubDatabase(object):
             dump.close()
         sha = _getSHA1(filename)
         testsha = r.json()["sha1"]
+        if r2.status_code != 200:
+            logger.error(f"error: download reported {r2.status_code}: {r2.reason}.")
         if sha != testsha:
             logger.error(f"error: downloaded file has different checksum {sha}!={testsha}. This should not happen. Contact the smodels-developers <smodels-developers@lists.oeaw.ac.at>")
             # sys.exit()
