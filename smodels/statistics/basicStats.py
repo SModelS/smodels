@@ -239,6 +239,10 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float,
     else:
         root = optimize.brentq( func, lower_bound, upper_bound, args=args,
                                 rtol=rtol, xtol=xtol )
+    try:
+        return float(root)
+    except Exception:
+        pass
     return root
 
 def determineBrentBracket( mu_hat : float, sigma_mu : float ,
