@@ -97,9 +97,19 @@ class SpeyModelFacade:
         # optimiser_arguments = { "method": "SLSQP" }
         optimiser_arguments = { "method": "L-BFGS-B" }
         optimiser_arguments.update ( kwargs )
-        ret = self.speyModel.poi_upper_limit ( expected = exp,
-               expected_pvalue = expected_pvalue,
-               optimiser_arguments = optimiser_arguments )
+        import contextlib
+        import io
+        with contextlib.redirect_stdout(io.StringIO()):
+            ## silence the spey warnings here
+            ret = self.speyModel.poi_upper_limit ( expected = exp,
+                   expected_pvalue = expected_pvalue,
+                   optimiser_arguments = optimiser_arguments )
+        if ret == float("inf"):
+            ## if we get nonsense, we try with their default method!
+            optimiser_arguments.pop ( "method" )
+            ret = self.speyModel.poi_upper_limit ( expected = exp,
+                   expected_pvalue = expected_pvalue,
+                   optimiser_arguments = optimiser_arguments )
         if nSigma == 0:
             ret = float ( ret )
         elif nSigma == 1:
@@ -112,10 +122,11 @@ class SpeyModelFacade:
 class SpeyRetriever:
     """ simple class that retrieves and constructs the sub computers
     using the Spey interface."""
-    
+
 
     @classmethod
-    def forMultiBinSL(cls, regionSet: str, dataset : CombinedDataSet, nsigDict : dict,
+    def forMultiBinSL(cls, regionSet: str, dataset : CombinedDataSet,
+            nsigDict : dict,
             deltas_rel : Optional[float] = 0.0 ) -> SpeyModelFacade:
         """ get a subcomputer for simplified likelihood sr-combination.
 
@@ -130,7 +141,6 @@ class SpeyRetriever:
 
         :returns: a subcomputer
         """
-
         import spey
         covs = dataset.globalInfo.cachedModels
         lumi = float ( dataset.getLumi().asNumber(1./fb) )
@@ -256,7 +266,7 @@ class SpeyRetriever:
 
         logger.error ("speyTools backend to NN is not implemented yet!" )
         raise SModelSError ("speyTools backend to NN is not implemented yet!" )
-    
+
         # globalInfo = dataset.globalInfo
         # labelToONNX = {}
         # regionMappings = globalInfo.regionMappings
