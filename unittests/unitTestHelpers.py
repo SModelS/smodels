@@ -41,11 +41,15 @@ def removeCruftOutputs( filename : str ):
         if os.path.exists(fname):
             os.remove(fname)
 
+this_dir = os.path.dirname(__file__)
+
 def checkPythonRequirements(
         allow_violations : bool = False,
-        requirements_path: PathType = "../smodels/share/requirements.txt"):
+        requirements_path: PathType = \
+        f"{this_dir}/../smodels/share/requirements.txt"):
     """ Simple function to check if the Python requirements
       are met using importlib and packaging."""
+    requirements_path = os.path.abspath ( requirements_path )
     from pathlib import Path
     from importlib.metadata import version, PackageNotFoundError
     from packaging.requirements import Requirement
