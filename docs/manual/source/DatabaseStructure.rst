@@ -117,7 +117,7 @@ likelihoods (both v1 and v2), ``pyhf``, ``full_pyhf`` (for the full stastical py
 models in case there is also a simplified version),  and ``onnx`` for machine learned
 surrogate models. By default, for each region set, SModelS uses the first
 model given in the list.
-When combining regions, SModelS computes results for the most sensitive combination of regions (i.e. the most sensitive ``regionSets``).
+When combining regions, SModelS computes results for the most sensitive combination of regions (i.e. the most sensitive ``regionSets``), even when the parameters file has ``reportAllSRs = True``.
 If a SR does not appear in any region set and is more sensitive than each of them, its results are used instead.
 
 Some shorthand notations are possible. For example, in the 
