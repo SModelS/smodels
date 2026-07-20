@@ -732,8 +732,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             expResults = dataSetResults[0]
         else:
             if combinedResults: # Include combination
-                combinedRes = _getCombinedResultFor(dataSetResults,
-                                                expResult)
+                combinedRes = _getCombinedResultFor(dataSetResults, expResult)
                 if combinedRes is not None:
                     dataSetResults.append(TheoryPredictionList([combinedRes]))
             if not useBestDataset: #  Report all datasets
@@ -743,19 +742,64 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 bestRes = _getBestResult(dataSetResults)
                 if bestRes is not None:
                     expResults.append(bestRes) # Best result = combination if available
+        
+        # A SR not entering any combination can be the most sensitive result
+        if len(expResults) == 1 and isinstance(expResults[0].dataset, CombinedDataSet): # We only have 1 result, and it is a combined result
+            bestPred = expResults[0]
+            bestExpectedR = bestPred.getRValue(evaluationType=apriori)
+            bestXsec = bestPred.xsection
+            if bestExpectedR is None:
+                bestExpectedR = 0.0
+                bestXsec = 0.0*fb
+            
+            for predList in dataSetResults:
+                for tpred in predList:
+                    dataset = tpred.dataset
+                    if isinstance(dataset, CombinedDataSet): continue # It is the combined dataset, don't compare it to itself
+                    regionType = regionTypeOf(dataset)
+                    if regionType == 'SR': # Only a SR can be the best SR
+                        # We are interested in SR that are not combined -> Check if it is the case
+                        isCombinedWith = []
+                        assert hasattr ( dataset, "dataInfo" ), "why does the dataset here not have a dataInfo?"
+                        dataId = dataset.getID()
+                        if hasattr ( expResult.globalInfo, "regionMappings" ) and not hasattr ( expResult.globalInfo, "regionSets" ):
+                            raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
+                        for regionSetName in expResult.globalInfo.statModels.keys():
+                            regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
+                            for region in regionList:
+                                if hasattr ( expResult.globalInfo, "regionMappings" ):
+                                    regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+                                    if dataId == regionDict['smodels']:
+                                        for reg in regionList:
+                                            regDict = expResult.globalInfo.regionMappings[reg ]
+                                            isCombinedWith.append(regDict['smodels'])
+                                elif dataId == region:
+                                    isCombinedWith += regionList
+                        
+                        if isCombinedWith: # The region belongs to a combination set? Yes: check if it is really combined; No: all good, can be a bestSR candidate
+                            isCombinedWith = set(isCombinedWith)
+                            isCombinedWith.remove(dataId)
 
+                            # Do not consider the region only if it exists a combined result with it, i.e. if other regions among its combination set have a result
+                            datasetResultsId = [tp.dataset.getID() for tpList in dataSetResults for tp in tpList]
+                            if any([True if region in datasetResultsId else False for region in isCombinedWith]):
+                                continue
+                            
+                        xsec = tpred.xsection
+                        expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
+                        if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
+                            bestExpectedR = expectedR
+                            bestXsec = xsec
+                            bestPred = tpred
+
+            expResults = TheoryPredictionList([bestPred])
+            
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            srType = 'SR' # By default assume it is a SR
-            # Check if SR corresponds to a CR or VR, in which case we do not report the upper limit
-            if hasattr(expResult.globalInfo, "regionMappings"):
-                assert type ( expResult.globalInfo.regionMappings) == dict, f"{expResult.globalInfo.id} regionMappings are not a dict"
-                srType = expResult.globalInfo.regionMappings.get(theoPred.dataId(),None)
-                if srType is not None:
-                    srType = srType["type"]
-                
-            if srType == "SR":
+            # Check if region corresponds to a CR or VR, in which case we do not report the upper limit
+            regionType = regionTypeOf(theoPred.dataset)
+            if regionType == "SR":
                 theoPred.upperLimit = theoPred.getUpperLimit()
             else:
                 theoPred.upperLimit = None
@@ -770,9 +814,36 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
     tpList.sortTheoryPredictions()
 
     return tpList
+    
+def regionTypeOf ( region ) -> Union[None,bool]:
+    """
+    A quality of life function to know the type of a dataset (SR, CR or VR).
+    :region: an efficiency-map-type dataset.
+    :returns: the corresponding value given to regionMappings,
+              'SR' if there is no regionMappings, or if it is a combined dataset,
+              'CR' if the region is tagged as such in its corresponding regionMappings,
+              and None if the region is not an EM-type dataset or if the globalInfo as a regionMappings but it does not include the region.
+    """
+    if isinstance(region,CombinedDataSet): return 'SR' # Combined dataset is considered as 'SR'
+    if region.dataInfo.dataType != 'efficiencyMap': return None # Dataset is not efficiency-map-type
+    regType = 'SR' # By default we assume it is a SR
+    globalInfo = region.globalInfo
+    
+    if hasattr(globalInfo,"regionMappings"):
+        assert type ( globalInfo.regionMappings) == dict, f"{expResult.globalInfo.id} regionMappings are not a dict"
+        regionDict = globalInfo.regionMappings.get(region.dataInfo.dataId, None)
+        if regionDict is None:
+            logger.warning ( f"Cannot evaluate the type of {region} from {globalInfo.id}, it is not listed in the regionMappings dict!" )
+            return None
+        regionType = regionDict.get("type", None)
+        if regionType is None:
+            logger.warning ( f"No type found in the regionMappings dict of {globalInfo.id} for {region}" )
+        
+    return regionType
 
 def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
-    """ is a given dataset mentioned in the combination?
+    """
+    Is a given dataset mentioned in the combination?
     we are allowing datasets in an expResult that is not mentioned
     in the combination of that result.
     :returns: true if its in, false if it is not in, None if there is no combination
@@ -780,16 +851,18 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
     assert hasattr ( dataset, "dataInfo" ), \
         "why does the dataset here not have a dataInfo?"
     dataId = dataset.getID()
-    if not hasattr ( expResult.globalInfo, "regionMappings" ):
-        return False
-    if not hasattr ( expResult.globalInfo, "regionSets" ):
+    if hasattr ( expResult.globalInfo, "regionMappings" ) and not hasattr ( expResult.globalInfo, "regionSets" ):
         raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
     
     for regionSetName in expResult.globalInfo.statModels.keys():
         regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
         for region in regionList:
-            regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
-            if dataId == regionDict['smodels']:
+            if hasattr ( expResult.globalInfo, "regionMappings" ):
+                regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+                name = regionDict['smodels']
+            else:
+                name = region
+            if dataId == name:
                 return True
     return False
 
@@ -817,12 +890,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
     globalInfo = expResult.globalInfo
     for predList in dataSetResults:
         for tpred in predList:
-            dataId = tpred.dataId()
-            regionTypeDict[dataId] = 'SR'
-            if hasattr ( globalInfo, "regionMappings" ):
-                    for regionDict in globalInfo.regionMappings.values():
-                        if dataId == regionDict['smodels']:
-                            regionTypeDict[dataId] = regionDict['type']
+            regionTypeDict[tpred.dataId()] = regionTypeOf(tpred.dataset)
     
     if all(regionType != 'SR' for regionType in regionTypeDict.values()):
         return None
@@ -902,19 +970,8 @@ def _getBestResult(dataSetResults):
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
-        dataset = predList[0].dataset
-        globalInfo = dataset.globalInfo
-
-        # Only a SR can be the best SR
-        if hasattr(globalInfo,"regionMappings"):
-            regionType = "SR" # Assume it is a SR by default
-            for regionDict in globalInfo.regionMappings.values():
-                if dataset.dataInfo.dataId == regionDict["smodels"]:
-                    regionType = regionDict["type"]
             
-            if regionType != "SR":
-                continue
-
+        dataset = predList[0].dataset
         if dataset.getType() != "efficiencyMap":
             txt = (
                 "Multiple data sets should only exist for efficiency map results, but we have them for %s?"
@@ -922,6 +979,11 @@ def _getBestResult(dataSetResults):
             )
             logger.error(txt)
             raise SModelSError(txt)
+            
+        regionType = regionTypeOf(dataset)
+        if regionType != "SR":
+            continue
+        
         pred = predList[0]
         xsec = pred.xsection
         expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
@@ -931,7 +993,6 @@ def _getBestResult(dataSetResults):
             bestXsec = xsec
 
     return bestPred
-
 
 def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
                            deltas_rel=None):
