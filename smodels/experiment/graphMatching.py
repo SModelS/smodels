@@ -28,13 +28,15 @@ def getCycle(G):
     
     visited=set()    
     stack = []
+    stack_set = set()
     
     def dfs_visit(u):
 
         # Add u to the current stack of visited nodes
-        stack.append(u)                         
+        stack.append(u)
+        stack_set.add(u)
         for v in G[u]:
-            if v in stack: # A cycle has been found with a path starting and ending in v                
+            if v in stack_set: # A cycle has been found with a path starting and ending in v                
                 stack.append(v) # Include v at the end of the stack
                 return True
             if v in visited:
@@ -43,7 +45,8 @@ def getCycle(G):
             if cycleFound:
                 return True
         visited.add(u)
-        stack.remove(u)
+        stack.pop()
+        stack_set.discard(u)
         return False    
                                  
     for u in G:

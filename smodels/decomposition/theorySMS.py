@@ -153,12 +153,12 @@ class TheorySMS(GenericSMS):
         newSMS._sorted = self._sorted
         newSMS.ancestors = self.ancestors[:]
         newSMS.smsID = self.smsID
-        newSMS.coveredBy = set(list(self.coveredBy)[:])
-        newSMS.testedBy = set(list(self.testedBy)[:])
+        newSMS.coveredBy = self.coveredBy.copy()
+        newSMS.testedBy = self.testedBy.copy()
 
         # Set nodes:
         if not emptyNodes:
-            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            nodesObjDict = {n : self._nodesMapping[n] for n in self._successors}
             newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS

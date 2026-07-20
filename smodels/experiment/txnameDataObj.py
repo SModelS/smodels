@@ -294,12 +294,9 @@ class TxNameData(object):
 
     def countNonZeros(self, mp):
         """ count the nonzeros in a vector """
-        nz = 0
         lim = 10**-4
-        for i in mp:
-            if abs(i) > lim:
-                nz += 1
-        return nz
+        arr = np.asarray(mp)
+        return int(np.count_nonzero(np.abs(arr) > lim))
 
     def onlyZeroValues(self):
         """ check if the map is zeroes only """

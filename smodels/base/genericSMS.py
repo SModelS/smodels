@@ -120,7 +120,7 @@ class GenericSMS(object):
             if not self._successors:
                 nodeIndex = 0
             else:
-                nodeIndex = max(self.nodeIndices)+1
+                nodeIndex = max(self._successors)+1
         elif nodeIndex in self._successors:
             raise SModelSError("Trying to add a node with a nodeIndex already in the tree.")
         self._successors[nodeIndex] = []
@@ -161,8 +161,7 @@ class GenericSMS(object):
         for nodeA, daughtersA in self._successors.items():
             if nodeIndex not in daughtersA:
                 continue
-            daughtersA = [d for d in daughtersA[:] if d != nodeIndex]
-            self._successors[nodeA] = daughtersA[:]
+            self._successors[nodeA] = [d for d in daughtersA if d != nodeIndex]
 
         if nodeIndex in self._predecessors:
             self._predecessors.pop(nodeIndex)
@@ -279,7 +278,7 @@ class GenericSMS(object):
 
         daughters = self._successors[nodeIndex]
         if ignoreInclusiveNodes:
-            daughters = [d for d in daughters[:]
+            daughters = [d for d in daughters
                          if not self.indexToNode(d).isInclusive]
 
         return daughters
@@ -336,7 +335,7 @@ class GenericSMS(object):
 
         # Set nodes:
         if not emptyNodes:
-            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            nodesObjDict = {n : self._nodesMapping[n] for n in self._successors}
             newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS
@@ -435,7 +434,7 @@ class GenericSMS(object):
         """
 
         edgesList = []
-        for n in self.nodeIndices:
+        for n in self._successors:
             edgesList += list(product([n],self.daughterIndices(n)))
 
         return edgesList
@@ -543,10 +542,10 @@ class GenericSMS(object):
         :return: Number of outgoing edges (int)
         """
 
-        if nodeIndex not in self.nodeIndices:
+        if nodeIndex not in self._successors:
             return 0
         else:
-            return len(self.daughterIndices(nodeIndex))
+            return len(self._successors[nodeIndex])
 
     def in_degree(self, nodeIndex):
         """
@@ -572,7 +571,7 @@ class GenericSMS(object):
         :return: Number of nodes (int)
         """
 
-        return len(self.nodeIndices)
+        return len(self._successors)
 
     def genIndexIterator(self, nodeIndex=None,
                          includeLeaves=False, ignoreInclusiveNodes=False):
@@ -606,7 +605,7 @@ class GenericSMS(object):
             for pair in generation:
                 mom, daughters = pair
                 for new_mom in daughters:
-                    if new_mom not in self.nodeIndices:
+                    if new_mom not in self._successors:
                         continue
                     new_daughters = self.daughterIndices(new_mom,ignoreInclusiveNodes)
 
@@ -676,11 +675,12 @@ class GenericSMS(object):
 
         # Re-number nodes according to their order
         if numberNodes:
-            indexDict = {n : orderedList.index(n) for n in self.nodeIndices}
+            orderedRank = {n: i for i, n in enumerate(orderedList)}
+            indexDict = {n : orderedRank[n] for n in self._successors}
             self.relabelNodeIndices(nodeIndexDict=indexDict)
         else:
             # Define dummy dict
-            indexDict = {n : n for n in self.nodeIndices}
+            indexDict = {n : n for n in self._successors}
 
         return indexDict
 
@@ -700,12 +700,14 @@ class GenericSMS(object):
             if nodeIndex not in sortList:
                 sortList.append(nodeIndex)
 
-        sortedIndices = sorted(indices, key = lambda n: sortList.index(n))
+        # Build rank dict for O(1) lookups instead of O(n) list.index()
+        rankDict = {n: i for i, n in enumerate(sortList)}
+        sortedIndices = sorted(indices, key = lambda n: rankDict[n])
         # Go over sorted indices and create new successors dict
         for nodeIndex in sortedIndices:
             daughters = self.daughterIndices(nodeIndex)
             # Sort daughters according to the list
-            sortedDaughters = sorted(daughters, key = lambda n: sortList.index(n))
+            sortedDaughters = sorted(daughters, key = lambda n: rankDict[n])
             newSuccessors[nodeIndex] = sortedDaughters[:]
         self._successors = newSuccessors
 
@@ -898,7 +900,7 @@ class GenericSMS(object):
         self._nodeCanonNames = {nodeIndex : cName for nodeIndex,cName
                                 in other._nodeCanonNames.items()}
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
-                             in self._finalStates.items()}
+                             in other._finalStates.items()}
 
     def treeToString(self, 
                      removeIndicesFrom='stable'):
@@ -923,7 +925,7 @@ class GenericSMS(object):
             raise SModelSError(f"removeIndicesFrom = {removeIndicesFrom} value not accepted for treeToString")
         rmFrom = removeIndicesFrom
         
-        smsStr = ""
+        smsParts = []
         rootIndex = self.rootIndex
         for momIndex, daughterIndices in self.genIndexIterator(rootIndex):
 
@@ -931,35 +933,37 @@ class GenericSMS(object):
             mom = self.indexToNode(momIndex)
             daughters = self.indexToNode(daughterIndices)
             if momIndex == rootIndex: # Always remove from PV
-                smsStr += f'({mom} > '
+                smsParts.append(f'({mom} > ')
             elif rmFrom is not None:
                 if rmFrom == 'all':
-                    smsStr += f'({mom} > '
+                    smsParts.append(f'({mom} > ')
                 elif rmFrom == 'SM' and mom.isSM:
-                    smsStr += f'({mom} > '
+                    smsParts.append(f'({mom} > ')
                 elif rmFrom == 'stable' and self.out_degree(momIndex) == 0:
-                    smsStr += f'({mom} > '
+                    smsParts.append(f'({mom} > ')
                 else: # Add index
-                    smsStr += '(%s(%i) > ' % (mom, momIndex)
+                    smsParts.append('(%s(%i) > ' % (mom, momIndex))
             else: # If None, always add index
-                smsStr += '(%s(%i) > ' % (mom, momIndex)
+                smsParts.append('(%s(%i) > ' % (mom, momIndex))
 
             # Add daughters
             for iD, d in enumerate(daughters):
                 dIndex = daughterIndices[iD]
                 if rmFrom is not None:
                     if rmFrom == 'all':
-                        smsStr += f'{d},'
+                        smsParts.append(f'{d},')
                     elif rmFrom == 'SM' and d.isSM:
-                        smsStr += f'{d},'
+                        smsParts.append(f'{d},')
                     elif rmFrom == 'stable' and self.out_degree(dIndex) == 0:
-                        smsStr += f'{d},'
+                        smsParts.append(f'{d},')
                     else: # Add index
-                        smsStr += '%s(%i),' % (d, dIndex)
+                        smsParts.append('%s(%i),' % (d, dIndex))
                 else: # If None, always add index
-                    smsStr += '%s(%i),' % (d, dIndex)
-            smsStr = smsStr[:-1] + '), '
-        smsStr = smsStr[:-2]
+                    smsParts.append('%s(%i),' % (d, dIndex))
+            smsParts[-1] = smsParts[-1][:-1] + '), '
+        smsStr = ''.join(smsParts)
+        if smsStr.endswith(', '):
+            smsStr = smsStr[:-2]
 
         return smsStr
 
@@ -1052,7 +1056,7 @@ class GenericSMS(object):
                               and new indices as values
         """
 
-        if any(nodeIndex not in nodeIndexDict for nodeIndex in self.nodeIndices):
+        if any(nodeIndex not in nodeIndexDict for nodeIndex in self._successors):
             raise SModelSError("Dictionary for relabelling nodes must contain all node indices")
 
         newMapping = {}
@@ -1108,16 +1112,16 @@ class GenericSMS(object):
         """
 
         malformedTree = False
-        if len(self.nodeIndices) > 1:
+        if len(self._successors) > 1:
             rootIndex = self.rootIndex
 
             # Check if root has no parents and at least one daughter
             if self.in_degree(rootIndex) != 0 or self.out_degree(rootIndex) == 0:
                 malformedTree = True
 
-            nNodes = len(self.nodeIndices)
+            nNodes = len(self._successors)
             # Check if all nodes (except root) have a unique parent
-            if any(self.in_degree(nodeIndex) != 1 for nodeIndex in self.nodeIndices
+            if any(self.in_degree(nodeIndex) != 1 for nodeIndex in self._successors
                    if nodeIndex != rootIndex):
                 malformedTree = True
 

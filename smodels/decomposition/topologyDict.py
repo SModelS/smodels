@@ -50,8 +50,6 @@ class TopologyDict(OrderedDict):
                 else:
                     smsList.insert(index, newSMS)
 
-                self[canonName] = smsList[:]
-
             return True
         else:
             return False

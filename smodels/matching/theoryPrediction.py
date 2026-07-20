@@ -110,12 +110,16 @@ class TheoryPrediction(object):
         xsection = 0*fb
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname)
+        # Pre-group SMS by txname for efficiency
+        smsByTx = {}
+        for sms in self.smsList:
+            tx = sms.txname
+            if tx not in smsByTx:
+                smsByTx[tx] = []
+            smsByTx[tx].append(sms)
         for tx in self.txnames:
-            # Filter the SMS
-            smsList = [sms for sms in self.smsList
-                        if sms.txname is tx]
             # Build dictionary needed for evaluation:
-            xsection += tx.evalConstraintFor(smsList)
+            xsection += tx.evalConstraintFor(smsByTx.get(tx, []))
 
         self.xsection = xsection
 
@@ -125,11 +129,15 @@ class TheoryPrediction(object):
         # (for an UL result there will be a single txname
         # and for EM results there should be no conditions)
         allConditions = []
+        # Pre-group SMS by txname for efficiency
+        smsByTx = {}
+        for sms in self.smsList:
+            tx = sms.txname
+            if tx not in smsByTx:
+                smsByTx[tx] = []
+            smsByTx[tx].append(sms)
         for tx in self.txnames:
-            # Filter the SMS
-            smsList = [sms for sms in self.smsList
-                        if sms.txname is tx]
-            cond = tx.evalConditionsFor(smsList)
+            cond = tx.evalConditionsFor(smsByTx.get(tx, []))
             if cond is None:
                 continue
             allConditions += cond

@@ -80,7 +80,7 @@ class ExpSMS(GenericSMS):
         for particle in allParticles:
             # If the particle has a node assigned, store it
             if '(' in particle and ')' in particle:  # Particles should always have a unique numbering
-                nodeIndex = eval(particle.split('(')[1].split(')')[0])
+                nodeIndex = int(particle.split('(')[1].split(')')[0])
             elif particle == 'PV':
                 nodeIndex = 0  # PV is always node zero
             else:
@@ -376,7 +376,7 @@ class ExpSMS(GenericSMS):
 
         newSMS = ExpSMS()
         if not emptyNodes:
-            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            nodesObjDict = {n : self._nodesMapping[n] for n in self._successors}
             newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS

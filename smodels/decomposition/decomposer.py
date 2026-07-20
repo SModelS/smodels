@@ -177,7 +177,7 @@ def addOneStepDecays(sms, sigmacutFB=0.0):
     smsList = [sms]
     # Get all (current) final states which are the mothers
     # of the decays to be added:
-    motherIndices = [n for n in sms.nodeIndices if sms.out_degree(n) == 0]
+    motherIndices = [n for n in sms._successors if sms.out_degree(n) == 0]
     mothers = sms.indexToNode(motherIndices)
     for motherIndex,mom in zip(motherIndices,mothers):
         # Check if mom should decay:
@@ -246,7 +246,7 @@ def cascadeDecay(tree, sigmacutFB=0.0):
         for T in treeList:
             newT = addOneStepDecays(T, sigmacutFB)
             if not newT:
-                finalNodes = [n for n in T.nodeIndices if T.out_degree(n) == 0]
+                finalNodes = [n for n in T._successors if T.out_degree(n) == 0]
                 # Make sure all the final states have decayed
                 # (newT can be empty if there is no allowed decay above sigmacutFB)
                 if any(T.indexToNode(fn).isFinalState is False for fn in finalNodes):

@@ -44,6 +44,20 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
+    # Compiled code objects are not picklable; exclude them from serialization.
+    _nonPicklable = {'_constraintCode', '_conditionsCode'}
+
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items()
+                if k not in self._nonPicklable}
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Ensure transient attributes exist (will be lazily compiled)
+        for attr in self._nonPicklable:
+            if not hasattr(self, attr):
+                setattr(self, attr, None)
+
     def __init__(self, path=None, globalObj=None, infoObj=None,
                  databaseParticles=None):
         self.path = path
@@ -57,7 +71,9 @@ class TxName(object):
         self._arrayToNodeDict = None
         self.smsMap = {}  # Stores the SMS and their label representaion
         self._constraintFunc = None
+        self._constraintCode = None
         self._conditionsList = []
+        self._conditionsCode = []
         self.finalState = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
@@ -124,6 +140,7 @@ class TxName(object):
                                                databaseParticles,
                                                checkUnique=True)
             self._constraintFunc = exprFunc
+            self._constraintCode = compile(exprFunc, '<constraint>', 'eval')
             self.smsMap = smsMap
 
         # Process conditions, simplify it so it can be easily evaluated and
@@ -133,10 +150,13 @@ class TxName(object):
             if not isinstance(conds, list):
                 conds = [conds]
             conditionsList = []
+            conditionsCode = []
             for cond in conds:
                 exprFunc, smsMap = self.processExpr(cond, databaseParticles)
                 conditionsList.append({exprFunc: smsMap})
+                conditionsCode.append({compile(exprFunc, '<condition>', 'eval'): smsMap})
             self._conditionsList = conditionsList
+            self._conditionsCode = conditionsCode
 
         # Do consistency checks:
         self.checkConsistency()
@@ -396,6 +416,10 @@ class TxName(object):
         if not self._constraintFunc:
             return None
 
+        # Lazily compile the constraint expression if not already done
+        if not hasattr(self, '_constraintCode') or self._constraintCode is None:
+            self._constraintCode = compile(self._constraintFunc, '<constraint>', 'eval')
+
         # Build dictionary with SMS and functions
         # required for evaluating the constraint expression
         localsDict = {"Cgtr": cGtr, "cGtr": cGtr, "cSim": cSim, "Csim": cSim}
@@ -405,7 +429,7 @@ class TxName(object):
         for sms in smsList:
             localsDict[sms.txlabel] += sms.weight
 
-        return eval(self._constraintFunc, localsDict, {})
+        return eval(self._constraintCode, localsDict, {})
 
     def evalConditionsFor(self, smsList):
         """
@@ -422,9 +446,17 @@ class TxName(object):
         if not self._conditionsList:
             return None
 
+        # Lazily compile condition expressions if not already done
+        if not hasattr(self, '_conditionsCode') or not self._conditionsCode:
+            self._conditionsCode = []
+            for cond in self._conditionsList:
+                condExpr = list(cond.keys())[0]
+                smsMap = list(cond.values())[0]
+                self._conditionsCode.append({compile(condExpr, '<condition>', 'eval'): smsMap})
+
         conditions = []
-        for cond in self._conditionsList:
-            condExpr = list(cond.keys())[0]
+        for condCode, cond in zip(self._conditionsCode, self._conditionsList):
+            condExpr = list(condCode.keys())[0]
             smsMap = list(cond.values())[0]
             weightsMap = {smsLabel: 0.0*physicsUnits.fb for smsLabel in smsMap.values()}
             # Add weights for matching SMS:
