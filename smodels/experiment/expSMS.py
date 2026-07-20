@@ -376,7 +376,7 @@ class ExpSMS(GenericSMS):
 
         newSMS = ExpSMS()
         if not emptyNodes:
-            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            nodesObjDict = dict(self._nodesMapping.items())
             newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS

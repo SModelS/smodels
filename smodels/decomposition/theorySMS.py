@@ -158,7 +158,7 @@ class TheorySMS(GenericSMS):
 
         # Set nodes:
         if not emptyNodes:
-            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            nodesObjDict = {n : node for n, node in self._nodesMapping.items()}
             newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS
@@ -402,7 +402,7 @@ class TheorySMS(GenericSMS):
             newSMS = newSMSList[0]
             if momIndex is newSMS.rootIndex:  # Skip primary vertex
                 continue
-            if momIndex not in newSMS.nodeIndices:  # In case the mother has been removed by compression
+            if momIndex not in newSMS._successors:  # In case the mother has been removed by compression
                 continue
             # Convert node index to node object
             mom = newSMS.indexToNode(momIndex)

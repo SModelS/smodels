@@ -120,7 +120,7 @@ class GenericSMS(object):
             if not self._successors:
                 nodeIndex = 0
             else:
-                nodeIndex = max(self.nodeIndices)+1
+                nodeIndex = max(self._successors) + 1
         elif nodeIndex in self._successors:
             raise SModelSError("Trying to add a node with a nodeIndex already in the tree.")
         self._successors[nodeIndex] = []
@@ -336,7 +336,7 @@ class GenericSMS(object):
 
         # Set nodes:
         if not emptyNodes:
-            nodesObjDict = {n : node for n,node in zip(self.nodeIndices,self.nodes)}
+            nodesObjDict = dict(self._nodesMapping.items())
             newSMS.copyTreeFrom(self, nodesObjDict)
 
         return newSMS
@@ -448,8 +448,7 @@ class GenericSMS(object):
         :return: List of ParticleNode objects
         """
 
-
-        nodeList = self.indexToNode(self.nodeIndices)
+        nodeList = [self._nodesMapping[n] for n in self._successors]
 
         return nodeList
 
@@ -543,10 +542,10 @@ class GenericSMS(object):
         :return: Number of outgoing edges (int)
         """
 
-        if nodeIndex not in self.nodeIndices:
+        if nodeIndex not in self._successors:
             return 0
         else:
-            return len(self.daughterIndices(nodeIndex))
+            return len(self._successors[nodeIndex])
 
     def in_degree(self, nodeIndex):
         """
@@ -572,7 +571,7 @@ class GenericSMS(object):
         :return: Number of nodes (int)
         """
 
-        return len(self.nodeIndices)
+        return len(self._successors)
 
     def genIndexIterator(self, nodeIndex=None,
                          includeLeaves=False, ignoreInclusiveNodes=False):
@@ -606,7 +605,7 @@ class GenericSMS(object):
             for pair in generation:
                 mom, daughters = pair
                 for new_mom in daughters:
-                    if new_mom not in self.nodeIndices:
+                    if new_mom not in self._successors:
                         continue
                     new_daughters = self.daughterIndices(new_mom,ignoreInclusiveNodes)
 
@@ -676,7 +675,8 @@ class GenericSMS(object):
 
         # Re-number nodes according to their order
         if numberNodes:
-            indexDict = {n : orderedList.index(n) for n in self.nodeIndices}
+            orderLookup = {n : i for i, n in enumerate(orderedList)}
+            indexDict = {n : orderLookup[n] for n in self.nodeIndices}
             self.relabelNodeIndices(nodeIndexDict=indexDict)
         else:
             # Define dummy dict
@@ -692,20 +692,22 @@ class GenericSMS(object):
         """
 
         newSuccessors = OrderedDict()
-        indices = self.nodeIndices
-        sortList = indicesList[:]
+        indices = list(self._successors)
+        sortDict = {n : i for i, n in enumerate(indicesList)}
         # Indices not present in indicesList are left
         # put at the end of the list
+        maxSortIdx = len(indicesList)
         for nodeIndex in indices:
-            if nodeIndex not in sortList:
-                sortList.append(nodeIndex)
+            if nodeIndex not in sortDict:
+                sortDict[nodeIndex] = maxSortIdx
+                maxSortIdx += 1
 
-        sortedIndices = sorted(indices, key = lambda n: sortList.index(n))
+        sortedIndices = sorted(indices, key = lambda n: sortDict[n])
         # Go over sorted indices and create new successors dict
         for nodeIndex in sortedIndices:
             daughters = self.daughterIndices(nodeIndex)
             # Sort daughters according to the list
-            sortedDaughters = sorted(daughters, key = lambda n: sortList.index(n))
+            sortedDaughters = sorted(daughters, key = lambda n: sortDict[n])
             newSuccessors[nodeIndex] = sortedDaughters[:]
         self._successors = newSuccessors
 
