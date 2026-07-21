@@ -826,7 +826,7 @@ def regionTypeOf ( region ) -> Union[None,bool]:
     """
     if isinstance(region,CombinedDataSet): return 'SR' # Combined dataset is considered as 'SR'
     if region.dataInfo.dataType != 'efficiencyMap': return None # Dataset is not efficiency-map-type
-    regType = 'SR' # By default we assume it is a SR
+    regionType = 'SR' # By default we assume it is a SR
     globalInfo = region.globalInfo
     
     if hasattr(globalInfo,"regionMappings"):
