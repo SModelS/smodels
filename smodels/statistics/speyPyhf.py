@@ -123,8 +123,8 @@ class SpeyPyhfData:
                 #sys.exit(-1)
             sig = nsig[ regionName ]
             nsignals.append(sig)
-        logger.error( f"list of datasets: {datasets}" )
-        logger.error( f"jsonFile after filtering: {jsName}" )
+        logger.debug( f"list of datasets: {datasets}" )
+        logger.debug( f"jsonFile after filtering: {jsName}" )
         # Loading the jsonFiles, unless we already have them (because we pickled)
         json = globalInfo.cachedModels[jsName]
         return cls( nsignals , json, jsName)
