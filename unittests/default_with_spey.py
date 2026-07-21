@@ -231,25 +231,25 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.004140203,
-        'upper limit (fb)' : 4.827492,
-        'expected upper limit (fb)' : 5.244436,
+        'theory prediction (fb)' : 4.207057e-05,
+        'upper limit (fb)' : 0.0371,
+        'expected upper limit (fb)' : 0.0371,
         'TxNames' : ['T6bbHH'],
         'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
         'AnalysisID' : 'ATLAS-SUSY-2018-31',
-        'DataSetID' : '(combined)',
+        'DataSetID' : 'SRB',
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
-        'dataType' : 'combined',
-        'r' : 0.0008576303,
-        'r_expected' : 0.0007894469,
+        'dataType' : 'efficiencyMap',
+        'r' : 0.001133978,
+        'r_expected' : 0.001133978,
         'Width (GeV)' : [
             [13.4903869, 0.00112364506, 'stable'],
             [13.4903869, 0.00112364506, 'stable']
         ],
-        'nll' : 46.76432,
-        'nll_min' : 46.76432,
-        'nll_SM' : 46.76432
+        'nll' : 2.426637,
+        'nll_min' : 2.426636,
+        'nll_SM' : 2.4262
     },
     {
         'maxcond' : 0.0,
