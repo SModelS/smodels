@@ -16,12 +16,11 @@ from typing import Optional
 from smodels.base.types import PathType
 
 def main():
+    """Set default input and output files."""
     import argparse
-    """ Set default input and output files """
     parameterFile = f"{installDirectory()}/smodels/etc/parameters_default.ini"
     outputDir = "./results/"
 
-    """ Get the name of input SLHA file and parameter file """
     ap = argparse.ArgumentParser( description=
             "Run SModelS over SLHA/LHE input files." )
     ap.add_argument('-f', '--filename',

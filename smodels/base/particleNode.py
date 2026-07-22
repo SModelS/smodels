@@ -91,7 +91,7 @@ class ParticleNode(object):
 
     def __getstate__(self) -> dict:
         """
-        Since getattr is defined, we must defined getstate
+        Since getattr is defined, we must define getstate
         for pickling/unpickling.
         """
 
@@ -101,7 +101,7 @@ class ParticleNode(object):
 
     def __setstate__(self, state: dict):
         """
-        Since getattr is defined, we must defined getstate
+        Since getattr is defined, we must define setstate
         for pickling/unpickling.
         """
 

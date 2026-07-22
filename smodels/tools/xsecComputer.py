@@ -231,7 +231,7 @@ class XSecComputer(XSecBase):
                            compute the higher order xsecs
         :param pythiaCard: Optional path to pythia.card. If None, uses
                            smodels/etc/pythia.card
-        :param ssmultipliers: optionally supply signal strengh multipliers,
+        :param ssmultipliers: optionally supply signal strength multipliers,
                 given as dictionary of the tuple of the mothers' pids as keys and
                 multipliers as values, e.g { (1000001,1000021):1.1 }.
         :returns: XSectionList object
@@ -285,7 +285,7 @@ class XSecComputer(XSecBase):
         :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
         :param tofile: False, True, "all": write results to file, if "all" also write lower xsecs to file.
         :param pythiacard: optionally supply your own runcard
-        :param ssmultipliers: optionally supply signal strengh multipliers,
+        :param ssmultipliers: optionally supply signal strength multipliers,
                               given as dictionary of the tuple of the mothers' pids as keys and
                               multipliers as values, e.g { (1000001,1000021):1.1 }.
         :param comment: an optional comment that gets added to the slha file.

@@ -114,6 +114,7 @@ class Particle(object):
 
     @classmethod
     def getinstances(cls) -> list:
+        """Return all live instances of this Particle class (pruning dead weakrefs)."""
         dead = set()
         instances = []
         for ref in Particle._instances:
@@ -127,6 +128,7 @@ class Particle(object):
 
     @classmethod
     def getID(cls) -> int:
+        """Return a unique integer ID for a new particle instance."""
         Particle._lastID += 1
         return Particle._lastID
 
@@ -197,6 +199,7 @@ class Particle(object):
         return self.__add__(other)
 
     def describe(self) -> str:
+        """Return a string representation of all particle attributes."""
         return str(self.__dict__)
 
     def eqProperties(self, other: 'Particle',
@@ -382,6 +385,7 @@ class InvisibleParticle(Particle):
     _instances : set = set()
     
     def __new__(cls, attributesDict: dict = {}, **kwargs: Any) -> 'InvisibleParticle':
+        """Create an InvisibleParticle, enforcing invisibility on all instances."""
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
         # Enforce invisibility for all InvisibleParticle instances.
@@ -390,6 +394,7 @@ class InvisibleParticle(Particle):
 
     @classmethod
     def getinstances(cls) -> list:
+        """Return all live instances of this InvisibleParticle class."""
         dead = set()
         instances = []
         for ref in InvisibleParticle._instances:
@@ -458,6 +463,7 @@ class MultiParticle(Particle):
 
     @classmethod
     def getinstances(cls) -> list:
+        """Return all live instances of this MultiParticle class."""
         dead = set()
         instances = []
         for ref in MultiParticle._instances:

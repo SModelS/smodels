@@ -142,7 +142,7 @@ class Plotter(object):
 
     def loadModelFile(self):
         """
-        Reads the parameters from the plotting parameter file.
+        Reads the model file for particle name lookups.
         """
 
         logger.info(f"Reading model.py file from {self.modelFile} ...")

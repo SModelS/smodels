@@ -65,7 +65,7 @@ class SLData:
     ):
         """
         :param observed: number of observed events per dataset
-        :param backgrounds: evaluationType bg per dataset
+        :param backgrounds: expected background per dataset
         :param covariance: uncertainty in background, as a covariance matrix
         :param nsignal: number of signal events in each dataset
         :param name: give the model a name, just for convenience.
@@ -141,7 +141,7 @@ class SLData:
         """
         The signal variances. Convenience function.
 
-        :param nsig: If None, it will use the model evaluationType number of signal events,
+        :param nsig: If None, it will use the model number of signal events,
                     otherwise will return the variances for the input value using the relative
                     signal uncertainty defined for the model.
 
@@ -288,7 +288,7 @@ class SLData:
 
     def rel_signals(self, mu: float) -> np.ndarray:
         """
-        Returns the number of evaluationType relative signal events, for all datasets,
+        Returns the number of relative signal events, for all datasets,
         given total signal strength mu. For mu=1, the sum of the numbers = 1.
 
         :param mu: Total number of signal events summed over all datasets.
@@ -298,7 +298,7 @@ class SLData:
 
     def nsignals(self, mu: float) -> np.ndarray:
         """
-        Returns the number of evaluationType signal events, for all datasets,
+        Returns the number of signal events, for all datasets,
         given total signal strength mu.
 
         :param mu: Total number of signal events summed over all datasets.
@@ -308,6 +308,8 @@ class SLData:
 
 
 class SLLikelihoodComputer:
+    """Computer that evaluates the negative log likelihood (NLL)
+    and related quantities for a simplified likelihood model."""
 
     debug_mode = False
 
@@ -569,7 +571,6 @@ class SLLikelihoodComputer:
             self.mu. notice, by default it returns nll
 
         :param theta: nuisance parameters
-        :param nll: if True, compute negative log likelihood
         """
         nll = True
         model = self.model
@@ -818,7 +819,7 @@ class SLLikelihoodComputer:
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
-        :param asimov: if
+        :param asimov: if not None, compute nll for asimov data with mu=asimov
         :returns: profile likelihood and error code (0=no error)
         """
         if evaluationType != observed:
@@ -939,10 +940,9 @@ class SLLikelihoodComputer:
         """
         Computes the chi2 for a given number of observed events nobs given
         the predicted background nb, error on this background deltab,
-        evaluationType number of signal events nsig and the relative error on
+        expected number of signal events nsig and the relative error on
         signal (deltas_rel).
 
-        :param nsig: number of signal events
         :return: chi2 (float)
 
         """
@@ -968,6 +968,9 @@ class SLLikelihoodComputer:
         return chi2
 
 class SLUpperLimitComputer:
+    """Computer that derives upper limits on the signal strength
+    multiplier mu using the CLs method for a simplified likelihood model."""
+
     debug_mode = False
 
     def __init__( self, 

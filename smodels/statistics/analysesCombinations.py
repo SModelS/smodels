@@ -24,6 +24,8 @@ from smodels.statistics.basicStats import observed, NllEvalType
 from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
+    """Computer that combines likelihoods from multiple theory predictions
+    (analyses) to compute joint limits and test statistics."""
 
     def __init__(self, theoryPredictions: list, deltas_rel: Optional[float] = None):
         """constructor.

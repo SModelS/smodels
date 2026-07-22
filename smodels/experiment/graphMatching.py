@@ -15,7 +15,7 @@ from collections import deque
 def getCycle(G: dict) -> Optional[list]:
     """
     Given a directed graph G, return a cycle, if it
-    exits.
+    exists.
     
     :param G: Dictionary with the directed edges 
               ({A : [B,C,D], B : [],..})

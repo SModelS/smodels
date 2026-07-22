@@ -20,7 +20,7 @@ from smodels.statistics.basicStats import observed, NllEvalType
 from typing import  Optional, Union, Dict
 
 class TruncatedGaussians:
-    """ likelihood computer based on the trunacated Gaussian approximation, see
+    """ likelihood computer based on the truncated Gaussian approximation, see
          arXiv:1202.3415 """
     __slots__ = [ "upperLimitOnMu", "expectedUpperLimitOnMu", "corr",
                   "sigma_mu", "denominator", "cl", "allowNegativeSignals" ]
@@ -33,7 +33,7 @@ class TruncatedGaussians:
                     corr : Optional[float] = 0.6, cl : float = .95 ):
         """
         :param upperLimitOnMu: observed upper limit on signal strength mu
-        :param expectedUpperLimitOnMu: evaluationType upper limit
+        :param expectedUpperLimitOnMu: expected upper limit
         on signal strength mu
         :param corr: correction factor:
         ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp)))
@@ -50,7 +50,7 @@ class TruncatedGaussians:
         self.upperLimitOnMu = upperLimitOnMu
         self.expectedUpperLimitOnMu = expectedUpperLimitOnMu
         self.corr = corr
-        # the evaluationType scale, eq 3.24 in arXiv:1202.3415
+        # the expected scale, eq 3.24 in arXiv:1202.3415
         self.sigma_mu = self._getSigmaMu()  
         self.denominator = np.sqrt(2.0) * self.sigma_mu
         self.allowNegativeSignals = False
@@ -147,7 +147,7 @@ class TruncatedGaussians:
         an upper limit and a central value.
         assumes a truncated Gaussian likelihood
         """
-        # the evaluationType scale, eq 3.24 in arXiv:1202.3415
+        # the expected scale, eq 3.24 in arXiv:1202.3415
         sigma_mu = self.expectedUpperLimitOnMu / 1.96
         #if self.newCorrectionType: # we could correct here
         #    sigma_mu = sigma_mu / ( 1. - self.corr/2.)

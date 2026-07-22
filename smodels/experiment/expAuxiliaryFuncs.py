@@ -64,7 +64,7 @@ def cGtr(weightA: float, weightB: float) -> Optional[float]:
     Return a number between 0 and 1 depending on how much it is violated
     (0 = A > B, 1 = A << B).
 
-    :returns: XSectioList object with the values for each label.
+    :returns: float between 0 and 1, or None if both weights are zero.
 
     """
 

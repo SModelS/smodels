@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-.. module:: xsecBasis
+.. module:: xsecBase
    :synopsis: Computation of reference ("theory") production cross sections.
 
 .. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
@@ -40,8 +40,7 @@ class XSecBase:
                     if maxOrder == LO, compute only LO pythia xsecs
                     if maxOrder == NLO, apply NLO K-factors from NLLfast (if available)
                     if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
-        :param nevents: number of events for pythia run
-        :param pythiaVersion: pythia6 or pythia8 (integer)
+        :param slha_folder_name: path to the SLHA file or folder
         :param maycompile: if True, then tools can get compiled on-the-fly
         """
         self.resummino_bin = "./smodels/lib/resummino/resummino-3.1.2/bin/resummino"
@@ -146,14 +145,14 @@ class ArgsStandardizer:
             if multipliers in [ "", "None", "none", "no", "{}" ]:
                 return None
             if multipliers.count("{") != 1 or multipliers.count("}") != 1:
-                logger.error ( "need to pass signal strengh multipliers as dictionary with tuple of pids as keys" )
+                logger.error ( "need to pass signal strength multipliers as dictionary with tuple of pids as keys" )
             if multipliers.count("(") != multipliers.count(")"):
-                logger.error ( "need to pass signal strengh multipliers as dictionary with tuple of pids as keys" )
+                logger.error ( "need to pass signal strength multipliers as dictionary with tuple of pids as keys" )
             return eval(multipliers)
         return multipliers
 
     def getInputFiles ( self, args ) -> list[str]:
-        """ geth the names of the slha files to run over """
+        """ get the names of the slha files to run over """
         inputPath  = args.filename.strip()
         if not os.path.exists( inputPath ):
             logger.error( f"Path {inputPath} does not exist." )

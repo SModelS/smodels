@@ -179,7 +179,7 @@ class TxName(object):
         Checks if all the SMS in txname have the same structure (topology/canonical name)
         and verify if its constraints and conditions are valid expressions.
 
-        :return: True if txname is consitency. Raises an error otherwise.
+        :return: True if txname is consistent. Raises an error otherwise.
         """
 
         # Check if all SMS have the same canonical name:
@@ -863,7 +863,7 @@ class TxName(object):
     def getEfficiencyFor(self, sms, mass=None) -> float:
         """
         For upper limit results, checks if the input SMS falls inside the
-        upper limit grid and has a non-zero reweigthing factor.
+        upper limit grid and has a non-zero reweighting factor.
         If it does, returns efficiency = 1, else returns
         efficiency = 0.  For efficiency map results, returns the
         signal efficiency including the lifetime reweighting.
@@ -989,7 +989,7 @@ class TxName(object):
                                  reverse=True)
                 return matches[0]
 
-        # If this point was reached, there were no macthes
+        # If this point was reached, there were no matches
         return None
 
     def hasLikelihood(self) -> bool:

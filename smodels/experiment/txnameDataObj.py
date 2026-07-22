@@ -450,11 +450,7 @@ class Delaunay1D:
         Efficient way to find x in a list.
         Returns the index (i) of xlist such that xlist[i] < x <= xlist[i+1].
         If x > max(xlist), returns the length of the list.
-        If x < min(xlist), returns 0.        vertices = np.take(self.tri.simplices, simplex, axis=0)
-        temp = np.take(self.tri.transform, simplex, axis=0)
-        d=temp.shape[2]
-        delta = uvw - temp[:, d]
-
+        If x < min(xlist), returns 0.
 
         :param xlist: List of x-type objects
         :param x: object to be searched for.

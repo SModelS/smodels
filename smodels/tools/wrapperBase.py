@@ -31,6 +31,9 @@ class WrapperBase(object):
     defaulttempdir = "/tmp/" ## the default directory for temp dirs
 
     def __init__(self):
+        """
+        Initialize the wrapper with default empty paths.
+        """
         self.executablePath = ""
         self.tempdir = ""
         self.maycompile = True

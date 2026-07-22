@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: databaseServer
+   :synopsis: Server for hosting a local SModelS database over a network socket.
+
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
+"""
+
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
 import socket
@@ -75,7 +83,7 @@ class DatabaseServer:
 
     def run ( self, nonblocking : bool = False ):
         """ run server
-        :param nonblock: run in nonblocking mode (not yet implemented)
+        :param nonblocking: run in nonblocking mode (not yet implemented)
         """
         if nonblocking:
             pid = os.fork()

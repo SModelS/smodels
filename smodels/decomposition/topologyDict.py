@@ -45,6 +45,14 @@ class TopologyDict(OrderedDict):
             return nSMS
 
     def addSMS(self, newSMS: TheorySMS) -> bool:
+        """
+        Add a new SMS to the dictionary. If an SMS with the same
+        canonical name and topology already exists, merge them.
+
+        :param newSMS: TheorySMS object to be added
+
+        :return: True if the SMS was added, False otherwise
+        """
 
         if isinstance(newSMS, TheorySMS):
             canonName = newSMS.canonName

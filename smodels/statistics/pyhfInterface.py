@@ -563,10 +563,10 @@ class PyhfUpperLimitComputer:
         Apply each region patch (self.patch) to his associated json (self.inputJson)
         to obtain the complete workspace
 
-        :param apriori: - If set to 'True': Replace the observation data entries
-        of the workspace by the corresponding sum of the evaluationType yields
-        - Else: The observed yields put in the workspace are the ones written in
-        the corresponfing json dictionary
+    :param apriori: - If set to 'True': Replace the observation data entries
+        of the workspace by the corresponding sum of the expected yields
+        - Else: The observed yields put in the workspace are the ones
+        written in the corresponding json dictionary
 
         :returns: the patched workspace
         """
@@ -575,7 +575,7 @@ class PyhfUpperLimitComputer:
         try:
             wsDict = jsonpatch.apply_patch(self.inputJson, self.patch)
             if apriori == True:
-                # Replace the observation data entries by the corresponding sum of the evaluationType yields
+                # Replace the observation data entries by the corresponding sum of the expected yields
                 for obs in wsDict["observations"]:
                     for ch in wsDict["channels"]:
                         # Finding matching observation and bkg channel
@@ -924,10 +924,10 @@ class PyhfUpperLimitComputer:
         """
         Small method used to return the appropriate workspace
 
-        :param evaluationType: if False, retuns the unmodified (but patched)
-        workspace. Used for computing observed or aposteriori evaluationType limits.
-        if apriori, retuns the modified (and patched) workspace, where
-        obs = sum(bkg). Used for computing apriori evaluationType limit.
+        :param evaluationType: if False, returns the unmodified (but patched)
+        workspace. Used for computing observed or aposteriori limits.
+        if apriori, returns the modified (and patched) workspace, where
+        obs = sum(bkg). Used for computing apriori limit.
         """
         if evaluationType in [ apriori ]: # , aposteriori ]:
             return self.workspace_expected

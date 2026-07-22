@@ -239,7 +239,12 @@ def getParticlesFromModule(modelFile: str) -> list[Particle]:
 
 
 def load() -> list[Particle]:
+    """
+    Load the BSM particle definitions from the default model file.
+    Tries to load as a Python module first, then as SLHA or LHE.
 
+    :return: list of BSM Particle objects
+    """
     from smodels.base.runtime import modelFile
 
     BSMList = None

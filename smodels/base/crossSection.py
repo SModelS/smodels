@@ -64,7 +64,7 @@ class XSectionInfo(object):
     """
 
     def normalizeSqrts(self, sqrts: Any) -> Any:
-        """ """
+        """Normalize square-root-of-s energy values: convert whole-number floats to ints."""
         if sqrts is None:
             return sqrts
         if type(sqrts) == float and abs(sqrts % 1) < 1e-5:
@@ -257,13 +257,13 @@ class XSection(object):
         """
 
         return self.__cmp__(other) == -1
-
     def __gt__(self, other: 'XSection | unum.Unum | int | float') -> bool:
         """
-        Checks if the cross-section value of self is smaller than of other.
+        Checks if the cross-section value of self is greater than of other.
         """
 
         return self.__cmp__(other) == 1
+
 
     def __str__(self) -> str:
         """
@@ -330,6 +330,7 @@ class XSectionList(object):
                 self.add(newentry)
 
     def __mul__(self, other: float | int) -> 'XSectionList':
+        """Multiply all cross sections in the list by *other*."""
         newList = self.copy()
         for ixsec, xsec in enumerate(newList):
             newList[ixsec] = xsec * other
@@ -337,9 +338,11 @@ class XSectionList(object):
         return newList
 
     def __rmul__(self, other: float | int) -> 'XSectionList':
+        """Right multiplication (see left multiplication)."""
         return self * other
 
     def __add__(self, other: 'XSectionList') -> 'XSectionList':
+        """Return a new list combining self and other."""
         newList = self.copy()
         if type(other) != type(self):
             logger.warning("Trying to add a XSectionList and a "+str(type(other)))
@@ -376,9 +379,11 @@ class XSectionList(object):
         return self
 
     def __iter__(self):
+        """Iterate over the XSection objects in the list."""
         return iter(self.xSections)
 
     def __getitem__(self, index: int) -> XSection:
+        """Return the XSection at *index*."""
         if len(self) <= index:
             txt = "Index in XSectionList out of bounds: idx(%d)>=length(%d). " % (index, len(self))
             txt += "(Are there cross sections given in the input?)"
@@ -387,6 +392,7 @@ class XSectionList(object):
         return self.xSections[index]
 
     def __setitem__(self, index: int, xsec: XSection) -> None:
+        """Set the XSection at *index*."""
         if not isinstance(xsec, XSection):
             logger.error("Input object must be a XSection() object")
             raise SModelSError()
@@ -394,6 +400,7 @@ class XSectionList(object):
             self.xSections[index] = xsec
 
     def __len__(self) -> int:
+        """Return the number of cross sections in the list."""
         return len(self.xSections)
 
     def __cmp__(self, other: 'XSectionList | XSection | unum.Unum | int | float') -> int:
@@ -432,7 +439,7 @@ class XSectionList(object):
 
     def __gt__(self, other: 'XSectionList | XSection | unum.Unum | int | float') -> bool:
         """
-        Checks if the cross-section value of self is smaller than of other.
+        Checks if the cross-section value of self is greater than of other.
         """
 
         return self.__cmp__(other) == 1
@@ -444,6 +451,7 @@ class XSectionList(object):
         return str(self)
 
     def niceStr(self) -> str:
+        """Return a human-readable multi-line string of all cross sections."""
         st = ""
         for xsec in self:
             st += xsec.niceStr()+'\n'

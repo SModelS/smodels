@@ -1,3 +1,10 @@
+"""
+.. module:: types
+   :synopsis: Common type aliases used throughout the smodels package.
+
+.. moduleauthor:: SModelS developers
+"""
+
 from typing import TypeAlias
 from os import PathLike
 

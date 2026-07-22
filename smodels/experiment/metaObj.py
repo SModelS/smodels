@@ -17,11 +17,11 @@ from typing import Optional
 from smodels.base.types import PathType
 
 class Meta(object):
-    current_version = 221 ## the current format version
-
     """ The Meta object holds all meta information regarding the
         database, like number of analyses, last time of modification, ...
         This info is needed to understand if we have to re-pickle. """
+
+    current_version = 221 ## the current format version
 
     def __init__(self, pathname : PathType, mtime : Optional[str]=None,
             filecount : Optional[int] = None, hasFastLim : Optional[bool]=None,
@@ -121,7 +121,6 @@ class Meta(object):
         plus the number of files.
 
         :param subdir: directory name that is checked
-        :param lastm: the most recent timestamp so far, plus number of files
         :returns: the most recent timestamp, and the number of files
         """
         #ret = lastm

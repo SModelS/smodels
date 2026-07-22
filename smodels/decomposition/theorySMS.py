@@ -76,7 +76,7 @@ class TheorySMS(GenericSMS):
 
         :parameter other: TheorySMS object
 
-        :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
+        :return: 0, if objects are equal, -1 if self < other, 1 if self > other
         """
 
         return self.compareTo(other)
@@ -151,7 +151,7 @@ class TheorySMS(GenericSMS):
 
         :param other: SMS object to be compared against self
 
-        :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
+        :return: 0, if objects are equal, -1 if self < other, 1 if self > other
         """
 
         if not isinstance(other,TheorySMS):
@@ -222,7 +222,7 @@ class TheorySMS(GenericSMS):
 
         :param motherIndex: Node index for the mother to which the decay should be added.
         :param decayNodes: Particle nodes for the daughters.
-        :br: Branching ratio value for the decay
+        :param br: Branching ratio value for the decay
         :param copy: if True, return a copy of self, with the decay attached.
 
         :return: new tree with the other composed with self.

@@ -295,6 +295,14 @@ class Model(object):
                 raise SModelSError("No mass found for %i in input file %s." % (particle.pdg, self.inputFile))
 
     def setDecays(self, decaysDict: dict, promptWidth: Any, stableWidth: Any, ignorePromptQNumbers: list[str]):
+        """
+        Define particle decays using decaysDict.
+
+        :param decaysDict: dictionary with PDGs as keys and pyslha.Particle decay data as values
+        :param promptWidth: width threshold above which particles are considered prompt
+        :param stableWidth: width threshold below which particles are considered stable
+        :param ignorePromptQNumbers: list of quantum number attributes to erase for prompt particles
+        """
 
         allPDGs = list(set(self.getValuesFor('pdg')))
 

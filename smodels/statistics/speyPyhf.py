@@ -206,7 +206,7 @@ class SpeyPyhfData:
             entries of each workspace by the corresponding sum of the
             expected yields \
             - Else: The observed yields put in the workspace are the ones
-            written in the corresponfing json dictionary
+            written in the corresponding json dictionary
 
         :returns: the list of patched workspaces
         """

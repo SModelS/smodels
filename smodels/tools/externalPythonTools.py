@@ -36,6 +36,9 @@ class ExternalPythonTool(object):
                 logger.error(f"could not find {importname}: {e}")
 
     def compile ( self ):
+        """
+        Attempt to install the python package using pip or setuptools.
+        """
         import sys
         cmd = ["install",self.name]
         if sys.prefix == sys.base_prefix:
@@ -71,7 +74,7 @@ class ExternalPythonTool(object):
 
     def installDirectory(self) -> str:
         """
-        Just returns the pythonPath variable
+        Returns the installation directory of the python package.
         """
         return self.pythonPath
 

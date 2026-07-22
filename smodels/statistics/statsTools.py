@@ -48,13 +48,10 @@ class CompRetriever:
         :param dataset: CombinedDataSet object
         :param regionSet: the regionSet defining the SRs for which to construct the computer
         :param nsigDict: Dictionary of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
+        :param deltas_rel: Relative uncertainty for the signal
 
         :returns: a subcomputer
         """
-
-        if deltas_rel is None:
-            deltas_rel = 0.0
 
         if  regionSet not in dataset.globalInfo.statModels:
             raise SModelSError( f"{regionSet} not in statModels in {dataset.globalInfo.id}" )
@@ -112,7 +109,7 @@ class CompRetriever:
         :param dataset: DataSet object
         :param regionSet: the regionSet defining the SRs for which to construct the computer
         :param nsigDict: Dictionary of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
+        :param deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
@@ -136,7 +133,6 @@ class CompRetriever:
         :param regionSet: the regionSet defining the SRs for which to construct the computer
         :param dataset: CombinedDataSet object
         :param nsigDict: Dictionary of signal events for each SR
-        :deltas_rel: Relative uncertainty for the signal
 
         :returns: a sub computer
         """
@@ -298,6 +294,15 @@ class StatsComputer:
 
     @classmethod
     def forTheoryPrediction(cls, theoryPrediction: object) -> Union[None,'StatsComputer']:
+        """Construct a StatsComputer from a TheoryPrediction.
+
+        Inspects the data type and statistical model of the theory
+        prediction and delegates to the appropriate sub-computer factory
+        (SL, pyhf, NN, truncated Gaussian, or analyses combination).
+
+        :param theoryPrediction: a TheoryPrediction or TheoryPredictionsCombiner object
+        :returns: a StatsComputer instance, or None if no suitable computer can be built
+        """
 
         CompRetriever = getCompRetrieverModule()
 
@@ -446,7 +451,7 @@ class StatsComputer:
             subComputer.likelihoodComputer.transform ( evaluationType )
 
     def restore ( self, evaluationType: NllEvalType ):
-        """ SL only. transform the data to evaluationType or observed """
+        """ SL only. Restore the data to the original observed values """
         if evaluationType != observed:
             return
         for subComputer in self.subComputers:

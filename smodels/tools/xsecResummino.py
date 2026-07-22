@@ -424,7 +424,12 @@ class XSecResummino(XSecBase):
         
         
     def find_channels(self, slha_file : str) -> list:
-        
+        """
+        Find the cross section channels already written in the SLHA file.
+
+        :param slha_file: path to the SLHA file
+        :returns: list of (channel, sqrt, order) tuples
+        """
         with open(slha_file, 'r') as f:
             data = f.readlines()
             

@@ -123,8 +123,6 @@ class NNUpperLimitComputer:
         :param cl: confdence level at which the upper limit is desired
         to be computed
         :param lumi: optional luminosity
-        :param pyhfComputer: optional pyhfComputer, if we need to fall back
-        for some super regions
         :ivar data: created from data
         :ivar nsignals: signal predictions list divided into sublists,
         one for each json file
@@ -296,6 +294,15 @@ class NNUpperLimitComputer:
     def CLs( self, mu : float = 1.0, evaluationType : NllEvalType = observed,
              allowNegativeSignals : bool = False,
              nSigma : int = 0, pmSigma : int = 0 ) -> float:
+        """Compute CLs for a given signal strength mu.
+
+        :param mu: signal strength multiplier
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :param allowNegativeSignals: if True, allow negative signal strengths
+        :param nSigma: sigma band for error bands (0 for central value)
+        :param pmSigma: +1 or -1 for +/- sigma variations, 0 for central
+        :returns: CLs value
+        """
         mu_hat, sigma_mu, clsRoot, nll_min, nll_minA, \
             s_nll_min, s_nll_minA = self.getCLsRootFunc(
                 evaluationType=evaluationType,

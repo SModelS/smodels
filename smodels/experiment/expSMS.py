@@ -372,7 +372,7 @@ class ExpSMS(GenericSMS):
 
         :param emptyNodes: If True, does not copy any of the nodes from self.
 
-        :return: TheorySMS object
+        :return: ExpSMS object
         """
 
         newSMS = ExpSMS()

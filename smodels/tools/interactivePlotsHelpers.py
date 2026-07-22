@@ -478,6 +478,10 @@ class Filler:
 
 
 class PlotlyBackend:
+    """
+    Backend class for generating interactive plots using Plotly.
+    """
+
     def __init__(self, master, path_to_plots: str):
         self.data_dict=master.data_dict
         self.SModelS_hover_information=master.SModelS_hover_information

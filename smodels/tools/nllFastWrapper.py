@@ -51,7 +51,6 @@ class NllFastWrapper(WrapperBase):
         :param testParams: what are the test params we need to run things with?
         :param testCondition: the line that should be the last output line when
                               running executable
-        :srcPath: the path of the source code, for compilation
         """
 
         WrapperBase.__init__(self)
@@ -145,6 +144,16 @@ class NllFastWrapper(WrapperBase):
             raise e
 
     def _compute(self, energy: str, pIDs: tuple, pdf: str, squarkmass: float, gluinomass: float) -> str:
+        """
+        Run NLLfast for the given process and return the output.
+
+        :param energy: center-of-mass energy string (e.g. '8TeV')
+        :param pIDs: tuple of particle IDs
+        :param pdf: PDF set name
+        :param squarkmass: squark mass in GeV
+        :param gluinomass: gluino mass in GeV
+        :returns: raw NLLfast output string
+        """
         process = self._getProcessName(pIDs)
         if process == "st":
             nll_run = "./nllfast_" + energy + f" {process} {pdf} {squarkmass}"
@@ -201,6 +210,13 @@ class NllFastWrapper(WrapperBase):
         else: return None
 
     def _runForDecoupled(self, energy: str, nllinput: tuple) -> str:
+        """
+        Run NLLfast in the decoupled regime with the given input.
+
+        :param energy: center-of-mass energy string
+        :param nllinput: tuple of arguments for the NLLfast command
+        :returns: raw NLLfast output string
+        """
         nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
         return self._run ( nll_run )
 
@@ -340,7 +356,7 @@ class NllFastWrapper8(NllFastWrapper):
 
 class NllFastWrapper13(NllFastWrapper):
     """
-    An instance of this class represents the installation of nllfast 8.
+    An instance of this class represents the installation of nllfast 13.
     """
 
     def __init__(self):

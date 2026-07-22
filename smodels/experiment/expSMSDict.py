@@ -29,7 +29,7 @@ class ExpSMSDict(dict):
 
     def __init__(self, expResultList: list = []):
         """
-        :param exptResultList: List of ExptResult objects used to build the map
+        :param expResultList: List of ExptResult objects used to build the map
         """
 
         self._smsDict = {}
@@ -70,7 +70,7 @@ class ExpSMSDict(dict):
         elif isinstance(key,TxName):
             useDict = self._txDict
         else:
-            logger.error(f"Can not assing a {str(type(key))} object to a ExpSMSDict")
+            logger.error(f"Can not assign a {str(type(key))} object to a ExpSMSDict")
             raise SModelSError()
 
         return useDict[key]
@@ -86,7 +86,7 @@ class ExpSMSDict(dict):
         elif isinstance(key,TxName):
             useDict = self._txDict
         else:
-            logger.error(f"Can not assing a {str(type(key))} object to a ExpSMSDict")
+            logger.error(f"Can not assign a {str(type(key))} object to a ExpSMSDict")
             raise SModelSError()
 
         useDict[key] =  value
@@ -98,7 +98,7 @@ class ExpSMSDict(dict):
         elif isinstance(key,TxName):
             useDict = self._txDict
         else:
-            logger.error(f"Can not assing a {str(type(key))} object to a ExpSMSDict")
+            logger.error(f"Can not assign a {str(type(key))} object to a ExpSMSDict")
             raise SModelSError()
 
         dict.__delitem__(useDict,key)
@@ -122,7 +122,7 @@ class ExpSMSDict(dict):
 
     def filter(self, expResultList: list) -> 'ExpSMSDict':
         """
-        Returns a copy of self contanining only the mapping
+        Returns a copy of self containing only the mapping
         to the TxNames contained in expResultList.
 
         :param expResultList: List of experimental results (ExpResult obj)
@@ -172,7 +172,7 @@ class ExpSMSDict(dict):
 
     def setTxNodeOrdering(self, sms, tx: TxName, smsLabel: str, reverse: bool = False):
         """
-        Relabel the node indices in sms accoding to the ExpSMS represented
+        Relabel the node indices in sms according to the ExpSMS represented
         by the smsLabel in the TxName tx (unique ExpSMS indices - > tx sms indices).
         If reverse=True, do the the reverse labeling (tx sms indices -> unique ExpSMS indices).
 
@@ -214,9 +214,9 @@ class ExpSMSDict(dict):
 
     def computeDicts(self, expResultList: list):
         """
-        Iterates over all (active) experimental results and build two dictionaries:
+        Iterates over all (active) experimental results and builds two dictionaries:
         one mapping TxNames and smsLabels to the unique SMS and another one
-        a with the unique SMS indices as keys and a dictionary
+        with the unique SMS indices as keys and a dictionary
         {TxName : smsLabel} as values. It also stores the mapping of the
         node numbering from the original Txname SMS to the unique (sorted) SMS.
 

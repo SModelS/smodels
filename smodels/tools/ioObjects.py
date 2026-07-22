@@ -183,7 +183,6 @@ class SlhaStatus(object):
         :parameter findMissingDecayBlocks: if True add a warning for missing decay blocks
         :parameter findIllegalDecays: if True check if all decays are kinematically allowed
         :parameter checkXsec: if True check if SLHA file contains cross sections
-        :parameter findLonglived: if True find stable charged particles and displaced vertices
         """
 
         self.filename = filename

@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: databaseClient
+   :synopsis: Client for connecting to a remote SModelS database server.
+
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
+"""
+
 import socket
 import sys
 import time

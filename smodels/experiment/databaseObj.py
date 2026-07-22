@@ -321,7 +321,7 @@ class Database(object):
     @property
     def pcl_meta(self) -> Meta:
         """
-        The meta info of the text version, a merger of the original ones
+        The meta info of the pickle version, a merger of the original ones
 
         """
         ret = None
@@ -487,7 +487,7 @@ class SubDatabase(object):
             sys.exit(-1)
 
     def loadTextDatabase(self):
-        """ simply loads the textdabase """
+        """ simply loads the text database """
         if self.txt_meta.databaseVersion and len(self.expResultList) > 0:
             logger.debug("Asked to load database, but has already been loaded. Ignore.")
             return

@@ -231,6 +231,18 @@ def simplify_bsm_particles(model: Model) -> Dict[int, Union[MultiParticle, Parti
 def decompose(model: Model, sigmacut: Union[float,int,UnitXSec] = 0*fb, 
                  massCompress: bool = True, invisibleCompress: bool = True, 
                  minmassgap: UnitEnergy = 0.0*GeV, minmassgapISR: UnitEnergy = 0.0*GeV) -> TopologyDict:
+    """
+    Decompose a BSM model into a list of SMS topologies.
+
+    :param model: Model object containing the BSM and SM particles and their decays
+    :param sigmacut: minimum cross-section to be included in the decomposition
+    :param massCompress: if True, perform mass compression
+    :param invisibleCompress: if True, perform invisible compression
+    :param minmassgap: minimum mass difference (in GeV) for mass compression
+    :param minmassgapISR: minimum mass difference (in GeV) for pure ISR compression
+
+    :return: TopologyDict containing the decomposed SMS topologies
+    """
      
     t0 = time.time()
     t1= time.time()

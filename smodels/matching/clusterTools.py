@@ -140,6 +140,12 @@ class SMSCluster(object):
     """
 
     def __init__(self, smsList: list[TheorySMS] = [], dataset: Optional[DataSet | CombinedDataSet] = None):
+        """
+        Initialize the cluster with a list of SMS and an optional dataset.
+
+        :param smsList: list of TheorySMS objects belonging to the cluster
+        :param dataset: dataset object used for computing upper limits
+        """
 
         self.smsList = smsList[:]
         self.dataset = dataset
@@ -236,7 +242,6 @@ class SMSCluster(object):
         and the distance between any SMS in the cluster
         and the cluster AverageSMS  is smaller than maxDist.
 
-        :param dataset: Dataset object used to check the UL
         :parameter maxDist: maximum distance between the averageSMS and
                             all the SMS in the cluster
 

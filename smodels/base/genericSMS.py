@@ -432,7 +432,7 @@ class GenericSMS(object):
     @property
     def nodeIndices(self) -> list[int]:
         """
-        Returns the tist of node indices in the Tree.
+        Returns the list of node indices in the Tree.
 
         :return: List of indices (int)
         """
@@ -459,7 +459,7 @@ class GenericSMS(object):
     @property
     def nodes(self) -> list:
         """
-        Returns the tist of ParticleNode objects in the Tree.
+        Returns the list of ParticleNode objects in the Tree.
 
         :return: List of ParticleNode objects
         """

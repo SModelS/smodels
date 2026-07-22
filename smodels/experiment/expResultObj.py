@@ -318,7 +318,7 @@ class ExpResult(object):
     def getTxnameWith(self, restrDict : dict = {} ) -> Union[list, 'TxName']:
         """
         Returns a list of TxName objects satisfying the restrictions.
-        The restrictions specified as a dictionary.
+        The restrictions are specified as a dictionary.
 
         :param restrDict: dictionary containing the fields and their allowed values.
                           E.g. {'txname' : 'T1', 'axes' : ....}

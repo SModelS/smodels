@@ -1,5 +1,5 @@
 """
-.. module:: SMparticleDefinitions
+.. module:: SMparticles
    :synopsis: Defines the SM particles.
 
 .. moduleauthor:: Alicia Wongel <alicia.wongel@gmail.com>

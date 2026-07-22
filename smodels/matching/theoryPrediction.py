@@ -104,6 +104,11 @@ class TheoryPrediction(object):
 
 
     def computeXSection(self):
+        """
+        Compute the total cross-section for the theory prediction
+        by summing the contributions from all txnames.
+        """
+
         if type(self.xsection) != type(None):
             return
 
@@ -120,6 +125,10 @@ class TheoryPrediction(object):
         self.xsection = xsection
 
     def computeConditions(self):
+        """
+        Compute the conditions for the theory prediction by
+        evaluating the conditions for all txnames.
+        """
 
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname
@@ -140,6 +149,9 @@ class TheoryPrediction(object):
             self.conditions = allConditions[:]
 
     def totalXsection(self) -> UnitXSec:
+        """
+        Return the total cross-section for this theory prediction.
+        """
         self.computeXSection()
         return self.xsection
 
@@ -496,7 +508,7 @@ class TheoryPredictionList(object):
 
 class TheoryPredictionsCombiner(TheoryPrediction):
     """
-    Facility used to combine theory predictions from different analyes.
+    Facility used to combine theory predictions from different analyses.
     If a list with a single TheoryPrediction is given, return the TheoryPrediction
     object.
     """
@@ -616,6 +628,9 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
 
     def totalXsection(self) -> UnitXSec:
+        """
+        Return the total cross-section summed over all combined theory predictions.
+        """
         ret = 0.0 * fb
         if self.theoryPredictions is not None:
             for tp in self.theoryPredictions:

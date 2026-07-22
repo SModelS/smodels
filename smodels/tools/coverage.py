@@ -38,7 +38,7 @@ descriptionDefault = {'missing (prompt)': 'missing topologies with prompt decays
 # Default BSM inclusive particles used for grouping final states:
 bsmDefault = [MET, HSCP, RHadronG, RHadronQ]
 
-# Defaul SM inclusive particles used for grouping final states
+# Default SM inclusive particles used for grouping final states
 smDefault = [WList, lList, tList, taList, nuList, jetList]
 
 # Weight factors for each group:
@@ -88,7 +88,7 @@ class Uncovered(object):
                                   (used for printout)
         :param smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping SM
                               particles when creating FinalStateSMS.
-        :param bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping
+        :param bsmFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping
                               BSM particles when creating FinalStateSMS.
         """
 

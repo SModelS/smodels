@@ -119,6 +119,11 @@ class Pythia8Wrapper(WrapperBase):
                 self.tempdir = None
 
     def checkInstallation(self, compile: bool = True) -> bool:
+        """Check if pythia8 is installed correctly.
+
+        :param compile: if True, attempt to compile if not installed
+        :returns: True if installation is ok
+        """
         # super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
