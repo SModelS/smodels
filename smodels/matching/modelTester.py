@@ -242,8 +242,8 @@ def testPoint( inputFile : PathType, outputDir : os.PathLike,
 
 
 def runSingleFile(inputFile : PathType, outputDir : os.PathLike,
-        parser : ConfigParserType, database : Database, timeout : int, development : bool,
-        parameterFile : PathType) -> dict:
+        parser : ConfigParser, database : Database, timeout : int, 
+        development : bool, parameterFile : PathType) -> dict:
     """
     Call testPoint on inputFile, write crash report in case of problems
 
@@ -276,9 +276,9 @@ def runSingleFile(inputFile : PathType, outputDir : os.PathLike,
     return {inputFile: None}
 
 
-def runSetOfFiles(inputFiles : list, outputDir : PathType, parser : ConfigParserType,
-        database : Database, timeout : int , development : bool,
-        parameterFile : PathType, return_dict : dict ):
+def runSetOfFiles(inputFiles : list, outputDir : PathType, 
+        parser : ConfigParser, database : Database, timeout : int, 
+        development : bool, parameterFile : PathType, return_dict : dict ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -327,7 +327,7 @@ def _determineNCPus(cpus_wanted : int, n_files : int ) -> int:
     return ncpus
 
 def testPoints(fileList : list, inDir : PathType, outputDir : os.PathLike,
-        parser : ConfigParserType, database : Database, timeout : int,
+        parser : ConfigParser, database : Database, timeout : int,
         development : bool, parameterFile : PathType ):
     """
     Loop over all input files in fileList with testPoint, using ncpus CPUs
@@ -428,7 +428,7 @@ def checkForSemicolon( strng : str, section : str, var : str ):
         logger.warning(
             f"A semicolon(;) has been found in [{section}] {var}, in your config file. If this was meant as comment, then please a space before it.")
 
-def loadDatabase(parser: ConfigParserType, db : Optional[Database] ) -> Union[None,Database]:
+def loadDatabase(parser: ConfigParser, db : Optional[Database] ) -> Union[None,Database]:
     """
     Load database
 
@@ -464,7 +464,7 @@ def loadDatabase(parser: ConfigParserType, db : Optional[Database] ) -> Union[No
     return database
 
 
-def loadDatabaseResults(parser: ConfigParserType, database : Database ):
+def loadDatabaseResults(parser: ConfigParser, database : Database ):
     """
     Restrict the (active) database results to the ones specified in parser
 
@@ -501,7 +501,7 @@ def loadDatabaseResults(parser: ConfigParserType, database : Database ):
                                  useNonValidated=useNonValidated)
 
 
-def getParameters(parameterFile : PathType ) -> ConfigParserType:
+def getParameters(parameterFile : PathType ) -> ConfigParser:
     """
     Read parameter file, exit in case of errors
 
