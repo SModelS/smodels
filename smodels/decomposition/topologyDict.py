@@ -22,6 +22,27 @@ class TopologyDict(OrderedDict):
 
         self.__dict__ = {}
 
+    def numberOfSMS(self, canonName=None):
+        """
+        Return the number of SMS in the dict. 
+        If canonName is not None, return the number of SMS with the corresponding canonName.
+
+        :param canonName: if None, return the total number of SMS, otherwise return only the number of SMS with the corresponding canonical name.
+
+        :return: Number of SMS in the dict.
+        """
+
+        if canonName is not None:
+            if canonName not in self:
+                return 0
+            else:
+                return len(self[canonName])
+        else:
+            nSMS = 0
+            for smsList in self.values():
+                nSMS += len(smsList)
+            return nSMS
+
     def addSMS(self, newSMS):
 
         if isinstance(newSMS, TheorySMS):
@@ -34,6 +55,7 @@ class TopologyDict(OrderedDict):
                 # (using a bisection method)
                 lo = 0
                 hi = len(smsList)
+                cmp = 1
                 while lo < hi:
                     mid = (lo+hi)//2
                     cmp = smsList[mid].compareTo(newSMS)
@@ -122,6 +144,19 @@ class TopologyDict(OrderedDict):
         for sms in self.getSMSList():
             sms.smsID = smsID
             smsID += 1
+
+    def setSMSAncestors(self):
+        """
+        Set the list of ancestors for each SMS in the Topology list
+        keeping only the SMS which belongs to self (remove intermediate ancestors).
+        """
+
+        keepIDs = set([sms.smsID for sms in self.getSMSList()])
+        for sms in self.getSMSList():
+            sms.setAncestors(keepIDs)
+        for sms in self.getSMSList():
+            sms._ancestors = None # Clear ancestors to save memory
+
 
     def getTotalWeight(self, canonName=None):
         """

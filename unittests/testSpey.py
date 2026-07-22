@@ -15,7 +15,9 @@ import unittest
 # from smodels.tools import statistics
 from smodels.statistics.statsTools import getCompRetrieverModule, \
          StatsComputer, CompRetriever
-from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
+
+from unitTestHelpers import equalObjs, runMain, importModule,  \
+         removeCruftOutputs, sortMissingTopologyLists
 from smodels.base import runtime
 import warnings
 
@@ -52,9 +54,9 @@ class SpeyTest(unittest.TestCase):
             filename = "./testFiles/slha/gluino_squarks.slha"
             inifile = "testParameters_spey.ini"
             from databaseLoader import database
-            outputfile = runMain( filename, inifile = inifile,
-                                  overridedatabase = database,
-                                  suppressStdout=True )
+            outputfile = runMain(filename, inifile = inifile, 
+                                 overridedatabase = database,
+                                 suppressStdout=True )
             smodelsOutput = importModule(outputfile)
             from default_with_spey import smodelsOutputDefault
             runtime._experimental["spey"]=False
@@ -63,7 +65,10 @@ class SpeyTest(unittest.TestCase):
             smodelsOutputDefault['ExptRes'] = sorted(
                     smodelsOutputDefault['ExptRes'],
                     key=lambda res: res['r'], reverse=True )
-            equals = equalObjs(smodelsOutput, smodelsOutputDefault,
+            sortMissingTopologyLists(smodelsOutput)
+            sortMissingTopologyLists(smodelsOutputDefault)
+            
+            equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
                                allowedRelDiff=0.02,
                                ignore=ignoreFields, fname=outputfile)
             if not equals:

@@ -16,7 +16,7 @@ import unittest
 import glob
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
+from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs, sortMissingTopologyLists
 import time
 import subprocess
 from smodels.base.smodelsLogging import logger
@@ -74,6 +74,10 @@ class RunSModelSTest(unittest.TestCase):
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version',]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
+
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         for i in ['./output.py', './output.pyc']:
@@ -97,6 +101,10 @@ class RunSModelSTest(unittest.TestCase):
                         'database version', 'model']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
+
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+        
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         for i in ['./output.py', './output.pyc']:

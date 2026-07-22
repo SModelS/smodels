@@ -54,6 +54,7 @@ def testPoint( inputFile : PathType, outputDir : os.PathLike,
     :return: dictionary with input filename as key and the
     MasterPrinter object as value
     """
+    t0 = time.time()
 
     """ Set BSM model, if necessary """
     if parser.has_option("particles","model"):
@@ -163,6 +164,8 @@ def testPoint( inputFile : PathType, outputDir : os.PathLike,
         return {os.path.basename(inputFile): masterPrinter}
 
     masterPrinter.addObj(smstoplist)
+    logger.info( f"Finished decomposition ({len(smstoplist.getSMSList())} topologies) in {(time.time()-t0)/60.:3.2f} min" )
+    t0 = time.time()
 
     """
     Compute theory predictions
@@ -203,6 +206,9 @@ def testPoint( inputFile : PathType, outputDir : os.PathLike,
     theoryPredictions = theoryPrediction.TheoryPredictionList(
         allPredictions, maxcond)
 
+    logger.info("Finished theory prediction (%i predictions) in %3.2f min" % (len(theoryPredictions),(time.time()-t0)/60.))
+    t0 = time.time() 
+
     if len(theoryPredictions) != 0:
         outputStatus.updateStatus(1)
         theoryPredictions._theoryPredictions = [tp for tp in theoryPredictions._theoryPredictions if "CR" not in os.path.basename(tp.dataset.path)] # Do not print CRs "results"
@@ -220,6 +226,7 @@ def testPoint( inputFile : PathType, outputDir : os.PathLike,
             smstoplist, sigmacut=sigmacut, sqrts=sqrts)
         masterPrinter.addObj(uncovered)
 
+    logger.info("Finished coverage in %3.2f min" % ((time.time()-t0)/60.))
     if parser.has_option("options", "combineAnas"):
         """ Combine analyses """
 

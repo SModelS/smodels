@@ -390,7 +390,7 @@ class ClustererTest(unittest.TestCase):
         mingap = 5.*GeV
         smsDict = decomposer.decompose(model, sigmacut, massCompress=True, invisibleCompress=True, minmassgap=mingap)
 
-        # Select SMS:
+        # Select SMS (allowing for either new or old notation):
         smsFilter = ['(PV > C1-(1),N2(2)), (C1-(1) > N1~,W-), (N2(2) > N1,Z)', 
                      '(PV > C1-(1),N3(2)), (C1-(1) > N1~,W-), (N3(2) > N1,Z)', 
                      '(PV > N2(1),C1+(2)), (N2(1) > N1,Z), (C1+(2) > N1,W+)',                     

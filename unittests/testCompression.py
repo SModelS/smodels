@@ -36,7 +36,7 @@ class CompressionTest(unittest.TestCase):
                 if evenParticles != "[[],[]]":
                     continue
                 tested = True
-                trueMothers = [mother for mother in sms.ancestors if mother is not sms]
+                trueMothers = [mother for mother in sms.getAncestors() if mother is not sms]
                 if not trueMothers:
                     continue
                 evenParticles = trueMothers[0].treeToBrackets()[0]
@@ -62,7 +62,7 @@ class CompressionTest(unittest.TestCase):
                 if evenParticles !="[[[t+],[t-]],[[q],[W+]]]":
                     continue
                 tested = True
-                trueMothers = [mother for mother in sms.ancestors if mother is not sms]
+                trueMothers = [mother for mother in sms.getAncestors() if mother is not sms]
                 self.assertEqual(len(trueMothers),0)
         self.assertTrue(tested)
 
@@ -83,13 +83,13 @@ class CompressionTest(unittest.TestCase):
                 evenParticles = str(evenParticles).replace("'","").replace(' ', '')
                 if evenParticles !="[[[b]],[[b]]]":
                     continue
-                mother = sms.ancestors[0]
+                mother = sms.getAncestors()[0]
                 masses = [node.mass for node in mother.nodes if node.isSM is False]
                 tested = True
                 dm=abs(masses[2]-masses[4])/GeV
                 #If intermediate BSM states are compared there are two elements ([[[b],[c,q]],[[b],[q,q]]])
                 # which do not get combined because their branches differ by the charges of the intermediate states
-                self.assertEqual(len(sms.ancestors),24)
+                self.assertEqual(len(sms.getAncestors()),24)
                 self.assertTrue(dm < 5.0)
         self.assertTrue(tested)
 
