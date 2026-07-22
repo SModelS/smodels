@@ -231,25 +231,25 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
-        'theory prediction (fb)' : 4.207057e-05,
-        'upper limit (fb)' : 0.0371,
-        'expected upper limit (fb)' : 0.0371,
+        'theory prediction (fb)' : 0.004140203,
+        'upper limit (fb)' : 3.447834,
+        'expected upper limit (fb)' : 3.620791,
         'TxNames' : ['T6bbHH'],
         'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
         'AnalysisID' : 'ATLAS-SUSY-2018-31',
-        'DataSetID' : 'SRB',
+        'DataSetID' : '(combined)',
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
-        'dataType' : 'efficiencyMap',
-        'r' : 0.001133978,
-        'r_expected' : 0.001133978,
+        'dataType' : 'combined',
+        'r' : 0.001200813,
+        'r_expected' : 0.001143453,
         'Width (GeV)' : [
             [13.4903869, 0.00112364506, 'stable'],
             [13.4903869, 0.00112364506, 'stable']
         ],
-        'nll' : 2.426637,
-        'nll_min' : 2.426636,
-        'nll_SM' : 2.4262
+        'nll' : -0.732664,
+        'nll_min' : -0.732664,
+        'nll_SM' : -0.733033
     },
     {
         'maxcond' : 0.0,
@@ -341,12 +341,12 @@ smodelsOutputDefault = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 73.08604,
-        'element' : '[[[jet,jet,W]],[[jet,t,b,W]]] (MET,MET)'
+        'element' : '[[[t,b,W]],[[jet,jet,jet,W]]] (MET,MET)'
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 73.08604,
-        'element' : '[[[t,b,W]],[[jet,jet,jet,W]]] (MET,MET)'
+        'element' : '[[[jet,jet,W]],[[jet,t,b,W]]] (MET,MET)'
     },
     {
         'sqrts (TeV)' : 13.0,
@@ -396,12 +396,12 @@ smodelsOutputDefault = {
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 73.08604,
-        'element' : '[[[jet,jet,W]],[[jet,t,b,W]]] (MET,MET)'
+        'element' : '[[[t,b,W]],[[jet,jet,jet,W]]] (MET,MET)'
     },
     {
         'sqrts (TeV)' : 13.0,
         'weight (fb)' : 73.08604,
-        'element' : '[[[t,b,W]],[[jet,jet,jet,W]]] (MET,MET)'
+        'element' : '[[[jet,jet,W]],[[jet,t,b,W]]] (MET,MET)'
     },
     {
         'sqrts (TeV)' : 13.0,
