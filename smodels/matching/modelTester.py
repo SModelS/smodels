@@ -34,15 +34,11 @@ from collections import OrderedDict
 import os
 import sys
 import time
-try:
-    from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
-except ImportError:
-    from configparser import ConfigParser as SafeConfigParser, NoSectionError, NoOptionError
+from configparser import ConfigParser, NoSectionError, NoOptionError
 import logging
-ConfigParserType = SafeConfigParser
 
 def testPoint( inputFile : PathType, outputDir : os.PathLike,
-        parser : ConfigParserType, database : Database ) -> dict:
+        parser : ConfigParser, database : Database ) -> dict:
     """
     Test model point defined in input file (running decomposition, check
     results, test coverage)
