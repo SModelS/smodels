@@ -30,7 +30,7 @@ class SpeyModelFacade:
     """ very simple container that wraps around spey models,
     and adapts the API to SModelS """
 
-    def __init__ ( self, speyModel, dataType : str, name : str,
+    def __init__ ( self, speyModel: object, dataType : str, name : str,
                    totalXsec: UnitXSec ):
         self.speyModel = speyModel
         self.dataType = dataType
@@ -58,14 +58,14 @@ class SpeyModelFacade:
 
     def nll ( self, mu : float, evaluationType : NllEvalType = observed,
               asimov : Optional[float] = None,
-              **kwargs ):
+              **kwargs ) -> float:
         exp = self.translateExpectationType ( evaluationType )
         kwargs["return_nll"]=True
         ret = self.speyModel.likelihood ( poi_test=mu,
                expected = exp, **kwargs )
         return float(ret)
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         return self.totalXsec
 
     @classmethod
@@ -219,7 +219,7 @@ class SpeyRetriever:
         return facade
 
     @classmethod
-    def forSingleBin( cls, regionSet: str, dataset, nsigDict, deltas_rel : float = 0.2,
+    def forSingleBin( cls, regionSet: str, dataset: object, nsigDict: dict, deltas_rel : float = 0.2,
                       lumi : Optional[UnitLumi]=None ) -> SpeyModelFacade:
         """ get a sub computer for an efficiency map (single bin).
 
@@ -254,7 +254,7 @@ class SpeyRetriever:
         return facade
 
     @classmethod
-    def forNNs(cls, regionSet: str, dataset, nsigDict ) -> SpeyModelFacade:
+    def forNNs(cls, regionSet: str, dataset: object, nsigDict: dict ) -> SpeyModelFacade:
         """ get a sub computer for an NN combination.
 
         :param dataset: CombinedDataSet object
@@ -313,7 +313,7 @@ class SpeyRetriever:
         # return facade
 
     @classmethod
-    def forPyhf(cls, regionSet: str, dataset, nsigDict) -> SpeyModelFacade:
+    def forPyhf(cls, regionSet: str, dataset: object, nsigDict: dict) -> SpeyModelFacade:
         """ get a sub computer for pyhf combination.
 
         :param dataset: CombinedDataSet object
@@ -343,7 +343,7 @@ class SpeyRetriever:
         return facade
 
     @classmethod
-    def forTruncatedGaussian(cls, theorypred, corr : float =0.6 ) -> None:
+    def forTruncatedGaussian(cls, theorypred: object, corr : float =0.6 ) -> None:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
@@ -355,7 +355,7 @@ class SpeyRetriever:
         return None
 
     @classmethod
-    def forAnalysesComb(cls,theoryPredictions, deltas_rel : float = 0.0) -> AnaCombLikelihoodComputer:
+    def forAnalysesComb(cls,theoryPredictions: list, deltas_rel : float = 0.0) -> AnaCombLikelihoodComputer:
         """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
         :param deltas_rel: relative error for the signal
@@ -377,7 +377,7 @@ class SimpleSpeyDataSet:
             self.bgError = bgError
 
     class GlobalInfo:
-        def __init__ ( self, lumi ):
+        def __init__ ( self, lumi: object ):
             self.id = "SimpleSpeyDataSet"
             self.lumi = lumi
 
@@ -387,10 +387,10 @@ class SimpleSpeyDataSet:
         self.dataInfo = self.SimpleInfo ( observedN, evaluationTypeBG, bgError )
         self.globalInfo = self.GlobalInfo( lumi )
 
-    def getLumi ( self ):
+    def getLumi ( self ) -> fb:
         return self.globalInfo.lumi
 
-    def getType ( self ):
+    def getType ( self ) -> str:
         return "efficiencyMap"
 
 if __name__ == "__main__":

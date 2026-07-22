@@ -33,9 +33,9 @@ class Pythia6Wrapper(WrapperBase):
     """
 
     def __init__(self,
-                 configFile="<install>/smodels/etc/pythia.card",
-                 executablePath="<install>/smodels/lib/pythia6/pythia_lhe",
-                 srcPath="<install>/smodels/lib/pythia6/"):
+                 configFile: str = "<install>/smodels/etc/pythia.card",
+                 executablePath: str = "<install>/smodels/lib/pythia6/pythia_lhe",
+                 srcPath: str = "<install>/smodels/lib/pythia6/"):
         """
         :param configFile: Location of the config file, full path; copy this
                            file and provide tools to change its content and to provide a template
@@ -59,7 +59,7 @@ class Pythia6Wrapper(WrapperBase):
 
         self.unlink()
 
-    def checkFileExists(self, inputFile):
+    def checkFileExists(self, inputFile: str) -> str:
         """
         Check if file exists, raise an IOError if it does not.
 
@@ -73,7 +73,7 @@ class Pythia6Wrapper(WrapperBase):
 
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Describe the current status
 
@@ -85,7 +85,7 @@ class Pythia6Wrapper(WrapperBase):
         return ret
 
 
-    def unlink(self, unlinkdir=True):
+    def unlink(self, unlinkdir: bool = True):
         """
         Remove temporary files.
 
@@ -109,7 +109,7 @@ class Pythia6Wrapper(WrapperBase):
                 self.tempdir = None
 
 
-    def replaceInCfgFile(self, replacements={"NEVENTS": 10000, "SQRTS":8000}):
+    def replaceInCfgFile(self, replacements: dict = {"NEVENTS": 10000, "SQRTS": 8000}):
         """
         Replace strings in the config file by other strings, similar to
         setParameter.
@@ -136,7 +136,7 @@ class Pythia6Wrapper(WrapperBase):
         f.close()
 
 
-    def setParameter(self, param="MSTP(163)", value=6):
+    def setParameter(self, param: str = "MSTP(163)", value: int = 6):
         """
         Modifies the config file, similar to .replaceInCfgFile.
 
@@ -153,7 +153,7 @@ class Pythia6Wrapper(WrapperBase):
         f.write(f"{param}={str(value)}\n")
         f.close()
 
-    def run( self, slhafile, lhefile=None, unlink=True ):
+    def run(self, slhafile: str, lhefile: str | None = None, unlink: bool = True):
         """
         Execute pythia_lhe with n events, at sqrt(s)=sqrts.
 
@@ -228,8 +228,8 @@ class Pythia6Wrapper(WrapperBase):
         return crossSection.getXsecFromLHEFile ( lheFile )
 
 
-    def _run(self, slhaFile, cfgfile=None, unlink=True, do_compile=False,
-            do_check=True ):
+    def _run(self, slhaFile: str, cfgfile: str | None = None, unlink: bool = True,
+             do_compile: bool = False, do_check: bool = True) -> str:
         """
         Really Run Pythia.
 

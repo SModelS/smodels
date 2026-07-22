@@ -16,7 +16,7 @@ from collections.abc import Iterable
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
 from functools import lru_cache
 
-def roundObj(obj, digits : int):
+def roundObj(obj, digits: int):
     """ round <obj> to <digits> digits """
     if isinstance(obj,Iterable):
         new_obj = tuple([np.round(x,digits) for x in obj])
@@ -24,7 +24,7 @@ def roundObj(obj, digits : int):
         new_obj = float(np.round(obj,digits))
     return new_obj
 
-def roundCache(argname = None, argpos : int = 0, digits : int = 8,
+def roundCache(argname: str | None = None, argpos : int = 0, digits : int = 8,
         maxsize: int = 128, verbose : bool = False,
         turnoff : bool = False ):
     """

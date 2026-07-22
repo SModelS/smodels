@@ -7,6 +7,8 @@
 """
 
 import weakref
+from typing import Any
+from collections.abc import Iterable
 
 
 class Particle(object):
@@ -15,11 +17,11 @@ class Particle(object):
     The properties are: label, pdg, mass, electric charge, color charge, width
     """
 
-    _instances = set()
-    _lastID = 0
+    _instances : set = set()
+    _lastID : int = 0
 
     
-    def __new__(cls, attributesDict={}, **kwargs):
+    def __new__(cls, attributesDict: dict = {}, **kwargs: Any) -> 'Particle':
         """
         Creates a particle. If a particle with the exact same attributes have
         already been created return this particle instead.
@@ -64,7 +66,7 @@ class Particle(object):
         cls._instances.add(weakref.ref(newParticle))
         return newParticle
 
-    def __getnewargs__(self):
+    def __getnewargs__(self) -> tuple:
         """
         Required for unpickling the object.
         When loading the pickled object, it will call __new__ with the
@@ -74,7 +76,7 @@ class Particle(object):
         attrDict = self.__class__._normalizedAttrDict(self.__dict__)
         return (attrDict,)
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict:
         """
         Makes sure the particle ID and comparison matrix
         are not stored in the pickle file, so they are dynamically assigned
@@ -85,21 +87,21 @@ class Particle(object):
 
         return attrDict
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict):
         """
         Dummy function, since all the initialization and attribute
         setting is handled by __new__.
         """
         pass
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return the object address. Required for using weakref
         """
         return self._id
     
     @classmethod
-    def _normalizedAttrDict(cls, data):
+    def _normalizedAttrDict(cls, data: dict) -> dict:
         """Drop runtime-only cache fields from attribute comparisons."""
 
         attrDict = dict(data.items())
@@ -111,7 +113,7 @@ class Particle(object):
 
 
     @classmethod
-    def getinstances(cls):
+    def getinstances(cls) -> list:
         dead = set()
         instances = []
         for ref in Particle._instances:
@@ -124,11 +126,11 @@ class Particle(object):
         return instances
 
     @classmethod
-    def getID(cls):
+    def getID(cls) -> int:
         Particle._lastID += 1
         return Particle._lastID
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: 'Particle') -> int:
         """
         Compares particle with other.
         The comparison is based on the particle properties.
@@ -149,28 +151,28 @@ class Particle(object):
         other._comp[self._id] = -cmpProp
         return cmpProp
 
-    def __lt__(self, p2):
+    def __lt__(self, p2: 'Particle') -> bool:
         return self.__cmp__(p2) == -1
 
-    def __gt__(self, p2):
+    def __gt__(self, p2: 'Particle') -> bool:
         return self.__cmp__(p2) == 1
 
-    def __eq__(self, p2):
+    def __eq__(self, p2: object) -> bool:
         return self.__cmp__(p2) == 0
 
-    def __ne__(self, p2):
+    def __ne__(self, p2: object) -> bool:
         return self.__cmp__(p2) != 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         if hasattr(self, 'label'):
             return self.label
         else:
             return ''
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
-    def __add__(self, other):
+    def __add__(self, other: 'Particle') -> 'Particle':
         """
         Define addition of two Particle objects
         or a Particle object and a MultiParticle object.
@@ -188,17 +190,17 @@ class Particle(object):
             combined = MultiParticle(particles=[self, other])
             return combined
 
-    def __radd__(self, other):
+    def __radd__(self, other: 'Particle') -> 'Particle':
         return self.__add__(other)
 
-    def __iadd__(self, other):
+    def __iadd__(self, other: 'Particle') -> 'Particle':
         return self.__add__(other)
 
-    def describe(self):
+    def describe(self) -> str:
         return str(self.__dict__)
 
-    def eqProperties(self, other,
-                     properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
+    def eqProperties(self, other: 'Particle',
+                     properties: list[str] = ['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']) -> bool:
         """
         Check if particle has the same properties (default is spin, colordim and eCharge)
         as other. Only compares the attributes which have been defined in both objects.
@@ -214,8 +216,8 @@ class Particle(object):
         else:
             return False
 
-    def cmpProperties(self, other,
-                      properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
+    def cmpProperties(self, other: 'Particle',
+                      properties: list[str] = ['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']) -> int:
         """
         Compare properties (default is isSM, spin, colordim, eCharge, mass and totalwidth).
         Return 0 if properties are equal, -1 if self < other and 1 if self > other.
@@ -246,7 +248,7 @@ class Particle(object):
 
         return 0
 
-    def copy(self):
+    def copy(self) -> 'Particle':
         """
         Make a copy of self with a distinct ID.
 
@@ -263,7 +265,7 @@ class Particle(object):
 
         return newParticle
 
-    def chargeConjugate(self, label=None):
+    def chargeConjugate(self, label: str | None = None) -> 'Particle':
         """
         Returns the charge conjugate particle (flips the sign of eCharge).
         If it has a pdg property also flips its sign.
@@ -296,7 +298,7 @@ class Particle(object):
 
         return pConjugate
 
-    def isNeutral(self):
+    def isNeutral(self) -> bool:
         """
         Return True if the particle is electrically charged and color neutral.
         If these properties have not been defined, return True.
@@ -311,7 +313,7 @@ class Particle(object):
 
         return True
 
-    def isMET(self):
+    def isMET(self) -> bool:
         """
         Checks if the particle can be considered as MET.
         If the _isInvisible attribute has not been defined, it will return True/False is isNeutral() = True/False.
@@ -325,7 +327,7 @@ class Particle(object):
         else:
             return self.isNeutral()
 
-    def isPrompt(self):
+    def isPrompt(self) -> bool:
         """
         Checks if the particle decays promptly.
         If _isPrompt has been set, return its value,
@@ -338,7 +340,7 @@ class Particle(object):
 
         return self._isPrompt
 
-    def isStable(self):
+    def isStable(self) -> bool:
         """
         Checks if the particle is stable.
         If _isStable has been set, return its value,
@@ -352,7 +354,7 @@ class Particle(object):
 
         return self._isStable
 
-    def contains(self, particle):
+    def contains(self, particle: 'Particle') -> bool:
         """
         If particle is a Particle object check if self and particle are the same object.
 
@@ -377,9 +379,9 @@ class InvisibleParticle(Particle):
     Particle._instances, which improves performance.
     """
 
-    _instances = set()
+    _instances : set = set()
     
-    def __new__(cls, attributesDict={}, **kwargs):
+    def __new__(cls, attributesDict: dict = {}, **kwargs: Any) -> 'InvisibleParticle':
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
         # Enforce invisibility for all InvisibleParticle instances.
@@ -387,7 +389,7 @@ class InvisibleParticle(Particle):
         return super(InvisibleParticle, cls).__new__(cls, attrDict)
 
     @classmethod
-    def getinstances(cls):
+    def getinstances(cls) -> list:
         dead = set()
         instances = []
         for ref in InvisibleParticle._instances:
@@ -408,9 +410,9 @@ class MultiParticle(Particle):
         The properties are: label, pdg, mass, electric charge, color charge, width
     """
 
-    _instances = set()
+    _instances : set = set()
 
-    def __new__(cls, label=None, particles=[], attributesDict={}, **kwargs):
+    def __new__(cls, label: str | None = None, particles: list = [], attributesDict: dict = {}, **kwargs: Any) -> 'MultiParticle':
         """
         Creates a multiparticle. If a multiparticle with the exact same particles
         already been created return this multiparticle instead.
@@ -455,7 +457,7 @@ class MultiParticle(Particle):
         return newMultiParticle
 
     @classmethod
-    def getinstances(cls):
+    def getinstances(cls) -> list:
         dead = set()
         instances = []
         for ref in MultiParticle._instances:
@@ -468,7 +470,7 @@ class MultiParticle(Particle):
 
         return instances
 
-    def __getnewargs__(self):
+    def __getnewargs__(self) -> tuple:
         """
         Required for unpickling the object.
         When loading the pickled object, it will call __new__ with the
@@ -481,7 +483,7 @@ class MultiParticle(Particle):
 
         return (self.label, self.particles, attrDict)
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict:
         """
         Makes sure the particle ID and comparison matrix
         are not stored in the pickle file, so they are dynamically assigned
@@ -492,14 +494,14 @@ class MultiParticle(Particle):
 
         return attrDict
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict):
         """
         Dummy function, since all the initialization and attribute
         setting is handled by __new__.
         """
         pass
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
         """
         If MultiParticle does not have attribute, return a list
         if the attributes of each particle in self.particles.
@@ -521,8 +523,8 @@ class MultiParticle(Particle):
         except (AttributeError, IndexError, TypeError) as e:
             raise AttributeError(e)
 
-    def cmpProperties(self, other,
-                      properties=['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']):
+    def cmpProperties(self, other: 'Particle',
+                      properties: list[str] = ['isSM', 'spin', 'colordim', 'eCharge', 'mass', 'totalwidth']) -> int:
         """
         Compares the properties in self with the ones in other.
         If other is a Particle object, checks if any of the particles in self matches
@@ -551,7 +553,7 @@ class MultiParticle(Particle):
         cmpv = self.particles[0].cmpProperties(otherParticles[0], properties)
         return cmpv
 
-    def __add__(self, other):
+    def __add__(self, other: 'Particle') -> 'Particle':
         """
         Define addition of two Particle objects
         or a Particle object and a MultiParticle object.
@@ -574,13 +576,13 @@ class MultiParticle(Particle):
 
         return combined
 
-    def __radd__(self, other):
+    def __radd__(self, other: 'Particle') -> 'Particle':
         return self.__add__(other)
 
-    def __iadd__(self, other):
+    def __iadd__(self, other: 'Particle') -> 'Particle':
         return self.__add__(other)
 
-    def getPdgs(self):
+    def getPdgs(self) -> list:
         """
         pdgs appearing in MultiParticle
         :return: list of pgds of particles in the MultiParticle
@@ -590,7 +592,7 @@ class MultiParticle(Particle):
 
         return pdgs
 
-    def getLabels(self):
+    def getLabels(self) -> list:
         """
         labels appearing in MultiParticle
         :return: list of labels of particles in the MultiParticle
@@ -600,7 +602,7 @@ class MultiParticle(Particle):
 
         return labels
 
-    def isNeutral(self):
+    def isNeutral(self) -> bool:
         """
         Return True if ALL particles in particle list are neutral.
 
@@ -610,7 +612,7 @@ class MultiParticle(Particle):
         neutral = all(particle.isNeutral() for particle in self.particles)
         return neutral
 
-    def isMET(self):
+    def isMET(self) -> bool:
         """
         Checks if all the particles in self can be considered as MET.
 
@@ -620,7 +622,7 @@ class MultiParticle(Particle):
         met = all(particle.isMET() for particle in self.particles)
         return met
 
-    def contains(self, particle):
+    def contains(self, particle: 'Particle') -> bool:
         """
         Check if MultiParticle contains the Particle object or MultiParticle object.
 

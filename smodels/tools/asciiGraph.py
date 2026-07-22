@@ -18,7 +18,7 @@ from smodels.base.model import Model
 
 
 
-def _printParticle(label):
+def _printParticle(label: str) -> str:
     """
     Rename particles for the asciidraw routine.
     
@@ -29,7 +29,7 @@ def _printParticle(label):
     return label[:2]
 
 
-def _drawBranch(branch, upwards, htmlFormat, border, l):
+def _drawBranch(branch: list, upwards: bool, htmlFormat: bool, border: bool, l: int) -> str:
     """
     Draw a single branch.
     
@@ -98,7 +98,7 @@ def _drawBranch(branch, upwards, htmlFormat, border, l):
     return ret
 
 
-def asciidraw(sms, labels=True, html=False, border=False):
+def asciidraw(sms, labels: bool = True, html: bool = False, border: bool = False) -> str:
     """
     Draw a simple ASCII graph on the screen.
     

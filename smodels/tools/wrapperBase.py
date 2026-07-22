@@ -35,7 +35,7 @@ class WrapperBase(object):
         self.tempdir = ""
         self.maycompile = True
 
-    def installDirectory(self):
+    def installDirectory(self) -> str:
         """
         :returns: the installation directory of the tool
 
@@ -47,14 +47,14 @@ class WrapperBase(object):
         return self.executablePath[:p]
 
 
-    def pathOfExecutable(self):
+    def pathOfExecutable(self) -> str:
         """
         :returns: path of executable
 
         """
         return self.executablePath
 
-    def chmod(self):
+    def chmod(self) -> bool:
         """
         chmod 755 on executable, if it exists.  Do nothing, if it doesnt exist.
         """
@@ -66,7 +66,7 @@ class WrapperBase(object):
         os.chmod ( self.executablePath, mode )
         return True
 
-    def compile ( self ):
+    def compile ( self ) -> bool | None:
         """
         Try to compile the tool.
         """
@@ -86,7 +86,7 @@ class WrapperBase(object):
         return True
 
 
-    def checkInstallation(self, compile=True ):
+    def checkInstallation(self, compile: bool = True ) -> bool:
         """
         Checks if installation of tool is correct by looking for executable and
         executing it. If check is False and compile is True, then try and compile it.
@@ -111,7 +111,7 @@ class WrapperBase(object):
             self.chmod()
         return True
 
-    def basePath(self):
+    def basePath(self) -> str:
         """
         Get the base installation path.
 
@@ -119,7 +119,7 @@ class WrapperBase(object):
         return os.path.dirname(inspect.getabsfile(self.basePath))
 
 
-    def absPath(self, path):
+    def absPath(self, path: str | None) -> str:
         """
         Get the absolute path of <path>, replacing <install> with the
         installation directory.
@@ -133,7 +133,7 @@ class WrapperBase(object):
         path = os.path.abspath(path)
         return path
 
-    def tempDirectory(self):
+    def tempDirectory(self) -> str:
         """
         Return the temporary directory name.
 
@@ -154,7 +154,7 @@ class WrapperBase(object):
 
 
 
-def ok(b):
+def ok(b: bool) -> str:
     """
     :returns: 'ok' if b is True, else, return 'error'.
 

@@ -126,7 +126,7 @@ class PyhfData:
     def __init__( self, nsignals : Dict, inputJson : dict,
             regions : Optional[list] = None, includeCRs : bool = False,
             signalUncertainty : Optional[float] = None,
-            globalInfo  = None, jsonFileName : Optional[str] = None ):
+            globalInfo : Optional[object] = None, jsonFileName : Optional[str] = None ):
         self.globalInfo = globalInfo
         self.nsignals = nsignals
         self.getTotalYield()
@@ -374,7 +374,7 @@ class PyhfUpperLimitComputer:
     signal information in the 'data' instance of 'PyhfData'
     """
 
-    def __init__(self, data, cl : float =0.95, lumi : Optional[UnitLumi]= None ):
+    def __init__(self, data: PyhfData, cl : float =0.95, lumi : Optional[UnitLumi]= None ):
         """
 
         :param data: instance of 'PyhfData' holding the signals information
@@ -475,7 +475,7 @@ class PyhfUpperLimitComputer:
             pass
         self.nsignals_1 = self.nsignals.copy()  # nsignals at previous loop
 
-    def changeChannelName ( self, srInfo ):
+    def changeChannelName ( self, srInfo: dict ) -> list:
         """ changes the channel names in the json to match the SModelS name.
         FIXME this is only a hack for now, should be replaced by a
         self-respecting dataIdMap in the database itself,
@@ -603,7 +603,7 @@ class PyhfUpperLimitComputer:
         self.data.nsignals = copy.deepcopy(self.bu_signal)
         del self.bu_signal
 
-    def get_position(self, name, model):
+    def get_position(self, name: str, model: object) -> int:
         """
         :param name: name of the parameter one wants to increase
         :param model: the pyhf model
@@ -616,7 +616,7 @@ class PyhfUpperLimitComputer:
             else:
                 position += model.config.param_set(par).n_parameters
 
-    def rescaleBgYields(self, init_pars, workspace, model):
+    def rescaleBgYields(self, init_pars: list, workspace: dict, model: object) -> list:
         """
         Increase initial value of nuisance parameters until the starting value of the total yield (mu*signal + background) is positive
 
@@ -756,8 +756,8 @@ class PyhfUpperLimitComputer:
             self.restore()
             return ret / 2.
 
-    def compute_invhess(self, x, data, model,
-            index : int, epsilon : float = 1e-05 ):
+    def compute_invhess(self, x: np.ndarray, data: np.ndarray, model: object,
+            index : int, epsilon : float = 1e-05 ) -> float:
         """
         if inv_hess is not given by the optimiser, calculate numerically by
         evaluating second order partial derivatives using 2 point central
@@ -794,7 +794,7 @@ class PyhfUpperLimitComputer:
                     hessian[i,j] = partial_xi_xj
                     if i!=j: hessian[j,i] = partial_xi_xj
 
-            def is_positive_definite(matrix):
+            def is_positive_definite(matrix: np.ndarray) -> bool:
                 eigenvalues = np.linalg.eigvals(matrix)
                 return all(eig > 0 for eig in eigenvalues)
 

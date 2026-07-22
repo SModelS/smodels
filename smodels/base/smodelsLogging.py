@@ -12,56 +12,56 @@ import logging
 
 class Colors:
     def __init__ ( self ):
-        self.on = False
+        self.on : bool = False
 
     @property
-    def debug ( self ):
+    def debug ( self ) -> str:
         return ""
 
     @property
-    def error ( self ):
+    def error ( self ) -> str:
         return self.red
 
     @property
-    def warn ( self ):
+    def warn ( self ) -> str:
         return self.yellow
 
     @property
-    def info ( self ):
+    def info ( self ) -> str:
         return self.green
 
     @property
-    def magenta( self ):
+    def magenta( self ) -> str:
         if self.on == False: return ""
         return '\033[0;35m'
 
     @property
-    def green( self ):
+    def green( self ) -> str:
         if self.on == False: return ""
         return '\033[0;32m'
 
     @property
-    def red ( self ):
+    def red ( self ) -> str:
         if self.on == False: return ""
         return '\033[0;31m'
 
     @property
-    def yellow ( self ):
+    def yellow ( self ) -> str:
         if self.on == False: return ""
         return '\033[0;33m'
 
     @property
-    def cyan ( self ):
+    def cyan ( self ) -> str:
         if self.on == False: return ""
         return '\033[0;36m'
 
     @property
-    def blue ( self ):
+    def blue ( self ) -> str:
         if self.on == False: return ""
         return '\033[0;34m'
 
     @property
-    def reset ( self ):
+    def reset ( self ) -> str:
         if self.on == False: return ""
         return '\033[;0m'
 
@@ -69,15 +69,15 @@ colors = Colors()
 
 
 class ColorizedStreamHandler(logging.StreamHandler):
-    def _color_wrap(self, *c):
-        def wrapped(inp):
+    def _color_wrap(self, *c: str) -> callable:
+        def wrapped(inp: str) -> str:
             return "".join(list(c) + [inp, colors.reset])
         return wrapped
 
-    def __init__(self, stream=None):
+    def __init__(self, stream: object = None):
         logging.StreamHandler.__init__(self, stream)
 
-    def should_color(self):
+    def should_color(self) -> bool:
 
         # If the stream is a tty we should color it
         if hasattr( self.stream, "isatty") and self.stream.isatty():
@@ -90,7 +90,7 @@ class ColorizedStreamHandler(logging.StreamHandler):
         # If anything else we should not color it
         return False
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         msg = logging.StreamHandler.format(self, record)
 
         if self.should_color():
@@ -107,7 +107,7 @@ class ColorizedStreamHandler(logging.StreamHandler):
 
         return msg
 
-def getLogger ():
+def getLogger () -> logging.Logger:
     FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in' \
        ' %(lineno)s: %(message)s'
     logging.basicConfig(format=FORMAT)
@@ -121,7 +121,7 @@ def getLogger ():
 
 logger = getLogger()
 
-def getLogLevel( asString=False ):
+def getLogLevel( asString: bool = False ) -> int | str:
     """ obtain the current log level.
     :params asString: return string, not number.
     """
@@ -140,7 +140,7 @@ def getLogLevel( asString=False ):
     return "unknown log level"
 
 
-def setLogLevel ( level ):
+def setLogLevel ( level: int | str | None ):
     """ set the log level of the central logger.
         can either be directly an integer ( e.g. logging.DEBUG ),
         or "debug", "info", "warning", or "error".

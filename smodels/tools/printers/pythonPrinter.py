@@ -33,13 +33,13 @@ class PyPrinter(BasicPrinter):
             filename : Optional[PathType]=None,
             outputFormat : str = 'version3'):
         BasicPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "py"
-        self.printtimespent = False
-        self.printingOrder = [OutputStatus, TopologyDict,
+        self.name: str = "py"
+        self.printtimespent: bool = False
+        self.printingOrder: list = [OutputStatus, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               TheoryPrediction, Uncovered]
-        self.errorsforr = False
-        self.toPrint = [None]*len(self.printingOrder)
+        self.errorsforr: bool = False
+        self.toPrint: list = [None]*len(self.printingOrder)
 
     def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
@@ -88,7 +88,7 @@ class PyPrinter(BasicPrinter):
         # that we also return the output dictionary
         return outputDict
 
-    def _formatTopologyDict(self, obj) -> Optional[dict]:
+    def _formatTopologyDict(self, obj: object) -> Optional[dict]:
         """
         Format data for a TopologyDict object.
 
@@ -108,7 +108,7 @@ class PyPrinter(BasicPrinter):
         else:
             return {"SMS Decomposition": smsList}
 
-    def _formatSMS(self, obj) -> dict:
+    def _formatSMS(self, obj: object) -> dict:
         """
         Format data for a SMS object.
 
@@ -171,7 +171,7 @@ class PyPrinter(BasicPrinter):
 
         return smsDict
 
-    def _formatOutputStatus(self, obj) -> dict:
+    def _formatOutputStatus(self, obj: object) -> dict:
         """
         Format data for a OutputStatus object.
 
@@ -196,7 +196,7 @@ class PyPrinter(BasicPrinter):
             infoDict['time spent'] = f"{time.time() - self.time:.2f}s"
         return {'OutputStatus': infoDict}
 
-    def addErrorsForRValues(self, obj, resDict : dict ):
+    def addErrorsForRValues(self, obj: object, resDict : dict ):
         """ for obj add the errors on the r values to resDict """
         r_e_p1 = obj.getRValue ( evaluationType = self.getTypeOfExpected(),
                 nSigma = 1 )
@@ -214,7 +214,7 @@ class PyPrinter(BasicPrinter):
         # if ul_m1 != None:
         #     resDict['r_m1'] = self._round ( ul_m1 )
 
-    def _formatTheoryPredictionList(self, obj) -> dict:
+    def _formatTheoryPredictionList(self, obj: object) -> dict:
         """
         Format data of the TheoryPredictionList object.
 
@@ -248,7 +248,7 @@ class PyPrinter(BasicPrinter):
 
             maxconds = theoryPrediction.getmaxCondition()
 
-            def _convWidth(x):
+            def _convWidth(x: object) -> object:
                 if type(x) == type(GeV):
                     x = float(x.asNumber(GeV))
                 if x == float("inf"):
@@ -257,7 +257,7 @@ class PyPrinter(BasicPrinter):
                     x = "stable"
                 return x
 
-            def roundme(x):
+            def roundme(x: object) -> object:
                 if type(x) == tuple:
                     return (round(x[0].asNumber(GeV), 2), x[1].asNumber(GeV))
                 return round(x.asNumber(GeV), 2)
@@ -344,7 +344,7 @@ class PyPrinter(BasicPrinter):
 
         return {'ExptRes': ExptRes}
 
-    def _formatDoc(self, obj) -> dict:
+    def _formatDoc(self, obj: object) -> dict:
         """
         Format a pyslha object to be printed as a dictionary
 
@@ -385,7 +385,7 @@ class PyPrinter(BasicPrinter):
                 'chamix': chamix, 'MM': {}, 'sbotmix': sbotmix,
                 'EXTPAR': EXTPAR, 'mass': mass}
 
-    def _formatUncovered(self, obj) -> dict:
+    def _formatUncovered(self, obj: object) -> dict:
         """
         Format data of the Uncovered object containing coverage info
 
@@ -426,10 +426,10 @@ class PyPrinter(BasicPrinter):
 
         return uncoveredDict
 
-    def _formatTheoryPrediction(self,obj) -> dict:
+    def _formatTheoryPrediction(self,obj: object) -> dict:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj) -> dict:
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> dict:
         """
         Format data of the TheoryPredictionsCombiner object.
 

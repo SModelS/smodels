@@ -26,7 +26,7 @@ from smodels.base.physicsUnits import UnitXSec
 from smodels.tools.caching import lru_cache
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 
-def getCompRetrieverModule():
+def getCompRetrieverModule() -> type:
     """ very single convenience function to centralize
     switching between our stats code and spey. """
     from smodels.base import runtime
@@ -41,7 +41,7 @@ class CompRetriever:
     """ simple class that retrieves and constructs the sub computers required by StatsComputer """
 
     @classmethod
-    def forMultiBinSL(cls,regionSet : str, dataset, nsigDict,
+    def forMultiBinSL(cls,regionSet : str, dataset: CombinedDataSet, nsigDict: dict,
             deltas_rel : Optional[float] = 0.0  ) -> SLUpperLimitComputer:
         """ get a subcomputer for simplified likelihood sr-combination.
 
@@ -130,7 +130,7 @@ class CompRetriever:
         return computer
 
     @classmethod
-    def forNNs(cls, regionSet : str, dataset, nsigDict ) -> NNUpperLimitComputer:
+    def forNNs(cls, regionSet : str, dataset: CombinedDataSet, nsigDict: dict ) -> NNUpperLimitComputer:
         """ get a sub computer for an NN combination.
 
         :param regionSet: the regionSet defining the SRs for which to construct the computer
@@ -233,7 +233,7 @@ class CompRetriever:
         return upperLimitComputer
 
     @classmethod
-    def forTruncatedGaussian(cls,theorypred, corr : float =0.6 ) -> Union[None,TruncatedGaussians]:
+    def forTruncatedGaussian(cls,theorypred: object, corr : float =0.6 ) -> Union[None,TruncatedGaussians]:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
         :param corr: correction factor: \
@@ -262,7 +262,7 @@ class CompRetriever:
         return computer
 
     @classmethod
-    def forAnalysesComb(cls,theoryPredictions, deltas_rel : Optional[float]) \
+    def forAnalysesComb(cls,theoryPredictions: list, deltas_rel : Optional[float]) \
             -> AnaCombLikelihoodComputer:
         """ get a sub computer for combination of analyses
         :param theoryPredictions: list of TheoryPrediction objects
@@ -297,7 +297,7 @@ class StatsComputer:
             computer.allowNegativeSignals = self.allowNegativeSignals
 
     @classmethod
-    def forTheoryPrediction(cls, theoryPrediction) -> Union[None,'StatsComputer']:
+    def forTheoryPrediction(cls, theoryPrediction: object) -> Union[None,'StatsComputer']:
 
         CompRetriever = getCompRetrieverModule()
 
@@ -436,7 +436,7 @@ class StatsComputer:
                     evaluationType = evaluationType, **kwargs )
         return None
 
-    def transform ( self, evaluationType ):
+    def transform ( self, evaluationType: NllEvalType ):
         """ SL only. transform the data to evaluationType or observed """
         for subComputer in self.subComputers:
             if subComputer is None:
@@ -445,7 +445,7 @@ class StatsComputer:
                 continue
             subComputer.likelihoodComputer.transform ( evaluationType )
 
-    def restore ( self, evaluationType ):
+    def restore ( self, evaluationType: NllEvalType ):
         """ SL only. transform the data to evaluationType or observed """
         if evaluationType != observed:
             return
@@ -511,7 +511,7 @@ class StatsComputer:
                 most_sensitive_computer = computer
         return most_sensitive_computer
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         """ get the total yield, summing over all computers """
         ret = 0.*fb
         for computer in self.subComputers:
@@ -552,20 +552,20 @@ class SimpleStatsDataSet:
             self.bgError = bgError
 
     class GlobalInfo:
-        def __init__ ( self, lumi ):
+        def __init__ ( self, lumi: UnitLumi ):
             self.id = "SimpleStatsDataSet"
             self.lumi = lumi
 
     def __init__ ( self, observedN : float, expectedBG : float,
-                   bgError : float, lumi = 1.0*fb ):
+                   bgError : float, lumi: UnitLumi = 1.0*fb ):
         """ initialise the dataset with all relevant stats """
         self.dataInfo = self.SimpleInfo ( observedN, expectedBG, bgError )
         self.globalInfo = self.GlobalInfo( lumi )
 
-    def getLumi ( self ):
+    def getLumi ( self ) -> UnitLumi:
         return self.globalInfo.lumi
 
-    def getType ( self ):
+    def getType ( self ) -> str:
         return "efficiencyMap"
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ class Browser(object):
     smodels-database. Browser can be restricted to specified run or experiment.
     """
 
-    def __init__(self, database, force_txt = False ):
+    def __init__(self, database, force_txt: bool = False):
         """
         :param force_txt: If True forces loading the text database.
         :param database: Path to the database or Database object
@@ -58,10 +58,10 @@ class Browser(object):
         else:
             self._selectedExpResults[index] = expRes
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._selectedExpResults)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str([expRes.globalInfo.getInfo('id') for expRes in self._selectedExpResults])
 
 
@@ -73,7 +73,7 @@ class Browser(object):
 
         self._selectedExpResults = self.database.expResultList[:]
 
-    def getValuesFor(self,attribute,expResult=None):
+    def getValuesFor(self, attribute: str, expResult=None):
         """
         Returns a list for the possible values appearing in the database
         for the required attribute (sqrts,id,constraint,...).
@@ -90,7 +90,7 @@ class Browser(object):
             return getValuesForObj(expResult,attribute)
 
 
-    def getAttributes(self,showPrivate=False):
+    def getAttributes(self, showPrivate: bool = False) -> list[str]:
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
@@ -106,7 +106,7 @@ class Browser(object):
 
         return attributes
 
-    def getEfficiencyFor(self,expid,dataset,txname,massarray):
+    def getEfficiencyFor(self, expid: str, dataset: str, txname: str, massarray):
         """
         Get an efficiency for the given experimental id,
         the dataset name, the txname, and the massarray.
@@ -138,7 +138,7 @@ class Browser(object):
 
         return expres.getEfficiencyFor(txname=txname, mass=massarray, dataset=dataset)
 
-    def getULFor(self,expid,txname,massarray, evaluationType=False ):
+    def getULFor(self, expid: str, txname: str, massarray, evaluationType: bool = False):
         """
         Get an upper limit for the given experimental id, the txname,
         and the massarray.
@@ -178,7 +178,7 @@ class Browser(object):
         logger.warning( f"Could not find TxName {txname} .")
         return None
 
-    def getULForSR(self,expid,datasetID):
+    def getULForSR(self, expid: str, datasetID: str):
         """
         Get an upper limit for the given experimental id and dataset (signal region).
         Can only be used for efficiency-map results.
@@ -211,7 +211,7 @@ class Browser(object):
         return None
 
 
-    def selectExpResultsWith(self,**restrDict):
+    def selectExpResultsWith(self, **restrDict):
         """
         Loads the list of the experimental results (pair of InfoFile and DataFile)
         satisfying the restrictions to the _selectedExpResults.

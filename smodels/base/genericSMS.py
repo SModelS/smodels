@@ -11,6 +11,7 @@ from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.inclusiveObjects import InclusiveValue
 from collections import OrderedDict
 from itertools import product
+from typing import Any
 
 class GenericSMS(object):
     """
@@ -23,33 +24,33 @@ class GenericSMS(object):
         Initialize basic attributes.
         """
 
-        self._canonName = None
-        self._rootIndex = None
-        self._successors = OrderedDict()  # Stores the nodes and their successors (daughters)
-        self._predecessors = {}  # Stores the nodes and their predecessors (parents)
-        self._nodesMapping = {}  # Stores the nodeIndex->node object mapping
-        self._nodeCanonNames = {}  # Stores the canonical names for the nodes
-        self._finalStates = {}  # Stores the final states of each node
-        self._nextNodeIndex = 0  # Cache the next free node index for fast insertions
-        self._sorted = False # Tag SMS as sorted or not
-        self._genIndexIteratorCache = {} # Cache for genIndexIterator results
+        self._canonName : int | InclusiveValue | None = None
+        self._rootIndex : int | None = None
+        self._successors : OrderedDict[int, list[int]] = OrderedDict()  # Stores the nodes and their successors (daughters)
+        self._predecessors : dict[int, int | None] = {}  # Stores the nodes and their predecessors (parents)
+        self._nodesMapping : dict[int, Any] = {}  # Stores the nodeIndex->node object mapping
+        self._nodeCanonNames : dict[int, int | InclusiveValue] = {}  # Stores the canonical names for the nodes
+        self._finalStates : dict[int, list[int]] = {}  # Stores the final states of each node
+        self._nextNodeIndex : int = 0  # Cache the next free node index for fast insertions
+        self._sorted : bool = False # Tag SMS as sorted or not
+        self._genIndexIteratorCache : dict = {} # Cache for genIndexIterator results
 
     def _clearGenIndexIteratorCache(self):
         """Clear cached breadth-first traversal results."""
 
         self._genIndexIteratorCache = {}
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return object.__hash__(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Returns the string representation of the tree.
         """
 
         return str(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Returns a string representing the process
         described by the tree.
@@ -57,7 +58,7 @@ class GenericSMS(object):
 
         return self.treeToString()
 
-    def getFinalStateStr(self):
+    def getFinalStateStr(self) -> str:
         """
         Returns a simplified string representation of the SMS 
         displaying only  the final states.
@@ -90,7 +91,7 @@ class GenericSMS(object):
         return fsStr
 
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         """
         If the attribute has not been defined for self
         try to fetch it from its nodes
@@ -111,7 +112,7 @@ class GenericSMS(object):
         except AttributeError:
             raise AttributeError(f"Neither SMS nor nodes have attribute ``{attr}''")
 
-    def add_node(self, node, nodeIndex=None):
+    def add_node(self, node: Any, nodeIndex: int | None = None) -> int:
         """
         Adds a node object to the tree. If nodeIndex is None,
         the node index will be automatically assigned.
@@ -135,7 +136,7 @@ class GenericSMS(object):
 
         return nodeIndex
 
-    def add_nodes_from(self, nodes):
+    def add_nodes_from(self, nodes: list) -> list[int]:
         """
         Adds a list of nodes to the Tree.
 
@@ -150,7 +151,7 @@ class GenericSMS(object):
 
         return nodeIndices
 
-    def remove_node(self, nodeIndex):
+    def remove_node(self, nodeIndex: int) -> None:
         """
         Removes a node from the tree if the nodeIndex is in the tree.
         The node is removed as well as its appearence in any edges.
@@ -183,7 +184,7 @@ class GenericSMS(object):
 
         self._clearGenIndexIteratorCache()
 
-    def remove_nodes_from(self, nodeIndices):
+    def remove_nodes_from(self, nodeIndices: list[int]) -> None:
         """
         Removes a list of nodes from the Tree.
 
@@ -193,7 +194,7 @@ class GenericSMS(object):
         for nodeIndex in nodeIndices:
             self.remove_node(nodeIndex)
 
-    def add_edge(self, nodeIndexA, nodeIndexB):
+    def add_edge(self, nodeIndexA: int, nodeIndexB: int) -> None:
         """
         Adds a directed edge to existing nodes in the Tree (nodeA -> nodeB).
 
@@ -205,7 +206,7 @@ class GenericSMS(object):
         self._predecessors[nodeIndexB] = nodeIndexA
         self._clearGenIndexIteratorCache()
 
-    def add_edges_from(self, edges):
+    def add_edges_from(self, edges: list[tuple[int, int]]) -> None:
         """
         Adds a list of directed edges to the Tree.
 
@@ -216,7 +217,7 @@ class GenericSMS(object):
         for edge in edges:
             self.add_edge(edge[0], edge[1])
 
-    def remove_edge(self, nodeIndexA, nodeIndexB):
+    def remove_edge(self, nodeIndexA: int, nodeIndexB: int) -> None:
         """
         Removes an edge from the tree if the edge
         (nodeIndexA -> nodeIndexB) is in the tree.
@@ -236,7 +237,7 @@ class GenericSMS(object):
 
         self._clearGenIndexIteratorCache()
 
-    def remove_edges(self, edges):
+    def remove_edges(self, edges: list[tuple[int, int]]) -> None:
         """
         Removes edges from the tree if they appear in the tree.
 
@@ -246,7 +247,7 @@ class GenericSMS(object):
         for edge in edges:
             self.remove_edge(edge[0], edge[1])
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Remove all nodes and edges from the graph, but
         keep its canonName.
@@ -261,7 +262,7 @@ class GenericSMS(object):
         self._nextNodeIndex = 0
         self._clearGenIndexIteratorCache()
 
-    def indexToNode(self, nodeIndex):
+    def indexToNode(self, nodeIndex: int | list[int] | tuple) -> Any:
         """
         Returns the node object with index nodeIndex.
         If nodeIndex is a list of indices, return the corresponding
@@ -282,7 +283,7 @@ class GenericSMS(object):
         else:
             raise SModelSError(f"Can not convert object of type {str(type(nodeIndex))} to nodes")
 
-    def daughterIndices(self, nodeIndex, ignoreInclusiveNodes=False):
+    def daughterIndices(self, nodeIndex: int, ignoreInclusiveNodes: bool = False) -> list[int]:
         """
         Returns the list of node indices corresponding to the
         daughters of nodeIndex.
@@ -298,7 +299,7 @@ class GenericSMS(object):
 
         return daughters
 
-    def daughters(self, nodeIndex,  ignoreInclusiveNodes=False):
+    def daughters(self, nodeIndex: int, ignoreInclusiveNodes: bool = False) -> list:
         """
         Returns the list of node objects corresponding to the
         daughters of nodeIndex.
@@ -312,7 +313,7 @@ class GenericSMS(object):
 
         return daughters
 
-    def parentIndex(self, nodeIndex):
+    def parentIndex(self, nodeIndex: int) -> int | None:
         """
         Returns the node index corresponding to the
         parent of nodeIndex.
@@ -322,7 +323,7 @@ class GenericSMS(object):
 
         return self._predecessors[nodeIndex]
 
-    def parent(self, nodeIndex):
+    def parent(self, nodeIndex: int) -> Any:
         """
         Returns the node object corresponding to the
         parent of nodeIndex.
@@ -335,7 +336,7 @@ class GenericSMS(object):
 
         return parent
     
-    def copy(self,emptyNodes=False):
+    def copy(self, emptyNodes: bool = False) -> 'GenericSMS':
         """
         Returns a shallow copy of self.
 
@@ -355,7 +356,7 @@ class GenericSMS(object):
 
         return newSMS
     
-    def compressToFinalStates(self,compressPrimary=False):
+    def compressToFinalStates(self, compressPrimary: bool = False) -> 'GenericSMS':
         """
         Compress the SMS subtrees generated by the primary mothers.
         After the compression the SMS will contain the primary mothers with
@@ -397,7 +398,7 @@ class GenericSMS(object):
         return smsComp
 
     @property
-    def rootIndex(self):
+    def rootIndex(self) -> int:
         """
         Returns the index of the root node (primary vertex) of the tree.
         If it has not been defined, compute it.
@@ -415,7 +416,7 @@ class GenericSMS(object):
         return self._rootIndex
 
     @property
-    def root(self):
+    def root(self) -> Any:
         """
         Returns the root node (primary vertex) of the tree.
         If it has not been defined, compute it.
@@ -429,7 +430,7 @@ class GenericSMS(object):
         return root
 
     @property
-    def nodeIndices(self):
+    def nodeIndices(self) -> list[int]:
         """
         Returns the tist of node indices in the Tree.
 
@@ -442,7 +443,7 @@ class GenericSMS(object):
         return nodeIndexList
 
     @property
-    def edgeIndices(self):
+    def edgeIndices(self) -> list[tuple[int, int]]:
         """
         Returns the list of edges indices (pairs of integers) in the Tree.
 
@@ -456,7 +457,7 @@ class GenericSMS(object):
         return edgesList
 
     @property
-    def nodes(self):
+    def nodes(self) -> list:
         """
         Returns the tist of ParticleNode objects in the Tree.
 
@@ -469,7 +470,7 @@ class GenericSMS(object):
         return nodeList
 
     @property
-    def edges(self):
+    def edges(self) -> list[tuple]:
         """
         Returns the list of edges (pairs of node objects) in the Tree.
 
@@ -481,7 +482,7 @@ class GenericSMS(object):
         return edgesList
 
     @property
-    def canonName(self):
+    def canonName(self) -> int | InclusiveValue:
         """
         Returns the canonName. If not defined, it will be computed.
 
@@ -493,7 +494,7 @@ class GenericSMS(object):
 
         return self._nodeCanonNames[self.rootIndex]
 
-    def computeCanonName(self, nodeIndex=None):
+    def computeCanonName(self, nodeIndex: int | None = None) -> int | InclusiveValue | None:
         """
         Recursively sets the canonName for each node.
         Returns the canonical name in integer form.
@@ -534,7 +535,7 @@ class GenericSMS(object):
 
         return canonName
 
-    def nodeCanonName(self,nodeIndex):
+    def nodeCanonName(self, nodeIndex: int) -> int | InclusiveValue:
         """
         Returns the canon name for the node.
 
@@ -548,7 +549,7 @@ class GenericSMS(object):
 
         return self._nodeCanonNames[nodeIndex]
 
-    def out_degree(self, nodeIndex):
+    def out_degree(self, nodeIndex: int) -> int:
         """
         Computes the number of outgoing edges from the node
         (number of daughters).
@@ -563,7 +564,7 @@ class GenericSMS(object):
         else:
             return len(self.daughterIndices(nodeIndex))
 
-    def in_degree(self, nodeIndex):
+    def in_degree(self, nodeIndex: int) -> int:
         """
         Computes the number of incoming edges to the node
         (number of parents).
@@ -579,7 +580,7 @@ class GenericSMS(object):
 
         return 0
 
-    def number_of_nodes(self):
+    def number_of_nodes(self) -> int:
         """
         Returns the total number of nodes in the Tree.
 
@@ -589,8 +590,8 @@ class GenericSMS(object):
 
         return len(self.nodeIndices)
 
-    def genIndexIterator(self, nodeIndex=None,
-                         includeLeaves=False, ignoreInclusiveNodes=False):
+    def genIndexIterator(self, nodeIndex: int | None = None,
+                         includeLeaves: bool = False, ignoreInclusiveNodes: bool = False):
         """
         Returns an iterator over the generations (mother and its daughters)
         of node indices starting at nodeIndex using a breadth first search.
@@ -637,7 +638,7 @@ class GenericSMS(object):
                         next_generation.append((new_mom, new_daughters))
             generation = next_generation
 
-    def dfsIndexIterator(self, nodeIndex=None, ignoreInclusiveNodes=False):
+    def dfsIndexIterator(self, nodeIndex: int | None = None, ignoreInclusiveNodes: bool = False):
         """
         Iterates over the node indices following a depth-first traversal of the tree
         starting at nodeIndex. If nodeIndex is None, include all nodes.
@@ -679,7 +680,7 @@ class GenericSMS(object):
                     # All the children have been visited, remove from list
                     daughters.pop()
 
-    def bfs_sort(self, numberNodes=False):
+    def bfs_sort(self, numberNodes: bool = False) -> dict[int, int]:
         """
         Sort the nodes according to their appearence in a
         breadth first search.
@@ -708,7 +709,7 @@ class GenericSMS(object):
         self._clearGenIndexIteratorCache()
         return indexDict
 
-    def sortAccordingTo(self,indicesList):
+    def sortAccordingTo(self, indicesList: list[int]) -> None:
         """
         Sort the nodes according to their order in indicesList.
 
@@ -734,7 +735,7 @@ class GenericSMS(object):
         self._successors = newSuccessors
         self._clearGenIndexIteratorCache()
 
-    def sort(self, nodeIndex=None, force=False):
+    def sort(self, nodeIndex: int | None = None, force: bool = False) -> dict[int, int] | None:
         """
         Sort subtree of self generated by nodeIndex.
         If nodeIndex is None, sort the tree and re-number the nodes
@@ -783,7 +784,7 @@ class GenericSMS(object):
         
         self._clearGenIndexIteratorCache()
 
-    def sortSubTrees(self, subtreeList):
+    def sortSubTrees(self, subtreeList: list[int]) -> list[int]:
         """
         Sorts a list of subtrees of self generated by the nodes
         in subtreeList.
@@ -814,7 +815,7 @@ class GenericSMS(object):
 
         return sorted_trees
 
-    def sortCommonSubTrees(self, subtreeList):
+    def sortCommonSubTrees(self, subtreeList: list[int]) -> list[int]:
         """
         Sorts a list of subtrees of self generated by the nodes
         in subtreeList using a quicksort algorithm.
@@ -845,7 +846,7 @@ class GenericSMS(object):
 
         return sortedList
 
-    def compareSubTrees(self, other, n1, n2):
+    def compareSubTrees(self, other: 'GenericSMS', n1: int, n2: int) -> int:
         """
         Compare the subtrees generated by the nodeIndex n1 in self
         and the nodeIndex n2 in other.
@@ -886,7 +887,7 @@ class GenericSMS(object):
                 return cmp
         return 0
 
-    def compareNodes(self,other,nodeIndex1,nodeIndex2):
+    def compareNodes(self, other: 'GenericSMS', nodeIndex1: int, nodeIndex2: int) -> int:
         """
         Convenience function for defining how nodes are compared
         within the SMS.
@@ -906,7 +907,7 @@ class GenericSMS(object):
         cmp = node1.compareTo(node2)
         return cmp
 
-    def copyTreeFrom(self, other, nodesObjDict):
+    def copyTreeFrom(self, other: 'GenericSMS', nodesObjDict: dict[int, Any]) -> None:
         """
         Replaces the tree structure (nodes, edges, indices,...)
         by the structure in other. Uses the nodesObjDict to set the
@@ -930,7 +931,7 @@ class GenericSMS(object):
         self._clearGenIndexIteratorCache()
 
     def treeToString(self, 
-                     removeIndicesFrom='stable'):
+                     removeIndicesFrom: str | None = 'stable') -> str:
         """
         Convert the tree to a process string (e.g. '(PV(0) > gluino(1),squark(2)), (gluino(1) >
                            MET(3),jet(4),jet(5)), (squark(2) > HSCP(6),u(7))')
@@ -992,7 +993,7 @@ class GenericSMS(object):
 
         return smsStr
 
-    def treeToBrackets(self):
+    def treeToBrackets(self) -> tuple[list, list, list]:
         """
         Convert the Tree to a nested list with the Z2 even
         final states. The Z2 odd final states (e.g. 'MET', 'HSCP') are
@@ -1044,7 +1045,7 @@ class GenericSMS(object):
 
         return branchList, finalState, intermediateState
 
-    def getFinalStates(self, nodeIndex=None):
+    def getFinalStates(self, nodeIndex: int | None = None) -> list[int]:
         """
         Get the list of nodes which have not decayed (appear at the top of the tree).
         If source is defined, get the final states generated by the cascade decay of the source
@@ -1072,7 +1073,7 @@ class GenericSMS(object):
 
         return self._finalStates[nodeIndex]
 
-    def relabelNodeIndices(self,nodeIndexDict):
+    def relabelNodeIndices(self, nodeIndexDict: dict[int, int]) -> None:
         """
         Relabel node indices according to nodeIndexDict.
         For node indices not appearing in nodeIndexDict nothing is done.
@@ -1120,7 +1121,7 @@ class GenericSMS(object):
         self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
         self._clearGenIndexIteratorCache()
 
-    def updateNodeObjects(self, nodeObjectDict):
+    def updateNodeObjects(self, nodeObjectDict: dict[int, Any]) -> None:
         """
         Update the node index -> node object mapping.
         Only affects the indices appearing in nodeObjectDict.
@@ -1133,7 +1134,7 @@ class GenericSMS(object):
             self._nodesMapping[nodeIndex] = newObj
         self._clearGenIndexIteratorCache()
 
-    def checkConsistency(self):
+    def checkConsistency(self) -> None:
         """
         Make sure the tree has the correct topology(directed rooted tree).
         Raises an error otherwise.
@@ -1160,7 +1161,7 @@ class GenericSMS(object):
         if malformedTree:
             raise SModelSError("Graph created with malformed structure (not  a tree).")
 
-    def switchBranches(self):
+    def switchBranches(self) -> 'GenericSMS | None':
         """
         If the SMS has a two branch structure (PV > X,Y), return
         a new SMS with its branches switched (PV > Y,X).
@@ -1189,16 +1190,16 @@ class GenericSMS(object):
 
         return smsNew
 
-    def draw(self, particleColor='steelblue2',
-                smColor='lightpink2',
-                pvColor='darkgray',
-                labelAttr='label',
-                attrUnit=None, filename=None, view=True,
-                maxLabelSize=10,
-                usePVimage=False,
-                graph_kwargs={'layout' : 'dot', 'ranksep' : '0.3', 'rankdir' : "LR"},
-                nodes_kwargs={'style' : 'filled', 'fontsize' : '10', 'color' : 'black','shape' : 'circle','margin' : '0'},
-                edges_kwargs={'arrowhead' : 'vee', 'arrowsize' : '0.7',  'color' : 'grey53'}):
+    def draw(self, particleColor: str = 'steelblue2',
+                smColor: str = 'lightpink2',
+                pvColor: str = 'darkgray',
+                labelAttr: str | dict | None = 'label',
+                attrUnit: Any = None, filename: str | None = None, view: bool = True,
+                maxLabelSize: int | None = 10,
+                usePVimage: str | bool = False,
+                graph_kwargs: dict[str, str] = {'layout' : 'dot', 'ranksep' : '0.3', 'rankdir' : "LR"},
+                nodes_kwargs: dict[str, str] = {'style' : 'filled', 'fontsize' : '10', 'color' : 'black','shape' : 'circle','margin' : '0'},
+                edges_kwargs: dict[str, str] = {'arrowhead' : 'vee', 'arrowsize' : '0.7',  'color' : 'grey53'}):
         """
         Draws Tree using matplotlib.
 

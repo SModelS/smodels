@@ -16,7 +16,7 @@ unum.Unum.VALUE_FORMAT = "%0.16E"
 
 servers = [ [] ]
 
-def shutdownAll ():
+def shutdownAll():
     if len(servers[0])==0:
         return
     print ( f"[databaseServer] shutting down {len(servers[0])} servers" )
@@ -83,7 +83,7 @@ class DatabaseServer:
                 return
         self.initialize()
 
-    def logServerStats ( self ):
+    def logServerStats(self):
         """ log our stats upon exit """
         self.pprint ( "server stats" )
         self.pprint ( "============" )
@@ -163,11 +163,11 @@ class DatabaseServer:
                     return str(res)
         return "None"
 
-    def finish ( self ):
+    def finish(self):
         if hasattr ( self, "connection" ):
             self.connection.close()
 
-    def pprintClientAddr ( self ):
+    def pprintClientAddr(self) -> str:
         """ super simple convenience function """
         return f"{self.client_address[0]}:{self.client_address[1]}"
 

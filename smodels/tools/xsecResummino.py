@@ -33,7 +33,7 @@ from smodels.base.types import PathType
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """
-    def __init__ ( self, maxOrder,slha_folder_name,sqrt = 13,ncpu=1, maycompile=True, type_writing = None, verbosity = '', json = None, particles = None, xsec_limit = None):
+    def __init__ ( self, maxOrder: int, slha_folder_name: str, sqrt = 13, ncpu: int = 1, maycompile: bool = True, type_writing: str | None = None, verbosity: str = '', json: str | None = None, particles: list | None = None, xsec_limit: float | None = None):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO resummino xsecs
@@ -381,7 +381,7 @@ class XSecResummino(XSecBase):
         C2 = data.blocks['MASS'][1000037]
         return N1,N2,C1, C2
 
-    def are_crosssection(self, slha_file : str, order):
+    def are_crosssection(self, slha_file : str, order: int) -> None:
         """
         check if the cross sections are already written, and remove the
         cross section written twice.

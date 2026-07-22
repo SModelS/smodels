@@ -19,7 +19,7 @@ from importlib import import_module
 
 
 
-def getParticlesFromSLHA(slhaData):
+def getParticlesFromSLHA(slhaData: str) -> list[Particle]:
     """
     Defines BSM particles from the QNUMBERS blocks in the slhafile.
 
@@ -146,7 +146,7 @@ def getParticlesFromSLHA(slhaData):
 
     return BSMList
 
-def getParticlesFromLHE(lhefile):
+def getParticlesFromLHE(lhefile: str) -> list[Particle]:
     """
     Defines BSM particles from the QNUMBERS blocks in the <slha> block contained in the lhefile.
 
@@ -197,7 +197,7 @@ def getParticlesFromLHE(lhefile):
 
     return BSMList
 
-def getParticlesFromModule(modelFile):
+def getParticlesFromModule(modelFile: str) -> list[Particle]:
     """
     Reads the python model file and retrieves the list of BSM particles (BSMList)
 
@@ -238,7 +238,7 @@ def getParticlesFromModule(modelFile):
 
 
 
-def load():
+def load() -> list[Particle]:
 
     from smodels.base.runtime import modelFile
 

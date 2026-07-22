@@ -14,7 +14,7 @@ from smodels.statistics.basicStats import observed, apriori, NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
-from typing import Union, Dict, Callable, Optional, List
+from typing import Union, Dict, Callable, Optional, List, Any
 import numpy as np
 
 # number of digits for rounding the mu argument when computing likelihoods
@@ -52,7 +52,7 @@ class TheoryPrediction(object):
         self.deltas_rel = deltas_rel
         self._statsComputer = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         ret = f"{self.analysisId()}:{self.totalXsection()}"
         return ret
 
@@ -139,11 +139,11 @@ class TheoryPrediction(object):
         else:
             self.conditions = allConditions[:]
 
-    def totalXsection(self):
+    def totalXsection(self) -> UnitXSec:
         self.computeXSection()
         return self.xsection
 
-    def getmaxCondition(self):
+    def getmaxCondition(self) -> float:
         """
         Returns the maximum xsection from the list conditions
 
@@ -182,7 +182,7 @@ class TheoryPrediction(object):
         return txnamesWeightsDict
 
     @property
-    def statsComputer(self):
+    def statsComputer(self) -> Any:
         if self._statsComputer is None:
             self.setStatsComputer()
         return self._statsComputer
@@ -336,20 +336,20 @@ class TheoryPrediction(object):
         return cls
 
     @whenDefined
-    def sigma_mu(self, evaluationType : NllEvalType = observed ):
+    def sigma_mu(self, evaluationType : NllEvalType = observed ) -> float:
         """sigma_mu of mu_hat"""
         llhDict = self.computeStatistics(evaluationType)
         return llhDict["sigma_mu"]
 
     @whenDefined
-    def muhat(self, evaluationType : NllEvalType = observed ):
+    def muhat(self, evaluationType : NllEvalType = observed ) -> float:
         """position of maximum likelihood"""
         llhDict = self.computeStatistics(evaluationType)
         return llhDict["muhat"]
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def nll(self, mu=1.0, evaluationType : NllEvalType = observed,
+    def nll(self, mu: float = 1.0, evaluationType : NllEvalType = observed,
             asimov : Optional[int] = None, **kwargs ) -> float:
         """
         get the nll for a signal strength modifier mu
@@ -386,7 +386,7 @@ class TheoryPrediction(object):
                          asimov=asimov, **kwargs )
         return self.nllToLikelihood ( mnll, return_nll )
 
-    def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
+    def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ) -> Union[None, float]:
         """ if not return_nll, then compute likelihood from nll """
         if return_nll:
             return nll
@@ -394,7 +394,7 @@ class TheoryPrediction(object):
 
     @whenDefined
     @lru_cache
-    def computeStatistics(self, evaluationType : NllEvalType = observed ):
+    def computeStatistics(self, evaluationType : NllEvalType = observed ) -> Dict[str, Any]:
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
@@ -413,7 +413,7 @@ class TheoryPredictionList(object):
     objects.
     """
 
-    def __init__(self, theoryPredictions=None, maxCond=None):
+    def __init__(self, theoryPredictions: Union[None, list[TheoryPrediction], 'TheoryPredictionList'] = None, maxCond: Optional[float] = None):
         """
         Initializes the list.
 
@@ -438,10 +438,10 @@ class TheoryPredictionList(object):
                         newPredictions.append(theoPred)
                 self._theoryPredictions = newPredictions
 
-    def append(self, theoryPred):
+    def append(self, theoryPred: TheoryPrediction):
         self._theoryPredictions.append(theoryPred)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if len(self._theoryPredictions) == 0:
             return "no predictions."
         ret = f"{len(self._theoryPredictions)} predictions: "
@@ -452,13 +452,13 @@ class TheoryPredictionList(object):
         for theoryPrediction in self._theoryPredictions:
             yield theoryPrediction
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> TheoryPrediction:
         return self._theoryPredictions[index]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._theoryPredictions)
 
-    def __add__(self, theoPredList):
+    def __add__(self, theoPredList: 'TheoryPredictionList') -> Optional['TheoryPredictionList']:
         if isinstance(theoPredList, TheoryPredictionList):
             res = TheoryPredictionList()
             res._theoryPredictions = self._theoryPredictions + theoPredList._theoryPredictions
@@ -466,7 +466,7 @@ class TheoryPredictionList(object):
         else:
             return None
 
-    def __radd__(self, theoPredList):
+    def __radd__(self, theoPredList: 'TheoryPredictionList') -> 'TheoryPredictionList':
         if theoPredList == 0:
             return self
         else:
@@ -541,7 +541,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
     @classmethod
     def selectResultsFrom(cls, theoryPredictions : Union[List[TheoryPrediction],TheoryPredictionList], 
-                          anaIDs : List[str] ):
+                          anaIDs : List[str] ) -> Optional['TheoryPredictionsCombiner']:
         """
         Select the results from theoryPrediction list which match one
         of the IDs in anaIDs. If there are multiple predictions for the
@@ -585,7 +585,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         combiner = cls(uniqueTPs)
         return combiner
 
-    def dataId(self):
+    def dataId(self) -> str:
         """
         Return a string with the IDs of all the datasets used in the combination.
         """
@@ -594,7 +594,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return ret
 
-    def analysisId(self):
+    def analysisId(self) -> str:
         """
         Return a string with the IDs of all the experimental results
         used in the combination.
@@ -604,7 +604,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return ret
 
-    def dataType(self, short=False):
+    def dataType(self, short: bool = False) -> str:
         """
         Return its type (combined)
         :param: short, if True, return abbreviation (anacomb)
@@ -615,14 +615,14 @@ class TheoryPredictionsCombiner(TheoryPrediction):
             return "combined"
 
 
-    def totalXsection(self):
+    def totalXsection(self) -> UnitXSec:
         ret = 0.0 * fb
         if self.theoryPredictions is not None:
             for tp in self.theoryPredictions:
                 ret += tp.xsection
         return ret
 
-    def getmaxCondition(self):
+    def getmaxCondition(self) -> float:
         """
         Returns the maximum xsection from the list conditions
 
@@ -668,7 +668,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         """
         return self.statsComputer.getLlhds( **kwargs )
 
-    def describe(self):
+    def describe(self) -> str:
         """returns a string containing a list of all analysisId and dataIds"""
         ids = []
         for tp in self.theoryPredictions:
@@ -815,7 +815,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
 
     return tpList
     
-def regionTypeOf ( region ) -> Union[None,bool]:
+def regionTypeOf ( region : Any ) -> Union[None,str]:
     """
     A quality of life function to know the type of a dataset (SR, CR or VR).
     :region: an efficiency-map-type dataset.
@@ -841,7 +841,7 @@ def regionTypeOf ( region ) -> Union[None,bool]:
         
     return regionType
 
-def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
+def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
     """
     Is a given dataset mentioned in the combination?
     we are allowing datasets in an expResult that is not mentioned
@@ -866,7 +866,7 @@ def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
                 return True
     return False
 
-def _getCombinedResultFor(dataSetResults, expResult):
+def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[TheoryPrediction]:
     """
     Compute the combined result for all datasets, if a statistical model is]
     available. Return a TheoryPrediction object
@@ -940,7 +940,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
     return theoryPrediction
 
 
-def _getBestResult(dataSetResults):
+def _getBestResult(dataSetResults: list) -> Optional[TheoryPrediction]:
     """
     Returns the best result according to the evaluationType upper limit.
     If a combined result is included in the list, always return it.
@@ -994,8 +994,8 @@ def _getBestResult(dataSetResults):
 
     return bestPred
 
-def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
-                           deltas_rel=None):
+def _getDataSetPredictions(dataset: Any, smsMatch: dict, smsDict: Any, maxMassDist: float,
+                            deltas_rel: Optional[float] = None) -> Optional[TheoryPredictionList]:
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -1070,7 +1070,7 @@ def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
         return predictionList
 
 
-def _getSMSFor(dataset,smsMatch,smsDict):
+def _getSMSFor(dataset: Any, smsMatch: dict, smsDict: Any) -> list:
     """
     Get SMS that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
@@ -1104,7 +1104,7 @@ def _getSMSFor(dataset,smsMatch,smsDict):
     return smsList
 
 
-def _combineSMS(smsList, dataset, maxDist):
+def _combineSMS(smsList: list, dataset: Any, maxDist: float) -> list[clusterTools.SMSCluster]:
     """
     Combine SMS according to the data set type.
     If expResult == upper limit type, first group SMS with different TxNames

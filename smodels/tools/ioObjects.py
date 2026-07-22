@@ -29,7 +29,7 @@ class OutputStatus(object):
     Object that holds all status information and has a predefined printout.
     """
 
-    def __init__( self, status, inputFile, parameters, databaseVersion):
+    def __init__(self, status: tuple, inputFile: str, parameters: dict, databaseVersion: str):
         """
         Initialize output. If one of the checks failed, exit.
 
@@ -67,7 +67,7 @@ class OutputStatus(object):
             self.status = -2
 
 
-    def updateStatus(self, status):
+    def updateStatus(self, status: int):
         """
         Update status.
 
@@ -76,7 +76,7 @@ class OutputStatus(object):
         """
         self.status = status
 
-    def updateSLHAStatus(self, status):
+    def updateSLHAStatus(self, status: int):
         """
         Update SLHA status.
 
@@ -86,7 +86,7 @@ class OutputStatus(object):
         self.slhastatus = status
         return
 
-    def addWarning(self, warning):
+    def addWarning(self, warning: str):
         """
         Append warning to warnings.
 
@@ -110,7 +110,7 @@ class FileStatus(object):
         self.status = 0, "File not checked\n"
 
 
-    def checkFile(self, inputFile):
+    def checkFile(self, inputFile: str):
         """
         Run checks on the input file.
 
@@ -138,11 +138,11 @@ class LheStatus(object):
 
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.filename = filename
         self.status = self.evaluateStatus()
 
-    def evaluateStatus(self):
+    def evaluateStatus(self) -> tuple:
         """
         run status check
         """
@@ -174,9 +174,9 @@ class SlhaStatus(object):
     = -2: case of formal problems, e.g. no cross sections
 
     """
-    def __init__(self, filename,
-                 findMissingDecayBlocks=True,
-                 findIllegalDecays=False, checkXsec=True):
+    def __init__(self, filename: str,
+                 findMissingDecayBlocks: bool = True,
+                 findIllegalDecays: bool = False, checkXsec: bool = True):
 
         """
         :parameter filename: path to input SLHA file
@@ -224,7 +224,7 @@ class SlhaStatus(object):
         return ret
 
 
-    def evaluateStatus(self):
+    def evaluateStatus(self) -> tuple:
         """
         Get status summary from all performed checks.
 
@@ -260,7 +260,7 @@ class SlhaStatus(object):
         if not warning: retMes = "Input file ok"
         return ret, retMes
 
-    def emptyDecay(self, pid):
+    def emptyDecay(self, pid: int):
         """
         Check if any decay is missing for the particle with pid
 
@@ -273,7 +273,7 @@ class SlhaStatus(object):
         return None
 
 
-    def findMissingDecayBlocks(self, findMissingBlocks):
+    def findMissingDecayBlocks(self, findMissingBlocks: bool) -> tuple:
         """
         For all non-SMpdgs particles listed in mass block, check if decay block is written
 
@@ -297,7 +297,7 @@ class SlhaStatus(object):
         return st, msg
 
 
-    def findIllegalDecay(self, findIllegal):
+    def findIllegalDecay(self, findIllegal: bool) -> tuple:
         """
         Find decays for which the sum of daughter masses excels the mother mass
 
@@ -339,7 +339,7 @@ class SlhaStatus(object):
         return st, badDecay
 
 
-    def hasXsec(self, checkXsec):
+    def hasXsec(self, checkXsec: bool) -> tuple:
         """
         Check if XSECTION table is present in the slha file.
 

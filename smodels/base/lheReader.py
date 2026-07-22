@@ -113,11 +113,11 @@ class LheReader(object):
         assert nevents == nevents_close, f"number of opening <event> tags {nevents} does not match number of closing </event> tags {nevents_close}"
         self.metainfo["nevents"]=nevents
 
-    def close(self):
+    def close(self) -> None:
         """ close file handle """
         self.file.close()
 
-    def next(self):
+    def next(self) -> 'SmsEvent':
         """
         Get next element in iteration.
 
@@ -132,7 +132,7 @@ class LheReader(object):
         return e
 
 
-    def __iter__(self):
+    def __iter__(self) -> 'LheReader':
         """
         Make class iterable.
 
@@ -141,11 +141,11 @@ class LheReader(object):
         """
         return self
 
-    def __next__(self):
+    def __next__(self) -> 'SmsEvent':
         """ for python3 """
         return self.next()
 
-    def event(self):
+    def event(self) -> 'SmsEvent | None':
         """
         Get next event.
 
@@ -206,7 +206,7 @@ class SmsEvent(object):
         self.metainfo = {}
 
 
-    def metaInfo( self, key : str ):
+    def metaInfo( self, key : str ) -> object:
         """
         Return the meta information of 'key', None if info does not exist.
 
@@ -235,7 +235,7 @@ class SmsEvent(object):
 
         return sorted(momspdg)
 
-    def __str__(self):
+    def __str__(self) -> str:
         nr = ""
         if self.eventnr != None:
             nr = " " + str(self.eventnr)
@@ -266,7 +266,7 @@ class LHEParticle(object):
         # position in the event list of particles
         self.position = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" \
                 % (self.pdg, self.px, self.py, self.pz, self.mass,
                    self.status, self.moms)

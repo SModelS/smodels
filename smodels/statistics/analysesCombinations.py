@@ -12,20 +12,20 @@
 """
 
 import numpy as np
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
      findRoot, exponentiateNLL
 import scipy.optimize as optimize
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
-from typing import Text, Tuple, Callable, Union, Dict
+from typing import Text, Tuple, Callable, Union, Dict, Optional
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.statistics.basicStats import observed, NllEvalType
 from smodels.matching.theoryPrediction import mu_digits
 
 class AnaCombLikelihoodComputer(object):
 
-    def __init__(self, theoryPredictions: list, deltas_rel=None):
+    def __init__(self, theoryPredictions: list, deltas_rel: Optional[float] = None):
         """constructor.
 
         :param theoryPredictions: the List of theory predictions
@@ -129,7 +129,7 @@ class AnaCombLikelihoodComputer(object):
         fluc = max(1e-6, 1e-5*toTry[0])  #incase toTry[0] = 0.0, take 1e-06
         toTry += [toTry[0] - fluc, toTry[0] + fluc]
 
-        def fun(mu):
+        def fun(mu: Union[float, np.ndarray]) -> Union[float, None]:
             # Make sure to always compute the correct llhd value (from theoryPrediction)
             # and not used the cached value (which is constant for mu~=1 an mu~=0)
             if isinstance(mu,np.ndarray):
@@ -203,7 +203,7 @@ class AnaCombLikelihoodComputer(object):
 
     @lru_cache
     def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed,
-            allowNegativeSignals = False, nSigma : int = 0 ) -> float:
+            allowNegativeSignals : bool = False, nSigma : int = 0 ) -> float:
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
@@ -222,7 +222,7 @@ class AnaCombLikelihoodComputer(object):
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         xsec = 0.0*fb
         for tp in self.theoryPredictions:
             xsec += tp.xsection

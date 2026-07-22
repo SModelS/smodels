@@ -10,7 +10,7 @@
 
 import os
 import glob
-from typing import Union
+from typing import Union, Optional
 from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
@@ -30,7 +30,7 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__( self, path=None, info=None, createInfo=True,
+    def __init__( self, path=None, info=None, createInfo: bool = True,
                   databaseParticles=None ):
         """
         :param path: Path to the dataset folder
@@ -71,10 +71,10 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
 
-    def getCollaboration(self,ds):
+    def getCollaboration(self, ds) -> str:
         return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
 
-    def isCombinableWith(self, other):
+    def isCombinableWith(self, other) -> bool:
         """
         Function that reports if two datasets are mutually uncorrelated = combinable.
 
@@ -121,7 +121,7 @@ class DataSet(object):
             return True
         return False
 
-    def isCombMatrixCombinableWith_(self, other):
+    def isCombMatrixCombinableWith_(self, other) -> bool:
         """ Check for combinability via the combinations matrix. """
         if not hasattr(self.globalInfo, "_combinationsmatrix"):
             return False
@@ -144,7 +144,7 @@ class DataSet(object):
                     return True
         return False
 
-    def isGlobalFieldCombinableWith_(self, other):
+    def isGlobalFieldCombinableWith_(self, other) -> bool:
         """
         Check for 'combinableWith' fields in globalInfo, check if <other> matches.
         This check is at analysis level (not at dataset level).
@@ -164,7 +164,7 @@ class DataSet(object):
             return True
         return False
 
-    def isLocalFieldCombinableWith_(self, other):
+    def isLocalFieldCombinableWith_(self, other) -> bool:
         """ Check for 'combinableWith' fields in dataInfo, check if <other> matches.
         This check is at dataset level (not at analysis level).
 
@@ -185,7 +185,7 @@ class DataSet(object):
             return True
         return False
 
-    def checkForRedundancy(self, databaseParticles):
+    def checkForRedundancy(self, databaseParticles) -> bool:
         """
         In case of efficiency maps, check if any txnames have overlapping
         constraints. This would result in double counting, so we dont
@@ -219,23 +219,23 @@ class DataSet(object):
                 logger.error(errmsg)
                 raise SModelSError(errmsg)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.dataInfo.dataId:
             ret = f"Dataset {self.dataInfo.dataId}: {', '.join(map(str, self.txnameList))}"
         else:
             ret = f"Dataset: {', '.join(map(str, self.txnameList))}"
         return ret
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.dataInfo.dataId:
             return self.dataInfo.dataId
         else:
             return 'Dataset (UL)'
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(other) != type(self):
             return False
         if self.dataInfo != other.dataInfo:
@@ -244,7 +244,7 @@ class DataSet(object):
             return False
         return True
 
-    def longStr(self):
+    def longStr(self) -> str:
         """
         Returns a long string displaying the dataset ID,
         the experimental result ID, the dataset type and the dataset txnames.
@@ -259,14 +259,14 @@ class DataSet(object):
 
         return lStr
 
-    def getType(self):
+    def getType(self) -> str:
         """
         Return the dataset type (EM/UL)
         """
 
         return self.dataInfo.dataType
 
-    def getID(self):
+    def getID(self) -> str:
         """
         Return the dataset ID
         """
@@ -284,7 +284,7 @@ class DataSet(object):
         else:
             return self.globalInfo.lumi
 
-    def getTxName(self, txname):
+    def getTxName(self, txname: str) -> Optional[txnameObj.TxName]:
         """
         get one specific txName object.
         """
@@ -305,7 +305,7 @@ class DataSet(object):
         else:
             return None
 
-    def getValuesFor(self, attribute):
+    def getValuesFor(self, attribute: str) -> list:
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
@@ -317,13 +317,13 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def folderName(self):
+    def folderName(self) -> str:
         """
         Name of the folder in text database.
         """
         return os.path.basename(self.path)
 
-    def getAttributes(self, showPrivate=False):
+    def getAttributes(self, showPrivate: bool = False) -> list:
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
@@ -485,7 +485,7 @@ class CombinedDataSet(object):
         self.sortDataSets()
         self.findType()
 
-    def isCombinableWith ( self, other ):
+    def isCombinableWith ( self, other ) -> bool:
         """
         Function that reports if two datasets are mutually uncorrelated = combinable.
         A combined dataset is combinable with "other", if all consistituents are.
@@ -497,7 +497,7 @@ class CombinedDataSet(object):
                 return False
         return True
 
-    def findType(self):
+    def findType(self) -> str:
         """ find the type of the combined dataset """
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
         if hasattr(self.globalInfo, "statModels"):
@@ -516,15 +516,15 @@ class CombinedDataSet(object):
                     types.add ( "pyhf" )
             return "+".join ( types )
 
-    def __str__(self):
+    def __str__(self) -> str:
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
         return ret
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
         return ret
 
-    def getIndex(self, dId, datasetOrder):
+    def getIndex(self, dId: str, datasetOrder: list) -> int:
         """
         Get the index of dataset within the datasetOrder,
         but allow for abbreviated names.
@@ -619,14 +619,14 @@ class CombinedDataSet(object):
         self._datasets = newds
 
 
-    def getType(self):
+    def getType(self) -> str:
         """
         Return the dataset type (combined)
         """
 
         return 'combined'
 
-    def getID(self):
+    def getID(self) -> str:
         """
         Return the ID for the combined dataset
         """
@@ -641,7 +641,7 @@ class CombinedDataSet(object):
 
         return self.globalInfo.lumi
 
-    def getDataSet(self, datasetID):
+    def getDataSet(self, datasetID: str) -> Optional['DataSet']:
         """
         Returns the dataset with the corresponding dataset ID.
         If the dataset is not found, returns None.

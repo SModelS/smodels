@@ -18,6 +18,7 @@ from smodels.statistics.basicStats import observed, apriori, aposteriori, \
          NllEvalType
 from typing import Text, Union, Tuple, Optional
 from smodels.statistics.basicStats import findRoot
+import logging
 
 import numpy as np
 import copy
@@ -27,7 +28,7 @@ try:
     from smodels.base.smodelsLogging import logger
 except ModuleNotFoundError:
 
-    def getLogger():
+    def getLogger() -> logging.Logger:
         """
         Configure the logging facility. Maybe adapted to fit into
         your framework.
@@ -52,14 +53,14 @@ class SLData:
 
     def __init__(
         self,
-        observed,
-        backgrounds,
-        covariance,
-        third_moment=None,
-        nsignal=None,
+        observed: Union[list, np.ndarray],
+        backgrounds: Union[list, np.ndarray],
+        covariance: Union[list, np.ndarray],
+        third_moment: Optional[Union[list, np.ndarray]] = None,
+        nsignal: Optional[Union[list, np.ndarray]] = None,
         name : Union[list,str] = "model",
         deltas_rel : float = 0.2,
-        lumi=None,
+        lumi: Optional[float] = None,
         asimov : Union[None,float] = None
     ):
         """
@@ -103,7 +104,7 @@ class SLData:
         self._computeABC()
         self.weight = np.linalg.inv(self.V )
 
-    def generateAsimovData ( self, theta_hat : list, mu : float = 0. ):
+    def generateAsimovData ( self, theta_hat : list, mu : float = 0. ) -> "SLData":
         """ generate a model with Asimov data out of the current model
         :param theta_hat: the profiled nuisance parameters
         :returns: Data object
@@ -117,7 +118,7 @@ class SLData:
         newModel.asimov = mu
         return newModel
 
-    def totalCovariance(self, nsig : list ):
+    def totalCovariance(self, nsig : list ) -> np.ndarray:
         """get the total covariance matrix, taking into account
         also signal uncertainty for the signal hypothesis <nsig>.
         If nsig is None, the predefined signal hypothesis is taken.
@@ -128,7 +129,7 @@ class SLData:
             cov_tot = self.covariance + self.var_s(nsig)
         return cov_tot
 
-    def zeroSignal(self):
+    def zeroSignal(self) -> bool:
         """
         Is the total number of signal events zero?
         """
@@ -136,7 +137,7 @@ class SLData:
             return True
         return len(self.nsignal[self.nsignal > 0.0]) == 0
 
-    def var_s(self, nsig : Union[None,list] = None):
+    def var_s(self, nsig : Union[None,list] = None) -> np.ndarray:
         """
         The signal variances. Convenience function.
 
@@ -152,7 +153,7 @@ class SLData:
             nsig = self.convert(nsig)
         return np.diag((nsig * self.deltas_rel) ** 2)
 
-    def isScalar(self, obj):
+    def isScalar(self, obj: object) -> bool:
         """
         Determine if obj is a scalar (float or int)
         """
@@ -167,7 +168,7 @@ class SLData:
             pass
         return False
 
-    def convert(self, obj):
+    def convert(self, obj: object) -> Optional[np.ndarray]:
         """
         Convert object to numpy arrays.
         If object is a float or int, it is converted to a one element
@@ -180,10 +181,10 @@ class SLData:
             return array([obj])
         return array(obj)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name + f" ({self.n} dims)"
 
-    def _convertCov(self, obj):
+    def _convertCov(self, obj: object) -> np.ndarray:
 
         if self.isScalar(obj):
             return array([[obj]])
@@ -253,21 +254,21 @@ class SLData:
                 ret[y][x] = T
         self.V = ret
 
-    def isLinear(self):
+    def isLinear(self) -> bool:
         """
         Statistical model is linear, i.e. no quadratic term in poissonians
         """
 
         return type(self.C) == type(None)
 
-    def diagCov(self):
+    def diagCov(self) -> np.ndarray:
         """
         Diagonal elements of covariance matrix. Convenience function.
         """
 
         return np.diag(self.covariance)
 
-    def correlations(self):
+    def correlations(self) -> np.ndarray:
         """
         Correlation matrix, computed from covariance matrix.
         Convenience function.
@@ -285,7 +286,7 @@ class SLData:
                 self.corr[y][x] = rho
         return self.corr
 
-    def rel_signals(self, mu):
+    def rel_signals(self, mu: float) -> np.ndarray:
         """
         Returns the number of evaluationType relative signal events, for all datasets,
         given total signal strength mu. For mu=1, the sum of the numbers = 1.
@@ -295,7 +296,7 @@ class SLData:
 
         return mu * self.signal_rel
 
-    def nsignals(self, mu):
+    def nsignals(self, mu: float) -> np.ndarray:
         """
         Returns the number of evaluationType signal events, for all datasets,
         given total signal strength mu.
@@ -310,7 +311,7 @@ class SLLikelihoodComputer:
 
     debug_mode = False
 
-    def __init__(self, data ):
+    def __init__(self, data: SLData ):
         """
         :param data: a Data object.
         """
@@ -343,10 +344,10 @@ class SLLikelihoodComputer:
         self.model.observed = obs
 
     @property
-    def name ( self ):
+    def name ( self ) -> str:
         return self.model.name
 
-    def dNLLdMu(self, mu, theta_hat = None ):
+    def dNLLdMu(self, mu: Union[float, list, np.ndarray], theta_hat: Optional[Union[list, np.ndarray]] = None ) -> float:
         """
         d (- ln L)/d mu, if L is the likelihood. The function
         whose root gives us muhat, i.e. the mu that maximizes
@@ -389,14 +390,14 @@ class SLLikelihoodComputer:
         return ret
 
     def extendedOutput(self, extended_output : bool,
-            default : Union[None,float] = None ):
+            default : Union[None,float] = None ) -> Union[dict, None, float]:
         if extended_output:
             ret = { "muhat": default, "sigma_mu": default }
             ret["nll_min"] = default
             return ret
         return default
 
-    def findAvgr(self, theta_hat ):
+    def findAvgr(self, theta_hat: Union[list, np.ndarray] ) -> Optional[tuple]:
         """from the difference observed - background, find got inital
         values for lower and upper"""
         model = self.model
@@ -418,7 +419,7 @@ class SLLikelihoodComputer:
         ret = min(mu_r), sum(wmu_r) / wtot, max(mu_r)
         return ret
 
-    def d2NLLdMu2 ( self, mu, theta_hat, allowZeroHessian=True ):
+    def d2NLLdMu2 ( self, mu: float, theta_hat: Union[list, np.ndarray], allowZeroHessian: bool = True ) -> np.ndarray:
         """ the hessian of the likelihood of mu, at mu,
         which is the Fisher information
         which is approximately the inverse of the covariance
@@ -449,8 +450,8 @@ class SLLikelihoodComputer:
         return hessian
 
     #def findMuHat(
-    def findMuHatViaBracketing( self, allowNegativeSignals=False,
-        extended_output=False ):
+    def findMuHatViaBracketing( self, allowNegativeSignals: bool = False,
+        extended_output: bool = False ) -> Union[float, dict, None]:
         """
         Find the most likely signal strength mu via a brent bracketing technique
         given the relative signal strengths in each dataset (signal region).
@@ -540,7 +541,7 @@ class SLLikelihoodComputer:
             return ret
         return mu_hat
 
-    def getSigmaMu(self, mu, theta_hat):
+    def getSigmaMu(self, mu: float, theta_hat: Union[list, np.ndarray]) -> float:
         """
         Get an estimate for the standard deviation of mu at <mu>, from
         the inverse hessian
@@ -563,7 +564,7 @@ class SLLikelihoodComputer:
 
     # Define integrand (gaussian_(bg+signal)*poisson(nobs)):
     # def prob(x0, x1 )
-    def nllOfTheta(self, theta ):
+    def nllOfTheta(self, theta: Union[list, np.ndarray] ) -> float:
         """ likelihood for nuicance parameters theta, given signal strength \
             self.mu. notice, by default it returns nll
 
@@ -582,7 +583,7 @@ class SLLikelihoodComputer:
         lmbda[lmbda <= 0.0] = 1e-30  ## turn zeroes to small values
         obs = model.observed
 
-        def is_integer(x):
+        def is_integer(x: object) -> bool:
             if type(x) in [int, np.int64]:
                 return True
             if type(x) in [float]:
@@ -624,7 +625,7 @@ class SLLikelihoodComputer:
         except ValueError as e:
             raise Exception( f"ValueError {e}, {model.V}" )
 
-    def dNLLdTheta(self, theta):
+    def dNLLdTheta(self, theta: Union[list, np.ndarray]) -> np.ndarray:
         """the derivative of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood."""
         model = self.model
@@ -642,7 +643,7 @@ class SLLikelihoodComputer:
         nllp_ = T - model.observed / lmbda * (T) + np.dot(theta, self.weight)
         return nllp_
 
-    def d2NLLdTheta2(self, theta):
+    def d2NLLdTheta2(self, theta: Union[list, np.ndarray]) -> np.ndarray:
         """the Hessian of nll as a function of the thetas.
         Makes it easier to find the maximum likelihood."""
         # xtot = theta + self.ntot
@@ -665,7 +666,7 @@ class SLLikelihoodComputer:
         )
         return nllh_
 
-    def getThetaHat(self, nobs, nb, mu, covb, max_iterations):
+    def getThetaHat(self, nobs: Union[list, np.ndarray], nb: Union[list, np.ndarray], mu: float, covb: Union[list, np.ndarray], max_iterations: int) -> Union[list, np.ndarray]:
         """ Compute nuisance parameter theta that maximizes our likelihood \
             (poisson*gauss) -- by setting dNLL/dTheta to zero
 
@@ -695,7 +696,7 @@ class SLLikelihoodComputer:
         thetamaxes.append(thetamax)
         ndims = len(p)
 
-        def distance(theta1, theta2):
+        def distance(theta1: np.ndarray, theta2: np.ndarray) -> float:
             for ctr, i in enumerate(theta1):
                 if i == 0.0:
                     theta1[ctr] = 1e-20
@@ -813,7 +814,7 @@ class SLLikelihoodComputer:
             raise Exception( f"cov-1={model.covariance + model.var_s(nsig)**(-1)}")
 
     def nll(self, mu : float, evaluationType : NllEvalType=observed,
-           asimov : Union[None,float] = None  ):
+           asimov : Union[None,float] = None  ) -> float:
         """compute the profiled likelihood for mu.
 
         :param mu: float Parameter of interest, signal strength
@@ -836,7 +837,7 @@ class SLLikelihoodComputer:
         return ret
 
     def nll_min( self, evaluationType : NllEvalType = observed,
-                 allowNegativeSignals : bool = False ) -> dict:
+                 allowNegativeSignals : bool = False ) -> Union[dict, None]:
         """ nll_min
         :param allowNegativeSignals: if False, then negative nsigs are
         replaced with 0.
@@ -885,7 +886,7 @@ class SLLikelihoodComputer:
         theta_hat, _ = self.findThetaHat( avgr )
         minr, avgr, maxr = self.findAvgr( theta_hat )
 
-        def myllhd( mu ):
+        def myllhd( mu: Union[float, list, np.ndarray] ) -> float:
             if isinstance(mu,(np.ndarray,list)):
                 mu = mu[0]
             theta = self.findThetaHat ( mu=float(mu) )
@@ -918,7 +919,7 @@ class SLLikelihoodComputer:
             return ret
         return mu_hat
 
-    def generateAsimovComputer ( self, mu : float = 0. ):
+    def generateAsimovComputer ( self, mu : float = 0. ) -> "SLLikelihoodComputer":
         """ given the current computer with its model,
         generate a model with asimov data for a given mu.
         :param mu: signal strength to create Asimov data for.
@@ -934,7 +935,7 @@ class SLLikelihoodComputer:
         newComputer.theta_hat = theta_hat
         return newComputer
 
-    def chi2(self ):
+    def chi2(self ) -> float:
         """
         Computes the chi2 for a given number of observed events nobs given
         the predicted background nb, error on this background deltab,
@@ -993,7 +994,7 @@ class SLUpperLimitComputer:
              **kwargs) -> float:
         return self.likelihoodComputer.nll ( poi_test, evaluationType, **kwargs )
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> float:
         model = self.likelihoodComputer.model
         return sum ( model.nsignal) / model.lumi
 

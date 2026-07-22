@@ -32,12 +32,12 @@ class SummaryPrinter(TxTPrinter):
         :param output: one of: stdout, file
         """
         TxTPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "summary"
-        self.printingOrder = [
+        self.name: str = "summary"
+        self.printingOrder: list = [
             OutputStatus, TheoryPredictionList, 
             TheoryPredictionsCombiner, 
             TheoryPrediction, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.toPrint: list = [None]*len(self.printingOrder)
 
     def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
@@ -55,7 +55,7 @@ class SummaryPrinter(TxTPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatTheoryPredictionList(self, obj) -> str:
+    def _formatTheoryPredictionList(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionList object.
 
@@ -178,10 +178,10 @@ class SummaryPrinter(TxTPrinter):
 
         return output
 
-    def _formatTheoryPrediction(self,obj) -> str:
+    def _formatTheoryPrediction(self,obj: object) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj) -> str:
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 

@@ -17,6 +17,7 @@ from smodels.base import physicsUnits
 from smodels.base.genericSMS import GenericSMS
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import observed, NllEvalType
+from typing import Optional, Union
 
 from smodels.experiment.expAuxiliaryFuncs import (smsInStr, removeUnits,
                                                rescaleWidth, unscaleWidth,
@@ -44,21 +45,21 @@ class TxName(object):
     file (constraint, condition,...) as well as the data.
     """
 
-    def __init__(self, path=None, globalObj=None, infoObj=None,
+    def __init__(self, path: Optional[str] = None, globalObj=None, infoObj=None,
                  databaseParticles=None):
         self.path = path
         self.globalInfo = globalObj
         self._infoObj = infoObj
-        self.txnameData = None
-        self.txnameDataExp = None  # evaluationType Data
-        self.dataMap = None
-        self.axesMap = None
-        self._arrayMap = None
-        self._arrayToNodeDict = None
-        self.smsMap = {}  # Stores the SMS and their label representaion
-        self._constraintFunc = None
-        self._conditionsList = []
-        self.finalState = ['MET', 'MET']  # default final state
+        self.txnameData: Optional['TxNameData'] = None
+        self.txnameDataExp: Optional['TxNameData'] = None
+        self.dataMap: Optional[dict] = None
+        self.axesMap: Optional[list] = None
+        self._arrayMap: Optional[dict] = None
+        self._arrayToNodeDict: Optional[dict] = None
+        self.smsMap: dict = {}
+        self._constraintFunc: Optional[str] = None
+        self._conditionsList: list = []
+        self.finalState: list = ['MET', 'MET']  # default final state
         self.intermediateState = None  # default intermediate state
 
         if self.path is None:
@@ -160,20 +161,20 @@ class TxName(object):
         # Finally convert axes fields used for validation
         self.convertAxes()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.txName
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'TxName') -> bool:
         """
         Sort by txName
         """
 
         return self.txName < other.txName
 
-    def checkConsistency(self):
+    def checkConsistency(self) -> bool:
         """
         Checks if all the SMS in txname have the same structure (topology/canonical name)
         and verify if its constraints and conditions are valid expressions.
@@ -329,8 +330,8 @@ class TxName(object):
                     axMap[flatArrayIndex] = str(oldArrayValue).replace(' ','')
                 self.axesMap.append(axMap)   
 
-    def processExpr(self, stringExpr, databaseParticles,
-                    checkUnique=False):
+    def processExpr(self, stringExpr: str, databaseParticles,
+                    checkUnique: bool = False) -> tuple:
         """
         Process a string expression (constraint or condition) for
         the SMS weights.
@@ -380,7 +381,7 @@ class TxName(object):
 
         return exprFunc, smsMap
 
-    def evalConstraintFor(self, smsList):
+    def evalConstraintFor(self, smsList: list) -> Optional[Union[float, int]]:
         """
         Evaluate the constraint function for a list of SMS
         which have been matched to the txname SMS. The
@@ -407,7 +408,7 @@ class TxName(object):
 
         return eval(self._constraintFunc, localsDict, {})
 
-    def evalConditionsFor(self, smsList):
+    def evalConditionsFor(self, smsList: list) -> Optional[list]:
         """
         Evaluate the conditions for a list of SMS
         which have been matched to the txname SMS. The
@@ -441,7 +442,7 @@ class TxName(object):
 
         return conditions
 
-    def preProcessData(self, rawData):
+    def preProcessData(self, rawData) -> tuple:
         """
         Convert input data (from the upperLimits, evaluationTypeUpperLimits or efficiencyMap fields)
         to a flat array without units. The output is used to construct the TxNameData object,
@@ -486,7 +487,7 @@ class TxName(object):
 
         return x_values, y_values
 
-    def transformData(self, data):
+    def transformData(self, data) -> tuple:
         """
         Uses the information in self.dataMap (or self._arrayMap) to convert data
         to a list of flat and unitless array. The data is split into two lists, one
@@ -510,7 +511,7 @@ class TxName(object):
 
         return np.array(xvalues), np.array(yvalues)
 
-    def transformPoint(self, x):
+    def transformPoint(self, x) -> list:
         """
         Transforms a x point (mass/width values) to a flat, unitless
         list. The widths are rescaled according to rescaleWidth.
@@ -557,7 +558,7 @@ class TxName(object):
 
         return xFlat
 
-    def inverseTransformPoint(self, xFlat):
+    def inverseTransformPoint(self, xFlat: list) -> list:
         """
         Transforms a 1D unitless array to a list of mass/width values.
         If self._arrayMap is defined, use it to convert to a nested
@@ -664,7 +665,7 @@ class TxName(object):
             _, attr, unit, nodeIndex = val
             self.dataMap[key] = (nodeIndex, attr, unit)
 
-    def getDataEntry(self, arrayValue):
+    def getDataEntry(self, arrayValue) -> tuple:
         """
         Given an array value, extract the masses, widths and their
         units from the array.
@@ -688,7 +689,7 @@ class TxName(object):
 
         return mass, massUnit, width, widthUnit
 
-    def getDataFromSMS(self, sms):
+    def getDataFromSMS(self, sms) -> list:
 
         dataMap = self.dataMap
         smsData = [None]*(1+max(dataMap.keys()))
@@ -704,7 +705,7 @@ class TxName(object):
 
         return smsData
 
-    def getReweightingFor(self, sms):
+    def getReweightingFor(self, sms) -> float:
         """
         Compute the lifetime reweighting for the SMS (fraction of prompt decays).
         If sms is a list, return 1.0.
@@ -761,7 +762,7 @@ class TxName(object):
                                         Leff_outer=self.Leff_outer)
         return reweightFactor
 
-    def evaluateString(self, value):
+    def evaluateString(self, value: str):
         """
         Evaluate string.
 
@@ -778,7 +779,7 @@ class TxName(object):
 
         return val
 
-    def hasOnlyZeroes(self):
+    def hasOnlyZeroes(self) -> bool:
         ozs = self.txnameData.onlyZeroValues()
         if self.txnameDataExp:
             e_ozs = self.txnameDataExp.onlyZeroValues()
@@ -789,7 +790,7 @@ class TxName(object):
                 return False
         return ozs
 
-    def fetchAttribute(self, attr, fillvalue=None):
+    def fetchAttribute(self, attr: str, fillvalue=None):
         """
         Auxiliary method to get the attribute from self. If
         not found, look for it in datasetInfo and if still not found
@@ -859,7 +860,7 @@ class TxName(object):
 
         return ul
 
-    def getEfficiencyFor(self, sms, mass=None):
+    def getEfficiencyFor(self, sms, mass=None) -> float:
         """
         For upper limit results, checks if the input SMS falls inside the
         upper limit grid and has a non-zero reweigthing factor.
@@ -908,7 +909,7 @@ class TxName(object):
 
         return eff
 
-    def addInfo(self, tag, value):
+    def addInfo(self, tag: str, value):
         """
         Adds the info field labeled by tag with value value to the object.
 
@@ -935,7 +936,7 @@ class TxName(object):
             except TypeError:
                 setattr(self, tag, value)
 
-    def getInfo(self, infoLabel):
+    def getInfo(self, infoLabel: str):
         """
         Returns the value of info field.
 
@@ -991,7 +992,7 @@ class TxName(object):
         # If this point was reached, there were no macthes
         return None
 
-    def hasLikelihood(self):
+    def hasLikelihood(self) -> bool:
         """
         Can I construct a likelihood for this map?
         True for all efficiency maps, and for upper limits maps

@@ -164,7 +164,7 @@ class Info(object):
                 if not os.path.isfile ( os.path.join(os.path.dirname(self.path), model) ):
                     raise SModelSError ( f"In {self.path}: model file {model} does not exist in the same directory as {self.path}" )
 
-    def __eq__(self, other):
+    def __eq__(self, other : object) -> bool:
         if self.__dict__ != other.__dict__:
             return False
         return True
@@ -216,7 +216,7 @@ class Info(object):
         p = os.path.dirname(self.path)
         return os.path.abspath(os.path.join(p, s_up))
 
-    def __ne__(self, other):
+    def __ne__(self, other : object) -> bool:
         return not self.__eq__(other)
 
     def addInfo(self, tag : str, value : str ):

@@ -8,6 +8,7 @@
 """
 
 import os
+import configparser
 from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.pythonPrinter import PyPrinter
 from smodels.tools.printers.xmlPrinter import XmlPrinter
@@ -31,11 +32,11 @@ class MPrinter(object):
 
     def __init__(self):
 
-        self.name = "master"
-        self.Printers = {}
-        self.outputFormat = "version3"
+        self.name: str = "master"
+        self.Printers: dict = {}
+        self.outputFormat: str = "version3"
 
-    def setPrinterOptions(self, parser):
+    def setPrinterOptions(self, parser: configparser.ConfigParser):
         """
         Define the printer types and their options.
 
@@ -85,7 +86,7 @@ class MPrinter(object):
                 newPrinter.setOptions(parser.items(prt+'-printer'))
             self.Printers[prt] = newPrinter
 
-    def addObj(self, obj):
+    def addObj(self, obj: object):
         """
         Adds the object to all its Printers:
 

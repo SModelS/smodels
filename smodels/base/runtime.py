@@ -38,7 +38,7 @@ def checkForIncompatibleModuleVersions() -> bool:
 
 checkForIncompatibleModuleVersions()
 
-def returnGitCommitId():
+def returnGitCommitId() -> str | None:
     """ if we are in a git-managed repository, return the git commit id """
     try:
         import subprocess
@@ -62,7 +62,7 @@ def returnGitCommitId():
         # Not a Git repo, or git command failed—do nothing
         return None
 
-def printEnvironmentInfo( args : Dict ):
+def printEnvironmentInfo( args : Dict ) -> bool:
     """ very simple method that prints out info relevant to debugging
         machine-dependent problems
     :param args: a dictionary with options, currently only a "colors" option
@@ -142,7 +142,7 @@ def experimentalFeature( feature : str ) -> Union[None,bool]:
         return None
     return _experimental[feature]
 
-def nCPUs():
+def nCPUs() -> int | None:
     """ obtain the number of *available* CPU cores on the machine, for several
         platforms and python versions. """
     try:

@@ -42,7 +42,7 @@ class NllEvalType(Enum):
     apriori = 2
 
     @classmethod
-    def init ( cls, evaluationType : Union[str,bool] ):
+    def init ( cls, evaluationType : Union[str,bool] ) -> "NllEvalType":
         """ get evaluationtype either from a string (e.g. 'posteriori') or a bool
             (true is priori, false is observed)
         """
@@ -55,10 +55,10 @@ class NllEvalType(Enum):
             return cls.observed
         raise SModelSError ( f"NllEvalType {evaluationType} unknown" )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.value)
 
-    def __eq__ ( self, other ):
+    def __eq__ ( self, other : object ) -> bool:
         if type ( other ) == NllEvalType:
             return super().__eq__ ( other  )
         if type ( other ) in [ bool, str ]:
@@ -331,7 +331,7 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
                 raise SModelSError( "cannot find b right of the root" )
     return a, b
 
-def deltaChi2FromLlhd(likelihood):
+def deltaChi2FromLlhd(likelihood: Optional[float]) -> Optional[float]:
     """compute the delta chi2 value from a likelihood (convenience function)"""
     if likelihood == 0.0:
         return 1e10  # a very high number is good

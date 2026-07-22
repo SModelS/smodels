@@ -57,7 +57,7 @@ class Meta(object):
         return f"db{self.python[0]}.pcl"
         # return "db%s%s.pcl" % ( self.python[0], hfl )
 
-    def versionFromFile ( self ):
+    def versionFromFile ( self ) -> Optional[str]:
         """
         Retrieves the version of the database using the version file.
         """
@@ -79,7 +79,7 @@ class Meta(object):
             # logger.error('There is no version file %s', vfile )
             # return 'unknown version'
 
-    def __str__ ( self ):
+    def __str__ ( self ) -> str:
         ret  = f"Meta: path={self.pathname}\n"
         ret += f"      mtime={time.ctime(self.mtime)}"
         ret += f", filecount={self.filecount}"
@@ -97,7 +97,7 @@ class Meta(object):
     def cTime ( self ) -> str:
         return time.ctime ( self.mtime )
 
-    def determineLastModified ( self, force : bool = False ):
+    def determineLastModified ( self, force : bool = False ) -> Optional[tuple]:
         """ compute the last modified timestamp, plus count
             number of files. Only if text db """
         if self.isPickle():
@@ -167,7 +167,7 @@ class Meta(object):
         # print ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
         logger.info ( "FastLim v1.1 efficiencies loaded. Please cite: arXiv:1402.0492, EPJC74 (2014) 11" )
 
-    def __eq__ ( self, other ):
+    def __eq__ ( self, other : object ) -> bool:
         if other == None: return False
         if self.pathname != other.pathname:
             return False

@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 import numpy as np
-from typing import Optional
+from typing import Optional, Callable
 
 
 # ---------------------------------------------------------------------------
@@ -53,7 +53,7 @@ def _undo_standardize(
 # Feature preprocessing (forward, used at inference time)
 # ---------------------------------------------------------------------------
 
-def _get_fn(fn_str: str):
+def _get_fn(fn_str: str) -> Callable:
     """Return a named scalar transform."""
     match fn_str:
         case "log":
@@ -111,7 +111,7 @@ def preprocess_features(
 # nLL postprocessing (inverse transforms)
 # ---------------------------------------------------------------------------
 
-def _get_inv_fn(fn_str: str):
+def _get_inv_fn(fn_str: str) -> Callable:
     """Return the inverse of a named scalar transform."""
     match fn_str:
         case "log":

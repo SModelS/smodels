@@ -34,7 +34,7 @@ except ImportError:
 
 class XSecBase:
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder,slha_folder_name, maycompile=True):
+    def __init__ ( self, maxOrder: int, slha_folder_name: str, maycompile: bool = True):
         """
         :param maxOrder: maximum order to compute the cross section, given as an integer
                     if maxOrder == LO, compute only LO pythia xsecs
@@ -52,7 +52,7 @@ class XSecBase:
         self.countNoNLOXSecs = 0
         self.maycompile = maycompile
 
-    def addXSecToFile( self, xsecs, slhafile, comment=None, complain=True):
+    def addXSecToFile( self, xsecs, slhafile: str, comment: str | None = None, complain: bool = True) -> int | bool:
         """
         Write cross sections to an SLHA file.
 
@@ -104,7 +104,7 @@ class XSecBase:
 
         return nxsecs 
 
-    def xsecToBlock( self, xsec, inPDGs=(2212, 2212), comment=None, xsecUnit = pb):
+    def xsecToBlock( self, xsec, inPDGs: tuple = (2212, 2212), comment: str | None = None, xsecUnit = pb) -> str:
         """
         Generate a string for a XSECTION block in the SLHA format from a XSection
         object.
@@ -141,7 +141,7 @@ class XSecBase:
 class ArgsStandardizer:
     """ simple class to collect all argument manipulators """
 
-    def getSSMultipliers ( self, multipliers ):
+    def getSSMultipliers ( self, multipliers ) -> dict | None:
         if type ( multipliers ) == str:
             if multipliers in [ "", "None", "none", "no", "{}" ]:
                 return None
@@ -152,7 +152,7 @@ class ArgsStandardizer:
             return eval(multipliers)
         return multipliers
 
-    def getInputFiles ( self, args ):
+    def getInputFiles ( self, args ) -> list[str]:
         """ geth the names of the slha files to run over """
         inputPath  = args.filename.strip()
         if not os.path.exists( inputPath ):
@@ -169,7 +169,7 @@ class ArgsStandardizer:
         random.shuffle ( inputFiles )
         return inputFiles
 
-    def checkAllowedSqrtses ( self, order, sqrtses ):
+    def checkAllowedSqrtses ( self, order: int, sqrtses: set ) -> None:
         """ check if the sqrtses are 'allowed' """
         if order == 0: return
         allowedsqrtses=[7, 8, 13, 13.6]
@@ -179,7 +179,7 @@ class ArgsStandardizer:
                         "TeV! Available are: %s TeV." % (sqrts, allowedsqrtses ))
                 sys.exit(-2)
 
-    def getOrder ( self, args ):
+    def getOrder ( self, args ) -> int:
         """ retrieve the order in perturbation theory from argument list """
         if args.NLL:
             return NLL
@@ -187,7 +187,7 @@ class ArgsStandardizer:
             return NLO
         return LO
 
-    def getjson ( self, args ):
+    def getjson ( self, args ) -> str | None:
         """ retrieve the path to the json file from argument list """
         json = args.conf
 
@@ -199,7 +199,7 @@ class ArgsStandardizer:
             else:
                 return logger.error("Path does not exist.")
 
-    def queryCrossSections ( self, filename ):
+    def queryCrossSections ( self, filename: str ) -> None:
         if os.path.isdir ( filename ):
             logger.error ( "Cannot query cross sections for a directory." )
             sys.exit(-1)
@@ -209,7 +209,7 @@ class ArgsStandardizer:
         else:
             print ( "0" )
 
-    def getSqrtses ( self, args ):
+    def getSqrtses ( self, args ) -> set:
         """ extract the sqrtses from argument list """
         if args.sqrts is None or len(args.sqrts) == 0:
             return {13}
@@ -218,7 +218,7 @@ class ArgsStandardizer:
         sqrtses = set(sqrtses)
         return sqrtses
 
-    def getParticles ( self, args ):
+    def getParticles ( self, args ) -> set | None:
         """ extract the particles from argument list, default to None, then channels are chosen by the json file """
         if not hasattr ( args, "particles" ) or len(args.particles) == 0:
             return None
@@ -230,7 +230,7 @@ class ArgsStandardizer:
         particles = set(particles)
         return particles
     
-    def checkNCPUs ( self, ncpus, inputFiles ):
+    def checkNCPUs ( self, ncpus: int, inputFiles: list[str] ) -> int:
         if ncpus < -1 or ncpus == 0:
             logger.error ( "Weird number of CPUs given: %d" % ncpus )
             sys.exit()
@@ -243,14 +243,14 @@ class ArgsStandardizer:
             logger.info ( "We run on %d cpus" % ncpus )
         return ncpus
 
-    def tempDir ( self, args ):
+    def tempDir ( self, args ) -> str:
         ret = "/tmp/"
         if hasattr ( args, "tempdir" ):
             ret = args.tempdir
         return ret
 
 
-    def checkXsec_limit (self,args ):
+    def checkXsec_limit (self,args ) -> float | None:
         if args.xseclimit == None:
             return None
         if args.xseclimit < 0:
@@ -260,7 +260,7 @@ class ArgsStandardizer:
             logger.warn("Are you sure to use a limit that high ? you might get errors.")
         return args.xseclimit
 
-    def getPythiaVersion ( self, args ):
+    def getPythiaVersion ( self, args ) -> int:
         pythiaVersion = 8
 
         if hasattr(args, 'pythia6' ) and args.pythia6 == True:
@@ -270,7 +270,7 @@ class ArgsStandardizer:
                 sys.exit()
         return pythiaVersion
 
-    def writeToFile ( self, args ):
+    def writeToFile ( self, args ) -> str | None:
         toFile = None
         if args.tofile:
             toFile="highest"

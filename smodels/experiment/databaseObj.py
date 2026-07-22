@@ -26,7 +26,7 @@ from smodels.base.physicsUnits import TeV
 from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 from smodels.base.types import PathType
 os.environ["OMP_NUM_THREADS"] = "2"
 
@@ -185,7 +185,7 @@ class Database(object):
 
             logger.info(f"{filename} created.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         # r = [ str(x) for x in self.subs ]
         # return "+".join(r)
         idList = "Database version: " + self.databaseVersion
@@ -219,7 +219,7 @@ class Database(object):
         idList += f"{datasets} datasets, {txnames} txnames.\n"
         return idList
 
-    def __eq__(self, other: "Database" ):
+    def __eq__(self, other: object) -> bool:
         if type(other) != type(self):
             return False
         for x, y in zip(self.subs, other.subs):
@@ -277,7 +277,7 @@ class Database(object):
         expDict = self._allExpSMSDict
         self.expSMSDict = expDict.filter(self.expResultList)
 
-    def getExpSMS(self):
+    def getExpSMS(self) -> list:
         """
         Returns all the SMS present in the selected experimental results
         """
@@ -285,7 +285,7 @@ class Database(object):
         return list(self.expSMSDict._smsDict.keys())
 
     @property
-    def databaseParticles(self):
+    def databaseParticles(self) -> list:
         """
         Database particles, a list, one entry per sub
         """
@@ -309,7 +309,7 @@ class Database(object):
         return "+".join(r)
 
     @property
-    def txt_meta(self):
+    def txt_meta(self) -> Meta:
         """
         The meta info of the text version, a merger of the original ones
 
@@ -319,7 +319,7 @@ class Database(object):
         return ret
 
     @property
-    def pcl_meta(self):
+    def pcl_meta(self) -> Meta:
         """
         The meta info of the text version, a merger of the original ones
 
@@ -432,7 +432,7 @@ class SubDatabase(object):
                      "recognized. Valid values are: pcl, txt, None." )
         raise SModelSError()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """ compare two databases """
         if type(self) != type(other):
             return False
@@ -593,7 +593,7 @@ class SubDatabase(object):
         # self.txt_meta = self.pcl_meta
         return self
 
-    def checkBinaryFile(self):
+    def checkBinaryFile(self) -> bool:
         nu = self.needsUpdate()
         logger.debug("Checking binary db file.")
         logger.debug( f"Binary file dates to {time.ctime(self.pcl_meta.mtime)}({self.pcl_meta.filecount})" )
@@ -641,7 +641,7 @@ class SubDatabase(object):
             logger.info(f"{binfile} created.")
 
     @property
-    def databaseVersion(self):
+    def databaseVersion(self) -> str:
         """
         The version of the database, read from the 'version' file.
 
@@ -653,11 +653,7 @@ class SubDatabase(object):
         self.txt_meta.databaseVersion = x
         self.pcl_meta.databaseVersion = x
 
-    def inNotebook(self):
-        """
-        Are we running within a notebook? Has an effect on the
-        progressbar we wish to use.
-        """
+    def inNotebook(self) -> bool:
 
         try:
             cfg = get_ipython().config
@@ -669,10 +665,7 @@ class SubDatabase(object):
             return False
 
     @property
-    def base(self):
-        """
-        This is the path to the base directory.
-        """
+    def base(self) -> str:
         return self.txt_meta.pathname
 
     def lockFile ( self, filename : PathType ) -> bool:
@@ -721,7 +714,7 @@ class SubDatabase(object):
         #import fcntl # does not work on all filesystems
         #fcntl.lockf(handle, fcntl.LOCK_UN)
 
-    def fetchFromScratch(self, path, store):
+    def fetchFromScratch(self, path: str, store: str) -> Tuple[str, str]:
         """ fetch database from scratch, together with
             description.
             :param store: filename to store json file.
@@ -897,7 +890,7 @@ class SubDatabase(object):
         self.source = "txt"
         return (path, path + m.getPickleFileName())
 
-    def __str__(self):
+    def __str__(self) -> str:
         idList = "Database version: " + self.databaseVersion
         idList += "\n"
         idList += "-" * len(idList) + "\n"
@@ -954,7 +947,7 @@ class SubDatabase(object):
             from smodels.experiment.defaultFinalStates import finalStates
             self.databaseParticles = finalStates
 
-    def _getParticles(self, particlesFile='databaseParticles.py'):
+    def _getParticles(self, particlesFile: str = 'databaseParticles.py'):
         """
         Load the particle objects used in the database.
 
@@ -977,7 +970,7 @@ class SubDatabase(object):
 
         return None
 
-    def _loadExpResults(self):
+    def _loadExpResults(self) -> list:
         """
         Checks the database folder and generates a list of ExpResult objects for
         each (globalInfo.txt,sms.py) pair.
@@ -1024,7 +1017,7 @@ class SubDatabase(object):
 
         return resultsList
 
-    def createExpResult(self, root):
+    def createExpResult(self, root: str):
         """ create, from pickle file or text files """
         txtmeta = Meta(root,
                        hasFastLim=None, databaseVersion=self.databaseVersion)

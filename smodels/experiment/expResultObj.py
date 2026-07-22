@@ -80,7 +80,7 @@ class ExpResult(object):
         serializer.dump(self, f, protocol=ptcl)
         f.close()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if self.globalInfo != other.globalInfo:
             return False
         if len(self.datasets) != len(other.datasets):
@@ -90,13 +90,13 @@ class ExpResult(object):
                 return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def id(self):
+    def id(self) -> str:
         return self.globalInfo.getInfo('id')
 
-    def __str__(self):
+    def __str__(self) -> str:
         label = self.globalInfo.getInfo('id') + ": "
         dataIDs = [dataset.getID() for dataset in self.datasets]
         ct_dids = 0
@@ -285,7 +285,7 @@ class ExpResult(object):
             logger.error(f"Dataset ID {dataID} not found in experimental result {self}")
             return None
 
-    def getValuesFor(self, attribute : str ):
+    def getValuesFor(self, attribute : str ) -> list:
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
@@ -298,7 +298,7 @@ class ExpResult(object):
 
         return getValuesForObj(self, attribute)
 
-    def getAttributes(self, showPrivate=False):
+    def getAttributes(self, showPrivate: bool = False) -> list:
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
@@ -315,7 +315,7 @@ class ExpResult(object):
 
         return attributes
 
-    def getTxnameWith(self, restrDict : dict = {} ):
+    def getTxnameWith(self, restrDict : dict = {} ) -> Union[list, 'TxName']:
         """
         Returns a list of TxName objects satisfying the restrictions.
         The restrictions specified as a dictionary.
@@ -344,7 +344,7 @@ class ExpResult(object):
 
         return txnameList
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         """ experimental results are sorted alphabetically according
         to their description strings """
         return str(self) < str(other)

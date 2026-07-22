@@ -12,9 +12,9 @@ class SModelSBaseError(Exception):
     Class to define SModelS specific errors
     """
 
-    def __init__(self, value=None):
+    def __init__(self, value: object = None):
         self.value = value
         Exception.__init__(self, value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self.value)

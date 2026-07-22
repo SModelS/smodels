@@ -16,6 +16,7 @@ from smodels.tools import nllFastWrapper
 from smodels.tools import externalPythonTools
 from smodels.base.smodelsLogging import logger
 from smodels.base.smodelsLogging import colors
+from collections.abc import KeysView
 
 class ToolBox(object):
     """
@@ -49,7 +50,7 @@ class ToolBox(object):
                 self.add(tool)
         
 
-    def add(self, instance):
+    def add(self, instance: object):
         """
         Adds a tool by passing an instance to this method.
         
@@ -57,7 +58,7 @@ class ToolBox(object):
         self.tools[instance.name] = instance
 
 
-    def listOfTools(self):
+    def listOfTools(self) -> KeysView:
         """
         Returns a simple list with the tool names.
         
@@ -65,7 +66,7 @@ class ToolBox(object):
         return self.tools.keys()
 
 
-    def installationOk(self, ok ):
+    def installationOk(self, ok: bool | str) -> str:
         """
         Returns color coded string to signal installation issues.
         """
@@ -80,7 +81,7 @@ class ToolBox(object):
         return ret
 
 
-    def checkInstallation(self, make=False, printit=True, longL=False ):
+    def checkInstallation(self, make: bool = False, printit: bool = True, longL: bool = False) -> bool:
         """
         Checks if all tools listed are installed properly, 
         returns True if everything is ok, False otherwise.
@@ -128,7 +129,7 @@ class ToolBox(object):
             instance.compile()
 
 
-    def get(self, tool, verbose=True):
+    def get(self, tool: str, verbose: bool = True):
         """
         Gets instance of tool from the toolbox.
         

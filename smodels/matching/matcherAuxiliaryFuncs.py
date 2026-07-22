@@ -17,7 +17,7 @@ from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 
 
 
-def roundValue(value, nround=-1):
+def roundValue(value: float | unum.Unum, nround: int = -1) -> float | unum.Unum:
     """
     Round a value to nround significant digits. If the input value is not
     a float or Unum object, it is zero or infinity, nothing is done.
@@ -53,7 +53,7 @@ def roundValue(value, nround=-1):
     return v_rounded
 
 
-def average(values, weights=None, nround=-1):
+def average(values: list, weights: list | None = None, nround: int = -1) -> float | unum.Unum | list | None:
     """
     Compute the weighted average of a list of objects.
     All the objects must be of the same type.

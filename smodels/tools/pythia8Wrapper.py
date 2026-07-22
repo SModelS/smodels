@@ -84,7 +84,7 @@ class Pythia8Wrapper(WrapperBase):
             raise IOError( f"file {nFile} does not exist" )
         return nFile
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Describe the current status
 
@@ -118,7 +118,7 @@ class Pythia8Wrapper(WrapperBase):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
 
-    def checkInstallation ( self, compile : bool = True ):
+    def checkInstallation(self, compile: bool = True) -> bool:
         # super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
@@ -235,7 +235,7 @@ class Pythia8Wrapper(WrapperBase):
 
         return ret
 
-    def chmod(self):
+    def chmod(self) -> bool:
         """
         chmod 755 on pythia executable, if it exists.
         Do nothing, if it doesnt exist.

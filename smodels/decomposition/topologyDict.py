@@ -11,6 +11,7 @@
 
 from smodels.decomposition.theorySMS import TheorySMS
 from collections import OrderedDict
+from typing import Any, List, Optional
 
 
 class TopologyDict(OrderedDict):
@@ -22,7 +23,7 @@ class TopologyDict(OrderedDict):
 
         self.__dict__ = {}
 
-    def numberOfSMS(self, canonName=None):
+    def numberOfSMS(self, canonName: Optional[int] = None) -> int:
         """
         Return the number of SMS in the dict. 
         If canonName is not None, return the number of SMS with the corresponding canonName.
@@ -43,7 +44,7 @@ class TopologyDict(OrderedDict):
                 nSMS += len(smsList)
             return nSMS
 
-    def addSMS(self, newSMS):
+    def addSMS(self, newSMS: TheorySMS) -> bool:
 
         if isinstance(newSMS, TheorySMS):
             canonName = newSMS.canonName
@@ -78,7 +79,7 @@ class TopologyDict(OrderedDict):
         else:
             return False
 
-    def getSMSList(self, canonName=None):
+    def getSMSList(self, canonName: Optional[int] = None) -> List[TheorySMS]:
         """
         Return a list with all the SMS appearing in the dict.
         If canonName is not None, return the SMS with the corresponding
@@ -101,7 +102,7 @@ class TopologyDict(OrderedDict):
             allsmsList.extend(self[cName])
         return allsmsList
 
-    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR):
+    def compress(self, doCompress: bool, doInvisible: bool, minmassgap: float, minmassgapISR: float):
         """
         Compress all SMS in the dictionary and include the compressed
         SMS in the topology list.
@@ -158,7 +159,7 @@ class TopologyDict(OrderedDict):
             sms._ancestors = None # Clear ancestors to save memory
 
 
-    def getTotalWeight(self, canonName=None):
+    def getTotalWeight(self, canonName: Optional[int] = None) -> Any:
         """
         Compute the summed cross-section over all the SMS.
         If canonName is not None, return the total cross-section

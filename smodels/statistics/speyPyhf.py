@@ -44,7 +44,7 @@ class SpeyPyhfData:
         self.getWSInfo()
         self.checkConsistency()
 
-    def getTotalYield ( self ):
+    def getTotalYield ( self ) -> float:
         """ the total yield in all signal regions """
         S = sum ( self.nsignals )
         self.totalYield = S
@@ -99,7 +99,7 @@ class SpeyPyhfData:
 
     @classmethod
     def createDataObject ( cls, dataset : CombinedDataSet, nsig : list,
-           regionSetName : str ):
+           regionSetName : str ) -> Optional["SpeyPyhfData"]:
         """ an object creator method """
 
         globalInfo = dataset.globalInfo
@@ -160,7 +160,7 @@ class SpeyPyhfData:
         # Checking if all signals matching this json are zero
         self.zeroSignalsFlag.append(allZero)
 
-    def patchMaker(self):
+    def patchMaker(self) -> Optional[list]:
         """
         Method that creates the list of patches to be applied to the
         `self.inputJsons` workspaces, one for each region given the
@@ -198,7 +198,7 @@ class SpeyPyhfData:
                 patch.append({"op": "remove", "path": path})
         return patch
     
-    def wsMaker(self, apriori=False):
+    def wsMaker(self, apriori: bool = False) -> Optional[list]:
         """
         Apply each region patch (self.patches) to his associated json
             (self.inputJsons) to obtain the complete workspaces

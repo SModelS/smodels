@@ -9,12 +9,13 @@
 
 from smodels.base.particleNode import ParticleNode
 from smodels.base.particle import MultiParticle
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
 from smodels.matching.matcherAuxiliaryFuncs import average
 from smodels.base.smodelsLogging import logger
+from typing import Optional, Union
 import numpy as np
 
 
@@ -28,7 +29,7 @@ class AverageSMS(TheorySMS):
     all SMS.
     """
 
-    def __init__(self, smsList=[]):
+    def __init__(self, smsList: list[TheorySMS] = []):
         if any(not isinstance(sms, TheorySMS) for sms in smsList):
             raise SModelSError("An AverageSMS must be created from a list of TheorySMS objects.")
 
@@ -101,7 +102,7 @@ class AverageSMS(TheorySMS):
         for sms in smsList[1:]:
             self.weight = self.weight + sms.weight
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         Compares the SMS with other. Only the properties
         defined in self.properties are used for comparison.
@@ -127,7 +128,7 @@ class AverageSMS(TheorySMS):
                     return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 class SMSCluster(object):
@@ -138,20 +139,20 @@ class SMSCluster(object):
     SMS and to manipulate this information.
     """
 
-    def __init__(self, smsList=[], dataset=None):
+    def __init__(self, smsList: list[TheorySMS] = [], dataset: Optional[DataSet | CombinedDataSet] = None):
 
         self.smsList = smsList[:]
         self.dataset = dataset
         # Compute average SMS
         self.averageSMS = self.computeAverageSMS()
         
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.averageSMS)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.averageSMS)
 
-    def getTotalXSec(self):
+    def getTotalXSec(self) -> UnitXSec:
         """
         Return the sum over the cross sections of all SMS belonging to
         the cluster.
@@ -163,7 +164,7 @@ class SMSCluster(object):
             totxsec += sms.weight
         return totxsec
 
-    def computeAverageSMS(self):
+    def computeAverageSMS(self) -> Optional[AverageSMS]:
         """
         Computes the average SMS for the cluster.
         The average SMS has generic ParticleNodes
@@ -193,7 +194,7 @@ class SMSCluster(object):
 
         return avgSMS
     
-    def distanceTo(self,sms):
+    def distanceTo(self, sms: Union[TheorySMS, 'SMSCluster']) -> Optional[float]:
         """
         Defines the relative distance between the cluster
         and SMS object or another cluster.
@@ -228,7 +229,7 @@ class SMSCluster(object):
 
         return ulDistance
 
-    def isValid(self,maxDist):
+    def isValid(self, maxDist: float) -> bool:
         """
         Checks if the SMSCluster is a valid cluster,
         i.e. if its AverageSMS has a well defined UL
@@ -263,7 +264,7 @@ class SMSCluster(object):
 
 
 
-def clusterSMS(smsList, maxDist, dataset):
+def clusterSMS(smsList: list[TheorySMS], maxDist: float, dataset: Union[DataSet, CombinedDataSet]) -> list[SMSCluster]:
     """
     Cluster the original SMS according to their distance in upper limit space.
 
@@ -310,7 +311,7 @@ def clusterSMS(smsList, maxDist, dataset):
     return clusters
 
 
-def doCluster(smsList, dataset, maxDist):
+def doCluster(smsList: list[TheorySMS], dataset: Union[DataSet, CombinedDataSet], maxDist: float) -> list[SMSCluster]:
     """
     Cluster algorithm to cluster SMS using a modified minimal spanning tree method.
 
@@ -401,7 +402,7 @@ def doCluster(smsList, dataset, maxDist):
     return clusters
 
 
-def groupSMS(smsList,dataset):
+def groupSMS(smsList: list[TheorySMS], dataset: Union[DataSet, CombinedDataSet]) -> list[SMSCluster]:
     """
     Group SMS into clusters where the average SMS is
     identical to all the SMS in cluster.
@@ -444,7 +445,7 @@ def groupSMS(smsList,dataset):
     
     return smsClusterList
 
-def mergeClusters(clusterList,useAverage=False):
+def mergeClusters(clusterList: list[SMSCluster], useAverage: bool = False) -> Optional[SMSCluster]:
     """
     Merge a list of SMSCluster objects using
     the averageSMS of each cluster if useAverage is True.

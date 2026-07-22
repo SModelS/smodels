@@ -17,25 +17,25 @@ class InclusiveValue(int):
     def __init__(self):
         int.__init__(self)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '*'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: object) -> int:
         if isinstance(other, (int, float, unum.Unum)):
             return 0
         else:
             return -1
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__cmp__(other) == 0
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self.__cmp__(other) != 0
 
 
@@ -47,20 +47,20 @@ class InclusiveList(list):
     def __init__(self):
         list.__init__(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '[*]'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: object) -> int:
         if isinstance(other, list):
             return 0
         else:
             return -1
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__cmp__(other) == 0
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self.__cmp__(other) != 0

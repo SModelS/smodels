@@ -18,13 +18,13 @@ class CrashReport(object):
     Class that handles all crash report information.
     
     """    
-    def __init__(self):        
+    def __init__(self):
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')
         self.timestampHuman = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         self.crashReportFileName = 'smodels-' + timestamp + '.crash'
 
 
-    def createCrashReportFile(self, inputFileName, parameterFileName):
+    def createCrashReportFile(self, inputFileName: str, parameterFileName: str):
         """
         Create a new SModelS crash report file.
         
@@ -78,7 +78,7 @@ class CrashReport(object):
             crashReportFile.write("-"*80+"\n\n")
             crashReportFile.write(parameterFileContent)
     
-    def createUnknownErrorMessage(self):
+    def createUnknownErrorMessage(self) -> str:
         """
         Create a message for an unknown error.
         
@@ -95,7 +95,7 @@ class CrashReport(object):
         return message
     
     
-def readCrashReportFile(crashReportFileName):
+def readCrashReportFile(crashReportFileName: str) -> tuple[str, str]:
     """
     Read a crash report file to use its input and parameter file sections for a
     SModelS run.
@@ -146,7 +146,7 @@ def readCrashReportFile(crashReportFileName):
     return crashReportInputFileName, crashReportParameterFileName
     
     
-def createStackTrace():
+def createStackTrace() -> str:
     """
     Return the stack trace.
     

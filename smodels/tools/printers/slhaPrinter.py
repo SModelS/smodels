@@ -32,14 +32,14 @@ class SLHAPrinter(TxTPrinter):
         :param output: one of: file, stdout
         """
         TxTPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "slha"
-        self.docompress = 0
-        self.combinesr = 0
-        self.combineanas = 0
-        self.printingOrder = [OutputStatus, TheoryPredictionList,
+        self.name: str = "slha"
+        self.docompress: int = 0
+        self.combinesr: int = 0
+        self.combineanas: int = 0
+        self.printingOrder: list = [OutputStatus, TheoryPredictionList,
                               TheoryPredictionsCombiner, 
                               TheoryPrediction, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.toPrint: list = [None]*len(self.printingOrder)
 
     def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
@@ -57,7 +57,7 @@ class SLHAPrinter(TxTPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatOutputStatus(self, obj) -> str:
+    def _formatOutputStatus(self, obj: object) -> str:
 
         smodelsversion = obj.smodelsVersion
         if not smodelsversion.startswith("v"):
@@ -91,7 +91,7 @@ class SLHAPrinter(TxTPrinter):
 
         return output
 
-    def _formatTheoryPredictionList(self, obj) -> str:
+    def _formatTheoryPredictionList(self, obj: object) -> str:
 
         printAll = True  # Controls which theory predictions are printed
         if hasattr(self, "expandedoutput") and not self.expandedoutput:
@@ -187,7 +187,7 @@ class SLHAPrinter(TxTPrinter):
 
         return output
 
-    def _formatUncovered(self, obj) -> str:
+    def _formatUncovered(self, obj: object) -> str:
 
         # First sort groups by label
         groups = sorted(obj.groups[:], key=lambda g: g.label)
@@ -199,10 +199,10 @@ class SLHAPrinter(TxTPrinter):
         output += "\n"
         return output
 
-    def _formatTheoryPrediction(self,obj) -> str:
+    def _formatTheoryPrediction(self,obj: object) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj) -> str:
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 

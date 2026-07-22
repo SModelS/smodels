@@ -14,6 +14,7 @@ from smodels.experiment.expSMS import ExpSMS
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from collections import OrderedDict
+from typing import Optional
 
 class ExpSMSDict(dict):
     """ 
@@ -26,7 +27,7 @@ class ExpSMSDict(dict):
                       original numbering in the Txname SMS ({TxName : {smsLabel : nodesDict}})
     """
 
-    def __init__(self, expResultList=[]):
+    def __init__(self, expResultList: list = []):
         """
         :param exptResultList: List of ExptResult objects used to build the map
         """
@@ -38,7 +39,7 @@ class ExpSMSDict(dict):
         if len(expResultList) > 0:
             self.computeDicts(expResultList)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Returns description of SMS dict with number
         of unique SMS and txname objects.
@@ -48,21 +49,21 @@ class ExpSMSDict(dict):
         
         return strD
     
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         return str(self)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the number of unique SMS
         """
 
         return len(self._smsDict)
 
-    def __iter__(self):
+    def __iter__(self) -> iter:
         return iter(self._smsDict)
 
-    def __getitem__(self,key):
+    def __getitem__(self, key):
 
         if isinstance(key,ExpSMS):
             useDict = self._smsDict
@@ -102,7 +103,7 @@ class ExpSMSDict(dict):
 
         dict.__delitem__(useDict,key)
 
-    def copy(self):
+    def copy(self) -> 'ExpSMSDict':
         """
         Create a copy of self.
 
@@ -119,7 +120,7 @@ class ExpSMSDict(dict):
 
         return newDict
 
-    def filter(self,expResultList):
+    def filter(self, expResultList: list) -> 'ExpSMSDict':
         """
         Returns a copy of self contanining only the mapping
         to the TxNames contained in expResultList.
@@ -155,21 +156,21 @@ class ExpSMSDict(dict):
 
         return newDict
             
-    def getSMS(self):
+    def getSMS(self) -> iter:
         """
         Iterate over the unique ExpSMS stored in self.
         """
 
         return iter(self._smsDict)
 
-    def getTx(self):
+    def getTx(self) -> iter:
         """
         Iterate over the TxNames stored in self.
         """
 
         return iter(self._txDict)
 
-    def setTxNodeOrdering(self,sms,tx,smsLabel,reverse=False):
+    def setTxNodeOrdering(self, sms, tx: TxName, smsLabel: str, reverse: bool = False):
         """
         Relabel the node indices in sms accoding to the ExpSMS represented
         by the smsLabel in the TxName tx (unique ExpSMS indices - > tx sms indices).
@@ -211,7 +212,7 @@ class ExpSMSDict(dict):
         
         return sms
 
-    def computeDicts(self,expResultList):
+    def computeDicts(self, expResultList: list):
         """
         Iterates over all (active) experimental results and build two dictionaries:
         one mapping TxNames and smsLabels to the unique SMS and another one
@@ -272,7 +273,7 @@ class ExpSMSDict(dict):
             self[txsms] = newDict
 
 
-    def getMatchesFrom(self,smsTopDict):
+    def getMatchesFrom(self, smsTopDict) -> dict:
         """
         Checks for all the matches between the SMS in smsTopDict (from decomposition)
         and the unique SMS in self. Returns a dictionary with the mapping:

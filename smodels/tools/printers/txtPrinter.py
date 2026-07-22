@@ -33,12 +33,12 @@ class TxTPrinter(BasicPrinter):
         :param output: one of: file, stdout
         """
         BasicPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "log"
-        self.printtimespent = False
-        self.printingOrder = [OutputStatus, Database, TopologyDict,
+        self.name: str = "log"
+        self.printtimespent: bool = False
+        self.printingOrder: list = [OutputStatus, Database, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               TheoryPrediction, Uncovered]
-        self.toPrint = [None] * len(self.printingOrder)
+        self.toPrint: list = [None] * len(self.printingOrder)
 
     def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
                        silent : bool = False ):
@@ -57,10 +57,10 @@ class TxTPrinter(BasicPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatDoc(self, obj) -> bool:
+    def _formatDoc(self, obj: object) -> bool:
         return False
 
-    def _formatOutputStatus(self, obj) -> str:
+    def _formatOutputStatus(self, obj: object) -> str:
         """
         Format data for a OutputStatus object.
 
@@ -94,7 +94,7 @@ class TxTPrinter(BasicPrinter):
         output += "=" * 80 + "\n"
         return output
 
-    def _formatTopologyDict(self, obj) -> str:
+    def _formatTopologyDict(self, obj: object) -> str:
         """
         Format data for a TopologyDict object.
 
@@ -160,7 +160,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatSMS(self, obj) -> str:
+    def _formatSMS(self, obj: object) -> str:
         """
         Format data for an SMS object.
 
@@ -216,7 +216,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatDatabase(self, obj) -> str:
+    def _formatDatabase(self, obj: object) -> str:
         """
         Format data for a Database object.
 
@@ -241,7 +241,7 @@ class TxTPrinter(BasicPrinter):
 
         return output+"\n"
 
-    def _formatExpResult(self, obj) -> str:
+    def _formatExpResult(self, obj: object) -> str:
         """
         Format data for a ExpResult object.
 
@@ -294,7 +294,7 @@ class TxTPrinter(BasicPrinter):
         fmt = ".%dg" % n
         return ("%"+fmt) % number
 
-    def _formatTheoryPredictionList(self, obj) -> str:
+    def _formatTheoryPredictionList(self, obj: object) -> str:
         """
         Format data for a TheoryPredictionList object.
 
@@ -420,7 +420,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatUncovered(self, obj) -> str:
+    def _formatUncovered(self, obj: object) -> str:
         """
         Format all uncovered data.
 
@@ -474,10 +474,10 @@ class TxTPrinter(BasicPrinter):
             output += "================================================================================\n"
         return output
 
-    def _formatTheoryPrediction(self,obj) -> str:
+    def _formatTheoryPrediction(self,obj: object) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj) -> str:
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 

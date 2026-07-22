@@ -15,7 +15,7 @@ import numpy as np
 import sys
 import onnxruntime
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import UnitLumi
+from smodels.base.physicsUnits import UnitLumi, UnitXSec
 from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
          observed, apriori, aposteriori, NllEvalType, \
          CLsWithErrorsfromNLL
@@ -87,7 +87,7 @@ class NNData:
     one for each json file
     """
 
-    def __init__(self, nsignals, dataObject ):
+    def __init__(self, nsignals: dict, dataObject: object):
         self.nsignals = nsignals  # fb
         self.dataObject = dataObject
         self.globalInfo = dataObject.globalInfo
@@ -95,7 +95,7 @@ class NNData:
         self.origDataSetOrder = datasets
         self.getTotalYield()
 
-    def getTotalYield ( self ):
+    def getTotalYield ( self ) -> float:
         """ the total yield in all signal regions """
         S = 0
         for signal in self.nsignals.values():
@@ -106,7 +106,7 @@ class NNData:
                 S += signal
         self.totalYield = S
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         return self.totalYield / self.globalInfo.lumi
 
 class NNUpperLimitComputer:
@@ -192,7 +192,7 @@ class NNUpperLimitComputer:
             sigma_mu = np.sqrt ( 1. / hessian )
         return sigma_mu
 
-    def getTotalXSec ( self ):
+    def getTotalXSec ( self ) -> UnitXSec:
         return self.data.getTotalXSec()
 
     def isControlRegion ( self, srname : str ) -> bool:
@@ -257,7 +257,7 @@ class NNUpperLimitComputer:
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def _actual_nll(self, poi_test : float,
-        outputType : Optional[str] = None ):
+        outputType : Optional[str] = None ) -> Optional[Union[dict, float]]:
         """ the method that really wraps around the llhd computation.
         :param outputType: if None return dictionary with all
         values, else supply string, e.g. nll_obs_1, for observed at mu=1.

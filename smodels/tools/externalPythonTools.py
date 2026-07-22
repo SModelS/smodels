@@ -18,7 +18,7 @@ class ExternalPythonTool(object):
     (contrary to nllfast or pythia).    
     
     """
-    def __init__(self, importname, optional=False ):
+    def __init__(self, importname: str, optional: bool = False):
         """
         Initializes the ExternalPythonTool object. Useful for installation. 
         :params optional: optional package, not needed for core SModelS.
@@ -62,21 +62,21 @@ class ExternalPythonTool(object):
 
 
 
-    def pathOfExecutable (self):
+    def pathOfExecutable(self) -> str:
         """
         Just returns the pythonPath variable
         """
         return self.pythonPath
 
 
-    def installDirectory(self):
+    def installDirectory(self) -> str:
         """
         Just returns the pythonPath variable
         """
         return self.pythonPath
 
 
-    def checkInstallation(self):
+    def checkInstallation(self) -> bool:
         """
         The check is basically done in the constructor
         """

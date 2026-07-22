@@ -11,7 +11,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import apriori, aposteriori, NllEvalType
 import numpy as np
 import time
-from typing import Union
+from typing import IO, Union
 from smodels.base.types import PathType
 
 class BasicPrinter(object):
@@ -27,16 +27,16 @@ class BasicPrinter(object):
         :param output: one of: file, stdout
         """
 
-        self.name = "basic"
-        self.time = time.time()  # time stamps
+        self.name: str = "basic"
+        self.time: float = time.time()  # time stamps
 
-        self.outputList = []
+        self.outputList: list = []
         self.filename = filename
-        self.output = output
-        self.printingOrder = []
+        self.output: str = output
+        self.printingOrder: list = []
         self.typeofexpectedvalues = apriori
-        self.toPrint = []
-        self.outputFormat = outputFormat
+        self.toPrint: list = []
+        self.outputFormat: str = outputFormat
 
         if filename and os.path.isfile(filename):
             logger.warning( f"Removing file {filename}" )
@@ -78,7 +78,7 @@ class BasicPrinter(object):
         for opt, value in options:
             setattr(self, opt, eval(value))
 
-    def addObj(self, obj) -> bool:
+    def addObj(self, obj: object) -> bool:
         """
         Adds object to the Printer.
 
@@ -94,7 +94,7 @@ class BasicPrinter(object):
                 return True
         return False
 
-    def openOutFile(self, filename : PathType, mode : str ):
+    def openOutFile(self, filename : PathType, mode : str ) -> IO[str]:
         """ creates and opens a data sink,
             creates path if needed """
         d = os.path.dirname(filename)
@@ -131,7 +131,7 @@ class BasicPrinter(object):
         self.time = time.time()  # prepare next timestamp
         return ret
 
-    def _formatObj(self, obj):
+    def _formatObj(self, obj: object) -> Union[str, bool]:
         """
         Method for formatting the output depending on the type of object
         and output.

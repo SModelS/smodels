@@ -9,9 +9,10 @@ import os
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 
 class DatabaseClient:
-    def __init__ ( self, servername = None, port = None, verbose = "info",
-                   rundir = "./", logfile = "@@rundir@@/dbclient.log",
-                   clientid = -1 ):
+    def __init__(self, servername: str | None = None, port: int | None = None,
+                 verbose: str = "info", rundir: str = "./",
+                 logfile: str = "@@rundir@@/dbclient.log",
+                 clientid: int = -1):
         verbose = verbose.lower()
         verbs = { "err": 10, "warn": 20, "info": 30, "debug": 40 }
         self.cache = {}
@@ -46,7 +47,7 @@ class DatabaseClient:
         self.initialize()
         self.send ( "shutdown", amount_expected = 0 )
 
-    def saveStats ( self ):
+    def saveStats(self):
         self.pprint ( f"client stats after {self.nqueries} queries" )
         self.pprint ( "=================================" )
         self.pprint ( f"number of results in cache: {len(self.cache)}" )
@@ -56,11 +57,11 @@ class DatabaseClient:
         self.pprint ( f"highest number of hits: {max(maxhits)}" )
         self.pprint ( f"lowest number of hits: {min(maxhits)}" )
 
-    def getWaitingTime ( self ):
+    def getWaitingTime(self) -> float:
         """ compute a waiting time between attempts, from self.ntries """
         return random.uniform ( 1, 5 ) + 6*self.ntries**2
 
-    def query ( self, msg ):
+    def query(self, msg: str):
         """ query a certain result, msg is eg.
             obs:ATLAS-SUSY-2016-07:ul:T1:[[5.5000E+02,4.5000E+02],[5.5000E+02,4.5000E+02]]
         """
@@ -94,7 +95,7 @@ class DatabaseClient:
             self.cache = newcache
             minclass += 1
 
-    def send ( self, message, amount_expected=32 ):
+    def send(self, message: str, amount_expected: int = 32):
         """ send the message.
         :param amount_expected: how many return bytes do you expect
         """
@@ -149,7 +150,7 @@ class DatabaseClient:
         if not hasattr ( self, "logfile" ):
             self.logfile = self.rundir + "/dbclient.log"
 
-    def findServerStatus ( self ):
+    def findServerStatus(self) -> str:
         serverfile = self.rundir + "/serverstatus.log"
         if not os.path.exists ( serverfile ):
             return "not found"
@@ -179,7 +180,7 @@ class DatabaseClient:
                 f.write ( f"[databaseClient{self.clientid}-{asctime}] {s_args}\n" )
                 f.close()
 
-    def nameAndPort ( self ):
+    def nameAndPort(self) -> str:
         return f"{self.servername}:{self.port}"
 
     def initialize( self ):
@@ -207,7 +208,7 @@ class DatabaseClient:
         raise SModelSError ( f"Could not connect to database in initialize, tried {self.ntries} times" )
 
 
-def stresstest( args ):
+def stresstest(args: tuple):
     """ this is one process in the stress test """
     verbosity, servername, port = "error", args[0], args[1]
     nr = args[2]
