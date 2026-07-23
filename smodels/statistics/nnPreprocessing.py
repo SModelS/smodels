@@ -143,6 +143,19 @@ def postprocess_nLLs(
         e.g. ``["log_w_negatives", "standardization"]``
     :returns: unpreprocessed nLL deltas, same shape as nLLs
     """
+    if trafos and "per_output" in trafos:
+        scale = float(trafos.get("asinh_scale", 1.0))
+        nLLs = np.array(nLLs, dtype=np.float64)
+        for c, fn_list in enumerate(trafos["per_output"]):
+            for fn_str in reversed(fn_list):
+                if fn_str == "standardization":
+                    nLLs[c] = nLLs[c] * std[c] + mean[c]
+                elif fn_str == "asinh":
+                    nLLs[c] = scale * np.sinh(nLLs[c])
+                else:
+                    nLLs[c] = _get_inv_fn(fn_str)(nLLs[c])
+        assert np.isfinite(nLLs).all(), "Non-finite values after postprocess_nLLs"
+        return nLLs
     if trafos:
         for fn_str in reversed(trafos):
             if fn_str == "standardization":
