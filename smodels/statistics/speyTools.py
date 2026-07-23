@@ -93,20 +93,17 @@ class SpeyModelFacade:
         if nSigma != 0:
             expected_pvalue = "1sigma"
 
-        # optimiser_arguments = None
-        # optimiser_arguments = { "method": "SLSQP" }
-        optimiser_arguments = { "method": "L-BFGS-B" }
-        optimiser_arguments.update ( kwargs )
+#        optimiser_arguments = { "method": "SLSQP" }
         import contextlib
         import io
         with contextlib.redirect_stdout(io.StringIO()):
             ## silence the spey warnings here
             ret = self.speyModel.poi_upper_limit ( expected = exp,
-                   expected_pvalue = expected_pvalue,
-                   optimiser_arguments = optimiser_arguments )
+                   expected_pvalue = expected_pvalue )
         if ret == float("inf"):
             ## if we get nonsense, we try with their default method!
-            optimiser_arguments.pop ( "method" )
+            optimiser_arguments = { "method": "L-BFGS-B" }
+            optimiser_arguments.update ( kwargs )
             ret = self.speyModel.poi_upper_limit ( expected = exp,
                    expected_pvalue = expected_pvalue,
                    optimiser_arguments = optimiser_arguments )
