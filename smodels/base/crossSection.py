@@ -366,9 +366,11 @@ class XSectionList(object):
         newList = newXsecs
         if isinstance(newXsecs, XSection):
             newList = [newXsecs]
+        currentInfo = self.getInfo()
         for newXsec in newList:
-            if newXsec.info not in self.getInfo():
+            if newXsec.info not in currentInfo:
                 self.add(newXsec)
+                currentInfo = self.getInfo()
             else:
                 for oldXsec in self:
                     if newXsec.info == oldXsec.info:
@@ -643,9 +645,11 @@ class XSectionList(object):
         newList = newXsecs
         if type(newXsecs) == type(XSection()):
             newList = [newXsecs]
+        currentInfo = self.getInfo()
         for newXsec in newList:
-            if newXsec.info not in self.getInfo():
+            if newXsec.info not in currentInfo:
                 self.add(newXsec)
+                currentInfo = self.getInfo()
             else:
                 for oldXsec in self:
                     if newXsec.info == oldXsec.info:

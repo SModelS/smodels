@@ -293,11 +293,14 @@ def clusterSMS(smsList: list[TheorySMS], maxDist: float, dataset: Union[DataSet,
 
     # Remove duplicated SMS:
     smsUnique = []
+    allAncestorIds = set()
     for sms in smsList:
         # Skip the SMS if it is related to any another SMS in the list
-        if any(sms.isRelatedTo(smsB) for smsB in smsUnique):
+        smsIds = set([id(sms)] + [id(a) for a in sms.getAncestors()])
+        if smsIds & allAncestorIds:
             continue
         smsUnique.append(sms)
+        allAncestorIds.update(smsIds)
 
     # Get txname list only with the txnames from unique SMS used for clustering
     txnames = list(set([sms.txname for sms in smsUnique]))
@@ -349,7 +352,7 @@ def doCluster(smsList: list[TheorySMS], dataset: Union[DataSet, CombinedDataSet]
 
     # Compute the distance matrix for the clusters:
     # (diagonal entries are set to None)
-    dMatrix = np.full((len(clusterList),len(clusterList)),fill_value=None)
+    dMatrix = np.full((len(clusterList),len(clusterList)),fill_value=np.nan)
     for iA,clusterA in enumerate(clusterList):
         for iB,clusterB in enumerate(clusterList):
             if iA >= iB: continue
@@ -358,8 +361,7 @@ def doCluster(smsList: list[TheorySMS], dataset: Union[DataSet, CombinedDataSet]
     
     # Check minimal distance between two distinct clusters
     # (set default to 2*maxDist in case len(clusterList) == 1, i.e. dMatrix is empty)
-    minDist = min([d for d in dMatrix.flatten() if d is not None], 
-                  default=2*maxDist)
+    minDist = np.nanmin(dMatrix) if dMatrix.size > 0 and np.any(~np.isnan(dMatrix)) else 2*maxDist
     # Merge closest cluster up to the point when
     # no more merges are possible (all clusters have distances larger than maxDist)
     while (len(clusterList) > 1) and (minDist < maxDist):
@@ -395,8 +397,7 @@ def doCluster(smsList: list[TheorySMS], dataset: Union[DataSet, CombinedDataSet]
             dMatrix[np.flip(mergeIndices)] = 2*maxDist
 
 
-        minDist = min([d for d in dMatrix.flatten() if d is not None], 
-                  default=2*maxDist)
+        minDist = np.nanmin(dMatrix) if dMatrix.size > 0 and np.any(~np.isnan(dMatrix)) else 2*maxDist
         
 
     # Finally sort clusters by total xsection and length

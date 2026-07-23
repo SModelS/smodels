@@ -81,7 +81,7 @@ class TopologyDict(OrderedDict):
                 else:
                     smsList.insert(index, newSMS)
 
-                self[canonName] = smsList[:]
+                self[canonName] = smsList
 
             return True
         else:
@@ -160,10 +160,11 @@ class TopologyDict(OrderedDict):
         keeping only the SMS which belongs to self (remove intermediate ancestors).
         """
 
-        keepIDs = set([sms.smsID for sms in self.getSMSList()])
-        for sms in self.getSMSList():
+        allSMS = self.getSMSList()
+        keepIDs = set([sms.smsID for sms in allSMS])
+        for sms in allSMS:
             sms.setAncestors(keepIDs)
-        for sms in self.getSMSList():
+        for sms in allSMS:
             sms._ancestors = None # Clear ancestors to save memory
 
 

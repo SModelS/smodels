@@ -88,6 +88,10 @@ class TheorySMS(GenericSMS):
         return self.__cmp__(other) == 1
 
     def __eq__(self, other: "TheorySMS") -> bool:
+        if not isinstance(other, TheorySMS):
+            return False
+        if self.canonName != other.canonName:
+            return False
         return self.__cmp__(other) == 0
 
     def __ne__(self, other: "TheorySMS") -> bool:
@@ -187,8 +191,8 @@ class TheorySMS(GenericSMS):
             newSMS._allAncestors = self._allAncestors[:]
         newSMS._sorted = self._sorted        
         newSMS.smsID = self.smsID
-        newSMS.coveredBy = set(list(self.coveredBy)[:])
-        newSMS.testedBy = set(list(self.testedBy)[:])
+        newSMS.coveredBy = self.coveredBy.copy()
+        newSMS.testedBy = self.testedBy.copy()
 
         # Set nodes:
         if not emptyNodes:

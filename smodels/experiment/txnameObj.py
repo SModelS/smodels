@@ -967,10 +967,11 @@ class TxName(object):
         else:
             checkList = [(expSMS, smsLabel) for expSMS, smsLabel in self.smsMap.items()]
         
+        switchedTheorySMS = theorySMS.switchBranches()
         for expSMS, smsLabel in checkList:
             # Compare sms:
             matches = []
-            for sms in [theorySMS,theorySMS.switchBranches()]:
+            for sms in [theorySMS,switchedTheorySMS]:
                 if sms is None: # If None it means we can not switch branches
                     continue
                 matchedSMS = expSMS.matchesTo(sms)

@@ -234,6 +234,13 @@ class ExpSMSDict(dict):
                     raise SModelSError()
                 self[tx] = {}
                 self._nodesDict[tx] = {}
+                # Build a canonName index for fast identical SMS lookup
+                canonNameIndex = {}
+                for existingSMS in self.getSMS():
+                    cName = existingSMS.canonName
+                    if cName not in canonNameIndex:
+                        canonNameIndex[cName] = []
+                    canonNameIndex[cName].append(existingSMS)
                 for sms,smsLabel in tx.smsMap.items():
                     newSMS = sms.copy()
                     # Keep the mapping between original nodes
@@ -246,10 +253,8 @@ class ExpSMSDict(dict):
                     else:
                         invertNodesDict = None
                     smsMatch = None
-                    # Loop for an identical SMS in smsDict
-                    # (there can only be one match, since the SMS within
-                    # a given txname must be unique)
-                    for sms1 in self.getSMS():
+                    # Loop for an identical SMS, only checking same canonName
+                    for sms1 in canonNameIndex.get(newSMS.canonName, []):
                         if newSMS.identicalTo(sms1):
                             smsMatch = sms1
                             break

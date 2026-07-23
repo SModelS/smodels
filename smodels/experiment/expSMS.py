@@ -165,6 +165,10 @@ class ExpSMS(GenericSMS):
         :return: True if objects are equivalent.
         """
 
+        if not isinstance(other, GenericSMS):
+            return False
+        if self.canonName != other.canonName:
+            return False
         match = self.matchesTo(other)
 
         return (match is not None)
@@ -356,13 +360,13 @@ class ExpSMS(GenericSMS):
             return False
         
         for nodeIndex in self.dfsIndexIterator():
-            cName1 = self.nodeCanonName(nodeIndex)
-            cName2 = other.nodeCanonName(nodeIndex)
-            if cName1 != cName2:
-                return False
             node1 = self.indexToNode(nodeIndex)
             node2 = other.indexToNode(nodeIndex)
             if node1.particle is not node2.particle:
+                return False
+            cName1 = self.nodeCanonName(nodeIndex)
+            cName2 = other.nodeCanonName(nodeIndex)
+            if cName1 != cName2:
                 return False
         return True
 
