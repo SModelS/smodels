@@ -179,8 +179,9 @@ class TheorySMS(GenericSMS):
         newSMS.maxWeight = self.maxWeight
         newSMS.prodXSec = self.prodXSec
         newSMS.decayBRs = self.decayBRs
-        if hasattr(self,'weightList'):
-            newSMS.weightList = self.weightList.copy()
+        wl = getattr(self, 'weightList', None)
+        if wl is not None:
+            newSMS.weightList = wl.copy()
         if self._ancestors is not None:
             newSMS._ancestors = self._ancestors[:]
         if self._allAncestors is not None:
@@ -327,9 +328,9 @@ class TheorySMS(GenericSMS):
         :return: A list of SMS objects containing all the ancestors sorted by generation.
         """
 
-        if hasattr(self, '_allAncestors') and self._allAncestors is None:
+        allAnc = getattr(self, '_allAncestors', None)
+        if allAnc is None:
             self.setAncestors()
-        
         return self._allAncestors
         
 
@@ -467,7 +468,7 @@ class TheorySMS(GenericSMS):
                 # Convert to node object
                 d = newSMS.indexToNode(dIndex)
                 # Split daughters into final states SM and others (BSM)
-                if hasattr(d, 'isSM') and d.isSM and newSMS.out_degree(dIndex) == 0:
+                if getattr(d, 'isSM', False) and newSMS.out_degree(dIndex) == 0:
                     smDaughters.append(dIndex)
                 else:
                     # Compute mass different between BSM daughter and mom

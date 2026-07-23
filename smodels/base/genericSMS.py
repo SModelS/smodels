@@ -34,11 +34,13 @@ class GenericSMS(object):
         self._nextNodeIndex : int = 0  # Cache the next free node index for fast insertions
         self._sorted : bool = False # Tag SMS as sorted or not
         self._genIndexIteratorCache : dict = {} # Cache for genIndexIterator results
+        self._nodeIndicesCache : list | None = None # Cache for nodeIndices
 
-    def _clearGenIndexIteratorCache(self):
-        """Clear cached breadth-first traversal results."""
+    def _invalidateCaches(self):
+        """Clear cached data."""
 
         self._genIndexIteratorCache = {}
+        self._nodeIndicesCache = None
 
     def __hash__(self) -> int:
         return object.__hash__(self)
@@ -69,8 +71,9 @@ class GenericSMS(object):
         """
 
         # Since it can be expensive to compute the string, we cache it
-        if hasattr(self,'_finalStateStr') and self._finalStateStr:
-            return self._finalStateStr
+        fsStr = getattr(self, '_finalStateStr', None)
+        if fsStr:
+            return fsStr
         
         smsComp = self.compressToFinalStates()
         smsComp.sort(force=True)
@@ -132,7 +135,7 @@ class GenericSMS(object):
         self._nodesMapping[nodeIndex] = node
         if nodeIndex >= self._nextNodeIndex:
             self._nextNodeIndex = nodeIndex + 1
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
         return nodeIndex
 
@@ -182,7 +185,7 @@ class GenericSMS(object):
         if nodeIndex in self._finalStates:
             self._finalStates.pop(nodeIndex)
 
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def remove_nodes_from(self, nodeIndices: list[int]) -> None:
         """
@@ -204,7 +207,7 @@ class GenericSMS(object):
 
         self._successors[nodeIndexA].append(nodeIndexB)
         self._predecessors[nodeIndexB] = nodeIndexA
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def add_edges_from(self, edges: list[tuple[int, int]]) -> None:
         """
@@ -235,7 +238,7 @@ class GenericSMS(object):
             if self._predecessors[nodeIndexB] == nodeIndexA:
                 self._predecessors.pop(nodeIndexB)
 
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def remove_edges(self, edges: list[tuple[int, int]]) -> None:
         """
@@ -260,7 +263,7 @@ class GenericSMS(object):
         self._finalStates = {}
         self._rootIndex = None
         self._nextNodeIndex = 0
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def indexToNode(self, nodeIndex: int | list[int] | tuple) -> Any:
         """
@@ -274,11 +277,11 @@ class GenericSMS(object):
         :return: Node object or list of Node objects
         """
 
-        if isinstance(nodeIndex,int):
+        if type(nodeIndex) is int:
             return self._nodesMapping[nodeIndex]
-        elif isinstance(nodeIndex,list):
+        elif type(nodeIndex) is list:
             return [self._nodesMapping[n] for n in nodeIndex]
-        elif isinstance(nodeIndex,tuple):
+        elif type(nodeIndex) is tuple:
             return tuple([self._nodesMapping[n] for n in nodeIndex])
         else:
             raise SModelSError(f"Can not convert object of type {str(type(nodeIndex))} to nodes")
@@ -394,7 +397,7 @@ class GenericSMS(object):
         # Re-compute canonical name and sort the tree
         smsComp._sorted = False
         smsComp._canonName = smsComp.computeCanonName()
-        smsComp._clearGenIndexIteratorCache()
+        smsComp._invalidateCaches()
         return smsComp
 
     @property
@@ -437,10 +440,11 @@ class GenericSMS(object):
         :return: List of indices (int)
         """
 
-
-        nodeIndexList = list(self._successors.keys())
-
-        return nodeIndexList
+        cache = self.__dict__.get('_nodeIndicesCache')
+        if cache is not None:
+            return cache
+        self._nodeIndicesCache = list(self._successors.keys())
+        return self._nodeIndicesCache
 
     @property
     def edgeIndices(self) -> list[tuple[int, int]]:
@@ -559,10 +563,10 @@ class GenericSMS(object):
         :return: Number of outgoing edges (int)
         """
 
-        if nodeIndex not in self.nodeIndices:
+        daughters = self._successors.get(nodeIndex)
+        if daughters is None:
             return 0
-        else:
-            return len(self.daughterIndices(nodeIndex))
+        return len(daughters)
 
     def in_degree(self, nodeIndex: int) -> int:
         """
@@ -588,7 +592,10 @@ class GenericSMS(object):
         :return: Number of nodes (int)
         """
 
-        return len(self.nodeIndices)
+        cache = self.__dict__.get('_nodeIndicesCache')
+        if cache is not None:
+            return len(cache)
+        return len(self._successors)
 
     def genIndexIterator(self, nodeIndex: int | None = None,
                          includeLeaves: bool = False, ignoreInclusiveNodes: bool = False):
@@ -695,18 +702,16 @@ class GenericSMS(object):
         for nodeIndex, _ in self.genIndexIterator(includeLeaves=True):
             orderedList.append(nodeIndex)
 
-        # Sort according to the bfs order
         self.sortAccordingTo(orderedList)
 
-        # Re-number nodes according to their order
         if numberNodes:
-            indexDict = {n : orderedList.index(n) for n in self.nodeIndices}
+            nodeIndices = self.nodeIndices
+            indexDict = {n: i for i, n in enumerate(orderedList) if n in nodeIndices}
             self.relabelNodeIndices(nodeIndexDict=indexDict)
         else:
-            # Define dummy dict
-            indexDict = {n : n for n in self.nodeIndices}
+            indexDict = {n: n for n in self.nodeIndices}
 
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
         return indexDict
 
     def sortAccordingTo(self, indicesList: list[int]) -> None:
@@ -719,21 +724,18 @@ class GenericSMS(object):
         newSuccessors = OrderedDict()
         indices = self.nodeIndices
         sortList = indicesList[:]
-        # Indices not present in indicesList are left
-        # put at the end of the list
         for nodeIndex in indices:
             if nodeIndex not in sortList:
                 sortList.append(nodeIndex)
 
-        sortedIndices = sorted(indices, key = lambda n: sortList.index(n))
-        # Go over sorted indices and create new successors dict
+        order = {n: i for i, n in enumerate(sortList)}
+        sortedIndices = sorted(indices, key=lambda n: order.get(n, len(sortList)))
         for nodeIndex in sortedIndices:
-            daughters = self.daughterIndices(nodeIndex)
-            # Sort daughters according to the list
-            sortedDaughters = sorted(daughters, key = lambda n: sortList.index(n))
+            daughters = self._successors[nodeIndex]
+            sortedDaughters = sorted(daughters, key=lambda n: order.get(n, len(sortList)))
             newSuccessors[nodeIndex] = sortedDaughters[:]
         self._successors = newSuccessors
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def sort(self, nodeIndex: int | None = None, force: bool = False) -> dict[int, int] | None:
         """
@@ -750,8 +752,7 @@ class GenericSMS(object):
                  and new indices as values.
         """
 
-        # If tree is already sorted, do nothing
-        if hasattr(self,'_sorted') and self._sorted and not force:
+        if getattr(self, '_sorted', False) and not force:
             return
 
 
@@ -767,11 +768,10 @@ class GenericSMS(object):
                 self.sort(d, force=force)
             sorted_daughters = self.sortSubTrees(daughters)
 
-
-            # Remove nodeIndex -> daughters edges
-            self.remove_edges(product([nodeIndex],daughters))
-            # Add edges with the correct ordering:
-            self.add_edges_from(product([nodeIndex],sorted_daughters))
+            for d in daughters:
+                self.remove_edge(nodeIndex, d)
+            for d in sorted_daughters:
+                self.add_edge(nodeIndex, d)
 
         # Finally, after sorting the subtrees,
         # make sure the nodes are sorted and numbered according
@@ -782,7 +782,7 @@ class GenericSMS(object):
             self._sorted = True
             return nodeIndexMap
         
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def sortSubTrees(self, subtreeList: list[int]) -> list[int]:
         """
@@ -827,24 +827,23 @@ class GenericSMS(object):
         :return: Sorted list of node indices.
         """
 
-        if len(subtreeList) == 1 or len(subtreeList) == 0:
+        n = len(subtreeList)
+        if n <= 1:
             return subtreeList
 
         s = subtreeList[:]
         pivot = s[0]
         i = 0
-        for j in range(len(s)-1):
-            if self.compareSubTrees(self, s[j+1], pivot) < 0:
+        compare = self.compareSubTrees
+        for j in range(n - 1):
+            if compare(self, s[j+1], pivot) < 0:
                 s[j+1], s[i+1] = s[i+1], s[j+1]
                 i += 1
         s[0], s[i] = s[i], s[0]
         first_part = self.sortCommonSubTrees(s[:i])
         second_part = self.sortCommonSubTrees(s[i+1:])
         first_part.append(s[i])
-
-        sortedList = first_part + second_part
-
-        return sortedList
+        return first_part + second_part
 
     def compareSubTrees(self, other: 'GenericSMS', n1: int, n2: int) -> int:
         """
@@ -858,32 +857,28 @@ class GenericSMS(object):
         :return: 0, if subtrees are equal, -1 if subtree1 < subtree2, 1 if subtree1 > subtree2
         """
 
-        # Compare node canonical names
-        cName1 = self.nodeCanonName(n1)
-        cName2 = other.nodeCanonName(n2)
-        if cName1 != cName2:
-            if cName1 < cName2:
-                return -1
-            else:
-                return 1
+        cName1 = self._nodeCanonNames.get(n1)
+        if cName1 is None:
+            cName1 = self.computeCanonName(n1)
+        cName2 = other._nodeCanonNames.get(n2)
+        if cName2 is None:
+            cName2 = other.computeCanonName(n2)
 
-        # Compare nodes
-        cmp = self.compareNodes(other,n1,n2)
-        if cmp != 0:
+        if cName1 != cName2:
+            return -1 if cName1 < cName2 else 1
+
+        cmp = self.compareNodes(other, n1, n2)
+        if cmp:
             return cmp
 
-        daughters1 = self.daughterIndices(n1)
-        daughters2 = other.daughterIndices(n2)
-        # If nodes are leaves, return 0
-        if len(daughters1) == len(daughters2) == 0:
+        daughters1 = self._successors[n1]
+        daughters2 = other._successors[n2]
+        if not daughters1 and not daughters2:
             return 0
 
-        # Check if the daughters from n2 match the ones from n1:
-        # (the daughters should be sorted at this point)
-        for i1, d1 in enumerate(daughters1):
-            d2 = daughters2[i1]
+        for d1, d2 in zip(daughters1, daughters2):
             cmp = self.compareSubTrees(other, d1, d2)
-            if cmp != 0:
+            if cmp:
                 return cmp
         return 0
 
@@ -899,13 +894,10 @@ class GenericSMS(object):
         :return: 1 if node1 > node2, -1 if node1 < node2, 0 if node1 == node2.
         """
 
-        # Comparison parameters:
-        node1 = self.indexToNode(nodeIndex1)
-        node2 = other.indexToNode(nodeIndex2)
+        node1 = self._nodesMapping[nodeIndex1]
+        node2 = other._nodesMapping[nodeIndex2]
 
-        # Directly use node comparison:
-        cmp = node1.compareTo(node2)
-        return cmp
+        return node1.compareTo(node2)
 
     def copyTreeFrom(self, other: 'GenericSMS', nodesObjDict: dict[int, Any]) -> None:
         """
@@ -928,7 +920,7 @@ class GenericSMS(object):
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
                              in other._finalStates.items()}
         self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def treeToString(self, 
                      removeIndicesFrom: str | None = 'stable') -> str:
@@ -1119,7 +1111,7 @@ class GenericSMS(object):
         self._finalStates = newFinalStates
         self._rootIndex = nodeIndexDict[self.rootIndex]
         self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def updateNodeObjects(self, nodeObjectDict: dict[int, Any]) -> None:
         """
@@ -1132,7 +1124,7 @@ class GenericSMS(object):
 
         for nodeIndex, newObj in nodeObjectDict.items():
             self._nodesMapping[nodeIndex] = newObj
-        self._clearGenIndexIteratorCache()
+        self._invalidateCaches()
 
     def checkConsistency(self) -> None:
         """

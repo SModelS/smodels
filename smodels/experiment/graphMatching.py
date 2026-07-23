@@ -27,16 +27,16 @@ def getCycle(G: dict) -> Optional[list]:
     """
 
     
-    visited=set()    
+    visited = set()
     stack = []
+    stack_set = set()
     
     def dfs_visit(u):
-
-        # Add u to the current stack of visited nodes
-        stack.append(u)                         
+        stack.append(u)
+        stack_set.add(u)
         for v in G[u]:
-            if v in stack: # A cycle has been found with a path starting and ending in v                
-                stack.append(v) # Include v at the end of the stack
+            if v in stack_set:
+                stack.append(v)
                 return True
             if v in visited:
                 continue
@@ -44,18 +44,13 @@ def getCycle(G: dict) -> Optional[list]:
             if cycleFound:
                 return True
         visited.add(u)
+        stack_set.discard(u)
         stack.remove(u)
         return False    
                                  
     for u in G:
-        # If u has been visited, it means no cycle 
-        # can have u as the initial node, so we can skip it.
-        if u in visited: 
+        if u in visited:
             continue
-        # Visit all the descendents of u
-        # (if any the "family trees" has a node
-        # with a descendent which returns to the node, a cycle
-        # has been found)
         cycleFound = dfs_visit(u)
         if cycleFound:
             break
@@ -63,9 +58,6 @@ def getCycle(G: dict) -> Optional[list]:
     if not cycleFound:
         return None
 
-    # If a cycle has been found the cycle is a subset
-    # of the current stack (stack = A -> B -> C -> D -> E -> C)
-    # where the last entry is the beginning and end of the cycle
     headNode = stack[-1]
     path = stack[stack.index(headNode):]
     
@@ -292,8 +284,8 @@ def perfectMatchingIter(left: list, right: list, edges: dict, match: dict, all_m
         new_match = dict(sorted(new_match.items()))
         all_matches.append(new_match)
 
-        # Choose an edge from the original match not present in the new_match
-        nL,nR = (set(match.items()).difference(set(new_match.items()))).pop()
+        nL = next(k for k in match if k not in new_match or match[k] != new_match[k])
+        nR = match[nL]
         
         # Form subproblems
         # Create G+ with the nodes nL,nR removed and all of

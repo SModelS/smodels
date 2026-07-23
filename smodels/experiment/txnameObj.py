@@ -428,7 +428,6 @@ class TxName(object):
             condExpr = list(cond.keys())[0]
             smsMap = list(cond.values())[0]
             weightsMap = {smsLabel: 0.0*physicsUnits.fb for smsLabel in smsMap.values()}
-            # Add weights for matching SMS:
             for sms in smsList:
                 for smsC, smsLabel in smsMap.items():
                     if smsC == sms:
@@ -721,11 +720,8 @@ class TxName(object):
             logger.error(msgError)
             raise SModelSError()
 
-        # For backward compatibility:
-        if not hasattr(self, 'Leff_inner'):
-            self.Leff_inner = None
-        if not hasattr(self, 'Leff_outer'):
-            self.Leff_outer = None
+        Leff_inner = getattr(self, 'Leff_inner', None)
+        Leff_outer = getattr(self, 'Leff_outer', None)
 
         # Collect the widths which are taken into accound by data:
         widthsInData = []

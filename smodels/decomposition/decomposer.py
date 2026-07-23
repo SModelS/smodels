@@ -38,11 +38,9 @@ def lightweight_sortTrees(subtreeList: Iterable[subtreeTuple],
     It assumes the sub-subtrees are arleady sorted by the same criteria.
     """
 
-    sorted_list = sorted(subtreeList, 
-                         key=lambda s: (s.canonName,tuple(particleOrderDict.get(pid, 0) 
-                                                          for pid in s.particleIDs)))
-    
-    return sorted_list
+    get = particleOrderDict.get
+    return sorted(subtreeList, 
+                  key=lambda s: (s.canonName, tuple(get(pid, 0) for pid in s.particleIDs)))
 
 def lightweight_sortParticleIDs( particleIDs: List[int], 
                                 particleOrderDict: Dict[int, int]) -> List[int]:
@@ -127,8 +125,10 @@ def get_lightweight_canonName(sorted_subtrees: List[subtreeTuple]) -> int:
     The subtrees are assumed to be already sorted by canonName and particle ordering, so that the same physical subtree will always have the same canonName regardless of the order in which the daughters were combined.
     """
 
-    cName = '1'+"".join(f"{subtree.canonName}" for subtree in sorted_subtrees) + '0'
-    return int(cName)
+    parts = ['1']
+    parts.extend(str(subtree.canonName) for subtree in sorted_subtrees)
+    parts.append('0')
+    return int(''.join(parts))
 
 
 def build_subtree_cacheFor(particleID: int, decayDict: Dict[int, List[decayTupleObj]], 
@@ -174,23 +174,20 @@ def build_subtree_cacheFor(particleID: int, decayDict: Dict[int, List[decayTuple
 
             for combo in product(*daughter_choices):
                 all_BRs = decay.br
-                for daughter_subtree in combo:
-                    all_BRs = all_BRs*daughter_subtree.decayBRs
+                for ds in combo:
+                    all_BRs *= ds.decayBRs
                 if all_BRs < minBR:
                     continue
-                combo = lightweight_sortTrees(combo,particleOrderDict)  # Sort daughter subtrees by canonName and particle ordering
+                combo = lightweight_sortTrees(combo,particleOrderDict)
                 cName = get_lightweight_canonName(combo)
-                parent_subtree = subtreeTuple(edges=[], particleIDs=[particleID,], decayBRs=all_BRs, canonName=int(cName))
-                for daughter_subtree in combo:
-                    index_map = {}
-                    for idx,daughter_id in enumerate(daughter_subtree.particleIDs):
-                        parent_subtree.particleIDs.append(daughter_id)
-                        new_index = len(parent_subtree.particleIDs)-1
-                        index_map[idx] = new_index                                                
-
-                    for edge_a, edge_b in daughter_subtree.edges:
+                parent_subtree = subtreeTuple(edges=[], particleIDs=[particleID,], decayBRs=all_BRs, canonName=cName)
+                for ds in combo:
+                    pid_list = ds.particleIDs
+                    n = len(parent_subtree.particleIDs)
+                    index_map = {i: n + i for i in range(len(pid_list))}
+                    parent_subtree.particleIDs.extend(pid_list)
+                    for edge_a, edge_b in ds.edges:
                         parent_subtree.edges.append((index_map[edge_a], index_map[edge_b]))
-
                     parent_subtree.edges.append((0, index_map[0]))
 
                 subtrees.append(parent_subtree)

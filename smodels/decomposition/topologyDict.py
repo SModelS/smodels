@@ -54,38 +54,32 @@ class TopologyDict(OrderedDict):
         :return: True if the SMS was added, False otherwise
         """
 
-        if isinstance(newSMS, TheorySMS):
-            canonName = newSMS.canonName
-            if canonName not in self:
-                self[canonName] = [newSMS]
-            else:
-                smsList = self[canonName]
-                # Find position to insert element
-                # (using a bisection method)
-                lo = 0
-                hi = len(smsList)
-                cmp = 1
-                while lo < hi:
-                    mid = (lo+hi)//2
-                    cmp = smsList[mid].compareTo(newSMS)
-                    if cmp < 0:
-                        lo = mid+1
-                    elif cmp > 0:
-                        hi = mid
-                    elif cmp == 0:
-                        lo = mid
-                        break
-                index = lo
-                if cmp == 0:
-                    smsList[index] = smsList[index] + newSMS
-                else:
-                    smsList.insert(index, newSMS)
-
-                self[canonName] = smsList[:]
-
-            return True
-        else:
+        if type(newSMS) is not TheorySMS:
             return False
+        canonName = newSMS.canonName
+        if canonName not in self:
+            self[canonName] = [newSMS]
+            return True
+        smsList = self[canonName]
+        lo = 0
+        hi = len(smsList)
+        found = False
+        while lo < hi:
+            mid = (lo+hi)//2
+            cmp = smsList[mid].compareTo(newSMS)
+            if cmp < 0:
+                lo = mid+1
+            elif cmp > 0:
+                hi = mid
+            else:
+                lo = mid
+                found = True
+                break
+        if found:
+            smsList[lo] = smsList[lo] + newSMS
+        else:
+            smsList.insert(lo, newSMS)
+        return True
 
     def getSMSList(self, canonName: Optional[int] = None) -> List[TheorySMS]:
         """
