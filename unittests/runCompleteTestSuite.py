@@ -188,7 +188,7 @@ if __name__ == "__main__":
         t_cpu1 = time.process_time() # CPU time used by this process
         dt_wall = (t_wall1 - t_wall0)/60. ## minutes
         dt_cpu = (t_cpu1 - t_cpu0)/60. ## minutes
-        print ( f"[runCompleteTestSuite] Finished running with {sys.argv[1:]}" )
+        print ( f"[runCompleteTestSuite] Finished running with {' '.join(sys.argv[1:])}" )
         print ( f"[runCompleteTestSuite] Wall time: {dt_wall:.2f} min" )
         print ( f"[runCompleteTestSuite] CPU time: {dt_cpu:.2f} min" )
         
