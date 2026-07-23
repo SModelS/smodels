@@ -921,12 +921,11 @@ class GenericSMS(object):
         """
 
         self._successors = OrderedDict((n, dList[:]) for n,dList in other._successors.items())
-        self._predecessors = {d : parent for d,parent in other._predecessors.items()}
+        self._predecessors = other._predecessors.copy()
         self._canonName = other._canonName
         self._rootIndex = other._rootIndex
-        self._nodesMapping = {nodeIndex : n for nodeIndex,n in nodesObjDict.items()}
-        self._nodeCanonNames = {nodeIndex : cName for nodeIndex,cName
-                                in other._nodeCanonNames.items()}
+        self._nodesMapping = {nodeIndex : nodesObjDict[nodeIndex] for nodeIndex in other._nodesMapping}
+        self._nodeCanonNames = other._nodeCanonNames.copy()
         self._finalStates = {nodeIndex : pList[:] for nodeIndex,pList
                              in other._finalStates.items()}
         self._nextNodeIndex = max(self._successors.keys()) + 1 if self._successors else 0

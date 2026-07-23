@@ -186,9 +186,9 @@ class TxNameData(object):
         # Vertex indices:
         vertices = np.take(self.tri.simplices, simplex, axis=0)
         # Compute the value:
-        values = np.array(self.y_values)
-        ret = np.dot(np.take(values, vertices), wts)
-        minXsec = min(np.take(values, vertices))
+        values = self._y_values_arr
+        ret = np.dot(values[vertices], wts)
+        minXsec = min(values[vertices])
         if ret < minXsec:
             logger.debug('Interpolation below simplex values. Will take the smallest simplex value.')
             ret = minXsec
@@ -222,10 +222,12 @@ class TxNameData(object):
 
         # #  compute gradient
         gradient = []
-        for i in range(self.dimensionality):
-            P2 = np.copy(point)
-            P2[i] += alpha
-            pv = self.interpolate(P2[:self.dimensionality])
+        dim = self.dimensionality
+        for i in range(dim):
+            orig = point[i]
+            point[i] = orig + alpha
+            pv = self.interpolate(point[:dim])
+            point[i] = orig  # restore in-place
             g = float((pv - self.projected_value)/alpha)
             if math.isnan(g):
                 # #  if we cannot compute a gradient, we return nan
@@ -239,13 +241,13 @@ class TxNameData(object):
         for i, grad in enumerate(gradient):
             gradient[i] = grad/C*alpha
         # #  walk one alpha along gradient
-        P3 = np.copy(point)
-        P4 = np.copy(point)
+        P3 = point.copy()
+        P4 = point.copy()
         for grad in gradient:
             P3[i] += grad
             P4[i] -= grad
-        agp = self.interpolate(P3[:self.dimensionality])
-        agm = self.interpolate(P4[:self.dimensionality])
+        agp = self.interpolate(P3[:dim])
+        agm = self.interpolate(P4[:dim])
         dep, dem = 0., 0.
         if self.projected_value == 0.:
             if agp != 0.:
@@ -296,14 +298,10 @@ class TxNameData(object):
 
         return self.projected_value
 
-    def countNonZeros(self, mp: list) -> int:
+    def countNonZeros(self, mp) -> int:
         """ count the nonzeros in a vector """
-        nz = 0
-        lim = 10**-4
-        for i in mp:
-            if abs(i) > lim:
-                nz += 1
-        return nz
+        arr = np.asarray(mp)
+        return int(np.sum(np.abs(arr) > 1e-4))
 
     def onlyZeroValues(self) -> bool:
         """ check if the map is zeroes only """

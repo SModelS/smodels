@@ -8,8 +8,7 @@
 
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from typing import Optional
-
-from collections import deque
+from collections import defaultdict
 
 
 def getCycle(G: dict) -> Optional[list]:
@@ -29,13 +28,15 @@ def getCycle(G: dict) -> Optional[list]:
     
     visited=set()    
     stack = []
+    in_stack = set()
     
     def dfs_visit(u):
 
         # Add u to the current stack of visited nodes
-        stack.append(u)                         
+        stack.append(u)
+        in_stack.add(u)
         for v in G[u]:
-            if v in stack: # A cycle has been found with a path starting and ending in v                
+            if v in in_stack: # A cycle has been found with a path starting and ending in v                
                 stack.append(v) # Include v at the end of the stack
                 return True
             if v in visited:
@@ -44,7 +45,8 @@ def getCycle(G: dict) -> Optional[list]:
             if cycleFound:
                 return True
         visited.add(u)
-        stack.remove(u)
+        stack.pop()
+        in_stack.discard(u)
         return False    
                                  
     for u in G:

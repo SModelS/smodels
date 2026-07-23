@@ -24,7 +24,13 @@ class Particle(object):
     @classmethod
     def _frozen_key(cls, attrDict: dict) -> tuple:
         """Build a hashable key from the normalized attribute dict."""
-        return tuple(sorted(attrDict.items()))
+        def _hashable(v):
+            try:
+                hash(v)
+                return v
+            except TypeError:
+                return repr(v)
+        return tuple(sorted((k, _hashable(v)) for k, v in attrDict.items()))
 
     
     def __new__(cls, attributesDict: dict = {}, **kwargs: Any) -> 'Particle':

@@ -103,6 +103,16 @@ class TheoryPrediction(object):
         return str(type(self).__name__)
 
 
+    def _groupSMSByTxname(self):
+        """Group smsList by txname for efficient lookup."""
+        groups = {}
+        for sms in self.smsList:
+            tx = sms.txname
+            if tx not in groups:
+                groups[tx] = []
+            groups[tx].append(sms)
+        return groups
+
     def computeXSection(self):
         """
         Compute the total cross-section for the theory prediction
@@ -113,12 +123,11 @@ class TheoryPrediction(object):
             return
 
         xsection = 0*fb
+        groups = self._groupSMSByTxname()
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname)
         for tx in self.txnames:
-            # Filter the SMS
-            smsList = [sms for sms in self.smsList
-                        if sms.txname is tx]
+            smsList = groups.get(tx, [])
             # Build dictionary needed for evaluation:
             xsection += tx.evalConstraintFor(smsList)
 
@@ -134,10 +143,9 @@ class TheoryPrediction(object):
         # (for an UL result there will be a single txname
         # and for EM results there should be no conditions)
         allConditions = []
+        groups = self._groupSMSByTxname()
         for tx in self.txnames:
-            # Filter the SMS
-            smsList = [sms for sms in self.smsList
-                        if sms.txname is tx]
+            smsList = groups.get(tx, [])
             cond = tx.evalConditionsFor(smsList)
             if cond is None:
                 continue
