@@ -134,13 +134,15 @@ def parallel_run ( verbose, testNotebooks=False, reduced=False ):
 def cleanDatabase ():
     """ remove database pickle files """
     databaseFolders = ['./database', './databaseBroken','./tinydb',
-                       './database_extra', './database_simple', './dbadd1']
+                       './database_extra', './database_simple', './dbadd1',
+                       './mlmodels_db/', './dbPAS12022', './dbSUS21002' ]
     for db in databaseFolders:
         for dirpath,_,filenames in os.walk(db):
             for f in filenames:
                 if os.path.splitext(f)[1] != '.pcl':
                     continue
                 filename = os.path.join(dirpath,f)
+                print ( f"[runCompleteTestSuite] deleting {filename}" )
                 os.remove(filename)
 
 if __name__ == "__main__":
@@ -150,6 +152,7 @@ if __name__ == "__main__":
     ap.add_argument('-c','--clean_database', help='remove database pickle files',
             action='store_true')
     ap.add_argument('-v','--verbose', help='run verbosely',action='store_true')
+    ap.add_argument('-t','--time', help='time the unit tests',action='store_true')
     ap.add_argument('-a','--allow_failed_reqs', 
             help='allow python requirements to fail',action='store_true')
     ap.add_argument('-f','--filter', help='run only tests that have <FILTER> in name. Works only with verbose and not parallel. case sensitive.',type=str,default=None)
@@ -159,6 +162,10 @@ if __name__ == "__main__":
     ap.add_argument('-r','--reduced', help='run reduced set of tests (no C++ interface, no xsec computation or notebook tests)',
             action='store_true', default = False)
     args = ap.parse_args()
+    if args.time:
+        import time
+        t_wall0 = time.perf_counter() # high-resolution wall clock
+        t_cpu0 = time.process_time() # CPU time used by this process
 
     if args.clean_database:
         print('Deleting database pickle files.')
@@ -171,10 +178,17 @@ if __name__ == "__main__":
 
         if args.parallel:
             parallel_run(args.verbose, args.notebooks, args.reduced)
-            sys.exit()
         elif args.verbose:
             verbose_run(args.filter, args.notebooks, args.reduced)
-            sys.exit()
         else:
             run(args.filter, args.notebooks, args.reduced,
                     args.allow_failed_reqs )
+    if args.time:
+        t_wall1 = time.perf_counter() # high-resolution wall clock
+        t_cpu1 = time.process_time() # CPU time used by this process
+        dt_wall = (t_wall1 - t_wall0)/60. ## minutes
+        dt_cpu = (t_cpu1 - t_cpu0)/60. ## minutes
+        print ( f"[runCompleteTestSuite] Finished running with {sys.argv[1:]}" )
+        print ( f"[runCompleteTestSuite] Wall time: {dt_wall:.2f} min" )
+        print ( f"[runCompleteTestSuite] CPU time: {dt_cpu:.2f} min" )
+        
