@@ -448,7 +448,7 @@ class DataSet(object):
                 StatsComputer
             mod = getCompRetrieverModule()
             nsigDict = { self.getID() : 1 }
-            m = mod.forSingleBin ( srSet=self.getID(), dataset=self,
+            m = mod.forSingleBin ( regionSet=self.getID(), dataset=self,
                                    nsigDict = nsigDict,
                                    deltas_rel = deltas_rel, lumi = self.getLumi() )
             comp = StatsComputer ( [ m ] )
