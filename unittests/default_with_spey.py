@@ -133,6 +133,28 @@ smodelsOutputDefault = {
     },
     {
         'maxcond' : 0.0,
+        'theory prediction (fb)' : 0.004140203,
+        'upper limit (fb)' : 0.0423837,
+        'expected upper limit (fb)' : 0.05823244,
+        'TxNames' : ['T6bbHH'],
+        'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
+        'AnalysisID' : 'ATLAS-SUSY-2018-31',
+        'DataSetID' : '(combined)',
+        'AnalysisSqrts (TeV)' : 13.0,
+        'lumi (fb-1)' : 139.0,
+        'dataType' : 'combined',
+        'r' : 0.09768387,
+        'r_expected' : 0.07109788,
+        'Width (GeV)' : [
+            [13.4903869, 0.00112364506, 'stable'],
+            [13.4903869, 0.00112364506, 'stable']
+        ],
+        'nll' : 3.919977,
+        'nll_min' : 3.762688,
+        'nll_SM' : 3.762688
+    },
+    {
+        'maxcond' : 0.0,
         'theory prediction (fb)' : 39.90113,
         'upper limit (fb)' : 467.97,
         'expected upper limit (fb)' : None,
@@ -191,8 +213,8 @@ smodelsOutputDefault = {
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.003919253,
-        'upper limit (fb)' : 0.6452136,
-        'expected upper limit (fb)' : 0.8013813,
+        'upper limit (fb)' : 0.4598331,
+        'expected upper limit (fb)' : 0.791154,
         'TxNames' : ['T1tttt'],
         'Mass (GeV)' : [[865.0, 129.0], [865.0, 129.0]],
         'AnalysisID' : 'CMS-SUS-16-050-agg',
@@ -200,8 +222,8 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 35.9,
         'dataType' : 'combined',
-        'r' : 0.006074349,
-        'r_expected' : 0.004890622,
+        'r' : 0.008523207,
+        'r_expected' : 0.004953843,
         'Width (GeV)' : [
             [0.0456539663, 'stable'],
             [0.0456539663, 'stable']
@@ -228,28 +250,6 @@ smodelsOutputDefault = {
         'nll' : 3.015969,
         'nll_min' : 2.989467,
         'nll_SM' : 3.019043
-    },
-    {
-        'maxcond' : 0.0,
-        'theory prediction (fb)' : 0.004140203,
-        'upper limit (fb)' : 3.447834,
-        'expected upper limit (fb)' : 3.620791,
-        'TxNames' : ['T6bbHH'],
-        'Mass (GeV)' : [[959.4, 268.9, 129.0], [959.4, 268.9, 129.0]],
-        'AnalysisID' : 'ATLAS-SUSY-2018-31',
-        'DataSetID' : '(combined)',
-        'AnalysisSqrts (TeV)' : 13.0,
-        'lumi (fb-1)' : 139.0,
-        'dataType' : 'combined',
-        'r' : 0.001200813,
-        'r_expected' : 0.001143453,
-        'Width (GeV)' : [
-            [13.4903869, 0.00112364506, 'stable'],
-            [13.4903869, 0.00112364506, 'stable']
-        ],
-        'nll' : -0.732664,
-        'nll_min' : -0.732664,
-        'nll_SM' : -0.733033
     },
     {
         'maxcond' : 0.0,
