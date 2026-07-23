@@ -48,6 +48,8 @@ class TxNameData(object):
         self._accept_errors_upto = accept_errors_upto
         self._V = None
         self.y_values = y[:]
+        # Pre-compute numpy array for fast interpolation
+        self._y_values_arr = np.array(self.y_values)
         # Compute PCA transformation:
         self.computeV(x)
         if self._keep_values:
@@ -87,7 +89,8 @@ class TxNameData(object):
         rotMatrix = self._V  # Rotation matrix
 
         point = np.array([point])
-        point = ((point - transVector)).tolist()[0]  # Translate
+        point = point - transVector  # Translate
+        point = point.flatten()
         point = np.dot(point, rotMatrix)  # Rotate
 
         return point

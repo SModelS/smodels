@@ -19,6 +19,12 @@ class Particle(object):
 
     _instances : set = set()
     _lastID : int = 0
+    _attr_cache : dict = {}  # frozen attribute tuple -> existing Particle instance
+
+    @classmethod
+    def _frozen_key(cls, attrDict: dict) -> tuple:
+        """Build a hashable key from the normalized attribute dict."""
+        return tuple(sorted(attrDict.items()))
 
     
     def __new__(cls, attributesDict: dict = {}, **kwargs: Any) -> 'Particle':
@@ -48,13 +54,10 @@ class Particle(object):
         attrDict = dict(attributesDict.items())
         attrDict.update(kwargs)
         attrDict = cls._normalizedAttrDict(attrDict)
-        for obj in cls.getinstances():
-            if not isinstance(obj, Particle):
-                continue
-            objAttr = cls._normalizedAttrDict(obj.__dict__)
-            if objAttr != attrDict:
-                continue
-            return obj
+        key = cls._frozen_key(attrDict)
+        cached = cls._attr_cache.get(key)
+        if cached is not None:
+            return cached
 
         newParticle = super(Particle, cls).__new__(cls)
         for attr, value in attrDict.items():
@@ -64,6 +67,7 @@ class Particle(object):
         newParticle._isStable = None
         newParticle._isPrompt = None
         cls._instances.add(weakref.ref(newParticle))
+        cls._attr_cache[key] = newParticle
         return newParticle
 
     def __getnewargs__(self) -> tuple:
@@ -265,6 +269,8 @@ class Particle(object):
         newParticle._id = cls.getID()
         newParticle._comp = {newParticle._id: 0}
         cls._instances.add(weakref.ref(newParticle))
+        # copy() intentionally creates a NEW particle (different ID),
+        # so do NOT add to _attr_cache.
 
         return newParticle
 
@@ -383,6 +389,7 @@ class InvisibleParticle(Particle):
     """
 
     _instances : set = set()
+    _attr_cache : dict = {}  # separate cache for InvisibleParticle
     
     def __new__(cls, attributesDict: dict = {}, **kwargs: Any) -> 'InvisibleParticle':
         """Create an InvisibleParticle, enforcing invisibility on all instances."""
@@ -390,7 +397,22 @@ class InvisibleParticle(Particle):
         attrDict.update(kwargs)
         # Enforce invisibility for all InvisibleParticle instances.
         attrDict['_isInvisible'] = True
-        return super(InvisibleParticle, cls).__new__(cls, attrDict)
+        attrDict = cls._normalizedAttrDict(attrDict)
+        key = cls._frozen_key(attrDict)
+        cached = cls._attr_cache.get(key)
+        if cached is not None:
+            return cached
+
+        newParticle = super(Particle, cls).__new__(cls)
+        for attr, value in attrDict.items():
+            setattr(newParticle, attr, value)
+        newParticle._id = cls.getID()
+        newParticle._comp = {newParticle._id: 0}
+        newParticle._isStable = None
+        newParticle._isPrompt = None
+        cls._instances.add(weakref.ref(newParticle))
+        cls._attr_cache[key] = newParticle
+        return newParticle
 
     @classmethod
     def getinstances(cls) -> list:

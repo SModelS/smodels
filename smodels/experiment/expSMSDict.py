@@ -303,10 +303,7 @@ class ExpSMSDict(dict):
         for sms in smsTopDict.getSMSList():
             canonName  = sms.canonName
             # Select txSMS with matching canon name:
-            selectedSMSlist = []
-            for cName,expSMSList in cNamesDict.items():
-                if cName == canonName:
-                    selectedSMSlist += expSMSList
+            selectedSMSlist = cNamesDict.get(canonName, [])
 
             # Loop over selected SMS and check for matches
             # Store the (correctly ordered) match in smsMatch

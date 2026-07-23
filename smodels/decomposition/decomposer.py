@@ -208,11 +208,14 @@ def simplify_bsm_particles(model: Model) -> Dict[int, Union[MultiParticle, Parti
     """
 
     bsmList = []
+    bsmIndex = {}  # hash -> index in bsmList for O(1) lookup
     for bsm_particle in model.BSMparticles:
-        if bsm_particle in bsmList:
-            index = bsmList.index(bsm_particle)
+        pid = hash(bsm_particle)
+        if pid in bsmIndex:
+            index = bsmIndex[pid]
             bsmList[index] = bsmList[index] + bsm_particle        
         else:
+            bsmIndex[pid] = len(bsmList)
             bsmList.append(bsm_particle)
 
     # For the SM particles, directly used the defined particles/multiparticles without merging

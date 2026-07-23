@@ -159,17 +159,18 @@ class GenericSMS(object):
         :param nodeIndex: Node index
         """
 
+        # Remove from parent's daughter list using _predecessors for O(1) lookup
+        parentIndex = self._predecessors.get(nodeIndex)
+        if parentIndex is not None and parentIndex in self._successors:
+            daughters = self._successors[parentIndex]
+            self._successors[parentIndex] = [d for d in daughters if d != nodeIndex]
+
         if nodeIndex in self._successors:
             self._successors.pop(nodeIndex)
             self._nodesMapping.pop(nodeIndex)
 
         if nodeIndex in self._nodeCanonNames:
             self._nodeCanonNames.pop(nodeIndex)
-
-        for nodeA, daughtersA in self._successors.items():
-            if nodeIndex not in daughtersA:
-                continue
-            self._successors[nodeA] = [d for d in daughtersA if d != nodeIndex]
 
         if nodeIndex in self._predecessors:
             self._predecessors.pop(nodeIndex)
