@@ -129,7 +129,7 @@ class PyhfData:
             globalInfo : Optional[object] = None, jsonFileName : Optional[str] = None ):
         self.globalInfo = globalInfo
         self.nsignals = nsignals
-        self.getTotalYield()
+        self.getTotalSignalYield()
         self.jsonFileName = jsonFileName
         self.regions = regions
         self.inputJson = inputJson
@@ -156,23 +156,25 @@ class PyhfData:
         self.checkConsistency()
         self.getWSInfo()
 
-    def getTotalYield ( self ) -> float:
+    def getTotalSignalYield ( self ) -> float:
         """ the total yield in all signal regions """
-        S = 0
+        S = 0.
         for signal in self.nsignals.values():
+            """
             if isinstance(signal, list):
                 for sig in signal:
                     S += sig
             else:
-                try:
-                    S += signal
-                except TypeError:
-                    raise SModelSError ( f"type {self.nsignals} is {type(signal)}" )
-        self.totalYield = S
+            """
+            try:
+                S += signal
+            except TypeError:
+                raise SModelSError ( f"type {self.nsignals} is {type(signal)}" )
+        self.totalSignalYield = S
 
     def getTotalXSec ( self ) -> UnitXSec:
         """ the total fiducial xsec for this computer """
-        return self.totalYield / self.globalInfo.lumi
+        return self.totalSignalYield / self.globalInfo.lumi
 
     def createPatchForRegion ( self, region : dict, i_ch : int,
             ch : dict, jsName : list ) -> tuple:
@@ -425,6 +427,48 @@ class PyhfUpperLimitComputer:
         )
         # self.checkPyhfVersion()
         self.welcome()
+
+    def totalYieldsFromSignals ( self, poi_test : float ) -> list :
+        """ given the signal yields self.nsignals, return the total
+        yields, signal + background. mostly needed for debugging.
+
+        :param poi_test: signal strength multiplier to test
+        :returns: list of total yields
+        """
+        yields = {}
+        channels = self.workspace["channels"]
+        observations = {}
+        bgs = {}
+        for obs in self.workspace["observations"]:
+            observations[obs["name"]]=sum(obs["data"])
+        for bg in self.workspace["channels"]:
+            bgs[bg["name"]]=0.
+            for sample in bg["samples"]:
+                if sample["name"]=="Bkg":
+                    bgs[ bg["name"] ] += sum ( sample["data"] )
+        ## its important that we pick up the order from self.data.nsignals
+        for regionName, signal in self.data.nsignals.items():
+            region = self.data.globalInfo.regionMappings[regionName]
+            pyhfname = region["pyhf"]
+            region_type = region["type"]
+            S = signal * poi_test
+            if region_type == "CR":
+                S += observations[pyhfname]
+            else:
+                S += bgs[pyhfname]
+            yields[pyhfname] = S
+        """
+        for channel in channels:
+            name = channel["name"]
+            if name not in yields:
+                continue
+#            assert name in self.data.nsignals.keys(), f"{name} not in {self.data.nsignals.keys()}"
+            for sample in channel["samples"]:
+                if "data" in sample:
+                    yields[name]+=sample["data"][0]
+        import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
+        """
+        return list(yields.values())
 
     def getTotalXSec ( self ) -> UnitXSec:
         return self.data.getTotalXSec()
