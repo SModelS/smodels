@@ -814,7 +814,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             theoPred.deltas_rel = deltas_rel
             # Check if region corresponds to a CR or VR, in which case we do not report the upper limit
             regionType = regionTypeOf(theoPred.dataset)
-            if regionType == "SR":
+            if regionType not in [ "CR", "VR" ]:
                 theoPred.upperLimit = theoPred.getUpperLimit()
             else:
                 theoPred.upperLimit = None
