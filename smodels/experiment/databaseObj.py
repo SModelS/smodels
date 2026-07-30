@@ -761,7 +761,7 @@ class SubDatabase(object):
         if defused:
             msg += " If you want the pickled database file to be cached in a different location, set the environment variable SMODELS_CACHEDIR, e.g. to '/tmp'."
         logger.warning(msg)
-        logger.info("need to fetch {r.json()['url']} and store in {filename}. size is {sizeof_fmt(size)}." )
+        logger.info( f"need to fetch {r.json()['url']} and store in {filename}. size is {sizeof_fmt(size)}." )
         self.lockFile ( filename )
         with open(filename, "wb") as dump:
             if not self.inNotebook():  # \r doesnt work in notebook
