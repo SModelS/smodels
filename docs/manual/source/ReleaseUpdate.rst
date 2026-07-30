@@ -45,7 +45,7 @@ New in Version 3.2.0:
   * Fixed pythia8 paths in automatic downloader
   * Introduced a printer registry for out-of-repo printers
   * |Database| extension (stat models): added ONNX models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09 
-  * |Database| extension (new results): added TSlepSlep to ATLAS-SUSY-2019-02 (UL), ....
+  * |Database| extension (new results): added ATLAS-SUSY-2018-09 (EM), ATLAS-SUSY-2019-02 (TSlepSlep, UL) ATLAS-SUSY-2019-04 (EM), ATLAS-SUSY-2020-27 (UL+EM), CMS-SUS-18-004 (EM), CMS-EXO-19-019 (UL), CMS-SUS-21-008 (UL), CMS-SUS-23-003 (UL)
   * Database now pickles with protocol 5 instead of protocol 4
 
 New in Version 3.1.1:
