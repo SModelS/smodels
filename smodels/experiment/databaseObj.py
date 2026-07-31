@@ -129,25 +129,28 @@ class Database(object):
             lists = [x.expResultList for x in self.subs]
             return self.mergeLists(lists)
 
-    def mergeLists( self, lists : list ) -> list:
+    def mergeLists( self, lists : list[list[ExpResult]] ) -> list[ExpResult]:
         """ small function, merges lists of expResults """
         D = {}
-        for tmp in lists:
-            for t in tmp:
-                if len(t.datasets) == 0:  # skip empty entries
-                    logger.debug(f"Analysis {t.globalInfo.id} in {t.globalInfo.path} has no datasets. Will remove it.")
+        for lst in lists:
+            # lst is a list of ExpResults
+            for eR in lst:
+                if len(eR.datasets) == 0:  # skip empty entries
+                    logger.debug(f"Analysis {eR.globalInfo.id} in {eR.globalInfo.path} has no datasets. Will remove it.")
                     continue
-                anaid = t.globalInfo.id + t.datasets[0].getType()
+                anaid = eR.globalInfo.id + eR.datasets[0].getType()
                 if anaid not in D:
-                    D[anaid] = t
+                    D[anaid] = eR
                 else:
-                    D[anaid] = self.mergeERs(D[anaid], t)
+                    D[anaid] = self.mergeERs(D[anaid], eR)
         return list(D.values())
 
     def mergeERs(self, o1 : ExpResult, r2 : ExpResult ) -> ExpResult:
         """ merge the content of exp res o1 and r2
         :param o1: other1, an experimentalResult
         :param r2: experimental Result 2
+
+        :returns: merged result
         """
         r1 = copy.deepcopy(o1)
         r1.globalInfo = r2.globalInfo
@@ -156,7 +159,7 @@ class Database(object):
             if ds.getID() not in dids:  # completely new dataset
                 r1.datasets.append(ds)
             else:  # just overwrite the old txnames
-                idx = dids.index(ds.getID())  # ds index
+                idx = dids.index ( ds.getID() )  # ds index
                 r2txs = ds.txnameList
                 r1txnames = [x.txName for x in r1.datasets[idx].txnameList]
                 for txn in r2txs:
