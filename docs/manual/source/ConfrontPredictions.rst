@@ -243,13 +243,12 @@ Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.we
 
 .. _surrogateMLModels:
 
-Surrogate Machine-Learned Statistical Models
+Machine-Learned Surrogate Statistical Models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Starting with SModelS v3.1.2, surrogate machine learned models can also be used
-to accelerate SModelS by replacing the more heavyweight full statistical models
-with fast machine learned ones.
-See :ref:`db struct <databaseStruct>` for the syntax in the database.
+Starting with SModelS v3.2.0, machine-learned surrogate models (in ONNX format) can be used instead of some pyhf models.  
+This enormously speeds up the likelihood calculations for the relevant analyses. 
+See :ref:`database structure <databaseStruct>` for the syntax in the database. 
 
 .. _analysesCombination:
 

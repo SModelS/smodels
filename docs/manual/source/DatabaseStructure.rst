@@ -152,7 +152,7 @@ that are used for the ML surrogate model, but not in the pyhf model:
 .. literalinclude:: /literals/globalInfo201832.txt
    :lines: 15-54
 
-Machine-learned models can be mixed with full models. In this case
+Machine-learned surrogate models can be mixed with pyhf models. In this case
 of ATLAS-SUSY-2019-09, by default surrogate models are used for the
 **onshell** and **offshell** region sets, but pyhf models for
 the other three region sets (**WH_0j**, **WH_nj**, **WH_DFOS**):
@@ -160,9 +160,9 @@ the other three region sets (**WH_0j**, **WH_nj**, **WH_DFOS**):
 .. literalinclude:: /literals/globalInfo201909.txt
    :lines: 11-69
 
-Note that the field ``includeCRs: False`` inhibits patching
-of control regions for the pyhf models. This field has no meaning
-for the machine learned surrogate models.
+Finally note that the field ``includeCRs: True/False`` turns patching
+of control regions on/off for the pyhf models. This field has no meaning
+for the ML surrogate models, where CRs are taken into account by construction.      
 
 * **Experimental Result folder is described by the** `ExpResult Class <experiment.html#experiment.expResultObj.ExpResult>`_
 * **globalInfo files  are described by the** `Info Class <experiment.html#experiment.infoObj.Info>`_
