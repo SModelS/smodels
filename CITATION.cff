@@ -29,10 +29,13 @@ authors:
   - given-names: Andre
     family-names: Lessa
     email: andre.lessa@ufabc.edu.br
-    affiliation: >-
-      Centro de Ciências Naturais e Humanas, Universidade
-      Federal do ABC, Santo André, 09210-580 SP, Brazil
     orcid: 'https://orcid.org/0000-0002-5251-7891'
+    affiliation: >-
+      Instituto de Física
+      Universidade de São Paulo
+      Rua do Matão, 1371
+      Cidade Universitária
+      05508-090 São Paulo, SP, Brazil
   - given-names: Arpita
     family-names: Mondal
     orcid: 'https://orcid.org/0009-0000-2706-8281'
