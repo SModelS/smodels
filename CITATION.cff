@@ -10,7 +10,7 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - given-names: Leo
+  - given-names: Léo
     family-names: Constantin
     orcid: 'https://orcid.org/0009-0005-1461-6521'
     email: constantin@lpsc.in2p3.fr
