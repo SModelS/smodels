@@ -58,34 +58,33 @@ authors:
       Akademie der Wissenschaften, Dominikanerbastei 16,
       A-1010 Wien, Austria
 identifiers:
-  - type: url
-    value: 'https://doi.org/10.1140/epjc/s10052-014-2868-5'
+  - type: doi
+    value: '10.1140/epjc/s10052-014-2868-5'
     description: 'SModelS: a tool for interpreting simplified-model results from the LHC and its application to supersymmetry'
-identifiers:
-  - type: url
-    value: 'https://doi.org/10.1016/j.cpc.2018.02.007'
+  - type: doi
+    value: '10.1016/j.cpc.2018.02.007'
     description: 'SModelS v1.1 user manual: Improving simplified model constraints with efficiency maps'
-  - type: url
-    value: 'https://doi.org/10.31526/LHEP.1.2018.02'
+  - type: doi
+    value: '10.31526/LHEP.1.2018.02'
     description: 'SModelS extension with the CMS supersymmetry search results from Run 2'
-  - type: url
-    value: 'https://doi.org/10.1016/j.cpc.2019.07.013'
+  - type: doi
+    value: '10.1016/j.cpc.2019.07.013'
     description: 'SModelS v1.2: long-lived particles, combination of signal regions, and other novelties'
-  - type: url
-    value: 'https://doi.org/10.31526/lhep.2020.158'
+  - type: doi
+    value: '10.31526/lhep.2020.158'
     description: 'SModelS Database Update v1.2.3'
-  - type: url
-    value: 'https://doi.org/10.1016/j.cpc.2021.107909'
+  - type: doi
+    value: '10.1016/j.cpc.2021.107909'
     description: 'A SModelS interface for pyhf likelihoods'
-  - type: url
-    value: 'https://doi.org/10.1007/JHEP08(2022)068'
+  - type: doi
+    value: '10.1007/JHEP08(2022)068'
     description: 'Constraining new physics with SModelS version 2'
-  - type: url
-    value: 'https://doi.org/10.21468/SciPostPhys.15.5.185'
+  - type: doi
+    value: '10.21468/SciPostPhys.15.5.185'
     description: 'SModelS v2.3: Enabling global likelihood analyses'
-	- type: url
-	  value: 'https://doi.org/10.1007/JHEP11(2024)074'
-	  description: 'SModelS v3: going beyond Z2 topologies'
+  - type: doi
+    value: '10.1007/JHEP11(2024)074'
+    description: 'SModelS v3: going beyond Z2 topologies'
 repository-code: 'https://github.com/SModelS'
 url: 'https://smodels.github.io'
 repository-artifact: 'https://zenodo.org/communities/smodels'
