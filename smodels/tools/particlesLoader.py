@@ -19,7 +19,7 @@ from importlib import import_module
 
 
 
-def getParticlesFromSLHA(slhaData):
+def getParticlesFromSLHA(slhaData: str) -> list[Particle]:
     """
     Defines BSM particles from the QNUMBERS blocks in the slhafile.
 
@@ -93,7 +93,7 @@ def getParticlesFromSLHA(slhaData):
         qnumberBlocks[-1].append(l)
 
     if not qnumberBlocks:
-        logger.error(f"No QNUMBERS blocks were found")
+        logger.error("No QNUMBERS blocks were found")
         raise SModelSError()
 
     #Build list of BSM particles:
@@ -123,7 +123,7 @@ def getParticlesFromSLHA(slhaData):
         except:
             logger.error(f"Error reading quantum numbers from block: \n {b} \n")
             continue
-        if any(not x in numbers for x in [1,2,3]):
+        if any(x not in numbers for x in [1,2,3]):
             logger.error(f"Missing quantum numbers in block:\n {b}\n")
             continue
 
@@ -146,7 +146,7 @@ def getParticlesFromSLHA(slhaData):
 
     return BSMList
 
-def getParticlesFromLHE(lhefile):
+def getParticlesFromLHE(lhefile: str) -> list[Particle]:
     """
     Defines BSM particles from the QNUMBERS blocks in the <slha> block contained in the lhefile.
 
@@ -197,7 +197,7 @@ def getParticlesFromLHE(lhefile):
 
     return BSMList
 
-def getParticlesFromModule(modelFile):
+def getParticlesFromModule(modelFile: str) -> list[Particle]:
     """
     Reads the python model file and retrieves the list of BSM particles (BSMList)
 
@@ -238,8 +238,13 @@ def getParticlesFromModule(modelFile):
 
 
 
-def load():
+def load() -> list[Particle]:
+    """
+    Load the BSM particle definitions from the default model file.
+    Tries to load as a Python module first, then as SLHA or LHE.
 
+    :return: list of BSM Particle objects
+    """
     from smodels.base.runtime import modelFile
 
     BSMList = None

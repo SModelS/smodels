@@ -1,0 +1,234 @@
+{
+    "channels": [
+        {
+            "name": "CRtt_cuts",
+            "samples": [
+                {
+                    "data": [
+                        138.95569062497054
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    149.22529358342678
+                                ],
+                                "lo_data": [
+                                    128.6860876665143
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "SR_metsigST",
+            "samples": [
+                {
+                    "data": [
+                        22.910582019575322,
+                        10.542557938663553,
+                        3.8375800734150443,
+                        2.576598768670603
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    25.350338810596806,
+                                    12.124706406469189,
+                                    4.669704690471659,
+                                    3.115362926554879
+                                ],
+                                "lo_data": [
+                                    20.47082522855384,
+                                    8.960409470857917,
+                                    3.0054554563584297,
+                                    2.037834610786327
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "VRzAlt_cuts",
+            "samples": [
+                {
+                    "data": [
+                        246.36019326046917
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    259.10186422754765
+                                ],
+                                "lo_data": [
+                                    233.6185222933907
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "CRz_cuts",
+            "samples": [
+                {
+                    "data": [
+                        72.47504326487253
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    79.69320202013112
+                                ],
+                                "lo_data": [
+                                    65.25688450961393
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "VRtt_cuts",
+            "samples": [
+                {
+                    "data": [
+                        123.6651277425864
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    133.15303469066896
+                                ],
+                                "lo_data": [
+                                    114.17722079450385
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        },
+        {
+            "name": "VRz_cuts",
+            "samples": [
+                {
+                    "data": [
+                        141.98089491676785
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi_data": [
+                                    149.9722837400905
+                                ],
+                                "lo_data": [
+                                    133.98950609344521
+                                ]
+                            },
+                            "name": "totalError",
+                            "type": "histosys"
+                        }
+                    ],
+                    "name": "Bkg"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "fixed": true,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                143.0
+            ],
+            "name": "CRtt_cuts"
+        },
+        {
+            "data": [
+                28.0,
+                12.0,
+                4.0,
+                3.0
+            ],
+            "name": "SR_metsigST"
+        },
+        {
+            "data": [
+                242.0
+            ],
+            "name": "VRzAlt_cuts"
+        },
+        {
+            "data": [
+                73.0
+            ],
+            "name": "CRz_cuts"
+        },
+        {
+            "data": [
+                118.0
+            ],
+            "name": "VRtt_cuts"
+        },
+        {
+            "data": [
+                141.0
+            ],
+            "name": "VRz_cuts"
+        }
+    ],
+    "version": "1.0.0"
+}

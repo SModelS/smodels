@@ -9,22 +9,22 @@ smodelsOutputDefault = {
     'checkinput' : True,
     'doinvisible' : True,
     'docompress' : True,
-    'computestatistics' : False,
     'testcoverage' : True,
+    'computestatistics' : False,
     'combinesrs' : True,
     'file status' : 1,
     'decomposition status' : 1,
     'warnings' : 'Input file ok',
     'input file' : './testFiles/slha/T6bbHH_pyhf.slha',
-    'database version' : 'unittest211',
-    'smodels version' : '2.2.0'
+    'database version' : 'unittest320',
+    'smodels version' : '3.2.0'
 },
 'ExptRes' : [
     {
         'maxcond' : 0.0,
         'theory prediction (fb)' : 0.10091,
-        'upper limit (fb)' : 0.07947499,
-        'expected upper limit (fb)' : 0.1101209,
+        'upper limit (fb)' : 0.07902797,
+        'expected upper limit (fb)' : 0.09802453,
         'TxNames' : ['T6bbHH'],
         'Mass (GeV)' : [[1400.0, 1000.0, 60.0], [1400.0, 1000.0, 60.0]],
         'AnalysisID' : 'ATLAS-SUSY-2018-31',
@@ -32,14 +32,15 @@ smodelsOutputDefault = {
         'AnalysisSqrts (TeV)' : 13.0,
         'lumi (fb-1)' : 139.0,
         'dataType' : 'combined',
-        'r' : 1.269708,
-        'r_expected' : 0.9163569,
+        'r' : 1.27689,
+        'r_expected' : 1.029436,
         'Width (GeV)' : [[1.0, 1.0, 'stable'], [1.0, 1.0, 'stable']],
-        'r_expected_p1' : 0.6046151,
-        'r_expected_m1' : 1.350277,
-        'nll' : 55.31969,
-        'nll_min' : 52.29293,
-        'nll_SM' : 52.29293
+        'StatModel' : 'simplifiedA.json',
+        'r_expected_p1' : 0.6646876,
+        'r_expected_m1' : 1.552171,
+        'nll' : 25.8152,
+        'nll_min' : 22.79631,
+        'nll_SM' : 22.79631
     }
 ],
 'Total xsec for missing topologies (fb)' : 0.0,
@@ -51,4 +52,3 @@ smodelsOutputDefault = {
 'Total xsec for topologies outside the grid (fb)' : 0.0,
 'topologies outside the grid' : []
 }
-

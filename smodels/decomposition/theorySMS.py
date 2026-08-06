@@ -9,7 +9,10 @@
 
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 from smodels.base.genericSMS import GenericSMS
-from smodels.base.particle import Particle
+from smodels.base.particleNode import ParticleNode
+from smodels.base.particle import Particle,InvisibleParticle
+from typing import Any, Dict, List, Optional, Union
+
 
 class TheorySMS(GenericSMS):
     """
@@ -25,47 +28,75 @@ class TheorySMS(GenericSMS):
         GenericSMS.__init__(self)
 
         # Production cross-section:
-        self.prodXSec = None
+        self.prodXSec: Any = None
         # Total branching ratio (product of BRs)
-        self.decayBRs = 1.0
+        self.decayBRs: Optional[float] = 1.0
         # Maximum weight:
-        self.maxWeight = None
+        self.maxWeight: Optional[float] = None
         # List of SMS topologies which could have generated self (such as during compression)
-        self.ancestors = [self]
-        self.smsID = 0  # SMS identifier
+        self._ancestors: List["TheorySMS"] = [self]
+        self._allAncestors: Optional[List["TheorySMS"]] = None  # Cache for all ancestors of self (including self)
+        self.smsID: int = 0  # SMS identifier
         # Type of analyses which have SMS matching self:
-        self.coveredBy = set()
+        self.coveredBy: set = set()
         # Type of analyses which have SMS matching self and for
         # which the physical parameters are covered
-        self.testedBy = set()
+        self.testedBy: set = set()
 
-    def __cmp__(self,other):
+    @classmethod
+    def from_treeTuple(cls, tree: Any, particleDict : Dict[int, Particle], sort : bool = True) -> "TheorySMS":
+        """
+        Create a TheorySMS object from a named subtree tuple.
+
+        :param treetuple: treetuple describing the SMS topology and particles
+        :param particleDict: dictionary mapping particle IDs to particle objects
+
+        :return: TheorySMS object
+        """
+
+        sms = TheorySMS()
+        sms._canonName = tree.canonName
+        sms.decayBRs = tree.decayBRs
+        old2newIndexMapping = {}
+        for nodeIndex,particle_id in enumerate(tree.particleIDs):
+            particle = particleDict[particle_id]
+            node = ParticleNode(particle)
+            newIndex = sms.add_node(node)
+            old2newIndexMapping[nodeIndex] = newIndex
+        for edgeA, edgeB in tree.edges:
+            sms.add_edge(old2newIndexMapping[edgeA], old2newIndexMapping[edgeB])
+
+        if sort:
+            sms.sort()
+        return sms
+
+    def __cmp__(self, other: "TheorySMS") -> int:
         """
         Compare self to other based on the compareTo method.
 
         :parameter other: TheorySMS object
 
-        :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
+        :return: 0, if objects are equal, -1 if self < other, 1 if self > other
         """
 
         return self.compareTo(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: "TheorySMS") -> bool:
         return self.__cmp__(other) == -1
 
-    def __gt__(self, other):
+    def __gt__(self, other: "TheorySMS") -> bool:
         return self.__cmp__(other) == 1
 
-    def __eq__(self, other):
+    def __eq__(self, other: "TheorySMS") -> bool:
         return self.__cmp__(other) == 0
 
-    def __ne__(self, other):
+    def __ne__(self, other: "TheorySMS") -> bool:
         return self.__cmp__(other) != 0
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return object.__hash__(self)
 
-    def __add__(self, other):
+    def __add__(self, other: "TheorySMS") -> "TheorySMS":
         """
         Combines the equivalent nodes (add particles) and the weightLists.
         Can only be done if self and other have the same topology and ordering.
@@ -86,7 +117,7 @@ class TheorySMS(GenericSMS):
         newSMS.addNodesFrom(other)
         # Add other attributes
         newSMS.prodXSec = self.prodXSec + other.prodXSec
-        newSMS.ancestors = self.ancestors[:] + other.ancestors[:]
+        newSMS._ancestors = self._ancestors[:] + other._ancestors[:]
         newSMS.weightList = self.weightList + other.weightList
         newSMS.maxWeight = self.maxWeight + other.maxWeight
         # Decay BRs can no longer be properly defined:
@@ -94,7 +125,7 @@ class TheorySMS(GenericSMS):
 
         return newSMS
 
-    def setGlobalProperties(self,sort=True,canonName=True,weight=True):
+    def setGlobalProperties(self, sort: bool = True, canonName: bool = True, weight: bool = True):
         """
         Compute and set global properties for the SMS
         (sort, renumber nodes, compute the canonical name and its total weight).
@@ -112,7 +143,7 @@ class TheorySMS(GenericSMS):
         if weight:
             self.weightList = self.computeWeightList()
 
-    def compareTo(self, other):
+    def compareTo(self, other: "TheorySMS") -> int:
         """
         Compare self to other.
         If the SMS are not sorted, sort them and then do a direct comparison of each
@@ -120,7 +151,7 @@ class TheorySMS(GenericSMS):
 
         :param other: SMS object to be compared against self
 
-        :return: 0, if objects are equal, -1 if self < other, 1 if other > sekf
+        :return: 0, if objects are equal, -1 if self < other, 1 if self > other
         """
 
         if not isinstance(other,TheorySMS):
@@ -134,7 +165,7 @@ class TheorySMS(GenericSMS):
         cmp = self.compareSubTrees(other,self.rootIndex,other.rootIndex)
         return cmp
 
-    def copy(self, emptyNodes=False):
+    def copy(self, emptyNodes: bool = False) -> "TheorySMS":
         """
         Returns a shallow copy of self.
 
@@ -150,8 +181,11 @@ class TheorySMS(GenericSMS):
         newSMS.decayBRs = self.decayBRs
         if hasattr(self,'weightList'):
             newSMS.weightList = self.weightList.copy()
-        newSMS._sorted = self._sorted
-        newSMS.ancestors = self.ancestors[:]
+        if self._ancestors is not None:
+            newSMS._ancestors = self._ancestors[:]
+        if self._allAncestors is not None:
+            newSMS._allAncestors = self._allAncestors[:]
+        newSMS._sorted = self._sorted        
         newSMS.smsID = self.smsID
         newSMS.coveredBy = set(list(self.coveredBy)[:])
         newSMS.testedBy = set(list(self.testedBy)[:])
@@ -163,7 +197,7 @@ class TheorySMS(GenericSMS):
 
         return newSMS
 
-    def addNodesFrom(self, other):
+    def addNodesFrom(self, other: "TheorySMS"):
         """
         Combines the nodes (add particles) in equivalent nodes in each trees.
         Can only be done if the trees have the same topology and ordering.
@@ -181,14 +215,14 @@ class TheorySMS(GenericSMS):
         # Just change the nodeIndex -> node mapping:
         self.updateNodeObjects(nodeObjectDict=newMapping)
 
-    def attachDecay(self, motherIndex, decayNodes, br=1.0, copy=True):
+    def attachDecay(self, motherIndex: int, decayNodes: list, br: float = 1.0, copy: bool = True) -> "TheorySMS":
         """
         Attaches a decay to self. If copy = True, returns a copy of self
         with the decay attached.
 
         :param motherIndex: Node index for the mother to which the decay should be added.
         :param decayNodes: Particle nodes for the daughters.
-        :br: Branching ratio value for the decay
+        :param br: Branching ratio value for the decay
         :param copy: if True, return a copy of self, with the decay attached.
 
         :return: new tree with the other composed with self.
@@ -223,7 +257,7 @@ class TheorySMS(GenericSMS):
 
         return newSMS
 
-    def computeWeightList(self):
+    def computeWeightList(self) -> Optional[Any]:
         """
         Computes the SMS weight (production cross-section*BRs) using maxWeight
         and the production cross-section.
@@ -231,12 +265,14 @@ class TheorySMS(GenericSMS):
         :return: CrossSectionList object
         """
 
+        if self.prodXSec is None:
+            return None
         prodXSec = self.prodXSec
         brs = self.decayBRs
 
         return prodXSec*brs
 
-    def _getAncestorsDict(self, igen=0):
+    def _getAncestorsDict(self, igen: int = 0) -> Dict[int, List["TheorySMS"]]:
         """
         Returns a dictionary with all the ancestors
         of the SMS. The dictionary keys are integers
@@ -252,7 +288,7 @@ class TheorySMS(GenericSMS):
         """
 
         ancestorsDict = {igen + 1: []}
-        for ancestor in self.ancestors:
+        for ancestor in self._ancestors:
             if ancestor is self:
                 continue
             ancestorsDict[igen + 1].append(ancestor)
@@ -263,13 +299,12 @@ class TheorySMS(GenericSMS):
 
         return ancestorsDict
 
-    def getAncestors(self):
+    def setAncestors(self, keepIDs : Union[None,List[int]] = None):
         """
-        Get a list of all the ancestors of self.
-        The list is ordered so the mothers appear first, then the grandmother,
-        then the grandgrandmothers,...
+        Set the list of ancestors for self, keeping only the SMS which 
+        have IDs in the keepIDs list.
 
-        :return: A list of SMS objects containing all the ancestors sorted by generation.
+        :param keepIDs: List of SMS IDs to be kept as ancestors.
         """
 
         ancestorsDict = self._getAncestorsDict()
@@ -278,9 +313,27 @@ class TheorySMS(GenericSMS):
         for igen in sorted(ancestorsDict.keys()):
             allAncestors += ancestorsDict[igen]
 
-        return allAncestors
+        if keepIDs is not None:
+            allAncestors = [sms for sms in allAncestors if sms.smsID in keepIDs]
+        
+        self._allAncestors = allAncestors
 
-    def isRelatedTo(self, other):
+    def getAncestors(self) -> List["TheorySMS"]:
+        """
+        Get a list of all the ancestors of self.
+        The list is ordered so the mothers appear first, then the grandmother,
+        then the grandgrandmothers,...
+
+        :return: A list of SMS objects containing all the ancestors sorted by generation.
+        """
+
+        if hasattr(self, '_allAncestors') and self._allAncestors is None:
+            self.setAncestors()
+        
+        return self._allAncestors
+        
+
+    def isRelatedTo(self, other: "TheorySMS") -> bool:
         """
         Checks if self has other as an ancestor or they share
         ancestors. Returns True if self and other have at least one ancestor in common, otherwise returns False.
@@ -302,7 +355,7 @@ class TheorySMS(GenericSMS):
         else:
             return False
 
-    def setTestedBy(self, resultType):
+    def setTestedBy(self, resultType: str):
         """
         Tag the sms as tested by the result type.
         It also recursively tags all of its ancestors.
@@ -314,7 +367,7 @@ class TheorySMS(GenericSMS):
         for ancestor in self.getAncestors():
             ancestor.testedBy.add(resultType)
 
-    def setCoveredBy(self, resultType):
+    def setCoveredBy(self, resultType: str):
         """
         Tag the sms as covered by the result type
         (it is tested AND its parameters are within the result grid).
@@ -326,8 +379,8 @@ class TheorySMS(GenericSMS):
         self.coveredBy.add(resultType)
         for ancestor in self.getAncestors():
             ancestor.coveredBy.add(resultType)
-
-    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR):
+    
+    def compress(self, doCompress: bool, doInvisible: bool, minmassgap: float, minmassgapISR: float) -> List["TheorySMS"]:
         """
         Keep compressing the original SMS and the derived ones till they
         can be compressed no more.
@@ -377,7 +430,7 @@ class TheorySMS(GenericSMS):
 
         return newList
 
-    def massCompress(self, minmassgap, minmassgapISR):
+    def massCompress(self, minmassgap: float, minmassgapISR: float) -> Optional["TheorySMS"]:
         """
         Perform mass compression.
         It is only done if there is one decay of type BSM_i -> BSM_j + (any number of SM),
@@ -433,7 +486,7 @@ class TheorySMS(GenericSMS):
             # If making first compression, copy self:
             if newSMS is self:
                 newSMS = self.copy()
-                newSMS.ancestors = [self]
+                newSMS._ancestors = [self]
                 newSMSList[0] = newSMS
 
             # Get grandmother:
@@ -477,7 +530,7 @@ class TheorySMS(GenericSMS):
 
         return newSMS
 
-    def invisibleCompress(self):
+    def invisibleCompress(self) -> Optional["TheorySMS"]:
         """
         Perform invisible compression.
         It is done if there is a decay of the type BSM > xxx
@@ -516,16 +569,15 @@ class TheorySMS(GenericSMS):
                 # If making first compression, copy self:
                 if newSMS is self:
                     newSMS = self.copy()
-                    newSMS.ancestors = [self]
+                    newSMS._ancestors = [self]
                     newSMSList[0] = newSMS
 
                 newSMS.remove_nodes_from(daughterIndices)
                 # Replace mother particle by invisible (generic) particle
                 # with its width equal to the maximum width amongst the daughters
                 maxWidth = max([d.totalwidth for d in daughters])
-                invParticle = Particle(label='inv', mass=mom.mass,
+                invParticle = InvisibleParticle(label='inv', mass=mom.mass,
                                        eCharge=0, colordim=1,
-                                       _isInvisible=True,
                                        totalwidth=maxWidth,
                                        pdg=mom.pdg, isSM=mom.isSM)
                 newmom = mom.copy()

@@ -19,19 +19,18 @@ try:
     warnings.filterwarnings("ignore", message="numpy.dtype size changed")
     import plotly.graph_objs as go
     import plotly
-except ImportError as e:
+except ImportError:
     logger.error ( "could not import plotly. Please try to install it, e.g. via:\npip install --user plotly" )
     sys.exit()
 try:
     import pandas as pd
-except ImportError as e:
+except ImportError:
     logger.error ( "could not import pandas. Please try to install it, e.g. via:\npip install --user pandas" )
     sys.exit()
-import os
 import pyslha
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
 
-def importPythonOutput(smodelsFile):
+def importPythonOutput(smodelsFile: str):
     """
     Imports the smodels output from each .py file.
     """
@@ -54,7 +53,7 @@ def importPythonOutput(smodelsFile):
 
     return smodelsOutput
 
-def outputStatus(smodelsDict):
+def outputStatus(smodelsDict: dict):
     """
     Check the smodels output status in the file, if it's -1,
     it will append 'none' to each list in the dictionary.
@@ -66,7 +65,7 @@ def outputStatus(smodelsDict):
 
     return outputStatus
 
-def getEntry(inputDict,*keys):
+def getEntry(inputDict: dict, *keys):
     """
     Get entry key in dictionary inputDict.
     If a list of keys is provided, it will assumed nested
@@ -78,13 +77,13 @@ def getEntry(inputDict,*keys):
         return inputDict
 
     key = keys.pop(0)
-    if not key in inputDict:
+    if key not in inputDict:
         logger.debug(f'Key {key} not found in input dictionary')
         return False
     else:
         return getEntry(inputDict[key],*keys)
 
-def getSlhaFile(smodelsOutput):
+def getSlhaFile(smodelsOutput: dict) -> str:
     """
     Returns the file name of the SLHA file corresponding to the output in smodelsDict
     """
@@ -95,7 +94,7 @@ def getSlhaFile(smodelsOutput):
 
     return os.path.basename(slhaFile)
 
-def getSlhaData(slhaFile):
+def getSlhaData(slhaFile: str):
     """
     Uses pyslha to read the SLHA file. Return a pyslha.Doc objec, if successful.
     """
@@ -117,7 +116,7 @@ class Filler:
      A class with the functions required to fill the data dictionary to produce the plots
     """
 
-    def __init__( self,plotter, smodelsOutput,slhaData ):
+    def __init__(self, plotter, smodelsOutput: dict, slhaData):
         self.data_dict=plotter.data_dict
         self.smodelsOutput=smodelsOutput
         self.slhaData=slhaData
@@ -129,7 +128,7 @@ class Filler:
 
         return
 
-    def truncate(self,number):
+    def truncate(self, number: float) -> float:
         "truncate float to 3 decimal places"
         if number<1 and number>1e-90:
 
@@ -151,7 +150,7 @@ class Filler:
         return truncated
 
 
-    def getExpres(self):
+    def getExpres(self) -> dict:
         """
         Extracts the Expres info from the .py output. If requested, the data
         will be appended on each corresponding list
@@ -212,10 +211,10 @@ class Filler:
         #    self.data_dict['chi2'].append(chi_2)
         if 'Analysis' in self.data_dict.keys():
             self.data_dict['Analysis'].append(analysis_id)
-        return self.data_dict;
+        return self.data_dict
 
 
-    def getTotalMissingXsec(self):
+    def getTotalMissingXsec(self) -> dict:
         """ Extracts the total crossection from missing topologies. """
 
         decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
@@ -232,7 +231,7 @@ class Filler:
 
         return self.data_dict
 
-    def getMaxMissingTopology(self):
+    def getMaxMissingTopology(self) -> dict:
         """ Extracts the missing topology with the largest cross section  """
 
         decompStatus = getEntry(self.smodelsOutput,'OutputStatus','decomposition status')
@@ -249,7 +248,7 @@ class Filler:
 
         return self.data_dict
 
-    def getMaxMissingTopologyXsection(self):
+    def getMaxMissingTopologyXsection(self) -> dict:
         """ Extracts the cross section of the missing topology with the largest
             cross section  """
 
@@ -268,7 +267,7 @@ class Filler:
 
         return self.data_dict
 
-    def getTotalMissingPrompt(self):
+    def getTotalMissingPrompt(self) -> dict:
         """
         Extracts the Total cross section from missing prompt topologies
         """
@@ -284,7 +283,7 @@ class Filler:
             self.data_dict.get('MT_prompt_xsec').append(total_xsec)
         return self.data_dict
 
-    def getTotalMissingDisplaced(self):
+    def getTotalMissingDisplaced(self) -> dict:
         """
         Extracts the Total cross section from missing displaced topologies
         """
@@ -298,7 +297,7 @@ class Filler:
             self.data_dict.get('MT_displaced_xsec').append(total_xsec)
         return self.data_dict
 
-    def getOutsideGrid(self):
+    def getOutsideGrid(self) -> dict:
         """
         Extracts the outside grid info from the .py output. If requested, the
         data will be appended on each corresponding list.
@@ -313,7 +312,7 @@ class Filler:
             self.data_dict.get('MT_outgrid_xsec').append(total_xsec)
         return self.data_dict
 
-    def getSlhaHoverInfo(self):
+    def getSlhaHoverInfo(self) -> dict:
         """
         Gets the requested slha info from each slha file, to fill the hover.
         """
@@ -328,7 +327,7 @@ class Filler:
 
         return self.data_dict
 
-    def getCtau(self):
+    def getCtau(self) -> dict:
         """
         Computes the requested ctaus, that will go into de hover.
         """
@@ -359,7 +358,7 @@ class Filler:
         self.sm_particle_names = module
         return
 
-    def getParticleName(self,pdg):
+    def getParticleName(self, pdg: int) -> str:
         """ looks for the particle label in the model.py file """
         found=False
 
@@ -384,7 +383,7 @@ class Filler:
 
         return particle_name
 
-    def getBR(self):
+    def getBR(self) -> dict:
         """
         Gets the requested branching ratios from the slha file, that will go into de hover.
         """
@@ -428,7 +427,7 @@ class Filler:
 
         return self.data_dict
 
-    def getVariable(self,variable):
+    def getVariable(self, variable: dict) -> dict:
         """
         Gets the variable from the slha file.
         """
@@ -443,7 +442,7 @@ class Filler:
 
         return self.data_dict
 
-    def getSmodelSData(self):
+    def getSmodelSData(self) -> dict:
         """ fills data dict with smodels data """
 
         self.data_dict = Filler.getExpres(self)
@@ -460,7 +459,7 @@ class Filler:
 
         return self.data_dict
 
-    def getSlhaData(self,variable_x,variable_y):
+    def getSlhaData(self, variable_x: dict, variable_y: dict) -> dict:
         ''' fills data dict with slha data'''
 
         Filler.openSMParticles(self)
@@ -479,7 +478,11 @@ class Filler:
 
 
 class PlotlyBackend:
-    def __init__ ( self, master, path_to_plots ):
+    """
+    Backend class for generating interactive plots using Plotly.
+    """
+
+    def __init__(self, master, path_to_plots: str):
         self.data_dict=master.data_dict
         self.SModelS_hover_information=master.SModelS_hover_information
         self.slha_hover_information=master.slha_hover_information
@@ -503,7 +506,7 @@ class PlotlyBackend:
         return self.data_frame_all
 
 
-    def refiningVariableNames(self):
+    def refiningVariableNames(self) -> dict:
         ''' Redifining the output variable names to html format  '''
 
         self.html_names={'SModelS_status':'SModelS status',
@@ -639,22 +642,22 @@ class PlotlyBackend:
         if 'file' in self.SModelS_hover_information:
             data_frame_provisional.loc[data_frame_provisional['file'] =='False', 'file'] = 'Not-available'
             self.data_frame_all['hover_text']=self.data_frame_all['hover_text']+'file'+': '+data_frame_provisional['file']+'<br>'
-        return self.data_frame_all;
+        return self.data_frame_all
 
-    def DataFrameExcludedNonexcluded(self):
+    def DataFrameExcludedNonexcluded(self) -> tuple:
         """ Generate sub data frames for excluded and non-excluded points """
         self.data_frame_excluded=self.data_frame_all.loc[self.data_frame_all['SModelS_status']=='Excluded']
         self.data_frame_nonexcluded=self.data_frame_all.loc[self.data_frame_all['SModelS_status']=='Non-excluded']
-        return self.data_frame_excluded, self.data_frame_nonexcluded;
+        return self.data_frame_excluded, self.data_frame_nonexcluded
 
-    def GetXyAxis(self):
+    def GetXyAxis(self) -> tuple:
         """ Retrieves the names of the x and y axis variables. """
         self.x_axis=list(self.variable_x.keys())[0]
         self.y_axis=list(self.variable_y.keys())[0]
-        return self.x_axis,self.y_axis;
+        return self.x_axis,self.y_axis
 
 
-    def SeparateContDiscPlots(self):
+    def SeparateContDiscPlots(self) -> tuple:
         ''' Generate sub lists of plots with discrete and conitnuous z axis variables. '''
         self.cont_plots=[]
         self.disc_plots=[]
@@ -664,9 +667,9 @@ class PlotlyBackend:
                 self.disc_plots.append(plot)
             else:
                 self.cont_plots.append(plot)
-        return self.cont_plots, self.disc_plots;
+        return self.cont_plots, self.disc_plots
 
-    def plotDescription(self):
+    def plotDescription(self) -> dict:
         ''' Generate a description for each plot.'''
         self.plot_descriptions={'SModelS_status':'Excluded or not excluded by SModelS.',
               'r_max':'highest r-value from SModelS.',
@@ -679,10 +682,10 @@ class PlotlyBackend:
               'MT_prompt_xsec':'Extracts the total cross section from missing prompt topologies',
               'MT_displaced_xsec':'Extracts the total cross section from missing displaced topologies',
               'MT_outgrid_xsec':'Missing cross section outside the mass grids of the experimental results.'}
-        return self.plot_descriptions;
+        return self.plot_descriptions
 
 #####continuous plots##############
-    def makeContinuousPlots(self,data_frame,data_selection):
+    def makeContinuousPlots(self, data_frame, data_selection: str):
             """ Generate plots with continuous z axis variables, using all data points """
             #if 'all' in self.plot_data:
             for cont_plot in self.cont_plots:
@@ -797,10 +800,10 @@ class PlotlyBackend:
 
                 fig = go.Figure(data=data, layout=layout)
                 plotly.offline.plot(fig, filename = self.path_to_plots+'/'+cont_plot+'_'+data_selection+'.html', auto_open=False)
-            return;
+            return
 
     #########Discrete_plots############
-    def makeDiscretePlots(self,data_frame,data_selection):
+    def makeDiscretePlots(self, data_frame, data_selection: str):
         """ Generate plots with discrete z axis variables, using all data points """
 
         for disc_plot in self.disc_plots:
@@ -891,9 +894,9 @@ class PlotlyBackend:
 
 
             plotly.offline.plot(fig, filename = self.path_to_plots+'/'+disc_plot+'_'+data_selection+'.html', auto_open=False)
-        return;
+        return
 
-    def createIndexHtml(self):
+    def createIndexHtml(self) -> bool:
         """
         Fills the index.html file with links to the interactive plots.
         """
@@ -920,7 +923,7 @@ class PlotlyBackend:
         main_file.close()
         return True
 
-    def makePlots(self, indexfile ):
+    def makePlots(self, indexfile: str) -> bool:
         """
         Uses the data in self.data_dict to produce the plots.
 
@@ -980,6 +983,6 @@ class PlotlyBackend:
         PlotlyBackend.createIndexHtml(self)
         return True
 
-    def cleanUp ( self ):
+    def cleanUp(self):
         if os.path.exists ( self.data_frame_filename ):
             os.unlink ( self.data_frame_filename )

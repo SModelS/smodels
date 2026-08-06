@@ -1,0 +1,7 @@
+dataId: CR_ewk_tau_low
+dataType: efficiencyMap
+observedN: 2247
+expectedBG: 2250.9
+bgError: 51.3
+upperLimit: 0.9659*fb
+expectedUpperLimit: 0.9767*fb

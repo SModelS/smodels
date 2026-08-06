@@ -9,32 +9,37 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from __future__ import print_function
-from smodels import installation
+import os
+import copy
+os.environ["OMP_NUM_THREADS"] = "1"
+from typing import Optional
+
 from smodels.tools import toolBox
-from smodels.base.physicsUnits import pb, TeV, GeV
-from smodels.base import crossSection, runtime
-from smodels.base.crossSection import LO, NLO, NLL
+from smodels.base.physicsUnits import pb, TeV, UnitEnergy
+from smodels.base import crossSection
+from smodels.base.crossSection import LO, NLO, NLL, XSectionList
 from smodels.base.smodelsLogging import logger, setLogLevel
-from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
+from smodels.decomposition.exceptions import SModelSDecompositionError \
+         as SModelSError
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
-import os, copy
+from smodels.base.types import PathType
 import pyslha
 try:
     import cStringIO as io
-except ImportError as e:
+except ImportError:
     import io
 import sys
 
 class XSecComputer(XSecBase):
     """ cross section computer class, what else? """
-    def __init__ ( self, maxOrder, nevents, pythiaVersion, maycompile=True,
-                   defaulttempdir : str = "/tmp/" ):
+    def __init__ ( self, maxOrder, nevents : int, pythiaVersion : str,
+            maycompile : bool = True, defaulttempdir : str = "/tmp/" ):
         """
-        :param maxOrder: maximum order to compute the cross section, given as an integer
-                    if maxOrder == LO, compute only LO pythia xsecs
-                    if maxOrder == NLO, apply NLO K-factors from NLLfast (if available)
-                    if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
+        :param maxOrder: maximum order to compute the cross section,
+        given as an integer
+        if maxOrder == LO, compute only LO pythia xsecs
+        if maxOrder == NLO, apply NLO K-factors from NLLfast (if available)
+        if maxOrder == NLL, apply NLO+NLL K-factors from NLLfast (if available)
         :param nevents: number of events for pythia run
         :param pythiaVersion: pythia6 or pythia8 (integer)
         :param maycompile: if True, then tools can get compiled on-the-fly
@@ -54,7 +59,7 @@ class XSecComputer(XSecBase):
         self.pythiaVersion = pythiaVersion
         self.defaulttempdir = defaulttempdir
 
-    def _checkSLHA ( self, slhafile ):
+    def _checkSLHA ( self, slhafile: str ) -> None:
         if not os.path.isfile(slhafile):
             logger.error( f"SLHA file {slhafile} not found." )
             raise SModelSError()
@@ -64,20 +69,20 @@ class XSecComputer(XSecBase):
             logger.error( f"File {slhafile} cannot be parsed as SLHA file: {e}" )
             raise SModelSError()
 
-    def _checkSqrts ( self, sqrts ):
+    def _checkSqrts ( self, sqrts ) -> UnitEnergy:
         if type(sqrts)==type(float) or type(sqrts)==type(int):
             logger.warning("sqrt(s) given as scalar, will add TeV as unit." )
             sqrts=float(sqrts)*TeV
         return sqrts
 
-    def _checkMaxOrder ( self, maxOrder ):
+    def _checkMaxOrder ( self, maxOrder ) -> int:
         smaxorder={ "LO": 0, "NLO": 1, "NLL": 2 }
         if maxOrder in smaxorder.keys():
             logger.warning("maxorder given as string, please supply integer.")
             maxOrder=smaxorder[maxOrder]
         return maxOrder
 
-    def addHigherOrders ( self, sqrts, slhafile ):
+    def addHigherOrders ( self, sqrts, slhafile: str ) -> XSectionList:
         """ add higher order xsecs """
         xsecs = copy.deepcopy ( self.loXsecs )
         s = float(sqrts/TeV)
@@ -137,7 +142,7 @@ class XSecComputer(XSecBase):
         #    logger.error ( "xsec=%s (%s)" % (i,type(i)) )
         return xsecs
 
-    def match ( self, pids, theorypid ):
+    def match ( self, pids, theorypid ) -> bool:
         """ do the pids given by the user match the
             pids of the theorypred? """
         spids = list(pids)
@@ -147,7 +152,7 @@ class XSecComputer(XSecBase):
         jokerpids = []
         for spid in spids:
             if type(spid)==int:
-                if not spid in stpids:
+                if spid not in stpids:
                     return False
                 else:
                     stpids.remove(spid)
@@ -179,8 +184,7 @@ class XSecComputer(XSecBase):
         #print ( "tpid", theorypid, "matched", pids )
         return True
 
-
-    def applyMultipliers ( self, xsecs, ssmultipliers ):
+    def applyMultipliers ( self, xsecs, ssmultipliers : dict ) -> XSectionList:
         """
         apply the given multipliers to the cross sections """
         for pids in ssmultipliers.keys():
@@ -205,15 +209,15 @@ class XSecComputer(XSecBase):
                 newx.add(x)
         return newx
 
-    def getPythia ( self ):
+    def getPythia ( self ) -> object:
         """ returns the pythia tool that is configured to be used """
         ret= toolBox.ToolBox().get("pythia%d" % self.pythiaVersion )
         ret.maycompile = self.maycompile
         ret.defaulttempdir = self.defaulttempdir
         return ret
 
-    def compute ( self, sqrts, slhafile,  lhefile=None, unlink=True, loFromSlha=None,
-                  pythiacard=None, ssmultipliers=None ):
+    def compute ( self, sqrts, slhafile: str,  lhefile: str | None = None, unlink: bool = True, loFromSlha: bool | None = None,
+                  pythiacard: str | None = None, ssmultipliers: dict | None = None ) -> XSectionList:
         """
         Run pythia and compute SUSY cross sections for the input SLHA file.
 
@@ -227,7 +231,7 @@ class XSecComputer(XSecBase):
                            compute the higher order xsecs
         :param pythiaCard: Optional path to pythia.card. If None, uses
                            smodels/etc/pythia.card
-        :param ssmultipliers: optionally supply signal strengh multipliers,
+        :param ssmultipliers: optionally supply signal strength multipliers,
                 given as dictionary of the tuple of the mothers' pids as keys and
                 multipliers as values, e.g { (1000001,1000021):1.1 }.
         :returns: XSectionList object
@@ -269,9 +273,9 @@ class XSecComputer(XSecBase):
         logger.debug ( f"how many NLL xsecs? {len(self.xsecs)}" )
         return self.xsecs
 
-    def computeForOneFile ( self, sqrtses, inputFile, unlink,
-                            lOfromSLHA, tofile, pythiacard = None,
-                            ssmultipliers = None, comment = None ):
+    def computeForOneFile ( self, sqrtses: set, inputFile: str, unlink: bool,
+                            lOfromSLHA, tofile: str | None, pythiacard: str | None = None,
+                            ssmultipliers: dict | None = None, comment: str | None = None ) -> int:
         """
         Compute the cross sections for one file.
 
@@ -281,7 +285,7 @@ class XSecComputer(XSecBase):
         :param lofromSLHA: try to obtain LO xsecs from SLHA file itself
         :param tofile: False, True, "all": write results to file, if "all" also write lower xsecs to file.
         :param pythiacard: optionally supply your own runcard
-        :param ssmultipliers: optionally supply signal strengh multipliers,
+        :param ssmultipliers: optionally supply signal strength multipliers,
                               given as dictionary of the tuple of the mothers' pids as keys and
                               multipliers as values, e.g { (1000001,1000021):1.1 }.
         :param comment: an optional comment that gets added to the slha file.
@@ -328,16 +332,17 @@ class XSecComputer(XSecBase):
             print()
         return nXSecs
 
-    def computeForBunch ( self, sqrtses, inputFiles, unlink,
-                          lOfromSLHA, tofile, pythiacard=None,
-                          ssmultipliers=None   ):
+    def computeForBunch ( self, sqrtses: set, inputFiles: list[str], unlink: bool,
+                          lOfromSLHA, tofile: str | None, pythiacard: str | None = None,
+                          ssmultipliers: dict | None = None   ) -> None:
         """ compute xsecs for a bunch of slha files """
         for inputFile in inputFiles:
             logger.debug ( f"computing xsec for {inputFile}" )
             self.computeForOneFile ( sqrtses, inputFile, unlink, lOfromSLHA,
                       tofile, pythiacard=pythiacard, ssmultipliers = ssmultipliers )
 
-    def addCommentToFile ( self, comment, slhaFile ):
+    def addCommentToFile ( self, comment : Optional[str],
+                           slhaFile : PathType ):
         """ add the optional comment to file """
         if comment in [ None, "" ]:
             return
@@ -372,7 +377,7 @@ class XSecComputer(XSecBase):
                     logger.error ( "Different signal strength multipliers have alread been applied!!!" )
                     rewrite.append ( line+" ERROR inconsistent!" )
             else:
-                if not "produced at step" in line:
+                if "produced at step" not in line:
                     rewrite.append ( line )
         outfile = open(slhaFile, 'w')
         for line in rewrite:
@@ -383,7 +388,7 @@ class XSecComputer(XSecBase):
         outfile.write ( "\n" )
         outfile.close()
 
-def main(args):
+def main(args) -> None:
     canonizer = ArgsStandardizer()
     setLogLevel ( args.verbosity )
     if not hasattr ( args, "noautocompile" ):

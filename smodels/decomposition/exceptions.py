@@ -6,15 +6,17 @@
 
 """
 
+from typing import Optional
+
 
 class SModelSDecompositionError(Exception):
     """
     Class to define SModelS specific errors
     """
 
-    def __init__(self, value=None):
-        self.value = value
+    def __init__(self, value: Optional[str] = None):
+        self.value: Optional[str] = value
         Exception.__init__(self, value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self.value)

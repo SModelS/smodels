@@ -241,9 +241,18 @@ using the best signal region (left) to using the full likelihood (right).
 
 Figure: Comparison of exclusion curves for `ATLAS-SUSY-2019-08 <https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2019-08/>`_ using only the best signal region (left), and the combination of all 9 signal regions with pyhf (right).
 
+.. _surrogateMLModels:
+
+Machine-Learned Surrogate Statistical Models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Starting with SModelS v3.2.0, machine-learned surrogate models (in ONNX format) can be used instead of some pyhf models.  
+This enormously speeds up the likelihood calculations for the relevant analyses. 
+See :ref:`database structure <databaseStruct>` for the syntax in the database. 
+
 .. _analysesCombination:
 
-Combination of different Analyses
+Combination of Different Analyses
 ---------------------------------
 
 Starting with SModelS v2.2, it is possible to combine likelihoods from

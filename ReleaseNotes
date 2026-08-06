@@ -1,3 +1,17 @@
+Release v3.2.0, Aug 7 2026
+=======================================================
+
+  * First support for NN surrogate statistical models (ONNX format)
+  * Modified the syntax for statistical models in the database: in the globalInfo.txt files, the fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels. Note that this BREAKS BACKWARDS COMPATIBILITY
+  * Small fixes in likelihood calculations and pyhf interface
+  * Moved all interfaces from .likelihoods to .nlls
+  * Updated lheReader to properly deal with MG5 LHE files (fixes github issue #53, see also discussion #54)
+  * Fixed pythia8 paths in automatic downloader
+  * Introduced a printer registry for out-of-repo printers
+  * Database extension (stat models): added ONNX models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09 -- thanks to Humberto Reyes-Gonzalez, Joaquin Iturriza Ramirez and Rafal Maselek for their help
+  * Database extension (new results): added ATLAS-SUSY-2018-09 (EM), ATLAS-SUSY-2019-02 (TSlepSlep, UL) ATLAS-SUSY-2019-04 (EM), ATLAS-SUSY-2020-27 (UL+EM), CMS-SUS-18-004 (EM), CMS-EXO-19-019 (UL), CMS-SUS-21-008 (UL), CMS-SUS-23-003 (UL) -- thanks to Lucas Heck and Axel Schwingrouber-Mazet for valuable contributions
+  * Database now pickles with protocol 5 instead of protocol 4
+
 Release v3.1.1, Wed 4 Feb 2026
 =======================================================
 
@@ -90,47 +104,47 @@ Release v3.0.0, Tue 20 Aug 2024
 Release v2.3.3, Tue 19 Dec 2023
 =======================================================
 
-  * added resummino cross section computer
-  * fixed bug in computation of error on muhat, for pyhf likelihoods
+  * Added resummino cross section computer
+  * Fixed bug in computation of error on muhat, for pyhf likelihoods
     (affects mostly the numpy backend)
-  * small change in initialisation of gradient descent method for computation of
+  * Small change in initialisation of gradient descent method for computation of
     combined mu_hat, to increate robustness of method
 
 Release v2.3.2, Wed 30 Aug 2023
 =======================================================
 
-  * fixed bug in initialisation of analysis combination
-  * smodels version now printed in all output formats
+  * Fixed bug in initialisation of analysis combination
+  * Smodels version now printed in all output formats
 
 Release v2.3.1, Mon 17 Jul 2023
 =======================================================
 
-  * fixed bug for reading QNUMBERS from SLHA files
-  * small fixes in how pythia6 and pythia8 are built
-  * small fix in truncated Gaussian llhd experimental feature
-  * small fix in computation of combined upper limits
-  * combinationmatrices are now forced to be symmetric
-  * added isCombinableWith method also for CombinedDataSets
-  * added a recipe for how to use a combinations matrix
-  * runtime.nCPUs() now returns number of available CPUs, not all CPUs
+  * Fixed bug for reading QNUMBERS from SLHA files
+  * Small fixes in how pythia6 and pythia8 are built
+  * Small fix in truncated Gaussian llhd experimental feature
+  * Small fix in computation of combined upper limits
+  * Combinationmatrices are now forced to be symmetric
+  * Added isCombinableWith method also for CombinedDataSets
+  * Added a recipe for how to use a combinations matrix
+  * Runtime.nCPUs() now returns number of available CPUs, not all CPUs
   * xseccomputer now has --tempdir option
-  * StatsComputer now has CLs method
-  * changed default prompt width from 1e-8 to 1e-11 GeV in code
+  * statsComputer now has CLs method
+  * Changed default prompt width from 1e-8 to 1e-11 GeV in code
 
 
 Release v2.3.0, Tue 23 May 2023
 =======================================================
 
-  * fixed bug for an LHE input only with anti-particles
-  * fixed error that truncated signal yields when computing expected upper limits
-  * added minMass parameter for setting a minimum mass threshold for BSM masses
-  * fixed C++ interface to work with python 3.11
-  * bumped up pythia8 from 8.307 to 8.308
+  * Fixed bug for an LHE input only with anti-particles
+  * Fixed error that truncated signal yields when computing expected upper limits
+  * Added minMass parameter for setting a minimum mass threshold for BSM masses
+  * Fixed C++ interface to work with python 3.11
+  * Bumped up pythia8 from 8.307 to 8.308
   * SModelS can now track inter-analyses combinability at the level of whole
     analyses as well as individual signal regions via a combinations matrix
-  * added support for SLv2 (Gaussian with a skew), arXiv:1809.05548
-  * refactored the statistics modules, code ready for interfacing Spey
-  * introduced "full_llhds" database add-on (see parameters.ini file)
+  * Added support for SLv2 (Gaussian with a skew), arXiv:1809.05548
+  * Refactored the statistics modules, code ready for interfacing Spey
+  * Introduced "full_llhds" database add-on (see parameters.ini file)
 
   * Database extension: added/updated results from 6 ATLAS and 4 CMS analyses
     (hfm=HistFactory model, cov=covariance matrix for SR combination):
@@ -146,30 +160,30 @@ Release v2.3.0, Tue 23 May 2023
 Release v2.2.1, Tue 18 October 2022
 =======================================================
 
-  * fixes in analyses combinations, simplified and pyhf likelihoods
-  * small fixes for python 3.10
-  * bumped up pythia8 from 8.306 to 8.307
-  * included example on how to plot likelihoods from analysis combination
-  * small bug fix for particle addition
+  * Fixes in analyses combinations, simplified and pyhf likelihoods
+  * Small fixes for python 3.10
+  * Bumped up pythia8 from 8.306 to 8.307
+  * Included example on how to plot likelihoods from analysis combination
+  * Small bug fix for particle addition
 
 Release v2.2.0.post1, Mon 4 April 2022
 =======================================================
 
-  * removed dependency on importlib.metadata to make it work with python <= 3.7
+  * Removed dependency on importlib.metadata to make it work with python <= 3.7
 
 Release v2.2.0, Wed 30 March 2022
 =======================================================
 
-  * introduced (user-defined) combinations of analyses
-  * changed expected limits computed with pyhf from post-fit to pre-fit
-  * a few smaller changes around expected likelihoods and limits
-  * changed default value of promptWidth parameter from 1e-8 to 1e-11 GeV
-  * allow ncpus to take on zero and negative values in ini file
+  * Introduced (user-defined) combinations of analyses
+  * Changed expected limits computed with pyhf from post-fit to pre-fit
+  * A few smaller changes around expected likelihoods and limits
+  * Changed default value of promptWidth parameter from 1e-8 to 1e-11 GeV
+  * Allow ncpus to take on zero and negative values in ini file
     [meaning use all but this (absolute) number of CPU cores]
-  * notion of "nonaggregated" databases introduced
-  * small fixes in recipes
-  * updates in references.bib, installation notes
-  * more small fixes in unit tests
+  * Notion of "nonaggregated" databases introduced
+  * Small fixes in recipes
+  * Updates in references.bib, installation notes
+  * More small fixes in unit tests
 
   * Database extension -- added new results from 4 ATLAS and 11 CMS analyses:
     - results from ATLAS:
@@ -182,13 +196,13 @@ Release v2.2.0, Wed 30 March 2022
 Release v2.1.1, Tue 19 Oct 2021
 =======================================================
 
-  * caching weight matrix in simplified likelihoods
-  * notion of "debug" databases introduced
-  * introduced reportAllSRs option
-  * tiny fix in mybinder link (see https://pypi.org/project/smodels/)
-  * small fixes in unit tests
-  * improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
-  * experimental features can now be turned on via ini file
+  * Caching weight matrix in simplified likelihoods
+  * Notion of "debug" databases introduced
+  * Introduced reportAllSRs option
+  * Tiny fix in mybinder link (see https://pypi.org/project/smodels/)
+  * Small fixes in unit tests
+  * Improved truncated Gaussians in likelihoodsFromLimits (but kept as experimental feature)
+  * Experimental features can now be turned on via ini file
 
 Release v2.1.0, Wed 29 Sep 2021
 =======================================================
@@ -251,20 +265,20 @@ Release v2.0.0, Mon 15 Mar 2021
 Release v1.2.4, Thu 3 Sep 2020
 =======================================================
 
-  * added pyhf support
-  * pickle path bug fix
-  * bug fix for parallel xseccomputers
+  * Added pyhf support
+  * Pickle path bug fix
+  * Bug fix for parallel xseccomputers
   * Introduced the SMODELS_CACHEDIR environment variable to allow for a different
     location of the cached database file
-  * fixed dataId bug in datasets
+  * Fixed dataId bug in datasets
 
 Release v1.2.3, Mon 27 Apr 2020
 =======================================================
 
-  * database updated with results from more than 20 new analyses
-  * server for databases is now smodels.github.io, not smodels.hephy.at
-  * small bug fix for displaced topologies
-  * small fix in slha printer, r_expected was r_observed
+  * Database updated with results from more than 20 new analyses
+  * Server for databases is now smodels.github.io, not smodels.hephy.at
+  * Small bug fix for displaced topologies
+  * Small fix in slha printer, r_expected was r_observed
   * Downloaded database files now stored in $HOME/.cache/smodels
 
 Release v1.2.2, Tue 28 Nov 2018
@@ -296,10 +310,10 @@ Release v1.2.0, Wed 15 Aug 2018
 Release v1.1.3, Wed 08 Aug 2018
 =======================================================
 
-  * support for covariance matrices and combination of signal regions
-  * new plotting tool added to smodelsTools.py (interactive-plots)
-  * path to particles.py can now be specified in parameters.ini file
-  * wildcards allowed when selecting analyses, datasets, txnames
+  * Support for covariance matrices and combination of signal regions
+  * New plotting tool added to smodelsTools.py (interactive-plots)
+  * Path to particles.py can now be specified in parameters.ini file
+  * Wildcards allowed when selecting analyses, datasets, txnames
   * Added option to show individual contributions from
     topologies to total theory prediction
   * Database path allows URLs
@@ -307,7 +321,7 @@ Release v1.1.3, Wed 08 Aug 2018
   * Fixed lastUpdate bug, now giving correct date
   * Changes in pickling (e.g. subpickling, removing redundant zeroes)
   * smodelsTools.py now has fixpermissions, for system-wide installs
-  * fixed small issue with pair production of even particles
+  * Fixed small issue with pair production of even particles
   * Moved the code documentation to the manual
   * Added option for installing within the source folder
 
@@ -320,9 +334,9 @@ Release v1.1.1, Tue 27 Jun 2017
 =======================================================
 
   * pythia8 support
-  * colored loggers
-  * improved binary database
-  * automated SLHA and LHE file detection
+  * Colored loggers
+  * Improved binary database
+  * Automated SLHA and LHE file detection
   * smodelsTools.py now also supports toolbox
   * C++ interface
   * Fix and improvements for missing topologies
@@ -332,22 +346,22 @@ Release v1.1.1, Tue 27 Jun 2017
 Release v1.1.0patch1, Tue 21 Feb 2017
 =======================================================
 
-  * pions added to final state particles
-  * added full list of PIDs in asymmetric and long topologies coverage output
-  * fix in CMS-SUS-12-024-eff, ATLAS-SUSY-2013-11-eff and CMS-SUS-13-013-eff
+  * Pions added to final state particles
+  * Added full list of PIDs in asymmetric and long topologies coverage output
+  * Fix in CMS-SUS-12-024-eff, ATLAS-SUSY-2013-11-eff and CMS-SUS-13-013-eff
 
 Release v1.1.0, Mon 23 Jan 2017 08:00:00 PM CET
 =======================================================
 
-  * the inclusion of efficiency maps
-  * a new and more flexible database format
-  * extended information on topology coverage
-  * inclusion of likelihood and chi2 calculation for efficiency maps
-  * inclusion of a database browser tool for easy access to the information
+  * The inclusion of efficiency maps
+  * A new and more flexible database format
+  * Extended information on topology coverage
+  * Inclusion of likelihood and chi2 calculation for efficiency maps
+  * Inclusion of a database browser tool for easy access to the information
     stored in the database
-  * the database now supports also a more efficient binary format
-  * performance improvement for the decomposition of the input model
-  * inclusion of new simplified results to the database
+  * The database now supports also a more efficient binary format
+  * Performance improvement for the decomposition of the input model
+  * Inclusion of new simplified results to the database
     (including a few 13 TeV results)
   * fastlim efficiency maps can now also be used in SModelS
 
@@ -368,14 +382,14 @@ Release v1.0.3, Tue 17 Mar 2015 09:22:03 AM BRT
 Release v1.0.2, Wed 25 Feb 2015 02:48:11 PM BRT
 =======================================================
 
-  * lepton summation fix in runSModelS (Ursula Laa)
+  * Lepton summation fix in runSModelS (Ursula Laa)
   * Major speedup in slha file decomposition (Andre Lessa)
 
 
 Release v1.0.1, Thu 22 Jan 2015 12:42:29 PM BRST
 =======================================================
 
-  * cluster bug fix (Andre Lessa)
-  * slha checks updates (Ursula Laa)
+  * Cluster bug fix (Andre Lessa)
+  * Slha checks updates (Ursula Laa)
   * Fixed SUS-13-012 bug in database (Michael Traub)
-  * updated references.bib to include SLAC meta info (Wolfgang Waltenberger)
+  * Updated references.bib to include SLAC meta info (Wolfgang Waltenberger)

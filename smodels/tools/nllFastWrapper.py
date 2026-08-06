@@ -11,7 +11,6 @@
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-from __future__ import print_function
 import operator
 import pyslha
 
@@ -45,14 +44,13 @@ class NllFastWrapper(WrapperBase):
     An instance of this class represents the installation of nllfast.
     """
 
-    def __init__(self, sqrts, nllfastVersion, testParams, testCondition):
+    def __init__(self, sqrts: int, nllfastVersion: str, testParams: str, testCondition: str):
         """
         :param sqrts: sqrt of s, in TeV, as an integer,
         :param nllfastVersion: version of the nllfast tool
         :param testParams: what are the test params we need to run things with?
         :param testCondition: the line that should be the last output line when
                               running executable
-        :srcPath: the path of the source code, for compilation
         """
 
         WrapperBase.__init__(self)
@@ -69,7 +67,7 @@ class NllFastWrapper(WrapperBase):
         self.compiler = "gfortran"
         self.executable = ""
 
-    def _interpolateKfactors( self, kFacsVector, xval):
+    def _interpolateKfactors(self, kFacsVector: list, xval: float) -> list:
         """
         Interpolate a list of k-factor  values from kFacsVector = [[x0,[k1,k2,..]], [x1,[k1,k2,..],...].
 
@@ -92,7 +90,7 @@ class NllFastWrapper(WrapperBase):
 
         return kFacs
 
-    def _getKfactorsFrom( self, output ):
+    def _getKfactorsFrom(self, output: str):
         """
         Read NLLfast output and return the k-factors.
 
@@ -104,7 +102,7 @@ class NllFastWrapper(WrapperBase):
             il = 0
             line = lines[il]
             process = False
-            while not "K_NLO" in line and il < len(lines) - 2:
+            while "K_NLO" not in line and il < len(lines) - 2:
                 if "process" in line:
                     process = line[line.find("process:") + 8:].replace(" ", "")
                 il += 1
@@ -125,7 +123,7 @@ class NllFastWrapper(WrapperBase):
 
         return kFacs
 
-    def _run ( self, this ):
+    def _run(self, this: str) -> str:
         """
         Run. Code taken from nllFast.runNLLfast
         Return the process name (in NLLfast notation) for the pair production of
@@ -145,7 +143,17 @@ class NllFastWrapper(WrapperBase):
             os.chdir(current_dir)
             raise e
 
-    def _compute ( self, energy, pIDs, pdf, squarkmass, gluinomass ):
+    def _compute(self, energy: str, pIDs: tuple, pdf: str, squarkmass: float, gluinomass: float) -> str:
+        """
+        Run NLLfast for the given process and return the output.
+
+        :param energy: center-of-mass energy string (e.g. '8TeV')
+        :param pIDs: tuple of particle IDs
+        :param pdf: PDF set name
+        :param squarkmass: squark mass in GeV
+        :param gluinomass: gluino mass in GeV
+        :returns: raw NLLfast output string
+        """
         process = self._getProcessName(pIDs)
         if process == "st":
             nll_run = "./nllfast_" + energy + f" {process} {pdf} {squarkmass}"
@@ -154,7 +162,7 @@ class NllFastWrapper(WrapperBase):
                   (process, pdf, squarkmass, gluinomass)
         return self._run( nll_run )
 
-    def _getProcessName(self, pIDs):
+    def _getProcessName(self, pIDs: tuple) -> str | None:
         """
         Return the process name (in NLLfast notation) for the pair production of
         pIDs.
@@ -184,7 +192,7 @@ class NllFastWrapper(WrapperBase):
             process = 'st'
         return process
 
-    def _getDecoupledKfactors( self, process, energy, pdf, mass ):
+    def _getDecoupledKfactors(self, process: str, energy: str, pdf: str, mass: float):
         """
         Compute k-factors in the decoupled (squark or gluino) regime for the process.
         If a decoupled grid does not exist for the process, return None
@@ -201,11 +209,18 @@ class NllFastWrapper(WrapperBase):
             return self._getKfactorsFrom(nll_output)
         else: return None
 
-    def _runForDecoupled ( self, energy, nllinput ):
+    def _runForDecoupled(self, energy: str, nllinput: tuple) -> str:
+        """
+        Run NLLfast in the decoupled regime with the given input.
+
+        :param energy: center-of-mass energy string
+        :param nllinput: tuple of arguments for the NLLfast command
+        :returns: raw NLLfast output string
+        """
         nll_run = "./nllfast_" + energy + " %s %s %s %s" % nllinput
         return self._run ( nll_run )
 
-    def getKfactorsFor( self, pIDs, slhafile, pdf='cteq' ):
+    def getKfactorsFor(self, pIDs: tuple, slhafile: str, pdf: str = 'cteq'):
         """
         Read the NLLfast grid and returns a pair of k-factors (NLO and NLL) for
         the PIDs pair.
@@ -230,7 +245,7 @@ class NllFastWrapper(WrapperBase):
         masses=readfile.blocks['MASS']
         check_pids=squarks+gluinos+third
         for check in check_pids:
-            if not check in masses.entries:
+            if check not in masses.entries:
                 logger.error ( "cannot compute k factor for pdgid %d: " \
                   " no particle mass given. will set mass to inf." % check )
                 masses.entries[check]=1.e10
@@ -265,7 +280,7 @@ class NllFastWrapper(WrapperBase):
             else:
                 return kFacs
         # If run was not successful, check for decoupling error messages:
-        elif not "too low/high" in nll_output.lower():
+        elif "too low/high" not in nll_output.lower():
             logger.warning("Error running NLLfast")
             return (None, None)
 
@@ -341,7 +356,7 @@ class NllFastWrapper8(NllFastWrapper):
 
 class NllFastWrapper13(NllFastWrapper):
     """
-    An instance of this class represents the installation of nllfast 8.
+    An instance of this class represents the installation of nllfast 13.
     """
 
     def __init__(self):

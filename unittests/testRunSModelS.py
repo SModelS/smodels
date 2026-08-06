@@ -16,11 +16,11 @@ import unittest
 import glob
 from smodels.tools import crashReport
 from smodels.tools.timeOut import NoTime
-from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs
+from unitTestHelpers import equalObjs, runMain, importModule, removeCruftOutputs, sortMissingTopologyLists
 import time
 import subprocess
 from smodels.base.smodelsLogging import logger
-
+from databaseLoader import database
 
 class RunSModelSTest(unittest.TestCase):
     definingRun = False  # meant only to adapt to changes in output format
@@ -51,7 +51,7 @@ class RunSModelSTest(unittest.TestCase):
         try:
             filename = "./testFiles/slha/complicated.slha"
             t0 = time.time()
-            runMain(filename, timeout=1, suppressStdout=True,
+            runMain(filename, timeout=3, suppressStdout=True,
                     development=True, inifile="timeout.ini")
             print(f"should never get here. time spent:{time.time() - t0:.1f}s ")
             self.assertTrue(False)
@@ -74,6 +74,10 @@ class RunSModelSTest(unittest.TestCase):
         ignoreFields = ['input file', 'smodels version', 'ncpus', 'database version',]
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
+
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         for i in ['./output.py', './output.pyc']:
@@ -97,6 +101,10 @@ class RunSModelSTest(unittest.TestCase):
                         'database version', 'model']
         smodelsOutputDefault['ExptRes'] = sorted(smodelsOutputDefault['ExptRes'],
                                                  key=lambda res: res['r'], reverse=True)
+
+        sortMissingTopologyLists(smodelsOutput)
+        sortMissingTopologyLists(smodelsOutputDefault)
+        
         equals = equalObjs(smodelsOutput, smodelsOutputDefault, allowedRelDiff=0.02,
                            ignore=ignoreFields, fname=outputfile)
         for i in ['./output.py', './output.pyc']:
@@ -116,7 +124,8 @@ class RunSModelSTest(unittest.TestCase):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         filename = "./testFiles/slha/T6bbHH_pyhf.slha"
         inifile = "./testParameters_pyhf.ini"
-        outputfile = runMain(filename, inifile=inifile, suppressStdout=True )
+        outputfile = runMain(filename, inifile=inifile, suppressStdout=True,
+                              overridedatabase=database )
         smodelsOutput = importModule(outputfile)
         from T6bbHH_pyhf_default import smodelsOutputDefault
         ignoreFields = [ 'input file', 'smodels version', 'ncpus', 
@@ -128,7 +137,8 @@ class RunSModelSTest(unittest.TestCase):
             e = "T6bbHH_pyhf_default.py != ./unitTestOutput/T6bbHH_pyhf.slha.py"
             logger.error(e)
         self.assertTrue(equals)
-        removeCruftOutputs(outputfile)
+        if equals:
+            removeCruftOutputs(outputfile)
 
     def testGoodFile13(self):
 
@@ -216,7 +226,7 @@ class RunSModelSTest(unittest.TestCase):
         ctr = 0
         crash_file = None
         self.cleanUp()
-        runMain(filename, timeout=1, suppressStdout=True,
+        runMain(filename, timeout=2, suppressStdout=True,
                 inifile="timeout.ini")
         time.sleep(.2)
         for f in os.listdir("."):

@@ -8,11 +8,11 @@
 
 """
 
-from __future__ import print_function
 
 from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import os,glob
+import os
+import glob
 import importlib.util
 from smodels.tools import interactivePlotsHelpers as helpers
 import smodels
@@ -22,7 +22,8 @@ class Plotter(object):
     A class to store the required data and produce the interactive plots
     """
 
-    def __init__(self,smodelsFolder,slhaFolder,parameterFile,modelFile=None ):
+    def __init__(self, smodelsFolder: str, slhaFolder: str, parameterFile: str,
+                 modelFile: str | None = None):
         """
         Initializes the class.
 
@@ -141,7 +142,7 @@ class Plotter(object):
 
     def loadModelFile(self):
         """
-        Reads the parameters from the plotting parameter file.
+        Reads the model file for particle name lookups.
         """
 
         logger.info(f"Reading model.py file from {self.modelFile} ...")
@@ -160,7 +161,7 @@ class Plotter(object):
                 logger.warning("Error loading model.py file %s , will use pdgs instead.",  self.modelFile)
                 self.particle_names=None
 
-    def getParticleName(self,pdg):
+    def getParticleName(self, pdg: int):
         """ looks for the particle label in the model.py file """
         found=False
 
@@ -289,7 +290,7 @@ class Plotter(object):
 
         self.data_dict['file'] = []
 
-    def fillWith(self,smodelsOutput,slhaData):
+    def fillWith(self, smodelsOutput: dict | None, slhaData):
         """
         Fill the dictionary (data_dict) with the desired data from
         the smodels output dictionary (smodelsDict) and the pyslha.Doc object
@@ -307,13 +308,13 @@ class Plotter(object):
 
         self.data_dict=filler.getSlhaData(self.variable_x,self.variable_y)
 
-    def rmFiles ( self, flist ):
+    def rmFiles(self, flist: list):
         """ remove files in flist """
         for f in flist:
             if os.path.exists ( f ):
                 os.remove ( f )
 
-    def loadData(self,npoints=-1):
+    def loadData(self, npoints: int = -1) -> bool:
         """
         Reads the data from the smodels and SLHA folders.
         If npoints > 0, it will limit the number of points in the plot to npoints.
@@ -348,7 +349,7 @@ class Plotter(object):
                 
                     try:
                         tar.extractall(path,filter="data") # , members, numeric_owner
-                    except TypeError as e: ## perhaps an older version of tarfile
+                    except TypeError: ## perhaps an older version of tarfile
                         tar.extractall(path) # , members, numeric_owner
                     
                 
@@ -383,7 +384,7 @@ class Plotter(object):
                 
                     try:
                         tar.extractall(path,filter="data") # , members, numeric_owner
-                    except TypeError as e:
+                    except TypeError:
                         ## for older versions of tarfile
                         tar.extractall(path) # , members, numeric_owner
                     
@@ -430,14 +431,14 @@ class Plotter(object):
         """ display the pages, works in jupyter notebooks only """
         try:
             from IPython.display import display,HTML
-        except Exception as e:
+        except Exception:
             from IPython.core.display import display,HTML
         mainFile = open( self.outFolder + self.indexfile,'r')
         display(HTML(mainFile.read()))
         mainFile.close()
         self.cleanUp()
 
-    def plot(self, outFolder, indexfile = "plots.html" ):
+    def plot(self, outFolder: str, indexfile: str = "plots.html"):
         """
         Uses the data in self.data_dict to produce the plots.
 
@@ -460,7 +461,7 @@ class Plotter(object):
         if hasattr ( self, "plotter" ):
             self.plotter.cleanUp()
 
-def main(args,indexfile= "index.html" ):
+def main(args, indexfile: str = "index.html") -> str:
     """
     Create the interactive plots using the input from argparse
 

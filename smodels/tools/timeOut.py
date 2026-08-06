@@ -13,18 +13,18 @@ class NoTime(Exception):
     """
     The time out exception. Raised when the running time exceeds timeout
     """
-    def __init__(self, value=None):
+    def __init__(self, value: float | None = None):
         self.value = value
         Exception.__init__(self, value)
         
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{float(self.value):.2e}s time out exceeded'
 
 
 class Timeout():
     """Timeout class using ALARM signal."""
     
-    def __init__(self, sec):
+    def __init__(self, sec: int):
         self.sec = sec
         if type ( sec ) != int:
             logger.warning ( "timeout set to a non-integral number of seconds."

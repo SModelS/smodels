@@ -10,7 +10,7 @@
 
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.particle import Particle
-from smodels.base.inclusiveObjects import InclusiveValue
+from typing import Any
 
 # Define a common inclusive particle object
 # to be used with the inclusive node
@@ -28,9 +28,9 @@ class ParticleNode(object):
     :ivar particle: Stores the Particle object
     """
 
-    def __init__(self, particle,
-                 isFinalState=False,
-                 isInclusive=False, inclusiveList=False):
+    def __init__(self, particle: Particle,
+                 isFinalState: bool = False,
+                 isInclusive: bool = False, inclusiveList: bool = False):
 
         self.particle = particle
 
@@ -43,10 +43,10 @@ class ParticleNode(object):
         # Flag to identify as non-inclusive node:
         self.inclusiveList = inclusiveList
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return object.__hash__(self)
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: 'ParticleNode') -> int:
         """
         Node comparison based on compareTo method
 
@@ -55,30 +55,30 @@ class ParticleNode(object):
 
         return self.compareTo(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'ParticleNode') -> bool:
         return self.__cmp__(other) == -1
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'ParticleNode') -> bool:
         return self.__cmp__(other) == 1
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__cmp__(other) == 0
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self.__cmp__(other) != 0
 
-    def __str__(self):
+    def __str__(self) -> str:
 
         label = str(self.particle)
         if self.inclusiveList:
             label = '*'+label
         return label
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         return self.__str__()
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         """
         Returns the attribute from particle.
 
@@ -89,9 +89,9 @@ class ParticleNode(object):
 
         return getattr(self.particle, attr)
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict:
         """
-        Since getattr is defined, we must defined getstate
+        Since getattr is defined, we must define getstate
         for pickling/unpickling.
         """
 
@@ -99,15 +99,15 @@ class ParticleNode(object):
 
         return attrDict
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict):
         """
-        Since getattr is defined, we must defined getstate
+        Since getattr is defined, we must define setstate
         for pickling/unpickling.
         """
 
         self.__dict__.update(state)
 
-    def __add__(self, other):
+    def __add__(self, other: 'ParticleNode') -> 'ParticleNode':
         """
         Adds two nodes. The properties of self are kept, except
         for the particle, which are added with other.
@@ -122,7 +122,7 @@ class ParticleNode(object):
 
         return newNode
 
-    def compareTo(self, other):
+    def compareTo(self, other: 'ParticleNode') -> int:
         """
         Compare nodes accoring to  particles.
 
@@ -140,7 +140,7 @@ class ParticleNode(object):
 
         return cmp
 
-    def equalTo(self, other):
+    def equalTo(self, other: 'ParticleNode') -> bool:
         """
         Compare nodes accoring to their particle.
 
@@ -151,7 +151,7 @@ class ParticleNode(object):
 
         return (self.compareTo(other) == 0)
 
-    def copy(self):
+    def copy(self) -> 'ParticleNode':
         """
         Makes a shallow copy of itself. The particle attribute
         shares the same object with the original copy.
@@ -172,12 +172,12 @@ class InclusiveParticleNode(ParticleNode):
     :ivar particle: IncluviseParticle (dummy)
     """
 
-    def __init__(self, particle=IncluviseParticle):
+    def __init__(self, particle: Particle = IncluviseParticle):
 
         ParticleNode.__init__(self, particle=particle,
                               isInclusive=True)
 
-    def compareTo(self, other):
+    def compareTo(self, other: 'ParticleNode') -> int:
         """
         Dummy method. Always return 0, since it will always match any node.
 
@@ -188,7 +188,7 @@ class InclusiveParticleNode(ParticleNode):
 
         return 0
 
-    def copy(self):
+    def copy(self) -> 'InclusiveParticleNode':
         """
         Makes a shallow copy of itself. The particle attribute
         shares the same object with the original copy.
@@ -199,7 +199,7 @@ class InclusiveParticleNode(ParticleNode):
 
         return newNode
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         """
         Returns None if does not contain the attribute.
 

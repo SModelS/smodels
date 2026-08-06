@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
 
 import subprocess
 
@@ -31,7 +30,7 @@ def write ( c, f ):
             isIn = "afterusage"
         if line[:5] == "usage":
             isIn = "usage" 
-        if not isIn in [ "usage", "argument" ]:
+        if isIn not in [ "usage", "argument" ]:
             new += "\n"
         if isIn == "newargument" and lastIn == "argument":
             new = "\n" + new

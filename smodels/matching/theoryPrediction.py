@@ -10,12 +10,11 @@ from smodels.base.physicsUnits import TeV, fb, UnitXSec
 from smodels.experiment.datasetObj import CombinedDataSet
 from smodels.experiment.databaseObj import Database
 from smodels.matching.exceptions import SModelSMatcherError as SModelSError
-from smodels.statistics.basicStats import observed, apriori, aposteriori, \
-         NllEvalType
+from smodels.statistics.basicStats import observed, apriori, NllEvalType
 from smodels.matching import clusterTools
 from smodels.base.smodelsLogging import logger
 from smodels.tools.caching import roundCache,lru_cache
-from typing import Union, Text, Dict, Callable
+from typing import Union, Dict, Callable, Optional, List, Any
 import numpy as np
 
 # number of digits for rounding the mu argument when computing likelihoods
@@ -23,6 +22,7 @@ mu_digits = 8
 
 __all__ = [ "TheoryPrediction", "theoryPredictionsFor",
             "TheoryPredictionsCombiner" ]
+
 
 class TheoryPrediction(object):
     """
@@ -43,37 +43,48 @@ class TheoryPrediction(object):
         self.conditions = None
         self.mass = None
         self.totalwidth = None
+        self.dataset = None
+        self.txnames = []
+        self.smsList = []
         if deltas_rel is None:
             from smodels.base.runtime import _deltas_rel_default
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self._statsComputer = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         ret = f"{self.analysisId()}:{self.totalXsection()}"
         return ret
 
-    def dataId(self):
+    def dataId(self) -> Union[None,str]:
         """
         Return ID of dataset
         """
-
+        if self.dataset is None:
+            return None
+        
         return self.dataset.getID()
 
-    def analysisId(self):
+    def analysisId(self) -> Union[None,str]:
         """
         Return experimental analysis ID
         """
 
+        if self.dataset is None:
+            return None
+        
         return self.dataset.globalInfo.id
 
-    def dataType(self, short : bool = False ) -> str:
+    def dataType(self, short : bool = False ) -> Union[None,str]:
         """
         Return the type of dataset
         :param: short, if True, return abbreviation (ul,em,comb)
 
         :returns: data type, as a string, e.g. "efficiencyMap"
         """
+        if self.dataset is None:
+            return None
+
         if short:
             t = self.dataset.getType()
             D = {"upperLimit": "ul", "efficiencyMap": "em",
@@ -83,8 +94,23 @@ class TheoryPrediction(object):
             return "??"
 
         return self.dataset.getType()
+    
+    def type(self) -> str:
+        """
+        Return the type of theory prediction (single result)
+        """
+
+        return str(type(self).__name__)
+
 
     def computeXSection(self):
+        """
+        Compute the total cross-section for the theory prediction
+        by summing the contributions from all txnames.
+        """
+
+        if type(self.xsection) != type(None):
+            return
 
         xsection = 0*fb
         # Adds the contributions of all txnames
@@ -99,6 +125,10 @@ class TheoryPrediction(object):
         self.xsection = xsection
 
     def computeConditions(self):
+        """
+        Compute the conditions for the theory prediction by
+        evaluating the conditions for all txnames.
+        """
 
         # Adds the contributions of all txnames
         # (for an UL result there will be a single txname
@@ -118,10 +148,14 @@ class TheoryPrediction(object):
         else:
             self.conditions = allConditions[:]
 
-    def totalXsection(self):
+    def totalXsection(self) -> UnitXSec:
+        """
+        Return the total cross-section for this theory prediction.
+        """
+        self.computeXSection()
         return self.xsection
 
-    def getmaxCondition(self):
+    def getmaxCondition(self) -> float:
         """
         Returns the maximum xsection from the list conditions
 
@@ -160,7 +194,7 @@ class TheoryPrediction(object):
         return txnamesWeightsDict
 
     @property
-    def statsComputer(self):
+    def statsComputer(self) -> Any:
         if self._statsComputer is None:
             self.setStatsComputer()
         return self._statsComputer
@@ -172,52 +206,18 @@ class TheoryPrediction(object):
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
         """
-        from smodels.statistics.statsTools import getStatsComputerModule
-        StatsComputer = getStatsComputerModule()
+        from smodels.statistics.statsTools import StatsComputer
 
-        if self.dataType() == "upperLimit":
-            from smodels.base.runtime import experimentalFeature
-            if not experimentalFeature( "truncatedGaussians" ):
-                computer = 'N/A'
-            else:
-                computer = StatsComputer.forTruncatedGaussian(self)
-                if computer is None: # No evaluationType UL available
-                    computer = 'N/A'
+        statsComputer = StatsComputer.forTheoryPrediction(self)
 
-        elif self.dataType() == "efficiencyMap":
-            nsig = (self.xsection * self.dataset.getLumi()).asNumber()
-            computer = StatsComputer.forSingleBin(dataset=self.dataset,
-                                                  nsig=nsig,
-                                                  deltas_rel=self.deltas_rel )
-
-        elif self.dataType() == "combined":
-            # Get dictionary with dataset IDs and signal yields
-            srNsigDict = {ds.getID() : 0.0 for ds in self.dataset.origdatasets}
-            # Update with theory predictions
-            srNsigDict.update({pred.dataset.getID() :
-                          (pred.xsection*pred.dataset.getLumi()).asNumber()
-                          for pred in self.datasetPredictions})
-
-            # Get ordered list of datasets:
-            if hasattr(self.dataset.globalInfo, "covariance"):
-                datasetList = self.dataset.globalInfo.datasetOrder[:]
-                # Get list of signal yields corresponding to the dataset order:
-                srNsigs = [srNsigDict[dataID] for dataID in datasetList]
-                # Get computer
-                computer = StatsComputer.forMultiBinSL(dataset=self.dataset,
-                                                       nsig=srNsigs,
-                                                       deltas_rel = self.deltas_rel)
-
-            elif hasattr(self.dataset.globalInfo, "jsonFiles"):
-                computer = StatsComputer.forPyhf(dataset=self.dataset,
-                                                       nsig=srNsigDict,
-                                                       deltas_rel = self.deltas_rel)
-
-        self._statsComputer = computer
+        if statsComputer is None:
+            self._statsComputer = "N/A"
+        else:
+            self._statsComputer = statsComputer
 
     @lru_cache
     def getUpperLimit( self, evaluationType : NllEvalType = observed,
-                       nSigma : int = 0 ) -> UnitXSec:
+                       nSigma : int = 0, **kwargs ) -> UnitXSec:
         """
         Get the upper limit on sigma*eff.
         For UL-type results, use the UL map. For EM-Type returns
@@ -225,35 +225,36 @@ class TheoryPrediction(object):
         For combined results, returns the upper limit on the
         total sigma*eff (for all signal regions/datasets).
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :return: upper limit (Unum object)
         """
+        
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType,
                     nSigma = nSigma )
         if self.dataType() == "upperLimit":
             ul = self.dataset.getUpperLimitFor(
-                sms=self.avgSMS, txnames=self.txnames, 
-                evaluationType=evaluationType, 
+                sms=self.avgSMS, txnames=self.txnames,
+                evaluationType=evaluationType,
                 nSigma = nSigma
             )
         if self.dataType() == "combined":
-            ul = self.statsComputer.poi_upper_limit(
+            ul = self.statsComputer.getUpperLimit(
                 evaluationType = evaluationType,
                 nSigma = nSigma,
-                limit_on_xsec = True )
+                limit_on_xsec = True, **kwargs )
         return ul
 
     def getUpperLimitOnMu(self, evaluationType : NllEvalType = observed,
-            nSigma : int = 0, **kwargs ) -> float:
+            nSigma : int = 0, **kwargs ) -> Union[None,float]:
         """
         Get upper limit on signal strength multiplier, using the
         theory prediction value and the corresponding upper limit
         (i.e. mu_UL = upper limit/theory xsec)
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param nSigma: the upper limit for central value (0), 
+        :param nSigma: the upper limit for central value (0),
         + 1 sigma, - 1 sigma, etc.
         For error bands.
         :returns: upper limit on signal strength multiplier mu
@@ -262,11 +263,12 @@ class TheoryPrediction(object):
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
-            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
-
+            kwargs.pop ( "expected" )
+        for k,v in kwargs.items():
+            if k not in [ "pmSigma" ]:
+                logger.error ( f"unknown argument {k} in theoryPrediction.getUpperLimitOnMu()" )
         upperLimit = self.getUpperLimit( evaluationType=evaluationType,
-                                         nSigma=nSigma )
+                                         nSigma=nSigma, **kwargs )
         xsec = self.totalXsection()
         if xsec is None or upperLimit is None:
             return None
@@ -277,7 +279,7 @@ class TheoryPrediction(object):
 
     @lru_cache
     def getRValue( self, evaluationType : NllEvalType = observed,
-                   nSigma : int = 0, **kwargs ) -> float:
+                   nSigma : int = 0, **kwargs ) -> Union[float,None]:
         """
         Get the r value = theory prediction / experimental upper limit
 
@@ -287,9 +289,11 @@ class TheoryPrediction(object):
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
-            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
-        upperLimit = self.getUpperLimit(evaluationType,nSigma = nSigma )
+            kwargs.pop ( "expected" )
+        for k,v in kwargs.items():
+            if k not in [ "pmSigma" ]:
+                logger.error ( f"unknown argument {k} in theoryPrediction.getRValue()" )
+        upperLimit = self.getUpperLimit(evaluationType, nSigma = nSigma, **kwargs )
         if upperLimit is None or upperLimit.asNumber(fb) == 0.0:
             r = None
             return r
@@ -313,78 +317,88 @@ class TheoryPrediction(object):
         return wrapper
 
     @whenDefined
-    def lsm( self, evaluationType : NllEvalType = observed,
-             return_nll : bool = False ):
+    def nllsm( self, evaluationType : NllEvalType = observed,
+             return_nll : bool = False ) -> float:
         """likelihood at SM point, same as .def likelihood( ( mu = 0. )"""
-        llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["nllsm"],return_nll )
+        nllDict = self.computeStatistics(evaluationType)
+        return nllDict["nllsm"]
 
     @whenDefined
-    def lmax( self, evaluationType : NllEvalType = observed,
-              return_nll : bool = False ):
-        """likelihood at mu_hat"""
-        llhDict = self.computeStatistics(evaluationType)
-        return self.nllToLikelihood (llhDict["nll_min"],return_nll )
+    def nll_min( self, evaluationType : NllEvalType = observed,
+                 return_dict : bool = False,
+                 **kwargs ) -> Union[float,dict]:
+        """ nll at mu_hat
+        :param return_dict: if true, return also mu_hat and sigma_mu
+        """
+        nllDict = self.computeStatistics(evaluationType)
+        if len(kwargs)>0:
+            nllDict = self.statsComputer.nll_min (
+                    evaluationType = evaluationType, **kwargs )
+        if return_dict:
+            return nllDict
+        return nllDict["nll_min"]
 
     @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def CLs(self, mu : float = 1., evaluationType : NllEvalType = observed ) -> \
-                    Union[float,None]:
+    def CLs( self, mu : float = 1., evaluationType : NllEvalType = observed,
+             **kwargs ) -> Union[float,None]:
         """ obtain the CLs value of the combination for a given poi value "mu" """
-        cls = self.statsComputer.CLs ( poi_test = mu, evaluationType = evaluationType )
+        cls = self.statsComputer.CLs ( poi_test = mu,
+                evaluationType = evaluationType, **kwargs )
         return cls
 
     @whenDefined
-    def sigma_mu(self, evaluationType : NllEvalType = observed ):
+    def sigma_mu(self, evaluationType : NllEvalType = observed ) -> float:
         """sigma_mu of mu_hat"""
         llhDict = self.computeStatistics(evaluationType)
         return llhDict["sigma_mu"]
 
     @whenDefined
-    def muhat(self, evaluationType : NllEvalType = observed ):
+    def muhat(self, evaluationType : NllEvalType = observed ) -> float:
         """position of maximum likelihood"""
         llhDict = self.computeStatistics(evaluationType)
         return llhDict["muhat"]
 
     @whenDefined
-    def nll(self, mu=1.0, evaluationType : NllEvalType = observed,
-            asimov : Union[None,float] = None, **kwargs ) -> float:
-        """
-        get the negative log likelihood for a signal strength modifier mu.
-        this is a method to prepare for a transition to dealing with nlls only
-
-        :param evaluationType: one of: observed, apriori, aposteriori
-        """
-        return self.likelihood ( mu=mu, evaluationType=evaluationType,
-                                 asimov=asimov, return_nll=True )
-
-    @whenDefined
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
-    def likelihood(self, mu : float = 1.0, evaluationType : NllEvalType = observed,
-            return_nll : bool =False, asimov : Union[None,float] = None,
-            **kwargs ) -> float:
+    def nll(self, mu: float = 1.0, evaluationType : NllEvalType = observed,
+            asimov : Optional[int] = None, **kwargs ) -> float:
         """
-        get the likelihood for a signal strength modifier mu
-
+        get the nll for a signal strength modifier mu
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param return_nll: if True, return negative log likelihood, else likelihood
+        :asimov: get for asimov data with this mu, or None
         """
-        assert asimov in [ None, 0. ], \
-               "currently we only need asimov data for 0., no?"
+        if asimov != None and abs(asimov)>1e-8 and abs(asimov-1)>1e-8:
+            raise SModelSError (
+               "currently we only handle asimov data for 0. or 1." )
         if "expected" in kwargs:
             import warnings
             warnings.warn ( "flag 'expected' in theoryPrediction.getRValue() renamed to evaluationType, please adapt!", DeprecationWarning, stacklevel=2 )
             evaluationType = kwargs["expected"]
-        if len(kwargs)>2 or ( len(kwargs)==1 and not "expected" in kwargs ):
-            logger.error ( f"unknown argument(s) {' '.join(kwargs)} in theoryPrediction.getRValue()" )
+        for k,v in kwargs.items():
+            if k not in [ "pmSigma" ]:
+                logger.error ( f"unknown argument {k} in theoryPrediction.likelihood()" )
 
         # for truncated gaussians the fits only work with negative signals!
-        nll = self.statsComputer.likelihood(poi_test = mu,
-                       evaluationType = evaluationType, return_nll = return_nll,
-                       asimov = asimov )
+        nll = self.statsComputer.nll(poi_test = mu,
+                evaluationType = evaluationType, asimov = asimov, **kwargs )
         return nll
 
-    def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ):
+    @whenDefined
+    def likelihood(self, mu : float = 1.0, evaluationType : NllEvalType = observed,
+            return_nll : bool =False, asimov : Optional[int] = None,
+            **kwargs ) -> float:
+        """
+        get the likelihood for a signal strength modifier mu.
+        this is a method to prepare for a transition to dealing with nlls only
+
+        :param evaluationType: one of: observed, apriori, aposteriori
+        """
+        mnll = self.nll ( mu=mu, evaluationType=evaluationType,
+                         asimov=asimov, **kwargs )
+        return self.nllToLikelihood ( mnll, return_nll )
+
+    def nllToLikelihood ( self, nll : Union[None,float], return_nll : bool ) -> Union[None, float]:
         """ if not return_nll, then compute likelihood from nll """
         if return_nll:
             return nll
@@ -392,7 +406,7 @@ class TheoryPrediction(object):
 
     @whenDefined
     @lru_cache
-    def computeStatistics(self, evaluationType : NllEvalType = observed ):
+    def computeStatistics(self, evaluationType : NllEvalType = observed ) -> Dict[str, Any]:
         """
         Compute the likelihoods, and upper limit for this theory prediction.
         The resulting values are stored as the likelihood, lmax, and lsm
@@ -405,9 +419,96 @@ class TheoryPrediction(object):
         return llhdDict
 
 
+class TheoryPredictionList(object):
+    """
+    An instance of this class represents a collection of theory prediction
+    objects.
+    """
+
+    def __init__(self, theoryPredictions: Union[None, list[TheoryPrediction], 'TheoryPredictionList'] = None, maxCond: Optional[float] = None):
+        """
+        Initializes the list.
+
+        :parameter theoryPredictions: list of TheoryPrediction objects
+        :parameter maxCond: maximum relative violation of conditions for valid
+        results. If defined, it will keep only the theory predictions with
+        condition violation < maxCond.
+        """
+        self._theoryPredictions = []
+        if theoryPredictions and isinstance(theoryPredictions,
+                                            (TheoryPredictionList,list)):
+
+            if not maxCond:
+                self._theoryPredictions = theoryPredictions
+            else:
+                newPredictions = []
+                for theoPred in theoryPredictions:
+                    mCond = theoPred.getmaxCondition()
+                    if mCond != "N/A" and round(mCond/maxCond, 2) > 1.0:
+                        continue
+                    else:
+                        newPredictions.append(theoPred)
+                self._theoryPredictions = newPredictions
+
+    def append(self, theoryPred: TheoryPrediction):
+        self._theoryPredictions.append(theoryPred)
+
+    def __str__(self) -> str:
+        if len(self._theoryPredictions) == 0:
+            return "no predictions."
+        ret = f"{len(self._theoryPredictions)} predictions: "
+        ret += ", ".join([str(s) for s in self._theoryPredictions])
+        return ret
+
+    def __iter__(self):
+        for theoryPrediction in self._theoryPredictions:
+            yield theoryPrediction
+
+    def __getitem__(self, index: int) -> TheoryPrediction:
+        return self._theoryPredictions[index]
+
+    def __len__(self) -> int:
+        return len(self._theoryPredictions)
+
+    def __add__(self, theoPredList: 'TheoryPredictionList') -> Optional['TheoryPredictionList']:
+        if isinstance(theoPredList, TheoryPredictionList):
+            res = TheoryPredictionList()
+            res._theoryPredictions = self._theoryPredictions + theoPredList._theoryPredictions
+            return res
+        else:
+            return None
+
+    def __radd__(self, theoPredList: 'TheoryPredictionList') -> 'TheoryPredictionList':
+        if theoPredList == 0:
+            return self
+        else:
+            return self.__add__(theoPredList)
+
+    def removeRNone(self):
+        """
+        Remove predictions for which r-value = None
+        (such as when the UL computer fails due to convergence issues).
+        """
+
+        tpList = [tp for tp in self._theoryPredictions
+                  if tp.getRValue() is not None]
+        self._theoryPredictions = tpList[:]
+
+    def sortTheoryPredictions(self):
+        """
+        Reverse sort theoryPredictions by R value.
+        Used for printer.
+        """
+        self._theoryPredictions = sorted(
+            self._theoryPredictions,
+            key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()),
+            reverse=True,
+        )
+
+
 class TheoryPredictionsCombiner(TheoryPrediction):
     """
-    Facility used to combine theory predictions from different analyes.
+    Facility used to combine theory predictions from different analyses.
     If a list with a single TheoryPrediction is given, return the TheoryPrediction
     object.
     """
@@ -451,7 +552,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         self._statsComputer = None
 
     @classmethod
-    def selectResultsFrom(cls, theoryPredictions : list, anaIDs : list ):
+    def selectResultsFrom(cls, theoryPredictions : Union[List[TheoryPrediction],TheoryPredictionList], 
+                          anaIDs : List[str] ) -> Optional['TheoryPredictionsCombiner']:
         """
         Select the results from theoryPrediction list which match one
         of the IDs in anaIDs. If there are multiple predictions for the
@@ -495,7 +597,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         combiner = cls(uniqueTPs)
         return combiner
 
-    def dataId(self):
+    def dataId(self) -> str:
         """
         Return a string with the IDs of all the datasets used in the combination.
         """
@@ -504,7 +606,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return ret
 
-    def analysisId(self):
+    def analysisId(self) -> str:
         """
         Return a string with the IDs of all the experimental results
         used in the combination.
@@ -514,7 +616,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return ret
 
-    def dataType(self, short=False):
+    def dataType(self, short: bool = False) -> str:
         """
         Return its type (combined)
         :param: short, if True, return abbreviation (anacomb)
@@ -524,14 +626,18 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         else:
             return "combined"
 
-    def totalXsection(self):
+
+    def totalXsection(self) -> UnitXSec:
+        """
+        Return the total cross-section summed over all combined theory predictions.
+        """
         ret = 0.0 * fb
         if self.theoryPredictions is not None:
             for tp in self.theoryPredictions:
                 ret += tp.xsection
         return ret
 
-    def getmaxCondition(self):
+    def getmaxCondition(self) -> float:
         """
         Returns the maximum xsection from the list conditions
 
@@ -562,28 +668,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return txnamesWeightsDict
 
-    def setStatsComputer(self):
-        """
-        Creates and instance of StatsComputer depending on the
-        type of TheoryPrediction/dataset. In case it is not possible
-        to define a statistical computer (upper limit result or no expected
-        upper limits), set the computer to 'N/A'.
-        """
-
-        # First make sure all theory predictions in the combiner
-        # have well-defined stats models
-        if any(tp.statsComputer == 'N/A' for tp in self.theoryPredictions):
-            computer = 'N/A'
-        else:
-            from smodels.statistics.statsTools import getStatsComputerModule
-            StatsComputer = getStatsComputerModule()
-            computer = StatsComputer.forAnalysesComb(self.theoryPredictions,
-                    self.deltas_rel)
-
-        self._statsComputer = computer
-
-    def getLlhds(self,muvals,evaluationType : bool = False,
-                  normalize : bool = True ) -> dict:
+    def getLlhds(self, **kwargs ) -> dict:
         """
         Facility to access the likelihoods for the individual analyses and
         the combined likelihood.
@@ -596,102 +681,14 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
+        return self.statsComputer.getLlhds( **kwargs )
 
-        return self.statsComputer.likelihoodComputer.getLlhds(muvals,evaluationType,normalize)
-
-    def describe(self):
+    def describe(self) -> str:
         """returns a string containing a list of all analysisId and dataIds"""
         ids = []
         for tp in self.theoryPredictions:
             ids.append(f"{tp.analysisId()}:{tp.dataId()}")
         return f"SRs: {', '.join(ids)}"
-
-
-class TheoryPredictionList(object):
-    """
-    An instance of this class represents a collection of theory prediction
-    objects.
-    """
-
-    def __init__(self, theoryPredictions=None, maxCond=None):
-        """
-        Initializes the list.
-
-        :parameter theoryPredictions: list of TheoryPrediction objects
-        :parameter maxCond: maximum relative violation of conditions for valid
-        results. If defined, it will keep only the theory predictions with
-        condition violation < maxCond.
-        """
-        self._theoryPredictions = []
-        if theoryPredictions and isinstance(theoryPredictions,
-                                            (TheoryPredictionList,list)):
-
-            if not maxCond:
-                self._theoryPredictions = theoryPredictions
-            else:
-                newPredictions = []
-                for theoPred in theoryPredictions:
-                    mCond = theoPred.getmaxCondition()
-                    if mCond != "N/A" and round(mCond/maxCond, 2) > 1.0:
-                        continue
-                    else:
-                        newPredictions.append(theoPred)
-                self._theoryPredictions = newPredictions
-
-    def append(self, theoryPred):
-        self._theoryPredictions.append(theoryPred)
-
-    def __str__(self):
-        if len(self._theoryPredictions) == 0:
-            return "no predictions."
-        ret = f"{len(self._theoryPredictions)} predictions: "
-        ret += ", ".join([str(s) for s in self._theoryPredictions])
-        return ret
-
-    def __iter__(self):
-        for theoryPrediction in self._theoryPredictions:
-            yield theoryPrediction
-
-    def __getitem__(self, index):
-        return self._theoryPredictions[index]
-
-    def __len__(self):
-        return len(self._theoryPredictions)
-
-    def __add__(self, theoPredList):
-        if isinstance(theoPredList, TheoryPredictionList):
-            res = TheoryPredictionList()
-            res._theoryPredictions = self._theoryPredictions + theoPredList._theoryPredictions
-            return res
-        else:
-            return None
-
-    def __radd__(self, theoPredList):
-        if theoPredList == 0:
-            return self
-        else:
-            return self.__add__(theoPredList)
-
-    def removeRNone(self):
-        """
-        Remove predictions for which r-value = None
-        (such as when the UL computer fails due to convergence issues).
-        """
-
-        tpList = [tp for tp in self._theoryPredictions
-                  if tp.getRValue() is not None]
-        self._theoryPredictions = tpList[:]
-
-    def sortTheoryPredictions(self):
-        """
-        Reverse sort theoryPredictions by R value.
-        Used for printer.
-        """
-        self._theoryPredictions = sorted(
-            self._theoryPredictions,
-            key=lambda theoPred: (theoPred.getRValue() is not None, theoPred.getRValue()),
-            reverse=True,
-        )
 
 
 def theoryPredictionsFor(database : Database, smsTopDict : Dict,
@@ -750,8 +747,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             expResults = dataSetResults[0]
         else:
             if combinedResults: # Include combination
-                combinedRes = _getCombinedResultFor(dataSetResults,
-                                                expResult)
+                combinedRes = _getCombinedResultFor(dataSetResults, expResult)
                 if combinedRes is not None:
                     dataSetResults.append(TheoryPredictionList([combinedRes]))
             if not useBestDataset: #  Report all datasets
@@ -759,35 +755,69 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             else:
                 expResults = TheoryPredictionList()
                 bestRes = _getBestResult(dataSetResults)
-                if not bestRes is None:
+                if bestRes is not None:
                     expResults.append(bestRes) # Best result = combination if available
+        
+        # A SR not entering any combination can be the most sensitive result
+        if len(expResults) == 1 and isinstance(expResults[0].dataset, CombinedDataSet): # We only have 1 result, and it is a combined result
+            bestPred = expResults[0]
+            bestExpectedR = bestPred.getRValue(evaluationType=apriori)
+            bestXsec = bestPred.xsection
+            if bestExpectedR is None:
+                bestExpectedR = 0.0
+                bestXsec = 0.0*fb
+            
+            for predList in dataSetResults:
+                for tpred in predList:
+                    dataset = tpred.dataset
+                    if isinstance(dataset, CombinedDataSet): continue # It is the combined dataset, don't compare it to itself
+                    regionType = regionTypeOf(dataset)
+                    if regionType == 'SR': # Only a SR can be the best SR
+                        # We are interested in SR that are not combined -> Check if it is the case
+                        isCombinedWith = []
+                        assert hasattr ( dataset, "dataInfo" ), "why does the dataset here not have a dataInfo?"
+                        dataId = dataset.getID()
+                        if hasattr ( expResult.globalInfo, "regionMappings" ) and not hasattr ( expResult.globalInfo, "regionSets" ):
+                            raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
+                        for regionSetName in expResult.globalInfo.statModels.keys():
+                            regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
+                            for region in regionList:
+                                if hasattr ( expResult.globalInfo, "regionMappings" ):
+                                    regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+                                    if dataId == regionDict['smodels']:
+                                        for reg in regionList:
+                                            regDict = expResult.globalInfo.regionMappings[reg ]
+                                            isCombinedWith.append(regDict['smodels'])
+                                elif dataId == region:
+                                    isCombinedWith += regionList
+                        
+                        if isCombinedWith: # The region belongs to a combination set? Yes: check if it is really combined; No: all good, can be a bestSR candidate
+                            isCombinedWith = set(isCombinedWith)
+                            isCombinedWith.remove(dataId)
 
+                            # Do not consider the region only if it exists a combined result with it, i.e. if other regions among its combination set have a result
+                            datasetResultsId = [tp.dataset.getID() for tpList in dataSetResults for tp in tpList]
+                            if any([True if region in datasetResultsId else False for region in isCombinedWith]):
+                                continue
+                            
+                        xsec = tpred.xsection
+                        expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
+                        if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
+                            bestExpectedR = expectedR
+                            bestXsec = xsec
+                            bestPred = tpred
+
+            expResults = TheoryPredictionList([bestPred])
+            
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
-            tpe = None
-            if isinstance(theoPred.dataset,CombinedDataSet): # Individual CRs shouldn't give results
+            # Check if region corresponds to a CR or VR, in which case we do not report the upper limit
+            regionType = regionTypeOf(theoPred.dataset)
+            if regionType not in [ "CR", "VR" ]:
                 theoPred.upperLimit = theoPred.getUpperLimit()
-                continue
             else:
-                if hasattr(theoPred.dataset.globalInfo, "jsonFiles"): # Only signal in CRs for jsonFiles so far
-                    for regionSet in theoPred.dataset.globalInfo.jsonFiles.values():
-                        for region in regionSet:
-                            if region["smodels"] == theoPred.dataset.dataInfo.dataId:
-                                tpe = region["type"]
-                                break
-                else:
-                    tpe = "SR"
-
-                #if tpe is None:
-                #    this probably just means that the signal region is not mentioned in the jsonFiles. thats allowed.
-                #    logger.debug(f"Could not find type of region {theoPred.dataset.dataInfo.dataId} from {theoPred.analysisId()}")
-                    # raise SModelSError()
-
-                if tpe == "SR":
-                    theoPred.upperLimit = theoPred.getUpperLimit()
-                else:
-                    theoPred.upperLimit = None
+                theoPred.upperLimit = None
 
         expResults.sortTheoryPredictions()
 
@@ -799,62 +829,87 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
     tpList.sortTheoryPredictions()
 
     return tpList
+    
+def regionTypeOf ( region : Any ) -> Union[None,str]:
+    """
+    A quality of life function to know the type of a dataset (SR, CR or VR).
+    :region: an efficiency-map-type dataset.
+    :returns: the corresponding value given to regionMappings,
+              'SR' if there is no regionMappings, or if it is a combined dataset,
+              'CR' if the region is tagged as such in its corresponding regionMappings,
+              and None if the region is not an EM-type dataset or if the globalInfo as a regionMappings but it does not include the region.
+    """
+    if isinstance(region,CombinedDataSet): return 'SR' # Combined dataset is considered as 'SR'
+    if region.dataInfo.dataType != 'efficiencyMap': return None # Dataset is not efficiency-map-type
+    regionType = 'SR' # By default we assume it is a SR
+    globalInfo = region.globalInfo
+    
+    if hasattr(globalInfo,"regionMappings"):
+        assert type ( globalInfo.regionMappings) == dict, f"{expResult.globalInfo.id} regionMappings are not a dict"
+        regionDict = globalInfo.regionMappings.get(region.dataInfo.dataId, None)
+        if regionDict is None:
+            logger.warning ( f"Cannot evaluate the type of {region} from {globalInfo.id}, it is not listed in the regionMappings dict!" )
+            return None
+        regionType = regionDict.get("type", None)
+        if regionType is None:
+            logger.warning ( f"No type found in the regionMappings dict of {globalInfo.id} for {region}" )
+        
+    return regionType
 
-def _isDatasetInCombination ( dataset, expResult ) -> Union[None,bool]:
-    """ is a given dataset mentioned in the combination?
+def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
+    """
+    Is a given dataset mentioned in the combination?
     we are allowing datasets in an expResult that is not mentioned
     in the combination of that result.
     :returns: true if its in, false if it is not in, None if there is no combination
     """
-    assert hasattr ( dataset, "dataInfo" ), "why does the dataset here not have a dataInfo?"
-    dataId = dataset.dataInfo.dataId
-    if hasattr ( expResult.globalInfo, "jsonFiles" ):
-        for regionSet in expResult.globalInfo.jsonFiles.values():
-            for region in regionSet:
-                if dataId == region["smodels"]:
-                    return True
-        return False
-    if hasattr ( expResult.globalInfo, "datasetOrder" ):
-        for ds in expResult.globalInfo.datasetOrder:
-            if dataId == ds:
+    assert hasattr ( dataset, "dataInfo" ), \
+        "why does the dataset here not have a dataInfo?"
+    dataId = dataset.getID()
+    if hasattr ( expResult.globalInfo, "regionMappings" ) and not hasattr ( expResult.globalInfo, "regionSets" ):
+        raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
+    
+    for regionSetName in expResult.globalInfo.statModels.keys():
+        regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
+        for region in regionList:
+            if hasattr ( expResult.globalInfo, "regionMappings" ):
+                regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+                name = regionDict['smodels']
+            else:
+                name = region
+            if dataId == name:
                 return True
-        return False
-    return None
+    return False
 
-def _getCombinedResultFor(dataSetResults, expResult):
+def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[TheoryPrediction]:
     """
-    Compute the combined result for all datasets, if covariance
-    matrices or jsonFiles are available. Return a TheoryPrediction object
+    Compute the combined result for all datasets, if a statistical model is]
+    available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
 
-    :param datasetPredictions: List of TheoryPrediction objects for each signal region
+    :param datasetPredictions: List of TheoryPrediction objects
+    for each signal region
     :param expResult: ExpResult object corresponding to the experimental result
 
     :return: TheoryPrediction object
     """
-    # Don't give combined result if all regions are CRs
-    isNotSR = []
-    for predList in dataSetResults:
-        if hasattr ( expResult.globalInfo, "jsonFiles" ):
-            for regionSet in expResult.globalInfo.jsonFiles.values():
-                for region in regionSet:
-                    if region['smodels'] == predList[0].dataset.dataInfo.dataId:
-                        if region['type'] == 'SR':
-                            isNotSR.append(False)
-                        else:
-                            isNotSR.append(True)
-        else:
-            isNotSR = [ False ]
-
-    if all(isNotSR):
-        return None
 
     if len(dataSetResults) == 1:
         return dataSetResults[0]
-    elif not expResult.hasCovarianceMatrix() and not expResult.hasJsonFile():
+    elif not expResult.hasStatsModel():
         return None
-
+    
+    # Don't give combined result if all regions are CRs
+    regionTypeDict = {}
+    globalInfo = expResult.globalInfo
+    for predList in dataSetResults:
+        for tpred in predList:
+            regionTypeDict[tpred.dataId()] = regionTypeOf(tpred.dataset)
+    
+    if all(regionType != 'SR' for regionType in regionTypeDict.values()):
+        return None
+    
     txnameList = []
     smsList = []
     totalXsec = None
@@ -900,7 +955,7 @@ def _getCombinedResultFor(dataSetResults, expResult):
     return theoryPrediction
 
 
-def _getBestResult(dataSetResults):
+def _getBestResult(dataSetResults: list) -> Optional[TheoryPrediction]:
     """
     Returns the best result according to the evaluationType upper limit.
     If a combined result is included in the list, always return it.
@@ -930,23 +985,8 @@ def _getBestResult(dataSetResults):
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
+            
         dataset = predList[0].dataset
-        globalInfo = dataset.globalInfo
-
-        # Only a SR can be the best SR
-        stop = False
-        if hasattr(globalInfo,"jsonFiles"):
-            for regionSet in globalInfo.jsonFiles.values():
-                for region in regionSet:
-                    if type(region) == dict and \
-                            region['smodels'] == dataset.dataInfo.dataId:
-                        if "type" in region and region['type'] != 'SR':
-                            stop = True
-                    if stop: break
-                if stop: break
-        if stop:
-            continue
-
         if dataset.getType() != "efficiencyMap":
             txt = (
                 "Multiple data sets should only exist for efficiency map results, but we have them for %s?"
@@ -954,6 +994,11 @@ def _getBestResult(dataSetResults):
             )
             logger.error(txt)
             raise SModelSError(txt)
+            
+        regionType = regionTypeOf(dataset)
+        if regionType != "SR":
+            continue
+        
         pred = predList[0]
         xsec = pred.xsection
         expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
@@ -964,9 +1009,8 @@ def _getBestResult(dataSetResults):
 
     return bestPred
 
-
-def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
-                           deltas_rel=None):
+def _getDataSetPredictions(dataset: Any, smsMatch: dict, smsDict: Any, maxMassDist: float,
+                            deltas_rel: Optional[float] = None) -> Optional[TheoryPredictionList]:
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -1041,7 +1085,7 @@ def _getDataSetPredictions(dataset, smsMatch,smsDict, maxMassDist,
         return predictionList
 
 
-def _getSMSFor(dataset,smsMatch,smsDict):
+def _getSMSFor(dataset: Any, smsMatch: dict, smsDict: Any) -> list:
     """
     Get SMS that belong to any of the TxNames in dataset
     (appear in any of constraints in the result).
@@ -1075,7 +1119,7 @@ def _getSMSFor(dataset,smsMatch,smsDict):
     return smsList
 
 
-def _combineSMS(smsList, dataset, maxDist):
+def _combineSMS(smsList: list, dataset: Any, maxDist: float) -> list[clusterTools.SMSCluster]:
     """
     Combine SMS according to the data set type.
     If expResult == upper limit type, first group SMS with different TxNames

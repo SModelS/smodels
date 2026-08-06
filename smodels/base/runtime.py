@@ -11,7 +11,7 @@
 """
 
 from typing import Union, Text, Dict
-import os
+from smodels.base.types import PathType
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
@@ -38,7 +38,7 @@ def checkForIncompatibleModuleVersions() -> bool:
 
 checkForIncompatibleModuleVersions()
 
-def returnGitCommitId():
+def returnGitCommitId() -> str | None:
     """ if we are in a git-managed repository, return the git commit id """
     try:
         import subprocess
@@ -62,7 +62,7 @@ def returnGitCommitId():
         # Not a Git repo, or git command failed—do nothing
         return None
 
-def printEnvironmentInfo( args : Dict ):
+def printEnvironmentInfo( args : Dict ) -> bool:
     """ very simple method that prints out info relevant to debugging
         machine-dependent problems
     :param args: a dictionary with options, currently only a "colors" option
@@ -71,7 +71,8 @@ def printEnvironmentInfo( args : Dict ):
     """
     from smodels.base.smodelsLogging import colors
     colors.on = True if "colors" in args and args["colors"] == True else False
-    import importlib, platform
+    import importlib
+    import platform
 
     modules = [ "scipy", "sympy", "numpy",
         "pyslha", "unum", "pyhf" ]
@@ -97,7 +98,7 @@ def printEnvironmentInfo( args : Dict ):
         print ( f"\ngit commit: {gitId}" )
     return depsMet
 
-def filetype ( filename : os.PathLike ) -> Union[Text,None]:
+def filetype ( filename : PathType ) -> Union[Text,None]:
     """ obtain information about the filetype of an input file,
         currently only used to discriminate between slha and lhe
         files.
@@ -137,13 +138,18 @@ def experimentalFeature( feature : str ) -> Union[None,bool]:
 
     :returns: None if feature does not exist, else boolean
     """
-    if not feature in _experimental:
+    if feature not in _experimental:
         return None
     return _experimental[feature]
 
-def nCPUs():
+def nCPUs() -> int | None:
     """ obtain the number of *available* CPU cores on the machine, for several
         platforms and python versions. """
+    try:
+        import os
+        return os.cpu_count()
+    except AttributeError as e:
+        pass
     try:
         # next few lines taken from
         # https://stackoverflow.comhttps//stackoverflow.com/questions/1006289/how-to-find-out-the-number-of-cpus-using-python/questions/1006289/how-to-find-out-the-number-of-cpus-using-python

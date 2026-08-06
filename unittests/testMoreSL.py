@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testSpey
-   :synopsis: Test spey against the numbers we got from CMS-SUS-21-002
+.. module:: testMoreSL
+   :synopsis: Test more simplified likelihoods
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
 
 """
-        
+
 import unittest
 import sys
 sys.path.insert(0,"../")
@@ -17,9 +17,8 @@ from smodels.share.models.SMparticles import SMList
 from smodels.base.model import Model
 from smodels.decomposition import decomposer
 from smodels.matching.theoryPrediction import theoryPredictionsFor
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import apriori
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
 import numpy as np
 
 import time
@@ -58,7 +57,42 @@ class MoreSLTest(unittest.TestCase):
                     if verbose:
                         print ( f"{slhaname} {exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
                     if delta > .15:
-                        line = f"mismatch for {slhaname}({exp}): base={base[exp]}, computed={r[exp]}"
+                        line = f"mismatch for {slhaname}({exp}): base={base[exp]:.2f}, computed={r[exp]:.2f}"
+                        logger.error ( line )
+                        self.assertTrue ( delta < .15 )
+        t = time.time() - t0
+        if verbose:
+            print ( f"took {t:.3f}s, average delta {np.mean(deltas):.4f}" )
+
+    def test16050Selected ( self ):
+        from databaseLoader import database as db
+        datasetIDs = [ "ar1", "ar2", "ar3" ]
+        # datasetIDs = [ "all" ]
+        db.selectExpResults ( analysisIDs = [ "CMS-SUS-16-050-agg" ],
+                              datasetIDs = datasetIDs )
+        defaults = {}
+        # defaults [ "T1tttt" ] = { "obs": 253.00557, "exp": 141.603199 }
+        defaults [ "T1tttt" ] = { "obs": 4.35, "exp": 5.68 }
+        verbose = False
+        t0 = time.time()
+        deltas = []
+        for slhaname in defaults.keys():
+            model = Model(BSMparticles=BSMList, SMparticles=SMList)
+            fname = f"./testFiles/slha/{slhaname}.slha"
+            model.updateParticles(inputFile=fname)
+            toplist = decomposer.decompose(model)
+            predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
+            for p in predictions:
+                r = { "obs": p.getRValue(),
+                      "exp": p.getRValue ( evaluationType=apriori ) }
+                base = defaults[slhaname]
+                for exp in [ "obs", "exp" ]:
+                    delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
+                    deltas.append ( delta )
+                    if verbose:
+                        print ( f"{slhaname} {exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
+                    if delta > .02:
+                        line = f"mismatch for {slhaname}({exp}): base={base[exp]:.2f}, computed={r[exp]:.2f}"
                         logger.error ( line )
                         self.assertTrue ( delta < .15 )
         t = time.time() - t0
@@ -83,7 +117,8 @@ class MoreSLTest(unittest.TestCase):
             toplist = decomposer.decompose(model)
             predictions = theoryPredictionsFor(db, toplist, combinedResults=True)
             for p in predictions:
-                r = { "obs": p.getRValue(), "exp": p.getRValue ( evaluationType=apriori ) }
+                r = { "obs": p.getRValue(),
+                      "exp": p.getRValue ( evaluationType=apriori ) }
                 base = defaults[slhaname]
                 for exp in [ "obs", "exp" ]:
                     delta = 2. * abs ( r[exp] - base[exp] ) / ( r[exp]+base[exp] )
@@ -91,7 +126,7 @@ class MoreSLTest(unittest.TestCase):
                     if verbose:
                         print ( f"{slhaname} {exp}: r {r[exp]:.3f} r_base {base[exp]} delta {delta:.3f}" )
                     if delta > .02:
-                        line = f"mismatch for {slhaname}({exp}): base={base[exp]}, computed={r[exp]}"
+                        line = f"mismatch for {slhaname}({exp}): base={base[exp]:.2f}, computed={r[exp]:.2f}"
                         logger.error ( line )
                         self.assertTrue ( delta < .15 )
         t = time.time() - t0

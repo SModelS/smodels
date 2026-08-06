@@ -25,7 +25,7 @@ class CppTest(unittest.TestCase):
         cmd = "cd ../cpp; make"
         a = CMD.getoutput ( cmd ).split("\n" )
         ## now check if "done" appears in the last line
-        if not "done" in a[-1] and not "done" in a[-2]:
+        if "done" not in a[-1] and "done" not in a[-2]:
             print ( f"[testCpp] keyword 'done' missing in output:\n{a}" )
         self.assertTrue ( "done" in a[-1] or "done" in a[-2] )
 
@@ -42,7 +42,7 @@ class CppTest(unittest.TestCase):
         templf = open ( "../cpp/template.ini", "rt" )
         templines = templf.readlines()
         templf.close()
-        if "database" in dbpath and not "https" in dbpath:
+        if "database" in dbpath and "https" not in dbpath:
                 dbpath = f"../unittests/{dbpath}"
         parmf = open ( "../cpp/parameters.ini", "wt" )
         for line in templines:
@@ -68,14 +68,14 @@ class CppTest(unittest.TestCase):
             print ( l )
         l = l[l.find('Input status'):]
         la = l.split("\n")
-        a = [ x.strip() for x in la  if x.strip() and x.strip()[0] != '#' 
-             and not 'WARNING' in x and not 'INFO' in x]        
+        a = [ x.strip() for x in la  if x.strip() and x.strip()[0] != '#'
+             and 'WARNING' not in x and 'INFO' not in x]
         with open("default_cpp.txt","r" ) as f:
             l = f.read()
-            l = l[l.find('Input status'):]            
+            l = l[l.find('Input status'):]
             lb = l.split("\n")
-            b = [ x.strip() for x in lb  if x.strip() and x.strip()[0] != '#' 
-                 and not 'WARNING' in x and not 'INFO' in x]
+            b = [ x.strip() for x in lb  if x.strip() and x.strip()[0] != '#'
+                 and 'WARNING' not in x and 'INFO' not in x]
         if len(a) != len(b):
             print ( "Files have different lengths" )
             self.writeDebug( a )

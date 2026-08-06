@@ -9,11 +9,13 @@
 from smodels.base.physicsUnits import standardUnits, GeV
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
+from typing import Union, Optional, Any
 
 import unum
 import re
 import numpy as np
-from collections import OrderedDict, deque
+import os
+from smodels.base.types import PathType
 
 try:
     from collections.abc import Iterable
@@ -24,7 +26,7 @@ minWidth = 1e-30  # Any width below this can be safely considered to be zero
 maxWidth = 1e50  # Any width above this can be safely considered to be infinity
 
 
-def cSim(*weights):
+def cSim(*weights: float) -> float:
     """
     Define the auxiliar similar function.
 
@@ -55,14 +57,14 @@ def cSim(*weights):
         return 0.
 
 
-def cGtr(weightA, weightB):
+def cGtr(weightA: float, weightB: float) -> Optional[float]:
     """
     Define the auxiliary greater function.
 
     Return a number between 0 and 1 depending on how much it is violated
     (0 = A > B, 1 = A << B).
 
-    :returns: XSectioList object with the values for each label.
+    :returns: float between 0 and 1, or None if both weights are zero.
 
     """
 
@@ -80,7 +82,7 @@ def cGtr(weightA, weightB):
     return result
 
 
-def removeUnits(value, stdUnits=standardUnits, returnUnit=False):
+def removeUnits(value: Any, stdUnits=standardUnits, returnUnit : bool = False ) -> Any:
     """
     Remove units from unum objects. Uses the units defined
     in base.physicsUnits.standard units to normalize the data.
@@ -130,7 +132,7 @@ def removeUnits(value, stdUnits=standardUnits, returnUnit=False):
             return value
 
 
-def addUnit(obj, unit):
+def addUnit(obj: Any, unit: Any) -> Any:
     """
     Add unit to object.
     If the object is a nested list, adds the unit to all of its elements.
@@ -153,7 +155,7 @@ def addUnit(obj, unit):
         return obj
 
 
-def flattenArray(objList):
+def flattenArray(objList: list) -> list:
     """
     Flatten any nested list to a 1D list.
 
@@ -172,7 +174,7 @@ def flattenArray(objList):
     return ret
 
 
-def reshapeList(objList, shapeArray):
+def reshapeList(objList: list, shapeArray: list) -> list:
     """
     Reshape a flat list according to the shape of shapeArray.
     The number of elements in shapeArray should equal the length of objList.
@@ -190,7 +192,7 @@ def reshapeList(objList, shapeArray):
         return objList.pop(0)
 
 
-def index_bisect(inlist, el):
+def index_bisect(inlist: list, el: Any) -> int:
     """
     Return the index where to insert item el in inlist.
     inlist is assumed to be sorted and a comparison function (lt or cmp)
@@ -210,7 +212,7 @@ def index_bisect(inlist, el):
     return lo
 
 
-def smsInStr(instring):
+def smsInStr(instring: Union[str, list]) -> list:
     """
     Parse instring and return a list of elements appearing in instring.
     instring can also be a list of strings.
@@ -284,7 +286,7 @@ def smsInStr(instring):
     return newElements
 
 
-def getValuesForObj(obj, attribute):
+def getValuesForObj(obj: Any, attribute: str) -> list:
     """
     Loops over all attributes in the object and in its attributes
     and returns a list of values for the desired attribute:
@@ -316,9 +318,9 @@ def getValuesForObj(obj, attribute):
     return uniqueValues
 
 
-def bracketToProcessStr(stringSMS, 
+def bracketToProcessStr(stringSMS: str, 
                         finalState=None, intermediateState=None,
-                        returnNodeDict=False):
+                        returnNodeDict: bool = False) -> Union[str, tuple]:
     """
     :parameter stringSMS: string describing the SMS in bracket notation
                          (e.g. [[[e+],[jet]],[[e-],[jet]]])
@@ -416,7 +418,7 @@ def bracketToProcessStr(stringSMS,
         return processStr
 
 
-def getAttributesFrom(obj, skipIDs=[]):
+def getAttributesFrom(obj: Any, skipIDs: list = []) -> list:
     """
     Loops over all attributes in the object and return a list
     of the attributes.
@@ -452,7 +454,7 @@ def getAttributesFrom(obj, skipIDs=[]):
     return list(set(flattenArray(attributes)))
 
 
-def rescaleWidth(width):
+def rescaleWidth(width: float) -> float:
     """
     The function that is applied to all widths to
     map it into a better variable for interpolation.
@@ -476,7 +478,7 @@ def rescaleWidth(width):
         return np.log(1+w)
 
 
-def unscaleWidth(x):
+def unscaleWidth(x: float) -> float:
     """
     Maps a coordinate value back to width.
     The mapping is such that x=0->width=0 and x=very large -> width = inf.
@@ -495,7 +497,7 @@ def unscaleWidth(x):
     return width
 
 
-def removeInclusives(massArray, shapeArray):
+def removeInclusives(massArray: Any, shapeArray: Any) -> Any:
     """
     Remove all entries corresponding to '*' in shapeArray.
     If shapeArray contains entries = '*', the corresponding entries
@@ -515,12 +517,12 @@ def removeInclusives(massArray, shapeArray):
                                % (len(shapeArray), len(massArray)))
         else:
             return [removeInclusives(xi, shapeArray[i]) for i, xi in enumerate(massArray)
-                    if not removeInclusives(xi, shapeArray[i]) is None]
+                    if removeInclusives(xi, shapeArray[i]) is not None]
     else:
         return massArray
 
 
-def addInclusives(massList, shapeArray):
+def addInclusives(massList: list, shapeArray: Any) -> Any:
     """
     Add entries corresponding to '*' in shapeArray.
     If shapeArray contains entries = '*', the corresponding entries
@@ -542,7 +544,7 @@ def addInclusives(massList, shapeArray):
         return shapeArray
 
 
-def sortParticleList(ptcList):
+def sortParticleList(ptcList: list) -> list:
     """
     sorts a list of particle or particle list objects by their label
     :param ptcList: list to be sorted containing particle or particle list objects
@@ -553,7 +555,7 @@ def sortParticleList(ptcList):
     return newPtcList
 
 
-def cleanWalk ( topdir ):
+def cleanWalk ( topdir : PathType ) -> list:
     """ perform os.walk, but ignore all hidden files and directories """
     import os
     ret = []
@@ -576,17 +578,27 @@ def cleanWalk ( topdir ):
         ret.append ( [ root, dirs, files ] )
     return ret
 
-def concatenateLines ( oldcontent ):
+def removeComments ( oldcontent : list ) -> list:
+    """ first we remove all comments """
+    newcontent = []
+    for line in oldcontent:
+        p1 = line.find ( "#" )
+        if p1 == 0 or ( p1 >= 0 and line[p1-1]!="\\" ):
+            line = line[:p1]
+        line = line.rstrip()
+        if len(line)>0:
+            newcontent.append ( line )
+    return newcontent
+
+def concatenateLines ( oldcontent : list ) -> list:
     """ of all lines in the list "oldcontent", concatenate the ones
         that end with '\'  or ',' """
     content=[] ## concatenate lines that end with "," or "\"
     tmp=""
     import re
+    oldcontent = removeComments ( oldcontent )
     for i,line in enumerate ( oldcontent ):
-        p1 = line.find ( "#" )
-        if p1 > -1:
-            line = line[:p1]
-        tmp+=line.strip()
+        tmp+=line
         ## if next line starts with tab or whitespace or "}",
         ## merge the lines
         if i < len(oldcontent)-1 and re.match("[ \t}]",oldcontent[i+1] ):

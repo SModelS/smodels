@@ -136,7 +136,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileCombineSRs:
 
-  * **combineSRs** (True/False): set to True to combine signal regions in |EMrs| when covariance matrix or pyhf JSON likelihood is available. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards for covariance matrices and v1.2.4 onwards for full likelihoods (using pyhf).
+  * **combineSRs** (True/False): set to True to combine signal regions in |EMrs| when covariance matrix, pyhf JSON likelihood, or an onnx surrogate model is available. Set to False to use only the most sensitive signal region (faster!). Available v1.1.3 onwards for covariance matrices and v1.2.4 onwards for full likelihoods (using pyhf).
 
 .. _parameterFilePyhfbackend:
 
@@ -313,7 +313,7 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileExpandedSummary:
 
-  * **expandedSummary** (True/False): set True to include in the summary output all applicable |results|, False for only the strongest one.
+  * **expandedSummary** (True/False): set to True to include in the summary output all applicable |results|, False for only the strongest one.
 
 .. _parameterFileSLHAprinter:
 
@@ -321,7 +321,7 @@ Below we give more detailed information about each entry in the parameters file.
 
   .. _parameterFileExpandedOutput:
 
-    * **expandedOutput** (True/False): set True to print the full list of results. If False only the most constraining result and excluding results are printed.
+    * **expandedOutput** (True/False): set to True to print the full list of results. If False only the most constraining result and excluding results are printed.
 
 .. _parameterFilePythonprinter:
 
@@ -329,16 +329,20 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileAddSMSList:
 
-  * **addSMSList** (True/False): set True to include in the Python output all information about all |SMS topologies| generated in the |decomposition|. If set to True the
+  * **addSMSList** (True/False): set to True to include in the Python output all information about all |SMS topologies| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
 .. _parameterFileAddTxWeights:
 
-  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
+  * **addTxWeights** (True/False): set to True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
 .. _parameterFileAddNodesMap:
 
-  * **addNodesMap** (True/False): set True to include the mapping of the nodes indices to the BSM labels. Available v3.0.0 onwards.
+  * **addNodesMap** (True/False): set to True to include the mapping of the nodes indices to the BSM labels. Available v3.0.0 onwards.
+
+.. _parameterFileAddStatModel:
+
+ * **addStatModel** (True/False): set to True to add the file name of the statistical model (or SL for simplified likelihoods). Available v3.1.2 onwards.
 
 .. _parameterFileXmlprinter:
 
@@ -346,12 +350,12 @@ Below we give more detailed information about each entry in the parameters file.
 
 .. _parameterFileAddSMSListXML:
 
-  * **addSMSList** (True/False): set True to include in the Python output all information about all |SMS topologies| generated in the |decomposition|. If set to True the
+  * **addSMSList** (True/False): set to True to include in the Python output all information about all |SMS topologies| generated in the |decomposition|. If set to True the
     output file can be quite large.
 
 .. _parameterFileAddTxWeightsXML:
 
-  * **addTxWeights** (True/False): set True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
+  * **addTxWeights** (True/False): set to True to print the contribution from individual topologies to each theory prediction. Available v1.1.3 onwards.
 
 
 

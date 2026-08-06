@@ -6,18 +6,17 @@
 
 .. moduleauthor:: Wolfgang Magerl <wolfgang.magerl@gmail.com>
 .. moduleauthor:: Ursula Laa <ursula.laa@lpsc.in2p3.fr>
-.. moduleauthor:: Suchita Kulkanri <suchita.kulkarni@gmail.com>
+.. moduleauthor:: Suchita Kulkarni <suchita.kulkarni@gmail.com>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
-from __future__ import print_function
 import numpy as np
 import itertools
 from collections import OrderedDict
 
 
-def printScanSummary(outputDict, outputFile):
+def printScanSummary(outputDict: dict, outputFile: str):
     """
     Method for creating a simple summary of the results when running SModelS
     over multiple files.
@@ -133,7 +132,7 @@ def printScanSummary(outputDict, outputFile):
             f.write(row+'\n')
     return
 
-def formatNestedDict(outputDict,ident=0,maxLength=50):
+def formatNestedDict(outputDict: dict, ident: int = 0, maxLength: int = 50) -> str:
     """
     Convert a nested dictionary to a string
     with identation.
@@ -177,7 +176,7 @@ def formatNestedDict(outputDict,ident=0,maxLength=50):
     output += ' '*(ident-4)+'}'
     return output
 
-def formatNestedList(outputList,ident=0,maxLength=50):
+def formatNestedList(outputList: list, ident: int = 0, maxLength: int = 50) -> str:
     """
     Convert a nested list to a string
     with identation.
@@ -215,7 +214,7 @@ def formatNestedList(outputList,ident=0,maxLength=50):
     output += ' '*(ident-4)+']'
     return output
 
-def getScanSummaryFrom(output, ptype):
+def getScanSummaryFrom(output, ptype: str) -> dict:
     """
     Retrieves information about the output according to the printer type (slha,python or summary)
 
@@ -281,7 +280,7 @@ def getScanSummaryFrom(output, ptype):
 
     return summaryDict
 
-def getInfoFromPython(output):
+def getInfoFromPython(output: dict):
     """
     Retrieves information from the python output
 
@@ -313,7 +312,7 @@ def getInfoFromPython(output):
 
     return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
 
-def getInfoFromSLHA(output):
+def getInfoFromSLHA(output: str):
     """
     Retrieves information from the SLHA output
 
@@ -367,7 +366,7 @@ def getInfoFromSLHA(output):
 
     return rvals, rexp, anaIDs, r_comb, rexp_comb, anaID_comb
 
-def getInfoFromSummary(output):
+def getInfoFromSummary(output: str):
     """
     Retrieves information from the summary output
 

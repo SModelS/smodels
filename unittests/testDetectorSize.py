@@ -8,8 +8,6 @@
 import sys
 sys.path.insert(0,"../")
 import unittest
-from smodels.share.models import mssm
-from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.reweighting import calculateProbabilities,defaultEffReweight
 from smodels.base.physicsUnits import GeV
 from databaseLoader import database
@@ -60,7 +58,6 @@ class DetectorSizeTest(unittest.TestCase):
         from smodels.share.models.SMparticles import SMList
         from smodels.share.models.mssm import BSMList
         from smodels.base.model import Model
-        from smodels.base import runtime
 
         slhafile = './testFiles/slha/lightEWinos.slha'
 

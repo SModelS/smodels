@@ -2,7 +2,9 @@
 
 """ the installer script, fetches pythia8, explodes the tarball, compiles. """
 
-import os, sys, shutil
+import os
+import sys
+import shutil
 
 def getVersion():
     """ obtain the pythia version we wish to use, stored in file 'pythiaversion' """
@@ -34,7 +36,7 @@ def fetch():
         else:
             rmTarball()
     import requests
-    url=f"https://pythia.org/download/pythia{ver[:2]}/"
+    url=f"https://pythia.org/releases/pythia{ver[:2]}/"
     print ( f"[installer.py] fetching {tarball} from {url}" )
     path = os.path.join ( url, tarball )
     # URL=http://home.thep.lu.se/~torbjorn/pythia8/$TARBALL
@@ -43,16 +45,17 @@ def fetch():
     if r.status_code != 200:
         print ( f"[installer.py] could not fetch tarball: {r.reason}." )
         rmTarball()
-        url=f"https://smodels.github.io/downloads/tarballs/"
+        url="https://smodels.github.io/downloads/tarballs/"
         print ( f"[installer.py] trying to fetch {tarball} from {url}" )
         path = os.path.join ( url, tarball )
-        r = requests.get ( path, stream=True )
+        r = requests.get ( path, stream=True, verify=True )
         if r.status_code != 200:
             print ( f"[installer.py] could not fetch tarball: {r.reason}." )
             rmTarball()
             sys.exit(-1)
     with open ( tarball, "wb" ) as f:
-        shutil.copyfileobj( r.raw, f )
+        for chunk in r.iter_content(chunk_size=1024 * 1024):
+            if chunk: f.write ( chunk )
         f.close()
 
 def unzip():
@@ -96,6 +99,11 @@ def unzip():
 def getNCPUs():
     """ get the number of CPUs to compile pythia8 with """
     ncpus = 4
+    try:
+        import os
+        ncpus = os.cpu_count()
+    except Exception as e:
+        pass
     try:
         from smodels.base.runtime import nCPUs
         ncpus = nCPUs()
@@ -155,24 +163,24 @@ def protectInstall():
     # print ( f"fixACLs: {os.getcwd()}" )
     # pythiaversion = getVersion()
     #cmd = f"chmod -R a-w pythia{pythiaversion}"
-    cmd = f"chmod -R a-w ."
+    cmd = "chmod -R a-w ."
     import subprocess
     subprocess.getoutput ( cmd )
-    print ( f"made pythia8 readonly" )
+    print ( "made pythia8 readonly" )
 
 def removeInstallProtection():
     """ make install writable and removable again """
     # pythiaversion = getVersion()
-    cmd = f"chmod -R u+w ."
+    cmd = "chmod -R u+w ."
     import subprocess
     subprocess.getoutput ( cmd )
-    print ( f"made pythia8 writable" )
+    print ( "made pythia8 writable" )
 
 
 def installPythia():
     """ fetch tarball, unzip it, compile pythia """
     if checkPythia() and checkPythiaHeaderFile():
-        print ( f"[installPythia] found an install that looks ok, will use it" )
+        print ( "[installPythia] found an install that looks ok, will use it" )
         rmTarball()
         return
     if not checkPythiaHeaderFile(): # no Pythia.h header file?
@@ -199,7 +207,7 @@ if __name__ == "__main__":
         ver = getVersion()
         print ( ver )
         sys.exit()
-    if not "TERM" in os.environ or os.environ["TERM"] in [ "", None ]:
+    if "TERM" not in os.environ or os.environ["TERM"] in [ "", None ]:
         # just to suppress a warning msg in github actions
         os.environ["TERM"]="xterm"
     installPythia()

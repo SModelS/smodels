@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testRunSModelS
-   :synopsis: Tests runSModelS
+.. module:: testExpSMSDict
+   :synopsis: Tests sms dictionary
 
-.. moduleauthor:: Ursula Laa <Ursula.Laa@assoc.oeaw.ac.at>
 .. moduleauthor:: Andre Lessa <lessa.a.p@gmail.com>
 
 """
 
 import sys
-
 sys.path.insert(0,"../")
 import unittest
-
 from databaseLoader import database
-
-from smodels.experiment.databaseObj import Database
-
 
 class ExpSMSDictTest(unittest.TestCase):
 
@@ -26,7 +20,8 @@ class ExpSMSDictTest(unittest.TestCase):
         database.selectExpResults(useNonValidated=True)
         expDict = database.expSMSDict
         self.assertEqual(len(list(expDict.getSMS())),80)
-        self.assertEqual(len(list(expDict.getTx())),645)
+        # was 645: but CMS-SUS-16-050-agg:ar0
+        self.assertEqual(len(list(expDict.getTx())),648)
 
     def testFilter(self):
 
@@ -34,13 +29,15 @@ class ExpSMSDictTest(unittest.TestCase):
         expDict = database.expSMSDict
 
         self.assertEqual(len(list(expDict.getSMS())),36)
-        self.assertEqual(len(list(expDict.getTx())),439)
+        # was 439: but CMS-SUS-16-050-agg:ar0
+        self.assertEqual(len(list(expDict.getTx())),442)
 
         # Reset database:
         database.selectExpResults(useNonValidated=True)
         expDict = database.expSMSDict
         self.assertEqual(len(list(expDict.getSMS())),80)
-        self.assertEqual(len(list(expDict.getTx())),645)
+        # was 645: but CMS-SUS-16-050-agg:ar0
+        self.assertEqual(len(list(expDict.getTx())),648)
 
     def testNodeDict(self):
 

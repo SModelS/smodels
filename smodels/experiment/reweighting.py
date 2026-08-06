@@ -10,12 +10,13 @@ from smodels.base.physicsUnits import GeV
 from smodels.base.genericSMS import GenericSMS
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
+from typing import Optional
 
 Leff_inner_default = 0.000769
 Leff_outer_default = 7.0
 
 
-def getWidthsFromSMS(sms):
+def getWidthsFromSMS(sms: GenericSMS) -> tuple:
     """
     Extracts all the widths of unstable particles in the SMS and the widths
     of BSM particles appearing as final states (undecayed).
@@ -57,9 +58,9 @@ def getWidthsFromSMS(sms):
     return unstableWidths, stableWidths
 
 
-def defaultEffReweight(sms=None, unstableWidths=None, stableWidths=None,
-                       Leff_inner=None, Leff_outer=None,
-                       minWeight=1e-10):
+def defaultEffReweight(sms: Optional[GenericSMS] = None, unstableWidths=None, stableWidths=None,
+                       Leff_inner: Optional[float] = None, Leff_outer: Optional[float] = None,
+                       minWeight: float = 1e-10) -> float:
     """
     Computes the lifetime reweighting factor for the SMS efficiency
     based on the widths of the BSM particles.
@@ -110,8 +111,8 @@ def defaultEffReweight(sms=None, unstableWidths=None, stableWidths=None,
     return elFraction
 
 
-def defaultULReweight(sms=None, unstableWidths=None, stableWidths=None,
-                      Leff_inner=None, Leff_outer=None):
+def defaultULReweight(sms: Optional[GenericSMS] = None, unstableWidths=None, stableWidths=None,
+                      Leff_inner: Optional[float] = None, Leff_outer: Optional[float] = None) -> Optional[float]:
     """
     Computes the lifetime reweighting factor for the SMS upper limit
     based on the lifetimes of all intermediate particles and the last stable odd-particle
@@ -144,17 +145,17 @@ def defaultULReweight(sms=None, unstableWidths=None, stableWidths=None,
         return 1./effFactor
 
 
-def reweightFactorFor(sms=None, resType='prompt',
+def reweightFactorFor(sms: Optional[GenericSMS] = None, resType: str = 'prompt',
                       unstableWidths=None, stableWidths=None,
-                      Leff_inner=None, Leff_outer=None):
+                      Leff_inner: Optional[float] = None, Leff_outer: Optional[float] = None) -> float:
     """
-    Computer the reweighting factor for the SMS according to the experimental result type.
+    Compute the reweighting factor for the SMS according to the experimental result type.
     Currently only two result types are supported: 'prompt' and 'displaced'.
     If resultType = 'prompt', returns the reweighting factor for all decays in the SMS
     to be prompt and the last odd particle to be stable.
     If resultType = 'displaced', returns the reweighting factor for ANY decay in the SMS
     to be displaced and no long-lived decays and the last odd particle to be stable.
-    Not that the fraction of "long-lived (meta-stable) decays" is usually included
+    Note that the fraction of "long-lived (meta-stable) decays" is usually included
     in topologies where the meta-stable particle appears in the final state. Hence
     it should not be included in the prompt or displaced fractions.
 
@@ -165,7 +166,7 @@ def reweightFactorFor(sms=None, resType='prompt',
     :param Leff_outer: is the effective outer radius of the detector, given in meters. If None,
                         use default value.
 
-    :return: probabilities (depending on types of decay within branch), branches (with different labels depending on type of decay)
+    :return: Reweight factor (float)
     """
 
     if Leff_inner is None:
@@ -224,12 +225,12 @@ def reweightFactorFor(sms=None, resType='prompt',
         return FdispTotal
 
 
-def calculateProbabilities(width, Leff_inner, Leff_outer):
+def calculateProbabilities(width: float, Leff_inner: float, Leff_outer: float) -> dict:
     """
     The fraction of prompt and displaced decays are defined as:
 
     F_long = exp(-totalwidth*l_outer/gb_outer)
-    F_prompt = 1 - exp(-totaltotalwidth*l_inner/gb_inner)
+    F_prompt = 1 - exp(-totalwidth*l_inner/gb_inner)
     F_displaced = 1 - F_prompt - F_long
 
     :param Leff_inner: is the effective inner radius of the detector, given in meters

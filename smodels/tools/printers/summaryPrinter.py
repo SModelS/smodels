@@ -6,9 +6,9 @@
 
 """
 
-from __future__ import print_function
 import os
-from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,\
+         TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
 from smodels.base.physicsUnits import fb, TeV
@@ -16,7 +16,8 @@ from smodels.base.smodelsLogging import logger
 from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
 import unum
-
+from typing import Optional
+from smodels.base.types import PathType
 
 class SummaryPrinter(TxTPrinter):
     """
@@ -24,16 +25,22 @@ class SummaryPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
+    def __init__( self, output : str = 'stdout', 
+                  filename : Optional[PathType] = None, 
+                  outputFormat : str = 'version3' ):
+        """
+        :param output: one of: stdout, file
+        """
         TxTPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "summary"
-        self.printingOrder = [
+        self.name: str = "summary"
+        self.printingOrder: list = [
             OutputStatus, TheoryPredictionList, 
             TheoryPredictionsCombiner, 
             TheoryPrediction, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.toPrint: list = [None]*len(self.printingOrder)
 
-    def setOutPutFile(self, filename, overwrite=True, silent=False):
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
+                       silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
@@ -48,7 +55,7 @@ class SummaryPrinter(TxTPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatTheoryPredictionList(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionList object.
 
@@ -135,10 +142,10 @@ class SummaryPrinter(TxTPrinter):
             if self.outputFormat != 'version2':
                 output += " Final States: " + fStates_str + "\n"
 
-            nll = theoPred.likelihood( return_nll = True )
+            nll = theoPred.nll ( )
             if nll is not None:
-                nllmin = theoPred.lmax( return_nll = True )
-                nllsm = theoPred.lsm( return_nll = True )
+                nllmin = theoPred.nll_min( )
+                nllsm = theoPred.nllsm( )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.floating)):
@@ -152,7 +159,7 @@ class SummaryPrinter(TxTPrinter):
                 else:
                     output += f" Likelihoods: nll, nll_min, nll_SM = {nll}, {nllmin}, {nllsm}\n"
 
-            if not (theoPred is obj[-1]):
+            if theoPred is not obj[-1]:
                 output += 80 * "-" + "\n"
 
         output += "\n \n"
@@ -171,10 +178,10 @@ class SummaryPrinter(TxTPrinter):
 
         return output
 
-    def _formatTheoryPrediction(self,obj):
+    def _formatTheoryPrediction(self,obj: object) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj):
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 
@@ -189,9 +196,9 @@ class SummaryPrinter(TxTPrinter):
         r = obj.getRValue()
         r_expected = obj.getRValue(evaluationType=self.getTypeOfExpected())
         # Get likelihoods:
-        nllsm = obj.lsm( return_nll = True )
-        nll = obj.likelihood( return_nll = True )
-        nllmin = obj.lmax( return_nll = True )
+        nllsm = obj.nllsm( )
+        nll = obj.nll( )
+        nllmin = obj.nll_min( )
         # Get sorted txnames
         txnames = []
         for tx in obj.getTxNamesWeights(sort=True):
@@ -204,11 +211,11 @@ class SummaryPrinter(TxTPrinter):
         if r is not None:
             output += f"combined r-value: {r:10.3E}\n"
         else:
-            output += f"combined r-value: NaN (failed to compute r-value)\n"
+            output += "combined r-value: NaN (failed to compute r-value)\n"
         if r_expected is not None:
             output += f"combined r-value (expected): {r_expected:10.3E}\n"
         else:
-            output += f"combined r-value (expected): NaN (failed to compute r-value)\n"
+            output += "combined r-value (expected): NaN (failed to compute r-value)\n"
         output += "\n===================================================== \n"
         output += "\n"
 

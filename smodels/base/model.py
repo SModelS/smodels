@@ -8,10 +8,11 @@
 import pyslha
 import os
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import GeV
+from smodels.base.physicsUnits import GeV, TeV
 from smodels.base import lheReader, crossSection
 from smodels.base.particle import Particle, MultiParticle
 from smodels.base.exceptions import SModelSBaseError as SModelSError
+from typing import Any
 
 class Model(object):
     """
@@ -20,7 +21,7 @@ class Model(object):
     cross-sections.
     """
 
-    def __init__(self, BSMparticles, SMparticles, label=None):
+    def __init__(self, BSMparticles: list[Particle], SMparticles: list[Particle], label: str | None = None):
         """
         Initializes the model
         :parameter BSMparticles: list with BSM particle objects
@@ -28,14 +29,14 @@ class Model(object):
         :parameter label: Optional string to label the model
         """
 
-        self.inputFile = None
+        self.inputFile : str | None = None
         # allBSMparticles stores all possible particles for a given model:
-        self.allBSMparticles = BSMparticles[:]
+        self.allBSMparticles : list[Particle] = BSMparticles[:]
         # BSMparticles is used to store the model particles defined by the inputFile.
         # When a model is updated, a copy of the BSM particles are stored in BSMparticles
         # and these are used to store masses, decays,...
-        self.BSMparticles = BSMparticles[:]  # at initialization assume all particles will be used
-        self.SMparticles = SMparticles[:]
+        self.BSMparticles : list[Particle] = BSMparticles[:]  # at initialization assume all particles will be used
+        self.SMparticles : list[Particle] = SMparticles[:]
         for p in self.SMparticles:
             p.isSM = True
         for p in self.BSMparticles:
@@ -50,17 +51,17 @@ class Model(object):
             if len(p) > 1:
                 raise SModelSError(f"PDG = {pdg} has been defined for multiple particles ({p}). Check your model definitions.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         if not self.label:
             return f'Model: {self.inputFile}'
         else:
             return f'Model: {self.label}'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         return str(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Model') -> bool:
         """
         Simple model comparison.
 
@@ -81,7 +82,7 @@ class Model(object):
 
         return True
 
-    def getParticle(self, **kwargs):
+    def getParticle(self, **kwargs: Any) -> Particle:
         """
         Return a single particle object with the listed attributes.
         If no particle is found or more than one particle is found, raise an error.
@@ -99,7 +100,7 @@ class Model(object):
         else:
             return particleList[0]
 
-    def getParticlesWith(self, **kwargs):
+    def getParticlesWith(self, **kwargs: Any) -> list[Particle]:
         """
         Return the particle objects with the listed attributes.
         MultiParticle objects are added if any of its particles matches the listed attributes.
@@ -141,7 +142,7 @@ class Model(object):
                 continue
             if any(particle is ptc for ptc in cleanList):
                 continue
-            if any((particle.contains(p) and not particle is p) for p in particleList):
+            if any((particle.contains(p) and particle is not p) for p in particleList):
                 continue
             cleanList.append(particle)
 
@@ -150,7 +151,7 @@ class Model(object):
 
         return cleanList
 
-    def getValuesFor(self, attributeStr):
+    def getValuesFor(self, attributeStr: str) -> list:
         """
         Returns a list with all the values for attribute appearing in the model.
 
@@ -166,14 +167,14 @@ class Model(object):
             value = getattr(particle, attributeStr)
             if isinstance(particle, MultiParticle) and isinstance(value, list):
                 for v in value:
-                    if not v in valueList:
+                    if v not in valueList:
                         valueList.append(v)
             else:
                 valueList.append(value)
 
         return valueList
 
-    def getModelDataFrom(self, inputFile):
+    def getModelDataFrom(self, inputFile: str) -> tuple:
         """
         Reads the input file (LHE or SLHA) and extract the relevant information
         (masses, widths, BRs and cross-sections). If a http address is given, it will
@@ -211,7 +212,7 @@ class Model(object):
             massDict = res.blocks['MASS']
             #  Make sure both PDG signs appear in massDict
             for pdg, mass in massDict.items():
-                if not -pdg in massDict:
+                if -pdg not in massDict:
                     massDict[-pdg] = abs(mass)
             decaysDict = res.decays
             xsections = crossSection.getXsecFromSLHAFile(inputFile)
@@ -226,7 +227,7 @@ class Model(object):
 
         return massDict, decaysDict, xsections
 
-    def getSMandBSMList(self):
+    def getSMandBSMList(self) -> tuple[list, list]:
         """
         Get the list of SM and BSM particles, according to the isSM value
         defined for each particle.
@@ -245,7 +246,7 @@ class Model(object):
 
         return smPDGs, bsmPDGs
 
-    def filterCrossSections(self):
+    def filterCrossSections(self) -> int:
         """
         Remove cross-sections for even particles or particles which do not belong to the model.
         Valid cross-sections are stored in self.xsections
@@ -265,7 +266,7 @@ class Model(object):
 
         return len(self.xsections.xSections)
 
-    def setMasses(self,massDict,roundMasses,minMass):
+    def setMasses(self, massDict: dict, roundMasses: int, minMass: Any) -> None:
         """
         Define particle masses using massDict.
 
@@ -293,7 +294,15 @@ class Model(object):
             else:
                 raise SModelSError("No mass found for %i in input file %s." % (particle.pdg, self.inputFile))
 
-    def setDecays(self, decaysDict, promptWidth, stableWidth, ignorePromptQNumbers):
+    def setDecays(self, decaysDict: dict, promptWidth: Any, stableWidth: Any, ignorePromptQNumbers: list[str]):
+        """
+        Define particle decays using decaysDict.
+
+        :param decaysDict: dictionary with PDGs as keys and pyslha.Particle decay data as values
+        :param promptWidth: width threshold above which particles are considered prompt
+        :param stableWidth: width threshold below which particles are considered stable
+        :param ignorePromptQNumbers: list of quantum number attributes to erase for prompt particles
+        """
 
         allPDGs = list(set(self.getValuesFor('pdg')))
 
@@ -371,7 +380,7 @@ class Model(object):
                 continue
             ndecays = len([dec for dec in p.decays if dec is not None])
             if ndecays == 0:
-                if not p.isSM:
+                if not p.isSM and p.mass < 20*TeV:
                     logger.warning(f"No valid decay found for {p}. It will be considered stable.")
                 p.totalwidth = 0.*GeV
 
@@ -384,9 +393,9 @@ class Model(object):
                         if hasattr ( particle, attr ):
                             delattr(particle, attr)
 
-    def updateParticles(self, inputFile, promptWidth = None, stableWidth = None,
-                        roundMasses = 1, ignorePromptQNumbers=[],
-                        minMass=1.0*GeV):
+    def updateParticles(self, inputFile: str, promptWidth: Any = None, stableWidth: Any = None,
+                        roundMasses: int = 1, ignorePromptQNumbers: list[str] = [],
+                        minMass: Any = 1.0*GeV):
         """
         Update mass, total width and branches of allParticles particles from input SLHA or LHE file.
 
@@ -445,9 +454,10 @@ class Model(object):
         #  Set particle decays
         self.setDecays(decaysDict, promptWidth, stableWidth, ignorePromptQNumbers)
 
-        #  Reset particle equality from all particles:
-        for p in Particle.getinstances():
-            p._comp = {p._id: 0}
-            if isinstance(p, MultiParticle):
-                for ptc in p.particles:
-                    p._comp[ptc._id] = 0
+        #  Reset all particle equalities through all particle classes:
+        for ptc in Particle.getinstances():
+            ptc._comp = {ptc._id : 0}
+        for pcls in Particle.__subclasses__():
+            for ptc in pcls.getinstances():
+                ptc._comp = {ptc._id : 0}
+        

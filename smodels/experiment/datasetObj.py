@@ -10,13 +10,12 @@
 
 import os
 import glob
-import numpy as np
-from typing import Union
+from typing import Union, Optional
 from smodels.experiment import txnameObj, infoObj
 from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, NllEvalType
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expSMS import ExpSMS
 from smodels.decomposition.theorySMS import TheorySMS
@@ -31,13 +30,14 @@ class DataSet(object):
     Holds the information to a data set folder (TxName objects, dataInfo,...)
     """
 
-    def __init__(self, path=None, info=None, createInfo=True, databaseParticles=None):
+    def __init__( self, path=None, info=None, createInfo: bool = True,
+                  databaseParticles=None ):
         """
         :param path: Path to the dataset folder
         :param info: globalInfo (from the ExptResult obj)
         :param createInfo: If True, create object from dataset folder
         :param databaseParticles: Model object holding Particle objects to be
-                                  used when creating the SMS topologies in the TxNames.
+        used when creating the SMS topologies in the TxNames.
         """
 
         self.path = path
@@ -71,10 +71,10 @@ class DataSet(object):
             self.txnameList.sort()
             self.checkForRedundancy(databaseParticles)
 
-    def getCollaboration(self,ds):
+    def getCollaboration(self, ds) -> str:
         return "CMS" if "CMS" in ds.globalInfo.id else "ATLAS"
 
-    def isCombinableWith(self, other):
+    def isCombinableWith(self, other) -> bool:
         """
         Function that reports if two datasets are mutually uncorrelated = combinable.
 
@@ -121,7 +121,7 @@ class DataSet(object):
             return True
         return False
 
-    def isCombMatrixCombinableWith_(self, other):
+    def isCombMatrixCombinableWith_(self, other) -> bool:
         """ Check for combinability via the combinations matrix. """
         if not hasattr(self.globalInfo, "_combinationsmatrix"):
             return False
@@ -144,7 +144,7 @@ class DataSet(object):
                     return True
         return False
 
-    def isGlobalFieldCombinableWith_(self, other):
+    def isGlobalFieldCombinableWith_(self, other) -> bool:
         """
         Check for 'combinableWith' fields in globalInfo, check if <other> matches.
         This check is at analysis level (not at dataset level).
@@ -164,7 +164,7 @@ class DataSet(object):
             return True
         return False
 
-    def isLocalFieldCombinableWith_(self, other):
+    def isLocalFieldCombinableWith_(self, other) -> bool:
         """ Check for 'combinableWith' fields in dataInfo, check if <other> matches.
         This check is at dataset level (not at analysis level).
 
@@ -185,7 +185,7 @@ class DataSet(object):
             return True
         return False
 
-    def checkForRedundancy(self, databaseParticles):
+    def checkForRedundancy(self, databaseParticles) -> bool:
         """
         In case of efficiency maps, check if any txnames have overlapping
         constraints. This would result in double counting, so we dont
@@ -219,23 +219,23 @@ class DataSet(object):
                 logger.error(errmsg)
                 raise SModelSError(errmsg)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.dataInfo.dataId:
             ret = f"Dataset {self.dataInfo.dataId}: {', '.join(map(str, self.txnameList))}"
         else:
             ret = f"Dataset: {', '.join(map(str, self.txnameList))}"
         return ret
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.dataInfo.dataId:
             return self.dataInfo.dataId
         else:
             return 'Dataset (UL)'
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(other) != type(self):
             return False
         if self.dataInfo != other.dataInfo:
@@ -244,7 +244,7 @@ class DataSet(object):
             return False
         return True
 
-    def longStr(self):
+    def longStr(self) -> str:
         """
         Returns a long string displaying the dataset ID,
         the experimental result ID, the dataset type and the dataset txnames.
@@ -259,14 +259,14 @@ class DataSet(object):
 
         return lStr
 
-    def getType(self):
+    def getType(self) -> str:
         """
         Return the dataset type (EM/UL)
         """
 
         return self.dataInfo.dataType
 
-    def getID(self):
+    def getID(self) -> str:
         """
         Return the dataset ID
         """
@@ -284,7 +284,7 @@ class DataSet(object):
         else:
             return self.globalInfo.lumi
 
-    def getTxName(self, txname):
+    def getTxName(self, txname: str) -> Optional[txnameObj.TxName]:
         """
         get one specific txName object.
         """
@@ -305,7 +305,7 @@ class DataSet(object):
         else:
             return None
 
-    def getValuesFor(self, attribute):
+    def getValuesFor(self, attribute: str) -> list:
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
@@ -317,13 +317,13 @@ class DataSet(object):
 
         return getValuesForObj(self, attribute)
 
-    def folderName(self):
+    def folderName(self) -> str:
         """
         Name of the folder in text database.
         """
         return os.path.basename(self.path)
 
-    def getAttributes(self, showPrivate=False):
+    def getAttributes(self, showPrivate: bool = False) -> list:
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
@@ -368,7 +368,7 @@ class DataSet(object):
                         If False, the value listed in the database will be used
                         instead.
         :param nSigma: the upper limit for central value (0),
-                        + 1 sigma, - 1 sigma for error bands. 
+                        + 1 sigma, - 1 sigma for error bands.
                         Only for efficiency-map results, and only if compute=True.
         :return: upper limit (Unum object)
         """
@@ -437,19 +437,23 @@ class DataSet(object):
             line = "getSRUpperLimit can only be used for efficiency map results!"
             logger.error( line )
             raise SModelSError( line )
+        """
         if nSigma != 0 and evaluationType == observed:
             line = f"nSigma={nSigma} but evaluationType={evaluationType}: not implemented"
             raise SModelSError ( line )
+        """
 
         if nSigma != 0:
-            from smodels.statistics.statsTools import getStatsComputerModule
-            mod = getStatsComputerModule()
-            # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
-            nsig = 1
-            comp = mod.forSingleBin ( dataset=self,
-                    nsig=nsig, deltas_rel = deltas_rel, lumi = self.getLumi() )
+            from smodels.statistics.statsTools import getCompRetrieverModule,\
+                StatsComputer
+            mod = getCompRetrieverModule()
+            nsigDict = { self.getID() : 1 }
+            m = mod.forSingleBin ( regionSet=self.getID(), dataset=self,
+                                   nsigDict = nsigDict,
+                                   deltas_rel = deltas_rel, lumi = self.getLumi() )
+            comp = StatsComputer ( [ m ] )
             # we dont even cache, not like this will be used much
-            ul = comp.poi_upper_limit (
+            ul = comp.getUpperLimit (
                 evaluationType = evaluationType,
                 nSigma = nSigma, limit_on_xsec = True )
             return ul
@@ -481,7 +485,7 @@ class CombinedDataSet(object):
         self.sortDataSets()
         self.findType()
 
-    def isCombinableWith ( self, other ):
+    def isCombinableWith ( self, other ) -> bool:
         """
         Function that reports if two datasets are mutually uncorrelated = combinable.
         A combined dataset is combinable with "other", if all consistituents are.
@@ -493,25 +497,37 @@ class CombinedDataSet(object):
                 return False
         return True
 
-    def findType(self):
+    def findType(self) -> str:
         """ find the type of the combined dataset """
         self.type = "bestSR"  # type of combined dataset, e.g. pyhf, or simplified
-        if hasattr(self.globalInfo, "covariance"):
-            self.type = "simplified"
-        if hasattr(self.globalInfo, "jsonFiles"):
-            self.type = "pyhf"
+        if hasattr(self.globalInfo, "statModels"):
+            self.type = ""
+            types = set()
+            for model_tuples in self.globalInfo.statModels.values():
+                ### models is e.g. [ ( "onnx", "bla.onnx" ), ... ]
+                if len(model_tuples)==0:
+                    continue
+                model_type = model_tuples[0][0]
+                if model_type == "onnx":
+                    types.add ( "nn" )
+                elif model_type == "sl":
+                    types.add ( "simplified" )
+                elif model_type in [ "full_pyhf", "pyhf" ]:
+                    types.add ( "pyhf" )
+            return "+".join ( types )
 
-    def __str__(self):
+    def __str__(self) -> str:
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
         return ret
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
         return ret
 
-    def getIndex(self, dId, datasetOrder):
+    def getIndex(self, dId: str, datasetOrder: list) -> int:
         """
-        Get the index of dataset within the datasetOrder, but allow for abbreviated names.
+        Get the index of dataset within the datasetOrder,
+        but allow for abbreviated names.
 
         :param dId: id of dataset to search for, may be abbreviated
         :param datasetOrder: the ordered list of datasetIds, long form
@@ -535,36 +551,82 @@ class CombinedDataSet(object):
 
     def sortDataSets(self):
         """
-        Sort datasets according to globalInfo.datasetOrder.
+        Sort datasets according to globalInfo.regionMappings / regionSets.
+        Needs to be done only for cov matrices
         """
-        if hasattr(self.globalInfo, "covariance"):
-            datasets = self.origdatasets[:]
-            if not hasattr(self.globalInfo, "datasetOrder"):
-                raise SModelSError(f"datasetOrder not given in globalInfo.txt for {self.globalInfo.id}")
-            datasetOrder = self.globalInfo.datasetOrder
-            if isinstance(datasetOrder, str):
-                datasetOrder = [datasetOrder]
+        if not hasattr ( self.globalInfo, "statModels" ):
+            return
 
-            if len(datasetOrder) != len(datasets):
-                raise SModelSError( f"Number of datasets in the datasetOrder field {len(datasetOrder)} does not match the number of datasets {len(datasets)}/{len(self.origdatasets)} for {self.globalInfo.id}" )
-            ## need to reinitialise, we might have lost some datasets when filtering
-            self._datasets = [ None ] * len(datasets)
-            for dataset in datasets:
-                idx = self.getIndex(dataset.getID(), datasetOrder)
-                if idx == -1:
-                    raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
-                self._datasets[idx] = dataset
-                # dsIndex = datasetOrder.index(dataset.getID())
-                # self._datasets[dsIndex] = dataset
+        hasSL = False
+        for regionSetName, model_tuples in self.globalInfo.statModels.items():
+            model_tuple = model_tuples[0]
+            # if models[0].endswith ( ".cov" ):
+            if model_tuple[0] == "sl":
+                hasSL = True
+            break
+        if not hasSL:
+            return
 
-    def getType(self):
+        # if hasattr(self.globalInfo, "covariances"):
+        datasets = self.origdatasets[:]
+        datasetOrder = []
+        datasetOrder_sl = []
+
+        if hasattr(self.globalInfo, "regionMappings"):
+        ## datasetOrder goes by regionMappings
+            for region in self.globalInfo.regionMappings.values():
+                if "sl" in region and region["sl"] != None:
+                    datasetOrder_sl.append ( region["smodels"] )
+                datasetOrder.append ( region["smodels"] )
+            if len(datasetOrder_sl) == 0:
+                logger.warning( f"No region of type 'sl' found in the regionMappings of {self.globalInfo.id}. Will try with all the regions of regionMappings then, but are you sure you want to use a simplified likelihood?" )
+            elif len(datasetOrder_sl) == 1:
+                logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
+            else:
+                datasetOrder = datasetOrder_sl
+
+        dim_region_set = 0
+        for regionSetName, statModels in self.globalInfo.statModels.items():
+            for statFramework, statFile in statModels:
+                if statFramework == 'sl':
+                    assert regionSetName in self.globalInfo.regionSets, \
+                        f"{regionSetName} does not appear in regionSets"
+                    if dim_region_set == 0:
+                        regionSetNameUsed = regionSetName
+                        dim_region_set += len ( self.globalInfo.regionSets[regionSetName] )
+                    else:
+                        logger.error( f"Multiple SL framework for {self.globalInfo.id}. Don't know how to handle that. Will use the region set '{regionSetNameUsed}' and not '{regionSetName}'." )
+
+        if len(datasetOrder) != dim_region_set:
+            with_sl_str = " with 'sl' entry " if len(datasetOrder_sl) >= 1 else " "
+            logger.info( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
+            datasetOrder = self.globalInfo.regionSets[regionSetNameUsed]
+
+        ## need to reinitialise, we might have lost some datasets when filtering
+        tmp = [ None ] * len(datasets)
+        for dataset in datasets:
+            idx = self.getIndex(dataset.getID(), datasetOrder)
+            if idx == -1:
+                continue
+                # raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
+            tmp[idx] = dataset
+            # dsIndex = datasetOrder.index(dataset.getID())
+            # self._datasets[dsIndex] = dataset
+        newds = []
+        for ds in tmp:
+            if ds != None:
+                newds.append ( ds )
+        self._datasets = newds
+
+
+    def getType(self) -> str:
         """
         Return the dataset type (combined)
         """
 
         return 'combined'
 
-    def getID(self):
+    def getID(self) -> str:
         """
         Return the ID for the combined dataset
         """
@@ -579,7 +641,7 @@ class CombinedDataSet(object):
 
         return self.globalInfo.lumi
 
-    def getDataSet(self, datasetID):
+    def getDataSet(self, datasetID: str) -> Optional['DataSet']:
         """
         Returns the dataset with the corresponding dataset ID.
         If the dataset is not found, returns None.

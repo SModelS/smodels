@@ -11,6 +11,7 @@
 
 from smodels.decomposition.theorySMS import TheorySMS
 from collections import OrderedDict
+from typing import Any, List, Optional
 
 
 class TopologyDict(OrderedDict):
@@ -22,7 +23,36 @@ class TopologyDict(OrderedDict):
 
         self.__dict__ = {}
 
-    def addSMS(self, newSMS):
+    def numberOfSMS(self, canonName: Optional[int] = None) -> int:
+        """
+        Return the number of SMS in the dict. 
+        If canonName is not None, return the number of SMS with the corresponding canonName.
+
+        :param canonName: if None, return the total number of SMS, otherwise return only the number of SMS with the corresponding canonical name.
+
+        :return: Number of SMS in the dict.
+        """
+
+        if canonName is not None:
+            if canonName not in self:
+                return 0
+            else:
+                return len(self[canonName])
+        else:
+            nSMS = 0
+            for smsList in self.values():
+                nSMS += len(smsList)
+            return nSMS
+
+    def addSMS(self, newSMS: TheorySMS) -> bool:
+        """
+        Add a new SMS to the dictionary. If an SMS with the same
+        canonical name and topology already exists, merge them.
+
+        :param newSMS: TheorySMS object to be added
+
+        :return: True if the SMS was added, False otherwise
+        """
 
         if isinstance(newSMS, TheorySMS):
             canonName = newSMS.canonName
@@ -34,6 +64,7 @@ class TopologyDict(OrderedDict):
                 # (using a bisection method)
                 lo = 0
                 hi = len(smsList)
+                cmp = 1
                 while lo < hi:
                     mid = (lo+hi)//2
                     cmp = smsList[mid].compareTo(newSMS)
@@ -56,7 +87,7 @@ class TopologyDict(OrderedDict):
         else:
             return False
 
-    def getSMSList(self, canonName=None):
+    def getSMSList(self, canonName: Optional[int] = None) -> List[TheorySMS]:
         """
         Return a list with all the SMS appearing in the dict.
         If canonName is not None, return the SMS with the corresponding
@@ -79,7 +110,7 @@ class TopologyDict(OrderedDict):
             allsmsList.extend(self[cName])
         return allsmsList
 
-    def compress(self, doCompress, doInvisible, minmassgap, minmassgapISR):
+    def compress(self, doCompress: bool, doInvisible: bool, minmassgap: float, minmassgapISR: float):
         """
         Compress all SMS in the dictionary and include the compressed
         SMS in the topology list.
@@ -123,7 +154,20 @@ class TopologyDict(OrderedDict):
             sms.smsID = smsID
             smsID += 1
 
-    def getTotalWeight(self, canonName=None):
+    def setSMSAncestors(self):
+        """
+        Set the list of ancestors for each SMS in the Topology list
+        keeping only the SMS which belongs to self (remove intermediate ancestors).
+        """
+
+        keepIDs = set([sms.smsID for sms in self.getSMSList()])
+        for sms in self.getSMSList():
+            sms.setAncestors(keepIDs)
+        for sms in self.getSMSList():
+            sms._ancestors = None # Clear ancestors to save memory
+
+
+    def getTotalWeight(self, canonName: Optional[int] = None) -> Any:
         """
         Compute the summed cross-section over all the SMS.
         If canonName is not None, return the total cross-section

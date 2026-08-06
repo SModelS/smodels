@@ -10,14 +10,16 @@
 from smodels.base.physicsUnits import TeV, pb
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.smodelsLogging import logger
-import pyslha, os, io
+import pyslha
+import io
 from typing import Union, Dict, Tuple
+from smodels.base.types import PathType
 
 class LheReader(object):
     """
     An instance of this class represents a reader for LHE files.
     """
-    def __init__( self, filename : Union[os.PathLike,io.FileIO],
+    def __init__( self, filename : Union[PathType,io.FileIO],
                   nmax : Union[int,None] = None ):
         """
         Constructor.
@@ -111,11 +113,11 @@ class LheReader(object):
         assert nevents == nevents_close, f"number of opening <event> tags {nevents} does not match number of closing </event> tags {nevents_close}"
         self.metainfo["nevents"]=nevents
 
-    def close(self):
+    def close(self) -> None:
         """ close file handle """
         self.file.close()
 
-    def next(self):
+    def next(self) -> 'SmsEvent':
         """
         Get next element in iteration.
 
@@ -130,7 +132,7 @@ class LheReader(object):
         return e
 
 
-    def __iter__(self):
+    def __iter__(self) -> 'LheReader':
         """
         Make class iterable.
 
@@ -139,11 +141,11 @@ class LheReader(object):
         """
         return self
 
-    def __next__(self):
+    def __next__(self) -> 'SmsEvent':
         """ for python3 """
         return self.next()
 
-    def event(self):
+    def event(self) -> 'SmsEvent | None':
         """
         Get next event.
 
@@ -204,12 +206,12 @@ class SmsEvent(object):
         self.metainfo = {}
 
 
-    def metaInfo( self, key : str ):
+    def metaInfo( self, key : str ) -> object:
         """
         Return the meta information of 'key', None if info does not exist.
 
         """
-        if not key in self.metainfo:
+        if key not in self.metainfo:
             return None
         return self.metainfo[key]
 
@@ -233,7 +235,7 @@ class SmsEvent(object):
 
         return sorted(momspdg)
 
-    def __str__(self):
+    def __str__(self) -> str:
         nr = ""
         if self.eventnr != None:
             nr = " " + str(self.eventnr)
@@ -264,7 +266,7 @@ class LHEParticle(object):
         # position in the event list of particles
         self.position = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "particle pdg %d p=(%.1f,%.1f,%.1f,m=%.1f) status %d moms %s" \
                 % (self.pdg, self.px, self.py, self.pz, self.mass,
                    self.status, self.moms)
@@ -289,13 +291,13 @@ def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
     for event in reader:
         eventMass,eventDecays = getDictionariesFromEvent(event)
         for pdg,mass in eventMass.items():
-            if not pdg in massDict:
+            if pdg not in massDict:
                 massDict[pdg] = mass
             else:
                 massDict[pdg] += mass
 
         for pdg,decays in eventDecays.items():
-            if not pdg in decaysDict:
+            if pdg not in decaysDict:
                 decaysDict[pdg] = decays
             else:
                 decaysDict[pdg] += decays
@@ -304,7 +306,7 @@ def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
     #Use averaged mass over all events:
     for pdg,masses in massDict.items():
         massDict[pdg] = sum(masses)/len(masses)
-        if not pdg in decaysDict:
+        if pdg not in decaysDict:
             decaysDict[pdg] = [] #Make sure all particles appear in decaysDict
 
     #Compute the decay dictionaries:
@@ -312,7 +314,7 @@ def getDictionariesFrom( lheFile, nevts : Union[int,None] = None ) -> \
         daughterIDs = []
         for eventDec in eventDecays:
             pids = sorted(eventDec.ids)
-            if not pids in daughterIDs:
+            if pids not in daughterIDs:
                 daughterIDs.append(pids)
         n = len(eventDecays) #Number of times the particle appears in all events
         combinedDecays = []
@@ -376,7 +378,7 @@ def getDictionariesFromEvent( event : SmsEvent ) -> Tuple[Dict,Dict]:
         if particle.status == -1: #Ignore incoming particles
             continue
 
-        if not particle.pdg in masses:
+        if particle.pdg not in masses:
             masses[particle.pdg] = [particle.mass]
             decays[particle.pdg] = []
 
@@ -386,7 +388,7 @@ def getDictionariesFromEvent( event : SmsEvent ) -> Tuple[Dict,Dict]:
         for ipn,newparticle in enumerate(particles):
             if ipn == ip:
                 continue
-            if not ip+1 in newparticle.moms:
+            if ip+1 not in newparticle.moms:
                 # newparticle is not a daughter of particle
                 continue
 

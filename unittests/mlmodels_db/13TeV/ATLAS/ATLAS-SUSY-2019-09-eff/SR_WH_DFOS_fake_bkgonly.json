@@ -1,0 +1,75 @@
+{
+    "channels": [
+        {
+            "name": "SR_WH_DFOS",
+            "samples": [
+                {
+                    "data": [
+                        11.5
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi": 1.209,
+                                "lo": 0.791
+                            },
+                            "name": "SR_WH_DFOS",
+                            "type": "normsys"
+                        }
+                    ],
+                    "name": "Bkg_SR_WH_DFOS"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    },
+                    {
+                        "bounds": [
+                            [
+                                0.0,
+                                10.0
+                            ]
+                        ],
+                        "fixed": false,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "mu_SIG"
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                20
+            ],
+            "name": "SR_WH_DFOS"
+        }
+    ],
+    "version": "1.0.0"
+}

@@ -9,16 +9,17 @@
 
 import os
 from smodels.experiment import infoObj
-from smodels.experiment import datasetObj
+from smodels.experiment.datasetObj import DataSet
 from smodels.experiment import metaObj
 from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, cleanWalk
-from typing import Union
+from typing import Union, Optional, Set
+from smodels.base.types import PathType
 
 try:
     import cPickle as serializer
-except ImportError as e:
+except ImportError:
     import pickle as serializer
 
 
@@ -28,7 +29,7 @@ class ExpResult(object):
     experimental result (experimental conference note or publication).
     """
 
-    def __init__( self, path : Union[None,os.PathLike]=None, 
+    def __init__( self, path : Union[None,PathType]=None, 
                   databaseParticles=None):
         """
         :param path: Path to the experimental result folder, None means
@@ -36,77 +37,36 @@ class ExpResult(object):
         :param databaseParticles: the model, i.e. the particle content
         """
 
-        if path in [None, "<transient>"]:
+        if path is None or path == "<transient>":
             self.path = "<transient>"
             return
-        if not os.path.isdir(path):
+        elif not os.path.isdir(path):
             raise SModelSExperimentError(f"{path} is not a path")
 
         self.path = path
         if not os.path.isfile(os.path.join(path, "globalInfo.txt")):
-            logger.error("globalInfo.txt file not found in " + path)
+            logger.error(f"globalInfo.txt file not found in {path}")
             raise TypeError
         self.globalInfo = infoObj.Info(os.path.join(path, "globalInfo.txt"))
         # Add type of experimental result (if not defined)
         if not hasattr(self.globalInfo, 'type'):
             self.globalInfo.type = 'prompt'
 
-        datasets = {}
         folders = []
         for root, _, files in cleanWalk(path):
             folders.append((root, files))
         folders.sort()
         self.datasets = []
-        hasJsons = hasattr(self.globalInfo, "jsonFiles" )
-        if hasJsons:
-            dsOrder = []
-            for SRs in self.globalInfo.jsonFiles.values():
-                if not isinstance(SRs,list):
-                    raise SModelSExperimentError(f"The entries in jsonFiles keys should be a list and not {type(SRs)}")
-                for SR in SRs:
-                    if not isinstance(SR,dict):
-                        raise SModelSExperimentError(f"The SRs in the jsonFiles keys should be a dictionary and not {type(SR)}")
-                    # In case the smodels label is not defined, ignore SR
-                    if not "smodels" in SR:
-                        continue
-                    smodelsLabel = SR["smodels"]
-                    if smodelsLabel is None or smodelsLabel in dsOrder:
-                        continue
-                    # Store the dataset following the order defined in globalInfo.jsonFiles
-                    dsOrder.append ( smodelsLabel )
-            self.globalInfo.datasetOrder = dsOrder
-        hasOrder = hasattr(self.globalInfo, "datasetOrder")
         for root, files in folders:
             if 'dataInfo.txt' in files:  # data folder found
                 # Build data set
                 try:
-                    dataset = datasetObj.DataSet(root, self.globalInfo,
-                                                 databaseParticles=databaseParticles)
-                    if hasOrder:
-                        datasets[dataset.dataInfo.dataId] = dataset
-                    else:
-                        self.datasets.append(dataset)
+                    dataset = DataSet(root, self.globalInfo,
+                                      databaseParticles=databaseParticles)
+                    self.datasets.append(dataset)
                 except TypeError as e:
                     logger.warning(f"Error creating dataset from dir {root}:\n {e}")
                     continue
-        if not hasOrder:
-            return
-        dsOrder = self.globalInfo.datasetOrder
-        if type(dsOrder) == str:
-            ## for debugging only, we allow a single dataset
-            dsOrder = [dsOrder]
-        for dsname in dsOrder:
-            self.datasets.append(datasets[dsname])
-        if type(self.globalInfo.datasetOrder)==tuple:
-            self.globalInfo.datasetOrder = list ( self.globalInfo.datasetOrder )
-        # now append the rest -- but only for json file case
-        if hasJsons:
-            for dsName,ds in datasets.items():
-                if dsName not in dsOrder:
-                    self.datasets.append ( ds )
-                    self.globalInfo.datasetOrder.append ( dsName )
-        if len(self.datasets) != len(dsOrder):
-            raise SModelSExperimentError( f"lengths of datasets and datasetOrder mismatch in {self.globalInfo.id}")
 
     def writePickle(self, dbVersion : str ):
         """ write the pickle file """
@@ -115,12 +75,12 @@ class ExpResult(object):
         pclfile = f"{self.path}/.{meta.getPickleFileName()}"
         logger.debug(f"writing expRes pickle file {pclfile}, mtime={meta.cTime()}")
         f = open(pclfile, "wb")
-        ptcl = min(4, serializer.HIGHEST_PROTOCOL)
+        ptcl = min(5, serializer.HIGHEST_PROTOCOL)
         serializer.dump(meta, f, protocol=ptcl)
         serializer.dump(self, f, protocol=ptcl)
         f.close()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if self.globalInfo != other.globalInfo:
             return False
         if len(self.datasets) != len(other.datasets):
@@ -130,13 +90,13 @@ class ExpResult(object):
                 return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def id(self):
+    def id(self) -> str:
         return self.globalInfo.getInfo('id')
 
-    def __str__(self):
+    def __str__(self) -> str:
         label = self.globalInfo.getInfo('id') + ": "
         dataIDs = [dataset.getID() for dataset in self.datasets]
         ct_dids = 0
@@ -150,7 +110,7 @@ class ExpResult(object):
         for dataset in self.datasets:
             for txname in dataset.txnameList:
                 tx = txname.txName
-                if not tx in txnames:
+                if tx not in txnames:
 
                     txnames.append(tx)
         if isinstance(txnames, list):
@@ -161,7 +121,7 @@ class ExpResult(object):
             label += txnames + ','
         return label[:-1]
 
-    def getDataset(self, dataId : str ) -> datasetObj.DataSet:
+    def getDataset(self, dataId : str ) -> Union[DataSet,None]:
         """
         retrieve dataset by dataId
         """
@@ -197,18 +157,61 @@ class ExpResult(object):
         :return: efficiency (float)
         """
 
-
+        if dataID is None:
+            return None
         dataset = self.getDataset(dataID)
         if dataset:
             return dataset.getEfficiencyFor(txname, sms=sms, mass=mass)
         else:
             return None
 
-    def hasCovarianceMatrix(self) -> bool:
-        return hasattr(self.globalInfo, "covariance")
+    def hasStatsModel(self) -> bool:
+        """ do we have any kind of statistical model """
+        if hasattr ( self.globalInfo, "statModels" ):
+            return True
+        return False
 
-    def hasJsonFile(self) -> bool:
-        return hasattr(self.globalInfo, "jsonFiles")
+    def typeOfStatsModel(self, regionSetName : Optional[str], idx : int = 0,
+                specifySL : bool = False ) -> Union[None,str,Set]:
+        """ what type of statistics model do we have for
+        regionSetName?
+        :param regionSetName: the name of the signal region set.
+        If None, return for all
+        :param idx: which index in a list (ignored if regionSetName==None)
+        :param specifySL: if true, then say "slv1" or "slv2", not "sl"
+
+        :returns: one of: onnx, cov, json
+        """
+        if not self.hasStatsModel():
+            return None
+        if regionSetName == None:
+            ret = set()
+            for name in self.globalInfo.regionSets.keys():
+                if name not in self.globalInfo.statModels:
+                    raise SModelSExperimentError ( f"{name} does not appear in {self.globalInfo.id}'s stats models" )
+                n = len ( self.globalInfo.statModels[name] )
+                for i in range(n):
+                    tp = self.typeOfStatsModel ( name, i, specifySL )
+                if tp != None:
+                    ret.add ( tp )
+            return ret
+        for regionSetName, model_tuples in self.globalInfo.statModels.items():
+            if idx >= len(model_tuples):
+                return None
+            model_tuple = model_tuples[idx]
+            model_type = model_tuple[0]
+            if model_type=="onnx":
+                return "onnx"
+            if model_type=="sl":
+                if not specifySL:
+                    return "sl"
+                if hasattr ( self.datasets[0].dataInfo, "thirdMoment" ):
+                    if self.datasets[0].dataInfo.thirdMoment != None:
+                        return "slv2"
+                return "slv1"
+            if model_type in [ "full_pyhf", "pyhf" ]:
+                return "pyhf"
+        return "?"
 
     def isCombinableWith ( self, other ) -> bool:
         """ can this expResult be safely assumed to be approximately uncorrelated
@@ -282,7 +285,7 @@ class ExpResult(object):
             logger.error(f"Dataset ID {dataID} not found in experimental result {self}")
             return None
 
-    def getValuesFor(self, attribute : str ):
+    def getValuesFor(self, attribute : str ) -> list:
         """
         Returns a list for the possible values appearing in the ExpResult
         for the required attribute (sqrts,id,constraint,...).
@@ -295,7 +298,7 @@ class ExpResult(object):
 
         return getValuesForObj(self, attribute)
 
-    def getAttributes(self, showPrivate=False):
+    def getAttributes(self, showPrivate: bool = False) -> list:
         """
         Checks for all the fields/attributes it contains as well as the
         attributes of its objects if they belong to smodels.experiment.
@@ -312,10 +315,10 @@ class ExpResult(object):
 
         return attributes
 
-    def getTxnameWith(self, restrDict : dict = {} ):
+    def getTxnameWith(self, restrDict : dict = {} ) -> Union[list, 'TxName']:
         """
         Returns a list of TxName objects satisfying the restrictions.
-        The restrictions specified as a dictionary.
+        The restrictions are specified as a dictionary.
 
         :param restrDict: dictionary containing the fields and their allowed values.
                           E.g. {'txname' : 'T1', 'axes' : ....}
@@ -341,7 +344,7 @@ class ExpResult(object):
 
         return txnameList
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         """ experimental results are sorted alphabetically according
         to their description strings """
         return str(self) < str(other)

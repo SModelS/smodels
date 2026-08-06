@@ -1,9 +1,22 @@
 #!/usr/bin/env python3
 
+"""
+.. module:: databaseServer
+   :synopsis: Server for hosting a local SModelS database over a network socket.
+
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
+"""
+
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import GeV
-import socket, atexit, time, os, sys, copy
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+import socket
+import atexit
+import time
+import os
+import sys
+import copy
+from smodels.statistics.basicStats import observed, apriori
 import unum
 from typing import Union
 
@@ -11,7 +24,7 @@ unum.Unum.VALUE_FORMAT = "%0.16E"
 
 servers = [ [] ]
 
-def shutdownAll ():
+def shutdownAll():
     if len(servers[0])==0:
         return
     print ( f"[databaseServer] shutting down {len(servers[0])} servers" )
@@ -70,7 +83,7 @@ class DatabaseServer:
 
     def run ( self, nonblocking : bool = False ):
         """ run server
-        :param nonblock: run in nonblocking mode (not yet implemented)
+        :param nonblocking: run in nonblocking mode (not yet implemented)
         """
         if nonblocking:
             pid = os.fork()
@@ -78,7 +91,7 @@ class DatabaseServer:
                 return
         self.initialize()
 
-    def logServerStats ( self ):
+    def logServerStats(self):
         """ log our stats upon exit """
         self.pprint ( "server stats" )
         self.pprint ( "============" )
@@ -158,11 +171,11 @@ class DatabaseServer:
                     return str(res)
         return "None"
 
-    def finish ( self ):
+    def finish(self):
         if hasattr ( self, "connection" ):
             self.connection.close()
 
-    def pprintClientAddr ( self ):
+    def pprintClientAddr(self) -> str:
         """ super simple convenience function """
         return f"{self.client_address[0]}:{self.client_address[1]}"
 

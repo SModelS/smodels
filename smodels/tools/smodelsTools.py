@@ -9,7 +9,6 @@
 
 """
 
-from __future__ import print_function
 
 def main():
     import argparse
@@ -160,7 +159,8 @@ def main():
         printEnvironmentInfo( vars(args) )
 
     if args.subparser_name == 'installation':
-        import sys, os
+        import sys
+        import os
         print(installation.banner())
         print("SModelS version:", installation.version())
         print("Installation directory:",installation.installDirectory())

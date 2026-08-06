@@ -16,12 +16,13 @@ from smodels.base.physicsUnits import TeV, pb, GeV
 from smodels.base import lheReader
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.base.smodelsLogging import logger
+from typing import Any
 
 # Orders in perturbation theory
 LO, NLO, NLL, NNLL = range(4)
 
 
-def orderToString(order, short=False, raise_error=False):
+def orderToString(order: int, short: bool = False, raise_error: bool = False) -> str:
     """ return the string that describes the perturbation order
     :param short: if true, return a short version of string
     :param raise_error: if true, raise exception if order is not know
@@ -44,7 +45,7 @@ def orderToString(order, short=False, raise_error=False):
     return "?"
 
 
-def stringToOrder(strng):
+def stringToOrder(strng: str) -> int:
     """ from a string describing the order return the perturbation order """
     order = {"LO": LO, "NLO": NLO, "NLL": NLL, "NNLL": NNLL,
             "NLO+NLL": NLL, "NLO+NLL+NNLL": NNLL}
@@ -62,26 +63,26 @@ class XSectionInfo(object):
 
     """
 
-    def normalizeSqrts(self, sqrts):
-        """ """
+    def normalizeSqrts(self, sqrts: Any) -> Any:
+        """Normalize square-root-of-s energy values: convert whole-number floats to ints."""
         if sqrts is None:
             return sqrts
         if type(sqrts) == float and abs(sqrts % 1) < 1e-5:
             return int(sqrts)
         return sqrts
 
-    def __init__(self, sqrts=None, order=None, label=None):
+    def __init__(self, sqrts: Any = None, order: int | None = None, label: str | None = None):
         """
         Constructor.
         :param: sqrts  center of mass energy, with unit
         :param: order perturbation order of xsec computation
         :param: label, a string that describes the xsec computation
         """
-        self.sqrts = self.normalizeSqrts(sqrts)
-        self.order = order
-        self.label = label
+        self.sqrts : Any = self.normalizeSqrts(sqrts)
+        self.order : int | None = order
+        self.label : str | None = label
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(other) != type(self):
             return False
         if other.sqrts != self.sqrts:
@@ -90,23 +91,23 @@ class XSectionInfo(object):
             return False
         return True
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # for now lets just make it a string
         order = self.order
         if order is None:
             order = 9
         return int(self.sqrts.asNumber(GeV)) + order
 
-    def __str__(self):
+    def __str__(self) -> str:
         self.sqrts = self.normalizeSqrts(self.sqrts)
         if not self.order:
             return str(self.sqrts)
         return f"{self.sqrts} ({self.order})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         if not isinstance(other, XSectionInfo):
             return True
         if other.sqrts != self.sqrts:
@@ -115,7 +116,7 @@ class XSectionInfo(object):
             return True
         return False
 
-    def copy(self):
+    def copy(self) -> 'XSectionInfo':
         """
         Generate an independent copy of self.
 
@@ -145,22 +146,22 @@ class XSection(object):
         Initializes the object to store a cross section value.
         All initial info is set to None.
         """
-        self.info = XSectionInfo()
-        self.value = None
-        self._pid = (None, None)
+        self.info : XSectionInfo = XSectionInfo()
+        self.value : Any = None
+        self._pid : tuple[int | None, int | None] = (None, None)
 
     @property
-    def pid(self):
+    def pid(self) -> tuple[int | None, int | None]:
         return self._pid
 
     @pid.setter
-    def pid(self, pn):
+    def pid(self, pn: tuple[int | None, int | None] | list[int]):
         if None in pn:
             self._pid = pn
             return
         self._pid = tuple(sorted(pn))
 
-    def __mul__(self, other):
+    def __mul__(self, other: float | int) -> 'XSection':
         """
         Multiplies the value of the cross section by the factor other (should
         be a float or int).
@@ -175,13 +176,13 @@ class XSection(object):
             raise SModelSError()
         return newXsec
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: float | int) -> 'XSection':
         """
         Right multiplication (see left multiplication).
         """
         return self * other
 
-    def __add__(self, other):
+    def __add__(self, other: 'XSection') -> 'XSection':
         """
         Returns a copy of self with the value of other added to its value.
         """
@@ -202,7 +203,7 @@ class XSection(object):
         logger.error(line)
         raise SModelSError(line)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         Compare two XSection objects. Returns True if .info and type and value and
         pid are equal.
@@ -218,7 +219,7 @@ class XSection(object):
             return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """
         Compare two XSection objects. Returns True if .info or type or value or
         pid is not equal.
@@ -226,7 +227,7 @@ class XSection(object):
 
         return not self.__eq__(other)
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: 'XSection | unum.Unum | int | float') -> int:
         """
         Compares the cross-section value to the value of another XSection object,
         float or Unum object (irrespective of the info attribute).
@@ -250,31 +251,31 @@ class XSection(object):
         else:
             return -1
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'XSection | unum.Unum | int | float') -> bool:
         """
         Checks if the cross-section value of self is smaller than of other.
         """
 
         return self.__cmp__(other) == -1
-
-    def __gt__(self, other):
+    def __gt__(self, other: 'XSection | unum.Unum | int | float') -> bool:
         """
-        Checks if the cross-section value of self is smaller than of other.
+        Checks if the cross-section value of self is greater than of other.
         """
 
         return self.__cmp__(other) == 1
 
-    def __str__(self):
+
+    def __str__(self) -> str:
         """
         Generate cross section information in string format.
         """
         st = self.info.label + ':' + str(self.value) + " " + str(self.pid)
         return st
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
-    def niceStr(self):
+    def niceStr(self) -> str:
         """
         Generates a more human readable string. The string format is:
         Sqrts: self.info.sqrts,  Weight: self.value
@@ -282,7 +283,7 @@ class XSection(object):
         st = 'Sqrts: '+str(self.info.sqrts) + ', Weight:' + str(self.value)
         return st
 
-    def copy(self):
+    def copy(self) -> 'XSection':
         """
         Generates an independent copy of self.
 
@@ -295,7 +296,7 @@ class XSection(object):
         newXsec.pid = tuple(list(self.pid)[:])
         return newXsec
 
-    def _zeroXSec(self):
+    def _zeroXSec(self) -> None:
         """
         Replace the cross section value by zero.
 
@@ -312,13 +313,13 @@ class XSectionList(object):
 
     """
 
-    def __init__(self, infoList=None):
+    def __init__(self, infoList: list[XSectionInfo] | None = None):
         """
         If infoList is defined, create entries with zero cross sections
         according to infoList. infoList must be a list of XSectionInfo objects.
 
         """
-        self.xSections = []
+        self.xSections : list[XSection] = []
 
         if infoList:
             for info in infoList:
@@ -328,17 +329,20 @@ class XSectionList(object):
                 newentry.info = info.copy()
                 self.add(newentry)
 
-    def __mul__(self, other):
+    def __mul__(self, other: float | int) -> 'XSectionList':
+        """Multiply all cross sections in the list by *other*."""
         newList = self.copy()
         for ixsec, xsec in enumerate(newList):
             newList[ixsec] = xsec * other
 
         return newList
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: float | int) -> 'XSectionList':
+        """Right multiplication (see left multiplication)."""
         return self * other
 
-    def __add__(self, other):
+    def __add__(self, other: 'XSectionList') -> 'XSectionList':
+        """Return a new list combining self and other."""
         newList = self.copy()
         if type(other) != type(self):
             logger.warning("Trying to add a XSectionList and a "+str(type(other)))
@@ -348,7 +352,7 @@ class XSectionList(object):
 
         return newList
 
-    def __iadd__(self, newXsecs):
+    def __iadd__(self, newXsecs: 'XSectionList | XSection') -> 'XSectionList':
         """
         Add a new list of cross sections.
 
@@ -375,9 +379,11 @@ class XSectionList(object):
         return self
 
     def __iter__(self):
+        """Iterate over the XSection objects in the list."""
         return iter(self.xSections)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> XSection:
+        """Return the XSection at *index*."""
         if len(self) <= index:
             txt = "Index in XSectionList out of bounds: idx(%d)>=length(%d). " % (index, len(self))
             txt += "(Are there cross sections given in the input?)"
@@ -385,17 +391,19 @@ class XSectionList(object):
             raise SModelSError(txt)
         return self.xSections[index]
 
-    def __setitem__(self, index, xsec):
+    def __setitem__(self, index: int, xsec: XSection) -> None:
+        """Set the XSection at *index*."""
         if not isinstance(xsec, XSection):
             logger.error("Input object must be a XSection() object")
             raise SModelSError()
         else:
             self.xSections[index] = xsec
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """Return the number of cross sections in the list."""
         return len(self.xSections)
 
-    def __cmp__(self, other):
+    def __cmp__(self, other: 'XSectionList | XSection | unum.Unum | int | float') -> int:
         """
         Compares the cross-section value to the value of another XSectionList object,
         XSection object, float or Unum object (irrespective of the info attribute).
@@ -422,33 +430,34 @@ class XSectionList(object):
         else:
             return -1
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'XSectionList | XSection | unum.Unum | int | float') -> bool:
         """
         Checks if the cross-section value of self is smaller than of other.
         """
 
         return self.__cmp__(other) == -1
 
-    def __gt__(self, other):
+    def __gt__(self, other: 'XSectionList | XSection | unum.Unum | int | float') -> bool:
         """
-        Checks if the cross-section value of self is smaller than of other.
+        Checks if the cross-section value of self is greater than of other.
         """
 
         return self.__cmp__(other) == 1
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str([str(xsec) for xsec in self])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
-    def niceStr(self):
+    def niceStr(self) -> str:
+        """Return a human-readable multi-line string of all cross sections."""
         st = ""
         for xsec in self:
             st += xsec.niceStr()+'\n'
         return st
 
-    def copy(self):
+    def copy(self) -> 'XSectionList':
         """
         Generates an independent copy of itself. Faster than deepcopy.
 
@@ -458,7 +467,7 @@ class XSectionList(object):
             newList.xSections.append(xsec.copy())
         return newList
 
-    def add(self, newxsec):
+    def add(self, newxsec: XSection) -> None:
         """
         Append a XSection object to the list.
 
@@ -469,7 +478,7 @@ class XSectionList(object):
         else:
             self.xSections.append(newxsec.copy())
 
-    def _addValue(self, newxsec):
+    def _addValue(self, newxsec: XSection) -> None:
         """
         Add a XSection object to the list.
 
@@ -489,7 +498,7 @@ class XSectionList(object):
             if not exists:
                 self.add(newxsec)
 
-    def getXsecsFor(self, item):
+    def getXsecsFor(self, item: Any) -> 'XSectionList':
         """
         Return a list of XSection objects for item (label, pid, sqrts).
 
@@ -506,7 +515,7 @@ class XSectionList(object):
                 xsecList.add(xsec)
         return xsecList
 
-    def _zeroXSecs(self):
+    def _zeroXSecs(self) -> None:
         """
         Replace the cross section values in the list by zero.
 
@@ -514,7 +523,7 @@ class XSectionList(object):
         for xsec in self:
             xsec.value = 0. * pb
 
-    def delete(self, xSec):
+    def delete(self, xSec: XSection) -> None:
         """
         Delete the cross section entry from the list.
 
@@ -523,7 +532,7 @@ class XSectionList(object):
             if xsec == xSec:
                 self.xSections.pop(ixsec)
 
-    def getInfo(self):
+    def getInfo(self) -> list[XSectionInfo]:
         """
         Get basic info about the cross sections appearing in the list (order,
         value and label).
@@ -538,7 +547,7 @@ class XSectionList(object):
                 allInfo.append(info)
         return allInfo
 
-    def _getLabels(self):
+    def _getLabels(self) -> list[str]:
         """
         Get all labels appearing in the list.
 
@@ -549,7 +558,7 @@ class XSectionList(object):
             allLabels.append(info.label)
         return list(set(allLabels))
 
-    def getPIDpairs(self):
+    def getPIDpairs(self) -> list[tuple]:
         """
         Get all particle ID pairs appearing in the list.
 
@@ -559,7 +568,7 @@ class XSectionList(object):
             allPidPairs.append(xsec.pid)
         return list(set(allPidPairs))
 
-    def getPIDs(self):
+    def getPIDs(self) -> list[int]:
         """
         Get all particle IDs appearing in the list.
 
@@ -569,7 +578,7 @@ class XSectionList(object):
             allPids.extend(xsec.pid)
         return sorted(list(set(allPids)))
 
-    def getMaxXsec(self):
+    def getMaxXsec(self) -> Any:
         """
         Get the maximum cross section value appearing in the list.
 
@@ -578,7 +587,7 @@ class XSectionList(object):
 
         return maxxsec
 
-    def getMinXsec(self):
+    def getMinXsec(self) -> Any | bool:
         """
         Get minimum cross section value appearing in the list.
 
@@ -592,7 +601,7 @@ class XSectionList(object):
                 minxsec = xsec.value
         return minxsec
 
-    def getDictionary(self, groupBy="pids"):
+    def getDictionary(self, groupBy: str = "pids") -> dict:
         """
         Convert the list of XSection objects to a nested dictionary.
 
@@ -621,7 +630,7 @@ class XSectionList(object):
 
         return xSecDictionary
 
-    def combineWith(self, newXsecs):
+    def combineWith(self, newXsecs: 'XSectionList | XSection') -> None:
         """
         Add a new list of cross sections.
 
@@ -635,7 +644,7 @@ class XSectionList(object):
         if type(newXsecs) == type(XSection()):
             newList = [newXsecs]
         for newXsec in newList:
-            if not newXsec.info in self.getInfo():
+            if newXsec.info not in self.getInfo():
                 self.add(newXsec)
             else:
                 for oldXsec in self:
@@ -644,7 +653,7 @@ class XSectionList(object):
                         if newXsec.pid != oldXsec.pid:
                             oldXsec.pid = (None, None)
 
-    def removeLowerOrder(self):
+    def removeLowerOrder(self) -> None:
         """
         Keep only the highest order cross section for each process in the list.
 
@@ -681,7 +690,7 @@ class XSectionList(object):
                          (len(self) - len(newList)))
         self.xSections = newList.xSections
 
-    def removeDuplicates(self):
+    def removeDuplicates(self) -> None:
         """
         If there are two entries for the same process, center of mass energy and order,
         keep only one (the one with highest value).
@@ -714,21 +723,21 @@ class XSectionList(object):
                            (len(self) - len(newList)))
             self.xSections = newList.xSections
 
-    def order(self):
+    def order(self) -> None:
         """
         Order the cross section in the list by their PDG pairs
         """
 
         self.xSections = sorted(self.xSections, key=lambda xsec: xsec.pid)
 
-    def sort(self):
+    def sort(self) -> None:
         """ sort the xsecs by the values """
         self.xSections = sorted(self.xSections,
                                 key=lambda xsec: xsec.value.asNumber(pb),
                                 reverse=True)
 
 
-def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
+def getXsecFromSLHAFile(slhafile: str, useXSecs: list[XSectionInfo] | None = None, xsecUnit: Any = pb) -> XSectionList:
     """
     Obtain cross sections for pair production of R-odd particles from input SLHA file.
     The default unit for cross section is pb.
@@ -770,7 +779,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
             xsec.value = pxsec.value * pb
             xsec.pid = production[2:]
             # Do not add xsecs which do not match the user required ones:
-            if (useXSecs and not xsec.info in useXSecs):
+            if (useXSecs and xsec.info not in useXSecs):
                 continue
             else:
                 xSecsInFile.add(xsec)
@@ -781,7 +790,7 @@ def getXsecFromSLHAFile(slhafile, useXSecs=None, xsecUnit=pb):
     return xSecsInFile
 
 
-def getXsecFromLHEFile(lhefile, addEvents=True):
+def getXsecFromLHEFile(lhefile: str, addEvents: bool = True) -> XSectionList:
     """
     Obtain cross sections from input LHE file.
 

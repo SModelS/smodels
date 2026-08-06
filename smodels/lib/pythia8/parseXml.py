@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
 import os
 
 substitutes = { "~u_L": "~u_1", "~u_R": "~u_2", "~c_L": "~u_3", "~c_R": "~u_4",
@@ -52,7 +51,7 @@ def create():
     f.close()
     pids = {}
     for line in lines:
-            if not "<particle" in line: continue
+            if "<particle" not in line: continue
             pos = line.find ( "spin" )
             line = line[:pos]
             deletes = [ '<particle id="', '"', '=', 'name', 'antiName' ]

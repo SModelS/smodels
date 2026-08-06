@@ -6,21 +6,21 @@
 
 """
 
-from __future__ import print_function
 import os
 from smodels.installation import installDirectory, version
 from smodels.base import smodelsLogging
 from smodels.matching import modelTester
 from smodels.tools import crashReport
-
+from smodels.experiment.databaseObj import Database
+from typing import Optional
+from smodels.base.types import PathType
 
 def main():
+    """Set default input and output files."""
     import argparse
-    """ Set default input and output files """
     parameterFile = f"{installDirectory()}/smodels/etc/parameters_default.ini"
     outputDir = "./results/"
 
-    """ Get the name of input SLHA file and parameter file """
     ap = argparse.ArgumentParser( description=
             "Run SModelS over SLHA/LHE input files." )
     ap.add_argument('-f', '--filename',
@@ -73,7 +73,9 @@ def main():
         run(args.filename, args.parameterFile, args.outputDir,
               db, args.timeout, args.development)
 
-def run( inFile, parameterFile, outputDir, db, timeout, development ):
+def run( inFile : PathType, parameterFile : os.PathLike,
+         outputDir : PathType, db : Optional[Database],
+         timeout : int, development : bool ):
     """
     Provides a command line interface to basic SModelS functionalities.
 
@@ -89,7 +91,6 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
             If True, force loading the text database.
     :param timeout: set a timeout for one model point (0 means no timeout)
     :param development: turn on development mode (e.g. no crash report)
-
     """
 
     """ Read and check parameter file, exit parameterFile does not exist """
@@ -102,7 +103,7 @@ def run( inFile, parameterFile, outputDir, db, timeout, development ):
     fileList, inDir = modelTester.getAllInputFiles(inFile)
 
     """ Create output directory if missing """
-    if not os.path.isdir(outputDir): os.mkdir(outputDir)
+    if not os.path.exists(outputDir): os.mkdir(outputDir)
 
     """ Restrict database results according to parameter file"""
     modelTester.loadDatabaseResults(parser, database)

@@ -6,7 +6,6 @@
 
 """
 
-from __future__ import print_function
 import os
 from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
 from smodels.tools.ioObjects import OutputStatus
@@ -17,7 +16,8 @@ from smodels.tools.printers.txtPrinter import TxTPrinter
 from smodels.statistics.basicStats import observed
 import numpy as np
 import unum
-
+from typing import Optional
+from smodels.base.types import PathType
 
 class SLHAPrinter(TxTPrinter):
     """
@@ -25,18 +25,24 @@ class SLHAPrinter(TxTPrinter):
     It uses the facilities of the TxTPrinter.
     """
 
-    def __init__(self, output='file', filename=None, outputFormat='version3'):
+    def __init__( self, output : str ='file', 
+                  filename : Optional[PathType] = None, 
+                  outputFormat : str = 'version3' ):
+        """
+        :param output: one of: file, stdout
+        """
         TxTPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "slha"
-        self.docompress = 0
-        self.combinesr = 0
-        self.combineanas = 0
-        self.printingOrder = [OutputStatus, TheoryPredictionList,
+        self.name: str = "slha"
+        self.docompress: int = 0
+        self.combinesr: int = 0
+        self.combineanas: int = 0
+        self.printingOrder: list = [OutputStatus, TheoryPredictionList,
                               TheoryPredictionsCombiner, 
                               TheoryPrediction, Uncovered]
-        self.toPrint = [None]*len(self.printingOrder)
+        self.toPrint: list = [None]*len(self.printingOrder)
 
-    def setOutPutFile(self, filename, overwrite=True, silent=False):
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
+                       silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be
         filename.smodels.
@@ -51,7 +57,7 @@ class SLHAPrinter(TxTPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatOutputStatus(self, obj):
+    def _formatOutputStatus(self, obj: object) -> str:
 
         smodelsversion = obj.smodelsVersion
         if not smodelsversion.startswith("v"):
@@ -85,7 +91,7 @@ class SLHAPrinter(TxTPrinter):
 
         return output
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatTheoryPredictionList(self, obj: object) -> str:
 
         printAll = True  # Controls which theory predictions are printed
         if hasattr(self, "expandedoutput") and not self.expandedoutput:
@@ -152,16 +158,17 @@ class SLHAPrinter(TxTPrinter):
             else:
                 output += f" {cter} 1 {'NaN':<30} #r value (failed to compute r-value)\n"
             if not r_expected:
-                output += f" {cter} 2 {'N/A':<30} #expected r value\n"  # r_expected could fail or simply not be available
+                output += f" {cter} 2 {'N/A':<30} #expected r value\n"  
+                # r_expected could fail or simply not be available
             else:
                 output += f" {cter} 2 {r_expected:<30.3E} #expected r value\n"
             output += f" {cter} 3 {theoPred.getmaxCondition():<30.2f} #condition violation\n"
             output += f" {cter} 4 {expResult.globalInfo.id:<30} #analysis\n"
             output += f" {cter} 5 {signalRegion.replace(' ', '_'):<30} #signal region \n"
-            nll = theoPred.likelihood( return_nll  = True )
+            nll = theoPred.nll( )
             if nll is not None:
-                nllmin = theoPred.lmax(return_nll=True)
-                nllsm = theoPred.lsm( return_nll=True )
+                nllmin = theoPred.nll_min( )
+                nllsm = theoPred.nllsm( )
                 lvals = [nll, nllmin, nllsm]
                 for i, lv in enumerate(lvals):
                     if isinstance(lv, (float, np.floating)):
@@ -180,7 +187,7 @@ class SLHAPrinter(TxTPrinter):
 
         return output
 
-    def _formatUncovered(self, obj):
+    def _formatUncovered(self, obj: object) -> str:
 
         # First sort groups by label
         groups = sorted(obj.groups[:], key=lambda g: g.label)
@@ -192,10 +199,10 @@ class SLHAPrinter(TxTPrinter):
         output += "\n"
         return output
 
-    def _formatTheoryPrediction(self,obj):
+    def _formatTheoryPrediction(self,obj: object) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj):
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 
@@ -219,9 +226,9 @@ class SLHAPrinter(TxTPrinter):
             r = self._round(cRes.getRValue(evaluationType=observed))
             r_expected = self._round(cRes.getRValue(evaluationType=self.getTypeOfExpected()))
 
-            nll = cRes.likelihood(return_nll=True)
-            nllmin = cRes.lmax(return_nll=True)
-            nllsm = cRes.lsm(return_nll=True)
+            nll = cRes.nll()
+            nllmin = cRes.nll_min()
+            nllsm = cRes.nllsm( )
             lvals = [nll, nllmin, nllsm]
             for i, lv in enumerate(lvals):
                 if isinstance(lv, (float, np.floating)):

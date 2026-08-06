@@ -8,21 +8,21 @@
 """
 
 from bisect import bisect
-from itertools import product
 from smodels.base.physicsUnits import fb
 from smodels.base.exceptions import SModelSBaseError as SModelSError
 from smodels.experiment.reweighting import reweightFactorFor
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.defaultFinalStates import (WList, lList, tList, taList, nuList, jetList,
                                                    MET, HSCP, RHadronG, RHadronQ,anyBSM)
+from typing import Callable
 
 
 #  Default definitions for the uncovered topology categories/groups:
 #  SMS filters for each group:
 #  (it should be a function which takes an SMS object as input
 #  and returns True if the SMS belongs to the group and False otherwise)
-filtersDefault = {'missing (prompt)': lambda sms: not ('prompt' in sms.coveredBy),
-                  'missing (displaced)': lambda sms: not ('displaced' in sms.coveredBy),
+filtersDefault = {'missing (prompt)': lambda sms: 'prompt' not in sms.coveredBy,
+                  'missing (displaced)': lambda sms: 'displaced' not in sms.coveredBy,
                   # 'missing (long cascade)' : lambda el: (not el.coveredBy) and el._getLength() > 3,
                   'missing (all)': lambda sms: (not sms.coveredBy),
                   'outsideGrid (all)': lambda sms: (sms.coveredBy and not sms.testedBy)}
@@ -38,7 +38,7 @@ descriptionDefault = {'missing (prompt)': 'missing topologies with prompt decays
 # Default BSM inclusive particles used for grouping final states:
 bsmDefault = [MET, HSCP, RHadronG, RHadronQ]
 
-# Defaul SM inclusive particles used for grouping final states
+# Default SM inclusive particles used for grouping final states
 smDefault = [WList, lList, tList, taList, nuList, jetList]
 
 # Weight factors for each group:
@@ -68,10 +68,10 @@ class Uncovered(object):
     """
 
     def __init__(self, topDict, sqrts=None, sigmacut=0*fb,
-                 groupFilters=filtersDefault,
-                 groupFactors=factorsDefault,
-                 groupdDescriptions=descriptionDefault,
-                 smFinalStates=smDefault, bsmFinalStates=bsmDefault):
+                 groupFilters: dict[str, Callable] = filtersDefault,
+                 groupFactors: dict[str, Callable] = factorsDefault,
+                 groupdDescriptions: dict[str, str] = descriptionDefault,
+                 smFinalStates: list = smDefault, bsmFinalStates: list = bsmDefault):
         """
         Inititalize the object.
 
@@ -88,7 +88,7 @@ class Uncovered(object):
                                   (used for printout)
         :param smFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping SM
                               particles when creating FinalStateSMS.
-        :param bsmFinalSates: List of (inclusive) Particle or MultiParticle objects used for grouping
+        :param bsmFinalStates: List of (inclusive) Particle or MultiParticle objects used for grouping
                               BSM particles when creating FinalStateSMS.
         """
 
@@ -132,7 +132,7 @@ class Uncovered(object):
             uncoveredTopos.getSMSFrom(topDict)
             self.groups.append(uncoveredTopos)
 
-    def getGroup(self, label):
+    def getGroup(self, label: str) -> 'UncoveredGroup | None':
         """
         Returns the group with the required label. If not found, returns None.
 
@@ -154,8 +154,8 @@ class UncoveredGroup(object):
     function for reweighting cross sections, etc.
     """
 
-    def __init__(self, label, smsFilter, reweightFactor,
-                 smFinalStates, bsmFinalStates, sqrts, sigmacut=0.):
+    def __init__(self, label: str, smsFilter: Callable, reweightFactor: Callable,
+                 smFinalStates: list, bsmFinalStates: list, sqrts, sigmacut: float = 0.):
         """
         :param label: Group label
         :param smsFilter: Function which takes an SMS as argument and returns True (False) if
@@ -181,10 +181,10 @@ class UncoveredGroup(object):
         self.smsFilter = smsFilter
         self.reweightFactor = reweightFactor
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.label
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
     def getSMSFrom(self, topDict):
@@ -238,7 +238,7 @@ class UncoveredGroup(object):
         # Finally sort general SMS by their missing cross-section:
         self.finalStateSMS = sorted(self.finalStateSMS, key=lambda fsEl: fsEl.missingX, reverse=True)
 
-    def getMissingX(self, sms):
+    def getMissingX(self, sms) -> float:
         """
         Calculate total missing cross section of an SMS, by recursively checking if its
         mothers already appear in the list.
@@ -280,7 +280,7 @@ class UncoveredGroup(object):
 
         return missingX-overlapXsec
 
-    def getTotalXSec(self, sqrts=None):
+    def getTotalXSec(self, sqrts=None) -> float:
         """
         Calculate total missing topology cross section at sqrts. If no sqrts is given use self.sqrts
         :ivar sqrts: sqrts
@@ -321,9 +321,9 @@ class FinalStateSMS(TheorySMS):
     daughters.
     """
 
-    def __init__(self, sms, missingX=None,
-                smFinalStates=smDefault,
-                bsmFinalStates=bsmDefault):
+    def __init__(self, sms, missingX: float | None = None,
+                 smFinalStates: list = smDefault,
+                 bsmFinalStates: list = bsmDefault):
 
         TheorySMS.__init__(self)
 
@@ -380,14 +380,14 @@ class FinalStateSMS(TheorySMS):
         self.setGlobalProperties(weight=False)
         self._contributingSMS = [sms]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Returns the final state string
         """
 
         return self.getFinalStateStr()
 
-    def oldStr(self):
+    def oldStr(self) -> str:
         """
         Generates a string using the old format (bracket notaion),
         if possible. For non Z2-like SMS, return the process string.

@@ -8,7 +8,7 @@
  
 """
  
-import sys,os,shutil
+import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.base.physicsUnits import GeV, fb, pb
@@ -21,8 +21,9 @@ class RunBrowserTest(unittest.TestCase):
     # ../smodelsTools.py interactive-plots -f ./testFiles/scanExample/smodels-output.tar.gz -s testFiles/scanExample/slhas.tar.gz -p iplots_parameters.py
     def testBrowser(self):
 
-        browser = databaseBrowser.Browser("unittest")
-        self.assertEqual(len(browser),16)
+        from databaseLoader import dbpath
+        browser = databaseBrowser.Browser( dbpath )
+        self.assertEqual(len(browser),17)
 
         # Check the upper limit for the HM200 signal region:
         ul = browser.getULForSR(expid='ATLAS-SUSY-2018-31', datasetID='SRA_H')

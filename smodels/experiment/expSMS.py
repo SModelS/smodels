@@ -15,6 +15,7 @@ from smodels.experiment.expAuxiliaryFuncs import bracketToProcessStr
 from smodels.experiment.graphMatching import maximal_matching
 from itertools import product
 from collections import OrderedDict
+from typing import Optional
 
 class ExpSMS(GenericSMS):
     """
@@ -30,8 +31,8 @@ class ExpSMS(GenericSMS):
         GenericSMS.__init__(self)
 
     @classmethod
-    def from_string(cls, stringSMS, model=None, finalState=None,
-                     intermediateState=None):
+    def from_string(cls, stringSMS: str, model=None, finalState: Optional[list] = None,
+                     intermediateState: Optional[list] = None) -> 'ExpSMS':
         """
         Converts a string describing an SMS to an SMS object. It accepts
         the (old) bracket notation or the process notation. For the old notation the
@@ -155,7 +156,7 @@ class ExpSMS(GenericSMS):
 
         return newSMS
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         SMS equality based on the compareTo method.
 
@@ -168,10 +169,10 @@ class ExpSMS(GenericSMS):
 
         return (match is not None)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return object.__hash__(self)
 
-    def matchesTo(self, other):
+    def matchesTo(self, other: GenericSMS) -> Optional['ExpSMS']:
         """
         Check if self matches other.
 
@@ -196,7 +197,7 @@ class ExpSMS(GenericSMS):
         # following the ordering of self
         invMapDict = OrderedDict()
         for n1 in self.nodeIndices:
-            if not n1 in mapDict:  # For InclusiveNodes the match is partial
+            if n1 not in mapDict:  # For InclusiveNodes the match is partial
                 continue
             n2 = mapDict[n1]
             # For inclusiveLists, set the firt match
@@ -224,7 +225,7 @@ class ExpSMS(GenericSMS):
 
         return matchedTree
 
-    def computeMatchingDict(self, other, n1, n2):
+    def computeMatchingDict(self, other: GenericSMS, n1, n2) -> Optional[dict]:
         """
         Compare the subtrees with n1 and n2 as roots and
         return a dictionary with the node matchings {n1 : n2,...}.
@@ -301,7 +302,7 @@ class ExpSMS(GenericSMS):
             if not self.indexToNode(d1).inclusiveList:
                 continue
             left_nodes.remove(d1)
-            if not d1 in edges:
+            if d1 not in edges:
                 continue
             for d2 in edges[d1]:
                 right_nodes.remove(d2)
@@ -349,7 +350,7 @@ class ExpSMS(GenericSMS):
         # print('   returning for %i = %i' %(n1,n2),finalMap)
         return finalMap
 
-    def identicalTo(self,other):
+    def identicalTo(self, other: 'ExpSMS') -> bool:
         
         if self.canonName != other.canonName:
             return False
@@ -365,13 +366,13 @@ class ExpSMS(GenericSMS):
                 return False
         return True
 
-    def copy(self, emptyNodes=False):
+    def copy(self, emptyNodes: bool = False) -> 'ExpSMS':
         """
         Returns a shallow copy of self.
 
         :param emptyNodes: If True, does not copy any of the nodes from self.
 
-        :return: TheorySMS object
+        :return: ExpSMS object
         """
 
         newSMS = ExpSMS()
@@ -381,7 +382,7 @@ class ExpSMS(GenericSMS):
 
         return newSMS
 
-    def compareNodes(self,other,nodeIndex1,nodeIndex2):
+    def compareNodes(self, other: 'ExpSMS', nodeIndex1, nodeIndex2) -> int:
         """
         Convenience function for defining how nodes are compared
         within the SMS. For ExpSMS the nodes are sorted according to their

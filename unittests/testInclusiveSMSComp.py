@@ -8,7 +8,6 @@
 
 """
 
-from __future__ import print_function
 import sys
 sys.path.insert(0,"../")
 import unittest
@@ -17,7 +16,7 @@ from smodels.share.models.mssm import BSMList
 from smodels.share.models.SMparticles import SMList
 from smodels.experiment.defaultFinalStates import finalStates
 from smodels.base.model import Model
-from smodels.base.physicsUnits import fb, GeV
+from smodels.base.physicsUnits import GeV
 from unitTestHelpers import getNodesIndices, getEdges
 
 slhafile="./testFiles/slha/lightEWinos.slha"

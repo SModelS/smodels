@@ -41,7 +41,8 @@ class RFailsTest(unittest.TestCase):
 
         # Reduce the number of attempts 
         pyhfInterface.nattempts_max = 5
-        database = Database('official')
+        # database = Database('official')
+        from fullDatabase import database
         out = runMain(filename,inifile='testParameters_rfails.ini',
                              overridedatabase = database, 
                              suppressStdout=True)
@@ -52,7 +53,7 @@ class RFailsTest(unittest.TestCase):
         output = Summary(outputfile, allowedRelDiff=0.05)
         default = Summary(defaultfile, allowedRelDiff=0.05)
         if output != default:
-            logger.error ( f"{out} differs from {defaultfile}" )
+            logger.error ( f"{outputfile} differs from {defaultfile}" )
         else:
             self.assertEqual(default, output)
             
@@ -93,6 +94,7 @@ class RFailsTest(unittest.TestCase):
         self.assertTrue(equals)
         if equals:
             self.removeOutputs(outputfile)
+            os.unlink ( "mdm_r_fails.slha" )
 
     def testRFailSummary(self):
         warnings.filterwarnings( action='ignore', category=DeprecationWarning )
@@ -103,7 +105,8 @@ class RFailsTest(unittest.TestCase):
 
         # Reduce the number of attempts 
         pyhfInterface.nattempts_max = 10
-        database = Database('official')
+        from fullDatabase import database
+        # database = Database('official')
         runMain(dirname,inifile='testParameters_rfails.ini',
                              overridedatabase = database,suppressStdout=True )
         outSummary = os.path.join(out, 'summary.txt')
@@ -120,6 +123,11 @@ class RFailsTest(unittest.TestCase):
 
             if os.path.isfile(outSummary):
                 os.remove(outSummary)
+            os.unlink ( "mdm_r_fails.slha" )
+
+            import glob
+            for f in glob.glob("scan_*.slha"):
+                os.unlink(f)
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,35 +12,49 @@ import sys
 sys.path.insert(0,"../")
 from smodels.experiment.databaseObj import Database
 import unittest
-import logging.config
-import os
 
 class AdditiveDBTest(unittest.TestCase):
     # use different logging config for the unit tests.
+    import logging.config
     logging.config.fileConfig( "./logging.conf" )
     from smodels.base.smodelsLogging import logger
 
     def testAddingSubset(self):
         """ tests adding same dataset """
-        db1 = Database ( "./database/" )
-        db2 = Database ( "./tinydb/+./database/" ) ## tinydb is subset of database
-        self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
+        from databaseLoader import dbpath, database, dbpathtiny
+        # db1 = Database ( "./database/" )
+        db1 = database
+        ## tinydb has an overlap with database
+        db2 = Database ( f"{dbpathtiny}+{dbpath}" )
+        self.assertTrue ( len(db2.expResultList)-1 == len(db1.expResultList) )
         tx1, tx2 = [], []
         for er1, er2 in zip ( db1.expResultList, db2.expResultList ):
             tx1.append ( er1.getTxNames() )
             tx2.append ( er2.getTxNames() )
         self.assertTrue ( len(tx1) == len(tx2) )
 
+    def testEmptyResult(self):
+        """ checks if empty result stays in """
+        from databaseLoader import dbpathtiny
+        db = Database ( dbpathtiny )
+        ers = db.getExpResults()
+        nres = len(ers)
+        if nres != 2:
+            print ( f"[testAdditiveDB] number of results in tinydb is {nres}: {[ x.globalInfo.id for x in ers ]}" )
+        self.assertTrue ( nres==2 )
+
     def testAddingTxname(self):
         """ tests adding same dataset """
         sel = "CMS-PAS-SUS-15-002"
         tx1, tx2 = [], []
-        db1 = Database ( "./database/" )
+        from databaseLoader import dbpath, database
+        db1 = database
+        # db1 = Database ( "./database/" )
         for er1 in db1.expResultList: 
             if er1.globalInfo.id == sel:
                 tx1.append ( er1.getTxNames() )
         tx1 = tx1[0]
-        db2 = Database ( "./database/+./dbadd1/" ) ## adds a t1 txname
+        db2 = Database ( f"{dbpath}+./dbadd1/" ) ## adds a t1 txname
         self.assertTrue ( len(db2.expResultList) == len(db1.expResultList) )
         for er2 in db2.expResultList:
             if er2.globalInfo.id == sel:

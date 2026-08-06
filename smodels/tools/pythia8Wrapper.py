@@ -8,16 +8,16 @@
 
 """
 
-from __future__ import print_function
 from smodels.tools.wrapperBase import WrapperBase
 from smodels.tools import wrapperBase
 from smodels.base.smodelsLogging import logger, setLogLevel
-from smodels.base.physicsUnits import fb, pb, TeV, mb
 from smodels.base.crossSection import XSectionList, getXsecFromLHEFile
 from smodels import installation
-from smodels.tools.pythia8particles import particles
 from smodels.decomposition.exceptions import SModelSDecompositionError as SModelSError
-import os, sys, io, shutil
+import os
+import sys
+import io
+import shutil
 from typing import Union
 
 try:
@@ -84,7 +84,7 @@ class Pythia8Wrapper(WrapperBase):
             raise IOError( f"file {nFile} does not exist" )
         return nFile
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Describe the current status
 
@@ -118,7 +118,12 @@ class Pythia8Wrapper(WrapperBase):
                 os.rmdir(self.tempdir)
                 self.tempdir = None
 
-    def checkInstallation ( self, compile : bool = True ):
+    def checkInstallation(self, compile: bool = True) -> bool:
+        """Check if pythia8 is installed correctly.
+
+        :param compile: if True, attempt to compile if not installed
+        :returns: True if installation is ok
+        """
         # super().checkInstallation(compile)
         exists = os.path.exists ( self.includeFile )
         xmldoc = self.getXmldoc()
@@ -208,7 +213,7 @@ class Pythia8Wrapper(WrapperBase):
         lhedata = lheF.read()
         lheF.close()
         os.remove(lhefile)
-        if not "<LesHouchesEvents" in lhedata:
+        if "<LesHouchesEvents" not in lhedata:
             raise SModelSError("No LHE events found in pythia output")
         if not unlink:
             tempfile = self.tempDirectory() + "/log"
@@ -235,7 +240,7 @@ class Pythia8Wrapper(WrapperBase):
 
         return ret
 
-    def chmod(self):
+    def chmod(self) -> bool:
         """
         chmod 755 on pythia executable, if it exists.
         Do nothing, if it doesnt exist.

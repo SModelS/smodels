@@ -8,32 +8,40 @@
 import os
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.decomposition.topologyDict import TopologyDict
-from smodels.matching.theoryPrediction import TheoryPredictionList,TheoryPrediction,TheoryPredictionsCombiner
+from smodels.matching.theoryPrediction import TheoryPredictionList,\
+         TheoryPrediction,TheoryPredictionsCombiner
 from smodels.experiment.databaseObj import Database
 from smodels.tools.ioObjects import OutputStatus
 from smodels.tools.coverage import Uncovered
-from smodels.base.physicsUnits import GeV, fb, TeV
+from smodels.base.physicsUnits import TeV
 from smodels.base.smodelsLogging import logger
-from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.basicStats import observed
 import numpy as np
-from itertools import groupby
 import time
+from typing import Optional
+from smodels.base.types import PathType
 
 class TxTPrinter(BasicPrinter):
     """
     Printer class to handle the printing of one single text output
     """
 
-    def __init__(self, output='stdout', filename=None, outputFormat='version3'):
+    def __init__( self, output : str = 'stdout', 
+                  filename : Optional[PathType] = None, 
+                  outputFormat : str = 'version3' ):
+        """
+        :param output: one of: file, stdout
+        """
         BasicPrinter.__init__(self, output, filename, outputFormat)
-        self.name = "log"
-        self.printtimespent = False
-        self.printingOrder = [OutputStatus, Database, TopologyDict,
+        self.name: str = "log"
+        self.printtimespent: bool = False
+        self.printingOrder: list = [OutputStatus, Database, TopologyDict,
                               TheoryPredictionList, TheoryPredictionsCombiner,
                               TheoryPrediction, Uncovered]
-        self.toPrint = [None] * len(self.printingOrder)
+        self.toPrint: list = [None] * len(self.printingOrder)
 
-    def setOutPutFile(self, filename, overwrite=True, silent=False):
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
+                       silent : bool = False ):
         """
         Set the basename for the text printer. The output filename will be
         filename.log.
@@ -49,11 +57,10 @@ class TxTPrinter(BasicPrinter):
                 logger.warning("Removing old output file " + self.filename)
             os.remove(self.filename)
 
-    def _formatDoc(self, obj):
-
+    def _formatDoc(self, obj: object) -> bool:
         return False
 
-    def _formatOutputStatus(self, obj):
+    def _formatOutputStatus(self, obj: object) -> str:
         """
         Format data for a OutputStatus object.
 
@@ -87,7 +94,7 @@ class TxTPrinter(BasicPrinter):
         output += "=" * 80 + "\n"
         return output
 
-    def _formatTopologyDict(self, obj):
+    def _formatTopologyDict(self, obj: object) -> str:
         """
         Format data for a TopologyDict object.
 
@@ -153,7 +160,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatSMS(self, obj):
+    def _formatSMS(self, obj: object) -> str:
         """
         Format data for an SMS object.
 
@@ -204,12 +211,12 @@ class TxTPrinter(BasicPrinter):
             output += "\t\t SMS ID: %i\n" %obj.smsID
             output += f"\t\t SMS: {str(obj)}\n"
             output += "\t\t Masses: %s\n" %str([(node,mass) for node,mass in zip(obj.nodes,obj.mass)
-                                                if not node.isSM and not node is obj.root])
+                                                if not node.isSM and node is not obj.root])
             output += "\t\t Cross-Sections:\n \t\t "+obj.weightList.niceStr().replace("\n", "\n \t\t ")
 
         return output
 
-    def _formatDatabase(self, obj):
+    def _formatDatabase(self, obj: object) -> str:
         """
         Format data for a Database object.
 
@@ -234,7 +241,7 @@ class TxTPrinter(BasicPrinter):
 
         return output+"\n"
 
-    def _formatExpResult(self, obj):
+    def _formatExpResult(self, obj: object) -> str:
         """
         Format data for a ExpResult object.
 
@@ -279,7 +286,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatNumber(self, number, n=4):
+    def _formatNumber(self, number : float, n : int = 4 ) -> str:
         """ format a number <number> to have n digits,
             but allow also for None, strings, etc """
         if type(number) not in [float, np.float64]:
@@ -287,7 +294,7 @@ class TxTPrinter(BasicPrinter):
         fmt = ".%dg" % n
         return ("%"+fmt) % number
 
-    def _formatTheoryPredictionList(self, obj):
+    def _formatTheoryPredictionList(self, obj: object) -> str:
         """
         Format data for a TheoryPredictionList object.
 
@@ -362,18 +369,16 @@ class TxTPrinter(BasicPrinter):
                 serv = self._formatNumber(theoryPrediction.getRValue(
                     evaluationType=self.getTypeOfExpected()), 4)
                 output += f"Expected r-value: {serv}\n"
-            nll = theoryPrediction.likelihood( return_nll = True )
+            nll = theoryPrediction.nll ()
             if nll is not None:
                 chi2, chi2sm = None, None
-                nllsm = theoryPrediction.lsm( return_nll = True )
-                nllmin = theoryPrediction.lmax( return_nll = True )
+                nllsm = theoryPrediction.nllsm( )
+                nllmin = theoryPrediction.nll_min( )
                 try:
-                    # chi2sm = -2*np.log(llhd/theoryPrediction.lsm())
                     chi2sm = 2*(nll - nllsm )
                 except TypeError:
                     pass
                 try:
-                    # chi2 = -2*np.log(llhd/theoryPrediction.lmax())
                     chi2 = 2*(nll - nllmin )
                 except TypeError:
                     pass
@@ -415,7 +420,7 @@ class TxTPrinter(BasicPrinter):
 
         return output
 
-    def _formatUncovered(self, obj):
+    def _formatUncovered(self, obj: object) -> str:
         """
         Format all uncovered data.
 
@@ -469,10 +474,10 @@ class TxTPrinter(BasicPrinter):
             output += "================================================================================\n"
         return output
 
-    def _formatTheoryPrediction(self,obj):
+    def _formatTheoryPrediction(self,obj: object) -> str:
         return self._formatTheoryPredictionsCombiner(obj)
 
-    def _formatTheoryPredictionsCombiner(self, obj):
+    def _formatTheoryPredictionsCombiner(self, obj: object) -> str:
         """
         Format data of the TheoryPredictionsCombiner object.
 
@@ -487,9 +492,9 @@ class TxTPrinter(BasicPrinter):
         r = self._formatNumber(obj.getRValue(),4)
         r_expected = self._formatNumber(obj.getRValue(evaluationType=self.getTypeOfExpected()),4)
         # Get likelihoods:
-        nllsm = obj.lsm( return_nll = True )
-        nll = obj.likelihood( return_nll = True )
-        nllmin = obj.lmax( return_nll = True )
+        nllsm = obj.nllsm( )
+        nll = obj.nll( )
+        nllmin = obj.nll_min( )
         # Get sorted txnames
         txnames = []
         for tx in obj.getTxNamesWeights(sort=True):

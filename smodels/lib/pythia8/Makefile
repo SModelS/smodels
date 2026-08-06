@@ -7,11 +7,24 @@
 PYTHIAVER := $(shell ./installer.py -v)
 
 PYTHIA8HOME := pythia$(PYTHIAVER)/
+
+ifeq ($(origin CXX), default)
+ifneq ($(shell command -v g++ 2>/dev/null),)
+    CXX := g++
+else ifneq ($(shell command -v c++ 2>/dev/null),)
+    CXX := c++
+else ifneq ($(shell command -v clang++ 2>/dev/null),)
+    CXX := clang++
+else
+    $(error No C++ compiler found)
+endif
+endif
+
 CXXFLAGS := -O3 -I$(PYTHIA8HOME)/include -I$(PYTHIA8HOME)/include/Pythia8/ -std=c++14
 LDFLAGS  := -L$(PYTHIA8HOME)/lib/ -L$(PYTHIA8HOME)/lib -Wl,-rpath,$(PWD)/$(PYTHIA8HOME)/lib
 XMLDOC   := $(PYTHIA8HOME)/share/Pythia8/xmldoc
 
-all: install_pythia8 pythia8.exe
+all: pythia8.exe
 
 version:
 	@echo $(PYTHIAVER)
@@ -23,7 +36,7 @@ clean:
 	chmod --quiet -R u+w pythia$(PYTHIAVER) || echo "no pythia$(PYTHIAVER)"
 	rm -rf $(EXES) test.slha pythia$(PYTHIAVER) .pythia*.tgz* pythia*.tgz*  pythia8.exe events.lhe
 
-pythia8.exe: pythia8.cc .PHONY
+pythia8.exe: pythia8.cc install_pythia8 .PHONY
 	echo $(XMLDOC) > xml.doc
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ pythia8.cc -lpythia8 -ldl
 

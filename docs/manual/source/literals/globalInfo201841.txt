@@ -9,5 +9,5 @@ publicationDOI: https://doi.org/10.1103/PhysRevD.104.112010
 private: False
 implementedBy: Sahana Narasimha
 lastUpdate: 2023/4/21
-datasetOrder: "SR-2B2Q-Vh", "SR-2B2Q-VZ", "SR-4Q-VV"
-covariance: [[ .61362, 0., 0. ], [ 0., .30989, 0. ], [ 0., 0., .59242 ] ]
+regionSets: { 'all': [ "SR-2B2Q-Vh", "SR-2B2Q-VZ", "SR-4Q-VV" ] }
+statModels: { 'all': [ ( 'sl', 'matrix.cov' ) ] }

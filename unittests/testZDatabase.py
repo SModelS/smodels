@@ -18,7 +18,7 @@ import os
 
 class DatabaseTest(unittest.TestCase):
     # use different logging config for the unit tests.
-    logging.config.fileConfig( "./logging.conf" )
+    # logging.config.fileConfig( "./logging.conf" )
     from smodels.base.smodelsLogging import logger
 
     def testWritePickle(self):
@@ -36,17 +36,18 @@ class DatabaseTest(unittest.TestCase):
 
     def testSelectors(self):
         from databaseLoader import database
-        validated = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
-                                            useNonValidated = False )
-        nonval = database.getExpResults(analysisIDs=['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024'],
+        anaIDs = ['*:8*TeV','CMS-PAS-SUS-15-002','CMS-PAS-SUS-16-024']
+        validated = database.getExpResults(analysisIDs=anaIDs,
+                                           useNonValidated = False )
+        nonval = database.getExpResults(analysisIDs=anaIDs,
                                          useNonValidated = True )
-#         print ( "validated=",len(validated),map ( str, validated ) )
-        self.assertTrue(len(validated)==8)
+        self.assertTrue(len(validated)==9)
         self.assertTrue(len(nonval)==9)
 
 
     def testLoadOfficial(self):
-        dblatest=Database ("official")
+        # dblatest=Database ("official") # I think here I want the official
+        from fullDatabase import database as dblatest
         latestver = dblatest.databaseVersion.replace(".","").replace("official","")
         from databaseLoader import database
         thisver = database.databaseVersion.replace("unittest","").replace(".","")

@@ -12,14 +12,11 @@ import sys
 sys.path.insert(0,"../")
 import unittest
 from smodels.base.smodelsLogging import setLogLevel
-from smodels.tools.particlesLoader import load
 from smodels.base.model import Model
 from smodels.share.models.SMparticles import SMList
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from smodels.share.models.mssm import BSMList
-from smodels.share.models.SMparticles import SMList
-from smodels.base.model import Model
 from smodels.base.physicsUnits import fb, GeV,MeV
 
 setLogLevel('error')

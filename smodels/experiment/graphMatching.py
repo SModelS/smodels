@@ -7,15 +7,15 @@
 """
 
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
-from smodels.base.smodelsLogging import logger
+from typing import Optional
 
 from collections import deque
 
 
-def getCycle(G):
+def getCycle(G: dict) -> Optional[list]:
     """
     Given a directed graph G, return a cycle, if it
-    exits.
+    exists.
     
     :param G: Dictionary with the directed edges 
               ({A : [B,C,D], B : [],..})
@@ -71,7 +71,7 @@ def getCycle(G):
     
     return path
 
-def getDirectedEdges(edges,match):    
+def getDirectedEdges(edges: dict, match: dict) -> tuple:    
     """
     From the edges of a bipartite graph (left -> right)
     and a match dictionary, split the edges into left -> right
@@ -103,7 +103,7 @@ def getDirectedEdges(edges,match):
                 
     return edgesL2R,edgesR2L    
 
-def maximal_matching(left, right, edges):
+def maximal_matching(left: list, right: list, edges: dict) -> dict:
     """
     Computes the maximal matching from left nodes to right nodes.
     The maximal matching is the maximal number of left nodes which can be
@@ -166,7 +166,7 @@ def maximal_matching(left, right, edges):
 
     return leftmatches
 
-def getNewMatch(left,right,edges,match):
+def getNewMatch(left: list, right: list, edges: dict, match: dict) -> Optional[dict]:
     """
     Given a perfect match, a list of left and right nodes in a bipartite
     graph and their edges (left > right), compute a new match.
@@ -232,7 +232,7 @@ def getNewMatch(left,right,edges,match):
     
     return new_match
 
-def getPerfectMatchings(left,right,edges):
+def getPerfectMatchings(left: list, right: list, edges: dict) -> iter:
     """
     Find all perfect matchings in an undirected bipartite graph.
 
@@ -258,7 +258,7 @@ def getPerfectMatchings(left,right,edges):
 
     return iter(all_matches)
 
-def perfectMatchingIter(left,right,edges,match,all_matches,add_e=None):
+def perfectMatchingIter(left: list, right: list, edges: dict, match: dict, all_matches: list, add_e=None) -> list:
     """
     Iterate over all perfect matchings.
 

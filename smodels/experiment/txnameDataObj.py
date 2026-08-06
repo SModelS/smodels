@@ -20,6 +20,7 @@ from scipy.linalg import svd, LinAlgError
 import numpy as np
 import math
 from math import floor, log10
+from typing import Optional, Union
 
 
 class TxNameData(object):
@@ -30,8 +31,8 @@ class TxNameData(object):
     """
     _keep_values = False  # keep the original values, only for debugging
 
-    def __init__(self, x, y, txdataId,
-                 accept_errors_upto=.05):
+    def __init__(self, x: list, y: list, txdataId: str,
+                 accept_errors_upto: Optional[float] = .05):
         """
         :param x: 2-D list of flat and unitless x-points (e.g. [ [mass1,mass2,mass3,mass4], ...])
         :param y: 1-D list with y-values (upper limits or efficiencies)
@@ -56,20 +57,20 @@ class TxNameData(object):
         """ a simple unique identifier, mostly for caching """
         return id(self)
 
-    def round_to_n(self, x, n):
+    def round_to_n(self, x: float, n: int) -> float:
         if x == 0.0:
             return x
         return round(x, int(-np.sign(x) * int(floor(log10(abs(x)))) + (n - 1)))
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(self) != type(other):
             return False
         return self._id == other._id
 
-    def PCAtransf(self, point):
+    def PCAtransf(self, point: list) -> list:
         """
         Transform a flat/unitless point with masses/widths to the PCA
         coordinate space.
@@ -91,7 +92,7 @@ class TxNameData(object):
 
         return point
 
-    def inversePCAtransf(self, point):
+    def inversePCAtransf(self, point: list) -> list:
         """
         Transform a a flat 1D point from coordinate space to flat/unitless point
         with masses/rescaled widths.
@@ -126,7 +127,7 @@ class TxNameData(object):
         return point
 
     @roundCache(argname="point",argpos=1,digits=2)
-    def getValueFor(self, point):
+    def getValueFor(self, point: list) -> Optional[float]:
         """
         Returns the UL or efficiency for the point.
 
@@ -154,7 +155,7 @@ class TxNameData(object):
             val = self._returnProjectedValue()
         return val
 
-    def interpolate(self, point, fill_value=np.nan):
+    def interpolate(self, point: list, fill_value: float = np.nan) -> float:
         """
         Returns the interpolated value for the point (in coordinates)
 
@@ -193,7 +194,7 @@ class TxNameData(object):
         ret = self.round_to_n(float(ret),6)
         return ret
 
-    def _estimateExtrapolationError(self, point):
+    def _estimateExtrapolationError(self, point: list) -> float:
         """
         When projecting a point from full_dimensionality to self.dimensionality, we
         estimate the evaluationType extrapolation error with the following
@@ -256,7 +257,7 @@ class TxNameData(object):
             de = dem
         return de
 
-    def _interpolateOutsideConvexHull(self, point):
+    def _interpolateOutsideConvexHull(self, point: list) -> Optional[float]:
         """
         Experimental routine, meant to check if we can interpolate outside
         convex hull
@@ -276,7 +277,7 @@ class TxNameData(object):
                          "propagate." % de)
         return None
 
-    def _returnProjectedValue(self):
+    def _returnProjectedValue(self) -> Optional[float]:
         """
         Return interpolation result with the appropriate units.
         """
@@ -292,7 +293,7 @@ class TxNameData(object):
 
         return self.projected_value
 
-    def countNonZeros(self, mp):
+    def countNonZeros(self, mp: list) -> int:
         """ count the nonzeros in a vector """
         nz = 0
         lim = 10**-4
@@ -301,7 +302,7 @@ class TxNameData(object):
                 nz += 1
         return nz
 
-    def onlyZeroValues(self):
+    def onlyZeroValues(self) -> bool:
         """ check if the map is zeroes only """
         eps = sys.float_info.epsilon
         negative_values = bool(sum([x < -eps for x in self.y_values]))
@@ -314,7 +315,7 @@ class TxNameData(object):
             return False
         return True
 
-    def computeV(self, x):
+    def computeV(self, x: list):
         """
         Compute rotation matrix _V, and triangulation self.tri
 
@@ -383,7 +384,7 @@ class Delaunay1D:
     forming the simplices (e.g. [[0,1],[1,2],[3,4],...]).
     """
 
-    def __init__(self, data):
+    def __init__(self, data: list):
 
         self.points = None
         self.simplices = None
@@ -406,7 +407,7 @@ class Delaunay1D:
         else:
             raise SModelSError()
 
-    def find_simplex(self, x, tol=0.):
+    def find_simplex(self, x: list, tol: float = 0.) -> int:
         """
         Find 1D data interval (simplex) to which x belongs
 
@@ -430,7 +431,7 @@ class Delaunay1D:
         else:
             return xi
 
-    def checkData(self, data):
+    def checkData(self, data: list) -> bool:
         """
         Define the simplices according to data. Compute and store
         the transformation matrix and simplices self.point.
@@ -444,16 +445,12 @@ class Delaunay1D:
                 return False
         return True
 
-    def find_index(self, xlist, x):
+    def find_index(self, xlist: list, x: float) -> int:
         """
         Efficient way to find x in a list.
         Returns the index (i) of xlist such that xlist[i] < x <= xlist[i+1].
         If x > max(xlist), returns the length of the list.
-        If x < min(xlist), returns 0.        vertices = np.take(self.tri.simplices, simplex, axis=0)
-        temp = np.take(self.tri.transform, simplex, axis=0)
-        d=temp.shape[2]
-        delta = uvw - temp[:, d]
-
+        If x < min(xlist), returns 0.
 
         :param xlist: List of x-type objects
         :param x: object to be searched for.

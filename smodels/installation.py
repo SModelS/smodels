@@ -8,12 +8,11 @@
 
 """
 
-from __future__ import print_function
 import sys
 import os
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
 
-def installDirectory():
+def installDirectory() -> str:
     """
     Return the software installation directory, by looking at location of this
     method.
@@ -26,9 +25,10 @@ def installDirectory():
     #path = path.replace("installation.py", "")
     return path + "/"
 
-def test_requirements():
+def test_requirements() -> bool:
     """ checks if all requirements are installed.
-    Returns true if that is the case. """
+    :returns: true if that is the case.
+    """
     import importlib.util
     for i in requirements():
         pos = i.find(">" )
@@ -40,10 +40,12 @@ def test_requirements():
             return False
     return True
 
-def resolve_dependencies( as_user = True, verbose = True ):
+def resolve_dependencies( as_user : bool = True,
+        verbose : bool = True ) -> Optional[int]:
     """ method that is meant to resolve the SModelS dependencies,
     via pip install --user. Warns you if pip cannot be found.
     :params as_user: if False, try system-wide install.
+    :returns: None, if dependencies met, else an integer
     """
     ck = test_requirements()
     if ck == True: ## nothing to be done
@@ -53,7 +55,7 @@ def resolve_dependencies( as_user = True, verbose = True ):
     req = f"{installDirectory()}/smodels/share/requirements.txt"
     try:
         import pip
-    except (ModuleNotFoundError,ImportError) as e:
+    except (ModuleNotFoundError,ImportError):
         if verbose:
             print ( "warning: pip not found. cannot install requirements. Maybe try easy_install pip" )
         return
@@ -62,7 +64,7 @@ def resolve_dependencies( as_user = True, verbose = True ):
     if as_user:
         o = subprocess.getoutput ( " ".join ( [ sys.executable, '-m', 'pip', 'install', '--user', '--dry-run', 'pyslha' ] ) )
         #o = subprocess.getoutput ( f"{p} install --user --dry-run pyslha" )
-        if not "Can not perform a '--user' install" in o:
+        if "Can not perform a '--user' install" not in o:
             cmd.insert( 4, '--user' )
 
     out = subprocess.call ( cmd )
@@ -73,7 +75,8 @@ def resolve_dependencies( as_user = True, verbose = True ):
         print ( "an error has occurred when resolving the dependencies." )
         return -1
 
-def cacheDirectory ( create=False, reportIfDefault=False ):
+def cacheDirectory ( create : bool = False,
+        reportIfDefault : bool = False ) -> str:
     """
     Returns the user's smodels cache directory, i.e. ~/.cache/smodels.
     :params create: if True, create the directory if it doesnt exist.
@@ -100,7 +103,7 @@ def cacheDirectory ( create=False, reportIfDefault=False ):
         return smodelsDir,True
     return smodelsDir
 
-def pythonDirectory():
+def pythonDirectory() -> str:
     """
     Return the python installation directory, by looking at location of this
     method. Same as installDirectory(), but trailing "smodels/" removed.
@@ -111,7 +114,7 @@ def pythonDirectory():
     return path
 
 
-def authors():
+def authors() -> str:
     """ return the author list, taken from BANNER """
     copying_file = open(f'{installDirectory()}/smodels/share/BANNER', 'r')
     lines = copying_file.readlines()
@@ -131,7 +134,7 @@ def authors():
         authors += to_add
     return authors
 
-def requirements():
+def requirements() -> list:
     ret=[]
     f = open( f"{installDirectory()}/smodels/share/requirements.txt")
     lines=f.readlines()
@@ -158,11 +161,11 @@ def version( return_tuple : bool = False ) -> Union[str,Tuple]:
     for i,r in enumerate(ret):
         try:
             ret[i]=int(r)
-        except ValueError as e:
+        except ValueError:
             pass
     return tuple(ret)
 
-def license():
+def license() -> str:
     """
     Print license information of the SModelS framework.
 
@@ -173,7 +176,7 @@ def license():
     return "".join(lines)
 
 
-def banner():
+def banner() -> str:
     """
     Returns SModelS banner.
 
@@ -201,15 +204,16 @@ def fixpermissions():
         print ( "sudo smodelsTools.py fixpermissions" )
 
 __dbServer__ = "https://smodels.github.io/database"
-__dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded", "unittest",
-                 "debug", "nonaggregated", "full_llhds", "unittestextra", None ]
+__dblabels__ = [ "official", "latest", "fastlim", "backup", "superseded",
+    "unittest", "debug", "nonaggregated", "full_llhds", "unittestextra",
+    "yieldsonly", "unittesttiny", None ]
 
-def databasePath ( label ):
+def databasePath ( label : str ) -> str:
     """ construct the path to the database json file
     :param label: one of: official, latest, fastlim, backup
     :returns: URL, e.g. https://smodels.github.io/database/official
     """
-    if not label in __dblabels__:
+    if label not in __dblabels__:
         from smodels.base.smodelsLogging import logger
         logger.warning ( f"cannot identify label {label}" )
         return label
