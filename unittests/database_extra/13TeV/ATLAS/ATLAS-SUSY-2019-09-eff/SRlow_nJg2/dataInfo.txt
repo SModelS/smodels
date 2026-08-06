@@ -1,0 +1,7 @@
+dataId: SRlow_nJg2
+dataType: efficiencyMap
+observedN: 12.0
+expectedBG: 12.4
+bgError: 1.9
+upperLimit: 0.0668*fb
+expectedUpperLimit: 0.0697*fb

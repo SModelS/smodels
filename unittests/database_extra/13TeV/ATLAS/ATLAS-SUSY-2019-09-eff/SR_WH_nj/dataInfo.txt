@@ -1,0 +1,7 @@
+dataId: SR_WH_nj
+dataType: efficiencyMap
+observedN: 488
+expectedBG: 492.6
+bgError: 26
+upperLimit: 0.488*fb
+expectedUpperLimit: 0.516*fb

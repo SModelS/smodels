@@ -1,0 +1,8 @@
+dataId: ar9
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 0.7
+bgError: 0.9564517760974675
+upperLimit: 0.112873*fb
+expectedUpperLimit: 0.112873*fb
+aggregated: t1b1MT2550__750MET250__400

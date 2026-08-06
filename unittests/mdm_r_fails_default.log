@@ -1,0 +1,83 @@
+Input status: 1
+Decomposition output status: 1 #decomposition was successful
+# Input File: ./testFiles/slha/2mdm_r_fails.slha
+# checkinput = True
+# combineanas = ATLAS-SUSY-2018-22-multibin, CMS-EXO-20-004
+# combinesrs = True
+# computestatistics = True
+# docompress = True
+# doinvisible = True
+# eraseprompt = eCharge,colordim
+# experimentalfeatures = False
+# maxcond = 0.2
+# minmassgap = 5.
+# ncpus = 30
+# promptwidth = 1e-11
+# reportallsrs = False
+# sigmacut = 0.0
+# stablewidth = 1e-25
+# testcoverage = True
+# SModelS version: 3.0.0
+# Database version: 3.0.0
+================================================================================
+  ========================================================  
+||                                                        ||
+||                 Theory Predictions and                 ||
+||                Experimental Constraints                ||
+||                                                        ||
+  ========================================================  
+
+---------------Analysis Label = ATLAS-SUSY-2018-22
+-------------------Dataset Label = SR2j_2200
+-------------------Txname Labels = ['TRV1']
+Analysis sqrts: 1.30E+01 [TeV]
+Theory prediction: 6.81E-07 [pb]
+Theory conditions:  None
+Observed experimental limit: 7.77E-01 [fb]
+Expected experimental limit: 7.93E-01 [fb]
+Observed r-value: 0.0008762
+Expected r-value: 0.0008587
+nll: 9.201
+nll_min: 9.201   -2log(L/L_max): 0.0004929
+nll_SM: 9.201   -2log(L/L_SM): 0.0004929
+
+---------------Analysis Label = ATLAS-SUSY-2018-22-multibin
+-------------------Dataset Label = (combined)
+-------------------Txname Labels = ['TRV1']
+Analysis sqrts: 1.30E+01 [TeV]
+Theory prediction: 3.38E-06 [pb]
+Theory conditions:  None
+Observed experimental limit: None
+Observed r-value: None
+
+Total cross-section for missing topologies (fb):  2.641E+01
+Total cross-section for missing topologies with displaced decays (fb):  0.000E+00
+Total cross-section for missing topologies with prompt decays (fb):  2.641E+01
+Total cross-section for topologies outside the grid (fb):  0.000E+00
+
+#Full information on unconstrained cross sections
+================================================================================
+missing topologies with the highest cross sections (up to 10):
+Sqrts (TeV)   Weight (fb)                  SMS description
+ 13.0          1.692E+01    #                                        PV > (jet,jet) 
+ 13.0          4.278E+00    #                                            PV > (t,t) 
+ 13.0          4.229E+00    #                                            PV > (b,b) 
+ 13.0          4.980E-01    #                                            PV > (W,W) 
+ 13.0          2.472E-01    #                                            PV > (Z,Z) 
+ 13.0          2.419E-01    #                                    PV > (higgs,higgs) 
+ 13.0          1.955E-06    #                                          PV > (ta,ta) 
+================================================================================
+No missing topologies with displaced decays found
+================================================================================
+missing topologies with prompt decays with the highest cross sections (up to 10):
+Sqrts (TeV)   Weight (fb)                  SMS description
+ 13.0          1.692E+01    #                                        PV > (jet,jet) 
+ 13.0          4.278E+00    #                                            PV > (t,t) 
+ 13.0          4.229E+00    #                                            PV > (b,b) 
+ 13.0          4.980E-01    #                                            PV > (W,W) 
+ 13.0          2.472E-01    #                                            PV > (Z,Z) 
+ 13.0          2.419E-01    #                                    PV > (higgs,higgs) 
+ 13.0          1.955E-06    #                                          PV > (ta,ta) 
+================================================================================
+No topologies outside the grid found
+================================================================================

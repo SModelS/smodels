@@ -1,0 +1,13 @@
+sqrts: 8.0*TeV
+lumi: 20.3/fb
+id: ATLAS-SUSY-2013-12
+prettyName: ATLAS trilepton inc Wh decay
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2013-12/
+arxiv: http://arxiv.org/abs/1402.7029
+publication: http://link.springer.com/article/10.1007/JHEP04(2014)169
+supersedes: ATLAS-CONF-2013-035; CONF-2012-154
+comment: TChiWh renamed to TChiWH
+private: False
+implementedBy: Wolfgang Waltenberger
+lastUpdate: 2015/5/6
+

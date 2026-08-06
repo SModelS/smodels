@@ -1,0 +1,8 @@
+dataId: ar50
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 3.5
+bgError: 2.1393924371185387
+upperLimit: 0.156984*fb
+expectedUpperLimit: 0.195735*fb
+aggregated: t2b>=3MT2>=1300MET250__350

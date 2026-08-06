@@ -1,0 +1,56 @@
+#: table_doi: 10.17182/hepdata.95354.v2/t1
+#: name: Cross section limits vs. mass (0.3 ns, wino LSP)
+#: description: The expected and observed 95% CL upper limits on the product of cross section and branching fraction for direct production of charginos as a function of chargino mass, for a chargino lifetime of 0.3 ns and with a purely wino LSP. The branching fraction for $\widetilde{\chi}^{\pm}_{1} \rightarrow \widetilde{\chi}^{0}_{1} \pi^{\pm}$ is set to 100%. Shown are the full Run 2 results, derived from the results of the search in the 2017 and 2018 data sets combined with those of the previous CMS result obtained in the 2015 and 2016 data sets. The cross section includes both $\widetilde{\chi}^{\pm}_{1} \widetilde{\chi}^{0}_{1}$ and $\widetilde{\chi}^{\pm}_{1}\widetilde{\chi}^{\mp}_{1}$ production in roughly a 2:1 ratio for all chargino masses considered. The dashed line indicates the theoretical prediction.
+#: data_file: cross_section_limits_vs._mass_(0.3_ns,_wino_lsp).yaml
+Chargino mass [GeV],Observed 95% CL upper limits on chargino production cross section [pb]
+100.0,0.046023
+200.0,0.039706
+300.0,0.034543
+400.0,0.028477
+500.0,0.035887
+600.0,0.036595
+700.0,0.036552
+800.0,0.040362
+900.0,0.04095
+1000.0,0.044558
+1100.0,0.042564
+
+Chargino mass [GeV],Expected 95% CL upper limits on chargino production cross section $\pm$ 1 s.d. [pb],1 s.d. +,1 s.d. -
+100.0,0.03781,0.017483,-0.011446
+200.0,0.02921,0.012924,-0.0085915
+300.0,0.025509,0.011083,-0.0074413
+400.0,0.020777,0.0095241,-0.0063407
+500.0,0.026104,0.011134,-0.0076151
+600.0,0.025903,0.011564,-0.0076187
+700.0,0.027758,0.01206,-0.0081645
+800.0,0.028882,0.013009,-0.0086344
+900.0,0.028871,0.012774,-0.0085991
+1000.0,0.031593,0.014482,-0.0094872
+1100.0,0.030682,0.014065,-0.0091725
+
+Chargino mass [GeV],Expected 95% CL upper limits on chargino production cross section $\pm$ 2 s.d. [pb],2 s.d. +,2 s.d. -
+100.0,0.03781,0.040563,-0.018314
+200.0,0.02921,0.029521,-0.01392
+300.0,0.025509,0.025008,-0.012057
+400.0,0.020777,0.021982,-0.010145
+500.0,0.026104,0.025455,-0.012338
+600.0,0.025903,0.026567,-0.012344
+700.0,0.027758,0.027388,-0.013229
+800.0,0.028882,0.030056,-0.01399
+900.0,0.028871,0.029538,-0.013759
+1000.0,0.031593,0.033816,-0.01518
+1100.0,0.030682,0.032462,-0.014862
+
+Chargino mass [GeV],NLO+NLL prediction for chargino production cross section [pb],scale/PDF uncertainties +,scale/PDF uncertainties -
+100.0,34.282,1.1034,-1.1034
+200.0,2.71,0.11469,-0.11469
+300.0,0.5771,0.02959,-0.02959
+400.0,0.17964,0.010716,-0.010716
+500.0,0.06848,0.0045981,-0.0045981
+600.0,0.029636,0.0022387,-0.0022387
+700.0,0.013949,0.0011369,-0.0011369
+800.0,0.0069704,0.00061505,-0.00061505
+900.0,0.0036497,0.00034213,-0.00034213
+1000.0,0.0019654,0.00019178,-0.00019178
+1100.0,0.001083,0.0001154,-0.0001154
+

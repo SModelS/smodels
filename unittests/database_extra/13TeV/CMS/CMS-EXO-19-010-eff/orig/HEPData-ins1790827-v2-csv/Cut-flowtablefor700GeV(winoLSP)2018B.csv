@@ -1,0 +1,88 @@
+#: table_doi: 10.17182/hepdata.95354.v2/t21
+#: name: Cut-flow table for 700 GeV (wino LSP) 2018B
+#: description: Predicted signal yields for the 2018B data-taking period, corresponding to $38.6\,\text{fb}^{-1}$, after the application of each search requirement for three chargino lifetime hypotheses ($\tau = 0.3$, $3.3$, and $33\,\text{ns}{}$) with a chargino mass of $700\,\text{GeV}{}$ in the case of a purely wino neutralino LSP. Excepting the final three, the requirements listed are cumulative such that only the events and objects passing a given requirement are considered in subsequent requirements. In the case of the final three requirements on the number of tracker layers with measurement, these are exclusive signal category selections where only one is applied for each category. The uncertainties are only the statistical uncertainties resulting from the sizes of the generated samples.
+#: data_file: cut-flow_table_for_700_gev_(wino_lsp)_2018b.yaml
+Requirement,"Number of passing events for $\tau = 0.3\,\text{ns}{}$",1 s.d. +,1 s.d. -
+total,539.0,2.4,-2.4
+trigger,78.2,0.9,-0.9
+passes $p_{\text{T}}^{\text{miss}}$ filters,78.1,0.9,-0.9
+"$p_{\text{T}}^{\text{miss}} > 120\,\text{GeV}{}$",77.4,0.9,-0.9
+"$\geq 1$ jet with $p_{\text{T}} > 110\,\text{GeV}{}$ and $|\eta| < 2.4$",70.1,0.9,-0.9
+"==0 pairs of jets with $\Delta\phi_{\text{jet, jet}} > 2.5$",60.6,0.8,-0.8
+"$|\Delta\phi(\mbox{leading jet}, \vec{p}_{\text{T}}^{\text{miss}})| > 0.5$",60.6,0.8,-0.8
+$\geq 1$ track with $|\eta| < 2.1$,59.4,0.8,-0.8
+"$\geq 1$ track with $p_{\text{T}} > 55\,\text{GeV}{}$",25.3,0.5,-0.5
+$\geq 1$ track passing fiducial selections,16.5,0.4,-0.4
+$\geq 1$ track with $\geq 4$ pixel hits,9.21,0.32,-0.32
+$\geq 1$ track with no missing inner hits,9.09,0.32,-0.32
+$\geq 1$ track with no missing middle hits,8.19,0.3,-0.3
+$\geq 1$ track with relative track isolation $< 5\%$,2.87,0.18,-0.18
+"$\geq 1$ track with $|d_{\text{xy}}| < 0.02\,\text{cm}{}$",2.8,0.18,-0.18
+"$\geq 1$ track with $|d_z| < 0.5\,\text{cm}{}$",2.79,0.17,-0.17
+"$\geq 1$ track with $\Delta R (\text{track}, \text{jet}) > 0.5$",2.68,0.17,-0.17
+"$\geq 1$ track with $\Delta R (\text{track}, \text{electron}) > 0.15$",2.57,0.17,-0.17
+"$\geq 1$ track with $\Delta R (\text{track}, \text{muon}) > 0.15$",2.56,0.17,-0.17
+"$\geq 1$ track with $\Delta R (\text{track}, \tau_{\text{h}}) > 0.15$",2.56,0.17,-0.17
+"$\geq 1$ track with $E_{\text{calo}} < 10\,\text{GeV}{}$",2.53,0.17,-0.17
+$\geq 1$ track with $\geq 3$ missing outer hits,2.51,0.17,-0.17
+$\phi(p_{\text{T}}^{\text{miss}}) < -1.6$ or $\phi(p_{\text{T}}^{\text{miss}}) > -0.6$,2.04,0.15,-0.15
+$\geq 1$ track with number of tracker layers with measurement == $4$,1.23,0.12,-0.12
+$\geq 1$ track with number of tracker layers with measurement == $5$,0.39,0.07,-0.07
+$\geq 1$ track with number of tracker layers with measurement \geq 6$,0.43,0.07,-0.07
+
+Requirement,"Number of passing events for $\tau = 3.3\,\text{ns}{}$",1 s.d. +,1 s.d. -
+total,539.0,3.4,-3.4
+trigger,81.8,1.3,-1.3
+passes $p_{\text{T}}^{\text{miss}}$ filters,81.8,1.3,-1.3
+"$p_{\text{T}}^{\text{miss}} > 120\,\text{GeV}{}$",80.1,1.3,-1.3
+"$\geq 1$ jet with $p_{\text{T}} > 110\,\text{GeV}{}$ and $|\eta| < 2.4$",71.2,1.2,-1.2
+"==0 pairs of jets with $\Delta\phi_{\text{jet, jet}} > 2.5$",60.9,1.1,-1.1
+"$|\Delta\phi(\mbox{leading jet}, \vec{p}_{\text{T}}^{\text{miss}})| > 0.5$",60.9,1.1,-1.1
+$\geq 1$ track with $|\eta| < 2.1$,60.5,1.1,-1.1
+"$\geq 1$ track with $p_{\text{T}} > 55\,\text{GeV}{}$",46.7,1.0,-1.0
+$\geq 1$ track passing fiducial selections,33.0,0.8,-0.8
+$\geq 1$ track with $\geq 4$ pixel hits,21.2,0.7,-0.7
+$\geq 1$ track with no missing inner hits,21.1,0.7,-0.7
+$\geq 1$ track with no missing middle hits,19.6,0.6,-0.6
+$\geq 1$ track with relative track isolation $< 5\%$,15.4,0.6,-0.6
+"$\geq 1$ track with $|d_{\text{xy}}| < 0.02\,\text{cm}{}$",15.4,0.6,-0.6
+"$\geq 1$ track with $|d_z| < 0.5\,\text{cm}{}$",15.4,0.6,-0.6
+"$\geq 1$ track with $\Delta R (\text{track}, \text{jet}) > 0.5$",15.1,0.6,-0.6
+"$\geq 1$ track with $\Delta R (\text{track}, \text{electron}) > 0.15$",14.3,0.6,-0.6
+"$\geq 1$ track with $\Delta R (\text{track}, \text{muon}) > 0.15$",13.9,0.5,-0.5
+"$\geq 1$ track with $\Delta R (\text{track}, \tau_{\text{h}}) > 0.15$",13.9,0.5,-0.5
+"$\geq 1$ track with $E_{\text{calo}} < 10\,\text{GeV}{}$",13.6,0.5,-0.5
+$\geq 1$ track with $\geq 3$ missing outer hits,9.28,0.45,-0.45
+$\phi(p_{\text{T}}^{\text{miss}}) < -1.6$ or $\phi(p_{\text{T}}^{\text{miss}}) > -0.6$,7.85,0.41,-0.41
+$\geq 1$ track with number of tracker layers with measurement == $4$,1.67,0.19,-0.19
+$\geq 1$ track with number of tracker layers with measurement == $5$,1.22,0.16,-0.16
+$\geq 1$ track with number of tracker layers with measurement \geq 6$,5.04,0.33,-0.33
+
+Requirement,"Number of passing events for $\tau = 33\,\text{ns}{}$",1 s.d. +,1 s.d. -
+total,539.0,2.4,-2.4
+trigger,84.6,1.0,-1.0
+passes $p_{\text{T}}^{\text{miss}}$ filters,84.6,1.0,-1.0
+"$p_{\text{T}}^{\text{miss}} > 120\,\text{GeV}{}$",82.3,0.9,-0.9
+"$\geq 1$ jet with $p_{\text{T}} > 110\,\text{GeV}{}$ and $|\eta| < 2.4$",72.7,0.9,-0.9
+"==0 pairs of jets with $\Delta\phi_{\text{jet, jet}} > 2.5$",62.4,0.8,-0.8
+"$|\Delta\phi(\mbox{leading jet}, \vec{p}_{\text{T}}^{\text{miss}})| > 0.5$",62.4,0.8,-0.8
+$\geq 1$ track with $|\eta| < 2.1$,62.3,0.8,-0.8
+"$\geq 1$ track with $p_{\text{T}} > 55\,\text{GeV}{}$",56.4,0.8,-0.8
+$\geq 1$ track passing fiducial selections,40.3,0.7,-0.7
+$\geq 1$ track with $\geq 4$ pixel hits,28.4,0.6,-0.6
+$\geq 1$ track with no missing inner hits,28.2,0.6,-0.6
+$\geq 1$ track with no missing middle hits,24.7,0.5,-0.5
+$\geq 1$ track with relative track isolation $< 5\%$,21.0,0.5,-0.5
+"$\geq 1$ track with $|d_{\text{xy}}| < 0.02\,\text{cm}{}$",21.0,0.5,-0.5
+"$\geq 1$ track with $|d_z| < 0.5\,\text{cm}{}$",21.0,0.5,-0.5
+"$\geq 1$ track with $\Delta R (\text{track}, \text{jet}) > 0.5$",20.6,0.5,-0.5
+"$\geq 1$ track with $\Delta R (\text{track}, \text{electron}) > 0.15$",17.9,0.4,-0.4
+"$\geq 1$ track with $\Delta R (\text{track}, \text{muon}) > 0.15$",7.47,0.28,-0.28
+"$\geq 1$ track with $\Delta R (\text{track}, \tau_{\text{h}}) > 0.15$",7.47,0.28,-0.28
+"$\geq 1$ track with $E_{\text{calo}} < 10\,\text{GeV}{}$",7.32,0.28,-0.28
+$\geq 1$ track with $\geq 3$ missing outer hits,2.48,0.16,-0.16
+$\phi(p_{\text{T}}^{\text{miss}}) < -1.6$ or $\phi(p_{\text{T}}^{\text{miss}}) > -0.6$,2.06,0.15,-0.15
+$\geq 1$ track with number of tracker layers with measurement == $4$,0.35,0.06,-0.06
+$\geq 1$ track with number of tracker layers with measurement == $5$,0.23,0.05,-0.05
+$\geq 1$ track with number of tracker layers with measurement \geq 6$,1.49,0.13,-0.13
+

@@ -1,0 +1,7 @@
+dataId: SRhigh_nJd
+dataType: efficiencyMap
+observedN: 2.0
+expectedBG: 5.4
+bgError: 1.4
+upperLimit: 0.0277*fb
+expectedUpperLimit: 0.0507*fb
