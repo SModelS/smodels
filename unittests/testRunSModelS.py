@@ -51,7 +51,7 @@ class RunSModelSTest(unittest.TestCase):
         try:
             filename = "./testFiles/slha/complicated.slha"
             t0 = time.time()
-            runMain(filename, timeout=2, suppressStdout=True,
+            runMain(filename, timeout=3, suppressStdout=True,
                     development=True, inifile="timeout.ini")
             print(f"should never get here. time spent:{time.time() - t0:.1f}s ")
             self.assertTrue(False)
