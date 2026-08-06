@@ -44,7 +44,7 @@ New in Version 3.2.0:
   * Updated `lheReader <base.html#module-base.lheReader>`_ to properly deal with MG5 LHE files (fixes github issue `#53 <https://github.com/SModelS/smodels/issues/53>`_, see also discussion `#54 <https://github.com/SModelS/smodels/issues/54>`_)
   * Fixed pythia8 paths in automatic downloader
   * Introduced a printer registry for out-of-repo printers
-  * |Database| extension (stat models): added ONNX models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09 
+  * |Database| extension (stat models): added ONNX models to ATLAS-SUSY-2018-04, ATLAS-SUSY-2018-16, ATLAS-SUSY-2018-32, ATLAS-SUSY-2019-08, ATLAS-SUSY-2019-09 -- thanks to Humberto Reyes-Gonzalez, Joaquin Iturriza Ramirez and Rafal Maselek for their help
   * |Database| extension (new results): added ATLAS-SUSY-2018-09 (EM), ATLAS-SUSY-2019-02 (TSlepSlep, UL) ATLAS-SUSY-2019-04 (EM), ATLAS-SUSY-2020-27 (UL+EM), CMS-SUS-18-004 (EM), CMS-EXO-19-019 (UL), CMS-SUS-21-008 (UL), CMS-SUS-23-003 (UL) -- thanks to Lucas Heck and Axel Schwingrouber-Mazet for valuable contributions
   * Database now pickles with protocol 5 instead of protocol 4
 
