@@ -51,7 +51,7 @@ class RunSModelSTest(unittest.TestCase):
         try:
             filename = "./testFiles/slha/complicated.slha"
             t0 = time.time()
-            runMain(filename, timeout=.1, suppressStdout=True,
+            runMain(filename, timeout=2, suppressStdout=True,
                     development=True, inifile="timeout.ini")
             print(f"should never get here. time spent:{time.time() - t0:.1f}s ")
             self.assertTrue(False)
@@ -226,7 +226,7 @@ class RunSModelSTest(unittest.TestCase):
         ctr = 0
         crash_file = None
         self.cleanUp()
-        runMain(filename, timeout=.1, suppressStdout=True,
+        runMain(filename, timeout=2, suppressStdout=True,
                 inifile="timeout.ini")
         time.sleep(.2)
         for f in os.listdir("."):
