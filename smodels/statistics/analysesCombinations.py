@@ -12,7 +12,7 @@
 """
 
 import numpy as np
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
      findRoot
@@ -56,7 +56,8 @@ class AnaCombLikelihoodComputer(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param asimov: if not None, compute llhd for asimov data with mu=asimov
         """
-        return self.likelihood ( mu, evaluationType, return_nll=True, asimov=asimov )
+        return self.likelihood ( mu, evaluationType, return_nll=True, 
+                                 asimov=asimov )
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def likelihood(
@@ -237,22 +238,28 @@ class AnaCombLikelihoodComputer(object):
         return ret
 
     @lru_cache
-    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, allowNegativeSignals = False ):
+    def getUpperLimitOnMu(self, evaluationType : NllEvalType=observed, 
+            allowNegativeSignals = False, nSigma : int = 0 ) -> float:
         """get upper limit on signal strength multiplier, i.e. value for mu for \
            which CLs = 0.95
 
         :param evaluationType: one of: observed, apriori, aposteriori
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on signal strength multiplier mu
         """
-        mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
-                                                        allowNegativeSignals=allowNegativeSignals)
+        mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
+                evaluationType=evaluationType,
+                allowNegativeSignals=allowNegativeSignals,
+                nSigma = nSigma )
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                                      allowNegative = allowNegativeSignals )
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
-    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, allowNegativeSignals= False):
+    def getUpperLimitOnSigmaTimesEff(self, evaluationType : NllEvalType=observed, 
+            allowNegativeSignals : bool = False, nSigma : int = 0 ) -> UnitXSec:
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
@@ -260,6 +267,8 @@ class AnaCombLikelihoodComputer(object):
             the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
         :param evaluationType: one of: observed, apriori, aposteriori
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on fiducial cross section
         """
         ul = self.getUpperLimitOnMu(evaluationType=evaluationType,
@@ -273,14 +282,17 @@ class AnaCombLikelihoodComputer(object):
         return ul * xsec
 
     def getCLsRootFunc(self, evaluationType : NllEvalType=observed,
-			    allowNegativeSignals : bool = False ) -> Tuple[float, float, Callable]:
+			              allowNegativeSignals : bool = False, nSigma : int = 0 ) \
+            -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
         plus mu_hat and sigma_mu
-
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :param evaluationType: one of: observed, apriori, aposteriori
         """
-        fmh = self.lmax(evaluationType=evaluationType, allowNegativeSignals=allowNegativeSignals)
+        fmh = self.lmax( evaluationType=evaluationType, 
+                         allowNegativeSignals=allowNegativeSignals )
         mu_hat, sigma_mu = fmh["muhat"], fmh["sigma_mu"]
         mu_hat = mu_hat if mu_hat is not None else 0.0
         nll0 = self.likelihood(mu_hat, evaluationType=evaluationType,
@@ -305,14 +317,16 @@ class AnaCombLikelihoodComputer(object):
             nllA = self.likelihood(mu, evaluationType=evaluationType,
                     return_nll=True, asimov = 0. )
 
-            return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
-                     return_type=return_type) if nll and nllA is not None else None
+            if nll is None or nllA is None:
+                return None
+            return CLsfromNLL( nllA, nll0A, nll, nll0, (mu_hat>mu),
+                               return_type=return_type, nSigma=nSigma )
 
         return mu_hat, sigma_mu, clsRoot
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
     def CLs( self, mu : float = 1., evaluationType : NllEvalType=observed,
-             return_type: Text = "CLs" ):
+             return_type: Text = "CLs", nSigma : int = 0 ) -> float:
         """
         Compute the exclusion confidence level of the model
 
@@ -326,7 +340,8 @@ class AnaCombLikelihoodComputer(object):
         """
         assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
             f"Unknown return type: {return_type}."
-        _, _, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType)
+        _, _, clsRoot = self.getCLsRootFunc(evaluationType=evaluationType,
+                nSigma = nSigma )
 
         return float(clsRoot(mu, return_type=return_type))
 

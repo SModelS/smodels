@@ -320,11 +320,13 @@ class XSecResummino(XSecBase):
         
         if order == 1:
             if float(results[1].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
+                logger.warning(f"too much change between LO and NLO for {particle_1} and {particle_2} with {slha_file} : xsection not created ")
                 with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1
         if order == 2:
             if float(results[2].split(" ")[2][1:])>2*float(results[0].split(" ")[2][1:]) or float(results[0].split(" ")[2][1:])> 2* float(results[1].split(" ")[2][1:]):
+                logger.warning(f"to much change between LO and NLL+NLO for {particle_1} and {particle_2} with {slha_file} : xsection not created ")
                 with open(log, 'a') as f:
                     f.write(f"to much change between LO and NLL+NLO for {particle_1} and {particle_2} with {slha_file}")
                 return 1

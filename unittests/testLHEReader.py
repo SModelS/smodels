@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-.. module:: testAsciiGraph
-   :synopsis: Tests the ascii grapher.
+.. module:: testLHEReader
+   :synopsis: Tests the lhe reader
               Depends also on lheReader, lheDecomposer.
 
 .. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
@@ -13,11 +13,12 @@ import unittest
 import sys
 sys.path.insert(0,"../")
 from smodels.base import lheReader
+from smodels.base.physicsUnits import pb
 import pyslha
 import logging as logger
 
-
-def compareDecays(decaysA,decaysB,allowDiff=0.01,minBR=1e-5):
+def compareDecays( decaysA, decaysB,
+        allowDiff : float = 0.01, minBR : float = 1e-5 ) -> bool:
     """
     Compares two lists of pyslha.Decay objects. Each list should correpond
     to the same parent particle.
@@ -59,7 +60,16 @@ class LHEReaderTest(unittest.TestCase):
         reader.close()
         self.assertEqual(len(events),5)
         
-
+    def testALRSM(self):
+        filename = "./testFiles/lhe/alrsm.lhe"
+        reader = lheReader.LheReader(filename)
+        events = [event for event in reader]
+        reader.close()
+        xsec = 1.367008E-01*pb
+        dxsec = ( reader.metainfo["totalxsec"] - xsec ).asNumber(pb)
+        self.assertAlmostEqual ( dxsec, 0. )
+        self.assertEqual(len(events),100)
+        
     def testEventDictionaries(self):
 
         filename = "./testFiles/lhe/simplyGluino.lhe"
@@ -94,19 +104,32 @@ class LHEReaderTest(unittest.TestCase):
             
         #Expected answer:
         decayRes = {}
-        decayRes[1000024] = [pyslha.Decay(br=1.0000,ids=[1000022, 24],parentid=1000024,nda=2)]
-        decayRes[1000023] = [pyslha.Decay(br=0.8571,ids=[1000022, 25],parentid=1000023,nda=2),
-                             pyslha.Decay(br=0.1429,ids=[1000022, 23],parentid=1000023,nda=2)]
-        decayRes[1000001] = [pyslha.Decay(br=1.0000,ids=[1000021, 1],parentid=1000001,nda=2)]
-        decayRes[1000002] = [pyslha.Decay(br=0.5000,ids=[1000024, 1],parentid=1000002,nda=2),
-                             pyslha.Decay(br=0.2500,ids=[1000021, 2],parentid=1000002,nda=2),
-                             pyslha.Decay(br=0.2500,ids=[1000023, 2],parentid=1000002,nda=2)]
-        decayRes[2000002] = [pyslha.Decay(br=1.0000,ids=[1000021, 2],parentid=2000002,nda=2)]
-        decayRes[1000021] = [pyslha.Decay(br=0.2500,ids=[-1000024, 4, -3],parentid=1000021,nda=3),
-                             pyslha.Decay(br=0.3750,ids=[1000024, -2, 1],parentid=1000021,nda=3),
-                             pyslha.Decay(br=0.1250,ids=[1000024, -4, 3],parentid=1000021,nda=3),
-                             pyslha.Decay(br=0.1250,ids=[1000023, -2, 2],parentid=1000021,nda=3),
-                             pyslha.Decay(br=0.1250,ids=[1000023, -6, 6],parentid=1000021,nda=3)]
+        decayRes[1000024] = [pyslha.Decay(br=1.0000,ids=[1000022, 24],
+                             parentid=1000024,nda=2)]
+        decayRes[1000023] = [pyslha.Decay(br=0.8571,ids=[1000022, 25],
+                             parentid=1000023,nda=2),
+                             pyslha.Decay(br=0.1429,ids=[1000022, 23],
+                             parentid=1000023,nda=2)]
+        decayRes[1000001] = [pyslha.Decay(br=1.0000,ids=[1000021, 1],
+                             parentid=1000001,nda=2)]
+        decayRes[1000002] = [pyslha.Decay(br=0.5000,ids=[1000024, 1],
+                             parentid=1000002,nda=2),
+                             pyslha.Decay(br=0.2500,ids=[1000021, 2],
+                             parentid=1000002,nda=2),
+                             pyslha.Decay(br=0.2500,ids=[1000023, 2],
+                             parentid=1000002,nda=2)]
+        decayRes[2000002] = [pyslha.Decay(br=1.0000,ids=[1000021, 2],
+                             parentid=2000002,nda=2)]
+        decayRes[1000021] = [pyslha.Decay(br=0.2500,ids=[-1000024, 4, -3],
+                             parentid=1000021,nda=3),
+                             pyslha.Decay(br=0.3750,ids=[1000024, -2, 1],
+                             parentid=1000021,nda=3),
+                             pyslha.Decay(br=0.1250,ids=[1000024, -4, 3],
+                             parentid=1000021,nda=3),
+                             pyslha.Decay(br=0.1250,ids=[1000023, -2, 2],
+                             parentid=1000021,nda=3),
+                             pyslha.Decay(br=0.1250,ids=[1000023, -6, 6],
+                             parentid=1000021,nda=3)]
 
         for pdg in decayRes:
             self.assertTrue(compareDecays(decayDict[pdg].decays,decayRes[pdg]))

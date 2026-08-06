@@ -153,6 +153,7 @@ class LheStatus(object):
         nevents = lhe.metainfo["nevents"]
         totxsec = lhe.metainfo["totalxsec"]
         sqrts = lhe.metainfo["sqrts"]
+        lhe.close()
         if (not type(sqrts) == type(1 * GeV)) or (not sqrts.asNumber()):
             return -1, f"Center-of-mass energy not found in the input LHE file {self.filename}"
         elif not nevents:

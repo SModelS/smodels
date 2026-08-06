@@ -15,14 +15,16 @@ __all__ = [ "StatsComputer", "getStatsComputerModule" ]
 from typing import Union, Text, Dict, List
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitLumi
 from smodels.statistics.simplifiedLikelihoods import LikelihoodComputer, UpperLimitComputer, Data
 from smodels.statistics.pyhfInterface import PyhfData, PyhfUpperLimitComputer
-from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
+from smodels.statistics.basicStats import observed, apriori, NllEvalType
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.experiment.datasetObj import DataSet,CombinedDataSet
-from typing import Union, Text
+from smodels.base.physicsUnits import UnitXSec
+
+from typing import Union, Optional
 
 def getStatsComputerModule():
     """ very single convenience function to centralize
@@ -67,7 +69,7 @@ class StatsComputer:
         self.likelihoodComputer = None
 
     @classmethod
-    def forSingleBin(cls, dataset, nsig, deltas_rel):
+    def forSingleBin(cls, dataset, nsig, deltas_rel, lumi : Optional[UnitLumi]=None ):
         """ get a statscomputer for an efficiency map (single bin).
 
         :param dataset: DataSet object
@@ -80,7 +82,7 @@ class StatsComputer:
                                  dataType="1bin",
                                  nsig=nsig, deltas_rel=deltas_rel)
 
-        computer.getComputerSingleBin( )
+        computer.getComputerSingleBin( lumi )
 
         return computer
 
@@ -176,7 +178,7 @@ class StatsComputer:
 
         return computer
 
-    def getComputerSingleBin(self):
+    def getComputerSingleBin(self,lumi):
         """
         Create computer from a single bin
 
@@ -185,8 +187,8 @@ class StatsComputer:
         dataset = self.dataObject
         data = Data( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = self.deltas_sys,
-                     nsignal = self.nsig )
-        # self.data = data
+                     nsignal = self.nsig, lumi = lumi )
+        self.data = data
         self.likelihoodComputer = LikelihoodComputer ( data )
         self.upperLimitComputer = UpperLimitComputer ( self.likelihoodComputer )
 
@@ -421,13 +423,19 @@ class StatsComputer:
         return ret
 
     def poi_upper_limit ( self, evaluationType : NllEvalType,
-           limit_on_xsec : bool = False ) -> float:
+           limit_on_xsec : bool = False,
+           nSigma : int = 0 ) -> Union[float,UnitXSec,None]:
         """
         Simple frontend to the upperlimit computers, later to spey.poi_upper_limit
 
         :param limit_on_xsec: if True, then return the limit on the
-                              cross section
+        cross section
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
         """
+
+        ret = None
         if self.dataType == "pyhf":
             if all([s == 0 for s in self.nsig]):
                 logger.warning("All signals are empty")
@@ -435,25 +443,33 @@ class StatsComputer:
             index = self.likelihoodComputer.getBestCombinationIndex()
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType, workspace_index = index )
+                       evaluationType = evaluationType, workspace_index = index,
+                       nSigma = nSigma )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       evaluationType = evaluationType, workspace_index = index )
+                       evaluationType = evaluationType, workspace_index = index,
+                       nSigma = nSigma )
         elif self.dataType in ["SL", "1bin", "truncGaussian"]:
             self.upperLimitComputer.likelihoodComputer.model = self.data
             if limit_on_xsec:
                 ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
-                       evaluationType = evaluationType )
+                       evaluationType = evaluationType,
+                       nSigma = nSigma )
             else:
                 ret = self.upperLimitComputer.getUpperLimitOnMu(
-                       evaluationType = evaluationType )
+                       evaluationType = evaluationType,
+                       nSigma = nSigma )
         elif self.dataType in ["analysesComb"]:
             if limit_on_xsec:
-                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(evaluationType = evaluationType,
-                                                                           allowNegativeSignals=self.allowNegativeSignals )
+                ret = self.upperLimitComputer.getUpperLimitOnSigmaTimesEff(
+                        evaluationType = evaluationType,
+                        allowNegativeSignals=self.allowNegativeSignals,
+                        nSigma = nSigma )
             else:
-                ret = self.upperLimitComputer.getUpperLimitOnMu(evaluationType = evaluationType,
-                                                                allowNegativeSignals=self.allowNegativeSignals )
+                ret = self.upperLimitComputer.getUpperLimitOnMu(
+                        evaluationType = evaluationType,
+                        allowNegativeSignals=self.allowNegativeSignals, 
+                        nSigma = nSigma )
 
         return ret
 

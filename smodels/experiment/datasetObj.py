@@ -11,8 +11,9 @@
 import os
 import glob
 import numpy as np
+from typing import Union
 from smodels.experiment import txnameObj, infoObj
-from smodels.base.physicsUnits import fb
+from smodels.base.physicsUnits import fb, UnitXSec
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, smsInStr
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -60,8 +61,7 @@ class DataSet(object):
                     txname = txnameObj.TxName(txtfile, self.globalInfo,
                                               self.dataInfo, databaseParticles)
                     if txname.hasOnlyZeroes():
-                        logger.debug("%s, %s has only zeroes. discard it." %
-                                     (self.path, txname.txName))
+                        logger.debug( f"{self.path}, {txname.txName} has only zeroes. discard it." )
                         continue
                     self.txnameList.append(txname)
                 except TypeError as e:
@@ -340,9 +340,10 @@ class DataSet(object):
 
         return attributes
 
-    def getUpperLimitFor(self, sms=None, evaluationType=False, txnames=None,
-                         compute=False, alpha=0.05, deltas_rel=0.2,
-                         mass=None):
+    def getUpperLimitFor(self, sms=None, evaluationType : NllEvalType = observed,
+            txnames=None, compute : bool = False,
+            alpha : float = 0.05, deltas_rel : float = 0.2,
+            mass=None, nSigma : int = 0 ) -> Union[None,bool,UnitXSec]:
         """
         Returns the upper limit for a given SMS (or mass) and txname. If
         the dataset hold an EM map result the upper limit is independent of
@@ -366,11 +367,15 @@ class DataSet(object):
                         from expected and observed number of events.
                         If False, the value listed in the database will be used
                         instead.
+        :param nSigma: the upper limit for central value (0),
+                        + 1 sigma, - 1 sigma for error bands. 
+                        Only for efficiency-map results, and only if compute=True.
         :return: upper limit (Unum object)
         """
 
         if self.getType() == 'efficiencyMap':
-            upperLimit = self.getSRUpperLimit(evaluationType=evaluationType)
+            upperLimit = self.getSRUpperLimit(evaluationType=evaluationType,
+                nSigma = nSigma )
             if upperLimit is None:
                 return None
             if (upperLimit/fb).normalize()._unit:
@@ -405,28 +410,49 @@ class DataSet(object):
 
             for tx in self.txnameList:
                 if tx == txname or tx.txName == txname:
-                    upperLimit = tx.getULFor(sms, evaluationType, mass=mass)
+                    # for UL-type results we ignore nSigma
+                    upperLimit = tx.getULFor(sms, evaluationType, mass=mass )
 
             return upperLimit
 
         else:
-            logger.warning("Unkown data type: %s. Data will be ignored.",
-                           self.getType())
+            logger.warning( f"Unkown data type: {self.getType()}. Data will be ignored." )
             return None
 
-    def getSRUpperLimit(self,evaluationType : NllEvalType = observed ):
+    def getSRUpperLimit( self,evaluationType : NllEvalType = observed,
+                         nSigma : int = 0, deltas_rel : float = 0.2 ) -> Union[None,UnitXSec]:
         """
-        Returns the 95% upper limit on the signal*efficiency for a given dataset (signal region).
+        Returns the 95% upper limit on the signal*efficiency
+        for a given dataset (signal region).
         Only to be used for efficiency map type results.
 
         :param evaluationType: one of: observed, apriori, aposteriori
+        :param nSigma: the upper limit for central value (0),
+                      + 1 sigma, - 1 sigma for error bands.
 
-        :returns: upper limit value
+        :returns: upper limit value on cross section
         """
 
         if not self.getType() == 'efficiencyMap':
-            logger.error("getSRUpperLimit can only be used for efficiency map results!")
-            raise SModelSError()
+            line = "getSRUpperLimit can only be used for efficiency map results!"
+            logger.error( line )
+            raise SModelSError( line )
+        if nSigma != 0 and evaluationType == observed:
+            line = f"nSigma={nSigma} but evaluationType={evaluationType}: not implemented"
+            raise SModelSError ( line )
+
+        if nSigma != 0:
+            from smodels.statistics.statsTools import getStatsComputerModule
+            mod = getStatsComputerModule()
+            # nsig = (self.xsection * self.dataset.getLumi()).asNumber()
+            nsig = 1
+            comp = mod.forSingleBin ( dataset=self,
+                    nsig=nsig, deltas_rel = deltas_rel, lumi = self.getLumi() )
+            # we dont even cache, not like this will be used much
+            ul = comp.poi_upper_limit (
+                evaluationType = evaluationType,
+                nSigma = nSigma, limit_on_xsec = True )
+            return ul
 
         if evaluationType != observed:
             if hasattr(self.dataInfo, "upperLimit") and not hasattr(self.dataInfo, "expectedUpperLimit"):

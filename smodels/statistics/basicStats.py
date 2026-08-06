@@ -51,28 +51,44 @@ class NllEvalType(Enum):
         raise SModelSError ( f"comparing a NllEvalType with {other}({type(other)})" )
 
 ## convenience
-observed, aposteriori, apriori = NllEvalType.observed, NllEvalType.aposteriori, NllEvalType.apriori
+observed, aposteriori, apriori = NllEvalType.observed, NllEvalType.aposteriori, \
+                                     NllEvalType.apriori
+
+def clsType ( CLs : float, return_type : str, cl : float = 0.95 ) -> float:
+    assert return_type in [ "1-CLs", "CLs", "CLs-alpha", "alpha-CLs" ], \
+        f"return_type {return_type} unknown"
+    if return_type == "1-CLs":
+        return 1.0 - CLs
+    if return_type == "CLs":
+        return CLs
+    if return_type == "CLs-alpha":
+        return CLs - 1 + cl
+    return 1 - cl - CLs
 
 def CLsfromNLL(
         nllA: float, nll0A: float, nll: float, nll0: float, big_muhat : bool,
-    return_type: Text = "CLs-alpha" ) -> float:
+    return_type: Text = "CLs-alpha", nSigma : int = 0 ) -> float:
     """
-    compute the CLs - alpha from the NLLs
-    TODO: following needs explanation
-
+    compute CLs (or similar) from the NLLs
     :param nllA: negative log likelihood for Asimov data
     :param nll0A: negative log likelihood at muhat for Asimov data
     :param nll: negative log likelihood
     :param nll0: negative log likelihood at muhat
     :param big_muhat: true if muhat>mu
-    :param return_type: (Text) can be "CLs-alpha", "1-CLs", "CLs" \
-                        CLs-alpha: returns CLs - 0.05 \
-                        alpha-CLs: returns CLs - 0.05 \
-                        1-CLs: returns 1-CLs value \
-                        CLs: returns CLs value
-    :return: Cls-type value, see above
+    :param return_type: (Text) one of "CLs-alpha", "alpha-CLs", "1-CLs", or "CLs":
+    ========== =======================
+    CLs-alpha: returns CLs - 0.05
+    alpha-CLs: returns 0.05 - CLs
+    1-CLs:     returns 1-CLs value
+    CLs:       returns "raw" CLs value
+    ========== =======================
+    :param nSigma: compute CLs not for central value but for this number of
+    sigmas (positive or negative), see Equations 86 - 89 in the CCGV paper.
+
+    :returns: Cls-type value, see above
     """
-    assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], f"Unknown return type: {return_type}."
+    assert return_type in ["CLs-alpha", "alpha-CLs", "1-CLs", "CLs"], \
+           f"Unknown return type: {return_type}."
     qmu = 0.0 if ( nll < nll0 or big_muhat ) else 2 * (nll - nll0)
     sqmu = np.sqrt(qmu)
     qA = 2 * (nllA - nll0A)
@@ -80,27 +96,21 @@ def CLsfromNLL(
         qA = 0.0
     sqA = np.sqrt(qA)
     if qA >= qmu:
-        CLsb = 1.0 - stats.multivariate_normal.cdf(sqmu)
-        CLb = stats.multivariate_normal.cdf(sqA - sqmu)
+        CLsb = 1.0 - stats.multivariate_normal.cdf(sqmu + nSigma )
+        CLb = stats.multivariate_normal.cdf(sqA - sqmu + nSigma )
     else:
-        CLsb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA))
-        CLb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA))
+        CLsb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu + qA) / (2 * sqA) + nSigma )
+        CLb = 1.0 if qA == 0.0 else 1.0 - stats.multivariate_normal.cdf((qmu - qA) / (2 * sqA) + nSigma )
 
     CLs = CLsb / CLb if CLb > 0 else 0.0
+    return clsType ( CLs, return_type, 0.95 )
 
-    if return_type == "1-CLs":
-        return 1.0 - CLs
-    elif return_type == "CLs":
-        return CLs
-    elif return_type == "CLs-alpha":
-        return CLs - 0.05
-
-    return 0.05 - CLs
-
-def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args : tuple = (),
-               rtol : float = 8.881784197001252e-16, xtol : float = 2e-12 ) -> float:
+def findRoot ( func : Callable, lower_bound : float, upper_bound : float,
+        args : tuple = (), rtol : float = 8.881784197001252e-16,
+        xtol : float = 2e-12 ) -> float:
     """ find the root of the function "func", within [lower_bound,upper_bound].
-    We first try the faster toms748. If that doesnt converge, we fall back to brentq.
+    We first try the faster toms748. If that doesnt converge,
+    we fall back to brentq.
     :param func: the callable function to find the root for
     :param lower_bound: lower end of bracket
     :param upper_bound: upper end of bracket
@@ -110,8 +120,8 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float, args :
     """
     logger.debug("Starting root finding")
     from scipy import optimize
-    root = optimize.toms748( func, lower_bound, upper_bound, args=args, rtol=rtol,
-                             xtol=xtol, full_output=True )
+    root = optimize.toms748( func, lower_bound, upper_bound, args=args,
+                             rtol=rtol, xtol=xtol, full_output=True )
     if root[1].converged:
         root = root[0]
     else:

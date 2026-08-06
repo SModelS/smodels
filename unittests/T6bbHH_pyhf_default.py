@@ -35,6 +35,8 @@ smodelsOutputDefault = {
         'r' : 1.269708,
         'r_expected' : 0.9163569,
         'Width (GeV)' : [[1.0, 1.0, 'stable'], [1.0, 1.0, 'stable']],
+        'r_expected_p1' : 0.6046151,
+        'r_expected_m1' : 1.350277,
         'nll' : 55.31969,
         'nll_min' : 52.29293,
         'nll_SM' : 52.29293

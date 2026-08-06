@@ -12,6 +12,7 @@
 from scipy import stats, optimize, integrate, special, linalg
 from numpy import sqrt, exp, log, sign, array, ndarray
 from functools import reduce
+from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.statistics.basicStats import observed, apriori, aposteriori, NllEvalType
@@ -1010,8 +1011,8 @@ class UpperLimitComputer:
         self.cl = cl
 
     def getUpperLimitOnSigmaTimesEff(
-        self, evaluationType : NllEvalType = observed, trylasttime : bool =False
-    ):
+        self, evaluationType : NllEvalType = observed, trylasttime : bool =False,
+        nSigma : int = 0 ) -> UnitXSec:
         """upper limit on the fiducial cross section sigma times efficiency,
             summed over all signal regions, i.e. sum_i xsec^prod_i eff_i
             obtained from the defined Data (using the signal prediction
@@ -1020,11 +1021,13 @@ class UpperLimitComputer:
 
         :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.  For error bands.
         :returns: upper limit on fiducial cross section
         """
         model = self.likelihoodComputer.model
         ul = self.getUpperLimitOnMu( evaluationType=evaluationType,
-                                     trylasttime=trylasttime)
+                                     trylasttime=trylasttime, nSigma = nSigma )
 
         if ul == None:
             return ul
@@ -1038,6 +1041,7 @@ class UpperLimitComputer:
         self,
         evaluationType: NllEvalType=observed,
         trylasttime: Optional[bool] = False,
+        nSigma : int = 0
     ) -> Tuple:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
@@ -1046,6 +1050,9 @@ class UpperLimitComputer:
         :param model: statistical model
         :param evaluationType: one of: observed, apriori, aposteriori
         :param trylasttime: if True, then dont try extra
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
         :return: mu_hat, sigma_mu, CLs-alpha
         """
         model = self.likelihoodComputer.model
@@ -1096,29 +1103,33 @@ class UpperLimitComputer:
             nll = computer.likelihood(mu, return_nll=True)
             nllA = compA.likelihood(mu, return_nll=True)
             return CLsfromNLL(nllA, nll0A, nll, nll0, (mu_hat>mu),
-                    return_type=return_type)
+                    return_type=return_type, nSigma = nSigma )
 
         return mu_hat, sigma_mu, clsRoot
 
     def getUpperLimitOnMu(
-        self, evaluationType : NllEvalType=observed, trylasttime : bool =False
-    ):
+        self, evaluationType : NllEvalType=observed, trylasttime : bool =False,
+        nSigma : int = 0 ) -> Union[None,float]:
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
         for each signal regio/dataset), by using
         the q_mu test statistic from the CCGV paper (arXiv:1007.1727).
 
-        :param evaluationType: one of: observed, apriori, aposteriori
-        :param trylasttime: if True, then dont try extra
+        :param evaluationType: one of: observed, apriori, aposteriori.
+        :param trylasttime: if True, then dont try extra.
+        :param nSigma: the upper limit for central value (0), 
+        + 1 sigma, - 1 sigma, etc.
+        For error bands.
         :returns: upper limit on the signal strength multiplier mu
         """
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
-            evaluationType = evaluationType, trylasttime = trylasttime
-        )
+            evaluationType = evaluationType, trylasttime = trylasttime,
+            nSigma = nSigma )
         if mu_hat == None:
             return None
         try:
-            a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot, allowNegative=False )
+            a, b = determineBrentBracket( mu_hat, sigma_mu, clsRoot, 
+                                          allowNegative=False )
         except SModelSError as e:
             return None
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )

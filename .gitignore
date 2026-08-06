@@ -78,8 +78,16 @@ docs/manual/source/XSecComputer.rst
 docs/manual/source/XSecResummino.rst
 docs/manual/source/FixPermissions.rst
 docs/manual/source/InteractivePlots.rst
+docs/manual/source/base.rst
+docs/manual/source/decomposition.rst
+docs/manual/source/matching.rst
+docs/manual/source/statistics.rst
+docs/manual/source/tools.printers.rst
 docs/manual/source/images/iplots_parameters.py
 docs/manual/source/recipes/interactivePlotsExample.py
+docs/manual/source/recipes/combinationsmatrix.py
+docs/manual/source/recipes/drawingGraphs.py
+docs/manual/source/recipes/plotCombinedLikelihood.py
 *~
 .http*
 *.crash
