@@ -86,7 +86,7 @@ def dataFiles ():
 
     """
     ret = []
-    ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.rst", "smodels/INSTALLATION.rst" ]) )
+    ret.append ( ("smodels/", [ "smodels/version", "smodels/COPYING", "smodels/README.md", "smodels/INSTALLATION.rst" ]) )
     for directory in [ "smodels/share/", "smodels/share/models/",
           "smodels/etc/", "smodels/lib/", "smodels/lib/nllfast/nllfast-1.2/",
           "smodels/lib/nllfast/nllfast-2.1/", "smodels/lib/nllfast/nllfast-3.1/",
