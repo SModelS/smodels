@@ -5,6 +5,7 @@ Release v3.2.0, Aug 10 2026
   * Modified the syntax for statistical models in the database: in the globalInfo.txt files, the fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels. Note that this BREAKS BACKWARDS COMPATIBILITY
   * Small fixes in likelihood calculations and pyhf interface
   * Moved all interfaces from .likelihoods to .nlls
+  * Changed the decomposition algorithm to a lightweight DFS method for improved performance in models with large number of topologies
   * Updated lheReader to properly deal with MG5 LHE files (fixes github issue #53, see also discussion #54)
   * Fixed pythia8 paths in automatic downloader
   * Introduced a printer registry for out-of-repo printers

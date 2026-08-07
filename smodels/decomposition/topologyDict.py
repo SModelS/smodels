@@ -12,6 +12,7 @@
 from smodels.decomposition.theorySMS import TheorySMS
 from collections import OrderedDict
 from typing import Any, List, Optional
+from smodels.base.physicsUnits import UnitEnergy
 
 
 class TopologyDict(OrderedDict):
@@ -110,7 +111,7 @@ class TopologyDict(OrderedDict):
             allsmsList.extend(self[cName])
         return allsmsList
 
-    def compress(self, doCompress: bool, doInvisible: bool, minmassgap: float, minmassgapISR: float):
+    def compress(self, doCompress: bool, doInvisible: bool, minmassgap: UnitEnergy, minmassgapISR: UnitEnergy):
         """
         Compress all SMS in the dictionary and include the compressed
         SMS in the topology list.

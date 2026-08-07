@@ -12,6 +12,7 @@ from smodels.base.genericSMS import GenericSMS
 from smodels.base.particleNode import ParticleNode
 from smodels.base.particle import Particle,InvisibleParticle
 from typing import Any, Dict, List, Optional, Union
+from smodels.base.physicsUnits import UnitEnergy
 
 
 class TheorySMS(GenericSMS):
@@ -380,7 +381,8 @@ class TheorySMS(GenericSMS):
         for ancestor in self.getAncestors():
             ancestor.coveredBy.add(resultType)
     
-    def compress(self, doCompress: bool, doInvisible: bool, minmassgap: float, minmassgapISR: float) -> List["TheorySMS"]:
+    def compress(self, doCompress: bool, doInvisible: bool, 
+                 minmassgap: UnitEnergy, minmassgapISR: UnitEnergy) -> List["TheorySMS"]:
         """
         Keep compressing the original SMS and the derived ones till they
         can be compressed no more.
@@ -430,7 +432,7 @@ class TheorySMS(GenericSMS):
 
         return newList
 
-    def massCompress(self, minmassgap: float, minmassgapISR: float) -> Optional["TheorySMS"]:
+    def massCompress(self, minmassgap: UnitEnergy, minmassgapISR: UnitEnergy) -> Optional["TheorySMS"]:
         """
         Perform mass compression.
         It is only done if there is one decay of type BSM_i -> BSM_j + (any number of SM),
@@ -447,10 +449,11 @@ class TheorySMS(GenericSMS):
         """
 
         # Start with self and make a copy later if needed
-        newSMSList = [self]  # Dummy list to store newSMS
+        newSMSList : List[TheorySMS] = [self]  # Dummy list to store newSMS
 
         # Loop over nodes from root to leaves:
         maxCompMassDiff = None # Keep track of the maximum compressed mass diffirence
+        massDiff = None
         for momIndex, daughterIndices in self.genIndexIterator():
             newSMS = newSMSList[0]
             if momIndex is newSMS.rootIndex:  # Skip primary vertex
@@ -480,7 +483,7 @@ class TheorySMS(GenericSMS):
             bsmDaughter = bsmDaughter[0]
 
             # Skip if mass difference is above minimum or if the parent is long-lived
-            if massDiff >= minmassgap or not mom.particle.isPrompt():
+            if massDiff is None or massDiff >= minmassgap or not mom.particle.isPrompt():
                 continue
 
             # If making first compression, copy self:
@@ -515,7 +518,7 @@ class TheorySMS(GenericSMS):
 
         # Check if any of the compressions violates minmassgapISR
         # and if the compressed SMS corresponds to pure MET, i.e. PV > MET + MET +... + MET
-        if maxCompMassDiff >= minmassgapISR:
+        if maxCompMassDiff is not None and maxCompMassDiff >= minmassgapISR:
             primaryMoms = newSMS.daughterIndices(newSMS.rootIndex)
             # Check if all primary mothers are final states and are MET
             if all(newSMS.out_degree(mom) == 0 for mom in primaryMoms):
@@ -542,7 +545,7 @@ class TheorySMS(GenericSMS):
         """
 
         # Start with self and make a copy later if needed
-        newSMSList = [self]  # Dummy list to store newSMS
+        newSMSList : List[TheorySMS] = [self]  # Dummy list to store newSMS
 
         while True:
             newSMS = newSMSList[0]

@@ -41,6 +41,7 @@ New in Version 3.2.0:
   * Modified the syntax for describing statistical models in the database: in the globalInfo.txt files, the fields datasetOrder, covariance, jsonFiles and jsonFiles_FullLikelihood have been replaced by regionMappings, regionSets and statModels, see `DatabaseStructure <DatabaseStructure.html#experimental-result-folder>`_. Note that this BREAKS BACKWARDS COMPATIBILITY
   * Small fixes in likelihood calculations and `pyhf interface <statistics.html#module-statistics.pyhfInterface>`_
   * Moved all interfaces from .likelihoods to .nlls
+  * Changed the |decomposition| algorithm to a lightweight DFS method for improved performance in models with large number of topologies
   * Updated `lheReader <base.html#module-base.lheReader>`_ to properly deal with MG5 LHE files (fixes github issue `#53 <https://github.com/SModelS/smodels/issues/53>`_, see also discussion `#54 <https://github.com/SModelS/smodels/issues/54>`_)
   * Fixed pythia8 paths in automatic downloader
   * Introduced a printer registry for out-of-repo printers
