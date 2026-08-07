@@ -1,0 +1,15 @@
+name: Interactive macOS-15 Shell
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start SSH session
+        uses: mxschmitt/action-tmate@v3
