@@ -1,0 +1,15 @@
+name: Interactive macOS-26 Shell
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: macos-26
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start SSH session
+        uses: mxschmitt/action-tmate@v3
