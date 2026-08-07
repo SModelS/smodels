@@ -93,7 +93,10 @@ class Info(object):
                 if tag.startswith("#"):  # a comment!
                     continue
                 line = content[i]
-                value = line.split(':', 1)[1].strip()
+                tokens = line.split(':', 1)
+                if len(tokens)<2:
+                    raise SModelSError ( f"cannot parse {line} in {self.path}" )
+                value = tokens[1].strip()
                 if tag in [ "covariance", "jsonFiles", \
                             "jsonFiles_FullLikelihood", "datasetOrder" ]:
                     from smodels import installation
