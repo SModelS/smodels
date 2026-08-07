@@ -1,7 +1,0 @@
-dataId: SR-inclusive_Low
-dataType: efficiencyMap
-observedN: 196
-expectedBG: 187.63
-bgError: 21.24
-upperLimit: 0.4157*fb
-expectedUpperLimit: 0.3592*fb
