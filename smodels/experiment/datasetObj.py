@@ -599,7 +599,7 @@ class CombinedDataSet(object):
 
         if len(datasetOrder) != dim_region_set:
             with_sl_str = " with 'sl' entry " if len(datasetOrder_sl) >= 1 else " "
-            logger.info( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
+            logger.debug( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
             datasetOrder = self.globalInfo.regionSets[regionSetNameUsed]
 
         ## need to reinitialise, we might have lost some datasets when filtering
