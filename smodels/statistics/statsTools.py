@@ -53,7 +53,7 @@ class CompRetriever:
         :returns: a subcomputer
         """
 
-        if  regionSet not in dataset.globalInfo.statModels:
+        if regionSet not in dataset.globalInfo.statModels:
             raise SModelSError( f"{regionSet} not in statModels in {dataset.globalInfo.id}" )
         covs = dataset.globalInfo.cachedModels
         type_n_models = dataset.globalInfo.statModels[regionSet]        
@@ -76,7 +76,7 @@ class CompRetriever:
         nsig = []
         third_momenta = []
         for sr in srList:
-            ds = dataset.getDataSet(sr)            
+            ds = dataset.getDataSet(sr)         
             if ds is None:
                 raise SModelSError(f"SR {sr} defined in regionSet {regionSet} not found in dataset {dataset.globalInfo.id}")
             nobs.append(ds.dataInfo.observedN)
@@ -332,7 +332,7 @@ class StatsComputer:
                 computers.append(computer)
 
         elif dataType == "combined" and tpType == "TheoryPrediction":
-            dataset = theoryPrediction.dataset            
+            dataset = theoryPrediction.dataset
             srNsigDictAll = { p.dataset.getID() : \
                 (p.xsection*dataset.getLumi()).asNumber() \
                 for p in theoryPrediction.datasetPredictions }

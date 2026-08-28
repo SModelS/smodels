@@ -560,10 +560,9 @@ class CombinedDataSet(object):
         hasSL = False
         for regionSetName, model_tuples in self.globalInfo.statModels.items():
             model_tuple = model_tuples[0]
-            # if models[0].endswith ( ".cov" ):
             if model_tuple[0] == "sl":
                 hasSL = True
-            break
+                break
         if not hasSL:
             return
 
@@ -571,7 +570,7 @@ class CombinedDataSet(object):
         datasets = self.origdatasets[:]
         datasetOrder = []
         datasetOrder_sl = []
-
+        '''
         if hasattr(self.globalInfo, "regionMappings"):
         ## datasetOrder goes by regionMappings
             for region in self.globalInfo.regionMappings.values():
@@ -584,24 +583,28 @@ class CombinedDataSet(object):
                 logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
             else:
                 datasetOrder = datasetOrder_sl
-
-        dim_region_set = 0
+        '''
+#        dim_region_set = 0
         for regionSetName, statModels in self.globalInfo.statModels.items():
             for statFramework, statFile in statModels:
                 if statFramework == 'sl':
                     assert regionSetName in self.globalInfo.regionSets, \
                         f"{regionSetName} does not appear in regionSets"
+                    for region in self.globalInfo.regionSets[regionSetName]:
+                        datasetOrder.append( region )
+                    '''
                     if dim_region_set == 0:
                         regionSetNameUsed = regionSetName
                         dim_region_set += len ( self.globalInfo.regionSets[regionSetName] )
                     else:
                         logger.error( f"Multiple SL framework for {self.globalInfo.id}. Don't know how to handle that. Will use the region set '{regionSetNameUsed}' and not '{regionSetName}'." )
-
+                    '''
+        '''
         if len(datasetOrder) != dim_region_set:
             with_sl_str = " with 'sl' entry " if len(datasetOrder_sl) >= 1 else " "
             logger.debug( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
             datasetOrder = self.globalInfo.regionSets[regionSetNameUsed]
-
+        '''
         ## need to reinitialise, we might have lost some datasets when filtering
         tmp = [ None ] * len(datasets)
         for dataset in datasets:
