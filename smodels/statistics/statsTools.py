@@ -93,7 +93,7 @@ class CompRetriever:
         data = SLData( nobs, bg, cov, third_moment=third_momenta,
                      nsignal = nsig,
                      deltas_rel = deltas_rel, lumi=dataset.getLumi(),
-                     name = regionSet )
+                     name = covname )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "SL"
