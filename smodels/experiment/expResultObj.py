@@ -189,12 +189,13 @@ class ExpResult(object):
             for name in self.globalInfo.regionSets.keys():
                 if name not in self.globalInfo.statModels:
                     raise SModelSExperimentError ( f"{name} does not appear in {self.globalInfo.id}'s stats models" )
-                n = len ( self.globalInfo.statModels[name] )
-                for i in range(n):
-                    tp = self.typeOfStatsModel ( name, i, specifySL )
-                    if tp != None:
-                        ret.add ( tp )
+                number_of_models = len ( self.globalInfo.statModels[name] )
+                for i in range(number_of_models):
+                    model_type = self.typeOfStatsModel ( name, i, specifySL )
+                    if model_type != None:
+                        ret.add ( model_type )
             return ret
+        
         for regionSetName, model_tuples in self.globalInfo.statModels.items():
             if idx >= len(model_tuples):
                 return None
