@@ -552,7 +552,7 @@ class CombinedDataSet(object):
     def sortDataSets(self):
         """
         Sort datasets according to globalInfo.regionMappings / regionSets.
-        Needs to be done only for cov matrices
+        Needs to be done only for Simplified Likelihoods (SL).
         """
         if not hasattr ( self.globalInfo, "statModels" ):
             return
@@ -566,45 +566,15 @@ class CombinedDataSet(object):
         if not hasSL:
             return
 
-        # if hasattr(self.globalInfo, "covariances"):
         datasets = self.origdatasets[:]
         datasetOrder = []
-        datasetOrder_sl = []
-        '''
-        if hasattr(self.globalInfo, "regionMappings"):
-        ## datasetOrder goes by regionMappings
-            for region in self.globalInfo.regionMappings.values():
-                if "sl" in region and region["sl"] != None:
-                    datasetOrder_sl.append ( region["smodels"] )
-                datasetOrder.append ( region["smodels"] )
-            if len(datasetOrder_sl) == 0:
-                logger.warning( f"No region of type 'sl' found in the regionMappings of {self.globalInfo.id}. Will try with all the regions of regionMappings then, but are you sure you want to use a simplified likelihood?" )
-            elif len(datasetOrder_sl) == 1:
-                logger.warning( f"Only one region of type 'sl' in the regionMappings of {self.globalInfo.id}. Will use it, but are you sure you want to combine a single region?" )
-            else:
-                datasetOrder = datasetOrder_sl
-        '''
-#        dim_region_set = 0
         for regionSetName, statModels in self.globalInfo.statModels.items():
-            for statFramework, statFile in statModels:
+            for statFramework, _ in statModels:
                 if statFramework == 'sl':
                     assert regionSetName in self.globalInfo.regionSets, \
                         f"{regionSetName} does not appear in regionSets"
                     for region in self.globalInfo.regionSets[regionSetName]:
                         datasetOrder.append( region )
-                    '''
-                    if dim_region_set == 0:
-                        regionSetNameUsed = regionSetName
-                        dim_region_set += len ( self.globalInfo.regionSets[regionSetName] )
-                    else:
-                        logger.error( f"Multiple SL framework for {self.globalInfo.id}. Don't know how to handle that. Will use the region set '{regionSetNameUsed}' and not '{regionSetName}'." )
-                    '''
-        '''
-        if len(datasetOrder) != dim_region_set:
-            with_sl_str = " with 'sl' entry " if len(datasetOrder_sl) >= 1 else " "
-            logger.debug( f"Number of datasets{with_sl_str}in the regionMappings field ({len(datasetOrder)}) does not match the dimension of the region set '{regionSetNameUsed}' ({dim_region_set}) of {self.globalInfo.id}. Will use the datasets as ordered in '{regionSetNameUsed}'." )
-            datasetOrder = self.globalInfo.regionSets[regionSetNameUsed]
-        '''
         ## need to reinitialise, we might have lost some datasets when filtering
         tmp = [ None ] * len(datasets)
         for dataset in datasets:
@@ -613,8 +583,6 @@ class CombinedDataSet(object):
                 continue
                 # raise SModelSError(f"Dataset ID {dataset.getID()} not found in datasetOrder")
             tmp[idx] = dataset
-            # dsIndex = datasetOrder.index(dataset.getID())
-            # self._datasets[dsIndex] = dataset
         newds = []
         for ds in tmp:
             if ds != None:
