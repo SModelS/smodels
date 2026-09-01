@@ -1,4 +1,4 @@
-Release v3.2.0, Aug 10 2026
+Release v3.2.0, Sep 1 2026
 =======================================================
 
   * First support for NN surrogate statistical models (ONNX format)
