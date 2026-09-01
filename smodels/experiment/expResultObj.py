@@ -192,8 +192,8 @@ class ExpResult(object):
                 n = len ( self.globalInfo.statModels[name] )
                 for i in range(n):
                     tp = self.typeOfStatsModel ( name, i, specifySL )
-                if tp != None:
-                    ret.add ( tp )
+                    if tp != None:
+                        ret.add ( tp )
             return ret
         for regionSetName, model_tuples in self.globalInfo.statModels.items():
             if idx >= len(model_tuples):
