@@ -41,7 +41,7 @@ class PyPrinter(BasicPrinter):
         self.errorsforr: bool = False
         self.toPrint: list = [None]*len(self.printingOrder)
 
-    def setOutPutFile( self, filename : PathType, overwrite : bool = True, 
+    def setOutPutFile( self, filename : PathType, overwrite : bool = True,
                        silent : bool = False ):
         """
         Set the basename for the python printer. The output filename will be
@@ -340,6 +340,15 @@ class PyPrinter(BasicPrinter):
                 resDict['nll'] = self._round(nll)
                 resDict['nll_min'] = self._round(theoryPrediction.nll_min())
                 resDict['nll_SM'] = self._round(theoryPrediction.nllsm( ))
+                if hasattr(self,"morenlls") and self.morenlls:
+                    from smodels.statistics.basicStats import apriori
+                    nllE = theoryPrediction.nll ( evaluationType = apriori )
+                    resDict['nllE'] = self._round( nllE )
+                    nllA = theoryPrediction.nll ( asimov = 0 )
+                    resDict['nllA'] = self._round( nllA )
+                    nllEA = theoryPrediction.nll ( evaluationType = apriori,
+                            asimov = 0 )
+                    resDict['nllEA'] = self._round( nllEA )
             ExptRes.append(resDict)
 
         return {'ExptRes': ExptRes}
@@ -466,6 +475,15 @@ class PyPrinter(BasicPrinter):
                    'nll_min': nllmin,
                    'nll_SM': nllsm,
                    'Txnames' : txnames}
+        if hasattr(self,"morenlls") and self.morenlls:
+            from smodels.statistics.basicStats import apriori
+            nllE = obj.nll ( evaluationType = apriori )
+            resDict['nllE'] = self._round( nllE )
+            nllA = obj.nll ( asimov = 0 )
+            resDict['nllA'] = self._round( nllA )
+            nllEA = obj.nll ( evaluationType = apriori,
+                    asimov = 0 )
+            resDict['nllEA'] = self._round( nllEA )
 
         if self.errorsforr:
             self.addErrorsForRValues ( obj, resDict )
