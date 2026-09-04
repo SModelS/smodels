@@ -18,15 +18,19 @@ class PrinterRegistry:
     printers = {}
 
     @classmethod
-    def register(cls, printer : type[BasicPrinter], extension : str ) -> bool:
+    def register( cls, printer : type[BasicPrinter], extension : str,
+                  allow_overwrite : bool = False ) -> bool:
         """
         register this printer
         :param printer: Printer object to register
         :param extension: Extension this printer will be in charge of
-        :returns: False if printer already exists (or other error),
-        else True
+        :param allow_overwrite: if true, then allow overwriting existing
+        entries
+        :returns: False if printer already existed, else True
         """
-        if extension in cls.printers:
+        if extension in cls.printers: # we allow overwrites though
+            if allow_overwrite:
+                cls.printers[extension] = printer
             return False
         cls.printers[extension] = printer
         return True
