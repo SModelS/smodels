@@ -1,3 +1,8 @@
+Release v3.2.1, xxx
+=======================================================
+
+  * Fix for printerRegistry in combination with ncpus > 1 multiprocessing
+
 Release v3.2.0, Sep 2 2026
 =======================================================
 
