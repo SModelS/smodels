@@ -38,6 +38,7 @@ class RunPrinterTest(unittest.TestCase):
                 pass
         PrinterRegistry.register ( NewPrinter, "dummy" )
         printer = PrinterRegistry.get ( "dummy" )
+        PrinterRegistry.printers.pop ( "dummy" )
         self.assertEqual ( printer, NewPrinter )
 
     def testPrintersV2(self):
