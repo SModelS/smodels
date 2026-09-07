@@ -279,7 +279,7 @@ def runSingleFile(inputFile : PathType, outputDir : os.PathLike,
 def runSetOfFiles(inputFiles : list, outputDir : PathType, 
         parser : ConfigParser, database : Database, timeout : int, 
         development : bool, parameterFile : PathType, return_dict : dict,
-        printers : dict ):
+        printers : None|dict = None ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -291,8 +291,9 @@ def runSetOfFiles(inputFiles : list, outputDir : PathType,
     :parameter parameterFile: parameter file, for crash reports
     :returns: nothing, but updates return_dict with printers output
     """
-    from smodels.tools.printers.printerRegistry import PrinterRegistry
-    PrinterRegistry.printers = printers ## we loose them in the fork
+    if printers != None:
+        from smodels.tools.printers.printerRegistry import PrinterRegistry
+        PrinterRegistry.printers = printers ## we loose them in the fork
 
     for inputFile in inputFiles:
         tmp=runSingleFile(inputFile, outputDir, parser, database,
