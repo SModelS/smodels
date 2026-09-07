@@ -278,7 +278,8 @@ def runSingleFile(inputFile : PathType, outputDir : os.PathLike,
 
 def runSetOfFiles(inputFiles : list, outputDir : PathType, 
         parser : ConfigParser, database : Database, timeout : int, 
-        development : bool, parameterFile : PathType, return_dict : dict ):
+        development : bool, parameterFile : PathType, return_dict : dict,
+        printers : dict ):
     """
     Loop over all input files in inputFiles with testPoint
 
@@ -290,6 +291,8 @@ def runSetOfFiles(inputFiles : list, outputDir : PathType,
     :parameter parameterFile: parameter file, for crash reports
     :returns: nothing, but updates return_dict with printers output
     """
+    from smodels.tools.printers.printerRegistry import PrinterRegistry
+    PrinterRegistry.printers = printers ## we loose them in the fork
 
     for inputFile in inputFiles:
         tmp=runSingleFile(inputFile, outputDir, parser, database,
@@ -392,12 +395,14 @@ def testPoints(fileList : list, inDir : PathType, outputDir : os.PathLike,
             # Split list of files
             chunkedFiles = [cleanedList[x::ncpus] for x in range(ncpus)]
             children = []
+            from smodels.tools.printers.printerRegistry import PrinterRegistry
+            printers = PrinterRegistry.printers
             from multiprocessing import Process, Manager
             manager = Manager()
             outputDict = manager.dict()
             for chunkFile in chunkedFiles:
                 args = ( chunkFile, outputDir, parser, database, timeout,
-                         development, parameterFile, outputDict )
+                         development, parameterFile, outputDict, printers )
                 p = Process ( target=runSetOfFiles, args = args )
                 p.start()
 
