@@ -18,7 +18,7 @@ from smodels.base.particle import Particle
 from smodels.base.particleNode import ParticleNode
 
 
-class TestGenIndexIteratorCache(unittest.TestCase):
+class TestGenIndexCache(unittest.TestCase):
 
     @staticmethod
     def _node(label, isInclusive=False):
@@ -40,7 +40,7 @@ class TestGenIndexIteratorCache(unittest.TestCase):
         return [mom for mom, _ in sms.genIndexIterator(includeLeaves=includeLeaves,
                                                        ignoreInclusiveNodes=ignoreInclusiveNodes)]
 
-    def test_cache_invalidation_on_topology_and_node_updates(self):
+    def test_cache(self):
         for sms_cls in (TheorySMS, ExpSMS):
             with self.subTest(smsClass=sms_cls.__name__):
                 sms, pv, a, b, c = self._build_sms(sms_cls)
