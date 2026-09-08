@@ -28,10 +28,10 @@ class TestGenIndexCache(unittest.TestCase):
     @staticmethod
     def _build_sms(sms_cls):
         sms = sms_cls()
-        pv = sms.add_node(TestGenIndexIteratorCache._node("PV"))
-        a = sms.add_node(TestGenIndexIteratorCache._node("A"))
-        b = sms.add_node(TestGenIndexIteratorCache._node("B"))
-        c = sms.add_node(TestGenIndexIteratorCache._node("C"))
+        pv = sms.add_node(TestGenIndexCache._node("PV"))
+        a = sms.add_node(TestGenIndexCache._node("A"))
+        b = sms.add_node(TestGenIndexCache._node("B"))
+        c = sms.add_node(TestGenIndexCache._node("C"))
         sms.add_edges_from([(pv, a), (pv, b), (a, c)])
         return sms, pv, a, b, c
 
