@@ -793,8 +793,7 @@ class SLLikelihoodComputer:
                 ini,
                 fprime=self.dNLLdTheta,
                 fhess=self.d2NLLdTheta2,
-                full_output=True,
-                disp=0,
+                full_output=True
             )
             # then always continue with TNC
             if type(model.observed) in [int, float]:
@@ -802,7 +801,7 @@ class SLLikelihoodComputer:
             else:
                 bounds = [(-10 * x, 10 * x) for x in model.observed]
             theta_hat,_,rc = optimize.fmin_tnc(
-                self.nllOfTheta, theta_hat, fprime=self.dNLLdTheta, disp=0,
+                self.nllOfTheta, theta_hat, fprime=self.dNLLdTheta,
                     bounds=bounds
             )
             if rc not in [0, 1, 2]: # Check if optimization converged
