@@ -15,7 +15,7 @@ from smodels.experiment.exceptions import SModelSExperimentError
 from smodels.base.smodelsLogging import logger
 from smodels.experiment.expAuxiliaryFuncs import getAttributesFrom, getValuesForObj, cleanWalk
 from typing import Union, Optional, Set
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 try:
     import cPickle as serializer

@@ -15,7 +15,7 @@ from smodels.tools.printers.xmlPrinter import XmlPrinter
 from smodels.tools.printers.summaryPrinter import SummaryPrinter
 from smodels.tools.printers.txtPrinter import TxTPrinter
 from smodels.tools.printers.slhaPrinter import SLHAPrinter
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 from smodels.tools.printers.printerRegistry import PrinterRegistry
 PrinterRegistry.register ( PyPrinter, "python" )

@@ -13,7 +13,7 @@ from smodels.base.smodelsLogging import logger
 import pyslha
 import io
 from typing import Union, Dict, Tuple
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class LheReader(object):
     """

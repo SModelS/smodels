@@ -28,7 +28,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.tools import ioObjects
 from smodels.tools import coverage
 from typing import Optional, Union
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 from collections import OrderedDict
 import os

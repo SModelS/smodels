@@ -21,7 +21,7 @@ from collections import OrderedDict
 from typing import Optional
 import unum
 import time
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 
 class PyPrinter(BasicPrinter):

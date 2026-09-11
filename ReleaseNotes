@@ -5,6 +5,7 @@ Release v3.2.1, xxx
     out-of-repo printers
   * Updated authorlist in BANNER
   * Recipe for out-of-repo printer added
+  * Renamed types to smodels_types to avoid name clashes
 
 Release v3.2.0, Sep 2 2026
 =======================================================

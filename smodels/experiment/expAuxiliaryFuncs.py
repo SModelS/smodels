@@ -15,7 +15,7 @@ import unum
 import re
 import numpy as np
 import os
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 try:
     from collections.abc import Iterable

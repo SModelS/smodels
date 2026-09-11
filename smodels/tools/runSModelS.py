@@ -13,7 +13,7 @@ from smodels.matching import modelTester
 from smodels.tools import crashReport
 from smodels.experiment.databaseObj import Database
 from typing import Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 def main():
     """Set default input and output files."""

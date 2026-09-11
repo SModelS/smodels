@@ -19,7 +19,7 @@ from smodels.statistics.basicStats import observed
 import numpy as np
 import time
 from typing import Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class TxTPrinter(BasicPrinter):
     """
