@@ -14,6 +14,7 @@ from smodels.tools import crashReport
 from smodels.experiment.databaseObj import Database
 from typing import Optional
 from smodels.base.smodels_types import PathType
+from smodels.base.exceptions import SModelSBaseError
 
 def main():
     """Set default input and output files."""
@@ -73,6 +74,34 @@ def main():
         run(args.filename, args.parameterFile, args.outputDir,
               db, args.timeout, args.development)
 
+def handleOORCode ( parser : "ConfigParser", parameterFile : PathType ) -> int:
+    """
+    Load out-of-repo (OOR) code, if the user requests it.
+    Used e.g. to add OOR printers
+
+    :returns: Number of codes that got loaded
+    """
+    if not "oor-codes" in parser.sections():
+        return 0
+    sec = parser["oor-codes"]
+    if sec.get("files") == None:
+        raise SModelSBaseError ( f"Section 'oor-codes' in {parameterFile} but no 'files' field defined" )
+    i = 0
+    files = sec["files"].split(",")
+    for fname in files:
+        if not os.path.exists ( fname ):
+            raise SModelSBaseError ( f"File {fname} does not exist in {parameterFile}:oor-codes:files" )
+        try:
+            with open ( fname, "rt" ) as f:
+                from smodels.base.smodelsLogging import logger
+                context=globals()
+                context["logger"]=logger
+                exec ( f.read(), context )
+        except Exception as e:
+            raise SModelSBaseError ( f"Error when reading {fname}: {e}" )
+        i += 1
+    return i
+
 def run( inFile : PathType, parameterFile : os.PathLike,
          outputDir : PathType, db : Optional[Database],
          timeout : int, development : bool ):
@@ -95,6 +124,8 @@ def run( inFile : PathType, parameterFile : os.PathLike,
 
     """ Read and check parameter file, exit parameterFile does not exist """
     parser = modelTester.getParameters(parameterFile)
+
+    handleOORCode ( parser, parameterFile )
 
     """ Check database location and load database, exit if not found """
     database = modelTester.loadDatabase(parser, db)
