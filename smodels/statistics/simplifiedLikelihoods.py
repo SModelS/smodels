@@ -788,22 +788,28 @@ class SLLikelihoodComputer:
             self.ones = np.ones(len(model.observed))
         self.gammaln = special.gammaln(model.observed + 1)
         try:
+            args = { "full_output": True }
+            import inspect
+            if "disp" in inspect.signature(optimize.fmin_ncg).parameters:
+                args["disp"]=False
+            
             theta_hat,*_ = optimize.fmin_ncg(
                 self.nllOfTheta,
                 ini,
                 fprime=self.dNLLdTheta,
                 fhess=self.d2NLLdTheta2,
-                full_output=True
+                **args 
             )
             # then always continue with TNC
             if type(model.observed) in [int, float]:
                 bounds = [(-10 * model.observed, 10 * model.observed)]
             else:
                 bounds = [(-10 * x, 10 * x) for x in model.observed]
+            args = { "bounds": bounds }
+            if "disp" in inspect.signature(optimize.fmin_tnc).parameters:
+                args["disp"]=False
             theta_hat,_,rc = optimize.fmin_tnc(
-                self.nllOfTheta, theta_hat, fprime=self.dNLLdTheta,
-                    bounds=bounds
-            )
+                self.nllOfTheta, theta_hat, fprime=self.dNLLdTheta, **args )
             if rc not in [0, 1, 2]: # Check if optimization converged
                 return theta_hat, rc
             else:
