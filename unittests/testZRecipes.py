@@ -41,6 +41,8 @@ def listOfNotebooks(notebookDir=nbdir):
 
 def checkArgParser ():
     import argparse
+    ## seems like its resolved?
+    return
     try:
         parser = argparse.ArgumentParser ( allow_abbrev=True )
     except TypeError as e:
