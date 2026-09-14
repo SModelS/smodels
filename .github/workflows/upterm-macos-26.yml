@@ -11,13 +11,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure tmux is working
-        run: |
-          brew install tmux
-          tmux new-session -d -s main
-          tmux list-sessions
-
       - name: Start SSH session
-        uses: lhotari/action-upterm@v1
-        with:
-          limit-access-to-actor: true
+        run: |
+          brew install upterm
+
+          # Fetch your GitHub SSH keys
+          curl -s https://github.com/WolfgangWaltenberger.keys > /tmp/authorized_keys
+
+          # Generate a host key for upterm
+          ssh-keygen -t ed25519 -f /tmp/upterm_host_key -N "" -q
+
+          # Start upterm in the background
+          upterm host \
+            --server ssh://uptermd.upterm.dev:22 \
+            --private-key /tmp/upterm_host_key \
+            --authorized-keys /tmp/authorized_keys \
+            -- bash -l &
+
+          UPTERM_PID=$!
+          sleep 5
+
+          # Try to get the session info
+          for i in $(seq 1 30); do
+            if upterm session current 2>/dev/null; then
+              echo ""
+              echo "========================================"
+              echo "SESSION IS READY — connect with the SSH"
+              echo "command shown above"
+              echo "========================================"
+              break
+            fi
+            echo "Waiting for upterm session... attempt $i"
+            sleep 3
+          done
+
+          # Keep the job alive
+          wait $UPTERM_PID || while true; do sleep 30; done
