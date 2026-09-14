@@ -1,4 +1,4 @@
-name: Interactive macOS-26 upterm Shell
+name: Interactive macOS-26 Shell
 
 on:
   workflow_dispatch:
@@ -10,6 +10,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ensure tmux is working
+        run: |
+          brew install tmux
+          tmux new-session -d -s main
+          tmux list-sessions
 
       - name: Start SSH session
         uses: lhotari/action-upterm@v1
