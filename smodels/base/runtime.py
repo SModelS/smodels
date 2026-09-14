@@ -81,7 +81,7 @@ def printEnvironmentInfo( args : Dict ) -> bool:
     print(f"Operating System: {colors.green}{platform.system()} {platform.release()}{colors.reset}")
     print(f"Python Version: {colors.green}{platform.python_version()}{colors.reset}")
     print(f"Machine Architecture: {colors.green}{platform.machine()}{colors.reset}")
-    print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
+    # print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
     print("\nModule Versions:")
 
     depsMet = True
