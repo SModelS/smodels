@@ -21,24 +21,27 @@ jobs:
           # Generate a host key for upterm
           ssh-keygen -t ed25519 -f /tmp/upterm_host_key -N "" -q
 
-          # Start upterm in the background
+          # Pre-add upterm server to known_hosts
+          mkdir -p ~/.ssh
+          ssh-keyscan -H uptermd.upterm.dev >> ~/.ssh/known_hosts 2>/dev/null
+
+          # Start upterm with known-hosts flag
           upterm host \
             --accept \
             --server ssh://uptermd.upterm.dev:22 \
             --private-key /tmp/upterm_host_key \
             --authorized-keys /tmp/authorized_keys \
+            --known-hosts ~/.ssh/known_hosts \
             -- bash -l &
 
           UPTERM_PID=$!
           sleep 5
 
-          # Try to get the session info
           for i in $(seq 1 30); do
             if upterm session current 2>/dev/null; then
               echo ""
               echo "========================================"
-              echo "SESSION IS READY — connect with the SSH"
-              echo "command shown above"
+              echo "SESSION IS READY"
               echo "========================================"
               break
             fi
@@ -46,5 +49,4 @@ jobs:
             sleep 3
           done
 
-          # Keep the job alive
           wait $UPTERM_PID || while true; do sleep 30; done
