@@ -23,6 +23,7 @@ jobs:
 
           # Start upterm in the background
           upterm host \
+			      --accept \
             --server ssh://uptermd.upterm.dev:22 \
             --private-key /tmp/upterm_host_key \
             --authorized-keys /tmp/authorized_keys \
