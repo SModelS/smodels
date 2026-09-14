@@ -1,4 +1,4 @@
-name: Interactive macOS-26 Shell
+name: Interactive macOS-26 Shell (upterm)
 
 on:
   workflow_dispatch:
