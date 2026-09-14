@@ -11,42 +11,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Start SSH session
+      - name: Start SSH session via bore
         run: |
-          brew install upterm
+          # Enable macOS remote login
+          sudo systemsetup -setremotelogin on
 
-          # Fetch your GitHub SSH keys
-          curl -s https://github.com/WolfgangWaltenberger.keys > /tmp/authorized_keys
-
-          # Generate a host key for upterm
-          ssh-keygen -t ed25519 -f /tmp/upterm_host_key -N "" -q
-
-          # Pre-add upterm server to known_hosts
+          # Add your GitHub SSH keys
           mkdir -p ~/.ssh
-          ssh-keyscan -H uptermd.upterm.dev >> ~/.ssh/known_hosts 2>/dev/null
+          curl -s https://github.com/WolfgangWaltenberger.keys >> ~/.ssh/authorized_keys
+          chmod 600 ~/.ssh/authorized_keys
 
-          # Start upterm with known-hosts flag
-          upterm host \
-            --accept \
-            --server ssh://uptermd.upterm.dev:22 \
-            --private-key /tmp/upterm_host_key \
-            --authorized-keys /tmp/authorized_keys \
-            --known-hosts ~/.ssh/known_hosts \
-            -- bash -l &
+          # Install bore
+          brew install bore-cli
 
-          UPTERM_PID=$!
+          # Start bore tunnel
+          bore local 22 --to bore.pub &
           sleep 5
 
-          for i in $(seq 1 30); do
-            if upterm session current 2>/dev/null; then
-              echo ""
-              echo "========================================"
-              echo "SESSION IS READY"
-              echo "========================================"
-              break
-            fi
-            echo "Waiting for upterm session... attempt $i"
-            sleep 3
-          done
+          echo "========================================"
+          echo "Check output above for the assigned port"
+          echo "Connect with: ssh runner@bore.pub -p <PORT>"
+          echo "========================================"
 
-          wait $UPTERM_PID || while true; do sleep 30; done
+          while true; do sleep 30; done
