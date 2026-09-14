@@ -19,6 +19,10 @@ modelFile="smodels.share.models.mssm"
 _experimental = { "truncatedgaussians": False,
                   "spey": False } ## experimental features
 
+## the session options used for onnx(runtime)
+onnx_session_options = { "inter_op_num_threads": 1,
+                         "intra_op_num_threads": 1 }
+
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
 def checkForIncompatibleModuleVersions() -> bool:

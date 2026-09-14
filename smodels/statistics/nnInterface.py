@@ -136,20 +136,19 @@ class NNUpperLimitComputer:
         self.name = onnxfilename
         self.allowNegativeSignals = False
         self.dataType = "nn"
-        # first thing we do, we determine whats the most sensitive model
-        session_options = {}
+        from smodels.base.runtime import onnx_session_options as session_options
+        """
+        session_options = copy.deepcopy ( onnx_session_options )
         import onnxruntime
         version = onnxruntime.__version__.split(".")
         if int(version[0])<=1 and int(version[1])<=20:
             session_options={ "inter_op_num_threads": 1,
                               "intra_op_num_threads": 1 }
+        """
         if onnxfilename not in self.data.globalInfo.cachedModels:
             logger.error ( f"could not find {onnxfilename} among cached models")
             sys.exit(-1)
         onnxb = data.globalInfo.cachedModels[onnxfilename]
-        #for onnxfilename,onnxb in self.data.globalInfo.cachedModels.items():
-        #    if not onnxfilename.endswith ( ".onnx" ):
-        #        continue
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
              session_options = session_options )
 
@@ -161,7 +160,9 @@ class NNUpperLimitComputer:
         self.cl = cl
 
         self.alreadyBeenThere = (
-            False  # boolean to detect wether self.signals has returned to an older value
+            # boolean to detect wether self.signals 
+            # has returned to an older value
+            False  
         )
         self.welcome()
         self.checkConsistencyMu0()
