@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  macos26_shell:
+  shell:
     runs-on: macos-26
     timeout-minutes: 60
 
@@ -16,21 +16,34 @@ jobs:
           # Enable macOS remote login
           sudo systemsetup -setremotelogin on
 
-          # Add your GitHub SSH keys
+          # Set a password for the runner user
+          PASSWORD="MacOS26!"
+          sudo dscl . -passwd /Users/runner "$PASSWORD"
+
+          # Also try to set up pubkey auth properly
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           curl -s https://github.com/WolfgangWaltenberger.keys >> ~/.ssh/authorized_keys
           chmod 600 ~/.ssh/authorized_keys
+          chmod 755 /Users/runner
 
-          # Install bore
+          # Make sure sshd allows both password and pubkey
+          sudo sed -i '' 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+          sudo sed -i '' 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+          sudo sed -i '' 's/^#\?AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
+          sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
+
+          # Install and start bore tunnel
           brew install bore-cli
-
-          # Start bore tunnel
           bore local 22 --to bore.pub &
           sleep 5
 
+          echo ""
           echo "========================================"
-          echo "Check output above for the assigned port"
-          echo "Connect with: ssh runner@bore.pub -p <PORT>"
+          echo "Username: runner"
+          echo "Password: $PASSWORD"
+          echo "Connect:  ssh runner@bore.pub -p <PORT>"
+          echo "(check above output for the assigned port)"
           echo "========================================"
 
           while true; do sleep 30; done

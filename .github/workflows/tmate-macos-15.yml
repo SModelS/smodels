@@ -1,10 +1,10 @@
-name: Interactive macOS-15 Shell
+name: Live macOS-15 Shell (tmate)
 
 on:
   workflow_dispatch:
 
 jobs:
-  debug:
+  shell:
     runs-on: macos-15
     timeout-minutes: 60
 
