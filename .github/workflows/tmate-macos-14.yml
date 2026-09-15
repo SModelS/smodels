@@ -1,11 +1,11 @@
-name: Interactive macOS-26 Shell
+name: Live macOS-14 Shell (tmate)
 
 on:
   workflow_dispatch:
 
 jobs:
-  debug:
-    runs-on: macos-26
+  shell:
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
@@ -13,5 +13,3 @@ jobs:
 
       - name: Start SSH session
         uses: mxschmitt/action-tmate@v3
-        with:
-          sudo: false
