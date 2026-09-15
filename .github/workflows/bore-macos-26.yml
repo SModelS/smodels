@@ -39,6 +39,10 @@ jobs:
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
 
+          # Install pipx
+          brew install pipx
+          sudo -u $USERNAME pipx ensurepath
+
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
           export CLICOLOR=1
@@ -55,7 +59,7 @@ jobs:
 
           # Useful stuff
           export HOMEBREW_NO_AUTO_UPDATE=1
-          export PATH="/opt/homebrew/bin:~/.local/bin:$PATH"
+          export PATH="/opt/homebrew/bin:~/.local/bin:/Users/$USER/.local/bin:$PATH"
 
           echo ""
           echo -e "\033[1;36m  macOS 26 — GitHub Actions Runner\033[0m"

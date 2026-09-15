@@ -15,7 +15,7 @@ jobs:
         run: |
           sudo systemsetup -setremotelogin on
 
-          PASSWORD="Hello1234!"
+          # PASSWORD="Hello1234!"
           USERNAME="sshuser"
 
           # Create a fresh user
