@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  shell:
+  interactive-shell:
     runs-on: macos-26
     timeout-minutes: 60
 
@@ -16,34 +16,59 @@ jobs:
           # Enable macOS remote login
           sudo systemsetup -setremotelogin on
 
-          # Set a password for the runner user
-          PASSWORD="MacOS26!"
-          sudo dscl . -passwd /Users/runner "$PASSWORD"
+          PASSWORD="Runner1234!"
 
-          # Also try to set up pubkey auth properly
+          # Try multiple methods to set password
+          sudo sysadminctl -resetPasswordFor runner -newPassword "$PASSWORD" 2>/dev/null || \
+          sudo dscl . -delete /Users/runner AuthenticationAuthority 2>/dev/null
+          sudo dscl . -create /Users/runner Password ""
+          sudo dscl . -passwd /Users/runner "$PASSWORD" 2>/dev/null || \
+          echo "Password methods failed, relying on pubkey auth"
+
+          # Fix pubkey auth properly
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          curl -s https://github.com/WolfgangWaltenberger.keys >> ~/.ssh/authorized_keys
+          curl -s https://github.com/WolfgangWaltenberger.keys > ~/.ssh/authorized_keys
           chmod 600 ~/.ssh/authorized_keys
-          chmod 755 /Users/runner
 
-          # Make sure sshd allows both password and pubkey
-          sudo sed -i '' 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-          sudo sed -i '' 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
-          sudo sed -i '' 's/^#\?AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
-          sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
+          # Fix home directory ownership and permissions
+          sudo chown -R runner:staff /Users/runner/.ssh
+          sudo chmod 755 /Users/runner
+
+          # Configure sshd to allow pubkey auth
+          sudo tee /etc/ssh/sshd_config.d/custom.conf <<EOF
+          PasswordAuthentication yes
+          PubkeyAuthentication yes
+          AuthorizedKeysFile .ssh/authorized_keys
+          UsePAM yes
+          StrictModes yes
+          EOF
+
+          # Restart sshd
+          sudo launchctl unload /System/Library/LaunchDaemons/ssh.plist 2>/dev/null
+          sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist 2>/dev/null
 
           # Install and start bore tunnel
           brew install bore-cli
           bore local 22 --to bore.pub &
           sleep 5
 
+          # Debug info
           echo ""
           echo "========================================"
           echo "Username: runner"
-          echo "Password: $PASSWORD"
+          echo "Password: $PASSWORD (may not work)"
+          echo ""
           echo "Connect:  ssh runner@bore.pub -p <PORT>"
           echo "(check above output for the assigned port)"
+          echo "========================================"
+          echo ""
+          echo "Debug: authorized_keys contents:"
+          cat ~/.ssh/authorized_keys
+          echo ""
+          echo "Debug: home dir permissions:"
+          ls -la /Users/ | grep runner
+          ls -la /Users/runner/.ssh/
           echo "========================================"
 
           while true; do sleep 30; done
