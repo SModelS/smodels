@@ -13,62 +13,69 @@ jobs:
 
       - name: Start SSH session via bore
         run: |
-          # Enable macOS remote login
           sudo systemsetup -setremotelogin on
 
-          PASSWORD="Runner1234!"
+          PASSWORD="Hello1234!"
+          USERNAME="sshuser"
 
-          # Try multiple methods to set password
-          # sudo sysadminctl -resetPasswordFor runner -newPassword "$PASSWORD" 2>/dev/null || \
-          sudo dscl . -delete /Users/runner AuthenticationAuthority 2>/dev/null
-          sudo dscl . -create /Users/runner Password ""
-          # sudo dscl . -passwd /Users/runner "$PASSWORD" 2>/dev/null || \
-          echo "Password methods failed, relying on pubkey auth"
+          # Create a fresh user
+          sudo dscl . -create /Users/$USERNAME
+          sudo dscl . -create /Users/$USERNAME UserShell /bin/bash
+          sudo dscl . -create /Users/$USERNAME RealName "SSH User"
+          sudo dscl . -create /Users/$USERNAME UniqueID 1099
+          sudo dscl . -create /Users/$USERNAME PrimaryGroupID 20
+          sudo dscl . -create /Users/$USERNAME NFSHomeDirectory /Users/$USERNAME
+          sudo mkdir -p /Users/$USERNAME
+          sudo chown $USERNAME:staff /Users/$USERNAME
+          # sudo dscl . -passwd /Users/$USERNAME "$PASSWORD"
 
-          # Fix pubkey auth properly
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          curl -s https://github.com/WolfgangWaltenberger.keys > ~/.ssh/authorized_keys
-          chmod 600 ~/.ssh/authorized_keys
+          # Give sudo access
+          sudo dscl . -append /Groups/admin GroupMembership $USERNAME
 
-          # Fix home directory ownership and permissions
-          sudo chown -R runner:staff /Users/runner/.ssh
-          sudo chmod 755 /Users/runner
+          # Add your SSH keys
+          sudo mkdir -p /Users/$USERNAME/.ssh
+          curl -s https://github.com/WolfgangWaltenberger.keys | sudo tee /Users/$USERNAME/.ssh/authorized_keys
+          sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
+          sudo chmod 700 /Users/$USERNAME/.ssh
+          sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
 
-          # Configure sshd to allow pubkey auth
-          sudo tee /etc/ssh/sshd_config.d/custom.conf <<EOF
-          PasswordAuthentication yes
-          PubkeyAuthentication yes
-          AuthorizedKeysFile .ssh/authorized_keys
-          UsePAM yes
-          StrictModes yes
-          EOF
+          # Set up colored prompt without hostname
+          sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
+          export CLICOLOR=1
+          export LSCOLORS=GxFxCxDxBxegedabagaced
+          export TERM=xterm-256color
 
-          # Restart sshd
-          sudo launchctl unload /System/Library/LaunchDaemons/ssh.plist 2>/dev/null
-          sudo launchctl load -w /System/Library/LaunchDaemons/ssh.plist 2>/dev/null
+          # Colored prompt: green user, blue directory, no hostname
+          export PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '
+
+          # Colored ls
+          alias ls='ls --color=auto 2>/dev/null || ls -G'
+          alias ll='ls -lah'
+          alias grep='grep --color=auto'
+
+          # Useful stuff
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          export PATH="/opt/homebrew/bin:~/.local/bin:$PATH"
+
+          echo ""
+          echo -e "\033[1;36m  macOS 15 — GitHub Actions Runner\033[0m"
+          echo -e "\033[0;33m  arch: $(uname -m) | cores: $(sysctl -n hw.ncpu) | mem: $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 ))GB\033[0m"
+          echo ""
+          PROFILE
+
+          sudo chown $USERNAME:staff /Users/$USERNAME/.bash_profile
 
           # Install and start bore tunnel
           brew install bore-cli
           bore local 22 --to bore.pub &
           sleep 5
 
-          # Debug info
           echo ""
           echo "========================================"
-          echo "Username: runner"
-          # echo "Password: $PASSWORD (may not work)"
-          echo ""
-          echo "Connect:  ssh runner@bore.pub -p <PORT>"
+          echo "Username: $USERNAME"
+          # echo "Password: $PASSWORD"
+          echo "Connect:  ssh $USERNAME@bore.pub -p <PORT>"
           echo "(check above output for the assigned port)"
-          echo "========================================"
-          echo ""
-          echo "Debug: authorized_keys contents:"
-          cat ~/.ssh/authorized_keys
-          echo ""
-          echo "Debug: home dir permissions:"
-          ls -la /Users/ | grep runner
-          ls -la /Users/runner/.ssh/
           echo "========================================"
 
           while true; do sleep 30; done
