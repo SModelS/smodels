@@ -40,8 +40,8 @@ jobs:
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
 
           # Install pipx
-          brew install pipx
-          sudo -u $USERNAME pipx ensurepath
+          # brew install pipx
+          # sudo -u $USERNAME pipx ensurepath
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
