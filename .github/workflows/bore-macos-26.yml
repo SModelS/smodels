@@ -1,4 +1,4 @@
-name: Interactive macOS-26 Shell (via bore.pub)
+name: Live macOS-26 Shell (bore.pub)
 
 on:
   workflow_dispatch:
