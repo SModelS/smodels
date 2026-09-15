@@ -54,7 +54,7 @@ Examples displaying several functionalities:
 
 * `How to use a combinations matrix <combinationsmatrix.html>`_ (download the Python code :download:`here <recipes/combinationsmatrix.py>`, IPython notebook :download:`here <recipes/combinationsmatrix.ipynb>`)
 
-* `How to write and use your own printer <outOfRepoPrinter.html>`_ (download the Python code :download:`here <recipes/outOfRepoPrinter.py>`, IPython notebook :download:`here <recipes/outOfRepoPrinter.ipynb>`)
+* `How to write and use your own printer <customPrinter.html>`_ (download the Python code :download:`here <recipes/customPrinter.py>`, IPython notebook :download:`here <recipes/customPrinter.ipynb>`)
 
 Examples using the cross-section computer:
 ------------------------------------------

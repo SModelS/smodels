@@ -30,7 +30,7 @@ class RunPrinterTest(unittest.TestCase):
             if os.path.exists(i):
                 os.remove(i)
 
-    def testOutOfRepoPrinter(self):
+    def testCustomPrinter(self):
         from smodels.tools.printers.printerRegistry import PrinterRegistry
         from smodels.tools.printers.basicPrinter import BasicPrinter
         class NewPrinter(BasicPrinter):
