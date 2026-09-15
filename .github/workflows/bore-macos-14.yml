@@ -27,7 +27,7 @@ jobs:
           sudo dscl . -create /Users/$USERNAME NFSHomeDirectory /Users/$USERNAME
           sudo mkdir -p /Users/$USERNAME
           sudo chown $USERNAME:staff /Users/$USERNAME
-          sudo dscl . -passwd /Users/$USERNAME "$PASSWORD"
+          # sudo dscl . -passwd /Users/$USERNAME "$PASSWORD"
 
           # Give sudo access
           sudo dscl . -append /Groups/admin GroupMembership $USERNAME
@@ -55,10 +55,10 @@ jobs:
 
           # Useful stuff
           export HOMEBREW_NO_AUTO_UPDATE=1
-          export PATH="/opt/homebrew/bin:$PATH"
+          export PATH="/opt/homebrew/bin:~/.local/bin:$PATH"
 
           echo ""
-          echo -e "\033[1;36m  macOS 26 (Tahoe) — GitHub Actions Runner\033[0m"
+          echo -e "\033[1;36m  macOS 14 (Sonoma) — GitHub Actions Runner\033[0m"
           echo -e "\033[0;33m  arch: $(uname -m) | cores: $(sysctl -n hw.ncpu) | mem: $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 ))GB\033[0m"
           echo ""
           PROFILE
@@ -73,7 +73,7 @@ jobs:
           echo ""
           echo "========================================"
           echo "Username: $USERNAME"
-          echo "Password: $PASSWORD"
+          # echo "Password: $PASSWORD"
           echo "Connect:  ssh $USERNAME@bore.pub -p <PORT>"
           echo "(check above output for the assigned port)"
           echo "========================================"
