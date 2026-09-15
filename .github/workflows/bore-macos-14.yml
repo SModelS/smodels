@@ -38,9 +38,6 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
-          # Install pipx
-          brew install pipx
-          sudo -u $USERNAME pipx ensurepath
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
@@ -61,7 +58,7 @@ jobs:
           export PATH="/opt/homebrew/bin:~/.local/bin:$PATH"
 
           echo ""
-          echo -e "\033[1;36m  macOS 14 (Sonoma) — GitHub Actions Runner\033[0m"
+          echo -e "\033[1;36m  macOS 14 — GitHub Actions Runner\033[0m"
           echo -e "\033[0;33m  arch: $(uname -m) | cores: $(sysctl -n hw.ncpu) | mem: $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 ))GB\033[0m"
           echo ""
           PROFILE
