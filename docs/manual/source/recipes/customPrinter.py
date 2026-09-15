@@ -49,6 +49,9 @@ class ExamplePrinter(BasicPrinter):
 
     def flush ( self ):
         """ this method is called at the end of a model point """
+        # self.somearg is defined in parameters_custom_printer.ini 
+        print ( f"ExamplePrinter.somearg: {self.somearg}" )
+        print ( f"ExamplePrinter: but do note that we lowercase all arguments!!" )
         for obj in self.toPrint:
             print ( f"ExamplePrinter, obj: {type(obj).__name__} object: I do with it as I wish" )
 
@@ -79,32 +82,60 @@ database = Database("official")
 # In[6]:
 
 
-parameterFile = "parameters_oor_printer.ini"
+parameterFile = "parameters_custom_printer.ini"
 parser = modelTester.getParameters( parameterFile )
 
+
+# ### Configure printers
 
 # In[7]:
 
 
-modelTester.loadDatabaseResults(parser, database) 
+## parameters_custom_printer.ini contains a section to configure your new printer:
+# [example-printer]
+# someArg = "this argument was set in parameters_custom_printer.ini"
 
 
 # In[8]:
 
 
-fileList, inDir = modelTester.getAllInputFiles( "inputFiles/slha/simplyGluino.slha" )
+## make sure to list your new printer in the list of printers used:
+# [printer]
+# outputType = example  ; use the example printer
 
 
 # In[9]:
 
 
-### Run SModelS, it will call ExamplePrinter
+modelTester.loadDatabaseResults(parser, database) 
 
 
 # In[10]:
 
 
+fileList, inDir = modelTester.getAllInputFiles( "inputFiles/slha/simplyGluino.slha" )
+
+
+# In[11]:
+
+
+### Run SModelS, it will call ExamplePrinter
+
+
+# In[12]:
+
+
 modelTester.testPoints ( fileList, inDir, "results/", parser, database, timeout=0, development=False, parameterFile = parameterFile ) 
+
+
+# ### Note how the printer can also be used via runSModelS.py directly, by adding to your ini file:
+
+# In[13]:
+
+
+## custom code to be executed                                        
+# [custom-codes]                                                              
+# files = ./examplePrinter.py  # comma separated
 
 
 # In[ ]:

@@ -1,11 +1,11 @@
 Release v3.2.1, xxx
 =======================================================
 
-  * Fix for printerRegistry in combination with ncpus > 1 multiprocessing and
-    out-of-repo printers
-  * out-of-repo printers can now also be used with runSModelS
+  * Fix for printerRegistry in combination with ncpus > 1 multiprocessing and custom printers
+  * custom printers can now also be used with runSModelS
   * Updated authorlist in BANNER
-  * Recipe for out-of-repo printer added
+  * Recipe for custom printer added
+  * Renamed out-of-repo printer to custom printer
   * Renamed types to smodels_types to avoid name clashes
   * silencing an "unknown solver option 'disp'" warning in scipy
   * onnx_session_options defined in runtime
