@@ -1,11 +1,11 @@
-name: Live macOS-26 Shell (bore.pub)
+name: Live macOS-14 Shell (bore.pub)
 
 on:
   workflow_dispatch:
 
 jobs:
   interactive-shell:
-    runs-on: macos-26
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
