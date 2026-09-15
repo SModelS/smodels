@@ -1,10 +1,10 @@
-name: Interactive macOS-26 Shell (upterm)
+name: Interactive macOS-26 Shell (via bore.pub)
 
 on:
   workflow_dispatch:
 
 jobs:
-  debug:
+  macos26_shell:
     runs-on: macos-26
     timeout-minutes: 60
 
