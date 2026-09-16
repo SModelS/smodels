@@ -21,7 +21,6 @@ from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
          CLsWithErrorsfromNLL
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from scipy import optimize, differentiate
-from smodels.statistics.nnAdapter import NNAdapter
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
 
@@ -149,6 +148,10 @@ class NNUpperLimitComputer:
             logger.error ( f"could not find {onnxfilename} among cached models")
             sys.exit(-1)
         onnxb = data.globalInfo.cachedModels[onnxfilename]
+        ## disable telemetry
+        import onnxruntime as ort
+        ort.disable_telemetry_events()
+        from smodels.statistics.nnAdapter import NNAdapter
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
              session_options = session_options )
 
