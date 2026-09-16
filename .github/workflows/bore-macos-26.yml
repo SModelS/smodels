@@ -40,7 +40,7 @@ jobs:
           # Install pipx
           # brew install pipx
           sudo -u $USERNAME pipx ensurepath
-          sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
+          # sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
