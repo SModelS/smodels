@@ -15,7 +15,6 @@ jobs:
         run: |
           sudo systemsetup -setremotelogin on
 
-          # PASSWORD="Hello1234!"
           USERNAME="sshuser"
 
           # Create a fresh user
@@ -27,7 +26,6 @@ jobs:
           sudo dscl . -create /Users/$USERNAME NFSHomeDirectory /Users/$USERNAME
           sudo mkdir -p /Users/$USERNAME
           sudo chown $USERNAME:staff /Users/$USERNAME
-          # sudo dscl . -passwd /Users/$USERNAME "$PASSWORD"
 
           # Give sudo access
           sudo dscl . -append /Groups/admin GroupMembership $USERNAME
@@ -39,6 +37,11 @@ jobs:
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
 
+          # Install pipx
+          # brew install pipx
+          # sudo -u $USERNAME pipx ensurepath
+          # sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
+
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
           export CLICOLOR=1
@@ -49,13 +52,13 @@ jobs:
           export PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '
 
           # Colored ls
-          alias ls='ls --color=auto 2>/dev/null || ls -G'
+          #alias ls='ls --color=auto 2>/dev/null || ls -G'
           alias ll='ls -lah'
           alias grep='grep --color=auto'
 
           # Useful stuff
           export HOMEBREW_NO_AUTO_UPDATE=1
-          export PATH="/opt/homebrew/bin:~/.local/bin:$PATH"
+          export PATH="/opt/homebrew/bin:~/.local/bin:/Users/$USER/.local/bin:$PATH"
 
           echo ""
           echo -e "\033[1;36m  macOS 15 — GitHub Actions Runner\033[0m"
@@ -67,14 +70,23 @@ jobs:
 
           # Install and start bore tunnel
           brew install bore-cli
-          bore local 22 --to bore.pub &
+          bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
           sleep 5
+
+          PORT=""
+          for i in $(seq 1 30); do
+              PORT=$(grep -oE 'bore\.pub:[0-9]+' /tmp/bore.log | head -1 | cut -d: -f2)
+              if [ -n "$PORT" ]; then
+                  break
+              fi
+              echo "Waiting for bore tunnel... attempt $i"
+              sleep 2
+          done
 
           echo ""
           echo "========================================"
           echo "Username: $USERNAME"
-          # echo "Password: $PASSWORD"
-          echo "Connect:  ssh $USERNAME@bore.pub -p <PORT>"
+          echo "Connect:  ssh $USERNAME@bore.pub -p $PORT"
           echo "(check above output for the assigned port)"
           echo "========================================"
 
