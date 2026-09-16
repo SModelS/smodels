@@ -39,7 +39,7 @@ jobs:
 
           # Install pipx
           # brew install pipx
-          sudo -u $USERNAME pipx ensurepath
+          # sudo -u $USERNAME pipx ensurepath
           # sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
 
           # Set up colored prompt without hostname
@@ -70,7 +70,7 @@ jobs:
 
           # Install and start bore tunnel
           brew install bore-cli
-          bore local 22 --to bore.pub &
+          bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
           sleep 5
 
           echo ""
