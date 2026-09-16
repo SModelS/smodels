@@ -73,7 +73,7 @@ jobs:
           bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
           sleep 5
 
-          PORT="<PORT>"
+          PORT=""
           for i in $(seq 1 30); do
               PORT=$(grep -oE 'bore\.pub:[0-9]+' /tmp/bore.log | head -1 | cut -d: -f2)
               if [ -n "$PORT" ]; then
