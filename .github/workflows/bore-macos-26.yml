@@ -15,7 +15,6 @@ jobs:
         run: |
           sudo systemsetup -setremotelogin on
 
-          PASSWORD="Hello1234!"
           USERNAME="sshuser"
 
           # Create a fresh user
@@ -27,7 +26,6 @@ jobs:
           sudo dscl . -create /Users/$USERNAME NFSHomeDirectory /Users/$USERNAME
           sudo mkdir -p /Users/$USERNAME
           sudo chown $USERNAME:staff /Users/$USERNAME
-          # sudo dscl . -passwd /Users/$USERNAME "$PASSWORD"
 
           # Give sudo access
           sudo dscl . -append /Groups/admin GroupMembership $USERNAME
@@ -41,7 +39,8 @@ jobs:
 
           # Install pipx
           # brew install pipx
-          # sudo -u $USERNAME pipx ensurepath
+          sudo -u $USERNAME pipx ensurepath
+          sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
@@ -77,7 +76,6 @@ jobs:
           echo ""
           echo "========================================"
           echo "Username: $USERNAME"
-          # echo "Password: $PASSWORD"
           echo "Connect:  ssh $USERNAME@bore.pub -p <PORT>"
           echo "(check above output for the assigned port)"
           echo "========================================"
