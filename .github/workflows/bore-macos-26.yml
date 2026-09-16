@@ -52,7 +52,7 @@ jobs:
           export PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '
 
           # Colored ls
-          alias ls='ls --color=auto 2>/dev/null || ls -G'
+          #alias ls='ls --color=auto 2>/dev/null || ls -G'
           alias ll='ls -lah'
           alias grep='grep --color=auto'
 
@@ -73,10 +73,20 @@ jobs:
           bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
           sleep 5
 
+          PORT="<PORT>"
+          for i in $(seq 1 30); do
+              PORT=$(grep -oE 'bore\.pub:[0-9]+' /tmp/bore.log | head -1 | cut -d: -f2)
+              if [ -n "$PORT" ]; then
+                  break
+              fi
+              echo "Waiting for bore tunnel... attempt $i"
+              sleep 2
+          done
+
           echo ""
           echo "========================================"
           echo "Username: $USERNAME"
-          echo "Connect:  ssh $USERNAME@bore.pub -p <PORT>"
+          echo "Connect:  ssh $USERNAME@bore.pub -p $PORT"
           echo "(check above output for the assigned port)"
           echo "========================================"
 
