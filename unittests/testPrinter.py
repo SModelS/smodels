@@ -36,6 +36,8 @@ class RunPrinterTest(unittest.TestCase):
         class NewPrinter(BasicPrinter):
             def __init__ ( self ):
                 pass
+            def setOutPutFile ( self ):
+                pass
         PrinterRegistry.register ( NewPrinter, "dummy" )
         printer = PrinterRegistry.get ( "dummy" )
         PrinterRegistry.printers.pop ( "dummy" )

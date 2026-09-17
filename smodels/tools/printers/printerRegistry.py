@@ -18,6 +18,21 @@ class PrinterRegistry:
     printers = {}
 
     @classmethod
+    def check_api( cls, printer ):
+        """ this class method checks that the printer the user registers
+        implements the required methods
+
+        :raises NotImplementedError: if method is missing
+        """
+        required_methods = [ "setOutPutFile", "addObj", "flush" ]
+
+        missing = [m for m in required_methods if not hasattr(printer, m) or \
+            not callable(getattr(printer, m))]
+        if missing:
+            comment = f"{printer.__name__} is missing methods: {' '.join(missing)}"
+            raise NotImplementedError( comment )
+
+    @classmethod
     def register( cls, printer : type[BasicPrinter], extension : str,
                   allow_overwrite : bool = False ) -> bool:
         """
@@ -28,6 +43,7 @@ class PrinterRegistry:
         entries
         :returns: False if printer already existed, else True
         """
+        cls.check_api ( printer )
         if extension in cls.printers: # we allow overwrites though
             if allow_overwrite:
                 cls.printers[extension] = printer
