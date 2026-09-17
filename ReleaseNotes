@@ -11,6 +11,7 @@ Release v3.2.1, xxx
   * onnx_session_options defined in runtime
   * disabled telemetry for onnxruntime as it causes problems on some mac os systems
   * Improved github's live shells for mac OS
+  * Bumped up pythia8 from 8317 to 8318
 
 Release v3.2.0, Sep 2 2026
 =======================================================
