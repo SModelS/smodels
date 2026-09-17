@@ -20,6 +20,8 @@ class MLModelsTest(unittest.TestCase):
         A simple case we test "by hand"
         """
         onnxFile = "testFiles/test.onnx"
+        import sys
+        sys.path.insert(0,"../smodels/statistics/")
         adapter = NNAdapter ( onnxFile, False )
         yields = {}
         regions = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts',
@@ -33,9 +35,11 @@ class MLModelsTest(unittest.TestCase):
             'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
             'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
             'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
+        for i,r in enumerate(regions):
+            regions[i]=r+"-0"
         for region in regions: # predict for no yields
             yields[ region ] = 0.
-        ret = adapter.predict ( yields )
+        ret = adapter.predict ( yields, yields_are_signal_yields = False )
         truths = { 'nll_exp_0': 675.10349848,
                    'nll_exp_1': 675.3807474856113,
                    'nll_obs_0': 688.4482887699999,

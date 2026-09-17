@@ -2,11 +2,10 @@
 
 """
 .. module:: nnAdapter
-   :synopsis: An Adapter class that wraps around the neural networks (e.g. onnx
-   files), handle all the pre and post processing. This adapter is
-   meant to be published with the ML paper, not with e.g. SModelS.
+   :synopsis: An Adapter class that wraps around the neural networks
+   published in arXiv:XXXX, handling all the pre- and post-processing.
 
-.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+.. moduleauthor:: OLLL Collaboration
 
 """
 
@@ -25,18 +24,24 @@ class NNAdapter:
     """
     Adapter that wraps around a neural network
     """
-    __slots__ = [ "mlModel", "modelType", "onnxMeta", "srOrder", "regressor", 
-                  "session_options", "onnxfilename" ]
+    __slots__ = [ "mlModel", "modelType", "onnxMeta", "srOrder", "regressor",
+                  "session_options", "onnxfilename", "crRegions" ]
 
     def __init__( self, mlModel : Union[bytes,str,onnx.ModelProto,os.PathLike],
-                  onnxfilename : str, session_options : dict = {} ):
+                  onnxfilename : None|str = None, session_options : dict = {},
+                  validate_metadata : bool = True ):
         """
         :param mlModel: the model, as a ModelProto, as a bytes stream,
         or as a path to an onnx file (needing to end with .onnx)
         :param onnxfilename: filename of onnxfile, for debugging only
+        if None, then assume it is the same as mlModel
         :param session_options: options for the onnxruntime inference session,
         e.g. { "inter_op_num_threads": 1 }
+        :param validate_metadata: if true, then validate metadata in onnx file,
+        before usage
         """
+        if onnxfilename == None:
+            onnxfilename = str(mlModel)
         assert type(mlModel) in [ bytes, str, onnx.ModelProto,os.PathLike],\
             "mlModel needs to be one of: bytes, str, onnx.ModelProto, PathType"
         if type(mlModel) == str and mlModel.endswith ( "onnx") and \
@@ -50,9 +55,70 @@ class NNAdapter:
                 sys.exit(-1)
         self.onnxfilename = onnxfilename
         self.session_options = session_options
+        if validate_metadata:
+            from smodels.statistics.metadataValidator import validateMetaData
+            validateMetaData ( self.mlModel.metadata_props )
         self._parseMetaData ()
         self._getSROrder()
+        self._cleanCRs()
         self._instantiateRegressor()
+
+    def predict ( self, yields : Union[dict,list],
+           yields_are_signal_yields : bool = True,
+           obs_as_bg : list|None|str = [] ) -> dict:
+        """ proposal for a slightly different API
+
+        :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
+        (in which case the order must match the one in the json)
+
+        :param yields_are_signal_yields: if True, then yields are
+        interpreted as signal yields, and the backgrounds get added.
+        if False, yields are assumed to be total yields
+
+        :param obs_as_bg: a list of signal regions for which we use 
+        observations as background_yields ("postfit"), given 
+        yields_are_signal_yields is True. If None or "default", then 
+        use self.onnxMeta["crRegions"] as defined in the onnx file
+
+        :returns: the negative log likelihoods (nlls) as a dictionary:
+        { 'nll_exp_0': ..., 'nll_exp_1': ..., 'nll_obs_0': ...,
+        'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
+        'nllA_obs_0': ..., 'nllA_obs_1': ... }
+        where 0, 1 means mu=0, 1, respectively. exp refers to a priori
+        expectation, obs are the observed values. nllA means the 
+        nll is evaluated for the Asimov dataset with mu' = 0.
+        """
+        if obs_as_bg in [ None, "default", "postfit" ]:
+            obs_as_bg = self.onnxMeta["crRegions"]
+        if yields_are_signal_yields:
+            yields = self._totalYieldsFromSignals ( yields, obs_as_bg )
+        scaled_yields = self._preprocess ( yields )
+        out = self._predictFromScaledYields ( scaled_yields )
+        ret = self._postprocess ( out )
+        return ret
+
+    def _getCRs( self, channels : list ) -> list:
+        """ get a list of every signal region marked as a control region
+        """
+        crRegions = []
+        for ch in channels:
+            for regionName, regionType in ch.items():
+                if regionType == "CR":
+                    crRegions.append ( regionName )
+        return crRegions
+
+    def _cleanCRs ( self ):
+        """ the meta information has all regions of all models,
+        so we clean the list of control regions here, 
+        possibly also adding the "-o" postfix to regio names
+        """
+        newCRs = []
+        for r in self.onnxMeta["crRegions"]:
+            if r in self.srOrder:
+                newCRs.append ( r )
+            if r+"-0" in self.srOrder:
+                newCRs.append ( f"{r}-0" )
+        self.onnxMeta["crRegions"] = newCRs
 
     def _instantiateRegressor ( self ):
         """ create the actual inference session object """
@@ -121,6 +187,8 @@ class NNAdapter:
         remove_channels=[]
         import json
         for em in self.mlModel.metadata_props:
+            if em.key == "channels":
+                data["crRegions"] = self._getCRs ( eval ( em.value ) )
             if em.key == "remove_channels":
                 # remove these channels at the end, so that order does not matter
                 remove_channels = eval(em.value)
@@ -179,7 +247,7 @@ class NNAdapter:
         arr = arr[0][0]
         return arr
 
-    def postprocess( self, arr : np.ndarray,
+    def _postprocess( self, arr : np.ndarray,
            add_errors : bool = True ) -> dict:
         """ given the networks predictions, compute the NLLs
 
@@ -208,13 +276,6 @@ class NNAdapter:
         nll1obs  = nll0obs  + deltas[1]
         nllA1exp = nllA0exp + deltas[2]
         nllA1obs = nllA0obs + deltas[3]
-        ## error propagation, fixme for now we just do it by hand:
-        ## s_y = abs ( y * s_x )
-        ## FIXME this needs to be changed for something generic
-        #s_nll1exp  = abs ( deltas[4] * deltas[0] )
-        #s_nll1obs  = abs ( deltas[5] * deltas[1] )
-        #s_nllA1exp = abs ( deltas[6] * deltas[2] )
-        #s_nllA1obs = abs ( deltas[7] * deltas[3] )
 
         ret = { "nll_exp_0": nll0exp,  "nll_exp_1": nll1exp,
                 "nll_obs_0": nll0obs,  "nll_obs_1": nll1obs,
@@ -223,8 +284,7 @@ class NNAdapter:
         if self.onnxMeta["nLL_obs_max"][1] is not None:
             ret["nll_obs_max"] = self.onnxMeta["nLL_obs_max"][1]
         if add_errors:
-            from smodels.statistics.nnPreprocessing import \
-                postprocess_nLLs_errors
+            from smodels.statistics.nnPreprocessing import postprocess_nLLs_errors
             errs = postprocess_nLLs_errors ( deltas_prepd[4:],
                     deltas_prepd[:4],
                     mean = nll_means,
@@ -237,21 +297,37 @@ class NNAdapter:
             ret["sigma_obsA"] = errs[3]
         return ret
 
-    def predict ( self, yields : Union[dict,list] ) -> dict:
-        """ predict for yields, the main method
-        :param yields: e.g. { "SR1": 3, "SR2": 5 }, or [3,5]
-        (in which case the order must match the one in the json)
+    def _totalYieldsFromSignals ( self, signal_yields : dict,
+           obs_as_bg : list = [] ) -> dict:
+        """ given the signal yields, return the total
+        yields, signal + background
 
-        :returns: { 'nll_exp_0': ..., 'nll_exp_1': ..., 'nll_obs_0': ...,
-                    'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
-                    'nllA_obs_0': ..., 'nllA_obs_1': ... }
+        :param signal_yields: the signal yields, as a (srname, yield) dictionary
+        :param obs_abs_bg: a list of signal regions for which we use 
+        observations as background_yields ("postfit")
+
+        :returns: the total yields, as a dictionary
         """
-        scaled_yields = self.preprocess ( yields )
-        out = self._predictFromScaledYields ( scaled_yields )
-        ret = self.postprocess ( out )
-        return ret
+        new_yields = {}
+        account_for_crs = obs_as_bg[:]
 
-    def preprocess ( self, yields : Union[dict,list] ) -> dict:
+        for srname,smyield in self.onnxMeta["bkg_yields"].items():
+            assert srname in signal_yields, \
+                f"nnInterface: cannot find sr name {srname} in '{ signal_yields }'"
+            signal = signal_yields[srname]
+            if srname in obs_as_bg:
+                account_for_crs.remove ( srname )
+                smyield = self.onnxMeta["obs_yields"][srname]
+                signal = 0.
+            tot = smyield + signal
+            new_yields[srname] = tot
+        if len(account_for_crs)>0:
+            raise Exception ( f"signal region(s) {account_for_crs} unknown" )
+
+        return new_yields
+
+
+    def _preprocess ( self, yields : Union[dict,list] ) -> dict:
         if type(yields)==dict:
             yields = self._inputDictToList ( yields )
         inp_list = np.array ( yields )
@@ -272,42 +348,21 @@ class NNAdapter:
         :returns: list of yields
         """
         ret = []
+        account_for_srs = list(in_dict.keys())
         if len(in_dict) != len ( self.srOrder ):
             raise Exception ( f"length of dict ({len(in_dict)} does not match srOrder ({len(self.srOrder)})" )
         for sr in self.srOrder:
             dsr = sr
-            if dsr.endswith ( "-0" ):
-                dsr = sr[:-2]
+            #if dsr.endswith ( "-0" ):
+            #    dsr = sr[:-2]
             if sr in in_dict:
                 ret.append ( in_dict[sr] )
+                account_for_srs.remove ( sr )
                 continue
-            if dsr in in_dict:
-                ret.append ( in_dict[dsr] )
-                continue
-            print( f"signal region {sr} not in input_dict" )
-            ret.append ( 0. )
+            #if dsr in in_dict:
+            #    ret.append ( in_dict[dsr] )
+            #    continue
+            raise Exception ( f"signal region {sr} not in input_dict" )
+        if len(account_for_srs)>0:
+            raise Exception ( f"signal region(s) {account_for_srs} unknown" )
         return ret
-
-if __name__ == "__main__":
-    regions = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts',
-        'SRhigh_0Je_cuts', 'SRhigh_0Jf1_cuts', 'SRhigh_0Jf2_cuts',
-        'SRhigh_0Jg1_cuts', 'SRhigh_0Jg2_cuts', 'SRhigh_nJa_cuts',
-        'SRhigh_nJb_cuts', 'SRhigh_nJc_cuts', 'SRhigh_nJd_cuts',
-        'SRhigh_nJe_cuts', 'SRhigh_nJf_cuts', 'SRhigh_nJg_cuts',
-        'SRlow_0Jb_cuts', 'SRlow_0Jc_cuts', 'SRlow_0Jd_cuts',
-        'SRlow_0Je_cuts', 'SRlow_0Jf1_cuts', 'SRlow_0Jf2_cuts',
-        'SRlow_0Jg1_cuts', 'SRlow_0Jg2_cuts', 'SRlow_nJb_cuts',
-        'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
-        'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
-        'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
-    # onnxFile = "../../unittests/testFiles/test.onnx"
-    onnxFile = "test.onnx"
-
-    adapter = NNAdapter ( onnxFile, False )
-
-    yields = {}
-    for region in regions: # predict for no yields
-        yields[ region ] = 0.
-    ret = adapter.predict ( yields )
-    print ("\n".join( f"{key:10s}: {value:.1f}" for key,value in ret.items()))
-    import sys; import IPython; IPython.embed( colors = "neutral" ); sys.exit()

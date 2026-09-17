@@ -227,7 +227,7 @@ class NNUpperLimitComputer:
             if err > tolerance:
                 raise SModelSError ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
 
-    def totalYieldsFromSignals ( self, poi_test : float ) -> list :
+    def totalYieldsFromSignals ( self, poi_test : float ) -> dict :
         """ given the signal yields self.nsignals, return the total
         yields, signal + background
 
@@ -235,7 +235,8 @@ class NNUpperLimitComputer:
         :returns: list of total yields
         """
 
-        yields = []
+        yields = [] # obsolete
+        yields = {}
         for srname,smyield in self.adaptor.onnxMeta["bkg_yields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -254,7 +255,7 @@ class NNUpperLimitComputer:
                 ## seems like a CR! replaced bkgexpected with observed (postfit)
                 smyield = obsyield
             tot = smyield + signal
-            yields.append ( tot )
+            yields[srname ] = tot
         return yields
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -273,7 +274,7 @@ class NNUpperLimitComputer:
 
         # from signal yields compute total yields
         yields = self.totalYieldsFromSignals( poi_test )
-        ret = self.adaptor.predict(yields)
+        ret = self.adaptor.predict(yields, yields_are_signal_yields = False )
 
         if outputType == None:
             return ret
