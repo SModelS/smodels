@@ -7,9 +7,9 @@ Release v3.2.1, xxx
   * Recipe for custom printer added, custom printing also mentioned in OutputDescription
   * Renamed out-of-repo printer to custom printer
   * Renamed types to smodels_types to avoid name clashes
-  * silencing an "unknown solver option 'disp'" warning in scipy
-  * onnx_session_options defined in runtime
-  * disabled telemetry for onnxruntime as it causes problems on some mac os systems
+  * Silencing an "unknown solver option 'disp'" warning in scipy
+  * Onnx_session_options defined in runtime
+  * Disabled telemetry for onnxruntime as it causes problems on some mac os systems
   * Improved github's live shells for mac OS
   * Bumped up pythia8 from 8317 to 8318
 
