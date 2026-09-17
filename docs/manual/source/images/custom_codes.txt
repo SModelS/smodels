@@ -1,0 +1,5 @@
+[custom-codes]
+files = printer1.py, printer2.py
+
+[example-printer]
+variableOne = "whatever you need this to be"

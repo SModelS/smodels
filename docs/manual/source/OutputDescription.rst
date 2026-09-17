@@ -376,3 +376,24 @@ for the combination of analyses.
        while for particles considered stable (see see :ref:`stableWidth parameter <parameterFileModel>`), the width is replaced by 'stable'.
        If more than one |SMS| contributes to the theory prediction, the average widths and masses of the BSM states
        are shown.
+
+.. _customPrinters:
+
+Custom Printers
+---------------
+
+In addition to the aforementioned options, a custom printer can be implemented and
+added to the predefined list of printers. To this end the file that contains the printer needs to be mentioned as a `custom code` in the ini file:
+
+.. literalinclude:: /images/custom_codes.txt
+   :lines: 1-2
+
+A skeleton/example of such a custom printer is here:
+
+.. literalinclude:: /images/example_printer.txt
+   :lines: 1-37
+
+Note the two lines at the end, they register the new printer as the "example" printer. This printer can then be configured via an `example-printer` section:
+
+.. literalinclude:: /images/custom_codes.txt
+   :lines: 4-5
