@@ -10,8 +10,10 @@
 
 import sys
 sys.path.insert(0,"../")
+sys.path.insert(0,"../smodels/statistics/")
+
 import unittest
-from smodels.statistics.nnAdapter import NNAdapter
+from smodels.statistics.hep_olll.nnAdapter import NNAdapter
 import warnings
 
 class MLModelsTest(unittest.TestCase):

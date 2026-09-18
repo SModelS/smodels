@@ -151,7 +151,7 @@ class NNUpperLimitComputer:
         ## disable telemetry
         import onnxruntime as ort
         ort.disable_telemetry_events()
-        from smodels.statistics.nnAdapter import NNAdapter
+        from smodels.statistics.hep_olll.nnAdapter import NNAdapter
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
              session_options = session_options )
 
