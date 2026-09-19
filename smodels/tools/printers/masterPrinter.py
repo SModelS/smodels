@@ -31,7 +31,6 @@ class MPrinter(object):
     """
 
     def __init__(self):
-
         self.name: str = "master"
         self.Printers: dict = {}
         self.outputFormat: str = "version3"
@@ -92,8 +91,12 @@ class MPrinter(object):
 
         :param obj: An object which can be handled by the Printers.
         """
+        from smodels.tools.printers.logged_filehandles import redirect_open, \
+            restore_original
+        redirect_open()
         for prt in self.Printers.values():
             prt.addObj(obj)
+        restore_original()
 
     def setOutPutFiles(self, filename : PathType, silent : bool = False ):
         """
@@ -104,7 +107,6 @@ class MPrinter(object):
         :param filename: Input file name
         :param silent: dont comment removing old files
         """
-
         for printer in self.Printers.values():
             printer.setOutPutFile(filename, silent=silent)
 
@@ -114,7 +116,11 @@ class MPrinter(object):
         If the printers return anything other than None,
         we pass it on.
         """
+        from smodels.tools.printers.logged_filehandles import redirect_open, \
+            restore_original
+        redirect_open()
         ret = {}
         for printerType, printer in self.Printers.items():
             ret[printerType] = printer.flush()
+        restore_original()
         return ret
