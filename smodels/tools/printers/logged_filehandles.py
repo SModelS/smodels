@@ -17,7 +17,7 @@ _original_open = builtins.open
 
 def logged_open(file, *args, **kwargs):
     """ an open method that logs the filename """
-    if "r" in args[0]: ## open for reading, we dont care
+    if len(args)==0 or ( "r" in args[0] ): ## open for reading, we dont care
         return _original_open(file, *args, **kwargs)
 
     frame = inspect.currentframe().f_back
