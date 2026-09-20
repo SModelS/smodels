@@ -49,42 +49,46 @@ class RunPrinterTest(unittest.TestCase):
         destination """
         from smodels.tools.printers.printerRegistry import PrinterRegistry
         from smodels.tools.printers.basicPrinter import BasicPrinter
+        fhandles = []
         class NewPrinter(BasicPrinter):
             def __init__ ( self ):
                 pass
             def setOutPutFile ( self, filename, silent ):
-                print ( f"setOutPutFile1" )
                 fname= "/tmp/bla"
-                self.f = open ( fname, "w" )
+                f = open ( fname, "w" )
+                fhandles.append ( f  )
             def addObj( self, obj ):
                 print ( f"addObj" )
             def flush( self ):
                 print ( f"flush" )
-            def close( self ):
-                close ( self.f )
         class NewPrinter2(BasicPrinter):
             def __init__ ( self ):
                 pass
             def setOutPutFile ( self, filename, silent ):
-                print ( f"setOutPutFile2" )
                 fname= "/tmp/bla"
-                self.f = open ( fname, "w" )
+                f = open ( fname, "w" )
+                fhandles.append ( f  )
             def addObj( self, obj ):
                 print ( f"addObj2" )
             def flush( self ):
                 print ( f"flush2" )
-            def close( self ):
-                close ( self.f )
 
-        PrinterRegistry.register ( NewPrinter, "dummy1" )
-        PrinterRegistry.register ( NewPrinter2, "dummy2" )
         slhafile = "./testFiles/slha/lightEWinos.slha"
         from databaseLoader import database
-        out = runMain(slhafile,inifile="testPrinters_2dummies.ini",
-                overridedatabase = database,
-                suppressStdout = False )
+        from smodels.base.exceptions import SModelSBaseError
+
+        with self.assertRaises(SModelSBaseError) as err:
+            PrinterRegistry.register ( NewPrinter, "dummy1" )
+            PrinterRegistry.register ( NewPrinter2, "dummy2" )
+            out = runMain(slhafile,inifile="testPrinters_2dummies.ini",
+                    overridedatabase = database,
+                    development = True,
+                    suppressStdout = True )
+        self.assertTrue ( "is opened by" in str(err.exception) )
         PrinterRegistry.printers.pop ( "dummy1" )
         PrinterRegistry.printers.pop ( "dummy2" )
+        for f in fhandles:
+            f.close()
 
     def testPrintersV2(self):
 
