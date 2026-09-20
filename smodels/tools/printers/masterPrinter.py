@@ -107,8 +107,12 @@ class MPrinter(object):
         :param filename: Input file name
         :param silent: dont comment removing old files
         """
+        from smodels.tools.printers.logged_filehandles import redirect_open, \
+            restore_original
+        redirect_open()
         for printer in self.Printers.values():
-            printer.setOutPutFile(filename, silent=silent)
+            printer.setOutPutFile( filename, silent = silent )
+        restore_original()
 
     def flush(self) -> dict:
         """

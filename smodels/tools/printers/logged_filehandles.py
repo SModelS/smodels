@@ -19,13 +19,17 @@ def logged_open(file, *args, **kwargs):
     """ an open method that logs the filename """
     if "r" in args[0]: ## open for reading, we dont care
         return _original_open(file, *args, **kwargs)
-    frame = inspect.currentframe().f_back
 
-    if frame is not None:
-        caller = f"{frame.f_globals.get('__name__', '?')}"
+    frame = inspect.currentframe().f_back
+    self = frame.f_locals.get("self")
+    function = frame.f_code.co_name
+    if self is not None:
+        caller = f"{type(self).__name__}.{function}"
     else:
-        caller = "<unknown>"
+        caller = function
+
     sfile = str(file)
+    # print ( f"[logged_filehandles] {sfile}: {caller}" )
     if sfile in opened_by: 
         if caller != opened_by[sfile]:
             line = f"{sfile} is opened by {opened_by[sfile]} as well as {caller}"

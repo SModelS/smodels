@@ -31,17 +31,60 @@ class RunPrinterTest(unittest.TestCase):
                 os.remove(i)
 
     def testCustomPrinter(self):
+        """ see if we can register our custom printer """
         from smodels.tools.printers.printerRegistry import PrinterRegistry
         from smodels.tools.printers.basicPrinter import BasicPrinter
         class NewPrinter(BasicPrinter):
             def __init__ ( self ):
                 pass
-            def setOutPutFile ( self ):
+            def setOutPutFile ( self, **kwargs ):
                 pass
         PrinterRegistry.register ( NewPrinter, "dummy" )
         printer = PrinterRegistry.get ( "dummy" )
         PrinterRegistry.printers.pop ( "dummy" )
         self.assertEqual ( printer, NewPrinter )
+
+    def testTwoPrintersOneDest(self):
+        """ test if we catch two printers writing to the same 
+        destination """
+        from smodels.tools.printers.printerRegistry import PrinterRegistry
+        from smodels.tools.printers.basicPrinter import BasicPrinter
+        class NewPrinter(BasicPrinter):
+            def __init__ ( self ):
+                pass
+            def setOutPutFile ( self, filename, silent ):
+                print ( f"setOutPutFile1" )
+                fname= "/tmp/bla"
+                self.f = open ( fname, "w" )
+            def addObj( self, obj ):
+                print ( f"addObj" )
+            def flush( self ):
+                print ( f"flush" )
+            def close( self ):
+                close ( self.f )
+        class NewPrinter2(BasicPrinter):
+            def __init__ ( self ):
+                pass
+            def setOutPutFile ( self, filename, silent ):
+                print ( f"setOutPutFile2" )
+                fname= "/tmp/bla"
+                self.f = open ( fname, "w" )
+            def addObj( self, obj ):
+                print ( f"addObj2" )
+            def flush( self ):
+                print ( f"flush2" )
+            def close( self ):
+                close ( self.f )
+
+        PrinterRegistry.register ( NewPrinter, "dummy1" )
+        PrinterRegistry.register ( NewPrinter2, "dummy2" )
+        slhafile = "./testFiles/slha/lightEWinos.slha"
+        from databaseLoader import database
+        out = runMain(slhafile,inifile="testPrinters_2dummies.ini",
+                overridedatabase = database,
+                suppressStdout = False )
+        PrinterRegistry.printers.pop ( "dummy1" )
+        PrinterRegistry.printers.pop ( "dummy2" )
 
     def testPrintersV2(self):
 
