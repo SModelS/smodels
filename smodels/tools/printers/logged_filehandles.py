@@ -9,6 +9,7 @@
 
 import builtins
 import inspect
+from smodels.base.exceptions import SModelSBaseError as SModelSError
 
 opened_by = {}
 
@@ -16,20 +17,20 @@ _original_open = builtins.open
 
 def logged_open(file, *args, **kwargs):
     """ an open method that logs the filename """
+    if "r" in args[0]: ## open for reading, we dont care
+        return _original_open(file, *args, **kwargs)
     frame = inspect.currentframe().f_back
 
     if frame is not None:
-        caller = (
-            f"{frame.f_globals.get('__name__', '?')}."
-            f"{frame.f_code.co_name}:"
-            f"{frame.f_lineno}"
-        )
+        caller = f"{frame.f_globals.get('__name__', '?')}"
     else:
         caller = "<unknown>"
-    print ( f"[logged_open] file:{file} args:{args} kwargs:{kwargs} caller {caller}" )
-
-    opened_by[str(file)] = caller
-
+    sfile = str(file)
+    if sfile in opened_by: 
+        if caller != opened_by[sfile]:
+            line = f"{sfile} is opened by {opened_by[sfile]} as well as {caller}"
+            raise SModelSError ( line )
+    opened_by[sfile] = caller
     return _original_open(file, *args, **kwargs)
 
 def redirect_open():
