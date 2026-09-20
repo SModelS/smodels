@@ -2,7 +2,7 @@ Release v3.2.1, xxx
 =======================================================
 
   * Fix for printerRegistry in combination with ncpus > 1 multiprocessing and custom printers
-  * custom printers can now also be used with runSModelS
+  * Custom printers can now also be used with runSModelS
   * Updated authorlist in BANNER
   * Recipe for custom printer added, custom printing also mentioned in OutputDescription
   * Renamed out-of-repo printer to custom printer
