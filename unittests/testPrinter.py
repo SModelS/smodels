@@ -52,22 +52,24 @@ class RunPrinterTest(unittest.TestCase):
         fhandles = []
         class NewPrinter(BasicPrinter):
             def __init__ ( self ):
+                self.filename = None
+                self.output = 'file'
                 pass
             def setOutPutFile ( self, filename, silent ):
                 fname= "/tmp/bla"
-                f = open ( fname, "w" )
-                fhandles.append ( f  )
+                self.filename = fname
             def addObj( self, obj ):
                 print ( f"addObj" )
             def flush( self ):
                 print ( f"flush" )
         class NewPrinter2(BasicPrinter):
             def __init__ ( self ):
+                self.output = 'file'
+                self.filename = None
                 pass
             def setOutPutFile ( self, filename, silent ):
                 fname= "/tmp/bla"
-                f = open ( fname, "w" )
-                fhandles.append ( f  )
+                self.filename = fname
             def addObj( self, obj ):
                 print ( f"addObj2" )
             def flush( self ):
@@ -84,7 +86,7 @@ class RunPrinterTest(unittest.TestCase):
                     overridedatabase = database,
                     development = True,
                     suppressStdout = True )
-        self.assertTrue ( "is opened by" in str(err.exception) )
+        self.assertTrue ( "is used by multiple printers" in str(err.exception) )
         PrinterRegistry.printers.pop ( "dummy1" )
         PrinterRegistry.printers.pop ( "dummy2" )
         for f in fhandles:

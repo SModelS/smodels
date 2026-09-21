@@ -111,7 +111,7 @@ class MPrinter(object):
             printer.setOutPutFile( filename, silent = silent )
             if not hasattr(printer, "filename"):
                 continue
-            if printer.filename == "stdout":
+            if printer.output != "file":
                 continue
             filenames.setdefault(printer.filename,[])
             filenames[printer.filename].append(type(printer).__name__)
