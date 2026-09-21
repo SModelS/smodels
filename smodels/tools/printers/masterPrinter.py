@@ -16,6 +16,8 @@ from smodels.tools.printers.summaryPrinter import SummaryPrinter
 from smodels.tools.printers.txtPrinter import TxTPrinter
 from smodels.tools.printers.slhaPrinter import SLHAPrinter
 from smodels.base.smodels_types import PathType
+from smodels.base.exceptions import SModelSBaseError as SModelSError
+
 
 from smodels.tools.printers.printerRegistry import PrinterRegistry
 PrinterRegistry.register ( PyPrinter, "python" )
@@ -104,9 +106,20 @@ class MPrinter(object):
         :param filename: Input file name
         :param silent: dont comment removing old files
         """
-
+        filenames = {}
         for printer in self.Printers.values():
-            printer.setOutPutFile(filename, silent=silent)
+            printer.setOutPutFile( filename, silent = silent )
+            if not hasattr(printer, "filename"):
+                continue
+            if printer.output != "file":
+                continue
+            filenames.setdefault(printer.filename,[])
+            filenames[printer.filename].append(type(printer).__name__)
+
+        for filename, printer_names in filenames.items():
+            if len(printer_names) > 1:
+                raise SModelSError(f"{filename} is used by multiple printers: {', '.join(printer_names)}")
+        
 
     def flush(self) -> dict:
         """

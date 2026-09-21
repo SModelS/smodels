@@ -33,22 +33,22 @@ class PrinterRegistry:
             raise NotImplementedError( comment )
 
     @classmethod
-    def register( cls, printer : type[BasicPrinter], extension : str,
+    def register( cls, printer : type[BasicPrinter], printer_label : str,
                   allow_overwrite : bool = False ) -> bool:
         """
         register this printer
         :param printer: Printer object to register
-        :param extension: Extension this printer will be in charge of
+        :param printer_label: Label for the printer, e.g. "python", "xml", "summary", "example"
         :param allow_overwrite: if true, then allow overwriting existing
         entries
         :returns: False if printer already existed, else True
         """
         cls.check_api ( printer )
-        if extension in cls.printers: # we allow overwrites though
+        if printer_label in cls.printers: # we allow overwrites though
             if allow_overwrite:
-                cls.printers[extension] = printer
+                cls.printers[printer_label] = printer
             return False
-        cls.printers[extension] = printer
+        cls.printers[printer_label] = printer
         return True
 
     @classmethod
