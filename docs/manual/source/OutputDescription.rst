@@ -270,7 +270,7 @@ Below we describe in detail the dictionary keys and values contained in the Pyth
   the signal cross section (theory prediction), the corresponding observed
   upper limit and the maximum condition violation (see :ref:`upper limit conditions <ULconditions>`) are shown.  A list of |txnames| and their meaning is available `here <https://smodels.github.io/docs/SmsDictionary>`_.
   The list of |final states| contributing to the signal is also shown.
-  Furthermore, the masses and widths\ [#f3]_ of the |SMS| contributing to the signal cross section, the
+  Furthermore, the masses\ [#f2]_ and widths\ [#f3]_ of the |SMS| contributing to the signal cross section, the
   individual contribution of each |txname| (if **addTxWeights** = True) and the negative log likelihood values
   (if **computeStatistics** = True) are also included.
 
@@ -390,10 +390,17 @@ added to the predefined list of printers. To this end the file that contains the
 
 A skeleton/example of such a custom printer is here:
 
-.. literalinclude:: /images/example_printer.txt
-   :lines: 1-37
+.. literalinclude:: /images/example_printer.py
+   :lines: 1-80
 
-Note the two lines at the end, they register the new printer as the "example" printer. This printer can then be configured via an `example-printer` section:
+Note the two lines at the end register the new printer as the "example" printer. 
+The printer can be used by adding "example" to the list of printers in the ini file:
 
 .. literalinclude:: /images/custom_codes.txt
    :lines: 4-5
+
+
+The printer can then be configured setting the desired variables in a `example-printer` section:
+
+.. literalinclude:: /images/custom_codes.txt
+   :lines: 7-8
