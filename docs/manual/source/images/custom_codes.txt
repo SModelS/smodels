@@ -1,5 +1,8 @@
 [custom-codes]
-files = printer1.py, printer2.py
+files = example_printer.py, printer2.py
+
+[printer]
+outputType = example ;Define the output formats
 
 [example-printer]
-variableOne = "whatever you need this to be"
+rmin = 20.0 # parameter for example printer
