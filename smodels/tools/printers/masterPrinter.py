@@ -16,6 +16,8 @@ from smodels.tools.printers.summaryPrinter import SummaryPrinter
 from smodels.tools.printers.txtPrinter import TxTPrinter
 from smodels.tools.printers.slhaPrinter import SLHAPrinter
 from smodels.base.smodels_types import PathType
+from smodels.tools.printers.logged_filehandles import redirect_open, restore_original
+
 
 from smodels.tools.printers.printerRegistry import PrinterRegistry
 PrinterRegistry.register ( PyPrinter, "python" )
@@ -91,8 +93,6 @@ class MPrinter(object):
 
         :param obj: An object which can be handled by the Printers.
         """
-        from smodels.tools.printers.logged_filehandles import redirect_open, \
-            restore_original
         redirect_open()
         for prt in self.Printers.values():
             prt.addObj(obj)
@@ -107,8 +107,6 @@ class MPrinter(object):
         :param filename: Input file name
         :param silent: dont comment removing old files
         """
-        from smodels.tools.printers.logged_filehandles import redirect_open, \
-            restore_original
         redirect_open()
         for printer in self.Printers.values():
             printer.setOutPutFile( filename, silent = silent )
@@ -120,8 +118,6 @@ class MPrinter(object):
         If the printers return anything other than None,
         we pass it on.
         """
-        from smodels.tools.printers.logged_filehandles import redirect_open, \
-            restore_original
         redirect_open()
         ret = {}
         for printerType, printer in self.Printers.items():
