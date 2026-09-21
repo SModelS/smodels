@@ -393,7 +393,8 @@ A skeleton/example of such a custom printer is here:
 .. literalinclude:: /images/example_printer.py
    :lines: 1-80
 
-Note the two lines at the end register the new printer as the "example" printer. 
+Note that the output filename set in `setOutPutFile` should not conflict with any of the filenames used by the other printers.
+The two lines at the end register the new printer as the "example" printer. 
 The printer can be used by adding "example" to the list of printers in the ini file:
 
 .. literalinclude:: /images/custom_codes.txt

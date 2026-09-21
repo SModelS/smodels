@@ -1,5 +1,6 @@
 from smodels.tools.printers.basicPrinter import BasicPrinter
 from smodels.matching.theoryPrediction import TheoryPredictionList
+import os
 
 class ExamplePrinter(BasicPrinter):
     """ A simple example of a custom printer, which only prints the analysis ID and the r-value """
