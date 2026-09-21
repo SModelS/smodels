@@ -32,7 +32,7 @@ def logged_open(file, *args, **kwargs):
     # print ( f"[logged_filehandles] {sfile}: {caller}" )
     if sfile in opened_by: 
         if caller != opened_by[sfile]:
-            line = f"{sfile} is opened by {opened_by[sfile]} as well as {caller}"
+            line = f"{sfile} is opened by two printers: {opened_by[sfile]} as well as {caller}"
             restore_original() # before raising error, restore normal open
             raise SModelSError ( line )
     opened_by[sfile] = caller
