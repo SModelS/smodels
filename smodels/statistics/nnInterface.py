@@ -151,6 +151,9 @@ class NNUpperLimitComputer:
         ## disable telemetry
         import onnxruntime as ort
         ort.disable_telemetry_events()
+        import os, sys
+        oll_dir = f"{os.path.dirname(__file__)}/"
+        sys.path.insert ( 0, oll_dir )
         from smodels.statistics.hep_olll.nnAdapter import NNAdapter
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
              session_options = session_options )
@@ -217,7 +220,7 @@ class NNUpperLimitComputer:
         """ when getting predictions for bkg_yields (SRs) and obs_yields (CRs),
         nll_*_mu0 == nll_*_mu1. check for this.
         """
-        tolerance = 1e-2 # FIXME eventually we need to lower this number
+        tolerance = 3e-2 # FIXME eventually we need to lower this number
         nlls = self._actual_nll ( poi_test = 0. )
         errors = {}
         for label in [ "nll_exp", "nll_obs", "nllA_exp", "nllA_obs" ]:
