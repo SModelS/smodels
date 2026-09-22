@@ -9,9 +9,9 @@
 import os
 import logging
 
-
 class Colors:
-    """ANSI color codes for terminal output. Disabled by default; enable via the ``on`` flag."""
+    """ANSI color codes for terminal output. Disabled by default;
+    enable via the ``on`` flag."""
 
     def __init__ ( self ):
         self.on : bool = False
@@ -69,9 +69,9 @@ class Colors:
 
 colors = Colors()
 
-
 class ColorizedStreamHandler(logging.StreamHandler):
-    """A stream handler that wraps log messages with ANSI color codes based on log level."""
+    """A stream handler that wraps log messages with ANSI color codes
+    based on log level."""
 
     def _color_wrap(self, *c: str) -> callable:
         def wrapped(inp: str) -> str:
@@ -112,7 +112,9 @@ class ColorizedStreamHandler(logging.StreamHandler):
         return msg
 
 def getLogger () -> logging.Logger:
-    """Create and configure the central smodels logger with a colorized stream handler."""
+    """ Create and configure the central smodels logger with a
+    colorized stream handler."""
+
     FORMAT = '%(levelname)s in %(module)s.%(funcName)s() in' \
        ' %(lineno)s: %(message)s'
     logging.basicConfig(format=FORMAT)
@@ -143,7 +145,6 @@ def getLogLevel( asString: bool = False ) -> int | str:
         if ret >= l:
             return lvlNames[l]
     return "unknown log level"
-
 
 def setLogLevel ( level: int | str | None ):
     """ set the log level of the central logger.
