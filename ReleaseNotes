@@ -13,6 +13,7 @@ Release v3.2.1, xxx
   * Improved github's live shells for mac OS
   * Bumped up pythia8 from 8317 to 8318
   * Added mechanism to check that printers do not overwrite each other
+  * Loosened a consistency check on ML models
 
 Release v3.2.0, Sep 2 2026
 =======================================================
