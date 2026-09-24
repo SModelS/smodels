@@ -856,34 +856,9 @@ def regionTypeOf ( region : Any ) -> Union[None,str]:
         
     return regionType
 
-def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
-    """
-    Is a given dataset mentioned in the combination?
-    we are allowing datasets in an expResult that is not mentioned
-    in the combination of that result.
-    :returns: true if its in, false if it is not in, None if there is no combination
-    """
-    assert hasattr ( dataset, "dataInfo" ), \
-        "why does the dataset here not have a dataInfo?"
-    dataId = dataset.getID()
-    if hasattr ( expResult.globalInfo, "regionMappings" ) and not hasattr ( expResult.globalInfo, "regionSets" ):
-        raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
-    
-    for regionSetName in expResult.globalInfo.statModels.keys():
-        regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
-        for region in regionList:
-            if hasattr ( expResult.globalInfo, "regionMappings" ):
-                regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
-                name = regionDict['smodels']
-            else:
-                name = region
-            if dataId == name:
-                return True
-    return False
-
 def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[TheoryPrediction]:
     """
-    Compute the combined result for all datasets, if a statistical model is]
+    Compute the combined result for all datasets, if a statistical model is
     available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
@@ -902,7 +877,6 @@ def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[Theo
     
     # Don't give combined result if all regions are CRs
     regionTypeDict = {}
-    globalInfo = expResult.globalInfo
     for predList in dataSetResults:
         for tpred in predList:
             regionTypeDict[tpred.dataId()] = regionTypeOf(tpred.dataset)
@@ -912,7 +886,6 @@ def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[Theo
     
     txnameList = []
     smsList = []
-    totalXsec = None
     datasetPredictions = []
     avgSMSlist = []
     for predList in dataSetResults:
@@ -923,12 +896,6 @@ def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[Theo
         txnameList += pred.txnames
         smsList += pred.smsList
         avgSMSlist.append(pred.avgSMS)
-        if not _isDatasetInCombination ( pred.dataset, expResult ):
-            continue
-        if totalXsec is None:
-            totalXsec = pred.xsection
-        else:
-            totalXsec += pred.xsection
 
     txnameList = list(set(txnameList))
 
@@ -946,11 +913,11 @@ def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[Theo
     theoryPrediction = TheoryPrediction()
     theoryPrediction.dataset = combinedDataset
     theoryPrediction.txnames = txnameList
-    theoryPrediction.avgSMS = avgSMS
-    theoryPrediction.xsection = totalXsec
+    theoryPrediction.avgSMS = avgSMS    
     theoryPrediction.datasetPredictions = datasetPredictions
     theoryPrediction.conditions = None
     theoryPrediction.smsList = smsList
+    theoryPrediction.xsection = theoryPrediction.statsComputer.getXSec()
 
     return theoryPrediction
 

@@ -524,6 +524,14 @@ class StatsComputer:
             ret += add
         return ret
 
+    def getXSec ( self ) -> UnitXSec:
+            """ get the total yield for the most sensitive model """
+            ret = 0.*fb
+            msm = self.getMostSensitiveModel()
+            if msm is not None:
+                ret = msm.getTotalXSec()
+            return ret
+
     def getUpperLimit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
            nSigma : int = 0, **kwargs ) -> Union[float,UnitXSec,None]:
@@ -543,7 +551,7 @@ class StatsComputer:
                    evaluationType = evaluationType, nSigma = nSigma, **kwargs )
         if ulmu == None or not limit_on_xsec:
             return ulmu
-        ret = ulmu * self.getTotalXSec()
+        ret = ulmu * msm.getTotalXSec()
         return ret
 
 class SimpleStatsDataSet:

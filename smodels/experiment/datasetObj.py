@@ -514,7 +514,8 @@ class CombinedDataSet(object):
                     types.add ( "simplified" )
                 elif model_type in [ "full_pyhf", "pyhf" ]:
                     types.add ( "pyhf" )
-            return "+".join ( types )
+            self.type = "+".join ( types )
+        return self.type
 
     def __str__(self) -> str:
         ret = f"Combined Dataset ({len(self._datasets)} datasets)"
