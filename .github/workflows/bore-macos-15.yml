@@ -36,12 +36,12 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
-          sudo chown -R $USERNAME /opt/homebrew
+          sudo chown -R $USERNAME:staff /opt/homebrew || echo "chown /opt/homebrew failed"
 
           # Install pipx
-          sudo -u $USERNAME brew install pipx
-          sudo -u $USERNAME pipx ensurepath
-          sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
+          sudo -u $USERNAME brew install pipx || echo "brew install pipx failed"
+          sudo -u $USERNAME pipx ensurepath || echo "pipx ensurepath failed"
+          sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime || echo "pipx install ... failed"
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
