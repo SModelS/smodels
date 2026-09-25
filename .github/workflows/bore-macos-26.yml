@@ -43,7 +43,7 @@ jobs:
           echo "which brew"
           which brew
           # Install pipx
-          brew install pipx
+          sudo -u $USERNAME brew install pipx
           # sudo -u $USERNAME pipx ensurepath
           # sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
 
