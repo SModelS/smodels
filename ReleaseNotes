@@ -1,4 +1,4 @@
-Release v3.2.1, xxx
+Release v3.2.1, Mon 28 Sep 2026
 =======================================================
 
   * Renamed 'out-of-repo printer' to 'custom printer'
@@ -15,7 +15,7 @@ Release v3.2.1, xxx
   * Bumped up pythia8 from 8317 to 8318
   * Updated authorlist in BANNER
 
-Release v3.2.0, Sep 2 2026
+Release v3.2.0, Wed 2 Sep 2026
 =======================================================
 
   * First support for NN surrogate statistical models (ONNX format)
