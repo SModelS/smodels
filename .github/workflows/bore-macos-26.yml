@@ -36,7 +36,7 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
-          sudo chown -R $USERNAME:staff /opt/homebrew
+          sudo chown -R $USERNAME:staff /opt/homebrew || echo "sudo chown failed"
 
           export HOMEBREW_NO_AUTO_UPDATE=1
           echo "whoami?"
