@@ -16,8 +16,8 @@ jobs:
           sudo systemsetup -setremotelogin on
 
           USERNAME="sshuser"
-		      HOME="/Users/$USERNAME"
-		      export HOME="/Users/$USERNAME"
+          HOME="/Users/$USERNAME"
+          export HOME="/Users/$USERNAME"
 
           # Create a fresh user
           sudo dscl . -create /Users/$USERNAME
