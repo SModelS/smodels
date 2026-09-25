@@ -16,6 +16,8 @@ jobs:
           sudo systemsetup -setremotelogin on
 
           USERNAME="sshuser"
+		      HOME="/Users/$USERNAME"
+		      export HOME="/Users/$USERNAME"
 
           # Create a fresh user
           sudo dscl . -create /Users/$USERNAME
@@ -37,7 +39,7 @@ jobs:
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
           sudo chown -R $USERNAME:staff /opt/homebrew || echo "[err] sudo chown /opt/homebrew failed"
-          sudo chown -R $USERNAME:staff /Users/runner || echo "[err] sudo chown /Users/runner failed"
+          # sudo chown -R $USERNAME:staff /Users/runner || echo "[err] sudo chown /Users/runner failed"
 
           export HOMEBREW_NO_AUTO_UPDATE=1
           echo "[me] whoami?"
