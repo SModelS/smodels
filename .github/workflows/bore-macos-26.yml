@@ -37,6 +37,10 @@ jobs:
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
 
+		      echo "whoami?"
+          whoami
+		      echo "which brew"
+			    which brew
           # Install pipx
           # brew install pipx
           # sudo -u $USERNAME pipx ensurepath
