@@ -44,12 +44,12 @@ jobs:
           echo "which brew"
           which brew
           echo "brew prefix"
-          sudo -u $USERNAME brew --prefix
-          echo "brew install pipx"
+          sudo -u $USERNAME brew --prefix || echo "brew --prefix failed"
+          echo "brew install -y pipx" 
           # Install pipx
-          sudo -u $USERNAME brew install -y pipx
-          # sudo -u $USERNAME pipx ensurepath
-          # sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
+          sudo -u $USERNAME brew install -y pipx || echo "brew install -y pipx failed"
+          sudo -u $USERNAME pipx ensurepath || echo "pix ensurepath failed"
+          sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime || echo "pipx install ... failed"
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
