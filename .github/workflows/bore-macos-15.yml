@@ -16,6 +16,8 @@ jobs:
           sudo systemsetup -setremotelogin on
 
           USERNAME="sshuser"
+          HOME="/Users/$USERNAME"
+          export HOME="/Users/$USERNAME"
 
           # Create a fresh user
           sudo dscl . -create /Users/$USERNAME
@@ -36,11 +38,24 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
+          sudo chown -R $USERNAME:staff /opt/homebrew || echo "[err] sudo chown /opt/homebrew failed"
 
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          echo "[me] whoami?"
+          sudo -u $USERNAME whoami
+          echo "[me] username $USERNAME"
+          echo "[me] which brew"
+          which brew
+          echo "[me] sudo echo HOME"
+          sudo -u $USERNAME echo $HOME
+          echo "[me] sudo brew prefix"
+          sudo -u $USERNAME brew --prefix || echo "brew --prefix failed"
+          echo "[me] sudo brew install -y pipx" 
           # Install pipx
-          # brew install pipx
-          # sudo -u $USERNAME pipx ensurepath
-          # sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime
+          sudo -u $USERNAME brew install -y pipx || echo "[err] sudo brew install -y pipx failed"
+          sudo -u $USERNAME pipx ensurepath || echo "[err] sudo pix ensurepath failed"
+          sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime || echo "pipx install ... failed"
+          sudo -u $USERNAME pipx install docutils unum pyslha requests onnx jsonpatch jsonschema pyhf || echo "pipx install ... failed"
 
           # Set up colored prompt without hostname
           sudo tee /Users/$USERNAME/.bash_profile << 'PROFILE'
@@ -57,7 +72,6 @@ jobs:
           alias grep='grep --color=auto'
 
           # Useful stuff
-          export HOMEBREW_NO_AUTO_UPDATE=1
           export PATH="/opt/homebrew/bin:~/.local/bin:/Users/$USER/.local/bin:$PATH"
 
           echo ""
@@ -69,8 +83,9 @@ jobs:
           sudo chown $USERNAME:staff /Users/$USERNAME/.bash_profile
 
           # Install and start bore tunnel
-          brew install bore-cli
-          bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
+          echo "[me] sudo brew install bore-cli"
+          sudo -u $USERNAME brew install bore-cli
+          sudo -u $USERNAME bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
           sleep 5
 
           PORT=""
