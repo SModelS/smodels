@@ -45,9 +45,11 @@ jobs:
           echo "username $USERNAME"
           echo "which brew"
           which brew
-          echo "brew prefix"
+          echo "sudo brew prefix"
+		      echo "sudo HOME"
+			  	sudo -u $USERNAME echo $HOME
           sudo -u $USERNAME brew --prefix || echo "brew --prefix failed"
-          echo "brew install -y pipx" 
+          echo "sudo brew install -y pipx" 
           # Install pipx
           sudo -u $USERNAME brew install -y pipx || echo "brew install -y pipx failed"
           sudo -u $USERNAME pipx ensurepath || echo "pix ensurepath failed"
