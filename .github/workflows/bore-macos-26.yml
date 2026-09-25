@@ -42,9 +42,9 @@ jobs:
           sudo -u $USERNAME whoami
           echo "which brew"
           which brew
-		      echo "brew prefix"
+          echo "brew prefix"
           sudo -u $USERNAME brew --prefix
-		      echo "brew install pipx"
+          echo "brew install pipx"
           # Install pipx
           sudo -u $USERNAME brew install pipx
           # sudo -u $USERNAME pipx ensurepath
