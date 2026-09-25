@@ -34,6 +34,23 @@ What's New
 ==========
 The major novelties of all releases since v1.0 are as follows:
 
+New in Version 3.2.1:
+^^^^^^^^^^^^^^^^^^^^^
+
+  * Renamed 'out-of-repo printer' to `custom printer <OutputDescription.html#custom-printers>`_
+  * Custom printers can now also be used with |runSModelS|
+  * Recipe for `custom printer <customPrinter.html>`_ added, custom printers also mentioned in OutputDescription
+  * Added mechanism to check that printers do not overwrite each other
+  * Fix for `printerRegistry <tools.printers.html#module-tools.printers.printerRegistry>`_ in combination with ncpus > 1 multiprocessing and custom printers
+  * Renamed types to smodels_types in `base <base.html#module-base>`_ to avoid name clashes
+  * Silenced an "unknown solver option 'disp'" warning in scipy
+  * Onnx_session_options defined in `runtime <base.html#module-base.base.runtime>`_ 
+  * Disabled telemetry for onnxruntime as it causes problems on some mac os systems
+  * Loosened a consistency check on ML models
+  * Improved github's live shells for mac OS
+  * Bumped up pythia8 from 8317 to 8318
+  * Updated authorlist in BANNER
+
 New in Version 3.2.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -57,8 +74,8 @@ New in Version 3.1.1:
   * Bumped up pythia8 from 8315 to 8317 (fixes "force" bug)
   * Fixed issues with fortran compilation of nllfast on lxplus (thanks Jonas Wuerzinger for reporting this)
   * Added filter for slogdet warnings (relevant on MacOS)
-  * Minor fixes in `slha printer <tools.printers.html#module-tools.printers.slhaPrinter>`_  
-  * Fixed bug preventing the extended output to be printed  
+  * Minor fixes in `slha printer <tools.printers.html#module-tools.printers.slhaPrinter>`_
+  * Fixed bug preventing the extended output to be printed
   * Fix for pyslha 3.3.1
   * Small fixes in `slha printer <tools.printers.html#module-tools.printers.slhaPrinter>`_, `pyhf interface <statistics.html#module-statistics.pyhfInterface>`_
   * |Database| extension: ATLAS-SUSY-2019-04 (UL), ATLAS-SUSY-2018-19 (EM), TRV1nunu added to CMS-EXO-20-004, ATLAS-SUSY-2018-22-multibin, ATLAS-SUSY-2018-22, ATLAS-EXOT-2018-06
@@ -66,7 +83,7 @@ New in Version 3.1.1:
 New in Version 3.1.0:
 ^^^^^^^^^^^^^^^^^^^^^
 
-  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions! 
+  * Introduced :ref:`minmassgapISR <parameterFileMinmassgapISR>` parameter for controlling the mass compression for ISR topologies. WARNING: with the default setting, behavior for ISR topologies differs from previous versions!
   * Improved the syntax of pyhf fields in globalInfo.txt:jsonFiles
   * Small fixes in analyses combinations, better handling exceptions in likelihood computations (we thank Leo Constantin for help with a bug fix concerning failed likelihood computations)
   * Fixed an inconsistency with the upper limits from analysis combinations. analysis-combined ULs may be different by up to ~ 10%
