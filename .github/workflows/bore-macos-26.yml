@@ -36,6 +36,7 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
+		      sudo chown -R sshuser /opt/homebrew
 
 		      echo "whoami?"
           whoami
