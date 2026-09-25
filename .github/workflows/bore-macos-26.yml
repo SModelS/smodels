@@ -36,11 +36,13 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
-          sudo chown -R $USERNAME:staff /opt/homebrew || echo "sudo chown failed"
+          sudo chown -R $USERNAME:staff /opt/homebrew || echo "sudo chown /opt/homebrew failed"
+          sudo chown -R $USERNAME:staff /Users/runner || echo "sudo chown /Users/runner failed"
 
           export HOMEBREW_NO_AUTO_UPDATE=1
           echo "whoami?"
           sudo -u $USERNAME whoami
+		  	  echo "username $USERNAME"
           echo "which brew"
           which brew
           echo "brew prefix"
