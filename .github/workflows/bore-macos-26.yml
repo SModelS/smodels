@@ -42,7 +42,7 @@ jobs:
           export HOMEBREW_NO_AUTO_UPDATE=1
           echo "whoami?"
           sudo -u $USERNAME whoami
-		  	  echo "username $USERNAME"
+          echo "username $USERNAME"
           echo "which brew"
           which brew
           echo "brew prefix"
