@@ -36,23 +36,23 @@ jobs:
           sudo chown -R $USERNAME:staff /Users/$USERNAME/.ssh
           sudo chmod 700 /Users/$USERNAME/.ssh
           sudo chmod 600 /Users/$USERNAME/.ssh/authorized_keys
-          sudo chown -R $USERNAME:staff /opt/homebrew || echo "sudo chown /opt/homebrew failed"
-          sudo chown -R $USERNAME:staff /Users/runner || echo "sudo chown /Users/runner failed"
+          sudo chown -R $USERNAME:staff /opt/homebrew || echo "[err] sudo chown /opt/homebrew failed"
+          sudo chown -R $USERNAME:staff /Users/runner || echo "[err] sudo chown /Users/runner failed"
 
           export HOMEBREW_NO_AUTO_UPDATE=1
-          echo "whoami?"
+          echo "[me] whoami?"
           sudo -u $USERNAME whoami
-          echo "username $USERNAME"
-          echo "which brew"
+          echo "[me] username $USERNAME"
+          echo "[me] which brew"
           which brew
-          echo "sudo brew prefix"
-		      echo "sudo HOME"
-			  	sudo -u $USERNAME echo $HOME
+          echo "[me] sudo HOME"
+          sudo -u $USERNAME echo $HOME
+          echo "[me] sudo brew prefix"
           sudo -u $USERNAME brew --prefix || echo "brew --prefix failed"
-          echo "sudo brew install -y pipx" 
+          echo "[me] sudo brew install -y pipx" 
           # Install pipx
-          sudo -u $USERNAME brew install -y pipx || echo "brew install -y pipx failed"
-          sudo -u $USERNAME pipx ensurepath || echo "pix ensurepath failed"
+          sudo -u $USERNAME brew install -y pipx || echo "[err] sudo brew install -y pipx failed"
+          sudo -u $USERNAME pipx ensurepath || echo "[err] sudo pix ensurepath failed"
           sudo -u $USERNAME pipx install ipython numpy sympy scipy onnxruntime || echo "pipx install ... failed"
 
           # Set up colored prompt without hostname
@@ -81,8 +81,9 @@ jobs:
           sudo chown $USERNAME:staff /Users/$USERNAME/.bash_profile
 
           # Install and start bore tunnel
-          brew install bore-cli
-          bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
+          echo "[me] brew install bore-cli"
+          sudo -u $USERNAME brew install bore-cli
+          sudo -u $USERNAME bore local 22 --to bore.pub 2>&1 | tee /tmp/bore.log &
           sleep 5
 
           PORT=""
