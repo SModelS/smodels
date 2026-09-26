@@ -53,7 +53,8 @@ jobs:
           echo "[me] sudo brew install -y pipx" 
           sudo -u $USERNAME python3 -m venv $HOME/venv || echo "[err] venv failed"
           sudo -u $USERNAME source $HOME/venv/bin/activate || echo "[err] activate failed"
-          sudo -u $USERNAME $HOME/venv/bin/python3 -m pip install ipython smodels || echo "[err] pip install smodels failed"
+          sudo -u $USERNAME $HOME/venv/bin/python3 -m pip install ipython smodels || echo "[err] pip install ipython smodels failed"
+          sudo -u $USERNAME $HOME/venv/bin/python3 -m pip install redirector ipynb matplotlib pandas jupyter || echo "[err] pip install redirector ipynb matplotlib pandas jupyter failed"
           # Install pipx
           # sudo -u $USERNAME brew install -y pipx || echo "[err] sudo brew install -y pipx failed"
           # sudo -u $USERNAME pipx ensurepath || echo "[err] sudo pix ensurepath failed"
