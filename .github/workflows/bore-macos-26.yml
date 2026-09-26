@@ -53,7 +53,7 @@ jobs:
           echo "[me] sudo brew install -y pipx" 
           sudo -u $USERNAME python3 -m venv $HOME/venv || echo "[err] venv failed"
           sudo -u $USERNAME source $HOME/venv/bin/activate || echo "[err] activate failed"
-          sudo -u $USERNAME python3 -m pip install smodels || echo "[err] pip install smodels failed"
+          sudo -u $USERNAME python3 -m pip install ipython smodels || echo "[err] pip install smodels failed"
           # Install pipx
           # sudo -u $USERNAME brew install -y pipx || echo "[err] sudo brew install -y pipx failed"
           # sudo -u $USERNAME pipx ensurepath || echo "[err] sudo pix ensurepath failed"
@@ -66,8 +66,6 @@ jobs:
           export LSCOLORS=GxFxCxDxBxegedabagaced
           export TERM=xterm-256color
 
-          # Colored prompt: green user, blue directory, no hostname
-          export PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '
 
           # Colored ls
           #alias ls='ls --color=auto 2>/dev/null || ls -G'
@@ -81,6 +79,10 @@ jobs:
           echo -e "\033[1;36m  macOS 26 — GitHub Actions Runner\033[0m"
           echo -e "\033[0;33m  arch: $(uname -m) | cores: $(sysctl -n hw.ncpu) | mem: $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 ))GB\033[0m"
           echo ""
+          source $HOME/venv/bin/activate
+
+          # Colored prompt: green user, blue directory, no hostname
+          export PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\] \$ '
           PROFILE
 
           sudo chown $USERNAME:staff /Users/$USERNAME/.bash_profile
