@@ -10,9 +10,9 @@
 
 """
 
-__all__ = [ "StatsComputer", "getCompRetrieverModule" ]
+__all__ = [ "StatsComputer", "getCompRetrieverModule", "mostSensitiveComputer" ]
 
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, Any
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
@@ -23,7 +23,6 @@ from smodels.statistics.basicStats import observed, apriori, NllEvalType, expone
 from smodels.statistics.truncatedGaussians import TruncatedGaussians
 from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.base.physicsUnits import UnitXSec
-from smodels.tools.caching import lru_cache
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
 
 def getCompRetrieverModule() -> type:
@@ -235,7 +234,7 @@ class CompRetriever:
         :param corr: correction factor: \
                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
                 a factor of corr = 0.6 is proposed.
-        :returns: list of subComputers (with a single entry)
+        :returns: a sub computer
         """
         # marked as experimental feature
         if not hasattr(theorypred, "avgElement"):
@@ -270,27 +269,65 @@ class CompRetriever:
                                     for tp in theoryPredictions])
 
         computer = AnaCombLikelihoodComputer( theoryPredictions=theoryPredictions,
-                                              deltas_rel=deltas_rel )
+                                              deltas_rel = deltas_rel )
         computer.allowNegativeSignals = allowNegativeSignals
         return computer
 
 
+def mostSensitiveComputer ( subComputers : list ) -> Any:
+    """ Given a list of sub computers, return the most sensitive one,
+    i.e. the one giving the smallest expected (apriori) upper limit
+    on the signal strength multiplier mu.
+
+    :param subComputers: list of sub computers to choose from
+    :returns: the most sensitive sub computer, or None if none of the
+    sub computers can give an expected upper limit on mu.
+    """
+    ul_min = float("inf")
+    most_sensitive = None
+    for computer in subComputers:
+        ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
+        if ul is not None and ul < ul_min:
+            ul_min = ul
+            most_sensitive = computer
+    return most_sensitive
+
 
 class StatsComputer:
     """ this is the stats computer, it takes the subcomputers
-    upon construction, and handles all the delegations to them,
-    getting the most sensitive model, etc
+    upon construction, determines the most sensitive one, and from then
+    on handles all the delegations to that single sub computer.
     """
 
     def __init__ ( self, subComputers : list, allowNegativeSignals : bool = False ):
         """
-         Initialise. allowNegativeSignals is true if its true for all
+         Initialise. From the given sub computers (one per statistical model
+         of the dataset), the most sensitive one is determined (see
+         mostSensitiveComputer) and kept as self.subcomputer. The total
+         cross section is the sum over all sub computers, i.e. over all
+         signal regions entering the statistical models.
+
+         :param subComputers: list of sub computers to choose from
+         :param allowNegativeSignals: true if its true for all
          subcomputers.
         """
-        self.subComputers = subComputers
+        if not isinstance(subComputers, list) or len(subComputers) == 0:
+            raise SModelSError ( "no subcomputers given to build a StatsComputer from" )
+
         self.allowNegativeSignals = allowNegativeSignals
-        for computer in self.subComputers:
+        for computer in subComputers:
             computer.allowNegativeSignals = self.allowNegativeSignals
+
+        # the cross section is the sum over all statistical models (not all
+        # sub computers can give one, e.g. the truncated Gaussians cannot):
+        self.totalXsec = 0.*fb
+        for computer in subComputers:
+            if not hasattr ( computer, "getTotalXSec" ):
+                continue
+            self.totalXsec += computer.getTotalXSec()
+
+        # and from now on, only the most sensitive model is used:
+        self.subcomputer = mostSensitiveComputer ( subComputers )
 
     @classmethod
     def forTheoryPrediction(cls, theoryPrediction: object) -> Union[None,'StatsComputer']:
@@ -321,7 +358,7 @@ class StatsComputer:
             dataset = theoryPrediction.dataset
             nsigDict = {dataset.getID() : (theoryPrediction.xsection * dataset.getLumi()).asNumber()}
             computer = CompRetriever.forSingleBin(regionSet=theoryPrediction.dataset.getID(),dataset=theoryPrediction.dataset,
-                                                nsigDict=nsigDict)
+                                                nsigDict=nsigDict, lumi=dataset.getLumi())
             computers.append(computer)
 
         elif dataType == "combined" and tpType == "TheoryPredictionsCombiner":
@@ -410,14 +447,12 @@ class StatsComputer:
 
     def nll ( self, poi_test : float, evaluationType : NllEvalType,
               asimov : Union[None,float] = None, **kwargs  ) -> Union[None,float]:
-        """ simple frontend to individual computers """
-        msm = self.getMostSensitiveModel()
+        """ simple frontend to the individual computer """
         self.transform ( evaluationType )
         kwargs.update ( { "evaluationType": evaluationType, "asimov": asimov } )
-        # kwargs = { "evaluationType": evaluationType, "asimov": asimov }
-        if msm is None:
+        if self.subcomputer is None:
             return None
-        ret = msm.nll ( poi_test, **kwargs)
+        ret = self.subcomputer.nll ( poi_test, **kwargs)
         return ret
 
     def likelihood ( self, poi_test : float, evaluationType : NllEvalType,
@@ -431,35 +466,33 @@ class StatsComputer:
               evaluationType : NllEvalType=observed,
               **kwargs ) -> Union[float,None]:
         """ compute CLs value for a given value of the poi """
-        msm = self.getMostSensitiveModel()
-        # print ( f"@@ST0 getMostSensitiveModel eType {evaluationType} ret {ret}" )
-        if msm is None:
+        if self.subcomputer is None:
             return None
 
-        if hasattr ( msm , "CLs" ):
-            return msm.CLs ( poi_test,
+        if hasattr ( self.subcomputer , "CLs" ):
+            return self.subcomputer.CLs ( poi_test,
                     evaluationType = evaluationType, **kwargs )
         return None
 
     def transform ( self, evaluationType: NllEvalType ):
         """ SL only. transform the data to evaluationType or observed """
-        for subComputer in self.subComputers:
-            if subComputer is None:
-                continue
-            if subComputer.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
-                continue
-            subComputer.likelihoodComputer.transform ( evaluationType )
+        if self.subcomputer is None:
+            return
+        if getattr ( self.subcomputer, "dataType", None ) in \
+                [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
+            return
+        self.subcomputer.likelihoodComputer.transform ( evaluationType )
 
     def restore ( self, evaluationType: NllEvalType ):
         """ SL only. Restore the data to the original observed values """
         if evaluationType != observed:
             return
-        for subComputer in self.subComputers:
-            if subComputer is None:
-                continue
-            if subComputer.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
-                continue
-            subComputer.model = subComputer.origModel
+        if self.subcomputer is None:
+            return
+        if getattr ( self.subcomputer, "dataType", None ) in \
+                [ "pyhf", "truncGaussian", "analysesComb" ]:
+            return
+        self.subcomputer.model = self.subcomputer.origModel
 
     def getLlhds(self, **kwargs ) -> dict:
         """
@@ -470,59 +503,52 @@ class StatsComputer:
 
         :param muvals: List with values for the signal strenth for which
         the likelihoods must be evaluated.
-        :param idx: index of subcomputer
+        :param idx: index of subcomputer (only a single sub computer, i.e.
+        the most sensitive one, is available, so only the default 0 works)
         :param evaluationType: returns the observed/priori expected/posteriori expected likelihood values.
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
         """
         idx = kwargs.pop("idx",0)
-        if idx >= len(self.subComputers):
-             logger.error(f"only {len(self.subComputers)} computers for prediction but index {idx} was requested")
-             raise SModelSError(f"only {len(self.subComputers)} computers for prediction index {idx} was requested")
-        
-        return self.subComputers[idx].getLlhds( **kwargs )
+        if self.subcomputer is None:
+            logger.error("no statistical model available to get the likelihoods from")
+            raise SModelSError("no statistical model available to get the likelihoods from")
+        if idx != 0:
+            msg = f"only the most sensitive model (index 0) is available for this prediction, but index {idx} was requested"
+            logger.error ( msg )
+            raise SModelSError ( msg )
+
+        return self.subcomputer.getLlhds( **kwargs )
 
     def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> Union[None,dict]:
         """
         :returns: dictionary with muhat, sigma_mu and nll_min as keys
         """
-        msm = self.getMostSensitiveModel()
-        if msm is None:
+        if self.subcomputer is None:
             return { "nll_min": float("nan" ), "mu_hat": float("nan"),
                      "sigma_mu": float("nan") }
         self.transform ( evaluationType )
 
-        ret = msm.nll_min (
+        ret = self.subcomputer.nll_min (
             evaluationType = evaluationType,
-            allowNegativeSignals = msm.allowNegativeSignals, **kwargs )
+            allowNegativeSignals = self.subcomputer.allowNegativeSignals, **kwargs )
         return ret
 
-    @lru_cache
     def getMostSensitiveModel ( self ) -> Union[PyhfUpperLimitComputer,NNUpperLimitComputer,\
                                                 SLUpperLimitComputer,AnaCombLikelihoodComputer,\
                                                 TruncatedGaussians,None]:
-        """ convenience function to get the most significant model
+        """ the most sensitive model, as determined upon initialisation of
+        the stats computer.
 
-        :returns: dictionary with idx of the computer, ul_min,
-        limit_on_xsecs
-        and the name of the most sensitive model
+        :returns: the most sensitive sub computer, or None if no expected
+        upper limit on mu could be obtained.
         """
-        ul_min = float("inf")
-        most_sensitive_computer = None
-        for i,computer in enumerate ( self.subComputers ):
-            ul = computer.getUpperLimitOnMu ( evaluationType=apriori )
-            if ul is not None and ul < ul_min:
-                ul_min = ul
-                most_sensitive_computer = computer
-        return most_sensitive_computer
+        return self.subcomputer
 
     def getTotalXSec ( self ) -> UnitXSec:
-        """ get the total yield, summing over all computers """
-        ret = 0.*fb
-        for computer in self.subComputers:
-            add = computer.getTotalXSec()
-            ret += add
-        return ret
+        """ the total cross section, i.e. the sum over all statistical
+        models of the dataset """
+        return self.totalXsec
 
     def getUpperLimit ( self, evaluationType : NllEvalType,
            limit_on_xsec : bool = False,
@@ -536,10 +562,9 @@ class StatsComputer:
         + 1 sigma, - 1 sigma, etc. For error bands.
         :param kwargs: e.g. pmSigma
         """
-        msm = self.getMostSensitiveModel()
-        if msm is None:
+        if self.subcomputer is None:
             return None
-        ulmu = msm.getUpperLimitOnMu(
+        ulmu = self.subcomputer.getUpperLimitOnMu(
                    evaluationType = evaluationType, nSigma = nSigma, **kwargs )
         if ulmu == None or not limit_on_xsec:
             return ulmu
@@ -570,6 +595,9 @@ class SimpleStatsDataSet:
     def getLumi ( self ) -> UnitLumi:
         return self.globalInfo.lumi
 
+    def getID ( self ) -> str:
+        return self.globalInfo.id
+
     def getType ( self ) -> str:
         return "efficiencyMap"
 
@@ -579,7 +607,10 @@ if __name__ == "__main__":
     # nobs,bg,bgerr,lumi = 0, 0.001, 0.01, 35.9/fb
     nobs,bg,bgerr,lumi = 3905,3658.3,238.767, 35.9/fb
     dataset = SimpleStatsDataSet ( nobs, bg, bgerr, lumi )
-    computer = StatsComputer ( dataset, 1. )
+    subComputer = CompRetriever.forSingleBin ( regionSet = dataset.getID(),
+                                               dataset = dataset, nsigDict = { dataset.getID() : 1 },
+                                               lumi = dataset.getLumi() )
+    computer = StatsComputer ( [ subComputer ] )
     ul = computer.getUpperLimit ( evaluationType = observed,
                                     limit_on_xsec = True )
     print ( "ul", ul )

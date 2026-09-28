@@ -346,7 +346,7 @@ class SpeyRetriever:
         :param corr: correction factor: \
                 ULexp_mod = ULexp / (1. - corr*((ULobs-ULexp)/(ULobs+ULexp))) \
                 a factor of corr = 0.6 is proposed.
-        :returns: list of subComputers (with a single entry)
+        :returns: a sub computer
         """
         logger.error ( "speyTools no truncated Gaussian backend exists" )
         return None

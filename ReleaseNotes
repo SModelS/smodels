@@ -14,6 +14,7 @@ Release v3.2.1, Mon 28 Sep 2026
   * Improved github's live shells for mac OS
   * Bumped up pythia8 from 8317 to 8318
   * Updated authorlist in BANNER
+  * TheoryPredictions now determine the most sensitive statistical model upon initialisation (TheoryPrediction.mostSensitive), and StatsComputer.subComputers (a list) has been replaced by StatsComputer.subcomputer (the single most sensitive model)
 
 Release v3.2.0, Wed 2 Sep 2026
 =======================================================

@@ -51,6 +51,7 @@ class TheoryPrediction(object):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self._statsComputer = None
+        self._mostSensitive = None
 
     def __str__(self) -> str:
         ret = f"{self.analysisId()}:{self.totalXsection()}"
@@ -199,12 +200,28 @@ class TheoryPrediction(object):
             self.setStatsComputer()
         return self._statsComputer
 
+    @property
+    def mostSensitive(self) -> Any:
+        """
+        The most sensitive statistical model of this theory prediction, i.e.
+        the model (or regionSet) giving the smallest expected upper limit
+        on mu. For theory predictions with a single statistical model, that
+        model is returned. It is determined when the stats computer is
+        initialised, and is None if no statistical model is available.
+        """
+        if self._statsComputer is None:
+            self.setStatsComputer()
+        return self._mostSensitive
+
     def setStatsComputer(self):
         """
         Creates and instance of StatsComputer depending on the
         type of TheoryPrediction/dataset. In case it is not possible
         to define a statistical computer (upper limit result or no expected
         upper limits), set the computer to 'N/A'.
+
+        The most sensitive of the statistical models of the dataset is
+        determined here, and stored in self._mostSensitive.
         """
         from smodels.statistics.statsTools import StatsComputer
 
@@ -212,8 +229,10 @@ class TheoryPrediction(object):
 
         if statsComputer is None:
             self._statsComputer = "N/A"
+            self._mostSensitive = None
         else:
             self._statsComputer = statsComputer
+            self._mostSensitive = statsComputer.subcomputer
 
     @lru_cache
     def getUpperLimit( self, evaluationType : NllEvalType = observed,
@@ -550,6 +569,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
             deltas_rel = _deltas_rel_default
         self.deltas_rel = deltas_rel
         self._statsComputer = None
+        self._mostSensitive = None
 
     @classmethod
     def selectResultsFrom(cls, theoryPredictions : Union[List[TheoryPrediction],TheoryPredictionList], 
