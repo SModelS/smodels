@@ -451,7 +451,7 @@ class DataSet(object):
             m = mod.forSingleBin ( regionSet=self.getID(), dataset=self,
                                    nsigDict = nsigDict,
                                    deltas_rel = deltas_rel, lumi = self.getLumi() )
-            comp = StatsComputer ( [ m ] )
+            comp = StatsComputer ( m )
             # we dont even cache, not like this will be used much
             ul = comp.getUpperLimit (
                 evaluationType = evaluationType,

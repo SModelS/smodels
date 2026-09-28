@@ -294,40 +294,36 @@ def mostSensitiveComputer ( subComputers : list ) -> Any:
 
 
 class StatsComputer:
-    """ this is the stats computer, it takes the subcomputers
-    upon construction, determines the most sensitive one, and from then
-    on handles all the delegations to that single sub computer.
+    """ this is the stats computer, it delegates all the
+    computations to a single sub computer, i.e. to the most sensitive
+    statistical model of the dataset.
     """
 
-    def __init__ ( self, subComputers : list, allowNegativeSignals : bool = False ):
+    def __init__ ( self, subComputer, allowNegativeSignals : bool = False,
+                   totalXSec : Optional[UnitXSec] = None ):
         """
-         Initialise. From the given sub computers (one per statistical model
-         of the dataset), the most sensitive one is determined (see
-         mostSensitiveComputer) and kept as self.subcomputer. The total
-         cross section is the sum over all sub computers, i.e. over all
-         signal regions entering the statistical models.
+         Initialise.
 
-         :param subComputers: list of sub computers to choose from
+         :param subComputer: the single computer all computations are
+         delegated to, i.e. the most sensitive statistical model of the
+         dataset (see mostSensitiveComputer). May be None, if no expected
+         upper limit on mu could be obtained for any of the models.
          :param allowNegativeSignals: true if its true for all
-         subcomputers.
+         statistical models of the dataset.
+         :param totalXSec: the cross section summed over all statistical
+         models of the dataset. If None, the total cross section of
+         subComputer is used.
         """
-        if not isinstance(subComputers, list) or len(subComputers) == 0:
-            raise SModelSError ( "no subcomputers given to build a StatsComputer from" )
-
+        self.subcomputer = subComputer
         self.allowNegativeSignals = allowNegativeSignals
-        for computer in subComputers:
-            computer.allowNegativeSignals = self.allowNegativeSignals
+        if self.subcomputer is None:
+            self.totalXsec = 0.*fb
+            return
 
-        # the cross section is the sum over all statistical models (not all
-        # sub computers can give one, e.g. the truncated Gaussians cannot):
-        self.totalXsec = 0.*fb
-        for computer in subComputers:
-            if not hasattr ( computer, "getTotalXSec" ):
-                continue
-            self.totalXsec += computer.getTotalXSec()
-
-        # and from now on, only the most sensitive model is used:
-        self.subcomputer = mostSensitiveComputer ( subComputers )
+        self.subcomputer.allowNegativeSignals = self.allowNegativeSignals
+        if totalXSec is None and hasattr ( self.subcomputer, "getTotalXSec" ):
+            totalXSec = self.subcomputer.getTotalXSec()
+        self.totalXsec = 0.*fb if totalXSec is None else totalXSec
 
     @classmethod
     def forTheoryPrediction(cls, theoryPrediction: object) -> Union[None,'StatsComputer']:
@@ -335,7 +331,10 @@ class StatsComputer:
 
         Inspects the data type and statistical model of the theory
         prediction and delegates to the appropriate sub-computer factory
-        (SL, pyhf, NN, truncated Gaussian, or analyses combination).
+        (SL, pyhf, NN, truncated Gaussian, or analyses combination). If the
+        dataset has several statistical models, the most sensitive one
+        (see mostSensitiveComputer) is the one the StatsComputer is built
+        from.
 
         :param theoryPrediction: a TheoryPrediction or TheoryPredictionsCombiner object
         :returns: a StatsComputer instance, or None if no suitable computer can be built
@@ -409,9 +408,19 @@ class StatsComputer:
 
         if not isinstance(computers,list) or len(computers) == 0:
             return None
-        else:
-            allowNegativeSignals = all([comp.allowNegativeSignals for comp in computers])
-            return cls(subComputers=computers, allowNegativeSignals=allowNegativeSignals)
+
+        # Only the most sensitive statistical model is used for the
+        # computations, but the cross section is the sum over all of them:
+        allowNegativeSignals = all([comp.allowNegativeSignals for comp in computers])
+        totalXSec = 0.*fb
+        for computer in computers:
+            if not hasattr ( computer, "getTotalXSec" ):
+                continue
+            totalXSec += computer.getTotalXSec()
+        subComputer = mostSensitiveComputer ( computers )
+        return cls( subComputer = subComputer,
+                    allowNegativeSignals = allowNegativeSignals,
+                    totalXSec = totalXSec )
 
     def get_five_values ( self, evaluationType : NllEvalType,
                       return_nll : bool = False,
@@ -610,7 +619,7 @@ if __name__ == "__main__":
     subComputer = CompRetriever.forSingleBin ( regionSet = dataset.getID(),
                                                dataset = dataset, nsigDict = { dataset.getID() : 1 },
                                                lumi = dataset.getLumi() )
-    computer = StatsComputer ( [ subComputer ] )
+    computer = StatsComputer ( subComputer )
     ul = computer.getUpperLimit ( evaluationType = observed,
                                     limit_on_xsec = True )
     print ( "ul", ul )
