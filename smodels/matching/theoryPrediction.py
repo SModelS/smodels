@@ -839,20 +839,24 @@ def regionTypeOf ( region : Any ) -> Union[None,str]:
               'CR' if the region is tagged as such in its corresponding regionMappings,
               and None if the region is not an EM-type dataset or if the globalInfo as a regionMappings but it does not include the region.
     """
-    if isinstance(region,CombinedDataSet): return 'SR' # Combined dataset is considered as 'SR'
-    if region.dataInfo.dataType != 'efficiencyMap': return None # Dataset is not efficiency-map-type
+    if isinstance(region,CombinedDataSet): 
+        return 'SR' # Combined dataset is considered as 'SR'
+    if region.dataInfo.dataType != 'efficiencyMap': 
+        return None # Dataset is not efficiency-map-type
     regionType = 'SR' # By default we assume it is a SR
     globalInfo = region.globalInfo
     
     if hasattr(globalInfo,"regionMappings"):
-        assert type ( globalInfo.regionMappings) == dict, f"{expResult.globalInfo.id} regionMappings are not a dict"
+        assert type ( globalInfo.regionMappings) == dict, \
+            f"{expResult.globalInfo.id} regionMappings are not a dict"
         regionDict = globalInfo.regionMappings.get(region.dataInfo.dataId, None)
+        anaId = globalInfo.id
         if regionDict is None:
-            logger.warning ( f"Cannot evaluate the type of {region} from {globalInfo.id}, it is not listed in the regionMappings dict!" )
+            logger.warning ( f"Cannot evaluate the type of {region} from {anaId}, it is not listed in the regionMappings dict!" )
             return None
         regionType = regionDict.get("type", None)
         if regionType is None:
-            logger.warning ( f"No type found in the regionMappings dict of {globalInfo.id} for {region}" )
+            logger.warning ( f"No type found in the regionMappings dict of {anaId} for {region}" )
         
     return regionType
 
@@ -861,19 +865,23 @@ def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
     Is a given dataset mentioned in the combination?
     we are allowing datasets in an expResult that is not mentioned
     in the combination of that result.
-    :returns: true if its in, false if it is not in, None if there is no combination
+    :returns: true if its in, false if it is not in, 
+    None if there is no combination
     """
     assert hasattr ( dataset, "dataInfo" ), \
         "why does the dataset here not have a dataInfo?"
     dataId = dataset.getID()
-    if hasattr ( expResult.globalInfo, "regionMappings" ) and not hasattr ( expResult.globalInfo, "regionSets" ):
+    if hasattr ( expResult.globalInfo, "regionMappings" ) and \
+            not hasattr ( expResult.globalInfo, "regionSets" ):
         raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
     
     for regionSetName in expResult.globalInfo.statModels.keys():
-        regionList = expResult.globalInfo.regionSets[regionSetName] # List of labels for the signal regions
+        # List of labels for the signal regions
+        regionList = expResult.globalInfo.regionSets[regionSetName] 
         for region in regionList:
             if hasattr ( expResult.globalInfo, "regionMappings" ):
-                regionDict = expResult.globalInfo.regionMappings[region] # dictionary mapping the label to the smodels, pyhf,... names
+                regionDict = expResult.globalInfo.regionMappings[region] 
+                # dictionary mapping the label to the smodels, pyhf,... names
                 name = regionDict['smodels']
             else:
                 name = region
@@ -881,9 +889,10 @@ def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
                 return True
     return False
 
-def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> Optional[TheoryPrediction]:
+def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> \
+        Optional[TheoryPrediction]:
     """
-    Compute the combined result for all datasets, if a statistical model is]
+    Compute the combined result for all datasets, if a statistical model is
     available. Return a TheoryPrediction object
     with the signal cross-section summed over all the signal regions
     and the respective upper limit.
@@ -1009,8 +1018,9 @@ def _getBestResult(dataSetResults: list) -> Optional[TheoryPrediction]:
 
     return bestPred
 
-def _getDataSetPredictions(dataset: Any, smsMatch: dict, smsDict: Any, maxMassDist: float,
-                            deltas_rel: Optional[float] = None) -> Optional[TheoryPredictionList]:
+def _getDataSetPredictions(dataset: Any, smsMatch: dict, 
+        smsDict: Any, maxMassDist: float, deltas_rel: Optional[float] = None) \
+        -> Optional[TheoryPredictionList]:
     """
     Compute theory predictions for a given data set.
     For upper-limit results returns the list of theory predictions for the
@@ -1021,11 +1031,11 @@ def _getDataSetPredictions(dataset: Any, smsMatch: dict, smsDict: Any, maxMassDi
     combine the masses (if needed) and compute the conditions (if existing).
 
     :parameter dataset: Data Set to be considered (DataSet object)
-    :parameter smsTopDict: dictionary of SMS, where the canonical names are keys and the TheorySMS objects are values.
-                           (TopologyDict object)
+    :parameter smsTopDict: dictionary of SMS, where the canonical names 
+    are keys and the TheorySMS objects are values.  (TopologyDict object)
     :parameter maxMassDist: maximum mass distance for clustering SMS (float)
-    :returns:  a TheoryPredictionList object containing a list of TheoryPrediction
-               objects
+    :returns:  a TheoryPredictionList object containing a list of 
+    TheoryPrediction objects
     """
     if deltas_rel is None:
         from smodels.base.runtime import _deltas_rel_default
@@ -1091,8 +1101,8 @@ def _getSMSFor(dataset: Any, smsMatch: dict, smsDict: Any) -> list:
     (appear in any of constraints in the result).
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsMatch: dictionary with unique ExpSMS as keys and the corresponding list of
-                         (matched TheorySMS, orignal TheorySMS) as values
+    :parameter smsMatch: dictionary with unique ExpSMS as keys and 
+    the corresponding list of (matched TheorySMS, orignal TheorySMS) as values
     :returns: list of SMS (TheorySMS objects)
     """
 
@@ -1119,7 +1129,8 @@ def _getSMSFor(dataset: Any, smsMatch: dict, smsDict: Any) -> list:
     return smsList
 
 
-def _combineSMS(smsList: list, dataset: Any, maxDist: float) -> list[clusterTools.SMSCluster]:
+def _combineSMS(smsList: list, dataset: Any, maxDist: float) -> \
+        list[clusterTools.SMSCluster]:
     """
     Combine SMS according to the data set type.
     If expResult == upper limit type, first group SMS with different TxNames
@@ -1132,15 +1143,16 @@ def _combineSMS(smsList: list, dataset: Any, maxDist: float) -> list[clusterTool
     """
 
     clusters = []
+    tpe = dataset.getType()
 
-    if dataset.getType() == "efficiencyMap":  # cluster all SMS
+    if tpe == "efficiencyMap":  # cluster all SMS
         clusters += clusterTools.clusterSMS(smsList, maxDist, dataset)
-    elif dataset.getType() == "upperLimit":  # Cluster each txname individually
+    elif tpe == "upperLimit":  # Cluster each txname individually
         txnames = list(set([sms.txname for sms in smsList]))
         for txname in txnames:
             txnameSMS = [sms for sms in smsList if sms.txname is txname]
             clusters += clusterTools.clusterSMS(txnameSMS, maxDist, dataset)
     else:
-        logger.warning(f"Unkown data type: {dataset.getType()}. Data will be ignored.")
+        logger.warning(f"Unkown data type: {tpe}. Data will be ignored.")
 
     return clusters
