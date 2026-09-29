@@ -97,14 +97,20 @@ class NNAdapter:
         ret = self._postprocess ( out )
         return ret
 
-    def _getCRs( self, channels : list ) -> list:
+    def _getCRs( self, channels : list|dict ) -> list:
         """ get a list of every signal region marked as a control region
         """
         crRegions = []
-        for ch in channels:
+        def appendDict ( ch, crRegions ):
             for regionName, regionType in ch.items():
                 if regionType == "CR":
                     crRegions.append ( regionName )
+
+        if type(channels)==list:
+            for ch in channels:
+                appendDict ( ch, crRegions )
+        else:
+            appendDict ( channels, crRegions )
         return crRegions
 
     def _cleanCRs ( self ):

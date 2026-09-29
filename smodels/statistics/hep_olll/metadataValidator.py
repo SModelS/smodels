@@ -30,8 +30,15 @@ METADATA_SCHEMA = {
             }
         },
         "channels": {
-            "type": "array",
-            "items": {"type": "object"}
+            "oneOf": [
+                {
+                    "type": "array",
+                    "items": {"type": "object"}
+                },
+                {
+                    "type": "object"
+                }
+            ]
         },
         "obs_yields": {
             "type": "array",
