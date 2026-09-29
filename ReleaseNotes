@@ -12,7 +12,6 @@ Release v3.2.1, Thu 1 Oct 2026
   * Onnx_session_options defined in runtime
   * Disabled telemetry for onnxruntime as it causes problems on some mac os systems
   * Loosened a consistency check on ML models
-  * Small updates to onnx models
   * Improved github's live shells for mac OS
   * Bumped up pythia8 from 8317 to 8318
   * Updated authorlist in BANNER
