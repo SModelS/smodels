@@ -68,6 +68,6 @@ def validateMetaData(metadata_props : "onnx metadata" ) -> dict:
     try:
         validate(instance=parsed, schema=METADATA_SCHEMA)
     except ValidationError as e:
-        raise ValueError(f"Metadata validation failed: {e.message}") from e
+        raise ValueError(f"Metadata validation failed: {str(e.message)[:200]} in {e.path}") from e
 
     return parsed

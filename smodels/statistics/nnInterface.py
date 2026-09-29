@@ -156,7 +156,8 @@ class NNUpperLimitComputer:
         sys.path.insert ( 0, oll_dir )
         from smodels.statistics.hep_olll.nnAdapter import NNAdapter
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
-             session_options = session_options )
+             session_options = session_options,
+             validate_metadata = True )
 
         # del self.data.globalInfo.onnxes # we wont need that, thank you
         self.lumi = lumi
