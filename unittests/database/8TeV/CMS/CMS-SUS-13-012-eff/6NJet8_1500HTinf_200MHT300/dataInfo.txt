@@ -1,7 +1,0 @@
-dataType: efficiencyMap
-dataId: 6NJet8_1500HTinf_200MHT300
-observedN: 18
-expectedBG: 21.1
-bgError: 8.1
-upperLimit: 0.838381188661*fb
-expectedUpperLimit: 0.95624027036*fb

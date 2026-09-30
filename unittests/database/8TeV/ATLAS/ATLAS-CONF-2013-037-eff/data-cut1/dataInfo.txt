@@ -1,7 +1,0 @@
-dataId: SRtN3
-dataType: efficiencyMap
-observedN: 7
-expectedBG: 5.0
-bgError: 2.0
-upperLimit: 0.4*fb
-expectedUpperLimit: 0.35*fb
