@@ -50,7 +50,7 @@ jobs:
           sudo -u $USERNAME echo $HOME
           echo "[me] sudo brew prefix"
           sudo -u $USERNAME brew --prefix || echo "brew --prefix failed"
-          echo "[me] sudo brew install -y pipx" 
+          echo "[me] sudo brew install -y pipx"
           sudo -u $USERNAME python3 -m venv $HOME/venv || echo "[err] venv failed"
           sudo -u $USERNAME source $HOME/venv/bin/activate || echo "[err] activate failed"
           sudo -u $USERNAME $HOME/venv/bin/python3 -m pip install ipython smodels || echo "[err] pip install ipython smodels failed"
