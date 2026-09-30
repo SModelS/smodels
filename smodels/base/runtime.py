@@ -11,13 +11,17 @@
 """
 
 from typing import Union, Text, Dict
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 ## place to keep the pointer to the model file (default = mssm)
 modelFile="smodels.share.models.mssm"
 
 _experimental = { "truncatedgaussians": False,
                   "spey": False } ## experimental features
+
+## the session options used for onnx(runtime)
+onnx_session_options = { "inter_op_num_threads": 1,
+                         "intra_op_num_threads": 1 }
 
 _deltas_rel_default = .2 ## the default relative error on the signal strength
 
@@ -81,7 +85,7 @@ def printEnvironmentInfo( args : Dict ) -> bool:
     print(f"Operating System: {colors.green}{platform.system()} {platform.release()}{colors.reset}")
     print(f"Python Version: {colors.green}{platform.python_version()}{colors.reset}")
     print(f"Machine Architecture: {colors.green}{platform.machine()}{colors.reset}")
-    print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
+    # print(f"Processor: {colors.green}{platform.processor()}{colors.reset}")
     print("\nModule Versions:")
 
     depsMet = True
@@ -181,5 +185,5 @@ def nCPUs() -> int | None:
     return None
 
 if __name__ == "__main__":
-    printEnvironmentInfo()
+    printEnvironmentInfo( args={} )
     # print ( f"This machine has {nCPUs()} CPUs" )

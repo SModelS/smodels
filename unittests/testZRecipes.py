@@ -41,11 +41,12 @@ def listOfNotebooks(notebookDir=nbdir):
 
 def checkArgParser ():
     import argparse
+    ## seems like its resolved?
     try:
         parser = argparse.ArgumentParser ( allow_abbrev=True )
     except TypeError as e:
         print ( "argparser does not take allow_abbrev as argument." )
-        print ( "this might be a problem. If it is, consider DOWNgrading argparser!" )
+        print ( "this might be a problem. If it is, consider UNINSTALLING argparser (falling back to the default argparser)!" )
 
 checkArgParser()
 

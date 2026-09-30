@@ -1,0 +1,8 @@
+[custom-codes]
+files = example_printer.py, printer2.py
+
+[printer]
+outputType = example ;Define the output formats
+
+[example-printer]
+rmin = 20.0 # parameter for example printer

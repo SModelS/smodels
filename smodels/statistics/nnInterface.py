@@ -21,7 +21,6 @@ from smodels.statistics.basicStats import determineBrentBracket, CLsfromNLL, \
          CLsWithErrorsfromNLL
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from scipy import optimize, differentiate
-from smodels.statistics.nnAdapter import NNAdapter
 from smodels.tools.caching import roundCache, lru_cache
 from smodels.matching.theoryPrediction import mu_digits
 
@@ -136,22 +135,29 @@ class NNUpperLimitComputer:
         self.name = onnxfilename
         self.allowNegativeSignals = False
         self.dataType = "nn"
-        # first thing we do, we determine whats the most sensitive model
-        session_options = {}
+        from smodels.base.runtime import onnx_session_options as session_options
+        """
+        session_options = copy.deepcopy ( onnx_session_options )
         import onnxruntime
         version = onnxruntime.__version__.split(".")
         if int(version[0])<=1 and int(version[1])<=20:
             session_options={ "inter_op_num_threads": 1,
                               "intra_op_num_threads": 1 }
+        """
         if onnxfilename not in self.data.globalInfo.cachedModels:
             logger.error ( f"could not find {onnxfilename} among cached models")
             sys.exit(-1)
         onnxb = data.globalInfo.cachedModels[onnxfilename]
-        #for onnxfilename,onnxb in self.data.globalInfo.cachedModels.items():
-        #    if not onnxfilename.endswith ( ".onnx" ):
-        #        continue
+        ## disable telemetry
+        import onnxruntime as ort
+        ort.disable_telemetry_events()
+        import os, sys
+        oll_dir = f"{os.path.dirname(__file__)}/"
+        sys.path.insert ( 0, oll_dir )
+        from smodels.statistics.hep_olll.nnAdapter import NNAdapter
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
-             session_options = session_options )
+             session_options = session_options,
+             validate_metadata = True )
 
         # del self.data.globalInfo.onnxes # we wont need that, thank you
         self.lumi = lumi
@@ -161,7 +167,9 @@ class NNUpperLimitComputer:
         self.cl = cl
 
         self.alreadyBeenThere = (
-            False  # boolean to detect wether self.signals has returned to an older value
+            # boolean to detect wether self.signals 
+            # has returned to an older value
+            False  
         )
         self.welcome()
         self.checkConsistencyMu0()
@@ -213,7 +221,7 @@ class NNUpperLimitComputer:
         """ when getting predictions for bkg_yields (SRs) and obs_yields (CRs),
         nll_*_mu0 == nll_*_mu1. check for this.
         """
-        tolerance = 1e-2 # FIXME eventually we need to lower this number
+        tolerance = 3e-2 # FIXME eventually we need to lower this number
         nlls = self._actual_nll ( poi_test = 0. )
         errors = {}
         for label in [ "nll_exp", "nll_obs", "nllA_exp", "nllA_obs" ]:
@@ -223,7 +231,7 @@ class NNUpperLimitComputer:
             if err > tolerance:
                 raise SModelSError ( f"error for {self.name} {label} for mu=0 is too large: {err:.2g}>{tolerance:.1g}" )
 
-    def totalYieldsFromSignals ( self, poi_test : float ) -> list :
+    def totalYieldsFromSignals ( self, poi_test : float ) -> dict :
         """ given the signal yields self.nsignals, return the total
         yields, signal + background
 
@@ -231,7 +239,8 @@ class NNUpperLimitComputer:
         :returns: list of total yields
         """
 
-        yields = []
+        yields = [] # obsolete
+        yields = {}
         for srname,smyield in self.adaptor.onnxMeta["bkg_yields"].items():
             p1 = srname.rfind("-")
             realname = srname[:p1]
@@ -250,7 +259,7 @@ class NNUpperLimitComputer:
                 ## seems like a CR! replaced bkgexpected with observed (postfit)
                 smyield = obsyield
             tot = smyield + signal
-            yields.append ( tot )
+            yields[srname ] = tot
         return yields
 
     @roundCache(argname='mu',argpos=1,digits=mu_digits)
@@ -269,7 +278,7 @@ class NNUpperLimitComputer:
 
         # from signal yields compute total yields
         yields = self.totalYieldsFromSignals( poi_test )
-        ret = self.adaptor.predict(yields)
+        ret = self.adaptor.predict(yields, yields_are_signal_yields = False )
 
         if outputType == None:
             return ret

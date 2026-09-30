@@ -13,7 +13,8 @@ from smodels.matching import modelTester
 from smodels.tools import crashReport
 from smodels.experiment.databaseObj import Database
 from typing import Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
+from smodels.base.exceptions import SModelSBaseError
 
 def main():
     """Set default input and output files."""
@@ -73,6 +74,34 @@ def main():
         run(args.filename, args.parameterFile, args.outputDir,
               db, args.timeout, args.development)
 
+def handleCustomCode ( parser : "ConfigParser", parameterFile : PathType ) -> int:
+    """
+    Load custom out-of-repo code, if the user requests it.
+    Used e.g. to add custom printers
+
+    :returns: Number of codes that got loaded
+    """
+    if not "custom-codes" in parser.sections():
+        return 0
+    sec = parser["custom-codes"]
+    if sec.get("files") == None:
+        raise SModelSBaseError ( f"Section 'custom-codes' in {parameterFile} but no 'files' field defined" )
+    i = 0
+    files = sec["files"].split(",")
+    for fname in files:
+        if not os.path.exists ( fname ):
+            raise SModelSBaseError ( f"File {fname} does not exist in {parameterFile}:custom-codes:files" )
+        try:
+            with open ( fname, "rt" ) as f:
+                from smodels.base.smodelsLogging import logger
+                context=globals()
+                context["logger"]=logger
+                exec ( f.read(), context )
+        except Exception as e:
+            raise SModelSBaseError ( f"Error when reading {fname}: {e}" )
+        i += 1
+    return i
+
 def run( inFile : PathType, parameterFile : os.PathLike,
          outputDir : PathType, db : Optional[Database],
          timeout : int, development : bool ):
@@ -95,6 +124,8 @@ def run( inFile : PathType, parameterFile : os.PathLike,
 
     """ Read and check parameter file, exit parameterFile does not exist """
     parser = modelTester.getParameters(parameterFile)
+
+    handleCustomCode ( parser, parameterFile )
 
     """ Check database location and load database, exit if not found """
     database = modelTester.loadDatabase(parser, db)

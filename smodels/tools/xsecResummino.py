@@ -29,7 +29,7 @@ import requests
 import tarfile
 from itertools import combinations
 from typing import Tuple
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class XSecResummino(XSecBase):
     """ cross section computer class (for resummino), what else? """

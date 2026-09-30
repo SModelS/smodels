@@ -14,7 +14,7 @@ import sys
 import time
 from smodels.base.smodelsLogging import logger
 from typing import Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class Meta(object):
     """ The Meta object holds all meta information regarding the

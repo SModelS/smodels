@@ -18,7 +18,7 @@ from smodels.tools.printers.pythonPrinter import PyPrinter
 from xml.dom import minidom
 from xml.etree import ElementTree
 from typing import Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class XmlPrinter(PyPrinter):
     """

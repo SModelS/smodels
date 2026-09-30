@@ -22,7 +22,7 @@ from smodels.base.smodelsLogging import logger, setLogLevel
 from smodels.decomposition.exceptions import SModelSDecompositionError \
          as SModelSError
 from smodels.tools.xsecBase import XSecBase, ArgsStandardizer
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 import pyslha
 try:
     import cStringIO as io

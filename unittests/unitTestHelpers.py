@@ -21,7 +21,7 @@ from os.path import join, basename
 from smodels.installation import installDirectory as iDir
 from smodels.base.smodelsLogging import logger, setLogLevel, getLogLevel
 from smodels.base.physicsUnits import fb
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 from smodels.decomposition.theorySMS import TheorySMS
 from smodels.experiment.expSMS import ExpSMS
 from typing import Optional

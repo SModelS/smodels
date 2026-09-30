@@ -27,7 +27,7 @@ from smodels.experiment.expAuxiliaryFuncs import cleanWalk
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
 from typing import List, Tuple, Union, Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 os.environ["OMP_NUM_THREADS"] = "2"
 
 scipyver = ""

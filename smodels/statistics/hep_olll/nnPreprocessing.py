@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 .. module:: preprocessing_nnAdapter
    :synopsis: Preprocessing and inverse-preprocessing functions for the

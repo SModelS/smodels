@@ -56,11 +56,11 @@ class CompRetriever:
         if regionSet not in dataset.globalInfo.statModels:
             raise SModelSError( f"{regionSet} not in statModels in {dataset.globalInfo.id}" )
         covs = dataset.globalInfo.cachedModels
-        type_n_models = dataset.globalInfo.statModels[regionSet]        
+        type_n_models = dataset.globalInfo.statModels[regionSet]
         mtype,covname = type_n_models[0] # get first statistical model
         if mtype != "sl":
             raise SModelSError(f"expected sl but got {mtype} for type of stats model in {dataset.globalInfo.id}")
-        
+
         srList = dataset.globalInfo.regionSets[regionSet]
         cov = covs[covname]
         if not isinstance(cov, list):
@@ -69,14 +69,14 @@ class CompRetriever:
         if len(cov) == 0:
             logger.error(f"covariance matrix has length {len(cov)} but regionSet {regionSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
             raise SModelSError(f"covariance matrix has length {len(cov)} but regionSet {regionSet} has {len(srList)} signal regions in {dataset.globalInfo.id}")
-        
+
         # Collect relevant data:
         nobs = []
         bg = []
         nsig = []
         third_momenta = []
         for sr in srList:
-            ds = dataset.getDataSet(sr)         
+            ds = dataset.getDataSet(sr)
             if ds is None:
                 raise SModelSError(f"SR {sr} defined in regionSet {regionSet} not found in dataset {dataset.globalInfo.id}")
             nobs.append(ds.dataInfo.observedN)
@@ -479,7 +479,7 @@ class StatsComputer:
         if idx >= len(self.subComputers):
              logger.error(f"only {len(self.subComputers)} computers for prediction but index {idx} was requested")
              raise SModelSError(f"only {len(self.subComputers)} computers for prediction index {idx} was requested")
-        
+
         return self.subComputers[idx].getLlhds( **kwargs )
 
     def nll_min ( self, evaluationType : NllEvalType, ** kwargs ) -> Union[None,dict]:

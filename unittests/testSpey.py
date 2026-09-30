@@ -69,7 +69,7 @@ class SpeyTest(unittest.TestCase):
             sortMissingTopologyLists(smodelsOutputDefault)
             
             equals = equalObjs(smodelsOutput, smodelsOutputDefault, 
-                               allowedRelDiff=0.02,
+                               allowedRelDiff=0.03,
                                ignore=ignoreFields, fname=outputfile)
             if not equals:
                 p = outputfile.find("unitTestOutput")

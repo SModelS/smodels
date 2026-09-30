@@ -14,7 +14,7 @@ from smodels.base.physicsUnits import GeV, fb, TeV, pb
 from smodels.experiment.exceptions import SModelSExperimentError as SModelSError
 from smodels.base.smodelsLogging import logger
 from typing import Optional, Union
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class Info(object):
     """

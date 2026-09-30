@@ -17,7 +17,7 @@ from smodels.tools.printers.txtPrinter import TxTPrinter
 import numpy as np
 import unum
 from typing import Optional
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class SummaryPrinter(TxTPrinter):
     """

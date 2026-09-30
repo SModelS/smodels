@@ -12,7 +12,7 @@ from smodels.statistics.basicStats import apriori, aposteriori, NllEvalType
 import numpy as np
 import time
 from typing import IO, Union
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 class BasicPrinter(object):
     """

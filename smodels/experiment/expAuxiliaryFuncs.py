@@ -15,7 +15,7 @@ import unum
 import re
 import numpy as np
 import os
-from smodels.base.types import PathType
+from smodels.base.smodels_types import PathType
 
 try:
     from collections.abc import Iterable
@@ -490,7 +490,7 @@ def unscaleWidth(x: float) -> float:
 
     with np.errstate(over='ignore'):  # Temporarily disable overflow error message
         # The small increase in x is required to
-        # enforce unscaleWidth(widthToCoordinae(np.inf)) = np.inf
+        # enforce unscaleWidth(widthToCoordinate(np.inf)) = np.inf
         width = minWidth*(np.exp(x)-1)
         if width > maxWidth:
             width = np.inf
