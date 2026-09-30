@@ -1,0 +1,8 @@
+dataId: ar16
+dataType: efficiencyMap
+observedN: 3
+expectedBG: 4.0
+bgError: 1.3258959235173777
+upperLimit: 0.135875*fb
+expectedUpperLimit: 0.161080*fb
+aggregated: t1b2MT2450__650MET250__400

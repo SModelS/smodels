@@ -1,0 +1,8 @@
+dataId: ar13
+dataType: efficiencyMap
+observedN: 14
+expectedBG: 8.7
+bgError: 2.5587106127891834
+upperLimit: 0.394297*fb
+expectedUpperLimit: 0.248024*fb
+aggregated: t1b2MT2200__350MET500__600

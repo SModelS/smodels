@@ -1,0 +1,7 @@
+dataId: SRAT0
+dataType: efficiencyMap
+observedN: 11
+expectedBG: 17.3
+bgError: 1.7
+upperLimit: 0.0437*fb
+expectedUpperLimit: 0.0741*fb

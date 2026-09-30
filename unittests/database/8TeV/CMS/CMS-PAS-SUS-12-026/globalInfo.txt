@@ -1,0 +1,8 @@
+sqrts: 8*TeV
+lumi: 9.2/fb
+id: CMS-PAS-SUS-12-026
+url: https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsSUS12026
+comment: Only CDS entry http://cdsweb.cern.ch/record/1496879/files/SUS-12-026-pas.pdf
+private: False
+implementedBy: Federico A
+lastUpdate: 2016/9/29

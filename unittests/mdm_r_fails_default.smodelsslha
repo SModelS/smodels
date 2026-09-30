@@ -1,0 +1,44 @@
+BLOCK SModelS_Settings
+ 0 v3.0.0                    #SModelS version
+ 1 3.0.0                     #database version
+ 2 0.2                       #maximum condition violation
+ 3 1                         #compression (0 off, 1 on)
+ 4 5.                        #minimum mass gap for mass compression [GeV]
+ 5 0.0                       #sigmacut [fb]
+ 6 1                         #signal region combination (0 off, 1 on)
+ 7 1                         #analyses combination (0 off, 1 on)
+ 8 1e-11                     #prompt width [GeV] 
+ 9 1e-25                     #stable width [GeV] 
+
+BLOCK SModelS_Exclusion
+ 0 0 0                              #output status (-1 not tested, 0 not excluded, 1 excluded)
+ 1 0 TRV1                           #txname 
+ 1 1 8.762E-04                      #r value
+ 1 2 8.587E-04                      #expected r value
+ 1 3 0.00                           #condition violation
+ 1 4 ATLAS-SUSY-2018-22             #analysis
+ 1 5 SR2j_2200                      #signal region 
+ 1 6 9.20E+00                       #nll
+ 1 7 9.20E+00                       #nll_min
+ 1 8 9.20E+00                       #nll_SM
+
+ 2 0 TRV1                           #txname 
+ 2 1 NaN                            #r value (failed to compute r-value)
+ 2 2 N/A                            #expected r value
+ 2 3 0.00                           #condition violation
+ 2 4 ATLAS-SUSY-2018-22-multibin    #analysis
+ 2 5 (combined)                     #signal region 
+ 2 6 N/A                            #nll
+ 2 7 N/A                            #nll_min
+ 2 8 N/A                            #nll_SM
+
+
+BLOCK SModelS_Coverage
+ 0 0 missing (all)                       # missing topologies
+ 0 1 2.641E+01                           # Total cross-section (fb)
+ 1 0 missing (displaced)                 # missing topologies with displaced decays
+ 1 1 0.000E+00                           # Total cross-section (fb)
+ 2 0 missing (prompt)                    # missing topologies with prompt decays
+ 2 1 2.641E+01                           # Total cross-section (fb)
+ 3 0 outsideGrid (all)                   # topologies outside the grid
+ 3 1 0.000E+00                           # Total cross-section (fb)

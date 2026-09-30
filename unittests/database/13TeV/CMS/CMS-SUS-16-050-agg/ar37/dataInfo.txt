@@ -1,0 +1,8 @@
+dataId: ar37
+dataType: efficiencyMap
+observedN: 11
+expectedBG: 8.7
+bgError: 2.7899820787954894
+upperLimit: 0.313916*fb
+expectedUpperLimit: 0.254924*fb
+aggregated: t2b2MT2200__300MET350__450

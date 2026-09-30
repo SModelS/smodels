@@ -1,0 +1,15 @@
+id: ATLAS-SUSY-2018-42-incl
+sqrts: 13*TeV
+lumi: 139.0/fb
+prettyName: charged LLPs, dE/dx
+url: https://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2018-42/
+arxiv: https://arxiv.org/abs/2205.06013
+publication: JHEP 06 (2023) 158
+publicationDOI: https://doi.org/10.1007/JHEP06(2023)158
+contact: atlas-phys-susy-conveners@cern.ch
+comment: Full analysis is binned in mass windows; should be treated as separate SRs in an extended implementation (todo).
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2023/5/11
+type: displaced
+

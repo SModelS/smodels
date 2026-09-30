@@ -1,0 +1,7 @@
+dataId: SR-inclusive_High
+dataType: efficiencyMap
+observedN: 27
+expectedBG: 19.69
+bgError: 4.58
+upperLimit: 0.147*fb
+expectedUpperLimit: 0.09499*fb

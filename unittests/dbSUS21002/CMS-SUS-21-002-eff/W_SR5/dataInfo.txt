@@ -1,0 +1,8 @@
+dataId: W_SR5
+dataType: efficiencyMap
+observedN: 23
+expectedBG: 34.7
+bgError: 4.7
+comment: W_SR5
+upperLimit: 0.0621*fb
+expectedUpperLimit: 0.119*fb

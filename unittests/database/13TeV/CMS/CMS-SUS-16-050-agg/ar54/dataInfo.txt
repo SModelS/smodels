@@ -1,0 +1,8 @@
+dataId: ar54
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 1.7
+bgError: 1.4543039572248988
+upperLimit: 0.100237*fb
+expectedUpperLimit: 0.144050*fb
+aggregated: t>=3b2MT2>=300MET250__400

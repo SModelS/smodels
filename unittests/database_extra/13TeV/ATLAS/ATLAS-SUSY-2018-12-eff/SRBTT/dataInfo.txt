@@ -1,0 +1,7 @@
+dataId: SRBTT
+dataType: efficiencyMap
+observedN: 67
+expectedBG: 46
+bgError: 7
+upperLimit: 0.324*fb
+expectedUpperLimit: 0.155*fb

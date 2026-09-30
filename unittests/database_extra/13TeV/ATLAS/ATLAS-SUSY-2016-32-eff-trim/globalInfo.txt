@@ -1,0 +1,14 @@
+id: ATLAS-SUSY-2016-32
+sqrts: 13*TeV
+lumi: 31.6/fb
+prettyName: hscp search
+url: http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-32/index.html
+arxiv: https://arxiv.org/abs/1902.01636
+publication: https://arxiv.org/pdf/1902.01636.pdf
+contact: Andre Lessa <lessa.a.p@gmail.com>; Jan Heisig <heisig@physik.rwth-aachen.de>; SModelS
+comment: Search for long-lived charged particles implemented according to the ATLAS note in http://atlas.web.cern.ch/Atlas/GROUPS/PHYSICS/PAPERS/SUSY-2016-32/hepdata_info.pdf. For the topologies with mixed MET-HSCP branches, the MET branch is irrelevant and wildcards are used. The topologies THSCPM5, THSCPM6 and THSCPM7 do not include the width information.
+private: False
+implementedBy: Andre Lessa
+lastUpdate: 2021/8/30
+Leff_inner: 0.001
+Leff_outer: 12.0

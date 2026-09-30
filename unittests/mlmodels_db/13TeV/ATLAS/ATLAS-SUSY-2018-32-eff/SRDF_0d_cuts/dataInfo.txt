@@ -1,0 +1,8 @@
+dataId: SRDF_0d_cuts
+dataType: efficiencyMap
+observedN: 16.0
+expectedBG: 21.7
+bgError: 3.0
+comment: SR-DF-0J_mt2=[120,140)
+upperLimit: 0.0589*fb
+expectedUpperLimit: 0.0925*fb

@@ -1,0 +1,8 @@
+dataId: c000track
+dataType: efficiencyMap
+observedN: 42
+expectedBG: 44.0
+bgError: 9.0
+upperLimit: 1.15*fb
+expectedUpperLimit: 1.23*fb
+Leff_outer: 3.0

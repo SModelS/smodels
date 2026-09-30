@@ -1,0 +1,8 @@
+dataId: ar53
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 0.6
+bgError: 0.7570336848516056
+upperLimit: 0.112053*fb
+expectedUpperLimit: 0.112053*fb
+aggregated: t>=3b1MT2>=300MET>=350

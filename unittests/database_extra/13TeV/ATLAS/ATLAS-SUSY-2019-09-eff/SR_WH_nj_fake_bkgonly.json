@@ -1,0 +1,75 @@
+{
+    "channels": [
+        {
+            "name": "SR_WH_nj",
+            "samples": [
+                {
+                    "data": [
+                        492.6
+                    ],
+                    "modifiers": [
+                        {
+                            "data": {
+                                "hi": 1.053,
+                                "lo": 0.947
+                            },
+                            "name": "SR_WH_nj",
+                            "type": "normsys"
+                        }
+                    ],
+                    "name": "Bkg_SR_WH_nj"
+                }
+            ]
+        }
+    ],
+    "measurements": [
+        {
+            "config": {
+                "parameters": [
+                    {
+                        "auxdata": [
+                            1.0
+                        ],
+                        "bounds": [
+                            [
+                                0.915,
+                                1.085
+                            ]
+                        ],
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "lumi",
+                        "sigmas": [
+                            0.017
+                        ]
+                    },
+                    {
+                        "bounds": [
+                            [
+                                0.0,
+                                10.0
+                            ]
+                        ],
+                        "fixed": false,
+                        "inits": [
+                            1.0
+                        ],
+                        "name": "mu_SIG"
+                    }
+                ],
+                "poi": "mu_SIG"
+            },
+            "name": "NormalMeasurement"
+        }
+    ],
+    "observations": [
+        {
+            "data": [
+                488
+            ],
+            "name": "SR_WH_nj"
+        }
+    ],
+    "version": "1.0.0"
+}

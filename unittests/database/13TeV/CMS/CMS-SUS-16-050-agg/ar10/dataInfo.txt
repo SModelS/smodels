@@ -1,0 +1,8 @@
+dataId: ar10
+dataType: efficiencyMap
+observedN: 7
+expectedBG: 4.3
+bgError: 1.5514509338035798
+upperLimit: 0.252318*fb
+expectedUpperLimit: 0.157961*fb
+aggregated: t1b1MT2550__750MET400__500

@@ -1,0 +1,7 @@
+dataId: SR_WH_DFOS
+dataType: efficiencyMap
+observedN: 20
+expectedBG: 11.5
+bgError: 2.4
+upperLimit: 0.143*fb
+expectedUpperLimit: 0.0681*fb

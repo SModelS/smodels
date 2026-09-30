@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+
+"""
+.. module:: testMLModels
+   :synopsis: Test the nnInterface
+
+.. moduleauthor:: Wolfgang Waltenberger <wolfgang.waltenberger@gmail.com>
+
+"""
+
+import sys
+sys.path.insert(0,"../")
+import unittest
+from smodels.statistics.nnAdapter import NNAdapter
+import warnings
+
+class MLModelsTest(unittest.TestCase):
+    def testSimple(self):
+        """
+        A simple case we test "by hand"
+        """
+        onnxFile = "testFiles/test.onnx"
+        adapter = NNAdapter ( onnxFile, False )
+        yields = {}
+        regions = [ 'SRhigh_0Jb_cuts', 'SRhigh_0Jc_cuts', 'SRhigh_0Jd_cuts',
+            'SRhigh_0Je_cuts', 'SRhigh_0Jf1_cuts', 'SRhigh_0Jf2_cuts',
+            'SRhigh_0Jg1_cuts', 'SRhigh_0Jg2_cuts', 'SRhigh_nJa_cuts',
+            'SRhigh_nJb_cuts', 'SRhigh_nJc_cuts', 'SRhigh_nJd_cuts',
+            'SRhigh_nJe_cuts', 'SRhigh_nJf_cuts', 'SRhigh_nJg_cuts',
+            'SRlow_0Jb_cuts', 'SRlow_0Jc_cuts', 'SRlow_0Jd_cuts',
+            'SRlow_0Je_cuts', 'SRlow_0Jf1_cuts', 'SRlow_0Jf2_cuts',
+            'SRlow_0Jg1_cuts', 'SRlow_0Jg2_cuts', 'SRlow_nJb_cuts',
+            'SRlow_nJc_cuts', 'SRlow_nJd_cuts', 'SRlow_nJe_cuts',
+            'SRlow_nJf1_cuts', 'SRlow_nJf2_cuts', 'SRlow_nJg1_cuts',
+            'SRlow_nJg2_cuts', 'CR_0J_WZ_cuts', 'CR_nJ_WZ_cuts' ]
+        for region in regions: # predict for no yields
+            yields[ region ] = 0.
+        ret = adapter.predict ( yields )
+        truths = { 'nll_exp_0': 675.10349848,
+                   'nll_exp_1': 675.3807474856113,
+                   'nll_obs_0': 688.4482887699999,
+                   'nll_obs_1': 716.2628889741528,
+                   'nllA_exp_0': 675.10349845,
+                   'nllA_exp_1': 675.3807786480749,
+                   'nllA_obs_0': 674.7278682388554,
+                   'nllA_obs_1': 675.1161725510684,
+                   'nll_obs_max': 682.9279235152198 }
+        for name,value in truths.items():
+            self.assertAlmostEqual ( ret[name], value )
+
+    def testRunMLModels(self):
+
+        warnings.filterwarnings(
+            "ignore",
+            category=DeprecationWarning,
+            message=r".*RefResolver is deprecated.*",
+            module=r"pyhf\.schema\.validator",
+        )
+
+        from smodels.experiment.databaseObj import Database
+        from smodels.decomposition import decomposer
+        from smodels.base import runtime
+        from smodels.tools.particlesLoader import load
+        from smodels.base.model import Model
+        from smodels.base.physicsUnits import GeV
+        import os
+        from smodels.share.models.SMparticles import SMList
+        from smodels.matching.theoryPrediction import theoryPredictionsFor
+        from smodels.statistics.basicStats import apriori, aposteriori
+        db = Database ( "./mlmodels_db/" ) ## a small database with mlmodels
+        db.getExpResults()
+        # slhafile = os.path.abspath('./testFiles/slha/TChiWZoff_150_125_150_125.slha')
+        slhafiles = [ "ewkinos.slha", "ewkinos_off.slha" ]
+        nlls = { 'ewkinos.slha': { 'ATLAS-SUSY-2019-09': {
+            'obs': 109.2548744617272, 'exp': 99.14532271766798 },
+                 'ATLAS-SUSY-2018-32': {
+            'obs': 93.80734619587368, 'exp': 82.58896814755686 } } }
+        uls = { 'ewkinos.slha': { 'ATLAS-SUSY-2019-09': {
+            'obs': 0.25807115669714714, 'exp': 0.3350494117797231,
+            'p1': 0.266992266053015 },
+                 'ATLAS-SUSY-2018-32': {
+            'obs': 1.3192072615224657, 'exp': 1.585071956798914,
+            'p1': 1.330402764063578 } } }
+        nlls['ewkinos_off.slha']= { 'ATLAS-SUSY-2018-16': {
+                'obs': 299.5023181876453, 'exp': 261.66487588845627 } }
+        uls['ewkinos_off.slha'] = { 'ATLAS-SUSY-2018-16': {
+                'obs': 0.24917556169220006, 'exp': 0.3874108842668479,
+                'p1':  0.26087901105926187 } }
+        for basename in slhafiles:
+            slhafile = os.path.abspath( f'./testFiles/mlmodels/{basename}')
+            runtime.modelFile = "smodels.share.models.mssm"
+            BSMList = load()
+            model = Model(BSMparticles=BSMList, SMparticles=SMList)
+            model.updateParticles(inputFile=slhafile,
+                    ignorePromptQNumbers = ['eCharge','colordim','spin'])
+
+            topDict = decomposer.decompose(model, sigmacut=0.001,
+                                   massCompress=True, invisibleCompress=True,
+                                   minmassgap=5*GeV)
+            allPredictions = theoryPredictionsFor( db, topDict,
+                    combinedResults=True )
+            for p in allPredictions:
+                anaId = p.analysisId()
+                my_nll = nlls[basename][anaId]
+                my_ul = uls[basename][anaId]
+                if p.nll() != my_nll["obs"]:
+                    print ( f"[testMLModels] for {p.analysisId()}:" )
+                self.assertAlmostEqual ( p.nll(),
+                        my_nll["obs"], 5 )
+                self.assertAlmostEqual ( p.nll( evaluationType = apriori),
+                        my_nll["exp"], 5 )
+                self.assertAlmostEqual ( p.getUpperLimitOnMu(),
+                        my_ul["obs"], 5 )
+                self.assertAlmostEqual ( \
+                        p.getUpperLimitOnMu( evaluationType = aposteriori ),
+                        my_ul["exp"], 5 )
+                self.assertAlmostEqual ( p.getUpperLimitOnMu( pmSigma = 1 ),
+                        my_ul["p1"], 5 )
+
+if __name__ == "__main__":
+    unittest.main()

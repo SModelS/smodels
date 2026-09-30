@@ -1,0 +1,8 @@
+dataId: ar22
+dataType: efficiencyMap
+observedN: 0
+expectedBG: 1.8
+bgError: 1.9204166214652487
+upperLimit: 0.097667*fb
+expectedUpperLimit: 0.154897*fb
+aggregated: t1b>=3MT21000__1500MET450__550

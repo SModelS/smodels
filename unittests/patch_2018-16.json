@@ -1,0 +1,1498 @@
+[
+  {
+    "op": "add",
+    "path": "/channels/0/samples/0",
+    "value": {
+      "data": [
+        34.41513914143056
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              41.98646975254528
+            ],
+            "lo_data": [
+              26.843808530315837
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/1/samples/0",
+    "value": {
+      "data": [
+        17.95431315585953
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              21.904262050148628
+            ],
+            "lo_data": [
+              14.004364261570434
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/2/samples/0",
+    "value": {
+      "data": [
+        13.57125298218677
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              16.55692863826786
+            ],
+            "lo_data": [
+              10.585577326105682
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/3/samples/0",
+    "value": {
+      "data": [
+        16.817964221944372
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              20.517916350772133
+            ],
+            "lo_data": [
+              13.118012093116612
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/4/samples/0",
+    "value": {
+      "data": [
+        24.350334298182005
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              29.707407843782047
+            ],
+            "lo_data": [
+              18.993260752581964
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/5/samples/0",
+    "value": {
+      "data": [
+        10.811548428392811
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              13.19008908263923
+            ],
+            "lo_data": [
+              8.433007774146393
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/6/samples/0",
+    "value": {
+      "data": [
+        0.2417721496502328
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.294962022573284
+            ],
+            "lo_data": [
+              0.18858227672718159
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/7/samples/0",
+    "value": {
+      "data": [
+        0.15755755524186316
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.19222021739507306
+            ],
+            "lo_data": [
+              0.12289489308865327
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/8/samples/0",
+    "value": {
+      "data": [
+        0.058901537129553365
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.0718598752980551
+            ],
+            "lo_data": [
+              0.045943198961051625
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/9/samples/0",
+    "value": {
+      "data": [
+        1.4392744747634667
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              1.7559148592114293
+            ],
+            "lo_data": [
+              1.122634090315504
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/10/samples/0",
+    "value": {
+      "data": [
+        1.4425197385171613
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              1.7598740809909368
+            ],
+            "lo_data": [
+              1.1251653960433858
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/11/samples/0",
+    "value": {
+      "data": [
+        0.035211111727584246
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.04295755630765278
+            ],
+            "lo_data": [
+              0.027464667147515713
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/12/samples/0",
+    "value": {
+      "data": [
+        5.92260635049228
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              7.225579747600581
+            ],
+            "lo_data": [
+              4.619632953383978
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/13/samples/0",
+    "value": {
+      "data": [
+        4.29997447364508
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              5.245968857846997
+            ],
+            "lo_data": [
+              3.3539800894431626
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/14/samples/0",
+    "value": {
+      "data": [
+        0.038294112293593925
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.04671881699818459
+            ],
+            "lo_data": [
+              0.029869407589003263
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/15/samples/0",
+    "value": {
+      "data": [
+        3.2939427099998166
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              4.018610106199776
+            ],
+            "lo_data": [
+              2.569275313799857
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/16/samples/0",
+    "value": {
+      "data": [
+        2.4501741340392726
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              2.9892124435279124
+            ],
+            "lo_data": [
+              1.9111358245506327
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/17/samples/0",
+    "value": {
+      "data": [
+        0.04871952210233719
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.05943781696485137
+            ],
+            "lo_data": [
+              0.03800122723982301
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/18/samples/0",
+    "value": {
+      "data": [
+        0.17524424269949762
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.2137979760933871
+            ],
+            "lo_data": [
+              0.13669050930560814
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/19/samples/0",
+    "value": {
+      "data": [
+        0.13548976171674124
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.1652975092944243
+            ],
+            "lo_data": [
+              0.10568201413905817
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/20/samples/0",
+    "value": {
+      "data": [
+        0.16550845143841442
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.20192031075486558
+            ],
+            "lo_data": [
+              0.12909659212196326
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/21/samples/0",
+    "value": {
+      "data": [
+        0.23203635838914963
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.28308435723476255
+            ],
+            "lo_data": [
+              0.1809883595435367
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/22/samples/0",
+    "value": {
+      "data": [
+        0.05741120547888265
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.07004167068423683
+            ],
+            "lo_data": [
+              0.04478074027352847
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/23/samples/0",
+    "value": {
+      "data": [
+        0.10524034271659391
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.12839321811424456
+            ],
+            "lo_data": [
+              0.08208746731894326
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/24/samples/0",
+    "value": {
+      "data": [
+        0.15894328778614325
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.19391081109909475
+            ],
+            "lo_data": [
+              0.12397576447319174
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/25/samples/0",
+    "value": {
+      "data": [
+        0.06517966429549195
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.07951919044050018
+            ],
+            "lo_data": [
+              0.05084013815048372
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/26/samples/0",
+    "value": {
+      "data": [
+        0.28258980914640963
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.3447595671586197
+            ],
+            "lo_data": [
+              0.22042005113419952
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/27/samples/0",
+    "value": {
+      "data": [
+        0.10559228071453662
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.12882258247173467
+            ],
+            "lo_data": [
+              0.08236197895733857
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/28/samples/0",
+    "value": {
+      "data": [
+        0.37678641219521286
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.45967942287815966
+            ],
+            "lo_data": [
+              0.29389340151226606
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/29/samples/0",
+    "value": {
+      "data": [
+        0.6707447768819953
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.8183086277960342
+            ],
+            "lo_data": [
+              0.5231809259679564
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/30/samples/0",
+    "value": {
+      "data": [
+        0.08055433640035584
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.09827629040843412
+            ],
+            "lo_data": [
+              0.06283238239227755
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/31/samples/0",
+    "value": {
+      "data": [
+        2.712212536060368
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              3.3088992939936492
+            ],
+            "lo_data": [
+              2.115525778127087
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/32/samples/0",
+    "value": {
+      "data": [
+        3.1669547576752803
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              3.863684804363842
+            ],
+            "lo_data": [
+              2.470224710986719
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/33/samples/0",
+    "value": {
+      "data": [
+        0.29558244404969275
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.36061058174062516
+            ],
+            "lo_data": [
+              0.23055430635876034
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/34/samples/0",
+    "value": {
+      "data": [
+        8.96491808326541
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              10.9372000615838
+            ],
+            "lo_data": [
+              6.99263610494702
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/35/samples/0",
+    "value": {
+      "data": [
+        6.918578085998305
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              8.440665264917932
+            ],
+            "lo_data": [
+              5.396490907078678
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/36/samples/0",
+    "value": {
+      "data": [
+        1.1920742523762338
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              1.4543305878990052
+            ],
+            "lo_data": [
+              0.9298179168534624
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/37/samples/0",
+    "value": {
+      "data": [
+        4.043957613646897
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              4.9336282886492135
+            ],
+            "lo_data": [
+              3.1542869386445793
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/38/samples/0",
+    "value": {
+      "data": [
+        4.855997295102097
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              5.9243167000245585
+            ],
+            "lo_data": [
+              3.7876778901796357
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/39/samples/0",
+    "value": {
+      "data": [
+        0.5099609199538656
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.622152322343716
+            ],
+            "lo_data": [
+              0.3977695175640152
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/40/samples/0",
+    "value": {
+      "data": [
+        0.12164354428198897
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.14840512402402653
+            ],
+            "lo_data": [
+              0.0948819645399514
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/41/samples/0",
+    "value": {
+      "data": [
+        0.08575139036166912
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.10461669624123633
+            ],
+            "lo_data": [
+              0.06688608448210191
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/42/samples/0",
+    "value": {
+      "data": [
+        0.23549150762200804
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.28729963929884983
+            ],
+            "lo_data": [
+              0.1836833759451663
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/channels/43/samples/0",
+    "value": {
+      "data": [
+        0.058629265001065446
+      ],
+      "modifiers": [
+        {
+          "data": null,
+          "type": "normfactor",
+          "name": "mu_SIG"
+        },
+        {
+          "data": null,
+          "type": "lumi",
+          "name": "lumi"
+        },
+        {
+          "data": {
+            "hi_data": [
+              0.07152770330129984
+            ],
+            "lo_data": [
+              0.04573082670083105
+            ]
+          },
+          "type": "histosys",
+          "name": "signalUncertainty"
+        }
+      ],
+      "name": "bsm"
+    }
+  }
+]

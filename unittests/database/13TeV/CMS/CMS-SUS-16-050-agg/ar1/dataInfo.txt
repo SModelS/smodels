@@ -1,0 +1,8 @@
+dataId: ar1
+dataType: efficiencyMap
+observedN: 3574
+expectedBG: 3363.0
+bgError: 218.8606862823929
+upperLimit: 18.126249*fb
+expectedUpperLimit: 12.363623*fb
+aggregated: t1b1MT2200__300MET250__400;t1b1MT2300__400MET250__400;t1b1MT2400__550MET250__400;t1b1MT2400__550MET400__500;t1b2MT2200__350MET250__400;t1b>=3MT2300__1000MET250__350

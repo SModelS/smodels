@@ -1,0 +1,8 @@
+dataId: WH_SR6
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 1.19
+bgError: 1.1
+comment: WH_SR6
+upperLimit: 0.0313*fb
+expectedUpperLimit: 0.0313*fb

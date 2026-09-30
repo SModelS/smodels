@@ -1,0 +1,8 @@
+dataId: ar12
+dataType: efficiencyMap
+observedN: 1
+expectedBG: 1.9
+bgError: 1.0168579055108928
+upperLimit: 0.099393*fb
+expectedUpperLimit: 0.128733*fb
+aggregated: t1b1MT2>=750MET600__750

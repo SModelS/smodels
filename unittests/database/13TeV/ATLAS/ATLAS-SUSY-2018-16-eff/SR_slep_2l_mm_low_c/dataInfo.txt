@@ -1,0 +1,7 @@
+dataId: SR_slep_2l_mm_low_c
+dataType: efficiencyMap
+observedN: 15
+expectedBG: 11.8
+bgError: 2.1
+upperLimit: 0.08692*fb
+expectedUpperLimit: 0.06998*fb

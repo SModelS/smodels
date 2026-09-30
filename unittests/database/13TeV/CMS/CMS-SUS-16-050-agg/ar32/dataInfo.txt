@@ -1,0 +1,8 @@
+dataId: ar32
+dataType: efficiencyMap
+observedN: 8
+expectedBG: 11.0
+bgError: 2.579728667902886
+upperLimit: 0.184095*fb
+expectedUpperLimit: 0.255079*fb
+aggregated: t2b1MT2300__450MET350__450
