@@ -37,6 +37,7 @@ The major novelties of all releases since v1.0 are as follows:
 New in Version 3.2.1:
 ^^^^^^^^^^^^^^^^^^^^^
 
+  * Fix in official database pickle causing crashes
   * Renamed 'out-of-repo printer' to `custom printer <OutputDescription.html#custom-printers>`_
   * Custom printers can now also be used with |runSModelS|
   * Recipe for `custom printer <customPrinter.html>`_ added, custom printers also mentioned in OutputDescription
@@ -44,7 +45,7 @@ New in Version 3.2.1:
   * Fix for `printerRegistry <tools.printers.html#module-tools.printers.printerRegistry>`_ in combination with ncpus > 1 multiprocessing and custom printers
   * Renamed types to smodels_types in `base <base.html#module-base>`_ to avoid name clashes
   * Silenced an "unknown solver option 'disp'" warning in scipy
-  * Onnx_session_options defined in `runtime <base.html#module-base.base.runtime>`_ 
+  * Onnx_session_options defined in `runtime <base.html#module-base.base.runtime>`_
   * Disabled telemetry for onnxruntime as it causes problems on some mac os systems
   * Loosened a consistency check on ML models
   * Improved github's live shells for mac OS
