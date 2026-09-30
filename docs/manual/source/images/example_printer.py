@@ -4,8 +4,8 @@ import os
 
 class ExamplePrinter(BasicPrinter):
     """ A simple example of a custom printer, which only prints the analysis ID and the r-value """
-    
-    def __init__ ( self, output : str = "file", 
+
+    def __init__ ( self, output : str = "file",
                    filename : str = "my.file" ):
         """ constructor, do what you will.
         In this example, we cachine in a self.toPrint
@@ -14,24 +14,24 @@ class ExamplePrinter(BasicPrinter):
         BasicPrinter.__init__ ( self, output, filename )
         self.toPrint = []
 
-    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True,       
-        silent : bool = False ): 
-        """ need to implement. Can implement your own logic here 
+    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True,
+        silent : bool = False ):
+        """ need to implement. Can implement your own logic here
         :param filename: slha filename
         :param overwrite: does the user want to overwrite?
         :param silent: usually used to comment on removing old files
         """
-        
+
         self.filename = filename + '_example.txt'
         if os.path.isfile(self.filename):
             os.remove(self.filename)
 
     def addObj ( self, obj ):
         """ add an object, either do something immediately with it,
-        or write to an object cache 
+        or write to an object cache
         """
         self.toPrint.append ( obj )
-        
+
     def _formatTheoryPredictionList(self, obj: object) -> dict:
         """
         Format data of the TheoryPredictionList object.
@@ -39,15 +39,15 @@ class ExamplePrinter(BasicPrinter):
         :param obj: A TheoryPredictionList object to be printed.
         """
         obj.sortTheoryPredictions()
-        
+
         outputDict = {}
         for theoryPrediction in obj._theoryPredictions:
             expID = theoryPrediction.analysisId()
             r = theoryPrediction.getRValue()
             outputDict[expID] = r
-            
+
         return outputDict
-            
+
 
     def flush ( self ) -> dict:
         """ this method is called at the end of a model point """
@@ -76,6 +76,6 @@ class ExamplePrinter(BasicPrinter):
 
 # these lines register the printer with smodels, to handle the "example" extension
 # The handle name has to be defined in [printer]:outputType in order for the printer to be called.
-from smodels.tools.printers.printerRegistry import PrinterRegistry                  
+from smodels.tools.printers.printerRegistry import PrinterRegistry
 PrinterRegistry.register ( ExamplePrinter, "example" )
 

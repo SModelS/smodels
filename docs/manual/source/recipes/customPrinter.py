@@ -23,7 +23,7 @@ from smodels.tools.printers.basicPrinter import BasicPrinter
 
 class ExamplePrinter(BasicPrinter):
     """ here is our implementation """
-    def __init__ ( self, output : str = "file", 
+    def __init__ ( self, output : str = "file",
                    filename : str = "my.file" ):
         """ constructor, do what you will.
         In this example, we cachine in a self.toPrint
@@ -32,9 +32,9 @@ class ExamplePrinter(BasicPrinter):
         BasicPrinter.__init__ ( self, output, filename )
         self.toPrint = []
 
-    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True,       
-        silent : bool = False ): 
-        """ need to implement. Can implement your own logic here 
+    def setOutPutFile( self, filename : os.PathLike, overwrite : bool = True,
+        silent : bool = False ):
+        """ need to implement. Can implement your own logic here
         :param filename: slha filename
         :param overwrite: does the user want to overwrite?
         :param silent: usually used to comment on removing old files
@@ -43,20 +43,20 @@ class ExamplePrinter(BasicPrinter):
 
     def addObj ( self, obj ):
         """ add an object, either do something immediately with it,
-        or write to an object cache 
+        or write to an object cache
         """
         self.toPrint.append ( obj )
 
     def flush ( self ):
         """ this method is called at the end of a model point """
-        # self.somearg is defined in parameters_custom_printer.ini 
+        # self.somearg is defined in parameters_custom_printer.ini
         print ( f"ExamplePrinter.somearg: {self.somearg}" )
         print ( f"ExamplePrinter: but do note that we lowercase all arguments!!" )
         for obj in self.toPrint:
             print ( f"ExamplePrinter, obj: {type(obj).__name__} object: I do with it as I wish" )
 
 # these lines register the printer with smodels, to handle the "example" extension
-from smodels.tools.printers.printerRegistry import PrinterRegistry                  
+from smodels.tools.printers.printerRegistry import PrinterRegistry
 PrinterRegistry.register ( ExamplePrinter, "example" );
 
 
@@ -107,7 +107,7 @@ parser = modelTester.getParameters( parameterFile )
 # In[9]:
 
 
-modelTester.loadDatabaseResults(parser, database) 
+modelTester.loadDatabaseResults(parser, database)
 
 
 # In[10]:
@@ -125,7 +125,7 @@ fileList, inDir = modelTester.getAllInputFiles( "inputFiles/slha/simplyGluino.sl
 # In[12]:
 
 
-modelTester.testPoints ( fileList, inDir, "results/", parser, database, timeout=0, development=False, parameterFile = parameterFile ) 
+modelTester.testPoints ( fileList, inDir, "results/", parser, database, timeout=0, development=False, parameterFile = parameterFile )
 
 
 # ### Note how the printer can also be used via runSModelS.py directly, by adding to your ini file:
@@ -133,8 +133,8 @@ modelTester.testPoints ( fileList, inDir, "results/", parser, database, timeout=
 # In[13]:
 
 
-## custom code to be executed                                        
-# [custom-codes]                                                              
+## custom code to be executed
+# [custom-codes]
 # files = ./examplePrinter.py  # comma separated
 
 

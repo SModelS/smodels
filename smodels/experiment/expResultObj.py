@@ -29,7 +29,7 @@ class ExpResult(object):
     experimental result (experimental conference note or publication).
     """
 
-    def __init__( self, path : Union[None,PathType]=None, 
+    def __init__( self, path : Union[None,PathType]=None,
                   databaseParticles=None):
         """
         :param path: Path to the experimental result folder, None means
@@ -195,7 +195,7 @@ class ExpResult(object):
                     if model_type != None:
                         ret.add ( model_type )
             return ret
-        
+
         for regionSetName, model_tuples in self.globalInfo.statModels.items():
             if idx >= len(model_tuples):
                 return None

@@ -75,9 +75,9 @@ class NNAdapter:
         interpreted as signal yields, and the backgrounds get added.
         if False, yields are assumed to be total yields
 
-        :param obs_as_bg: a list of signal regions for which we use 
-        observations as background_yields ("postfit"), given 
-        yields_are_signal_yields is True. If None or "default", then 
+        :param obs_as_bg: a list of signal regions for which we use
+        observations as background_yields ("postfit"), given
+        yields_are_signal_yields is True. If None or "default", then
         use self.onnxMeta["crRegions"] as defined in the onnx file
 
         :returns: the negative log likelihoods (nlls) as a dictionary:
@@ -85,7 +85,7 @@ class NNAdapter:
         'nll_obs_1': ..., 'nllA_exp_0': ..., 'nllA_exp_1': ...,
         'nllA_obs_0': ..., 'nllA_obs_1': ... }
         where 0, 1 means mu=0, 1, respectively. exp refers to a priori
-        expectation, obs are the observed values. nllA means the 
+        expectation, obs are the observed values. nllA means the
         nll is evaluated for the Asimov dataset with mu' = 0.
         """
         if obs_as_bg in [ None, "default", "postfit" ]:
@@ -115,7 +115,7 @@ class NNAdapter:
 
     def _cleanCRs ( self ):
         """ the meta information has all regions of all models,
-        so we clean the list of control regions here, 
+        so we clean the list of control regions here,
         possibly also adding the "-o" postfix to regio names
         """
         newCRs = []
@@ -309,7 +309,7 @@ class NNAdapter:
         yields, signal + background
 
         :param signal_yields: the signal yields, as a (srname, yield) dictionary
-        :param obs_abs_bg: a list of signal regions for which we use 
+        :param obs_abs_bg: a list of signal regions for which we use
         observations as background_yields ("postfit")
 
         :returns: the total yields, as a dictionary

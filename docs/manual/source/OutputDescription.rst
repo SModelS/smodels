@@ -7,7 +7,7 @@
 .. |SMS| replace:: :ref:`SMS <SMS>`
 .. |SMS topology| replace:: :ref:`SMS topology <SMS>`
 .. |SMS topologies| replace:: :ref:`SMS topologies <SMS>`
-.. |topology| replace:: :ref:`topology <SMS>`   
+.. |topology| replace:: :ref:`topology <SMS>`
 .. |topologies| replace:: :ref:`topologies <SMS>`
 .. |decomposition| replace:: :ref:`decomposition <decomposition>`
 .. |theory predictions| replace:: :doc:`theory predictions <TheoryPredictions>`
@@ -36,9 +36,9 @@
 .. |datasets| replace:: :ref:`data sets<DataSet>`
 .. |parameters| replace:: :ref:`parameters file <parameterFile>`
 .. |ssigBRe| replace:: :math:`\sum \sigma \times BR \times \epsilon`
-.. |canonical names| replace:: :ref:`canonical names <canonicalName>`   
-.. |canonical name| replace:: :ref:`canonical name <canonicalName>`  
-.. |final states| replace:: :ref:`final states <finalStates>`    
+.. |canonical names| replace:: :ref:`canonical names <canonicalName>`
+.. |canonical name| replace:: :ref:`canonical name <canonicalName>`
+.. |final states| replace:: :ref:`final states <finalStates>`
 
 .. _outputDescription:
 
@@ -361,7 +361,7 @@ file in the output folder. This text file lists, on a single line for each input
    :lines: 1-11
 
 
-If **combineAnas** is defined, the summary will also include the observed and expected :math:`r`-values 
+If **combineAnas** is defined, the summary will also include the observed and expected :math:`r`-values
 for the combination of analyses.
 
 
@@ -394,7 +394,7 @@ A skeleton/example of such a custom printer is here:
    :lines: 1-80
 
 Note that the output filename set in `setOutPutFile` should not conflict with any of the filenames used by the other printers.
-The two lines at the end register the new printer as the "example" printer. 
+The two lines at the end register the new printer as the "example" printer.
 The printer can be used by adding "example" to the list of printers in the ini file:
 
 .. literalinclude:: /images/custom_codes.txt

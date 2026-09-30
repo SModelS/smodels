@@ -62,7 +62,7 @@ class TheoryPrediction(object):
         """
         if self.dataset is None:
             return None
-        
+
         return self.dataset.getID()
 
     def analysisId(self) -> Union[None,str]:
@@ -72,7 +72,7 @@ class TheoryPrediction(object):
 
         if self.dataset is None:
             return None
-        
+
         return self.dataset.globalInfo.id
 
     def dataType(self, short : bool = False ) -> Union[None,str]:
@@ -94,7 +94,7 @@ class TheoryPrediction(object):
             return "??"
 
         return self.dataset.getType()
-    
+
     def type(self) -> str:
         """
         Return the type of theory prediction (single result)
@@ -230,7 +230,7 @@ class TheoryPrediction(object):
         For error bands.
         :return: upper limit (Unum object)
         """
-        
+
         if self.dataType() == "efficiencyMap":
             ul = self.dataset.getSRUpperLimit(evaluationType=evaluationType,
                     nSigma = nSigma )
@@ -552,7 +552,7 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         self._statsComputer = None
 
     @classmethod
-    def selectResultsFrom(cls, theoryPredictions : Union[List[TheoryPrediction],TheoryPredictionList], 
+    def selectResultsFrom(cls, theoryPredictions : Union[List[TheoryPrediction],TheoryPredictionList],
                           anaIDs : List[str] ) -> Optional['TheoryPredictionsCombiner']:
         """
         Select the results from theoryPrediction list which match one
@@ -757,7 +757,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                 bestRes = _getBestResult(dataSetResults)
                 if bestRes is not None:
                     expResults.append(bestRes) # Best result = combination if available
-        
+
         # A SR not entering any combination can be the most sensitive result
         if len(expResults) == 1 and isinstance(expResults[0].dataset, CombinedDataSet): # We only have 1 result, and it is a combined result
             bestPred = expResults[0]
@@ -766,7 +766,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
             if bestExpectedR is None:
                 bestExpectedR = 0.0
                 bestXsec = 0.0*fb
-            
+
             for predList in dataSetResults:
                 for tpred in predList:
                     dataset = tpred.dataset
@@ -790,7 +790,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                                             isCombinedWith.append(regDict['smodels'])
                                 elif dataId == region:
                                     isCombinedWith += regionList
-                        
+
                         if isCombinedWith: # The region belongs to a combination set? Yes: check if it is really combined; No: all good, can be a bestSR candidate
                             isCombinedWith = set(isCombinedWith)
                             isCombinedWith.remove(dataId)
@@ -799,7 +799,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                             datasetResultsId = [tp.dataset.getID() for tpList in dataSetResults for tp in tpList]
                             if any([True if region in datasetResultsId else False for region in isCombinedWith]):
                                 continue
-                            
+
                         xsec = tpred.xsection
                         expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
                         if expectedR > bestExpectedR or (expectedR == bestExpectedR and xsec > bestXsec):
@@ -808,7 +808,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
                             bestPred = tpred
 
             expResults = TheoryPredictionList([bestPred])
-            
+
         for theoPred in expResults:
             theoPred.expResult = expResult
             theoPred.deltas_rel = deltas_rel
@@ -829,7 +829,7 @@ def theoryPredictionsFor(database : Database, smsTopDict : Dict,
     tpList.sortTheoryPredictions()
 
     return tpList
-    
+
 def regionTypeOf ( region : Any ) -> Union[None,str]:
     """
     A quality of life function to know the type of a dataset (SR, CR or VR).
@@ -839,13 +839,13 @@ def regionTypeOf ( region : Any ) -> Union[None,str]:
               'CR' if the region is tagged as such in its corresponding regionMappings,
               and None if the region is not an EM-type dataset or if the globalInfo as a regionMappings but it does not include the region.
     """
-    if isinstance(region,CombinedDataSet): 
+    if isinstance(region,CombinedDataSet):
         return 'SR' # Combined dataset is considered as 'SR'
-    if region.dataInfo.dataType != 'efficiencyMap': 
+    if region.dataInfo.dataType != 'efficiencyMap':
         return None # Dataset is not efficiency-map-type
     regionType = 'SR' # By default we assume it is a SR
     globalInfo = region.globalInfo
-    
+
     if hasattr(globalInfo,"regionMappings"):
         assert type ( globalInfo.regionMappings) == dict, \
             f"{expResult.globalInfo.id} regionMappings are not a dict"
@@ -857,7 +857,7 @@ def regionTypeOf ( region : Any ) -> Union[None,str]:
         regionType = regionDict.get("type", None)
         if regionType is None:
             logger.warning ( f"No type found in the regionMappings dict of {anaId} for {region}" )
-        
+
     return regionType
 
 def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
@@ -865,7 +865,7 @@ def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
     Is a given dataset mentioned in the combination?
     we are allowing datasets in an expResult that is not mentioned
     in the combination of that result.
-    :returns: true if its in, false if it is not in, 
+    :returns: true if its in, false if it is not in,
     None if there is no combination
     """
     assert hasattr ( dataset, "dataInfo" ), \
@@ -874,13 +874,13 @@ def _isDatasetInCombination ( dataset : Any, expResult : Any ) -> bool:
     if hasattr ( expResult.globalInfo, "regionMappings" ) and \
             not hasattr ( expResult.globalInfo, "regionSets" ):
         raise SModelSError ( f"{expResult.globalInfo.id} has regionMappings but no regionSets" )
-    
+
     for regionSetName in expResult.globalInfo.statModels.keys():
         # List of labels for the signal regions
-        regionList = expResult.globalInfo.regionSets[regionSetName] 
+        regionList = expResult.globalInfo.regionSets[regionSetName]
         for region in regionList:
             if hasattr ( expResult.globalInfo, "regionMappings" ):
-                regionDict = expResult.globalInfo.regionMappings[region] 
+                regionDict = expResult.globalInfo.regionMappings[region]
                 # dictionary mapping the label to the smodels, pyhf,... names
                 name = regionDict['smodels']
             else:
@@ -908,17 +908,17 @@ def _getCombinedResultFor(dataSetResults: list, expResult: Any) -> \
         return dataSetResults[0]
     elif not expResult.hasStatsModel():
         return None
-    
+
     # Don't give combined result if all regions are CRs
     regionTypeDict = {}
     globalInfo = expResult.globalInfo
     for predList in dataSetResults:
         for tpred in predList:
             regionTypeDict[tpred.dataId()] = regionTypeOf(tpred.dataset)
-    
+
     if all(regionType != 'SR' for regionType in regionTypeDict.values()):
         return None
-    
+
     txnameList = []
     smsList = []
     totalXsec = None
@@ -994,7 +994,7 @@ def _getBestResult(dataSetResults: list) -> Optional[TheoryPrediction]:
         if len(predList) != 1:
             logger.error("Multiple clusters should only exist for upper limit results!")
             raise SModelSError()
-            
+
         dataset = predList[0].dataset
         if dataset.getType() != "efficiencyMap":
             txt = (
@@ -1003,11 +1003,11 @@ def _getBestResult(dataSetResults: list) -> Optional[TheoryPrediction]:
             )
             logger.error(txt)
             raise SModelSError(txt)
-            
+
         regionType = regionTypeOf(dataset)
         if regionType != "SR":
             continue
-        
+
         pred = predList[0]
         xsec = pred.xsection
         expectedR = (xsec/dataset.getSRUpperLimit(evaluationType=apriori)).asNumber()
@@ -1018,7 +1018,7 @@ def _getBestResult(dataSetResults: list) -> Optional[TheoryPrediction]:
 
     return bestPred
 
-def _getDataSetPredictions(dataset: Any, smsMatch: dict, 
+def _getDataSetPredictions(dataset: Any, smsMatch: dict,
         smsDict: Any, maxMassDist: float, deltas_rel: Optional[float] = None) \
         -> Optional[TheoryPredictionList]:
     """
@@ -1031,10 +1031,10 @@ def _getDataSetPredictions(dataset: Any, smsMatch: dict,
     combine the masses (if needed) and compute the conditions (if existing).
 
     :parameter dataset: Data Set to be considered (DataSet object)
-    :parameter smsTopDict: dictionary of SMS, where the canonical names 
+    :parameter smsTopDict: dictionary of SMS, where the canonical names
     are keys and the TheorySMS objects are values.  (TopologyDict object)
     :parameter maxMassDist: maximum mass distance for clustering SMS (float)
-    :returns:  a TheoryPredictionList object containing a list of 
+    :returns:  a TheoryPredictionList object containing a list of
     TheoryPrediction objects
     """
     if deltas_rel is None:
@@ -1101,7 +1101,7 @@ def _getSMSFor(dataset: Any, smsMatch: dict, smsDict: Any) -> list:
     (appear in any of constraints in the result).
 
     :parameter dataset:  Data Set to be considered (DataSet object)
-    :parameter smsMatch: dictionary with unique ExpSMS as keys and 
+    :parameter smsMatch: dictionary with unique ExpSMS as keys and
     the corresponding list of (matched TheorySMS, orignal TheorySMS) as values
     :returns: list of SMS (TheorySMS objects)
     """

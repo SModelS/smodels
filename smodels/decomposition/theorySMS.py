@@ -186,7 +186,7 @@ class TheorySMS(GenericSMS):
             newSMS._ancestors = self._ancestors[:]
         if self._allAncestors is not None:
             newSMS._allAncestors = self._allAncestors[:]
-        newSMS._sorted = self._sorted        
+        newSMS._sorted = self._sorted
         newSMS.smsID = self.smsID
         newSMS.coveredBy = set(list(self.coveredBy)[:])
         newSMS.testedBy = set(list(self.testedBy)[:])
@@ -302,7 +302,7 @@ class TheorySMS(GenericSMS):
 
     def setAncestors(self, keepIDs : Union[None,List[int]] = None):
         """
-        Set the list of ancestors for self, keeping only the SMS which 
+        Set the list of ancestors for self, keeping only the SMS which
         have IDs in the keepIDs list.
 
         :param keepIDs: List of SMS IDs to be kept as ancestors.
@@ -316,7 +316,7 @@ class TheorySMS(GenericSMS):
 
         if keepIDs is not None:
             allAncestors = [sms for sms in allAncestors if sms.smsID in keepIDs]
-        
+
         self._allAncestors = allAncestors
 
     def getAncestors(self) -> List["TheorySMS"]:
@@ -330,9 +330,9 @@ class TheorySMS(GenericSMS):
 
         if hasattr(self, '_allAncestors') and self._allAncestors is None:
             self.setAncestors()
-        
+
         return self._allAncestors
-        
+
 
     def isRelatedTo(self, other: "TheorySMS") -> bool:
         """
@@ -380,8 +380,8 @@ class TheorySMS(GenericSMS):
         self.coveredBy.add(resultType)
         for ancestor in self.getAncestors():
             ancestor.coveredBy.add(resultType)
-    
-    def compress(self, doCompress: bool, doInvisible: bool, 
+
+    def compress(self, doCompress: bool, doInvisible: bool,
                  minmassgap: UnitEnergy, minmassgapISR: UnitEnergy) -> List["TheorySMS"]:
         """
         Keep compressing the original SMS and the derived ones till they
@@ -522,10 +522,10 @@ class TheorySMS(GenericSMS):
             primaryMoms = newSMS.daughterIndices(newSMS.rootIndex)
             # Check if all primary mothers are final states and are MET
             if all(newSMS.out_degree(mom) == 0 for mom in primaryMoms):
-                if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):                      
+                if all(p.particle.isMET() for p in newSMS.indexToNode(primaryMoms)):
         # Redo the compression, but with minmassgap set to maxCompMassDiff
         # This way at least one of the steps in the compression will not be performed and the
-        # compressed SMS will not be pure MET. 
+        # compressed SMS will not be pure MET.
         # Also, it guarantees that the largest mass difference is the one left uncompressed
         # (we set minmassgap slightly below maxCompMassDiff for numerical estability)
                     return self.massCompress(minmassgap=(0.999*maxCompMassDiff),
