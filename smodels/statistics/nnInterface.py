@@ -149,9 +149,12 @@ class NNUpperLimitComputer:
             sys.exit(-1)
         onnxb = data.globalInfo.cachedModels[onnxfilename]
         ## disable telemetry
-        import onnxruntime as ort
-        ort.disable_telemetry_events()
         import os, sys
+        # it seems via setting an environment variable is the safer bet
+        os.environ["ORT_DISABLE_TELEMETRY"] = "1"
+        import onnxruntime as ort
+        # but lets keep also the 'cleaner' version in
+        ort.disable_telemetry_events()
         oll_dir = f"{os.path.dirname(__file__)}/"
         sys.path.insert ( 0, oll_dir )
         from smodels.statistics.hep_olll.nnAdapter import NNAdapter
@@ -167,9 +170,9 @@ class NNUpperLimitComputer:
         self.cl = cl
 
         self.alreadyBeenThere = (
-            # boolean to detect wether self.signals 
+            # boolean to detect whether self.signals
             # has returned to an older value
-            False  
+            False
         )
         self.welcome()
         self.checkConsistencyMu0()
