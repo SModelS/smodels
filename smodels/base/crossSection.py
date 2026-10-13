@@ -127,6 +127,8 @@ class XSectionInfo(object):
         newinfo.sqrts = self.sqrts
         newinfo.order = self.order
         newinfo.label = self.label[:]
+        if hasattr ( self, "comment" ):
+            newinfo.comment = self.comment
         return newinfo
 
 
