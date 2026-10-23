@@ -616,6 +616,33 @@ class TheoryPredictionsCombiner(TheoryPrediction):
 
         return ret
 
+    def experimentalId( self ) -> str:
+        """
+        Return Id of tpred's expresult
+            - anaId:upperLimit      if dataType = upperLimit
+            - anaId:dataId          if dataType = efficiencyMap
+            - anaId:matrixname      if dataType = combined,SLv1,v2
+            - anaId:jsonFileName    if dataType = combined,pyhf
+            - anaId:onnxFileName    if dataType = combined,nn
+        """
+        anaId = self.analysisId()
+        dtype = self.dataType()
+
+        if dtype == "upperLimit":
+            return f"{anaId}:{dtype}"
+
+        elif dtype == "combined":
+            sc0 = self._statsComputer.getMostSensitiveModel()
+            if sc0 is None:
+                dsId = self.dataId()
+                logger.warning( f"sc0=None in {anaId} dsId: {dsId}" )
+                return f"{anaId}:{dsId}"
+
+            sc0_type = sc0.dataType
+            return f"{anaId}:{sc0.name}"
+        dsId = self.dataId() # for em-type results
+        return f"{anaId}:{dsId}"
+
     def dataType(self, short: bool = False) -> str:
         """
         Return its type (combined)
