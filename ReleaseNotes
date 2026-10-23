@@ -2,6 +2,7 @@ Release v3.2.2, xxx
 =======================================================
 
   * Introduced convenience theoryprediction.experimentalId method
+  * Increased verbosity in determineBrentBracket
 
 Release v3.2.1, Thu 1 Oct 2026
 =======================================================

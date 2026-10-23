@@ -247,13 +247,15 @@ def findRoot ( func : Callable, lower_bound : float, upper_bound : float,
 
 def determineBrentBracket( mu_hat : float, sigma_mu : float ,
             rootfinder : Callable, allowNegative : bool = True,
-            args : dict = {}, verbose :  bool = True ) -> Tuple:
+            args : dict = {}, verbose :  bool = True, 
+            label : str = ""  ) -> Tuple:
     """find a, b for brent bracketing
 
     :param mu_hat: mu that maximizes likelihood
     :param sigm_mu: error on mu_hat (not too reliable)
     :param rootfinder: function that finds the root (usually root_func)
     :param allowNegative: if False, then do not allow a or b to become negative
+    :param label: analysis label, for debugging
     :returns: the interval a,b
     """
     msg = logger.error if verbose else logger.debug
@@ -265,6 +267,7 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
     ntrials = 20
     i = 0
     foundExtra = False
+    ext_label = "" if label == "label" else f" in {label}"
     avalues = [ 0.0, 1.0, -1.0, 3.0, -3.0, 10.0, -10.0, 0.1, -0.1,
                 0.01, -0.01, .001, -.001, 100., -100., .0001, -.0001 ]
     if not allowNegative:
@@ -286,11 +289,11 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
                     break
             if not foundExtra:
                 msg(
-                    f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
+                    f"cannot find an a that is left of the root{ext_label}. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
                 msg(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
                 raise SModelSError(
-                    f"cannot find an a that is left of the root. last attempt, a={a:.2f}, root = {ra:.2f}."
+                    f"cannot find an a that is left of the root{ext_label}. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
     i = 0
     foundExtra = False
@@ -314,7 +317,7 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
         if i > ntrials or ( b < 0 and not allowNegative ):
             for b in bvalues:
                 rb = rootfinder(b,**args)
-                memoize[b]=float(rb)
+                memoize[b]=float(round(rb,3))
                 if rb is None: # if cls computation failed, try with next b value
                     continue
                 if rb < 0.0:
@@ -324,11 +327,11 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
                     closestr = rb
                     closest = b
             if not foundExtra:
-                msg("cannot find a b that is right of the root (i.e. rootfinder(b) < 0).")
+                msg("cannot find a b that is right of the root{ext_label} (i.e. rootfinder(b) < 0).")
                 msg(f"memoize {memoize}" )
                 msg(f"closest to zero rootfinder({closest})={closestr}")
                 msg(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
-                raise SModelSError( "cannot find b right of the root" )
+                raise SModelSError( "cannot find b right of the root{ext_label}" )
     return a, b
 
 def deltaChi2FromLlhd(likelihood: Optional[float]) -> Optional[float]:

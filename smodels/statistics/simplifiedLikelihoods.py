@@ -1091,7 +1091,7 @@ class SLUpperLimitComputer:
             return None
         try:
             a, b = determineBrentBracket( mu_hat, sigma_mu, clsRoot,
-                                          allowNegative=False )
+            allowNegative=False, label=f"SL:{self.name}" )
         except SModelSError:
             return None
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )

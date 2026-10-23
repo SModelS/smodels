@@ -481,7 +481,7 @@ class NNUpperLimitComputer:
         try:
             a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
                     allowNegative = allowNegativeSignals, args=clsRootArgs,
-                        verbose = False )
+                        verbose = False, label=f"NN:{self.name}" )
         except Exception as e:
             logger.debug ( f"exception {e}" )
             return float("inf")

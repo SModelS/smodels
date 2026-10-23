@@ -220,7 +220,7 @@ class AnaCombLikelihoodComputer(object):
                 nSigma = nSigma )
 
         a, b = determineBrentBracket(mu_hat, sigma_mu, clsRoot,
-                                     allowNegative = allowNegativeSignals )
+                allowNegative = allowNegativeSignals, label=f"AC:{self.name}" )
         mu_lim = findRoot(clsRoot, a, b, rtol=1e-03, xtol=1e-06 )
         return mu_lim
 
