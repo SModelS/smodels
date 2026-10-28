@@ -635,10 +635,10 @@ class TheoryPredictionsCombiner(TheoryPrediction):
             sc0 = self._statsComputer.getMostSensitiveModel()
             if sc0 is None:
                 dsId = self.dataId()
-                logger.warning( f"sc0=None in {anaId} dsId: {dsId}" )
+                logger.debug( f"sc0=None in {anaId} dsId: {dsId}" )
                 return f"{anaId}:{dsId}"
 
-            sc0_type = sc0.dataType
+            # sc0_type = sc0.dataType
             return f"{anaId}:{sc0.name}"
         dsId = self.dataId() # for em-type results
         return f"{anaId}:{dsId}"
