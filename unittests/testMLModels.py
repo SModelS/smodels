@@ -83,14 +83,15 @@ class MLModelsTest(unittest.TestCase):
             'obs': 93.80734619587368, 'exp': 82.58896814755686 } } }
         uls = { 'ewkinos.slha': { 'ATLAS-SUSY-2019-09': {
             'obs': 0.25807115669714714, 'exp': 0.3350494117797231,
-            'p1': 0.266992266053015 },
+            'apriori': 0.3680326682375764, 'p1': 0.266992266053015 },
                  'ATLAS-SUSY-2018-32': {
             'obs': 1.3192072615224657, 'exp': 1.585071956798914,
-            'p1': 1.330402764063578 } } }
+            'apriori': 1.4336948198291573, 'p1': 1.330402764063578 } } }
         nlls['ewkinos_off.slha']= { 'ATLAS-SUSY-2018-16': {
                 'obs': 299.5023181876453, 'exp': 261.66487588845627 } }
         uls['ewkinos_off.slha'] = { 'ATLAS-SUSY-2018-16': {
                 'obs': 0.24917556169220006, 'exp': 0.3874108842668479,
+                'apriori': 0.3909871988831432,
                 'p1':  0.26087901105926187 } }
         for basename in slhafiles:
             slhafile = os.path.abspath( f'./testFiles/mlmodels/{basename}')
@@ -120,6 +121,9 @@ class MLModelsTest(unittest.TestCase):
                 self.assertAlmostEqual ( \
                         p.getUpperLimitOnMu( evaluationType = aposteriori ),
                         my_ul["exp"], 5 )
+                self.assertAlmostEqual ( \
+                        p.getUpperLimitOnMu( evaluationType = apriori ),
+                        my_ul["apriori"], 5 )
                 self.assertAlmostEqual ( p.getUpperLimitOnMu( pmSigma = 1 ),
                         my_ul["p1"], 5 )
 

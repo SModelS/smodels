@@ -33,28 +33,25 @@ nnSettings = {
     "errs_on_min": True
 }
 
-
 def clsRootFunc( mu : float, return_type: Text, obj : Callable,
         evaluationType : NllEvalType, nll_min : float, nll_minA : float,
         mu_hat : float, nSigma : int, pmSigma : int,
         s_nll_min : Optional[float], s_nll_minA : Optional[float] ) \
         -> Union[float,Tuple]:
     """ the cls root function for the ml models.
-    i had to put it as a separate function because i want to be
-    able to monkey patch it """
+    """
     # at - infinity this should be .95,
     # at + infinity it should -.05
     # Make sure to always compute the correct llhd value (from
     # theoryPrediction)
     # and not used the cached value (which is constant for mu~=1 an mu~=0)
-    nllA = obj.nll(mu, asimov = 0, pmSigma = 0, evaluationType = observed )
-    # nllA = obj.nll(mu, asimov = 0, pmSigma = 0, evaluationType = evaluationType )
+    nllA = obj.nll(mu, asimov = 0, pmSigma = 0, evaluationType = evaluationType )
     s_nllA, s_nll = None, None
     if pmSigma != 0:
         # s_nllA = 0. # abs ( obj.nll( mu, asimov = 0,
         #       pmSigma = 1 ) - nllA )
         s_nllA = abs ( obj.nll( mu, asimov = 0, pmSigma = 1,
-                       evaluationType = observed ) - nllA )
+                       evaluationType = evaluationType ) - nllA )
     if evaluationType == aposteriori:
         nll = nllA
         if pmSigma != 0:
@@ -514,7 +511,7 @@ class NNUpperLimitComputer:
         """
         s_nll_minA, s_nll_min = 0., 0.
         mu_hatA = 0
-        nll_minA = self.nll ( mu = 0, evaluationType = observed, asimov = 0 )
+        nll_minA = self.nll ( mu = 0, evaluationType = evaluationType, asimov = 0 )
         sigma_muA = 1
         #fmin = self.nll_min ( evaluationType=evaluationType,
         #                      allowNegativeSignals=allowNegativeSignals )
@@ -544,7 +541,7 @@ class NNUpperLimitComputer:
             # we compute the usual mu_hat, but add pmSigma times sigma
             # to nll_min(A)
             s_nll_minA = abs ( self.nll ( mu_hatA,
-                    evaluationType = observed,
+                    evaluationType = evaluationType,
                     pmSigma = 1, asimov = 0 ) - nll_minA )
             if evaluationType == aposteriori:
                 s_nll_min = s_nll_minA

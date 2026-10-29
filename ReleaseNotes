@@ -1,6 +1,7 @@
 Release v3.2.2, xxx
 =======================================================
 
+  * Fixed a bug with prefit CLS and upper limit values for NNs
   * Introduced convenience theoryprediction.experimentalId method
   * Increased verbosity in determineBrentBracket
 
