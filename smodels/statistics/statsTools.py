@@ -359,7 +359,7 @@ class StatsComputer:
                 elif model_type == "onnx":
                     computers.append(CompRetriever.forNNs(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
-                elif model_type == "pyhf":
+                elif model_type in [ "pyhf", "full_pyhf" ]:
                     computers.append(CompRetriever.forPyhf(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 else:
