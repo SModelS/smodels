@@ -327,7 +327,7 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
                     closestr = rb
                     closest = b
             if not foundExtra:
-                msg("cannot find a b that is right of the root{ext_label} (i.e. rootfinder(b) < 0).")
+                msg(f"cannot find a b that is right of the root{ext_label} (i.e. rootfinder(b) < 0).")
                 msg(f"memoize {memoize}" )
                 msg(f"closest to zero rootfinder({closest})={closestr}")
                 msg(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
