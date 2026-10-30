@@ -51,6 +51,16 @@ if command -v gsl-config &>/dev/null; then
     echo "GSL is installed."
     GSL_VERSION=$(gsl-config --version)
     echo "GSL version: $GSL_VERSION"
+    # CMake's FindGSL does not use gsl-config to locate the libraries (it only
+    # uses it for the version), so pass the locations from gsl-config to CMake.
+    GSL_PREFIX=$(gsl-config --prefix)
+    GSL_INCLUDE_DIR=$(gsl-config --cflags | sed -n 's/.*-I\([^ ]*\).*/\1/p')
+    GSL_LIB_DIR=$(gsl-config --libs | sed -n 's/.*-L\([^ ]*\).*/\1/p')
+    : "${GSL_INCLUDE_DIR:=$GSL_PREFIX/include}"
+    : "${GSL_LIB_DIR:=$GSL_PREFIX/lib}"
+    echo "GSL prefix: $GSL_PREFIX"
+    echo "GSL include directory: $GSL_INCLUDE_DIR"
+    echo "GSL library directory: $GSL_LIB_DIR"
 else
     echo "GSL is not installed. Stopping script execution."
     exit 1
@@ -111,7 +121,15 @@ download_and_install_resummino() {
         unzip "resummino-$RESUMMINO_VERSION.zip"
         mkdir -p resummino_install
         cd "resummino-$RESUMMINO_VERSION" || { echo "Error: Unable to change directory to resummino-$RESUMMINO_VERSION"; return 1; }
-        cmake . -DLHAPDF=$install_dir/lhapdf -DCMAKE_INSTALL_PREFIX=$install_dir/resummino_install -DCMAKE_POLICY_VERSION_MINIMUM=3.5 
+        cmake . -DLHAPDF="$install_dir/lhapdf" \
+            -DCMAKE_INSTALL_PREFIX="$install_dir/resummino_install" \
+            -DGSL_ROOT_DIR="$GSL_PREFIX" \
+            -DCMAKE_INCLUDE_PATH="$GSL_INCLUDE_DIR" \
+            -DCMAKE_LIBRARY_PATH="$GSL_LIB_DIR" \
+            -DCMAKE_INSTALL_RPATH="$GSL_LIB_DIR;$install_dir/lhapdf/lib" \
+            -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         make -j"$num_cores_to_use"
         make install
         cd ..

@@ -4,6 +4,7 @@ Release v3.2.2, xxx
   * Fixed a bug with prefit CLs and upper limit values for NNs
   * Allow model type "full_pyhf"
   * Introduced convenience theoryprediction.experimentalId method
+  * Small build fix for resummino adapter if gsl is in non-standard path
   * Increased verbosity in determineBrentBracket
 
 Release v3.2.1, Thu 1 Oct 2026
