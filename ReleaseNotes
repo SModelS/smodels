@@ -6,7 +6,9 @@ Release v3.2.2, xxx
   * Introduced convenience theoryprediction.experimentalId method
   * Small build fix for resummino adapter if gsl is in non-standard path
   * Increased verbosity in determineBrentBracket
+  * mu=1e9 added to list of values tried out when bracketing UL
   * Database, changed to NN model with signal uncertainties for atlas-susy-2018-16
+  * Small change in how we internally name models
 
 Release v3.2.1, Thu 1 Oct 2026
 =======================================================

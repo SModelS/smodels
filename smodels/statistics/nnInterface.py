@@ -129,7 +129,7 @@ class NNUpperLimitComputer:
         accidentally passes twice at two identical values
         """
         self.data = data
-        self.name = onnxfilename
+        self.name = f"{data.globalInfo.id}:{onnxfilename}"
         self.allowNegativeSignals = False
         self.dataType = "nn"
         from smodels.base.runtime import onnx_session_options as session_options

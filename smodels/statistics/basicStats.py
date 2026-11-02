@@ -289,22 +289,22 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
                     break
             if not foundExtra:
                 msg(
-                    f"cannot find an a that is left of the root{ext_label}. last attempt, a={a:.2f}, root = {ra:.2f}."
+                    f"cannot find an 'a' that is left of the root{ext_label}. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
                 msg(f"mu_hat={mu_hat:.2f}, sigma_mu={sigma_mu:.2f}")
                 raise SModelSError(
-                    f"cannot find an a that is left of the root{ext_label}. last attempt, a={a:.2f}, root = {ra:.2f}."
+                    f"cannot find an 'a' that is left of the root{ext_label}. last attempt, a={a:.2f}, root = {ra:.2f}."
                 )
     i = 0
     foundExtra = False
     b = mu_hat + 2.5 * sigma_mu
     rb = rootfinder(b,**args)
     bvalues = [1.0, 0.0, 3.0, -1.0, 10.0, -3.0, 0.1, -0.1, -10.0,
-               100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 10000.0,
-               100000.0, 1000000.0 ]
+               100.0, -100.0, 1000.0, .01, -.01, .001, -.001, 1e4,
+               1e5, 1e6, 1e9 ]
     if not allowNegative:
         bvalues = [ 1.0, 0.0, 3.0, 10.0, 0.1, 100.0, 1000.0, .01, .001,
-                    10000.0, 100000.0, 1000000.0 ]
+                    1e4, 1e5, 1e6, 1e9 ]
     while rb > 0.0:
         # if this is positive, we move it to the right
         i += 1
@@ -327,11 +327,11 @@ def determineBrentBracket( mu_hat : float, sigma_mu : float ,
                     closestr = rb
                     closest = b
             if not foundExtra:
-                msg(f"cannot find a b that is right of the root{ext_label} (i.e. rootfinder(b) < 0).")
-                msg(f"memoize {memoize}" )
-                msg(f"closest to zero rootfinder({closest})={closestr}")
+                msg(f"cannot find a 'b' that is right of the root{ext_label} (i.e. rootfinder(b) < 0).")
+                msg(f"values: {memoize}" )
+                msg(f"closest to zero rootfinder({closest})={closestr:.3g}")
                 msg(f"mu_hat was at {mu_hat:.2f} sigma_mu at {sigma_mu:.2f}")
-                raise SModelSError( "cannot find b right of the root{ext_label}" )
+                raise SModelSError( "cannot find 'b' right of the root{ext_label}" )
     return a, b
 
 def deltaChi2FromLlhd(likelihood: Optional[float]) -> Optional[float]:

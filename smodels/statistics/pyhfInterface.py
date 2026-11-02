@@ -405,6 +405,8 @@ class PyhfUpperLimitComputer:
         self.data = data
         self.lumi = lumi
         self.name = data.jsonFileName
+        if type(data.globalInfo) != type(None):
+            self.name = f"{data.globalInfo.id}:{data.jsonFileName}"
         self.dataType = "pyhf"
         self.allowNegativeSignals = False
         self.nsignals = copy.deepcopy ( self.data.nsignals )

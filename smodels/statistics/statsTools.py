@@ -90,10 +90,11 @@ class CompRetriever:
                 logger.warning ( f"third momenta given for some but not all signal regions in {dataset.globalInfo.id}" )
             third_momenta = None
 
+        objName = f"{ds.globalInfo.id}:{covname}"
         data = SLData( nobs, bg, cov, third_moment=third_momenta,
                      nsignal = nsig,
                      deltas_rel = deltas_rel, lumi=dataset.getLumi(),
-                     name = covname )
+                     name = objName )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "SL"
@@ -116,10 +117,11 @@ class CompRetriever:
         if regionSet != dataset.getID():
             logger.error ( f"regionSet {regionSet} does not match dataset id {dataset.getID()}" )
             raise SModelSError ( f"regionSet {regionSet} does not match dataset id {dataset.getID()}" )
+        modelname = f"{dataset.globalInfo.id}:{regionSet}"
         data = SLData( dataset.dataInfo.observedN, dataset.dataInfo.expectedBG,
                      dataset.dataInfo.bgError**2, deltas_rel = deltas_rel,
                      nsignal = list(nsigDict.values()), lumi = lumi,
-                     name = regionSet )
+                     name = modelname )
         likelihoodComputer = SLLikelihoodComputer ( data )
         computer = SLUpperLimitComputer ( likelihoodComputer )
         computer.dataType = "1bin"
