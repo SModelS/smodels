@@ -21,6 +21,9 @@ from unitTestHelpers import equalObjs, runMain, importModule,  \
 from smodels.base import runtime
 import warnings
 
+from smodels.statistics.speyTools import suppressSpeyThanks
+suppressSpeyThanks()
+
 class SpeyTest(unittest.TestCase):
     import logging.config
     logging.config.fileConfig( "./spey.conf" )

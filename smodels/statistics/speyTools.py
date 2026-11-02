@@ -25,6 +25,18 @@ from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 
 _debug = { "writePoint": False } # for debugging only
 
+def suppressSpeyThanks():
+    """ spey has this 'thank you for using Spey' message, atexit
+    Calling this function turns that off
+    """
+    import atexit
+    import spey
+    try:
+        atexit.unregister(spey._print_thanks)
+    except Exception:
+        pass
+
+# suppressSpeyThanks() ## if you want to turn of the spey thank you msg
 
 class SpeyModelFacade:
     """ very simple container that wraps around spey models,
