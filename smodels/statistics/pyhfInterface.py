@@ -444,10 +444,21 @@ class PyhfUpperLimitComputer:
         for obs in self.workspace["observations"]:
             observations[obs["name"]]=sum(obs["data"])
         for bg in self.workspace["channels"]:
-            bgs[bg["name"]]=0.
+            samples = bg["samples"]
             for sample in bg["samples"]:
                 if sample["name"]=="Bkg":
-                    bgs[ bg["name"] ] += sum ( sample["data"] )
+                    pyhfname = bg["name"]
+                    data = sample["data"]
+                    if len(data)>1:
+                        for i,d in enumerate(data):
+                            srname = f"{pyhfname}[{i}]"
+                            if not srname in bgs:
+                                bgs[srname]=0.
+                            bgs[ srname ] += d
+                    else:
+                        if not pyhfname in bgs:
+                            bgs[pyhfname]=0.
+                        bgs[pyhfname] += sum(data) # has only one element
         ## its important that we pick up the order from self.data.nsignals
         for regionName, signal in self.data.nsignals.items():
             region = self.data.globalInfo.regionMappings[regionName]
