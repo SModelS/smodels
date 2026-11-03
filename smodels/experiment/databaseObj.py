@@ -887,8 +887,8 @@ class SubDatabase(object):
 
         path = tmp + '/'
         if not os.path.exists(path):
-            logger.error(f'{path} is no valid path!')
-            raise DatabaseNotFoundException("Database not found")
+            # logger.error(f'{path} is no valid path!')
+            raise DatabaseNotFoundException( f"Database not found at {path}" )
         m = Meta(path)
         self.source = "txt"
         return (path, path + m.getPickleFileName())
