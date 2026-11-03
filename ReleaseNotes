@@ -9,6 +9,7 @@ Release v3.2.2, xxx
   * mu=1e9 added to list of values tried out when bracketing UL
   * Database, changed to NN model with signal uncertainties for atlas-susy-2018-16
   * Small change in how we internally name models
+  * Small fix in pyhfInterface.totalYieldsFromSignals debugging method
 
 Release v3.2.1, Thu 1 Oct 2026
 =======================================================
