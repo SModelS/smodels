@@ -443,7 +443,9 @@ class PyhfUpperLimitComputer:
         observations = {}
         bgs = {}
         for obs in self.workspace["observations"]:
-            observations[obs["name"]]=sum(obs["data"])
+            srname = obs["name"]
+            data = obs["data"]
+            observations[ srname ]=sum(data)
         channels = self.workspace["channels"]
         for bg in channels:
             samples = bg["samples"]
@@ -474,17 +476,6 @@ class PyhfUpperLimitComputer:
                     bgs[pyhfname]=0.
                 S += bgs[pyhfname]
             yields[pyhfname] = S
-        """
-        for channel in channels:
-            name = channel["name"]
-            if name not in yields:
-                continue
-#            assert name in self.data.nsignals.keys(), f"{name} not in {self.data.nsignals.keys()}"
-            for sample in channel["samples"]:
-                if "data" in sample:
-                    yields[name]+=sample["data"][0]
-        import sys, IPython; IPython.embed( colors = "neutral" ); sys.exit()
-        """
         return list(yields.values())
 
     def getTotalXSec ( self ) -> UnitXSec:
