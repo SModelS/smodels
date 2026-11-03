@@ -445,7 +445,11 @@ class PyhfUpperLimitComputer:
         for obs in self.workspace["observations"]:
             srname = obs["name"]
             data = obs["data"]
-            observations[ srname ]=sum(data)
+            if len(data)>1:
+                for i,d in enumerate(data):
+                    observations[ f"{srname}[{i}]" ] = d
+            else:
+                observations[ srname ]=sum(data) # has only one element
         channels = self.workspace["channels"]
         for bg in channels:
             samples = bg["samples"]
@@ -470,6 +474,8 @@ class PyhfUpperLimitComputer:
             region_type = region["type"]
             S = signal * poi_test
             if region_type == "CR":
+                if not pyhfname in observations:
+                    observations[pyhfname]=0.
                 S += observations[pyhfname]
             else:
                 if not pyhfname in bgs:
