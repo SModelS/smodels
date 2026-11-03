@@ -376,7 +376,8 @@ class PyhfUpperLimitComputer:
     signal information in the 'data' instance of 'PyhfData'
     """
 
-    def __init__(self, data: PyhfData, cl : float =0.95, lumi : Optional[UnitLumi]= None ):
+    def __init__( self, data: PyhfData, cl : float =0.95,
+                  lumi : Optional[UnitLumi]= None ):
         """
 
         :param data: instance of 'PyhfData' holding the signals information
@@ -443,10 +444,11 @@ class PyhfUpperLimitComputer:
         bgs = {}
         for obs in self.workspace["observations"]:
             observations[obs["name"]]=sum(obs["data"])
-        for bg in self.workspace["channels"]:
+        channels = self.workspace["channels"]
+        for bg in channels:
             samples = bg["samples"]
             for sample in bg["samples"]:
-                if sample["name"]=="Bkg":
+                if True: # sample["name"]=="Bkg":
                     pyhfname = bg["name"]
                     data = sample["data"]
                     if len(data)>1:
@@ -468,6 +470,8 @@ class PyhfUpperLimitComputer:
             if region_type == "CR":
                 S += observations[pyhfname]
             else:
+                if not pyhfname in bgs:
+                    bgs[pyhfname]=0.
                 S += bgs[pyhfname]
             yields[pyhfname] = S
         """
