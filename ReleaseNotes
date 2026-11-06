@@ -7,6 +7,7 @@ Release v3.2.2, xxx
   * Small build fix for resummino adapter if gsl is in non-standard path
   * Increased verbosity in determineBrentBracket
   * mu=1e9 added to list of values tried out when bracketing UL
+  * phasing out getLlhds in in favor of getNLLs
   * Database, changed to NN model with signal uncertainties for atlas-susy-2018-16
   * Small change in how we internally name models
   * Small fix in pyhfInterface.totalYieldsFromSignals debugging method
