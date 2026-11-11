@@ -322,8 +322,10 @@ class PyPrinter(BasicPrinter):
                        'Width (GeV)' : widths})
             if hasattr ( self, "addstatmodel" ) and self.addstatmodel and dataType == "combined":
                 model = theoryPrediction.statsComputer.getMostSensitiveModel()
-                mname = model.name
-                mname = mname.replace ( f"{expID}:","") ## not needed
+                mname = "None"
+                if model is not None:
+                    mname = model.name
+                    mname = mname.replace ( f"{expID}:","") ## not needed
                 resDict["StatModel"]=mname
 
             if self.errorsforr and theoryPrediction.dataType() != "upperLimit":
