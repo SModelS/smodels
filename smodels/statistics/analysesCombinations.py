@@ -232,7 +232,7 @@ class AnaCombLikelihoodComputer(object):
 
 
     def getCLsRootFunc(self, evaluationType : NllEvalType=observed,
-			              allowNegativeSignals : bool = False, nSigma : int = 0 ) \
+                          allowNegativeSignals : bool = False, nSigma : int = 0 ) \
             -> Tuple[float, float, Callable]:
         """
         Obtain the function "CLs-alpha[0.05]" whose root defines the upper limit,
@@ -298,8 +298,10 @@ class AnaCombLikelihoodComputer(object):
 
         return float(clsRoot(mu, return_type=return_type))
 
-    def getLlhds( self, muvals : list, evaluationType : NllEvalType=observed,
-			            normalize : bool = True) -> dict:
+    def getLlhds(self, muvals : list ,
+            evaluationType : NllEvalType = observed,
+            normalize : bool = True,
+            return_nlls : bool = False ) -> tuple:
         """
         Compute the likelihoods for the individual analyses and the combined
         likelihood.
@@ -311,26 +313,38 @@ class AnaCombLikelihoodComputer(object):
         :param evaluationType: one of: observed, apriori, aposteriori
         :param normalize: If True normalizes the likelihood by its integral
         over muvals.
+
+        :returns: tuple of dictionary of likelihoods and nlls
         """
-
+        nlls = self.getNLLs ( muvals, evaluationType )
+        dmu = np.append(np.diff(muvals), np.diff(muvals)[-1])
         llhds = {}
-        llhds['combined'] = np.array(\
-            [exponentiateNLL(self.nll(mu,evaluationType=evaluationType)) for mu in muvals])
-        tpreds = self.theoryPredictions
-        for t in tpreds:
-            Id = t.analysisId()
-            t.computeStatistics( evaluationType = evaluationType )
-            l = np.array(\
-                [exponentiateNLL(t.nll(mu,evaluationType=evaluationType)) for mu in muvals])
-            llhds[Id]=l
-
-        if normalize:
-            # Compute delta mu
-            dmuvals = np.diff(muvals)
-            dmuvals = np.append(dmuvals,dmuvals[-1])
-            for Id,l in llhds.items():
-                # Compute norm (integral over mu)
-                norm = np.sum(l*dmuvals)
-                llhds[Id] = l/norm
-
+        for anaID, nll in nlls.items():
+            l = np.exp(-(nll - np.nanmin(nll)))
+            if normalize:
+                l = l / np.nansum(l * dmu)
+            llhds[anaID] = l
         return llhds
+
+    def getNLLs(self, muvals : list ,
+            evaluationType : NllEvalType = observed ) -> dict:
+        """
+        Compute the nlle for the individual analyses and the combined
+        nlls.
+        Returns a dictionary with the analysis IDs as keys and the
+        nll values as values.
+
+        :param muvals: List with values for the signal strenth for which the
+        likelihoods must be evaluated.
+        :param evaluationType: one of: observed, apriori, aposteriori
+        :returns: dictionary of nlls
+        """
+        nlls = {}
+        nlls['combined'] = np.array([self.nll(mu, \
+                evaluationType=evaluationType) for mu in muvals], dtype=float)
+
+        for tp in self.theoryPredictions:
+            tp.computeStatistics(evaluationType=evaluationType)
+            nlls[tp.analysisId()] = np.array([tp.nll(mu, \
+                evaluationType=evaluationType) for mu in muvals], dtype=float )
+        return nlls
