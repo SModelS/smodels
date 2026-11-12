@@ -36,7 +36,7 @@ def suppressSpeyThanks():
     except Exception:
         pass
 
-# suppressSpeyThanks() ## if you want to turn of the spey thank you msg
+# suppressSpeyThanks() ## if you want to turn off the spey thank you msg
 
 class SpeyModelFacade:
     """ very simple container that wraps around spey models,
