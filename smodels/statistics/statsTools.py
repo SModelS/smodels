@@ -12,7 +12,7 @@
 
 __all__ = [ "StatsComputer", "getCompRetrieverModule" ]
 
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, TYPE_CHECKING
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.base.smodelsLogging import logger
 from smodels.base.physicsUnits import fb, UnitLumi
@@ -25,6 +25,10 @@ from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.base.physicsUnits import UnitXSec
 from smodels.tools.caching import lru_cache
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
+
+if TYPE_CHECKING:
+    from smodels.statistics.hs3Interface import Hs3UpperLimitComputer
+
 
 def getCompRetrieverModule() -> type:
     """ very single convenience function to centralize
@@ -231,6 +235,77 @@ class CompRetriever:
         return upperLimitComputer
 
     @classmethod
+    def forHs3( cls, regionSet : str, dataset : CombinedDataSet,
+                 nsigDict : dict ) -> "Hs3UpperLimitComputer":
+        """ get a sub computer for HS3 combination.
+
+        :param regionSet: name of signal region set
+        :param dataset: CombinedDataSet object
+        :param nsigDict: Dictionary with signal yields for each SR
+
+        :returns: a sub computer
+        """
+
+        # Import lazily: pyhs3 is an optional dependency, so environments
+        # without it should still be able to use all non-HS3 statistical
+        # models.
+        from smodels.statistics.hs3Interface import Hs3Data, Hs3UpperLimitComputer
+
+        globalInfo = dataset.globalInfo
+        regionMappings = globalInfo.regionMappings
+        labelToHs3 = {}
+        for sr_label in globalInfo.regionSets[regionSet]:
+            if sr_label not in regionMappings:
+                logger.error ( f"SR {sr_label} defined in regionSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+                raise SModelSError ( f"SR {sr_label} defined in regionSet {regionSet} not found in regionMappings for dataset {dataset.globalInfo.id}" )
+            regionMapping = regionMappings[sr_label]
+            if regionMapping.get("smodels") is not None:
+                # Fall back to the pyhf channel name, since HS3 channel
+                # names typically coincide with the pyhf ones.
+                channelName = regionMapping.get("hs3")
+                if channelName is None:
+                    channelName = regionMapping.get("pyhf")
+                if channelName is None:
+                    logger.error ( f"SR {sr_label} in regionSet {regionSet} has no HS3 or pyhf channel name for dataset {dataset.globalInfo.id}" )
+                    raise SModelSError ( f"SR {sr_label} in regionSet {regionSet} has no HS3 or pyhf channel name for dataset {dataset.globalInfo.id}" )
+                labelToHs3[sr_label] = channelName
+
+        if regionSet not in globalInfo.statModels:
+            logger.error ( f"regionSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"regionSet {regionSet} not found in statModels for dataset {dataset.globalInfo.id}" )
+
+        modelList = globalInfo.statModels[regionSet]
+        if len(modelList) == 0:
+            logger.error ( f"no model defined for regionSet {regionSet} in dataset {dataset.globalInfo.id}" )
+            raise SModelSError ( f"no model defined for regionSet {regionSet} in dataset {dataset.globalInfo.id}" )
+
+        model_type, model_filename = modelList[0] # Always use first model
+        if model_type not in [ "hs3", "full_hs3" ]:
+            logger.error ( f"model type {model_type} for regionSet {regionSet} in dataset {dataset.globalInfo.id} is not 'hs3/full_hs3'" )
+            raise SModelSError ( f"model type {model_type} for regionSet {regionSet} in dataset {dataset.globalInfo.id} is not 'hs3/full_hs3'" )
+
+        # Get dictionary for signal yields using the HS3 labels
+        nsignals = {label : nsigDict.get(label,0.0) for label in labelToHs3.keys()}
+        json = globalInfo.cachedModels[model_filename]
+        regions = [regionMappings[label] for label in globalInfo.regionSets[regionSet]]
+        logger.debug(f"list of datasets: {list(labelToHs3.keys())}")
+
+        includeCRs = False
+        if hasattr(globalInfo,'includeCRs'):
+            includeCRs = globalInfo.includeCRs
+        signalUncertainty = None
+        if hasattr(globalInfo,"signalUncertainty"):
+            signalUncertainty = globalInfo.signalUncertainty
+
+        data = Hs3Data(nsignals, json, regions,
+                       includeCRs, signalUncertainty, globalInfo,
+                       jsonFileName = model_filename )
+        upperLimitComputer = Hs3UpperLimitComputer( data,
+                                                    lumi=dataset.getLumi() )
+
+        return upperLimitComputer
+
+    @classmethod
     def forTruncatedGaussian(cls,theorypred: object, corr : float =0.6 ) -> Union[None,TruncatedGaussians]:
         """ get a sub computer for truncated gaussians
         :param theorypred: TheoryPrediction object
@@ -300,7 +375,7 @@ class StatsComputer:
 
         Inspects the data type and statistical model of the theory
         prediction and delegates to the appropriate sub-computer factory
-        (SL, pyhf, NN, truncated Gaussian, or analyses combination).
+        (SL, pyhf, HS3, NN, truncated Gaussian, or analyses combination).
 
         :param theoryPrediction: a TheoryPrediction or TheoryPredictionsCombiner object
         :returns: a StatsComputer instance, or None if no suitable computer can be built
@@ -363,6 +438,9 @@ class StatsComputer:
                                                     nsigDict=srNsigDict))
                 elif model_type in [ "pyhf", "full_pyhf" ]:
                     computers.append(CompRetriever.forPyhf(regionSet=regionSet,dataset=dataset,
+                                                    nsigDict=srNsigDict))
+                elif model_type in [ "hs3", "full_hs3" ]:
+                    computers.append(CompRetriever.forHs3(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 else:
                     logger.error(f"Unknown statistical model type {model_type} for regionSet {regionSet} in dataset {dataset}")
@@ -448,7 +526,7 @@ class StatsComputer:
         for subComputer in self.subComputers:
             if subComputer is None:
                 continue
-            if subComputer.dataType in [ "pyhf", "truncGaussian", "analysesComb", "nn" ]:
+            if subComputer.dataType in [ "pyhf", "hs3", "truncGaussian", "analysesComb", "nn" ]:
                 continue
             subComputer.likelihoodComputer.transform ( evaluationType )
 
@@ -459,7 +537,7 @@ class StatsComputer:
         for subComputer in self.subComputers:
             if subComputer is None:
                 continue
-            if subComputer.dataType in [ "pyhf", "truncGaussian", "analysesComb" ]:
+            if subComputer.dataType in [ "pyhf", "hs3", "truncGaussian", "analysesComb" ]:
                 continue
             subComputer.model = subComputer.origModel
 

@@ -514,6 +514,8 @@ class CombinedDataSet(object):
                     types.add ( "simplified" )
                 elif model_type in [ "full_pyhf", "pyhf" ]:
                     types.add ( "pyhf" )
+                elif model_type in [ "full_hs3", "hs3" ]:
+                    types.add ( "hs3" )
             return "+".join ( types )
 
     def __str__(self) -> str:

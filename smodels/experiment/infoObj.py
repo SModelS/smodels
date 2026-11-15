@@ -33,6 +33,7 @@ class Info(object):
         missing, "SR" is assumed. if the "smodels" counterpart is not
         given for a region, we assume that there is None.
         If no pyhf name is given, we assume it to be the smodels name.
+        if no hs3 name is given, we assume it to be the pyhf name.
         if no onnx name is given, we assume it to be the pyhf name.
         if no label is given, we assume it to be the smodels name.
         :param regions: list of regions in regionMappings globalInfo.txt
@@ -50,7 +51,7 @@ class Info(object):
                 regionDict.update(region)
             else:
                 raise SModelSError ( f"region {region} is neither a string nor a dictionary in {self.path}" )
-            for key in [ "type", "smodels", "pyhf", "sl", "onnx" ]:
+            for key in [ "type", "smodels", "pyhf", "hs3", "sl", "onnx" ]:
                 if key not in regionDict:
                     logger.debug ( f"region {label} has no {key} defined, setting to default value in {self.path}.")
             # Set defaults (if they were not defined)
@@ -61,6 +62,7 @@ class Info(object):
                 regionDict.setdefault("smodels", None)
             
             regionDict.setdefault("pyhf", regionDict["smodels"])
+            regionDict.setdefault("hs3", regionDict["pyhf"])
             regionDict.setdefault("sl", regionDict["smodels"])
             regionDict.setdefault("onnx", regionDict["pyhf"])
             
@@ -160,8 +162,8 @@ class Info(object):
                 if len(model_tuple) != 2:
                     raise SModelSError ( f"In {self.path}: statModels has to be a dict of lists of tuples of length 2, but its values are of length {len(model_tuple)}" )
                 model_type,model = model_tuple
-                if model_type not in [ "sl", "full_pyhf", "pyhf", "onnx" ]:
-                    raise SModelSError ( f"In {self.path}: model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, sl" )
+                if model_type not in [ "sl", "full_pyhf", "pyhf", "full_hs3", "hs3", "onnx" ]:
+                    raise SModelSError ( f"In {self.path}: model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, hs3, full_hs3, sl" )
                 if not isinstance ( model, str ):
                     raise SModelSError ( f"In {self.path}: model has to be a string, but is {type(model)}" )
                 if not os.path.isfile ( os.path.join(os.path.dirname(self.path), model) ):
@@ -201,13 +203,13 @@ class Info(object):
                             n_cols = len(txt[0])
                             if n_regionset != n_cols:
                                 raise SModelSError ( f"dimension({n_regionset}) of region set {regionSetName} does not match number of columns({n_columns}) of covariance matrix {model} in {self.path}" )
-                    elif model_type in [ "full_pyhf", "pyhf" ]:
+                    elif model_type in [ "full_pyhf", "pyhf", "full_hs3", "hs3" ]:
                         with open(fullPath,"rt") as f:
                             txt = json.load(f)
                     elif model_type == "onnx":
                         txt = f.read()
                     else:
-                        logger.error ( f"model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, sl" )
+                        logger.error ( f"model_type {model_type} is unknown. should be of: onnx, pyhf, full_pyhf, hs3, full_hs3, sl" )
                     self.cachedModels[model] = txt
                     f.close()
 

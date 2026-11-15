@@ -1,6 +1,8 @@
 Release v3.2.2, xxx
 =======================================================
 
+  * Added support for HS3 statistical models ("hs3" and "full_hs3" in
+    statModels), delegated to the new hs3Interface/pyhs3 backend
   * Fixed a bug with prefit CLs and upper limit values for NNs
   * Allow model type "full_pyhf"
   * Introduced convenience theoryprediction.experimentalId method
