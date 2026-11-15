@@ -93,12 +93,13 @@ The following (optional) fields are defined for each region:
 * the name of the region as known to SModelS (``smodels``),
 * the region ``type`` (SR or CR), 
 * the name of the region as known to pyhf (``pyhf``), if the statistical model is a pyhf json file,
+* the name of the region as known to HS3 (``hs3``), if the statistical model is an HS3 json workspace,
 * the name of the region as known by the surrogate ML model (``onnx``), if one exists, and
 * the name of the region as known to the simplified likelihood (``sl``), if the statistical model corresponds to a simplified likelihood.
 
 
 If any of the fields above is not given, the following default values are assumed:
-``type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels``
+``type = SR, smodels = None, pyhf = smodels, hs3 = pyhf, onnx = pyhf, sl = smodels``
 
 In case ``smodels`` is ``None``, the region is not used for computing signal contributions, but it can still be used for other purposes, such as nuisance fits.
 Finally, if ``regionMappings`` is not given, it is assumed that all regions appearing in ``regionSets`` (see below) are included in the mapping, with the SModelS name used for all fields and ``type = SR``.
@@ -114,7 +115,8 @@ statistical models. Each entry in that list is composed of a tuple
 with the model type as the first entry, and the model's file name
 as the second entry. For model types, we currently allow for: ``sl`` for simplified
 likelihoods (both v1 and v2), ``pyhf``, ``full_pyhf`` (for the full stastical pyhf
-models in case there is also a simplified version),  and ``onnx`` for machine learned
+models in case there is also a simplified version), ``hs3``, ``full_hs3`` (for
+full HS3 workspaces) and ``onnx`` for machine learned
 surrogate models. By default, for each region set, SModelS uses the first
 model given in the list.
 When combining regions, SModelS computes results for the most sensitive combination of regions (i.e. the most sensitive ``regionSets``), even when the parameters file has ``reportAllSRs = True``.
