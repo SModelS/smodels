@@ -32,13 +32,13 @@ import numpy as np
 from scipy import optimize
 from scipy.stats import norm
 
-from smodels.base.physicsUnits import UnitXSec, UnitLumi
+from smodels.base.physicsUnits import UnitLumi, UnitXSec
 from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import (
     CLsfromNLL,
     NllEvalType,
-    apriori,
     aposteriori,
+    apriori,
     clsType,
     findRoot,
     observed,
@@ -56,10 +56,10 @@ except ModuleNotFoundError:
 
 try:
     import pytensor.tensor as pt
-    from pytensor.graph.traversal import explicit_graph_inputs
     from pyhs3.compile import function as pyhs3_function
     from pyhs3.context import Context
     from pyhs3.distributions import HistFactoryDistChannel
+    from pytensor.graph.traversal import explicit_graph_inputs
 except Exception as e:  # pragma: no cover - only triggered for broken installs
     print(f"[SModelS:hs3Interface] pyhs3/pytensor import failed: {e}")
     sys.exit(-1)
@@ -206,9 +206,14 @@ def _modifierParameters(dist: dict) -> List[str]:
     parameters = []
     for sample in dist.get("samples", []):
         for modifier in sample.get("modifiers", []):
-            if "parameter" in modifier:
-                parameters.append(modifier["parameter"])
-            parameters.extend(modifier.get("parameters", []))
+            parameter = modifier.get("parameter")
+            if parameter is not None:
+                parameters.append(parameter)
+            parameters.extend(
+                name
+                for name in modifier.get("parameters", [])
+                if name is not None
+            )
     return parameters
 
 
@@ -569,18 +574,23 @@ class _Hs3ModelBundle:
             on_unused_input="ignore",
             mode="FAST_RUN",
         )
-        try:
-            # Gradient of the objective actually minimised, i.e. -2 log L.
-            grad = pt.grad(-2.0 * pt.sum(logProb), wrt=inputs)
-            self._gradFunction = pyhs3_function(
-                inputs=inputs,
-                outputs=grad,
-                on_unused_input="ignore",
-                mode="FAST_RUN",
-            )
-        except Exception as e:  # pragma: no cover - unusual graphs
-            logger.debug(f"Could not compile HS3 gradient: {e}")
-            self._gradFunction = None
+        self._gradFunction = None
+        if len(inputs) <= 12:
+            # For small models the compiled gradient is fast and reduces the
+            # number of likelihood evaluations.  For larger workspaces the
+            # pytensor gradient graph becomes prohibitively expensive to
+            # evaluate, so SciPy's numerical differentiation is used instead.
+            try:
+                # Gradient of the objective actually minimised, i.e. -2 log L.
+                grad = pt.grad(-2.0 * pt.sum(logProb), wrt=inputs)
+                self._gradFunction = pyhs3_function(
+                    inputs=inputs,
+                    outputs=grad,
+                    on_unused_input="ignore",
+                    mode="FAST_RUN",
+                )
+            except Exception as e:  # pragma: no cover - unusual graphs
+                logger.debug(f"Could not compile HS3 gradient: {e}")
 
         freeParams = model.free_params
         nominalParams = model.nominal_params
@@ -599,6 +609,12 @@ class _Hs3ModelBundle:
                 lower = defaultLower
             if upper is None:
                 upper = defaultUpper
+            # A lower bound of exactly zero makes the expected rates vanish at
+            # the boundary, so ``log(rate)`` is ``-inf`` and L-BFGS-B's line
+            # search gives up immediately.  pyhf uses ``1e-10`` for its
+            # constrained parameters; do the same here.
+            if float(lower) == 0.0:
+                lower = 1e-10
             self.bounds.append((float(lower), float(upper)))
 
         # Compile the expected-rate expressions.  These are the Poisson means,
@@ -876,10 +892,13 @@ class _Hs3ModelBundle:
                     return None
                 return grad[freeIndices]
 
+            # Only pass ``jac`` when an analytic gradient is available.
+            # A callable that returns ``None`` makes SciPy treat the gradient
+            # as zero, which stops the fit at the initial point.
             result = optimize.minimize(
                 objective,
                 x0[freeIndices],
-                jac=jacobian,
+                jac=(jacobian if self._gradFunction is not None else None),
                 method="L-BFGS-B",
                 bounds=[bounds[i] for i in freeIndices],
                 options={"maxiter": maxiter},
@@ -889,10 +908,13 @@ class _Hs3ModelBundle:
             parameters[self.poiIndex] = fixedPoi
             return parameters, float(result.fun), result
 
+        # Only pass ``jac`` when an analytic gradient is available.  Passing a
+        # callable that returns ``None`` makes SciPy treat the gradient as
+        # zero, so the optimiser stops at the initial point.
         result = optimize.minimize(
             self.twiceNLL,
             x0,
-            jac=self.gradient,
+            jac=(self.gradient if self._gradFunction is not None else None),
             method="L-BFGS-B",
             bounds=bounds,
             options={"maxiter": maxiter},
@@ -1194,6 +1216,7 @@ class Hs3UpperLimitComputer:
             if dataName not in dataNames:
                 dataNames.append(dataName)
         js["data"] = [dataByName[name] for name in dataNames if name in dataByName]
+        dataByName = {datum.get("name"): datum for datum in js["data"]}
         likelihood = dict(likelihood)
         likelihood["name"] = likelihood.get("name", "smodels_likelihood")
         likelihood["distributions"] = [distName for distName, _ in pairs]
@@ -1259,7 +1282,13 @@ class Hs3UpperLimitComputer:
 
         # Replace the data contents for expected or Asimov data.
         if aprioriData or dataContents is not None:
-            for (channel, dataName), datum in zip(pairs, js["data"]):
+            contentsByDataName = {}
+            for channel, dataName in pairs:
+                datum = dataByName.get(dataName)
+                if datum is None:
+                    raise SModelSError(
+                        f"HS3 data {dataName} for channel {channel} not found"
+                    )
                 if dataContents is not None:
                     contents = dataContents.get(channel)
                     if contents is None:
@@ -1271,6 +1300,8 @@ class Hs3UpperLimitComputer:
                     for sample in distributions[channel].get("samples", []):
                         if sample.get("name") == "bsm":
                             continue
+                        if poiName in _modifierParameters({"samples": [sample]}):
+                            continue
                         contents += np.asarray(
                             sample.get("data", {}).get("contents", []), dtype=float
                         )
@@ -1281,7 +1312,9 @@ class Hs3UpperLimitComputer:
                         f"{len(datum.get('contents', []))} bins, expected "
                         f"{len(contents)}"
                     )
-                datum["contents"] = [float(x) for x in contents]
+                contentsByDataName[dataName] = contents
+            for dataName, contents in contentsByDataName.items():
+                dataByName[dataName]["contents"] = [float(x) for x in contents]
 
         # Choose the analysis and make sure it refers to our likelihood.
         analysis = self._chooseAnalysis(js, likelihood)
