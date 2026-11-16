@@ -365,14 +365,8 @@ class SpeyRetriever:
         :returns: a sub computer
         """
         from smodels.statistics.statsTools import CompRetriever
-        return CompRetriever.forHs3(regionSet=regionSet, dataset=dataset,
+        return CompRetriever.forHS3(regionSet=regionSet, dataset=dataset,
                                     nsigDict=nsigDict)
-
-    @classmethod
-    def forHs3(cls, regionSet: str, dataset: object, nsigDict: dict):
-        """ Backwards-compatible alias for :meth:`forHS3`. """
-        return cls.forHS3(regionSet=regionSet, dataset=dataset,
-                          nsigDict=nsigDict)
 
     @classmethod
     def forTruncatedGaussian(cls, theorypred: object, corr : float =0.6 ) -> None:

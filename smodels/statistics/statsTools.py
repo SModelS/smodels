@@ -235,7 +235,7 @@ class CompRetriever:
         return upperLimitComputer
 
     @classmethod
-    def forHs3( cls, regionSet : str, dataset : CombinedDataSet,
+    def forHS3( cls, regionSet : str, dataset : CombinedDataSet,
                  nsigDict : dict ) -> "Hs3UpperLimitComputer":
         """ get a sub computer for HS3 combination.
 
@@ -440,7 +440,7 @@ class StatsComputer:
                     computers.append(CompRetriever.forPyhf(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 elif model_type in [ "hs3", "full_hs3" ]:
-                    computers.append(CompRetriever.forHs3(regionSet=regionSet,dataset=dataset,
+                    computers.append(CompRetriever.forHS3(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 else:
                     logger.error(f"Unknown statistical model type {model_type} for regionSet {regionSet} in dataset {dataset}")
