@@ -352,12 +352,13 @@ class SpeyRetriever:
         return facade
 
     @classmethod
-    def forHs3(cls, regionSet: str, dataset: object, nsigDict: dict):
+    def forHS3(cls, regionSet: str, dataset: object, nsigDict: dict):
         """ get a sub computer for an HS3 combination.
 
         The spey backend does not support HS3 yet, so delegate to the
         native HS3 interface.
 
+        :param regionSet: name of signal region set
         :param dataset: CombinedDataSet object
         :param nsigDict: Dictionary with signal yields for each SR
 
@@ -366,6 +367,12 @@ class SpeyRetriever:
         from smodels.statistics.statsTools import CompRetriever
         return CompRetriever.forHs3(regionSet=regionSet, dataset=dataset,
                                     nsigDict=nsigDict)
+
+    @classmethod
+    def forHs3(cls, regionSet: str, dataset: object, nsigDict: dict):
+        """ Backwards-compatible alias for :meth:`forHS3`. """
+        return cls.forHS3(regionSet=regionSet, dataset=dataset,
+                          nsigDict=nsigDict)
 
     @classmethod
     def forTruncatedGaussian(cls, theorypred: object, corr : float =0.6 ) -> None:
