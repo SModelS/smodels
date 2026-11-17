@@ -22,6 +22,7 @@ from smodels.share.models.mssm import BSMList
 from smodels.experiment.databaseObj import Database
 from smodels.base.physicsUnits import fb, GeV, TeV
 from smodels.statistics.basicStats import observed, apriori, aposteriori
+from smodels.statistics.analysesCombinations import AnaCombLikelihoodComputer
 from smodels.matching.modelTester import getCombiner
 import numpy as np
 import unittest
@@ -229,7 +230,6 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 
         # Also check if likelihood dict is defined:
         muvals = np.linspace(0.,3.,10)
-        dmu = muvals[1]-muvals[0]
         llhdDict = combiner.getLlhds(muvals=muvals,normalize=True)
 
         # Check if keys agree
@@ -238,8 +238,92 @@ class CombinedTheoryPredsTest(unittest.TestCase):
 
         for anaId,llhvals in llhdDict.items():
             self.assertEqual(len(muvals),len(llhvals)) # Just check if size of lists match
-            norm = np.sum(llhvals*dmu)
+            norm = np.sum(llhvals)
             self.assertAlmostEqual(norm,1.,2) # Check normalization
+
+
+class _DummyTheoryPrediction(object):
+    """A theory prediction with a known analytic nll curve."""
+
+    def __init__(self, anaId, nllfunc):
+        self._anaId = anaId
+        self._nllfunc = nllfunc
+
+    def analysisId(self):
+        return self._anaId
+
+    def computeStatistics(self, evaluationType=observed):
+        pass
+
+    def nll(self, mu=1.0, evaluationType=observed, asimov=None):
+        try:
+            mu = mu[0]
+        except (TypeError, IndexError):
+            pass
+        return self._nllfunc(float(mu))
+
+
+class _DummyCombiner(AnaCombLikelihoodComputer):
+    """An analyses combination with analytic nll curves, no setup required."""
+
+    def __init__(self, nllfunc, theoryPredictions=None):
+        self.theoryPredictions = theoryPredictions or []
+        self._nllfunc = nllfunc
+
+    def nll(self, mu=1.0, evaluationType=observed, asimov=None):
+        try:
+            mu = mu[0]
+        except (TypeError, IndexError):
+            pass
+        return self._nllfunc(float(mu))
+
+
+class NLLNormalizationTest(unittest.TestCase):
+
+    def testGetNLLsAndGetLlhdsNormalization(self):
+        muvals = np.linspace(0., 3., 10)
+        combined = lambda mu: .5 * (mu - 1.)**2
+        analysis = lambda mu: .25 * mu**2 + .1
+        combiner = _DummyCombiner(combined,
+                [_DummyTheoryPrediction("ana1", analysis)])
+
+        raw = combiner.getNLLs(muvals, normalize=False)
+        self.assertEqual(sorted(raw.keys()), ["ana1", "combined"])
+        np.testing.assert_allclose(raw['combined'], [combined(m) for m in muvals])
+        np.testing.assert_allclose(raw['ana1'], [analysis(m) for m in muvals])
+
+        normalized = combiner.getNLLs(muvals, normalize=True)
+        for anaID, nll in normalized.items():
+            # exp(-nll) sums to one for every entry of the dictionary
+            self.assertAlmostEqual(np.sum(np.exp(-nll)), 1., 10)
+            # normalization is a constant shift in nll space
+            np.testing.assert_allclose(nll - raw[anaID],
+                    np.full_like(nll, np.mean(nll - raw[anaID])), atol=1e-10)
+
+        llhds, nlls = combiner.getLlhds(muvals, normalize=True,
+                                        return_nlls=True)
+        for anaID in normalized:
+            np.testing.assert_allclose(llhds[anaID], np.exp(-normalized[anaID]))
+            np.testing.assert_allclose(nlls[anaID], normalized[anaID])
+
+        unnormalized = combiner.getLlhds(muvals, normalize=False)
+        np.testing.assert_allclose(unnormalized['combined'],
+                np.exp(-raw['combined']))
+
+    def testNormalizationWithLargeNLLs(self):
+        """A plain log(sum(exp(-nll))) would underflow for these nlls."""
+        muvals = np.linspace(0., 3., 10)
+        offset = 1000.
+        combined = lambda mu: offset + .5 * (mu - 1.)**2
+        combiner = _DummyCombiner(combined)
+
+        raw = combiner.getNLLs(muvals, normalize=False)['combined']
+        normalized = combiner.getNLLs(muvals, normalize=True)['combined']
+        self.assertTrue(np.all(np.isfinite(normalized)))
+        self.assertAlmostEqual(np.sum(np.exp(-normalized)), 1., 10)
+        np.testing.assert_allclose(normalized - raw,
+                np.full_like(raw, np.mean(normalized - raw)))
+
 
 if __name__ == "__main__":
     unittest.main()

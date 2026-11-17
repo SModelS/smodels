@@ -17,6 +17,7 @@ from smodels.base.smodelsLogging import logger
 from smodels.statistics.basicStats import CLsfromNLL, determineBrentBracket, \
      findRoot, exponentiateNLL
 import scipy.optimize as optimize
+from scipy.special import logsumexp
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from typing import Text, Tuple, Callable, Union, Dict, Optional
 from smodels.tools.caching import roundCache, lru_cache
@@ -311,25 +312,25 @@ class AnaCombLikelihoodComputer(object):
         :param muvals: List with values for the signal strenth for which the
         likelihoods must be evaluated.
         :param evaluationType: one of: observed, apriori, aposteriori
-        :param normalize: If True normalizes the likelihood by its integral
-        over muvals.
+        :param normalize: If True the likelihoods are normalized such that
+        they sum up to one over muvals. The normalization is performed by
+        getNLLs in log space; no further normalization is done here.
+        :param return_nlls: If True, return the nlls alongside the likelihoods.
 
-        :returns: tuple of dictionary of likelihoods and nlls
+        :returns: dictionary of likelihoods, or tuple of dictionary of
+        likelihoods and dictionary of nlls if return_nlls is True
         """
-        nlls = self.getNLLs ( muvals, evaluationType )
-        dmu = np.append(np.diff(muvals), np.diff(muvals)[-1])
-        llhds = {}
-        for anaID, nll in nlls.items():
-            l = np.exp(-(nll - np.nanmin(nll)))
-            if normalize:
-                l = l / np.nansum(l * dmu)
-            llhds[anaID] = l
+        nlls = self.getNLLs(muvals, evaluationType, normalize=normalize)
+        llhds = {anaID: np.exp(-nll) for anaID, nll in nlls.items()}
+        if return_nlls:
+            return llhds, nlls
         return llhds
 
     def getNLLs(self, muvals : list ,
-            evaluationType : NllEvalType = observed ) -> dict:
+            evaluationType : NllEvalType = observed,
+            normalize : bool = False ) -> dict:
         """
-        Compute the nlle for the individual analyses and the combined
+        Compute the nlls for the individual analyses and the combined
         nlls.
         Returns a dictionary with the analysis IDs as keys and the
         nll values as values.
@@ -337,6 +338,11 @@ class AnaCombLikelihoodComputer(object):
         :param muvals: List with values for the signal strenth for which the
         likelihoods must be evaluated.
         :param evaluationType: one of: observed, apriori, aposteriori
+        :param normalize: If True, shift the nlls by a constant such that the
+        corresponding likelihoods, exp(-nll), sum up to one over muvals. The
+        shift is computed in log space using the log-sum-exp trick, which
+        keeps the calculation stable also for large nll values. NaN entries
+        are ignored in the normalization and remain NaN.
         :returns: dictionary of nlls
         """
         nlls = {}
@@ -347,4 +353,14 @@ class AnaCombLikelihoodComputer(object):
             tp.computeStatistics(evaluationType=evaluationType)
             nlls[tp.analysisId()] = np.array([tp.nll(mu, \
                 evaluationType=evaluationType) for mu in muvals], dtype=float )
+
+        if normalize:
+            for anaID, nll in nlls.items():
+                valid = np.isfinite(nll)
+                if not np.any(valid):
+                    continue
+                # log(sum_i exp(-nll_i)). Adding this constant to every nll
+                # makes sum_i exp(-nll_i) == 1. Using logsumexp avoids the
+                # overflow/underflow of a plain log(sum(exp(...))).
+                nlls[anaID] = nll + logsumexp(-nll[valid])
         return nlls

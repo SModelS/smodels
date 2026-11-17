@@ -474,8 +474,8 @@ class StatsComputer:
         the likelihoods must be evaluated.
         :param idx: index of subcomputer
         :param evaluationType: returns the observed/priori expected/posteriori expected likelihood values.
-        :param normalize: If True normalizes the likelihood by its integral
-        over muvals.
+        :param normalize: If True normalizes the likelihoods such that they
+        sum up to one over muvals.
         """
         idx = kwargs.pop("idx",0)
         if idx >= len(self.subComputers):

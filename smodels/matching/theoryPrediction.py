@@ -705,8 +705,8 @@ class TheoryPredictionsCombiner(TheoryPrediction):
         :param muvals: List with values for the signal strenth for which
         the likelihoods must be evaluated.
         :param evaluationType: returns the observed/priori expected/posteriori expected likelihood values.
-        :param normalize: If True normalizes the likelihood by its integral
-        over muvals.
+        :param normalize: If True normalizes the likelihoods such that they
+        sum up to one over muvals.
         """
         return self.statsComputer.getLlhds( **kwargs )
 
