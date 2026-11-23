@@ -154,7 +154,7 @@ class NNUpperLimitComputer:
         ort.disable_telemetry_events()
         oll_dir = f"{os.path.dirname(__file__)}/"
         sys.path.insert ( 0, oll_dir )
-        from smodels.statistics.hep_olll.nnAdapter import NNAdapter
+        from hep_olll.nnAdapter import NNAdapter
         self.adaptor = NNAdapter ( onnxb, onnxfilename,
              session_options = session_options,
              validate_metadata = True )
