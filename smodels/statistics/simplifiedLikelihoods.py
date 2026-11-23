@@ -1072,7 +1072,7 @@ class SLUpperLimitComputer:
 
     def getUpperLimitOnMu(
         self, evaluationType : NllEvalType=observed,
-        nSigma : int = 0 ) -> Union[None,float]:
+        nSigma : int = 0, **kwargs ) -> Union[None,float]:
         """upper limit on the signal strength multiplier mu
         obtained from the defined Data (using the signal prediction
         for each signal regio/dataset), by using
@@ -1084,6 +1084,10 @@ class SLUpperLimitComputer:
         For error bands.
         :returns: upper limit on the signal strength multiplier mu
         """
+        if "pmSigma" in kwargs: #  and kwargs["pmSigma"] == 0:
+            kwargs.pop ( "pmSigma" )
+        if len ( kwargs ) > 0:
+            logger.warning ( f"SL computer will ignore {kwargs}" )
         mu_hat, sigma_mu, clsRoot = self.getCLsRootFunc(
             evaluationType = evaluationType,
             nSigma = nSigma )
