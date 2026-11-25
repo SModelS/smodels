@@ -8,6 +8,8 @@ Release v3.2.2, xxx
   * Increased verbosity in determineBrentBracket
   * mu=1e9 added to list of values tried out when bracketing UL
   * Phasing out getLlhds in favor of getNLLs
+  * In case a text database is given, and we have an unpickling error,
+    try repickling
   * Switched to hep_olll pypi packge
   * Database, changed to NN model with signal uncertainties for ATLAS-SUSY-2018-16,
     updated NN models for ATLAS-SUSY-2019-09, ATLAS-SUSY-2019-08
