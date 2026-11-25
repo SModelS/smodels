@@ -576,7 +576,9 @@ class SubDatabase(object):
                     except UnpicklingError as e:
                         logger.warning("Unpickling error, trying repickling." )
                         self.createBinaryFile()
-                        self.expResultList = serializer.load(f, encoding="latin1")
+                        f.close()
+                        with open(self.pcl_meta.pathname, "rb") as f:
+                            self.expResultList = serializer.load(f, encoding="latin1")
                     t1 = time.time()-t0
                     logger.info( f"Loaded database from {self.pcl_meta.pathname} in {t1:.1f} secs." )
                     self.databaseParticles = None
