@@ -569,9 +569,11 @@ class SubDatabase(object):
                         self.createBinaryFile()
                         return self
                     logger.info(f"loading binary db file {self.pcl_meta.pathname} format version {self.pcl_meta.format_version}" )
-                    if sys.version[0] == "2":
-                        self.expResultList = serializer.load(f)
-                    else:
+                    try:
+                        self.expResultList = serializer.load(f, encoding="latin1")
+                    except UnpicklingError as e:
+                        logger.warning("Unpickling error, trying repickling." )
+                        self.createBinaryFile()
                         self.expResultList = serializer.load(f, encoding="latin1")
                     t1 = time.time()-t0
                     logger.info( f"Loaded database from {self.pcl_meta.pathname} in {t1:.1f} secs." )
