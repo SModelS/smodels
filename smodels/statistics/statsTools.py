@@ -235,6 +235,24 @@ class CompRetriever:
         return upperLimitComputer
 
     @classmethod
+    def forRoofit( cls, regionSet : str, dataset : CombinedDataSet,
+                   nsigDict : dict ):
+        """ get a sub computer for a ROOT/roofit statistical model.
+
+        ROOT models are only supported through the spey-roofit backend,
+        so this factory simply delegates to :class:`SpeyRetriever`.
+
+        :param regionSet: name of signal region set
+        :param dataset: CombinedDataSet object
+        :param nsigDict: Dictionary with signal yields for each SR
+
+        :returns: a sub computer
+        """
+        from smodels.statistics.speyTools import SpeyRetriever
+        return SpeyRetriever.forRoofit(regionSet=regionSet, dataset=dataset,
+                                       nsigDict=nsigDict)
+
+    @classmethod
     def forHS3( cls, regionSet : str, dataset : CombinedDataSet,
                  nsigDict : dict ) -> "Hs3UpperLimitComputer":
         """ get a sub computer for HS3 combination.
@@ -375,7 +393,7 @@ class StatsComputer:
 
         Inspects the data type and statistical model of the theory
         prediction and delegates to the appropriate sub-computer factory
-        (SL, pyhf, HS3, NN, truncated Gaussian, or analyses combination).
+        (SL, pyhf, HS3, roofit, NN, truncated Gaussian, or analyses combination).
 
         :param theoryPrediction: a TheoryPrediction or TheoryPredictionsCombiner object
         :returns: a StatsComputer instance, or None if no suitable computer can be built
@@ -441,6 +459,9 @@ class StatsComputer:
                                                     nsigDict=srNsigDict))
                 elif model_type in [ "hs3", "full_hs3" ]:
                     computers.append(CompRetriever.forHS3(regionSet=regionSet,dataset=dataset,
+                                                    nsigDict=srNsigDict))
+                elif model_type in [ "roofit", "full_roofit" ]:
+                    computers.append(CompRetriever.forRoofit(regionSet=regionSet,dataset=dataset,
                                                     nsigDict=srNsigDict))
                 else:
                     logger.error(f"Unknown statistical model type {model_type} for regionSet {regionSet} in dataset {dataset}")
@@ -526,7 +547,7 @@ class StatsComputer:
         for subComputer in self.subComputers:
             if subComputer is None:
                 continue
-            if subComputer.dataType in [ "pyhf", "hs3", "truncGaussian", "analysesComb", "nn" ]:
+            if subComputer.dataType in [ "pyhf", "hs3", "roofit", "truncGaussian", "analysesComb", "nn" ]:
                 continue
             subComputer.likelihoodComputer.transform ( evaluationType )
 
@@ -537,7 +558,7 @@ class StatsComputer:
         for subComputer in self.subComputers:
             if subComputer is None:
                 continue
-            if subComputer.dataType in [ "pyhf", "hs3", "truncGaussian", "analysesComb" ]:
+            if subComputer.dataType in [ "pyhf", "hs3", "roofit", "truncGaussian", "analysesComb" ]:
                 continue
             subComputer.model = subComputer.origModel
 

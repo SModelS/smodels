@@ -9,13 +9,14 @@
 
 """
 
-__all__ = [ "SpeyRetriever"]
+__all__ = [ "SpeyRetriever", "SpeyRoofitData"]
 
 from typing import Optional
 from spey import ExpectationType, get_backend
 from smodels.base.physicsUnits import UnitXSec
 from smodels.statistics.exceptions import SModelSStatisticsError as SModelSError
 from smodels.experiment.datasetObj import DataSet, CombinedDataSet
+from smodels.statistics.speyRoofit import SpeyRoofitData
 # spey.set_optimiser( "iminuit" )
 
 from smodels.base.smodelsLogging import logger
@@ -320,6 +321,44 @@ class SpeyRetriever:
         #                             model_filename, xsec )
         # # os.unlink ( tempf )
         # return facade
+
+    @classmethod
+    def forRoofit(cls, regionSet: str, dataset: object, nsigDict: dict) -> SpeyModelFacade:
+        """ get a sub computer for a ROOT/roofit statistical model.
+
+        :param regionSet: name of signal region set
+        :param dataset: CombinedDataSet object
+        :param nsigDict: Dictionary with signal yields for each SR
+
+        :returns: a sub computer
+        """
+        data = SpeyRoofitData.createDataObject ( dataset, nsigDict, regionSet )
+        if data is None:
+            raise SModelSError ( f"regionSet {regionSet} in dataset "
+                                 f"{dataset.globalInfo.id} has no ROOT roofit model" )
+
+        try:
+            stat_wrapper = get_backend("root.roofit")
+        except Exception as e:
+            data.cleanup()
+            raise SModelSError(
+                "The root.roofit backend is needed for roofit statistical "
+                "models. Please install and register the spey-roofit plugin."
+            ) from e
+
+        analysis = dataset.globalInfo.id
+        try:
+            speyModel = stat_wrapper( workspace = data.rootFile,
+                                      signal_yields = data.signal_yields,
+                                      analysis = analysis )
+        except Exception:
+            data.cleanup()
+            raise
+        xsec = data.totalYield / dataset.globalInfo.lumi
+        facade = SpeyModelFacade ( speyModel, "roofit", data.rootFileName, xsec )
+        # Keep the temporary ROOT file alive for as long as the model is used.
+        facade.roofitData = data
+        return facade
 
     @classmethod
     def forPyhf(cls, regionSet: str, dataset: object, nsigDict: dict) -> SpeyModelFacade:

@@ -95,6 +95,7 @@ pythonTools = { "unum" : ExternalPythonTool("unum"),
                 "pyhf": ExternalPythonTool("pyhf",optional=True),
                 "pyhs3": ExternalPythonTool("pyhs3",optional=True),
                 "pytensor": ExternalPythonTool("pytensor",optional=True),
+                "spey_roofit": ExternalPythonTool("spey_roofit",optional=True),
                 "plotly": ExternalPythonTool("plotly",optional=True),
                 "pandas": ExternalPythonTool("pandas",optional=True),
                 "ipython": ExternalPythonTool("IPython",optional=True), }

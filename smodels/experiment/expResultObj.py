@@ -180,7 +180,7 @@ class ExpResult(object):
         :param idx: which index in a list (ignored if regionSetName==None)
         :param specifySL: if true, then say "slv1" or "slv2", not "sl"
 
-        :returns: one of: onnx, cov, json, hs3
+        :returns: one of: onnx, cov, json, hs3, roofit
         """
         if not self.hasStatsModel():
             return None
@@ -214,6 +214,8 @@ class ExpResult(object):
                 return "pyhf"
             if model_type in [ "full_hs3", "hs3" ]:
                 return "hs3"
+            if model_type in [ "full_roofit", "roofit" ]:
+                return "roofit"
         return "?"
 
     def isCombinableWith ( self, other ) -> bool:
