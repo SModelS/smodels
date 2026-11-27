@@ -98,7 +98,7 @@ The following (optional) fields are defined for each region:
 
 
 If any of the fields above is not given, the following default values are assumed:
-``type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels``
+``type = SR, smodels = None, pyhf = smodels, onnx = pyhf, sl = smodels, full_pyhf = pyhf``
 
 In case ``smodels`` is ``None``, the region is not used for computing signal contributions, but it can still be used for other purposes, such as nuisance fits.
 Finally, if ``regionMappings`` is not given, it is assumed that all regions appearing in ``regionSets`` (see below) are included in the mapping, with the SModelS name used for all fields and ``type = SR``.
