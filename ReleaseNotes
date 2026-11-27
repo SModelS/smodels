@@ -2,21 +2,23 @@ Release v3.2.2, xxx
 =======================================================
 
   * Fixed a bug with prefit CLs and upper limit values for NNs
-  * Allow model type "full_pyhf"
-  * Introduced convenience theoryprediction.experimentalId method
   * Small build fix for resummino adapter if gsl is in non-standard path
   * mu=1e9 added to list of values tried out when bracketing UL
   * Phasing out getLlhds in favor of getNLLs
-  * In case a text database is given, and we have an unpickling error,
-    try repickling
   * A "~" in database paths now expands to $HOME
-  * Switched to hep_olll pypi packge
   * Database, changed to NN model with signal uncertainties for ATLAS-SUSY-2018-16,
     updated NN models for ATLAS-SUSY-2019-09, ATLAS-SUSY-2019-08
-  * Small fix in pyhfInterface.totalYieldsFromSignals debugging method
+  * NNAdapter now imported from hep_olll (pypi)
+  * Introduce model type "full_pyhf" in statModels
+
+Changes that do not affect the end user:
+  * Introduced convenience theoryprediction.experimentalId method
+  * In case a text database is given, and we have an unpickling error,
+    try repickling (only affecting running in parallel on clusters
+    with text database)
   * Started modelMeta to document provenance of stats models
-  * Small change in how we internally name models
   * Increased verbosity in determineBrentBracket
+  * Small fix in pyhfInterface.totalYieldsFromSignals debugging method
 
 Release v3.2.1, Thu 1 Oct 2026
 =======================================================
